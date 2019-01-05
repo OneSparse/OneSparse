@@ -1,17 +1,20 @@
 #!/bin/bash
 
-set -e
-
 DB_HOST="pggraphblas-test-db"
 DB_NAME="postgres"
 SU="postgres"
 EXEC="docker exec $DB_HOST"
 
+echo force rm previous container
+docker rm -f pggraphblas-test-db
+
+set -e
+
 echo building test image
 docker build . -t pggraphblas/test
 
 echo running test container
-docker run -d --name "$DB_HOST" pggraphblas/test
+docker run --cap-add=SYS_PTRACE --security-opt seccomp=unconfined -d --name "$DB_HOST" pggraphblas/test
 
 $EXEC make clean
 $EXEC make install

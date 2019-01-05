@@ -28,6 +28,8 @@ typedef struct pgGrB_Matrix {
 } pgGrB_Matrix;
 
 
+static void context_callback_matrix_free(void*);
+
 PG_FUNCTION_INFO_V1(matrix_in);
 PG_FUNCTION_INFO_V1(matrix_out);
 
