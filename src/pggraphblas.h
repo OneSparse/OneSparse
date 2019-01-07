@@ -29,14 +29,19 @@ typedef struct pgGrB_Matrix {
 } pgGrB_Matrix;
 
 typedef struct pgGrB_Matrix_AggState {
-  Oid      elemtype;
+  /* Oid      elemtype; */
   List     *rows;
+  List     *cols;
+  List     *vals;
 } pgGrB_Matrix_AggState;
 
 static void context_callback_matrix_free(void*);
 
 PG_FUNCTION_INFO_V1(matrix_agg_acc);
 PG_FUNCTION_INFO_V1(matrix_final_int4);
+
+PG_FUNCTION_INFO_V1(matrix_extract);
+
 PG_FUNCTION_INFO_V1(matrix_in);
 PG_FUNCTION_INFO_V1(matrix_out);
 

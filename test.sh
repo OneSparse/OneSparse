@@ -31,11 +31,12 @@ done
 echo running tests
 $EXEC pg_prove -U "$SU" /pggraphblas/test.sql
 
-echo destroying test container and image
-
 if [ $# -eq 1 ]
-  then
+then
+    echo argument passed so waiting.  Press any key to finish.
     read tmp
 fi
+
+echo destroying test container and image
 
 docker rm --force "$DB_HOST"

@@ -3,7 +3,9 @@
 
 CREATE TYPE matrix;
 
-CREATE FUNCTION matrix_agg_acc(internal, bigint[])
+CREATE TYPE matrix_tuple AS (i bigint, j bigint, v real);
+
+CREATE FUNCTION matrix_agg_acc(internal, bigint, bigint, real)
 RETURNS internal
 AS '$libdir/pggraphblas', 'matrix_agg_acc'
 LANGUAGE C CALLED ON NULL INPUT;
@@ -12,6 +14,11 @@ CREATE FUNCTION matrix_final_int4(internal)
 RETURNS matrix
 AS '$libdir/pggraphblas', 'matrix_final_int4'
 LANGUAGE C CALLED ON NULL INPUT;
+
+CREATE FUNCTION matrix_extract(matrix)
+RETURNS SETOF matrix_tuple
+AS '$libdir/pggraphblas', 'matrix_extract'
+LANGUAGE C STABLE STRICT;
 
 CREATE FUNCTION matrix_in(cstring)
 RETURNS matrix
@@ -29,7 +36,7 @@ CREATE TYPE matrix (
     output = matrix_out
 );
 
-CREATE AGGREGATE matrix_agg (bigint[]) (
+CREATE AGGREGATE matrix_agg (bigint, bigint, real) (
     sfunc = matrix_agg_acc,
     stype = internal,
     finalfunc = matrix_final_int4
