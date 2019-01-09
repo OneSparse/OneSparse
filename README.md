@@ -18,9 +18,11 @@ TODO:
 * Generalize matrix type
 * polymorphic matrix_agg support all types
 * overload all the operators
+* parallel aggregates of subgraphs with final merging
 * everything above but for vectors
 
 UNKNOWNS:
     
 * operation descriptors, how to mask, invert, clear destination?
-* storage options?  CRS? CCS?        
+* storage options?  CRS? CCS? Tim Davis recommends just storing
+  extracted tuples for now

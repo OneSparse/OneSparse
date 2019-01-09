@@ -35,6 +35,13 @@ typedef struct pgGrB_Matrix_AggState {
   List     *vals;
 } pgGrB_Matrix_AggState;
 
+typedef struct pgGrB_Matrix_ExtractState {
+  pgGrB_Matrix *mat;
+  GrB_Index *rows;
+  GrB_Index *cols;
+  int64 *vals;
+} pgGrB_Matrix_ExtractState;
+
 static void context_callback_matrix_free(void*);
 
 PG_FUNCTION_INFO_V1(matrix_agg_acc);

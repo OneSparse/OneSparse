@@ -13,7 +13,7 @@ matrix_agg_acc(PG_FUNCTION_ARGS)
   pgGrB_Matrix_AggState *mstate;
   MemoryContext aggcxt;
   MemoryContext oldcxt;
-  Datum row, col, val;
+  Datum *row, *col, *val;
 
   if (!AggCheckCallContext(fcinfo, &aggcxt))
     elog(ERROR, "aggregate function called in non-aggregate context");
@@ -30,13 +30,17 @@ matrix_agg_acc(PG_FUNCTION_ARGS)
     mstate = (pgGrB_Matrix_AggState *)PG_GETARG_POINTER(0);
   }
 
-  row = PG_GETARG_INT64(1);
-  col = PG_GETARG_INT64(2);
-  val = PG_GETARG_FLOAT4(3);
+  row = palloc(sizeof(int64));
+  col = palloc(sizeof(int64));
+  val = palloc(sizeof(int64));
 
-  mstate->rows = lappend(mstate->rows, &row);
-  mstate->cols = lappend(mstate->cols, &col);
-  mstate->vals = lappend(mstate->vals, &val);
+  *row = PG_GETARG_INT64(1);
+  *col = PG_GETARG_INT64(2);
+  *val = PG_GETARG_INT64(3);
+
+  mstate->rows = lappend(mstate->rows, row);
+  mstate->cols = lappend(mstate->cols, col);
+  mstate->vals = lappend(mstate->vals, val);
 
   MemoryContextSwitchTo(oldcxt);
 
@@ -51,9 +55,9 @@ matrix_final_int4(PG_FUNCTION_ARGS) {
   MemoryContextCallback *ctxcb;
 
   pgGrB_Matrix_AggState *mstate = (pgGrB_Matrix_AggState*)PG_GETARG_POINTER(0);
-  size_t count = list_length(mstate->rows);
+  size_t n = 0, count = list_length(mstate->rows);
   GrB_Index *row_indices, *col_indices;
-  float4 *matrix_vals;
+  int64 *matrix_vals;
 
   ListCell *li, *lj, *lv;
 
@@ -71,15 +75,17 @@ matrix_final_int4(PG_FUNCTION_ARGS) {
 
   row_indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * count);
   col_indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * count);
-  matrix_vals = (float4*) palloc0(sizeof(float4) * count);
+  matrix_vals = (int64*) palloc0(sizeof(int64) * count);
 
   forthree (li, (mstate)->rows, lj, (mstate)->cols, lv, (mstate)->vals) {
-    row_indices[count] = DatumGetInt64(lfirst(li));
-    col_indices[count] = DatumGetInt64(lfirst(lj));
-    matrix_vals[count] = DatumGetInt64(lfirst(lv));
+    /* elog(NOTICE, "%lu", DatumGetInt64(*(Datum*)lfirst(li))); */
+    /* elog(NOTICE, "%lu", DatumGetInt64(*(Datum*)lfirst(lj))); */
+    /* elog(NOTICE, "%f", DatumGetFloat4(*(Datum*)lfirst(lv))); */
+    row_indices[n] = DatumGetInt64(*(Datum*)lfirst(li));
+    col_indices[n] = DatumGetInt64(*(Datum*)lfirst(lj));
+    matrix_vals[n] = DatumGetInt64(*(Datum*)lfirst(lv));
+    n++;
   }
-
-  elog(NOTICE, "%lu", count);
 
   CHECK(GrB_Matrix_new(&(retval->A),
                        GrB_FP32,
@@ -108,6 +114,7 @@ matrix_extract(PG_FUNCTION_ARGS) {
   HeapTuple tuple;
   GrB_Index nvals = 0;
   pgGrB_Matrix *mat;
+  pgGrB_Matrix_ExtractState *state;
 
   if (SRF_IS_FIRSTCALL()) {
     MemoryContext oldcontext;
@@ -115,9 +122,22 @@ matrix_extract(PG_FUNCTION_ARGS) {
     funcctx = SRF_FIRSTCALL_INIT();
     oldcontext = MemoryContextSwitchTo(funcctx->multi_call_memory_ctx);
     mat = (pgGrB_Matrix *) PG_GETARG_POINTER(0);
-    funcctx->user_fctx = (void*)mat;
+
+    state = (pgGrB_Matrix_ExtractState*)palloc(sizeof(pgGrB_Matrix_ExtractState));
     CHECK(GrB_Matrix_nvals(&nvals, mat->A));
+    
+    state->rows = (GrB_Index*) palloc0(sizeof(GrB_Index) * nvals);
+    state->cols = (GrB_Index*) palloc0(sizeof(GrB_Index) * nvals);
+    state->vals = (int64*) palloc0(sizeof(int64) * nvals);
+
+    CHECK(GrB_Matrix_extractTuples(state->rows,
+                                   state->cols,
+                                   state->vals,
+                                   &nvals,
+                                   mat->A));
+    state->mat = mat;
     funcctx->max_calls = nvals;
+    funcctx->user_fctx = (void*)state;
 
     /* One-time setup code appears here: */
     if (get_call_result_type(fcinfo, NULL, &tupdesc) != TYPEFUNC_COMPOSITE)
@@ -127,16 +147,18 @@ matrix_extract(PG_FUNCTION_ARGS) {
                       "that cannot accept type record")));
     BlessTupleDesc(tupdesc);
     funcctx->tuple_desc = tupdesc;
+    
     MemoryContextSwitchTo(oldcontext);
   }
 
   funcctx = SRF_PERCALL_SETUP();
-  mat = (pgGrB_Matrix*)funcctx->user_fctx;
+  state = (pgGrB_Matrix_ExtractState*)funcctx->user_fctx;
+  mat = state->mat;
 
   if (funcctx->call_cntr < funcctx->max_calls) {
-    values[0] = Int64GetDatum(1);
-    values[1] = Int64GetDatum(1);
-    values[2] = Float4GetDatum(1.0);
+    values[0] = Int64GetDatum(state->rows[funcctx->call_cntr]);
+    values[1] = Int64GetDatum(state->cols[funcctx->call_cntr]);
+    values[2] = Int64GetDatum(state->vals[funcctx->call_cntr]);
 
     tuple = heap_form_tuple(tupdesc, values, nulls);
     result = HeapTupleGetDatum(tuple);
@@ -161,7 +183,7 @@ matrix_in(PG_FUNCTION_ARGS)
   int count;
 
   GrB_Index *row_indices, *col_indices;
-  float4 *matrix_vals;
+  int64 *matrix_vals;
 
   /* A comment from the pg source...
    *
@@ -184,7 +206,7 @@ matrix_in(PG_FUNCTION_ARGS)
                            NULL);
 
   locfcinfo.arg[0] = PG_GETARG_DATUM(0);
-  locfcinfo.arg[1] = ObjectIdGetDatum(FLOAT4OID);
+  locfcinfo.arg[1] = ObjectIdGetDatum(INT8OID);
   locfcinfo.arg[2] = Int32GetDatum(-1);
   locfcinfo.argnull[0] = false;
   locfcinfo.argnull[1] = false;
@@ -213,10 +235,19 @@ matrix_in(PG_FUNCTION_ARGS)
 
   lb = ARR_LBOUND(vals);
   count = dims[0] + lb[0] - 1;
+  
 
   row_indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * count);
   col_indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * count);
-  matrix_vals = (float4*) palloc0(sizeof(float4) * count);
+  matrix_vals = (int64*) palloc0(sizeof(int64) * count);
+
+  int64 *data = (int64*)ARR_DATA_PTR(vals);
+
+  for (int i = 0; i < count; i++) {
+    row_indices[i] = data[i];
+    col_indices[i*2] = data[i*2];
+    matrix_vals[i*3] = data[i*3];
+  }
 
   retval = (pgGrB_Matrix*) palloc(sizeof(pgGrB_Matrix));
 
@@ -244,23 +275,22 @@ matrix_out(PG_FUNCTION_ARGS)
   pgGrB_Matrix *mat = (pgGrB_Matrix *) PG_GETARG_POINTER(0);
   char *result;
   GrB_Index nrows, ncols, nvals;
-  GrB_Index n;
 
   GrB_Index *row_indices, *col_indices;
-  float4 *matrix_vals;
+  int64 *matrix_vals;
 
   CHECK(GrB_Matrix_nrows(&nrows, mat->A));
   CHECK(GrB_Matrix_ncols(&ncols, mat->A));
   CHECK(GrB_Matrix_nvals(&nvals, mat->A));
 
-  row_indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * nrows);
-  col_indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * ncols);
-  matrix_vals = (float4*) palloc0(sizeof(float4) * nvals);
+  row_indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * nvals);
+  col_indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * nvals);
+  matrix_vals = (int64*) palloc0(sizeof(int64) * nvals);
 
   CHECK(GrB_Matrix_extractTuples(row_indices,
                                  col_indices,
                                  matrix_vals,
-                                 &n,
+                                 &nvals,
                                  mat->A));
 
   result = psprintf("{%lu, %lu, %lu}::matrix", nrows, ncols, nvals);
