@@ -52,6 +52,39 @@ PG_FUNCTION_INFO_V1(matrix_extract);
 PG_FUNCTION_INFO_V1(matrix_in);
 PG_FUNCTION_INFO_V1(matrix_out);
 
+PG_FUNCTION_INFO_V1(matrix_ncols);
+PG_FUNCTION_INFO_V1(matrix_nrows);
+PG_FUNCTION_INFO_V1(matrix_nvals);
+
+PG_FUNCTION_INFO_V1(matrix_x_matrix);
+
+/* Vectors */
+
+typedef struct pgGrB_Vector {
+  GrB_Vector V;
+} pgGrB_Vector;
+
+typedef struct pgGrB_Vector_AggState {
+  /* Oid      elemtype; */
+  List     *vals;
+} pgGrB_Vector_AggState;
+
+typedef struct pgGrB_Vector_ExtractState {
+  pgGrB_Vector *vec;
+  GrB_Index *size;
+} pgGrB_Vector_ExtractState;
+
+static void context_callback_vector_free(void*);
+
+PG_FUNCTION_INFO_V1(vector_agg_acc);
+PG_FUNCTION_INFO_V1(vector_final_int4);
+
+PG_FUNCTION_INFO_V1(vector_extract);
+
+PG_FUNCTION_INFO_V1(vector_in);
+PG_FUNCTION_INFO_V1(vector_out);
+
+
 void _PG_init(void);
 
 #endif /* PGGRAPHBLAS_H */

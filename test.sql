@@ -40,8 +40,7 @@ insert into graph (i, j, v) values
     (7, 3, 10);
 
 SELECT lives_ok($$
-    with graph as (
-      select matrix_agg(i, j, v) from graph)
+    with graph as (select matrix_agg(i, j, v) from graph)
     select matrix_extract(i) from graph x(i);
 $$, 'matrix_agg');
 

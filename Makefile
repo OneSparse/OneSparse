@@ -5,7 +5,7 @@ PG_CONFIG ?= pg_config
 DATA = $(wildcard *--*.sql)
 PGXS := $(shell $(PG_CONFIG) --pgxs)
 MODULE_big = pggraphblas
-OBJS = $(patsubst %.c,%.o,$(wildcard src/*.c))
+OBJS = $(patsubst %.c,%.o,$(wildcard src/pggraphblas.c))
 SHLIB_LINK = -lgraphblas
 PG_CPPFLAGS = -O0
 

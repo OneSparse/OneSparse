@@ -30,6 +30,26 @@ RETURNS cstring
 AS '$libdir/pggraphblas', 'matrix_out'
 LANGUAGE C IMMUTABLE STRICT;
 
+CREATE FUNCTION matrix_nrows(matrix)
+RETURNS bigint
+AS '$libdir/pggraphblas', 'matrix_nrows'
+LANGUAGE C STABLE STRICT;
+
+CREATE FUNCTION matrix_ncols(matrix)
+RETURNS bigint
+AS '$libdir/pggraphblas', 'matrix_ncols'
+LANGUAGE C STABLE STRICT;
+
+CREATE FUNCTION matrix_nvals(matrix)
+RETURNS bigint
+AS '$libdir/pggraphblas', 'matrix_nvals'
+LANGUAGE C STABLE STRICT;
+
+CREATE FUNCTION matrix_x_matrix(matrix, matrix)
+RETURNS matrix
+AS '$libdir/pggraphblas', 'matrix_x_matrix'
+LANGUAGE C STABLE STRICT;
+            
 CREATE TYPE matrix (
     internallength = 8,
     input = matrix_in,
@@ -41,3 +61,9 @@ CREATE AGGREGATE matrix_agg (bigint, bigint, bigint) (
     stype = internal,
     finalfunc = matrix_final_int4
 );
+
+CREATE OPERATOR * (
+    leftarg = matrix,
+    rightarg = matrix,
+    procedure = matrix_x_matrix
+);    
