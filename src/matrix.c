@@ -68,7 +68,7 @@ matrix_final_int4(PG_FUNCTION_ARGS) {
   ctxcb = (MemoryContextCallback*) palloc(sizeof(MemoryContextCallback));
   ctxcb->func = context_callback_matrix_free;
   ctxcb->arg = retval;
-  MemoryContextRegisterResetCallback(CurrentMemoryContext, ctxcb);
+  MemoryContextRegisterResetCallback(CurTransactionContext, ctxcb);
 
   row_indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * count);
   col_indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * count);
@@ -122,7 +122,7 @@ matrix_extract(PG_FUNCTION_ARGS) {
 
     state = (pgGrB_Matrix_ExtractState*)palloc(sizeof(pgGrB_Matrix_ExtractState));
     CHECK(GrB_Matrix_nvals(&nvals, mat->A));
-    
+
     state->rows = (GrB_Index*) palloc0(sizeof(GrB_Index) * nvals);
     state->cols = (GrB_Index*) palloc0(sizeof(GrB_Index) * nvals);
     state->vals = (int64*) palloc0(sizeof(int64) * nvals);
@@ -144,7 +144,7 @@ matrix_extract(PG_FUNCTION_ARGS) {
                       "that cannot accept type record")));
     BlessTupleDesc(tupdesc);
     funcctx->tuple_desc = tupdesc;
-    
+
     MemoryContextSwitchTo(oldcontext);
   }
 
@@ -157,7 +157,7 @@ matrix_extract(PG_FUNCTION_ARGS) {
     values[1] = Int64GetDatum(state->cols[funcctx->call_cntr]);
     values[2] = Int64GetDatum(state->vals[funcctx->call_cntr]);
 
-    tuple = heap_form_tuple(tupdesc, values, nulls);
+    tuple = heap_form_tuple(funcctx->tuple_desc, values, nulls);
     result = HeapTupleGetDatum(tuple);
     SRF_RETURN_NEXT(funcctx, result);
   } else {
@@ -328,18 +328,37 @@ matrix_x_matrix(PG_FUNCTION_ARGS) {
   GrB_Info info;
   pgGrB_Matrix *A, *B, *C;
   GrB_Index m, n;
-  
+
   A = (pgGrB_Matrix *) PG_GETARG_POINTER(0);
   CHECK(GrB_Matrix_nrows(&m, A->A));
-                         
+
   B = (pgGrB_Matrix *) PG_GETARG_POINTER(1);
   CHECK(GrB_Matrix_ncols(&n, B->A));
 
   C = (pgGrB_Matrix *) palloc0(sizeof(pgGrB_Matrix));
-                         
+
   CHECK(GrB_Matrix_new (&(C->A), GrB_INT64, m, n));
-  
+
   CHECK(GrB_mxm(C->A, NULL, NULL, GxB_PLUS_TIMES_INT64, A->A, B->A, NULL));
   PG_RETURN_POINTER(C);
 }
 
+Datum
+matrix_ewise_mult(PG_FUNCTION_ARGS) {
+  GrB_Info info;
+  pgGrB_Matrix *A, *B, *C;
+  GrB_Index m, n;
+
+  A = (pgGrB_Matrix *) PG_GETARG_POINTER(0);
+  CHECK(GrB_Matrix_nrows(&m, A->A));
+
+  B = (pgGrB_Matrix *) PG_GETARG_POINTER(1);
+  CHECK(GrB_Matrix_ncols(&n, B->A));
+
+  C = (pgGrB_Matrix *) palloc0(sizeof(pgGrB_Matrix));
+
+  CHECK(GrB_Matrix_new (&(C->A), GrB_INT64, m, n));
+
+  CHECK(GrB_eWiseMult(C->A, NULL, NULL, GrB_TIMES_INT64, A->A, B->A, NULL));
+  PG_RETURN_POINTER(C);
+}
