@@ -8,8 +8,7 @@ Datum
 matrix_agg_acc(PG_FUNCTION_ARGS)
 {
   pgGrB_Matrix_AggState *mstate;
-  MemoryContext aggcxt;
-  MemoryContext oldcxt;
+  MemoryContext aggcxt, oldcxt;
   Datum *row, *col, *val;
 
   if (!AggCheckCallContext(fcinfo, &aggcxt))
@@ -49,6 +48,7 @@ matrix_final_int4(PG_FUNCTION_ARGS) {
   GrB_Info info;
   pgGrB_Matrix *retval;
 
+  MemoryContext oldcxt;
   MemoryContextCallback *ctxcb;
 
   pgGrB_Matrix_AggState *mstate = (pgGrB_Matrix_AggState*)PG_GETARG_POINTER(0);
@@ -63,13 +63,6 @@ matrix_final_int4(PG_FUNCTION_ARGS) {
 
   mstate = (pgGrB_Matrix_AggState *)PG_GETARG_POINTER(0);
 
-  retval = (pgGrB_Matrix*)palloc(sizeof(pgGrB_Matrix));
-
-  ctxcb = (MemoryContextCallback*) palloc(sizeof(MemoryContextCallback));
-  ctxcb->func = context_callback_matrix_free;
-  ctxcb->arg = retval;
-  MemoryContextRegisterResetCallback(CurTransactionContext, ctxcb);
-
   row_indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * count);
   col_indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * count);
   matrix_vals = (int64*) palloc0(sizeof(int64) * count);
@@ -83,6 +76,17 @@ matrix_final_int4(PG_FUNCTION_ARGS) {
     matrix_vals[n] = DatumGetInt64(*(Datum*)lfirst(lv));
     n++;
   }
+
+  // oldcxt = MemoryContextSwitchTo(CurTransactionContext);
+  
+  retval = (pgGrB_Matrix*)palloc(sizeof(pgGrB_Matrix));
+
+  ctxcb = (MemoryContextCallback*) palloc(sizeof(MemoryContextCallback));
+  ctxcb->func = context_callback_matrix_free;
+  ctxcb->arg = retval;
+  MemoryContextRegisterResetCallback(CurTransactionContext, ctxcb);
+
+  // MemoryContextSwitchTo(oldcxt);
 
   CHECK(GrB_Matrix_new(&(retval->A),
                        GrB_INT64,
@@ -171,6 +175,8 @@ matrix_in(PG_FUNCTION_ARGS)
   GrB_Info info;
   pgGrB_Matrix *retval;
 
+  MemoryContext oldcxt;
+  
   MemoryContextCallback *ctxcb;
 
   Datum arr;
@@ -245,12 +251,15 @@ matrix_in(PG_FUNCTION_ARGS)
     matrix_vals[i] = data[i+count+count];
   }
 
+
+  //  oldcxt = MemoryContextSwitchTo(CurTransactionContext);
   retval = (pgGrB_Matrix*) palloc(sizeof(pgGrB_Matrix));
 
   ctxcb = (MemoryContextCallback*) palloc(sizeof(MemoryContextCallback));
   ctxcb->func = context_callback_matrix_free;
   ctxcb->arg = retval;
-  MemoryContextRegisterResetCallback(CurrentMemoryContext, ctxcb);
+  MemoryContextRegisterResetCallback(CurTransactionContext, ctxcb);
+  //  MemoryContextSwitchTo(oldcxt);
 
   CHECK(GrB_Matrix_new(&(retval->A), GrB_INT64, count + 1, count + 1));
 
@@ -323,20 +332,22 @@ matrix_nvals(PG_FUNCTION_ARGS) {
   return Int64GetDatum(count);
 }
 
+#define BINOP_PREAMBLE()                        \
+  do {                                          \
+    A = (pgGrB_Matrix *) PG_GETARG_POINTER(0);  \
+    B = (pgGrB_Matrix *) PG_GETARG_POINTER(1);        \
+    C = (pgGrB_Matrix *) palloc0(sizeof(pgGrB_Matrix)); \
+  } while (0)
+
 Datum
 matrix_x_matrix(PG_FUNCTION_ARGS) {
   GrB_Info info;
   pgGrB_Matrix *A, *B, *C;
   GrB_Index m, n;
+  BINOP_PREAMBLE();
 
-  A = (pgGrB_Matrix *) PG_GETARG_POINTER(0);
   CHECK(GrB_Matrix_nrows(&m, A->A));
-
-  B = (pgGrB_Matrix *) PG_GETARG_POINTER(1);
   CHECK(GrB_Matrix_ncols(&n, B->A));
-
-  C = (pgGrB_Matrix *) palloc0(sizeof(pgGrB_Matrix));
-
   CHECK(GrB_Matrix_new (&(C->A), GrB_INT64, m, n));
 
   CHECK(GrB_mxm(C->A, NULL, NULL, GxB_PLUS_TIMES_INT64, A->A, B->A, NULL));
@@ -348,17 +359,27 @@ matrix_ewise_mult(PG_FUNCTION_ARGS) {
   GrB_Info info;
   pgGrB_Matrix *A, *B, *C;
   GrB_Index m, n;
+  BINOP_PREAMBLE();
 
-  A = (pgGrB_Matrix *) PG_GETARG_POINTER(0);
   CHECK(GrB_Matrix_nrows(&m, A->A));
-
-  B = (pgGrB_Matrix *) PG_GETARG_POINTER(1);
-  CHECK(GrB_Matrix_ncols(&n, B->A));
-
-  C = (pgGrB_Matrix *) palloc0(sizeof(pgGrB_Matrix));
-
+  CHECK(GrB_Matrix_ncols(&n, A->A));
   CHECK(GrB_Matrix_new (&(C->A), GrB_INT64, m, n));
 
   CHECK(GrB_eWiseMult(C->A, NULL, NULL, GrB_TIMES_INT64, A->A, B->A, NULL));
+  PG_RETURN_POINTER(C);
+}
+
+Datum
+matrix_ewise_add(PG_FUNCTION_ARGS) {
+  GrB_Info info;
+  pgGrB_Matrix *A, *B, *C;
+  GrB_Index m, n;
+  BINOP_PREAMBLE();
+  
+  CHECK(GrB_Matrix_nrows(&m, A->A));
+  CHECK(GrB_Matrix_ncols(&n, A->A));
+  CHECK(GrB_Matrix_new (&(C->A), GrB_INT64, m, n));
+
+  CHECK(GrB_eWiseAdd(C->A, NULL, NULL, GrB_PLUS_INT64, A->A, B->A, NULL));
   PG_RETURN_POINTER(C);
 }

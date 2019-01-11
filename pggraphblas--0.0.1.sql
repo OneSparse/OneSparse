@@ -55,6 +55,11 @@ RETURNS matrix
 AS '$libdir/pggraphblas', 'matrix_ewise_mult'
 LANGUAGE C STABLE STRICT;
 
+CREATE FUNCTION matrix_ewise_add(matrix, matrix)
+RETURNS matrix
+AS '$libdir/pggraphblas', 'matrix_ewise_add'
+LANGUAGE C STABLE STRICT;
+    
 CREATE TYPE matrix (
     internallength = 8,
     input = matrix_in,
@@ -73,9 +78,15 @@ CREATE OPERATOR * (
     procedure = matrix_x_matrix
 );
 
-
 CREATE OPERATOR && (
     leftarg = matrix,
     rightarg = matrix,
     procedure = matrix_ewise_mult
 );
+
+CREATE OPERATOR || (
+    leftarg = matrix,
+    rightarg = matrix,
+    procedure = matrix_ewise_add
+);
+    
