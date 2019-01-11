@@ -98,7 +98,7 @@ matrix_final_int4(PG_FUNCTION_ARGS) {
                          col_indices,
                          matrix_vals,
                          count,
-                         GrB_SECOND_FP32));
+                         GrB_SECOND_INT64));
   PG_RETURN_POINTER(retval);
 }
 
@@ -268,7 +268,7 @@ matrix_in(PG_FUNCTION_ARGS)
                          col_indices,
                          matrix_vals,
                          count,
-                         GrB_PLUS_FP32));
+                         GrB_PLUS_INT64));
 
   PG_RETURN_POINTER(retval);
 }
@@ -332,10 +332,10 @@ matrix_nvals(PG_FUNCTION_ARGS) {
   return Int64GetDatum(count);
 }
 
-#define BINOP_PREAMBLE()                        \
-  do {                                          \
-    A = (pgGrB_Matrix *) PG_GETARG_POINTER(0);  \
-    B = (pgGrB_Matrix *) PG_GETARG_POINTER(1);        \
+#define MATRIX_BINOP_PREAMBLE()                         \
+  do {                                                  \
+    A = (pgGrB_Matrix *) PG_GETARG_POINTER(0);          \
+    B = (pgGrB_Matrix *) PG_GETARG_POINTER(1);          \
     C = (pgGrB_Matrix *) palloc0(sizeof(pgGrB_Matrix)); \
   } while (0)
 
@@ -344,7 +344,7 @@ matrix_x_matrix(PG_FUNCTION_ARGS) {
   GrB_Info info;
   pgGrB_Matrix *A, *B, *C;
   GrB_Index m, n;
-  BINOP_PREAMBLE();
+  MATRIX_BINOP_PREAMBLE();
 
   CHECK(GrB_Matrix_nrows(&m, A->A));
   CHECK(GrB_Matrix_ncols(&n, B->A));
@@ -359,7 +359,7 @@ matrix_ewise_mult(PG_FUNCTION_ARGS) {
   GrB_Info info;
   pgGrB_Matrix *A, *B, *C;
   GrB_Index m, n;
-  BINOP_PREAMBLE();
+  MATRIX_BINOP_PREAMBLE();
 
   CHECK(GrB_Matrix_nrows(&m, A->A));
   CHECK(GrB_Matrix_ncols(&n, A->A));
@@ -374,7 +374,7 @@ matrix_ewise_add(PG_FUNCTION_ARGS) {
   GrB_Info info;
   pgGrB_Matrix *A, *B, *C;
   GrB_Index m, n;
-  BINOP_PREAMBLE();
+  MATRIX_BINOP_PREAMBLE();
   
   CHECK(GrB_Matrix_nrows(&m, A->A));
   CHECK(GrB_Matrix_ncols(&n, A->A));

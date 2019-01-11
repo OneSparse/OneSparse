@@ -17,7 +17,7 @@ insert into graph (i, j, v) values
     (6, 3, 9),
     (7, 3, 10);
 
-create function test_mult() returns setof matrix_tuple as $$
+create function test_m_mult() returns setof matrix_tuple as $$
     declare m matrix;
     begin
         select matrix_agg(i, j, v) from graph into m;
@@ -25,7 +25,7 @@ create function test_mult() returns setof matrix_tuple as $$
     end;
 $$ language plpgsql;
 
-create function test_ewise_mult() returns setof matrix_tuple as $$
+create function test_m_ewise_mult() returns setof matrix_tuple as $$
     declare m matrix;
     begin
         select matrix_agg(i, j, v) from graph into m;
@@ -33,10 +33,27 @@ create function test_ewise_mult() returns setof matrix_tuple as $$
     end;
 $$ language plpgsql;
     
-create function test_ewise_add() returns setof matrix_tuple as $$
+create function test_m_ewise_add() returns setof matrix_tuple as $$
     declare m matrix;
     begin
         select matrix_agg(i, j, v) from graph into m;
         return query select * from matrix_extract(m || m);
+    end;
+$$ language plpgsql;
+
+
+create function test_v_ewise_mult() returns setof vector_tuple as $$
+    declare m vector;
+    begin
+        select vector_agg(i, v) from graph into m;
+        return query select * from vector_extract(m && m);
+    end;
+$$ language plpgsql;
+    
+create function test_v_ewise_add() returns setof vector_tuple as $$
+    declare m vector;
+    begin
+        select vector_agg(i, v) from graph into m;
+        return query select * from vector_extract(m || m);
     end;
 $$ language plpgsql;

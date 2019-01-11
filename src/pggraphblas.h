@@ -68,12 +68,14 @@ typedef struct pgGrB_Vector {
 
 typedef struct pgGrB_Vector_AggState {
   /* Oid      elemtype; */
-  List     *vals;
+  List     *I;
+  List     *X;
 } pgGrB_Vector_AggState;
 
 typedef struct pgGrB_Vector_ExtractState {
   pgGrB_Vector *vec;
-  GrB_Index *size;
+  GrB_Index *rows;
+  int64 *vals;
 } pgGrB_Vector_ExtractState;
 
 static void context_callback_vector_free(void*);
@@ -86,6 +88,8 @@ PG_FUNCTION_INFO_V1(vector_extract);
 PG_FUNCTION_INFO_V1(vector_in);
 PG_FUNCTION_INFO_V1(vector_out);
 
+PG_FUNCTION_INFO_V1(vector_ewise_mult);
+PG_FUNCTION_INFO_V1(vector_ewise_add);
 
 void _PG_init(void);
 

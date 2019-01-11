@@ -90,3 +90,66 @@ CREATE OPERATOR || (
     procedure = matrix_ewise_add
 );
     
+CREATE TYPE vector;
+
+CREATE TYPE vector_tuple AS (i bigint, j bigint);
+
+CREATE FUNCTION vector_agg_acc(internal, bigint, bigint)
+RETURNS internal
+AS '$libdir/pggraphblas', 'vector_agg_acc'
+LANGUAGE C CALLED ON NULL INPUT;
+
+CREATE FUNCTION vector_final_int4(internal)
+RETURNS vector
+AS '$libdir/pggraphblas', 'vector_final_int4'
+LANGUAGE C CALLED ON NULL INPUT;
+
+CREATE FUNCTION vector_extract(vector)
+RETURNS SETOF vector_tuple
+AS '$libdir/pggraphblas', 'vector_extract'
+LANGUAGE C STABLE STRICT;
+
+CREATE FUNCTION vector_in(cstring)
+RETURNS vector
+AS '$libdir/pggraphblas', 'vector_in'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION vector_out(vector)
+RETURNS cstring
+AS '$libdir/pggraphblas', 'vector_out'
+LANGUAGE C IMMUTABLE STRICT;
+    
+CREATE FUNCTION vector_ewise_mult(vector, vector)
+RETURNS vector
+AS '$libdir/pggraphblas', 'vector_ewise_mult'
+LANGUAGE C STABLE STRICT;
+
+CREATE FUNCTION vector_ewise_add(vector, vector)
+RETURNS vector
+AS '$libdir/pggraphblas', 'vector_ewise_add'
+LANGUAGE C STABLE STRICT;
+
+CREATE TYPE vector (
+    internallength = 8,
+    input = vector_in,
+    output = vector_out
+);
+
+CREATE AGGREGATE vector_agg (bigint, bigint) (
+    sfunc = vector_agg_acc,
+    stype = internal,
+    finalfunc = vector_final_int4
+);
+
+CREATE OPERATOR && (
+    leftarg = vector,
+    rightarg = vector,
+    procedure = vector_ewise_mult
+);
+
+CREATE OPERATOR || (
+    leftarg = vector,
+    rightarg = vector,
+    procedure = vector_ewise_add
+);
+    
