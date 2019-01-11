@@ -15,9 +15,9 @@ RETURNS matrix
 AS '$libdir/pggraphblas', 'matrix_final_int4'
 LANGUAGE C CALLED ON NULL INPUT;
 
-CREATE FUNCTION matrix_extract(matrix)
+CREATE FUNCTION matrix_tuples(matrix)
 RETURNS SETOF matrix_tuple
-AS '$libdir/pggraphblas', 'matrix_extract'
+AS '$libdir/pggraphblas', 'matrix_tuples'
 LANGUAGE C STABLE STRICT;
 
 CREATE FUNCTION matrix_in(cstring)
@@ -104,9 +104,9 @@ RETURNS vector
 AS '$libdir/pggraphblas', 'vector_final_int4'
 LANGUAGE C CALLED ON NULL INPUT;
 
-CREATE FUNCTION vector_extract(vector)
+CREATE FUNCTION vector_tuples(vector)
 RETURNS SETOF vector_tuple
-AS '$libdir/pggraphblas', 'vector_extract'
+AS '$libdir/pggraphblas', 'vector_tuples'
 LANGUAGE C STABLE STRICT;
 
 CREATE FUNCTION vector_in(cstring)

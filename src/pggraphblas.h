@@ -47,7 +47,7 @@ static void context_callback_matrix_free(void*);
 PG_FUNCTION_INFO_V1(matrix_agg_acc);
 PG_FUNCTION_INFO_V1(matrix_final_int4);
 
-PG_FUNCTION_INFO_V1(matrix_extract);
+PG_FUNCTION_INFO_V1(matrix_tuples);
 
 PG_FUNCTION_INFO_V1(matrix_in);
 PG_FUNCTION_INFO_V1(matrix_out);
@@ -83,7 +83,7 @@ static void context_callback_vector_free(void*);
 PG_FUNCTION_INFO_V1(vector_agg_acc);
 PG_FUNCTION_INFO_V1(vector_final_int4);
 
-PG_FUNCTION_INFO_V1(vector_extract);
+PG_FUNCTION_INFO_V1(vector_tuples);
 
 PG_FUNCTION_INFO_V1(vector_in);
 PG_FUNCTION_INFO_V1(vector_out);

@@ -104,7 +104,7 @@ matrix_final_int4(PG_FUNCTION_ARGS) {
 
 
 Datum
-matrix_extract(PG_FUNCTION_ARGS) {
+matrix_tuples(PG_FUNCTION_ARGS) {
   GrB_Info info;
   FuncCallContext  *funcctx;
   TupleDesc tupdesc;
