@@ -57,6 +57,9 @@ PG_FUNCTION_INFO_V1(matrix_nrows);
 PG_FUNCTION_INFO_V1(matrix_nvals);
 
 PG_FUNCTION_INFO_V1(matrix_x_matrix);
+PG_FUNCTION_INFO_V1(matrix_x_vector);
+PG_FUNCTION_INFO_V1(vector_x_matrix);
+
 PG_FUNCTION_INFO_V1(matrix_ewise_mult);
 PG_FUNCTION_INFO_V1(matrix_ewise_add);
 

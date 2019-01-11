@@ -355,6 +355,42 @@ matrix_x_matrix(PG_FUNCTION_ARGS) {
 }
 
 Datum
+matrix_x_vector(PG_FUNCTION_ARGS) {
+  GrB_Info info;
+  pgGrB_Matrix *A;
+  pgGrB_Vector *B, *C;
+  GrB_Index size;
+
+  A = (pgGrB_Matrix *) PG_GETARG_POINTER(0);            \
+  B = (pgGrB_Vector *) PG_GETARG_POINTER(1);            \
+  C = (pgGrB_Vector *) palloc0(sizeof(pgGrB_Vector));   \
+
+  CHECK(GrB_Vector_size(&size, B->V));
+  CHECK(GrB_Vector_new (&(C->V), GrB_INT64, size));
+
+  CHECK(GrB_mxv(C->V, NULL, NULL, GxB_PLUS_TIMES_INT64, A->A, B->V, NULL));
+  PG_RETURN_POINTER(C);
+}
+
+Datum
+vector_x_matrix(PG_FUNCTION_ARGS) {
+  GrB_Info info;
+  pgGrB_Matrix *B;
+  pgGrB_Vector *A, *C;
+  GrB_Index size;
+
+  A = (pgGrB_Vector *) PG_GETARG_POINTER(0);
+  B = (pgGrB_Matrix *) PG_GETARG_POINTER(1);
+  C = (pgGrB_Vector *) palloc0(sizeof(pgGrB_Vector));
+
+  CHECK(GrB_Vector_size(&size, A->V));
+  CHECK(GrB_Vector_new (&(C->V), GrB_INT64, size));
+
+  CHECK(GrB_vxm(C->V, NULL, NULL, GxB_PLUS_TIMES_INT64, A->V, B->A, NULL));
+  PG_RETURN_POINTER(C);
+}
+
+Datum
 matrix_ewise_mult(PG_FUNCTION_ARGS) {
   GrB_Info info;
   pgGrB_Matrix *A, *B, *C;

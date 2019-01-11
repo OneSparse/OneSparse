@@ -1,8 +1,8 @@
 #include "pggraphblas.h"
 PG_MODULE_MAGIC;
 
-#include "matrix.c"
 #include "vector.c"
+#include "matrix.c"
 
 void
 _PG_init(void)

@@ -2,6 +2,7 @@
 \echo Use "CREATE EXTENSION pggraphblas" to load this file. \quit
 
 CREATE TYPE matrix;
+CREATE TYPE vector;
 
 CREATE TYPE matrix_tuple AS (i bigint, j bigint, v bigint);
 
@@ -50,6 +51,16 @@ RETURNS matrix
 AS '$libdir/pggraphblas', 'matrix_x_matrix'
 LANGUAGE C STABLE STRICT;
 
+CREATE FUNCTION matrix_x_vector(matrix, vector)
+RETURNS vector
+AS '$libdir/pggraphblas', 'matrix_x_vector'
+LANGUAGE C STABLE STRICT;
+
+CREATE FUNCTION vector_x_matrix(vector, matrix)
+RETURNS vector
+AS '$libdir/pggraphblas', 'vector_x_matrix'
+LANGUAGE C STABLE STRICT;
+
 CREATE FUNCTION matrix_ewise_mult(matrix, matrix)
 RETURNS matrix
 AS '$libdir/pggraphblas', 'matrix_ewise_mult'
@@ -78,6 +89,18 @@ CREATE OPERATOR * (
     procedure = matrix_x_matrix
 );
 
+CREATE OPERATOR * (
+    leftarg = vector,
+    rightarg = matrix,
+    procedure = vector_x_matrix
+);
+    
+CREATE OPERATOR * (
+    leftarg = matrix,
+    rightarg = vector,
+    procedure = matrix_x_vector
+);
+    
 CREATE OPERATOR && (
     leftarg = matrix,
     rightarg = matrix,
@@ -90,8 +113,6 @@ CREATE OPERATOR || (
     procedure = matrix_ewise_add
 );
     
-CREATE TYPE vector;
-
 CREATE TYPE vector_tuple AS (i bigint, j bigint);
 
 CREATE FUNCTION vector_agg_acc(internal, bigint, bigint)
@@ -141,13 +162,13 @@ CREATE AGGREGATE vector_agg (bigint, bigint) (
     finalfunc = vector_final_int4
 );
 
-CREATE OPERATOR && (
+CREATE OPERATOR * (
     leftarg = vector,
     rightarg = vector,
     procedure = vector_ewise_mult
 );
 
-CREATE OPERATOR || (
+CREATE OPERATOR + (
     leftarg = vector,
     rightarg = vector,
     procedure = vector_ewise_add
