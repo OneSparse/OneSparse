@@ -1,8 +1,27 @@
 -- complain if script is sourced in psql, rather than via CREATE EXTENSION
 \echo Use "CREATE EXTENSION pggraphblas" to load this file. \quit
 
-CREATE TYPE matrix;
 CREATE TYPE vector;
+CREATE TYPE vector_tuple AS (i bigint, j bigint);
+
+CREATE FUNCTION vector_in(cstring)
+RETURNS vector
+AS '$libdir/pggraphblas', 'vector_in'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION vector_out(vector)
+RETURNS cstring
+AS '$libdir/pggraphblas', 'vector_out'
+LANGUAGE C IMMUTABLE STRICT;
+    
+CREATE TYPE vector (
+    internallength = 8,
+    input = vector_in,
+    output = vector_out
+);
+    
+
+CREATE TYPE matrix;
 
 CREATE TYPE matrix_tuple AS (i bigint, j bigint, v bigint);
 
@@ -113,8 +132,6 @@ CREATE OPERATOR || (
     procedure = matrix_ewise_add
 );
     
-CREATE TYPE vector_tuple AS (i bigint, j bigint);
-
 CREATE FUNCTION vector_agg_acc(internal, bigint, bigint)
 RETURNS internal
 AS '$libdir/pggraphblas', 'vector_agg_acc'
@@ -130,16 +147,6 @@ RETURNS SETOF vector_tuple
 AS '$libdir/pggraphblas', 'vector_tuples'
 LANGUAGE C STABLE STRICT;
 
-CREATE FUNCTION vector_in(cstring)
-RETURNS vector
-AS '$libdir/pggraphblas', 'vector_in'
-LANGUAGE C IMMUTABLE STRICT;
-
-CREATE FUNCTION vector_out(vector)
-RETURNS cstring
-AS '$libdir/pggraphblas', 'vector_out'
-LANGUAGE C IMMUTABLE STRICT;
-    
 CREATE FUNCTION vector_ewise_mult(vector, vector)
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_ewise_mult'
@@ -149,12 +156,6 @@ CREATE FUNCTION vector_ewise_add(vector, vector)
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_ewise_add'
 LANGUAGE C STABLE STRICT;
-
-CREATE TYPE vector (
-    internallength = 8,
-    input = vector_in,
-    output = vector_out
-);
 
 CREATE AGGREGATE vector_agg (bigint, bigint) (
     sfunc = vector_agg_acc,

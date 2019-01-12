@@ -44,6 +44,8 @@ typedef struct pgGrB_Matrix_ExtractState {
 
 static void context_callback_matrix_free(void*);
 
+ArrayType* new_int64ArrayType(int);
+
 PG_FUNCTION_INFO_V1(matrix_agg_acc);
 PG_FUNCTION_INFO_V1(matrix_final_int4);
 
@@ -97,3 +99,4 @@ PG_FUNCTION_INFO_V1(vector_ewise_add);
 void _PG_init(void);
 
 #endif /* PGGRAPHBLAS_H */
+

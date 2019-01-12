@@ -161,6 +161,10 @@ vector_tuples(PG_FUNCTION_ARGS) {
 Datum
 vector_in(PG_FUNCTION_ARGS)
 {
+
+  /* This is all wrong and provisional until I can get my head around
+     the ::array API. */
+  
   GrB_Info info;
   pgGrB_Vector *retval;
 
@@ -215,15 +219,11 @@ vector_in(PG_FUNCTION_ARGS)
   }
 
   ndim = ARR_NDIM(vals);
-  if (ndim != 2) {
-    ereport(ERROR, (errmsg("Two-dimesional arrays are required")));
+  if (ndim != 1) {
+    ereport(ERROR, (errmsg("One-dimesional array is required")));
   }
 
   dims = ARR_DIMS(vals);
-
-  if (dims[0] != 2) {
-    ereport(ERROR, (errmsg("First dimension must contain 3 arrays")));
-  }
 
   lb = ARR_LBOUND(vals);
   count = dims[0] + lb[0] - 1;
@@ -233,11 +233,10 @@ vector_in(PG_FUNCTION_ARGS)
 
   data = (int64*)ARR_DATA_PTR(vals);
 
-  for (int i = 0; i < count; i++) {
-    row_indices[i] = data[i];
-    vector_vals[i] = data[i+count+count];
+  for (int64 i = 0; i < count; i++) {
+    row_indices[i] = i;
+    vector_vals[i] = data[i];
   }
-
 
   //  oldcxt = MemoryContextSwitchTo(CurTransactionContext);
   retval = (pgGrB_Vector*) palloc(sizeof(pgGrB_Vector));
@@ -262,6 +261,10 @@ vector_in(PG_FUNCTION_ARGS)
 Datum
 vector_out(PG_FUNCTION_ARGS)
 {
+
+  /* This is all wrong and provisional until I can get my head around
+     the ::array API. */
+  
   GrB_Info info;
   pgGrB_Vector *vec = (pgGrB_Vector *) PG_GETARG_POINTER(0);
   char *result;
@@ -269,6 +272,7 @@ vector_out(PG_FUNCTION_ARGS)
 
   GrB_Index *row_indices;
   int64 *vector_vals;
+  ArrayType *outarray;
 
   CHECK(GrB_Vector_size(&size, vec->V));
   CHECK(GrB_Vector_nvals(&nvals, vec->V));
@@ -281,7 +285,13 @@ vector_out(PG_FUNCTION_ARGS)
                                  &size,
                                  vec->V));
 
-  result = psprintf("{%lu, %lu}::vector", size, nvals);
+  result = psprintf("{");
+  for (int i = 0; i < size; i++) {
+    result = strcat(result, psprintf("%lu", vector_vals[i]));
+    if (i != size - 1)
+      result = strcat(result, ",");
+  }
+  result = strcat(result, "}");
   PG_RETURN_CSTRING(result);
 }
 
