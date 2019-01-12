@@ -157,6 +157,16 @@ RETURNS vector
 AS '$libdir/pggraphblas', 'vector_ewise_add'
 LANGUAGE C STABLE STRICT;
 
+CREATE FUNCTION vector_eq(vector, vector)
+RETURNS bool
+AS '$libdir/pggraphblas', 'vector_eq'
+LANGUAGE C STABLE STRICT;
+
+CREATE FUNCTION vector_neq(vector, vector)
+RETURNS bool
+AS '$libdir/pggraphblas', 'vector_neq'
+LANGUAGE C STABLE STRICT;
+    
 CREATE AGGREGATE vector_agg (bigint, bigint) (
     sfunc = vector_agg_acc,
     stype = internal,
@@ -174,4 +184,17 @@ CREATE OPERATOR + (
     rightarg = vector,
     procedure = vector_ewise_add
 );
-    
+
+CREATE OPERATOR = (
+    leftarg = vector,
+    rightarg = vector,
+    procedure = vector_eq,
+    negator = <>
+);
+
+CREATE OPERATOR <> (
+    leftarg = vector,
+    rightarg = vector,
+    procedure = vector_neq,
+    negator = =
+);

@@ -96,6 +96,9 @@ PG_FUNCTION_INFO_V1(vector_out);
 PG_FUNCTION_INFO_V1(vector_ewise_mult);
 PG_FUNCTION_INFO_V1(vector_ewise_add);
 
+PG_FUNCTION_INFO_V1(vector_eq);
+PG_FUNCTION_INFO_V1(vector_neq);
+
 void _PG_init(void);
 
 #endif /* PGGRAPHBLAS_H */

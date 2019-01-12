@@ -244,7 +244,7 @@ vector_in(PG_FUNCTION_ARGS)
   ctxcb = (MemoryContextCallback*) palloc(sizeof(MemoryContextCallback));
   ctxcb->func = context_callback_vector_free;
   ctxcb->arg = retval;
-  MemoryContextRegisterResetCallback(CurTransactionContext, ctxcb);
+  MemoryContextRegisterResetCallback(CurrentMemoryContext, ctxcb);
   //  MemoryContextSwitchTo(oldcxt);
 
   CHECK(GrB_Vector_new(&(retval->V), GrB_INT64, count + 1));
@@ -329,4 +329,50 @@ vector_ewise_add(PG_FUNCTION_ARGS) {
 
   CHECK(GrB_eWiseAdd(C->V, NULL, NULL, GrB_PLUS_INT64, A->V, B->V, NULL));
   PG_RETURN_POINTER(C);
+}
+
+Datum
+vector_eq(PG_FUNCTION_ARGS) {
+  GrB_Info info;
+  pgGrB_Vector *A, *B, *C;
+  GrB_Index asize, bsize, anvals, bnvals;
+  bool result = 0;
+  
+  VECTOR_BINOP_PREAMBLE();
+  CHECK(GrB_Vector_size(&asize, A->V));
+  CHECK(GrB_Vector_size(&bsize, B->V));
+  CHECK(GrB_Vector_size(&anvals, A->V));
+  CHECK(GrB_Vector_size(&bnvals, B->V));
+
+  if (asize != bsize || anvals != bnvals)
+    PG_RETURN_BOOL(result);
+
+  CHECK(GrB_Vector_new (&(C->V), GrB_BOOL, asize));
+  
+  CHECK(GrB_eWiseMult(C->V, NULL, NULL, GxB_ISEQ_INT64, A->V, B->V, NULL));
+  CHECK(GrB_Vector_reduce_BOOL(&result, NULL, GxB_LAND_BOOL_MONOID, C->V, NULL));
+  PG_RETURN_BOOL(result);
+}
+
+Datum
+vector_neq(PG_FUNCTION_ARGS) {
+  GrB_Info info;
+  pgGrB_Vector *A, *B, *C;
+  GrB_Index asize, bsize, anvals, bnvals;
+  bool result = 0;
+  
+  VECTOR_BINOP_PREAMBLE();
+  CHECK(GrB_Vector_size(&asize, A->V));
+  CHECK(GrB_Vector_size(&bsize, B->V));
+  CHECK(GrB_Vector_size(&anvals, A->V));
+  CHECK(GrB_Vector_size(&bnvals, B->V));
+
+  if (asize != bsize || anvals != bnvals)
+    PG_RETURN_BOOL(result);
+
+  CHECK(GrB_Vector_new (&(C->V), GrB_BOOL, asize));
+  
+  CHECK(GrB_eWiseMult(C->V, NULL, NULL, GxB_ISNE_INT64, A->V, B->V, NULL));
+  CHECK(GrB_Vector_reduce_BOOL(&result, NULL, GxB_LAND_BOOL_MONOID, C->V, NULL));
+  PG_RETURN_BOOL(result);
 }

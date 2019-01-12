@@ -258,7 +258,7 @@ matrix_in(PG_FUNCTION_ARGS)
   ctxcb = (MemoryContextCallback*) palloc(sizeof(MemoryContextCallback));
   ctxcb->func = context_callback_matrix_free;
   ctxcb->arg = retval;
-  MemoryContextRegisterResetCallback(CurTransactionContext, ctxcb);
+  MemoryContextRegisterResetCallback(CurrentMemoryContext, ctxcb);
   //  MemoryContextSwitchTo(oldcxt);
 
   CHECK(GrB_Matrix_new(&(retval->A), GrB_INT64, count + 1, count + 1));

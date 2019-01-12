@@ -14,9 +14,26 @@ create extension pggraphblas;
 
 \i fixture.sql
 begin;
-select plan(1);
+select plan(3);
 
-select lives_ok($$select '{1,2,3}'::vector$$, 'lives_ok');
+select is(
+    '{1,2,3}'::vector
+,
+    '{1,2,3}'::vector,
+    'literal vector');
+    
+select is(
+    '{1,2,3}'::vector + '{2,3,4}'::vector
+,
+    '{3,5,7}'::vector,
+    'literal vector add');
+
+select is(
+    '{1,2,3}'::vector * '{2,3,4}'::vector
+,
+    '{2,6,12}'::vector,
+    'literal vector mul');
+
 
 select * from finish();
 rollback;
