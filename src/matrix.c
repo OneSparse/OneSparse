@@ -77,16 +77,16 @@ matrix_final_int4(PG_FUNCTION_ARGS) {
     n++;
   }
 
-  // oldcxt = MemoryContextSwitchTo(CurTransactionContext);
+  //oldcxt = MemoryContextSwitchTo(CurTransactionContext);
   
   retval = (pgGrB_Matrix*)palloc(sizeof(pgGrB_Matrix));
 
   ctxcb = (MemoryContextCallback*) palloc(sizeof(MemoryContextCallback));
   ctxcb->func = context_callback_matrix_free;
   ctxcb->arg = retval;
-  MemoryContextRegisterResetCallback(CurTransactionContext, ctxcb);
+  MemoryContextRegisterResetCallback(CurrentMemoryContext, ctxcb);
 
-  // MemoryContextSwitchTo(oldcxt);
+  //MemoryContextSwitchTo(oldcxt);
 
   CHECK(GrB_Matrix_new(&(retval->A),
                        GrB_INT64,

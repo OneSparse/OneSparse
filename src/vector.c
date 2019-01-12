@@ -72,16 +72,16 @@ vector_final_int4(PG_FUNCTION_ARGS) {
     n++;
   }
 
-  // oldcxt = MemoryContextSwitchTo(CurTransactionContext);
+  //oldcxt = MemoryContextSwitchTo(CurTransactionContext);
   
   retval = (pgGrB_Vector*)palloc(sizeof(pgGrB_Vector));
 
   ctxcb = (MemoryContextCallback*) palloc(sizeof(MemoryContextCallback));
   ctxcb->func = context_callback_vector_free;
   ctxcb->arg = retval;
-  MemoryContextRegisterResetCallback(CurTransactionContext, ctxcb);
+  MemoryContextRegisterResetCallback(CurrentMemoryContext, ctxcb);
 
-  // MemoryContextSwitchTo(oldcxt);
+  //MemoryContextSwitchTo(oldcxt);
 
   CHECK(GrB_Vector_new(&(retval->V),
                        GrB_INT64,

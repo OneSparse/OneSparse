@@ -9,7 +9,14 @@
 -- \set ON_ERROR_STOP true
 -- \set QUIET 1
 
-CREATE EXTENSION pgtap;
-CREATE EXTENSION pggraphblas;
+create extension pgtap;
+create extension pggraphblas;
 
 \i fixture.sql
+begin;
+select plan(1);
+
+select lives_ok($$select '{1,2,3}'::vector$$, 'lives_ok');
+
+select * from finish();
+rollback;
