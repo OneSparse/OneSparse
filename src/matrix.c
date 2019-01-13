@@ -266,7 +266,7 @@ matrix_out(PG_FUNCTION_ARGS)
   CHECK(GrB_Matrix_nvals(&nvals, mat->A));
 
   row_indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * nvals);
-  col_indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * nvals);
+  col_indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * ncols);
   matrix_vals = (int64*) palloc0(sizeof(int64) * nvals);
 
   CHECK(GrB_Matrix_extractTuples(row_indices,
