@@ -73,7 +73,7 @@ vector_final_int4(PG_FUNCTION_ARGS) {
   }
 
   //oldcxt = MemoryContextSwitchTo(CurTransactionContext);
-  
+
   retval = (pgGrB_Vector*)palloc(sizeof(pgGrB_Vector));
 
   ctxcb = (MemoryContextCallback*) palloc(sizeof(MemoryContextCallback));
@@ -164,12 +164,12 @@ vector_in(PG_FUNCTION_ARGS)
 
   /* This is all wrong and provisional until I can get my head around
      the ::array API. */
-  
+
   GrB_Info info;
   pgGrB_Vector *retval;
 
   MemoryContext oldcxt;
-  
+
   MemoryContextCallback *ctxcb;
 
   Datum arr;
@@ -265,7 +265,7 @@ vector_out(PG_FUNCTION_ARGS)
 
   /* This is all wrong and provisional until I can get my head around
      the ::array API. */
-  
+
   GrB_Info info;
   pgGrB_Vector *vec = (pgGrB_Vector *) PG_GETARG_POINTER(0);
   char *result;
@@ -287,21 +287,21 @@ vector_out(PG_FUNCTION_ARGS)
                                  vec->V));
 
   result = psprintf("{{");
-  
+
   for (int i = 0; i < size; i++) {
     result = strcat(result, psprintf("%lu", row_indices[i]));
     if (i != size - 1)
       result = strcat(result, ",");
   }
   result = strcat(result, "},{");
-  
+
   for (int i = 0; i < nvals; i++) {
     result = strcat(result, psprintf("%lu", vector_vals[i]));
     if (i != nvals - 1)
       result = strcat(result, ",");
   }
   result = strcat(result, "}}");
-  
+
   PG_RETURN_CSTRING(result);
 }
 
@@ -333,7 +333,7 @@ vector_ewise_add(PG_FUNCTION_ARGS) {
   pgGrB_Vector *A, *B, *C;
   GrB_Index m;
   VECTOR_BINOP_PREAMBLE();
-  
+
   CHECK(GrB_Vector_size(&m, A->V));
   CHECK(GrB_Vector_new (&(C->V), GrB_INT64, m));
 
@@ -347,7 +347,7 @@ vector_eq(PG_FUNCTION_ARGS) {
   pgGrB_Vector *A, *B, *C;
   GrB_Index asize, bsize, anvals, bnvals;
   bool result = 0;
-  
+
   VECTOR_BINOP_PREAMBLE();
   CHECK(GrB_Vector_size(&asize, A->V));
   CHECK(GrB_Vector_size(&bsize, B->V));
@@ -358,7 +358,7 @@ vector_eq(PG_FUNCTION_ARGS) {
     PG_RETURN_BOOL(result);
 
   CHECK(GrB_Vector_new (&(C->V), GrB_BOOL, asize));
-  
+
   CHECK(GrB_eWiseMult(C->V, NULL, NULL, GxB_ISEQ_INT64, A->V, B->V, NULL));
   CHECK(GrB_Vector_reduce_BOOL(&result, NULL, GxB_LAND_BOOL_MONOID, C->V, NULL));
   PG_RETURN_BOOL(result);
@@ -370,7 +370,7 @@ vector_neq(PG_FUNCTION_ARGS) {
   pgGrB_Vector *A, *B, *C;
   GrB_Index asize, bsize, anvals, bnvals;
   bool result = 0;
-  
+
   VECTOR_BINOP_PREAMBLE();
   CHECK(GrB_Vector_size(&asize, A->V));
   CHECK(GrB_Vector_size(&bsize, B->V));
@@ -381,7 +381,7 @@ vector_neq(PG_FUNCTION_ARGS) {
     PG_RETURN_BOOL(result);
 
   CHECK(GrB_Vector_new (&(C->V), GrB_BOOL, asize));
-  
+
   CHECK(GrB_eWiseMult(C->V, NULL, NULL, GxB_ISNE_INT64, A->V, B->V, NULL));
   CHECK(GrB_Vector_reduce_BOOL(&result, NULL, GxB_LAND_BOOL_MONOID, C->V, NULL));
   PG_RETURN_BOOL(result);

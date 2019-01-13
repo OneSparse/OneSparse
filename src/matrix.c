@@ -78,7 +78,7 @@ matrix_final_int4(PG_FUNCTION_ARGS) {
   }
 
   //oldcxt = MemoryContextSwitchTo(CurTransactionContext);
-  
+
   retval = (pgGrB_Matrix*)palloc(sizeof(pgGrB_Matrix));
 
   ctxcb = (MemoryContextCallback*) palloc(sizeof(MemoryContextCallback));
@@ -176,7 +176,7 @@ matrix_in(PG_FUNCTION_ARGS)
   pgGrB_Matrix *retval;
 
   MemoryContext oldcxt;
-  
+
   MemoryContextCallback *ctxcb;
 
   Datum arr;
@@ -299,28 +299,28 @@ matrix_out(PG_FUNCTION_ARGS)
                                  mat->A));
 
   result = psprintf("{{");
-  
+
   for (int i = 0; i < nrows; i++) {
     result = strcat(result, psprintf("%lu", row_indices[i]));
     if (i != nrows - 1)
       result = strcat(result, ",");
   }
   result = strcat(result, "},{");
-  
+
   for (int i = 0; i < ncols; i++) {
     result = strcat(result, psprintf("%lu", col_indices[i]));
     if (i != ncols - 1)
       result = strcat(result, ",");
   }
   result = strcat(result, "},{");
-  
+
   for (int i = 0; i < nvals; i++) {
     result = strcat(result, psprintf("%lu", matrix_vals[i]));
     if (i != nvals - 1)
       result = strcat(result, ",");
   }
   result = strcat(result, "}}");
-  
+
   PG_RETURN_CSTRING(result);
 }
 
@@ -433,7 +433,7 @@ matrix_ewise_add(PG_FUNCTION_ARGS) {
   pgGrB_Matrix *A, *B, *C;
   GrB_Index m, n;
   MATRIX_BINOP_PREAMBLE();
-  
+
   CHECK(GrB_Matrix_nrows(&m, A->A));
   CHECK(GrB_Matrix_ncols(&n, A->A));
   CHECK(GrB_Matrix_new (&(C->A), GrB_INT64, m, n));
