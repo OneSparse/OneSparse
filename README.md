@@ -9,9 +9,14 @@ the database directly with `./psql`
 
 DONE-ish:
     
-* Matrix type for FP32 (float4)
-* matrix_agg to GrB_Matrix_build
-* matrix_extract from GrB_Matrix_extractTuples
+* Matrix type for INT64 (float4)
+* matrix_agg/matrix_tuples to GrB_Matrix_build
+* matrix_tuples from GrB_Matrix_extractTuples
+* vector type for INT64 (float4)
+* vector_agg to GrB_Matrix_build
+* matrix_tuples from GrB_Vector_extractTuples
+* most of the GrB_PLUS_TIMES_INT64 semi-ring.
+* overloaded operators for plus,times,set-union/intersection
 
 TODO:
     
@@ -19,7 +24,6 @@ TODO:
 * polymorphic matrix_agg support all types
 * overload all the operators
 * parallel aggregates of subgraphs with final merging
-* everything above but for vectors
 
 UNKNOWNS:
     
