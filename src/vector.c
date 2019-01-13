@@ -176,7 +176,7 @@ vector_in(PG_FUNCTION_ARGS)
   ArrayType *vals;
   FunctionCallInfoData locfcinfo;
   int ndim, *dims, *lb;
-  int count;
+  bigint count, max;
 
   GrB_Index *row_indices;
   int64 *vector_vals, *data;
@@ -227,6 +227,7 @@ vector_in(PG_FUNCTION_ARGS)
 
   lb = ARR_LBOUND(vals);
   count = dims[0] + lb[0] - 1;
+  max = 0;
 
   row_indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * count);
   vector_vals = (int64*) palloc0(sizeof(int64) * count);
@@ -285,13 +286,22 @@ vector_out(PG_FUNCTION_ARGS)
                                  &size,
                                  vec->V));
 
-  result = psprintf("{");
+  result = psprintf("{{");
+  
   for (int i = 0; i < size; i++) {
-    result = strcat(result, psprintf("%lu", vector_vals[i]));
+    result = strcat(result, psprintf("%lu", row_indices[i]));
     if (i != size - 1)
       result = strcat(result, ",");
   }
-  result = strcat(result, "}");
+  result = strcat(result, "},{");
+  
+  for (int i = 0; i < nvals; i++) {
+    result = strcat(result, psprintf("%lu", vector_vals[i]));
+    if (i != nvals - 1)
+      result = strcat(result, ",");
+  }
+  result = strcat(result, "}}");
+  
   PG_RETURN_CSTRING(result);
 }
 

@@ -298,7 +298,29 @@ matrix_out(PG_FUNCTION_ARGS)
                                  &nvals,
                                  mat->A));
 
-  result = psprintf("{%lu, %lu, %lu}::matrix", nrows, ncols, nvals);
+  result = psprintf("{{");
+  
+  for (int i = 0; i < nrows; i++) {
+    result = strcat(result, psprintf("%lu", row_indices[i]));
+    if (i != nrows - 1)
+      result = strcat(result, ",");
+  }
+  result = strcat(result, "},{");
+  
+  for (int i = 0; i < ncols; i++) {
+    result = strcat(result, psprintf("%lu", col_indices[i]));
+    if (i != ncols - 1)
+      result = strcat(result, ",");
+  }
+  result = strcat(result, "},{");
+  
+  for (int i = 0; i < nvals; i++) {
+    result = strcat(result, psprintf("%lu", matrix_vals[i]));
+    if (i != nvals - 1)
+      result = strcat(result, ",");
+  }
+  result = strcat(result, "}}");
+  
   PG_RETURN_CSTRING(result);
 }
 
