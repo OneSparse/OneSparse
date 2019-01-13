@@ -44,11 +44,9 @@ matrix_agg_acc(PG_FUNCTION_ARGS)
 }
 
 Datum
-matrix_final_int4(PG_FUNCTION_ARGS) {
+matrix_final_int8(PG_FUNCTION_ARGS) {
   GrB_Info info;
   pgGrB_Matrix *retval;
-
-  MemoryContext oldcxt;
   MemoryContextCallback *ctxcb;
 
   pgGrB_Matrix_AggState *mstate = (pgGrB_Matrix_AggState*)PG_GETARG_POINTER(0);
@@ -68,16 +66,11 @@ matrix_final_int4(PG_FUNCTION_ARGS) {
   matrix_vals = (int64*) palloc0(sizeof(int64) * count);
 
   forthree (li, (mstate)->rows, lj, (mstate)->cols, lv, (mstate)->vals) {
-    /* elog(NOTICE, "%lu", DatumGetInt64(*(Datum*)lfirst(li))); */
-    /* elog(NOTICE, "%lu", DatumGetInt64(*(Datum*)lfirst(lj))); */
-    /* elog(NOTICE, "%f", DatumGetFloat4(*(Datum*)lfirst(lv))); */
     row_indices[n] = DatumGetInt64(*(Datum*)lfirst(li));
     col_indices[n] = DatumGetInt64(*(Datum*)lfirst(lj));
     matrix_vals[n] = DatumGetInt64(*(Datum*)lfirst(lv));
     n++;
   }
-
-  //oldcxt = MemoryContextSwitchTo(CurTransactionContext);
 
   retval = (pgGrB_Matrix*)palloc(sizeof(pgGrB_Matrix));
 
@@ -85,8 +78,6 @@ matrix_final_int4(PG_FUNCTION_ARGS) {
   ctxcb->func = context_callback_matrix_free;
   ctxcb->arg = retval;
   MemoryContextRegisterResetCallback(CurrentMemoryContext, ctxcb);
-
-  //MemoryContextSwitchTo(oldcxt);
 
   CHECK(GrB_Matrix_new(&(retval->A),
                        GrB_INT64,
@@ -175,31 +166,16 @@ matrix_in(PG_FUNCTION_ARGS)
   GrB_Info info;
   pgGrB_Matrix *retval;
 
-  MemoryContext oldcxt;
-
   MemoryContextCallback *ctxcb;
 
   Datum arr;
   ArrayType *vals;
   FunctionCallInfoData locfcinfo;
-  int ndim, *dims, *lb;
-  int count;
+  int ndim, *dims;
+  int64 count, maxrows, maxcols;
 
   GrB_Index *row_indices, *col_indices;
   int64 *matrix_vals, *data;
-
-  /* A comment from the pg source...
-   *
-   * Normally one would call array_recv() using DirectFunctionCall3, but
-   * that does not work since array_recv wants to cache some data using
-   * fcinfo->flinfo->fn_extra.  So we need to pass it our own flinfo
-   * parameter.
-   */
-
-  /* arr = DirectFunctionCall3(array_in, */
-  /*                           PG_GETARG_DATUM(0), */
-  /*                           ObjectIdGetDatum(INT2OID), */
-  /*                           Int32GetDatum(-1)); */
 
   InitFunctionCallInfoData(locfcinfo,
                            fcinfo->flinfo,
@@ -236,8 +212,9 @@ matrix_in(PG_FUNCTION_ARGS)
     ereport(ERROR, (errmsg("First dimension must contain 3 arrays")));
   }
 
-  lb = ARR_LBOUND(vals);
-  count = dims[0] + lb[0] - 1;
+  count = dims[1];
+  maxrows = count;
+  maxcols = count;
 
   row_indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * count);
   col_indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * count);
@@ -247,21 +224,22 @@ matrix_in(PG_FUNCTION_ARGS)
 
   for (int i = 0; i < count; i++) {
     row_indices[i] = data[i];
+    if (data[i] > maxrows)
+      maxrows = data[i];
     col_indices[i] = data[i+count];
+    if (data[i+count] > maxcols)
+      maxcols = data[i+count];
     matrix_vals[i] = data[i+count+count];
   }
 
-
-  //  oldcxt = MemoryContextSwitchTo(CurTransactionContext);
   retval = (pgGrB_Matrix*) palloc(sizeof(pgGrB_Matrix));
 
   ctxcb = (MemoryContextCallback*) palloc(sizeof(MemoryContextCallback));
   ctxcb->func = context_callback_matrix_free;
   ctxcb->arg = retval;
   MemoryContextRegisterResetCallback(CurrentMemoryContext, ctxcb);
-  //  MemoryContextSwitchTo(oldcxt);
 
-  CHECK(GrB_Matrix_new(&(retval->A), GrB_INT64, count + 1, count + 1));
+  CHECK(GrB_Matrix_new(&(retval->A), GrB_INT64, maxrows+1, maxcols+1));
 
   CHECK(GrB_Matrix_build(retval->A,
                          row_indices,
@@ -280,7 +258,6 @@ matrix_out(PG_FUNCTION_ARGS)
   pgGrB_Matrix *mat = (pgGrB_Matrix *) PG_GETARG_POINTER(0);
   char *result;
   GrB_Index nrows, ncols, nvals;
-
   GrB_Index *row_indices, *col_indices;
   int64 *matrix_vals;
 
@@ -354,12 +331,63 @@ matrix_nvals(PG_FUNCTION_ARGS) {
   return Int64GetDatum(count);
 }
 
+
 #define MATRIX_BINOP_PREAMBLE()                         \
   do {                                                  \
     A = (pgGrB_Matrix *) PG_GETARG_POINTER(0);          \
     B = (pgGrB_Matrix *) PG_GETARG_POINTER(1);          \
     C = (pgGrB_Matrix *) palloc0(sizeof(pgGrB_Matrix)); \
   } while (0)
+
+Datum
+matrix_eq(PG_FUNCTION_ARGS) {
+  GrB_Info info;
+  pgGrB_Matrix *A, *B, *C;
+  GrB_Index arows, brows, acols, bcols, anvals, bnvals;
+  bool result = 0;
+
+  MATRIX_BINOP_PREAMBLE();
+  CHECK(GrB_Matrix_nrows(&arows, A->A));
+  CHECK(GrB_Matrix_nrows(&brows, B->A));
+  CHECK(GrB_Matrix_ncols(&acols, A->A));
+  CHECK(GrB_Matrix_ncols(&bcols, B->A));
+  CHECK(GrB_Matrix_nvals(&anvals, A->A));
+  CHECK(GrB_Matrix_nvals(&bnvals, B->A));
+
+  if (arows != brows || acols != bcols || anvals != bnvals)
+    PG_RETURN_BOOL(0);
+
+  CHECK(GrB_Matrix_new (&(C->A), GrB_BOOL, arows, bcols));
+
+  CHECK(GrB_eWiseMult(C->A, NULL, NULL, GxB_ISEQ_INT64, A->A, B->A, NULL));
+  CHECK(GrB_Matrix_reduce_BOOL(&result, NULL, GxB_LAND_BOOL_MONOID, C->A, NULL));
+  PG_RETURN_BOOL(result);
+}
+
+Datum
+matrix_neq(PG_FUNCTION_ARGS) {
+  GrB_Info info;
+  pgGrB_Matrix *A, *B, *C;
+  GrB_Index arows, brows, acols, bcols, anvals, bnvals;
+  bool result = 1;
+
+  MATRIX_BINOP_PREAMBLE();
+  CHECK(GrB_Matrix_nrows(&arows, A->A));
+  CHECK(GrB_Matrix_nrows(&brows, B->A));
+  CHECK(GrB_Matrix_ncols(&acols, A->A));
+  CHECK(GrB_Matrix_ncols(&bcols, B->A));
+  CHECK(GrB_Matrix_nvals(&anvals, A->A));
+  CHECK(GrB_Matrix_nvals(&bnvals, B->A));
+
+  if (arows != brows || acols != bcols || anvals != bnvals)
+    PG_RETURN_BOOL(1);
+
+  CHECK(GrB_Matrix_new (&(C->A), GrB_BOOL, arows, bcols));
+
+  CHECK(GrB_eWiseMult(C->A, NULL, NULL, GxB_ISNE_INT64, A->A, B->A, NULL));
+  CHECK(GrB_Matrix_reduce_BOOL(&result, NULL, GxB_LAND_BOOL_MONOID, C->A, NULL));
+  PG_RETURN_BOOL(result);
+}
 
 Datum
 matrix_x_matrix(PG_FUNCTION_ARGS) {

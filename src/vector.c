@@ -42,11 +42,10 @@ vector_agg_acc(PG_FUNCTION_ARGS)
 }
 
 Datum
-vector_final_int4(PG_FUNCTION_ARGS) {
+vector_final_int8(PG_FUNCTION_ARGS) {
   GrB_Info info;
   pgGrB_Vector *retval;
 
-  MemoryContext oldcxt;
   MemoryContextCallback *ctxcb;
 
   pgGrB_Vector_AggState *mstate = (pgGrB_Vector_AggState*)PG_GETARG_POINTER(0);
@@ -72,16 +71,12 @@ vector_final_int4(PG_FUNCTION_ARGS) {
     n++;
   }
 
-  //oldcxt = MemoryContextSwitchTo(CurTransactionContext);
-
   retval = (pgGrB_Vector*)palloc(sizeof(pgGrB_Vector));
 
   ctxcb = (MemoryContextCallback*) palloc(sizeof(MemoryContextCallback));
   ctxcb->func = context_callback_vector_free;
   ctxcb->arg = retval;
   MemoryContextRegisterResetCallback(CurrentMemoryContext, ctxcb);
-
-  //MemoryContextSwitchTo(oldcxt);
 
   CHECK(GrB_Vector_new(&(retval->V),
                        GrB_INT64,
@@ -168,15 +163,13 @@ vector_in(PG_FUNCTION_ARGS)
   GrB_Info info;
   pgGrB_Vector *retval;
 
-  MemoryContext oldcxt;
-
   MemoryContextCallback *ctxcb;
 
   Datum arr;
   ArrayType *vals;
   FunctionCallInfoData locfcinfo;
-  int ndim, *dims, *lb;
-  bigint count, max;
+  int ndim, *dims;
+  int64 count, max;
 
   GrB_Index *row_indices;
   int64 *vector_vals, *data;
@@ -214,41 +207,49 @@ vector_in(PG_FUNCTION_ARGS)
 
   vals = DatumGetArrayTypeP(arr);
 
-  if (ARR_HASNULL(vals)) {
+  if (ARR_HASNULL(vals))
     ereport(ERROR, (errmsg("Array may not contain NULLs")));
-  }
 
   ndim = ARR_NDIM(vals);
-  if (ndim != 1) {
-    ereport(ERROR, (errmsg("One-dimesional array is required")));
-  }
 
   dims = ARR_DIMS(vals);
 
-  lb = ARR_LBOUND(vals);
-  count = dims[0] + lb[0] - 1;
-  max = 0;
+  count = dims[0];
+  max = count;
 
   row_indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * count);
   vector_vals = (int64*) palloc0(sizeof(int64) * count);
 
   data = (int64*)ARR_DATA_PTR(vals);
 
-  for (int64 i = 0; i < count; i++) {
-    row_indices[i] = i;
-    vector_vals[i] = data[i];
+  if (ndim == 1) {
+    for (int64 i = 0; i < count; i++) {
+      row_indices[i] = i;
+      vector_vals[i] = data[i];
+    }
+  } else if (ndim == 2) {
+    count = dims[1];
+    max = count;
+    for (int64 i = 0; i < count; i++) {
+      row_indices[i] = data[i];
+      vector_vals[i] = data[i+count];
+      if (data[i] > max)
+        max = data[i];
+    }
+    max++;
+  } else {
+    ereport(ERROR,
+            (errmsg("One (dense) or two (sparse) dimensional arrays required")));
   }
 
-  //  oldcxt = MemoryContextSwitchTo(CurTransactionContext);
   retval = (pgGrB_Vector*) palloc(sizeof(pgGrB_Vector));
 
   ctxcb = (MemoryContextCallback*) palloc(sizeof(MemoryContextCallback));
   ctxcb->func = context_callback_vector_free;
   ctxcb->arg = retval;
   MemoryContextRegisterResetCallback(CurrentMemoryContext, ctxcb);
-  //  MemoryContextSwitchTo(oldcxt);
 
-  CHECK(GrB_Vector_new(&(retval->V), GrB_INT64, count + 1));
+  CHECK(GrB_Vector_new(&(retval->V), GrB_INT64, max));
 
   CHECK(GrB_Vector_build(retval->V,
                          row_indices,
@@ -273,7 +274,6 @@ vector_out(PG_FUNCTION_ARGS)
 
   GrB_Index *row_indices;
   int64 *vector_vals;
-  ArrayType *outarray;
 
   CHECK(GrB_Vector_size(&size, vec->V));
   CHECK(GrB_Vector_nvals(&nvals, vec->V));
@@ -351,8 +351,8 @@ vector_eq(PG_FUNCTION_ARGS) {
   VECTOR_BINOP_PREAMBLE();
   CHECK(GrB_Vector_size(&asize, A->V));
   CHECK(GrB_Vector_size(&bsize, B->V));
-  CHECK(GrB_Vector_size(&anvals, A->V));
-  CHECK(GrB_Vector_size(&bnvals, B->V));
+  CHECK(GrB_Vector_nvals(&anvals, A->V));
+  CHECK(GrB_Vector_nvals(&bnvals, B->V));
 
   if (asize != bsize || anvals != bnvals)
     PG_RETURN_BOOL(result);
@@ -374,8 +374,8 @@ vector_neq(PG_FUNCTION_ARGS) {
   VECTOR_BINOP_PREAMBLE();
   CHECK(GrB_Vector_size(&asize, A->V));
   CHECK(GrB_Vector_size(&bsize, B->V));
-  CHECK(GrB_Vector_size(&anvals, A->V));
-  CHECK(GrB_Vector_size(&bnvals, B->V));
+  CHECK(GrB_Vector_nvals(&anvals, A->V));
+  CHECK(GrB_Vector_nvals(&bnvals, B->V));
 
   if (asize != bsize || anvals != bnvals)
     PG_RETURN_BOOL(result);
@@ -385,4 +385,24 @@ vector_neq(PG_FUNCTION_ARGS) {
   CHECK(GrB_eWiseMult(C->V, NULL, NULL, GxB_ISNE_INT64, A->V, B->V, NULL));
   CHECK(GrB_Vector_reduce_BOOL(&result, NULL, GxB_LAND_BOOL_MONOID, C->V, NULL));
   PG_RETURN_BOOL(result);
+}
+
+Datum
+vector_nvals(PG_FUNCTION_ARGS) {
+  GrB_Info info;
+  pgGrB_Vector *vec;
+  GrB_Index count;
+  vec = (pgGrB_Vector *) PG_GETARG_POINTER(0);
+  CHECK(GrB_Vector_nvals(&count, vec->V));
+  return Int64GetDatum(count);
+}
+
+Datum
+vector_size(PG_FUNCTION_ARGS) {
+  GrB_Info info;
+  pgGrB_Vector *vec;
+  GrB_Index count;
+  vec = (pgGrB_Vector *) PG_GETARG_POINTER(0);
+  CHECK(GrB_Vector_size(&count, vec->V));
+  return Int64GetDatum(count);
 }

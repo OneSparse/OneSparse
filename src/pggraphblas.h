@@ -47,7 +47,7 @@ static void context_callback_matrix_free(void*);
 ArrayType* new_int64ArrayType(int);
 
 PG_FUNCTION_INFO_V1(matrix_agg_acc);
-PG_FUNCTION_INFO_V1(matrix_final_int4);
+PG_FUNCTION_INFO_V1(matrix_final_int8);
 
 PG_FUNCTION_INFO_V1(matrix_tuples);
 
@@ -61,6 +61,9 @@ PG_FUNCTION_INFO_V1(matrix_nvals);
 PG_FUNCTION_INFO_V1(matrix_x_matrix);
 PG_FUNCTION_INFO_V1(matrix_x_vector);
 PG_FUNCTION_INFO_V1(vector_x_matrix);
+
+PG_FUNCTION_INFO_V1(matrix_eq);
+PG_FUNCTION_INFO_V1(matrix_neq);
 
 PG_FUNCTION_INFO_V1(matrix_ewise_mult);
 PG_FUNCTION_INFO_V1(matrix_ewise_add);
@@ -86,7 +89,7 @@ typedef struct pgGrB_Vector_ExtractState {
 static void context_callback_vector_free(void*);
 
 PG_FUNCTION_INFO_V1(vector_agg_acc);
-PG_FUNCTION_INFO_V1(vector_final_int4);
+PG_FUNCTION_INFO_V1(vector_final_int8);
 
 PG_FUNCTION_INFO_V1(vector_tuples);
 
@@ -98,6 +101,9 @@ PG_FUNCTION_INFO_V1(vector_ewise_add);
 
 PG_FUNCTION_INFO_V1(vector_eq);
 PG_FUNCTION_INFO_V1(vector_neq);
+
+PG_FUNCTION_INFO_V1(vector_nvals);
+PG_FUNCTION_INFO_V1(vector_size);
 
 void _PG_init(void);
 

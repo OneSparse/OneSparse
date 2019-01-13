@@ -19,7 +19,6 @@ CREATE TYPE vector (
     input = vector_in,
     output = vector_out
 );
-    
 
 CREATE TYPE matrix;
 
@@ -30,9 +29,9 @@ RETURNS internal
 AS '$libdir/pggraphblas', 'matrix_agg_acc'
 LANGUAGE C CALLED ON NULL INPUT;
 
-CREATE FUNCTION matrix_final_int4(internal)
+CREATE FUNCTION matrix_final_int8(internal)
 RETURNS matrix
-AS '$libdir/pggraphblas', 'matrix_final_int4'
+AS '$libdir/pggraphblas', 'matrix_final_int8'
 LANGUAGE C CALLED ON NULL INPUT;
 
 CREATE FUNCTION matrix_tuples(matrix)
@@ -65,6 +64,16 @@ RETURNS bigint
 AS '$libdir/pggraphblas', 'matrix_nvals'
 LANGUAGE C STABLE STRICT;
 
+CREATE FUNCTION matrix_eq(matrix, matrix)
+RETURNS bool
+AS '$libdir/pggraphblas', 'matrix_eq'
+LANGUAGE C STABLE STRICT;
+
+CREATE FUNCTION matrix_neq(matrix, matrix)
+RETURNS bool
+AS '$libdir/pggraphblas', 'matrix_neq'
+LANGUAGE C STABLE STRICT;
+    
 CREATE FUNCTION matrix_x_matrix(matrix, matrix)
 RETURNS matrix
 AS '$libdir/pggraphblas', 'matrix_x_matrix'
@@ -99,9 +108,23 @@ CREATE TYPE matrix (
 CREATE AGGREGATE matrix_agg (bigint, bigint, bigint) (
     sfunc = matrix_agg_acc,
     stype = internal,
-    finalfunc = matrix_final_int4
+    finalfunc = matrix_final_int8
 );
 
+CREATE OPERATOR = (
+    leftarg = matrix,
+    rightarg = matrix,
+    procedure = matrix_eq,
+    negator = <>
+);
+
+CREATE OPERATOR <> (
+    leftarg = matrix,
+    rightarg = matrix,
+    procedure = matrix_neq,
+    negator = =
+);
+    
 CREATE OPERATOR * (
     leftarg = matrix,
     rightarg = matrix,
@@ -131,15 +154,16 @@ CREATE OPERATOR || (
     rightarg = matrix,
     procedure = matrix_ewise_add
 );
-    
+
+        
 CREATE FUNCTION vector_agg_acc(internal, bigint, bigint)
 RETURNS internal
 AS '$libdir/pggraphblas', 'vector_agg_acc'
 LANGUAGE C CALLED ON NULL INPUT;
 
-CREATE FUNCTION vector_final_int4(internal)
+CREATE FUNCTION vector_final_int8(internal)
 RETURNS vector
-AS '$libdir/pggraphblas', 'vector_final_int4'
+AS '$libdir/pggraphblas', 'vector_final_int8'
 LANGUAGE C CALLED ON NULL INPUT;
 
 CREATE FUNCTION vector_tuples(vector)
@@ -167,10 +191,20 @@ RETURNS bool
 AS '$libdir/pggraphblas', 'vector_neq'
 LANGUAGE C STABLE STRICT;
     
+CREATE FUNCTION vector_size(vector)
+RETURNS bigint
+AS '$libdir/pggraphblas', 'vector_size'
+LANGUAGE C STABLE STRICT;
+    
+CREATE FUNCTION vector_nvals(vector)
+RETURNS bigint
+AS '$libdir/pggraphblas', 'vector_nvals'
+LANGUAGE C STABLE STRICT;
+
 CREATE AGGREGATE vector_agg (bigint, bigint) (
     sfunc = vector_agg_acc,
     stype = internal,
-    finalfunc = vector_final_int4
+    finalfunc = vector_final_int8
 );
 
 CREATE OPERATOR * (
