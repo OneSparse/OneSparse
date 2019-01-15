@@ -9,8 +9,6 @@ problems.
 
 [GraphBLAS Mathematics](http://www.mit.edu/~kepner/GraphBLAS/GraphBLAS-Math-release.pdf)
 
-For more information about GraphBLAS in the context of RedisGraph:
-
 [Lower Latency Graph Queries in Cypher with Redis GraphRoi Lipman, Redis LabsTim Davis, Texas A&M U](https://www.youtube.com/watch?v=xnez6tloNSQ)
 
 [A good introduction to semirings](https://www.youtube.com/watch?v=Gd_VT_Nj8Xw)
