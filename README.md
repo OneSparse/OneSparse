@@ -11,9 +11,7 @@ problems.
 
 [Lower Latency Graph Queries in Cypher with Redis GraphRoi Lipman, Redis LabsTim Davis, Texas A&M U](https://www.youtube.com/watch?v=xnez6tloNSQ)
 
-[A good introduction to semirings](https://www.youtube.com/watch?v=Gd_VT_Nj8Xw)
-
-[Part II of above intro](https://www.youtube.com/watch?v=dluPFbuq6zs)
+[A good introduction to semirings Part I](https://www.youtube.com/watch?v=Gd_VT_Nj8Xw) [Part II](https://www.youtube.com/watch?v=dluPFbuq6zs)
 
 [A good introduction to abstract algebra](https://www.youtube.com/playlist?list=PLi01XoE8jYoi3SgnnGorR_XOW3IcK-TP6)
 
