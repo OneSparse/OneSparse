@@ -4,6 +4,51 @@ context_callback_matrix_free(void* m) {
   GrB_Matrix_free(&mat->A);
 }
 
+static Size EM_get_flat_size(ExpandedObjectHeader *eohptr);
+static void EM_flatten_into(ExpandedObjectHeader *eohptr,
+                            void *result, Size allocated_size);
+
+static const ExpandedObjectMethods EM_methods = {
+  EM_get_flat_size,
+  EM_flatten_into
+};
+
+static Size
+EM_get_flat_size(ExpandedObjectHeader *eohptr) {
+  ExpandedMatrixHeader *emh = (ExpandedMatrixHeader *) eohptr;
+  Size nbytes;
+  
+  Assert(emh->em_magic == EM_MAGIC);
+  
+  if (emh->flat_value)
+   return ARR_SIZE(emh->flat_value);
+  
+  /* If we have a cached size value, believe that */
+  if (emh->flat_size)
+    return emh->flat_size;
+  
+  nbytes = 0;
+  /* cache for next time */
+  emh->flat_size = nbytes;
+  
+  return nbytes;
+}
+
+static void
+EM_flatten_into(ExpandedObjectHeader *eohptr,
+                void *result, Size allocated_size)
+{
+    ExpandedMatrixHeader *emh = (ExpandedMatrixHeader *) eohptr;
+    pgGrB_Matrix *aresult = (pgGrB_Matrix *) result;
+
+    Assert(emh->em_magic == EM_MAGIC);
+    Assert(allocated_size == emh->flat_size);
+    memset(aresult, 0, allocated_size);
+
+    SET_VARSIZE(aresult, allocated_size);
+}
+
+
 Datum
 matrix_agg_acc(PG_FUNCTION_ARGS)
 {
@@ -171,7 +216,7 @@ matrix_in(PG_FUNCTION_ARGS)
   Datum arr;
   ArrayType *vals;
   FunctionCallInfoData locfcinfo;
-  int ndim, *dims;
+  int ndim, *dims, *lb, *ub;
   int64 count, maxrows, maxcols;
 
   GrB_Index *row_indices, *col_indices;
@@ -359,7 +404,7 @@ matrix_eq(PG_FUNCTION_ARGS) {
 
   CHECK(GrB_Matrix_new (&(C->A), GrB_BOOL, arows, bcols));
 
-  CHECK(GrB_eWiseMult(C->A, NULL, NULL, GxB_ISEQ_INT64, A->A, B->A, NULL));
+  CHECK(GrB_eWiseMult(C->A, NULL, NULL, GrB_EQ_INT64, A->A, B->A, NULL));
   CHECK(GrB_Matrix_reduce_BOOL(&result, NULL, GxB_LAND_BOOL_MONOID, C->A, NULL));
   PG_RETURN_BOOL(result);
 }
@@ -411,9 +456,9 @@ matrix_x_vector(PG_FUNCTION_ARGS) {
   pgGrB_Vector *B, *C;
   GrB_Index size;
 
-  A = (pgGrB_Matrix *) PG_GETARG_POINTER(0);            \
-  B = (pgGrB_Vector *) PG_GETARG_POINTER(1);            \
-  C = (pgGrB_Vector *) palloc0(sizeof(pgGrB_Vector));   \
+  A = (pgGrB_Matrix *) PG_GETARG_POINTER(0);
+  B = (pgGrB_Vector *) PG_GETARG_POINTER(1);
+  C = (pgGrB_Vector *) palloc0(sizeof(pgGrB_Vector));
 
   CHECK(GrB_Vector_size(&size, B->V));
   CHECK(GrB_Vector_new (&(C->V), GrB_INT64, size));

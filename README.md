@@ -1,5 +1,25 @@
 # pggraphblas
-Postgres extension wrapping GraphBLAS
+High Performance Graph Processing with Postgres using Linear Algebra
+
+GraphBLAS is a linear algebra API optimized for processing graphs
+encoded as sparse matrices and vectors.  In addition to common
+real/integer matrix algebras, GraphBLAS supports up to 960 different
+"semiring" algebras, that can be used to encode and solve graph
+problems.
+
+[GraphBLAS Mathematics](http://www.mit.edu/~kepner/GraphBLAS/GraphBLAS-Math-release.pdf)
+
+For more information about GraphBLAS in the context of RedisGraph:
+
+[Lower Latency Graph Queries in Cypher with Redis GraphRoi Lipman, Redis LabsTim Davis, Texas A&M U](https://www.youtube.com/watch?v=xnez6tloNSQ)
+
+[A good introduction to semirings](https://www.youtube.com/watch?v=Gd_VT_Nj8Xw)
+
+[Part II of above intro](https://www.youtube.com/watch?v=dluPFbuq6zs)
+
+[A good introduction to abstract algebra](https://www.youtube.com/playlist?list=PLi01XoE8jYoi3SgnnGorR_XOW3IcK-TP6)
+
+[Graph algorithms via SuiteSparse:GraphBLAS: triangle counting and K-truss](http://faculty.cse.tamu.edu/davis/GraphBLAS_files/Davis_HPEC18.pdf)
 
 If you have docker installed, run `./test.sh` to build a docker with
 postgres:11 and GraphBLAS compiled with debug symbols on.  This will
@@ -8,7 +28,7 @@ the container will not be immediately cleaned up, and you can access
 the database directly with `./psql`
 
 DONE-ish:
-    
+
 * Matrix type for INT64 (float4)
 * matrix_agg/matrix_tuples to GrB_Matrix_build
 * matrix_tuples from GrB_Matrix_extractTuples
@@ -19,14 +39,14 @@ DONE-ish:
 * overloaded operators for plus,times,set-union/intersection
 
 TODO:
-    
+
 * Generalize matrix type
 * polymorphic matrix_agg support all types
 * overload all the operators
 * parallel aggregates of subgraphs with final merging
 
 UNKNOWNS:
-    
+
 * operation descriptors, how to mask, invert, clear destination?
 * storage options?  CRS? CCS? Tim Davis recommends just storing
   extracted tuples for now

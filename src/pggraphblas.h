@@ -14,7 +14,9 @@
 #include "utils/lsyscache.h"
 #include "nodes/pg_list.h"
 
-#define CHECK(method)                                   \
+#define M_MAGIC 689276813		/* ID for debugging crosschecks */
+
+#define CHECK(method)                                       \
 {                                                           \
     info = method ;                                         \
     if (! (info == GrB_SUCCESS || info == GrB_NO_VALUE))    \
@@ -27,6 +29,13 @@
 typedef struct pgGrB_Matrix {
   GrB_Matrix A;
 } pgGrB_Matrix;
+
+typedef struct pgGrB_FlatMatrix {
+    int32       vl_len_;
+    int         nrows;
+    int         ncols;
+    Oid         elemtype;
+} pgGrB_FlatMatrix;
 
 typedef struct pgGrB_Matrix_AggState {
   /* Oid      elemtype; */
@@ -44,7 +53,24 @@ typedef struct pgGrB_Matrix_ExtractState {
 
 static void context_callback_matrix_free(void*);
 
-ArrayType* new_int64ArrayType(int);
+typedef struct ExpandedMatrixHeader  {
+  ExpandedObjectHeader hdr;
+  int em_magic;
+
+  GrB_Index nrows;
+  GrB_Index ncols;
+
+  Oid element_type;
+  int16 typlen;
+  bool typbyval;
+  char typalign;
+  
+  GrB_Matrix A;
+  
+  Size flat_size;
+  pgGrB_FlatMatrix *flat_value;
+
+} ExpandedMatrixHeader;
 
 PG_FUNCTION_INFO_V1(matrix_agg_acc);
 PG_FUNCTION_INFO_V1(matrix_final_int8);

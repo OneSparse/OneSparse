@@ -75,10 +75,15 @@ select is(
 select is(
     '{{0,1,2},{1,2,3},{4,5,6}}'::matrix || '{{0,1,2},{1,2,3},{4,5,6}}'::matrix,
     '{{0,1,2},{1,2,3},{8,10,12}}'::matrix,
-    'dense literal matrix add');
+    'dense literal matrix ewise add');
 
 select is(
     '{{0,1,2},{1,2,3},{4,5,6}}'::matrix && '{{0,1,2},{1,2,3},{4,5,6}}'::matrix,
+    '{{0,1,2},{1,2,3},{16,25,36}}'::matrix,
+    'dense literal matrix ewise mul');
+    
+select is(
+    '{{0,1,2},{1,2,3},{4,5,6}}'::matrix * '{{0,1,2},{1,2,3},{4,5,6}}'::matrix,
     '{{0,1,2},{1,2,3},{16,25,36}}'::matrix,
     'dense literal matrix mul');
     
