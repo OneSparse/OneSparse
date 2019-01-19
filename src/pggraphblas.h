@@ -14,9 +14,14 @@
 #include "utils/lsyscache.h"
 #include "nodes/pg_list.h"
 
-#define M_MAGIC 689276813		/* ID for debugging crosschecks */
 
-#define CHECK(method)                                       \
+/* dumb debug helper */
+#define elogn(s) elog(NOTICE, "%s", (s))
+#define elogn1(s, v) elog(NOTICE, "%s: %lu", (s), (v))
+
+/* GraphBLAS API checking macros */
+
+#define CHECKD(method)                                      \
 {                                                           \
     info = method ;                                         \
     if (! (info == GrB_SUCCESS || info == GrB_NO_VALUE))    \
@@ -26,24 +31,63 @@
     }                                                       \
 }
 
-typedef struct pgGrB_Matrix {
-  GrB_Matrix A;
-} pgGrB_Matrix;
+#define CHECKV(method)                                      \
+{                                                           \
+    info = method ;                                         \
+    if (! (info == GrB_SUCCESS || info == GrB_NO_VALUE))    \
+    {                                                       \
+      elog(ERROR, "%s", GrB_error());                       \
+      return;                                               \
+    }                                                       \
+}
 
+/* Flattened representation of matrix, used to store to disk.
+
+Actual array data is appended and for the moment cannot exceed 1GB.
+*/
 typedef struct pgGrB_FlatMatrix {
-    int32       vl_len_;
-    int         nrows;
-    int         ncols;
-    Oid         elemtype;
+  int32 vl_len_;
+  GrB_Index nrows;
+  GrB_Index ncols;
+  GrB_Index nvals;
+  GrB_Type type;
+  Oid elemtype;
 } pgGrB_FlatMatrix;
 
+/* ID for debugging crosschecks */
+#define EM_MAGIC 689276813
+
+/* Expanded representation of matrix.
+
+When loaded from storage, the flattened representation is used to
+build the matrix with GrB_Matrix_build.
+*/
+typedef struct pgGrB_Matrix  {
+  ExpandedObjectHeader hdr;
+  int em_magic;
+  GrB_Index nrows;
+  GrB_Index ncols;
+  GrB_Index nvals;
+  GrB_Type type;
+  GrB_Matrix A;
+  Size flat_size;
+  pgGrB_FlatMatrix *flat_value;
+
+} pgGrB_Matrix;
+
+
+/* Aggregate function state (matrix_agg) for accumulating tuples into a matrix.
+ */
 typedef struct pgGrB_Matrix_AggState {
   /* Oid      elemtype; */
-  List     *rows;
-  List     *cols;
-  List     *vals;
+  List *rows;
+  List *cols;
+  List *vals;
 } pgGrB_Matrix_AggState;
 
+/* Set Returning Function (matrix_tuples) state for generating tuples
+   from a matrix.
+ */
 typedef struct pgGrB_Matrix_ExtractState {
   pgGrB_Matrix *mat;
   GrB_Index *rows;
@@ -51,32 +95,49 @@ typedef struct pgGrB_Matrix_ExtractState {
   int64 *vals;
 } pgGrB_Matrix_ExtractState;
 
-static void context_callback_matrix_free(void*);
 
-typedef struct ExpandedMatrixHeader  {
-  ExpandedObjectHeader hdr;
-  int em_magic;
+/* Callback function for freeing matrices. */
+static void
+context_callback_matrix_free(void*);
 
-  GrB_Index nrows;
-  GrB_Index ncols;
+/* Utility function that expands a flattened matrix datum. */
+Datum
+expand_matrix(Datum matrixdatum,
+              MemoryContext parentcontext);
 
-  Oid element_type;
-  int16 typlen;
-  bool typbyval;
-  char typalign;
-  
-  GrB_Matrix A;
-  
-  Size flat_size;
-  pgGrB_FlatMatrix *flat_value;
+/* Helper function that either detoasts or expands matrices. */
+pgGrB_Matrix *
+DatumGetMatrix(Datum d);
 
-} ExpandedMatrixHeader;
+/* Helper function to create an empty flattened matrix. */
+pgGrB_FlatMatrix *
+construct_empty_matrix(GrB_Index nrows,
+                       GrB_Index ncols,
+                       GrB_Type type);
+
+/* Helper function that creates an expanded empty matrix. */
+pgGrB_Matrix *
+construct_empty_expanded_matrix(GrB_Index nrows,
+                                GrB_Index ncols,
+                                GrB_Type type,
+                                MemoryContext parentcontext);
+
+
+/* Helper to detoast and expand matrixs arguments */
+#define PGGRB_GETARG_MATRIX(n)  DatumGetMatrix(PG_GETARG_DATUM(n))
+
+/* Helper to return Expanded Object Header Pointer from matrix. */
+#define PGGRB_RETURN_MATRIX(A) return EOHPGetRWDatum(&(A)->hdr)
+
+/* Helper to compute flat matrix header size */
+#define PGGRB_MATRIX_OVERHEAD() MAXALIGN(sizeof(pgGrB_FlatMatrix))
+
+/* Public API functions */
 
 PG_FUNCTION_INFO_V1(matrix_agg_acc);
 PG_FUNCTION_INFO_V1(matrix_final_int8);
 
 PG_FUNCTION_INFO_V1(matrix_tuples);
-
 PG_FUNCTION_INFO_V1(matrix_in);
 PG_FUNCTION_INFO_V1(matrix_out);
 

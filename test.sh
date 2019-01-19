@@ -17,8 +17,9 @@ docker build . -t pggraphblas/test
 echo running test container
 docker run --cap-add=SYS_PTRACE --security-opt seccomp=unconfined -d --name "$DB_HOST" pggraphblas/test
 
-$EXEC make clean
-$EXEC make install
+$EXECIT pg_ctl start
+# $EXEC make clean
+# $EXEC make install
 
 echo waiting for database to accept connections
 until
@@ -36,7 +37,7 @@ then
     $EXEC pg_prove -U "$SU" /pggraphblas/test.sql
 else
     echo running repl
-    ./psql
+    $EXECIT tmux new -s pggraphblas
 fi
 
 echo destroying test container and image

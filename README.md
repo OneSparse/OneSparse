@@ -1,11 +1,11 @@
 # pggraphblas
 High Performance Graph Processing with Postgres using Linear Algebra
 
-GraphBLAS is a linear algebra API optimized for processing graphs
-encoded as sparse matrices and vectors.  In addition to common
+GraphBLAS is a sparse linear algebra API optimized for processing
+graphs encoded as sparse matrices and vectors.  In addition to common
 real/integer matrix algebras, GraphBLAS supports up to 960 different
-"semiring" algebras, that can be used to encode and solve graph
-problems.
+"semiring" algebras, that can be used to sparsely encode and solve
+graph problems.
 
 [GraphBLAS Mathematics](http://www.mit.edu/~kepner/GraphBLAS/GraphBLAS-Math-release.pdf)
 
@@ -17,11 +17,13 @@ problems.
 
 [Graph algorithms via SuiteSparse:GraphBLAS: triangle counting and K-truss](http://faculty.cse.tamu.edu/davis/GraphBLAS_files/Davis_HPEC18.pdf)
 
-If you have docker installed, run `./test.sh` to build a docker with
-postgres:11 and GraphBLAS compiled with debug symbols on.  This will
-automatically run test.sql.  If you provide any argument to test.sh
-the container will not be immediately cleaned up, and you can access
-the database directly with `./psql`
+# development
+
+If you have docker installed, run `./test.sh` to build a docker
+container with postgres:11 and GraphBLAS compiled with debug symbols
+on.  This will automatically run test.sql.  If you provide any
+argument to test.sh the container will not be immediately cleaned up,
+and you can access the database directly with `./psql`
 
 DONE-ish:
 
@@ -31,8 +33,9 @@ DONE-ish:
 * vector type for INT64 (float4)
 * vector_agg to GrB_Matrix_build
 * matrix_tuples from GrB_Vector_extractTuples
-* most of the GrB_PLUS_TIMES_INT64 semi-ring.
+* most of the GrB_PLUS_TIMES_INT64 semiring.
 * overloaded operators for plus,times,set-union/intersection
+* "expanded" object API
 
 TODO:
 
@@ -44,5 +47,3 @@ TODO:
 UNKNOWNS:
 
 * operation descriptors, how to mask, invert, clear destination?
-* storage options?  CRS? CCS? Tim Davis recommends just storing
-  extracted tuples for now

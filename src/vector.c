@@ -78,11 +78,11 @@ vector_final_int8(PG_FUNCTION_ARGS) {
   ctxcb->arg = retval;
   MemoryContextRegisterResetCallback(CurrentMemoryContext, ctxcb);
 
-  CHECK(GrB_Vector_new(&(retval->V),
+  CHECKD(GrB_Vector_new(&(retval->V),
                        GrB_INT64,
                        count));
 
-  CHECK(GrB_Vector_build(retval->V,
+  CHECKD(GrB_Vector_build(retval->V,
                          row_indices,
                          vector_vals,
                          count,
@@ -112,12 +112,12 @@ vector_tuples(PG_FUNCTION_ARGS) {
     vec = (pgGrB_Vector *) PG_GETARG_POINTER(0);
 
     state = (pgGrB_Vector_ExtractState*)palloc(sizeof(pgGrB_Vector_ExtractState));
-    CHECK(GrB_Vector_size(&size, vec->V));
+    CHECKD(GrB_Vector_size(&size, vec->V));
 
     state->rows = (GrB_Index*) palloc0(sizeof(GrB_Index) * size);
     state->vals = (int64*) palloc0(sizeof(int64) * size);
 
-    CHECK(GrB_Vector_extractTuples(state->rows,
+    CHECKD(GrB_Vector_extractTuples(state->rows,
                                    state->vals,
                                    &size,
                                    vec->V));
@@ -249,9 +249,9 @@ vector_in(PG_FUNCTION_ARGS)
   ctxcb->arg = retval;
   MemoryContextRegisterResetCallback(CurrentMemoryContext, ctxcb);
 
-  CHECK(GrB_Vector_new(&(retval->V), GrB_INT64, max));
+  CHECKD(GrB_Vector_new(&(retval->V), GrB_INT64, max));
 
-  CHECK(GrB_Vector_build(retval->V,
+  CHECKD(GrB_Vector_build(retval->V,
                          row_indices,
                          vector_vals,
                          count,
@@ -275,13 +275,13 @@ vector_out(PG_FUNCTION_ARGS)
   GrB_Index *row_indices;
   int64 *vector_vals;
 
-  CHECK(GrB_Vector_size(&size, vec->V));
-  CHECK(GrB_Vector_nvals(&nvals, vec->V));
+  CHECKD(GrB_Vector_size(&size, vec->V));
+  CHECKD(GrB_Vector_nvals(&nvals, vec->V));
 
   row_indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * size);
   vector_vals = (int64*) palloc0(sizeof(int64) * size);
 
-  CHECK(GrB_Vector_extractTuples(row_indices,
+  CHECKD(GrB_Vector_extractTuples(row_indices,
                                  vector_vals,
                                  &size,
                                  vec->V));
@@ -320,10 +320,10 @@ vector_ewise_mult(PG_FUNCTION_ARGS) {
   GrB_Index m;
   VECTOR_BINOP_PREAMBLE();
 
-  CHECK(GrB_Vector_size(&m, A->V));
-  CHECK(GrB_Vector_new (&(C->V), GrB_INT64, m));
+  CHECKD(GrB_Vector_size(&m, A->V));
+  CHECKD(GrB_Vector_new (&(C->V), GrB_INT64, m));
 
-  CHECK(GrB_eWiseMult(C->V, NULL, NULL, GrB_TIMES_INT64, A->V, B->V, NULL));
+  CHECKD(GrB_eWiseMult(C->V, NULL, NULL, GrB_TIMES_INT64, A->V, B->V, NULL));
   PG_RETURN_POINTER(C);
 }
 
@@ -334,10 +334,10 @@ vector_ewise_add(PG_FUNCTION_ARGS) {
   GrB_Index m;
   VECTOR_BINOP_PREAMBLE();
 
-  CHECK(GrB_Vector_size(&m, A->V));
-  CHECK(GrB_Vector_new (&(C->V), GrB_INT64, m));
+  CHECKD(GrB_Vector_size(&m, A->V));
+  CHECKD(GrB_Vector_new (&(C->V), GrB_INT64, m));
 
-  CHECK(GrB_eWiseAdd(C->V, NULL, NULL, GrB_PLUS_INT64, A->V, B->V, NULL));
+  CHECKD(GrB_eWiseAdd(C->V, NULL, NULL, GrB_PLUS_INT64, A->V, B->V, NULL));
   PG_RETURN_POINTER(C);
 }
 
@@ -349,18 +349,18 @@ vector_eq(PG_FUNCTION_ARGS) {
   bool result = 0;
 
   VECTOR_BINOP_PREAMBLE();
-  CHECK(GrB_Vector_size(&asize, A->V));
-  CHECK(GrB_Vector_size(&bsize, B->V));
-  CHECK(GrB_Vector_nvals(&anvals, A->V));
-  CHECK(GrB_Vector_nvals(&bnvals, B->V));
+  CHECKD(GrB_Vector_size(&asize, A->V));
+  CHECKD(GrB_Vector_size(&bsize, B->V));
+  CHECKD(GrB_Vector_nvals(&anvals, A->V));
+  CHECKD(GrB_Vector_nvals(&bnvals, B->V));
 
   if (asize != bsize || anvals != bnvals)
     PG_RETURN_BOOL(result);
 
-  CHECK(GrB_Vector_new (&(C->V), GrB_BOOL, asize));
+  CHECKD(GrB_Vector_new (&(C->V), GrB_BOOL, asize));
 
-  CHECK(GrB_eWiseMult(C->V, NULL, NULL, GxB_ISEQ_INT64, A->V, B->V, NULL));
-  CHECK(GrB_Vector_reduce_BOOL(&result, NULL, GxB_LAND_BOOL_MONOID, C->V, NULL));
+  CHECKD(GrB_eWiseMult(C->V, NULL, NULL, GxB_ISEQ_INT64, A->V, B->V, NULL));
+  CHECKD(GrB_Vector_reduce_BOOL(&result, NULL, GxB_LAND_BOOL_MONOID, C->V, NULL));
   PG_RETURN_BOOL(result);
 }
 
@@ -372,18 +372,18 @@ vector_neq(PG_FUNCTION_ARGS) {
   bool result = 0;
 
   VECTOR_BINOP_PREAMBLE();
-  CHECK(GrB_Vector_size(&asize, A->V));
-  CHECK(GrB_Vector_size(&bsize, B->V));
-  CHECK(GrB_Vector_nvals(&anvals, A->V));
-  CHECK(GrB_Vector_nvals(&bnvals, B->V));
+  CHECKD(GrB_Vector_size(&asize, A->V));
+  CHECKD(GrB_Vector_size(&bsize, B->V));
+  CHECKD(GrB_Vector_nvals(&anvals, A->V));
+  CHECKD(GrB_Vector_nvals(&bnvals, B->V));
 
   if (asize != bsize || anvals != bnvals)
     PG_RETURN_BOOL(result);
 
-  CHECK(GrB_Vector_new (&(C->V), GrB_BOOL, asize));
+  CHECKD(GrB_Vector_new (&(C->V), GrB_BOOL, asize));
 
-  CHECK(GrB_eWiseMult(C->V, NULL, NULL, GxB_ISNE_INT64, A->V, B->V, NULL));
-  CHECK(GrB_Vector_reduce_BOOL(&result, NULL, GxB_LAND_BOOL_MONOID, C->V, NULL));
+  CHECKD(GrB_eWiseMult(C->V, NULL, NULL, GxB_ISNE_INT64, A->V, B->V, NULL));
+  CHECKD(GrB_Vector_reduce_BOOL(&result, NULL, GxB_LAND_BOOL_MONOID, C->V, NULL));
   PG_RETURN_BOOL(result);
 }
 
@@ -393,7 +393,7 @@ vector_nvals(PG_FUNCTION_ARGS) {
   pgGrB_Vector *vec;
   GrB_Index count;
   vec = (pgGrB_Vector *) PG_GETARG_POINTER(0);
-  CHECK(GrB_Vector_nvals(&count, vec->V));
+  CHECKD(GrB_Vector_nvals(&count, vec->V));
   return Int64GetDatum(count);
 }
 
@@ -403,6 +403,6 @@ vector_size(PG_FUNCTION_ARGS) {
   pgGrB_Vector *vec;
   GrB_Index count;
   vec = (pgGrB_Vector *) PG_GETARG_POINTER(0);
-  CHECK(GrB_Vector_size(&count, vec->V));
+  CHECKD(GrB_Vector_size(&count, vec->V));
   return Int64GetDatum(count);
 }
