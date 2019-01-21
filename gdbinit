@@ -13,3 +13,4 @@ handle SIGUSR2 noprint nostop
 
 # Ugly hack so we don't break on process exit  
 python gdb.events.exited.connect(lambda x: [gdb.execute('inferior 1'), gdb.post_event(lambda: gdb.execute('continue'))])
+

@@ -57,6 +57,7 @@ EM_flatten_into(ExpandedObjectHeader *eohptr,
   pgGrB_Matrix *A = (pgGrB_Matrix *) eohptr;
   pgGrB_FlatMatrix *flat = (pgGrB_FlatMatrix *) result;
 
+  elogn("flattening");
   if (A->flat_value) {
     Assert(allocated_size == VARSIZE(A->flat_value));
     memcpy(flat, A->flat_value, allocated_size);

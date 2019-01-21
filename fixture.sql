@@ -1,3 +1,5 @@
+create extension pggraphblas;
+select pg_backend_pid();
     
 create table graph (
     i bigint,
@@ -16,7 +18,6 @@ insert into graph (i, j, v) values
     (5, 6, 8),
     (6, 3, 9),
     (7, 3, 10);
-
 
 create function test_m_ewise_mult() returns setof matrix_tuple as $$
     declare m matrix;
@@ -50,3 +51,14 @@ create function test_v_ewise_add() returns setof vector_tuple as $$
         return query select * from vector_tuples(m || m);
     end;
 $$ language plpgsql;
+
+create function matrix_from_table() returns matrix as $$
+    declare m matrix;
+    begin
+        raise notice 'sql before agg';
+        select matrix_agg(i, j, v) from graph into m;
+        raise notice 'sql before return';
+        return m || m;
+    end;
+$$ language plpgsql;
+    

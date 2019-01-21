@@ -37,7 +37,8 @@ then
     $EXEC pg_prove -U "$SU" /pggraphblas/test.sql
 else
     echo running repl
-    $EXECIT tmux new -s pggraphblas
+    $EXEC tmux new-session -d -s pggraphblas 'psql'
+    $EXECIT tmux attach-session -t pggraphblas
 fi
 
 echo destroying test container and image
