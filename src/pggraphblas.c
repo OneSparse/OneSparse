@@ -1,6 +1,7 @@
 #include "pggraphblas.h"
 PG_MODULE_MAGIC;
 
+#include "isequal.c"
 #include "vector.c"
 #include "matrix.c"
 

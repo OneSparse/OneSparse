@@ -537,60 +537,27 @@ matrix_nvals(PG_FUNCTION_ARGS) {
 Datum
 matrix_eq(PG_FUNCTION_ARGS) {
   GrB_Info info;
-  pgGrB_Matrix *A, *B, *C;
-  GrB_Index arows, brows, acols, bcols, anvals, bnvals;
-  bool result = 0;
+  pgGrB_Matrix *A, *B;
+  bool result;
 
   A = PGGRB_GETARG_MATRIX(0);
   B = PGGRB_GETARG_MATRIX(1);
 
-  CHECKD(GrB_Matrix_nrows(&arows, A->A));
-  CHECKD(GrB_Matrix_nrows(&brows, B->A));
-  CHECKD(GrB_Matrix_ncols(&acols, A->A));
-  CHECKD(GrB_Matrix_ncols(&bcols, B->A));
-  CHECKD(GrB_Matrix_nvals(&anvals, A->A));
-  CHECKD(GrB_Matrix_nvals(&bnvals, B->A));
-
-  if (arows != brows || acols != bcols || anvals != bnvals)
-    PG_RETURN_BOOL(0);
-
-  C = (pgGrB_Matrix *) palloc0(sizeof(pgGrB_Matrix));
-  CHECKD(GrB_Matrix_new (&(C->A), GrB_BOOL, arows, bcols));
-
-  CHECKD(GrB_eWiseMult(C->A, NULL, NULL, GrB_EQ_INT64, A->A, B->A, NULL));
-  CHECKD(GrB_Matrix_reduce_BOOL(&result, NULL, GxB_LAND_BOOL_MONOID, C->A, NULL));
-  CHECKD(GrB_Matrix_free(&C->A));
-  pfree(C);
+  CHECKD(isequal(&result, A->A, B->A, NULL));
   PG_RETURN_BOOL(result);
 }
 
 Datum
 matrix_neq(PG_FUNCTION_ARGS) {
   GrB_Info info;
-  pgGrB_Matrix *A, *B, *C;
-  GrB_Index arows, brows, acols, bcols, anvals, bnvals;
-  bool result = 1;
+  pgGrB_Matrix *A, *B;
+  bool result;
 
   A = PGGRB_GETARG_MATRIX(0);
   B = PGGRB_GETARG_MATRIX(1);
 
-  CHECKD(GrB_Matrix_nrows(&arows, A->A));
-  CHECKD(GrB_Matrix_nrows(&brows, B->A));
-  CHECKD(GrB_Matrix_ncols(&acols, A->A));
-  CHECKD(GrB_Matrix_ncols(&bcols, B->A));
-  CHECKD(GrB_Matrix_nvals(&anvals, A->A));
-  CHECKD(GrB_Matrix_nvals(&bnvals, B->A));
-
-  if (arows != brows || acols != bcols || anvals != bnvals)
-    PG_RETURN_BOOL(1);
-
-  C = (pgGrB_Matrix *) palloc0(sizeof(pgGrB_Matrix));
-  CHECKD(GrB_Matrix_new (&(C->A), GrB_BOOL, arows, bcols));
-  CHECKD(GrB_eWiseMult(C->A, NULL, NULL, GxB_ISNE_INT64, A->A, B->A, NULL));
-  CHECKD(GrB_Matrix_reduce_BOOL(&result, NULL, GxB_LAND_BOOL_MONOID, C->A, NULL));
-  CHECKD(GrB_Matrix_free(&C->A));
-  pfree(C);
-  PG_RETURN_BOOL(result);
+  CHECKD(isequal(&result, A->A, B->A, NULL));
+  PG_RETURN_BOOL(!result);
 }
 
 Datum

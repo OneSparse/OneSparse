@@ -14,7 +14,6 @@
 #include "utils/lsyscache.h"
 #include "nodes/pg_list.h"
 
-
 /* dumb debug helper */
 #define elogn(s) elog(NOTICE, "%s", (s))
 #define elogn1(s, v) elog(NOTICE, "%s: %lu", (s), (v))
@@ -39,7 +38,23 @@
       elog(ERROR, "%s", GrB_error());                       \
       return;                                               \
     }                                                       \
-}
+}                                                           \
+
+GrB_Info isequal_type
+(
+    bool *result,
+    GrB_Matrix A,
+    GrB_Matrix B,
+    GrB_BinaryOp op
+ );
+
+GrB_Info isequal
+(
+    bool *result,
+    GrB_Matrix A,
+    GrB_Matrix B,
+    GrB_BinaryOp userop
+ );
 
 /* Flattened representation of matrix, used to store to disk.
 
@@ -194,4 +209,3 @@ PG_FUNCTION_INFO_V1(vector_size);
 void _PG_init(void);
 
 #endif /* PGGRAPHBLAS_H */
-
