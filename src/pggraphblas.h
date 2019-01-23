@@ -72,7 +72,6 @@ typedef struct pgGrB_Matrix  {
   GrB_Matrix A;
   Size flat_size;
   pgGrB_FlatMatrix *flat_value;
-
 } pgGrB_Matrix;
 
 

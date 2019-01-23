@@ -127,4 +127,4 @@ $$ language plpgsql;
 
 -- select '{{0,1,2},{1,2,3},{4,5,6}}'::matrix;
     
-select matrix_from_table();
+select * from matrix_from_table();

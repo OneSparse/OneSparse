@@ -57,7 +57,6 @@ EM_flatten_into(ExpandedObjectHeader *eohptr,
   pgGrB_Matrix *A = (pgGrB_Matrix *) eohptr;
   pgGrB_FlatMatrix *flat = (pgGrB_FlatMatrix *) result;
 
-  elogn("flattening");
   if (A->flat_value) {
     Assert(allocated_size == VARSIZE(A->flat_value));
     memcpy(flat, A->flat_value, allocated_size);
@@ -109,7 +108,6 @@ expand_matrix(Datum flatdatum,
   A->em_magic = EM_MAGIC;
 
   if (VARATT_IS_EXTERNAL_EXPANDED_RW(DatumGetPointer(flatdatum))) {
-    elogn("matrix is expanded");
     oldA = (pgGrB_Matrix *) DatumGetEOHP(flatdatum);
     Assert(oldA->em_magic == EM_MAGIC);
     CHECKD(GrB_Matrix_new(&A->A,
@@ -122,13 +120,11 @@ expand_matrix(Datum flatdatum,
       PGGRB_RETURN_MATRIX(A);
     }
   }
-  elogn("matrix is flat");
 
   oldcxt = MemoryContextSwitchTo(objcxt);
   flat = (pgGrB_FlatMatrix*)PG_DETOAST_DATUM_COPY(flatdatum);
 
   nrows = flat->nrows;
-  elogn1("flat rows:", nrows);
   ncols = flat->ncols;
   nvals = flat->nvals;
   type = flat->type;
@@ -192,7 +188,6 @@ construct_empty_expanded_matrix(GrB_Index nrows,
                                 MemoryContext parentcontext) {
   pgGrB_FlatMatrix  *flat;
   Datum	d;
-  elogn1("constructing empty expanded", nrows);
   flat = construct_empty_matrix(nrows, ncols, type);
   d = expand_matrix(PointerGetDatum(flat), parentcontext);
   pfree(flat);
@@ -207,11 +202,9 @@ DatumGetMatrix(Datum d) {
   pgGrB_Matrix *A;
   if (VARATT_IS_EXTERNAL_EXPANDED_RW(DatumGetPointer(d))) {
     A = (pgGrB_Matrix *) DatumGetEOHP(d);
-    elogn1("already expanded", A->nvals);
     Assert(A->em_magic == EM_MAGIC);
     return A;
   }
-  elogn("expanding");
   d = expand_matrix(d, CurrentMemoryContext);
   return (pgGrB_Matrix *) DatumGetEOHP(d);
 }
@@ -288,7 +281,6 @@ matrix_final_int8(PG_FUNCTION_ARGS) {
                                            GrB_INT64,
                                            CurrentMemoryContext);
 
-  elogn1("building matrix", count);
   CHECKD(GrB_Matrix_build(retval->A,
                          row_indices,
                          col_indices,
@@ -438,8 +430,8 @@ matrix_in(PG_FUNCTION_ARGS)
     matrix_vals[i] = data[i+count+count];
   }
 
-  retval = construct_empty_expanded_matrix(count+1,
-                                           count+1,
+  retval = construct_empty_expanded_matrix(count,
+                                           count,
                                            GrB_INT64,
                                            CurrentMemoryContext);
 
@@ -472,7 +464,6 @@ matrix_out(PG_FUNCTION_ARGS)
   GrB_Index *row_indices, *col_indices;
   int64 *matrix_vals;
 
-  elogn("matrix_out");
   CHECKD(GrB_Matrix_nrows(&nrows, mat->A));
   CHECKD(GrB_Matrix_ncols(&ncols, mat->A));
   CHECKD(GrB_Matrix_nvals(&nvals, mat->A));
@@ -678,7 +669,6 @@ matrix_ewise_add(PG_FUNCTION_ARGS) {
   A = PGGRB_GETARG_MATRIX(0);
   B = PGGRB_GETARG_MATRIX(1);
 
-  elogn("bout to eadd");
   CHECKD(GrB_Matrix_nrows(&m, A->A));
   CHECKD(GrB_Matrix_ncols(&n, A->A));
 

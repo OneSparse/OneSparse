@@ -37,7 +37,7 @@ then
     $EXEC pg_prove -U "$SU" /pggraphblas/test.sql
 else
     echo running repl
-    $EXEC tmux new-session -d -s pggraphblas 'psql'
+    $EXEC tmux new-session -d -s pggraphblas $1
     $EXECIT tmux attach-session -t pggraphblas
 fi
 
