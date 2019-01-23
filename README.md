@@ -7,6 +7,13 @@ real/integer matrix algebras, GraphBLAS supports up to 960 different
 "semiring" algebras, that can be used to sparsely encode and solve
 graph problems.
 
+pggraphblas wraps the [SuiteSparse
+GraphBLAS](http://faculty.cse.tamu.edu/davis/suitesparse.html)
+implementation and provides access to the matrix and vector types, as
+well much of the APIs functionality.  This is a currently a very
+"alpha" quality integration, much of the API is not supported yet but
+is an active work in progress.  See TODO below.
+
 [GraphBLAS Mathematics](http://www.mit.edu/~kepner/GraphBLAS/GraphBLAS-Math-release.pdf)
 
 [Lower Latency Graph Queries in Cypher with Redis GraphRoi Lipman, Redis LabsTim Davis, Texas A&M U](https://www.youtube.com/watch?v=xnez6tloNSQ)
@@ -23,11 +30,13 @@ If you have docker installed, run `./test.sh` to build a docker
 container with postgres:11 and GraphBLAS compiled with debug symbols
 on.  This will automatically run test.sql.  If you provide any
 argument to test.sh the container will not be immediately cleaned up,
-and you can access the database directly with `./psql`
+and the argument will be run in a tmux in the container, so to launch
+a psql, do `./test.sh psql`.  GDB is installed so create another pane
+and attach to the current database pid to debug the C code.
 
 DONE-ish:
 
-* Matrix type for INT64 (float4)
+* Matrix type for INT64 (bigint)
 * matrix_agg/matrix_tuples to GrB_Matrix_build
 * matrix_tuples from GrB_Matrix_extractTuples
 * vector type for INT64 (float4)
