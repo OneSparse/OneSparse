@@ -62,4 +62,6 @@ create function matrix_from_table() returns matrix as $$
     end;
 $$ language plpgsql;
     
-select '{{0,1,2},{1,2,0},{4,5,6}}'::matrix * '{{0,1,2},{1,2,0},{4,5,6}}'::matrix;
+-- select '{{0,1,2},{1,2,0},{4,5,6}}'::matrix * '{{0,1,2},{1,2,0},{4,5,6}}'::matrix;
+
+-- select matrix_agg(i, j, v) from graph;

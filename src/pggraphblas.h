@@ -141,7 +141,7 @@ construct_empty_expanded_matrix(GrB_Index nrows,
 #define PGGRB_GETARG_MATRIX(n)  DatumGetMatrix(PG_GETARG_DATUM(n))
 
 /* Helper to return Expanded Object Header Pointer from matrix. */
-#define PGGRB_RETURN_MATRIX(A) return EOHPGetRWDatum(&(A)->hdr)
+#define PGGRB_RETURN_MATRIX(A) PG_RETURN_DATUM(EOHPGetRWDatum(&(A)->hdr))
 
 /* Helper to compute flat matrix header size */
 #define PGGRB_MATRIX_OVERHEAD() MAXALIGN(sizeof(pgGrB_FlatMatrix))
