@@ -81,70 +81,74 @@ EM_flatten_into(ExpandedObjectHeader *eohptr,
   SET_VARSIZE(flat, allocated_size);
 }
 
-/* Given a possibly flat matrix datum, either dup it if already
-   expanded or expand it. */
+/* Expand a flat matrix. */
 Datum
-expand_matrix(Datum flatdatum,
-              MemoryContext parentcontext) {
+expand_flat_matrix(Datum flatdatum,
+                   MemoryContext parentcontext) {
   GrB_Info info;
-  pgGrB_Matrix *A, *oldA;
+  
+  pgGrB_Matrix *A;
   pgGrB_FlatMatrix *flat;
-  MemoryContext objcxt;
-  MemoryContext oldcxt;
+  
+  MemoryContext objcxt, oldcxt;
   MemoryContextCallback *ctxcb;
+  
   GrB_Index ncols, nrows, nvals;
   GrB_Index *rows, *cols;
   int64 *vals;
   GrB_Type type;
 
-  objcxt = AllocSetContextCreate(parentcontext,
-                                 "expanded matrix",
-                                 ALLOCSET_START_SMALL_SIZES);
+  /* Create a new context that will hold the expanded object. */
+  objcxt = AllocSetContextCreate(
+          parentcontext,
+          "expanded matrix",
+          ALLOCSET_DEFAULT_SIZES);
 
-  A = (pgGrB_Matrix*)MemoryContextAlloc(objcxt,
-                                        sizeof(pgGrB_Matrix));
+  /* Allocate a new expanded matrix */
+  A = (pgGrB_Matrix*)MemoryContextAlloc(
+          objcxt,
+          sizeof(pgGrB_Matrix));
 
+  /* Initialize the ExpandedObjectHeader member with flattening
+   * methods and new object context */
   EOH_init_header(&A->hdr, &EM_methods, objcxt);
+
+  /* Used for debugging checks */
   A->em_magic = EM_MAGIC;
 
-  if (VARATT_IS_EXTERNAL_EXPANDED_RW(DatumGetPointer(flatdatum))) {
-    oldA = (pgGrB_Matrix *) DatumGetEOHP(flatdatum);
-    Assert(oldA->em_magic == EM_MAGIC);
-    CHECKD(GrB_Matrix_new(&A->A,
-                          oldA->type,
-                          oldA->nrows,
-                          oldA->ncols));
-
-    if (oldA->A != NULL) {
-      CHECKD(GrB_Matrix_dup(&A->A, oldA->A));
-      PGGRB_RETURN_MATRIX(A);
-    }
-  }
-
+  /* Switch to new object context */
   oldcxt = MemoryContextSwitchTo(objcxt);
+
+  /* Copy the flat datum into our context */
   flat = (pgGrB_FlatMatrix*)PG_DETOAST_DATUM_COPY(flatdatum);
 
+  /* Get dimensional information from flat */
   nrows = flat->nrows;
   ncols = flat->ncols;
   nvals = flat->nvals;
   type = flat->type;
 
+  /* Rows, cols, and vals are pointers into the vardata area */
   rows = (GrB_Index*)VARDATA(flat)+PGGRB_MATRIX_OVERHEAD();
   cols = (GrB_Index*)rows + (nrows * sizeof(GrB_Index));
   vals = (int64*)cols + (ncols * sizeof(GrB_Index));
 
+  /* Initialize the new matrix */
   CHECKD(GrB_Matrix_new(&A->A,
                         type,
                         nrows,
                         ncols));
 
-  ctxcb = (MemoryContextCallback*)MemoryContextAlloc(objcxt,
-                       sizeof(MemoryContextCallback));
+  /* Create a context callback to free matrix when context is cleared */
+  ctxcb = (MemoryContextCallback*)MemoryContextAlloc(
+          objcxt,
+          sizeof(MemoryContextCallback));
   
   ctxcb->func = context_callback_matrix_free;
   ctxcb->arg = A;
   MemoryContextRegisterResetCallback(objcxt, ctxcb);
 
+  /* If there's actual values, build the matrix */
   if (nvals > 0) {
     CHECKD(GrB_Matrix_build(A->A,
                             rows,
@@ -154,19 +158,17 @@ expand_matrix(Datum flatdatum,
                             GrB_SECOND_INT64));
   }
 
-  A->nrows = nrows;
-  A->ncols = ncols;
-  A->nvals = nvals;
-  A->flat_size = 0;
+  A->flat_size = VARSIZE(flat);
   A->flat_value = flat;
-  
+
+  /* Switch back to old context */
   MemoryContextSwitchTo(oldcxt);
   PGGRB_RETURN_MATRIX(A);
 }
 
 /* Construct an empty flat matrix. */
 pgGrB_FlatMatrix *
-construct_empty_matrix(GrB_Index nrows,
+construct_empty_flat_matrix(GrB_Index nrows,
                        GrB_Index ncols,
                        GrB_Type type) {
   pgGrB_FlatMatrix *result;
@@ -188,8 +190,8 @@ construct_empty_expanded_matrix(GrB_Index nrows,
                                 MemoryContext parentcontext) {
   pgGrB_FlatMatrix  *flat;
   Datum	d;
-  flat = construct_empty_matrix(nrows, ncols, type);
-  d = expand_matrix(PointerGetDatum(flat), parentcontext);
+  flat = construct_empty_flat_matrix(nrows, ncols, type);
+  d = expand_flat_matrix(PointerGetDatum(flat), parentcontext);
   pfree(flat);
   return (pgGrB_Matrix *) DatumGetEOHP(d);
 }
@@ -200,12 +202,14 @@ This is used by PGGRB_GETARG_MATRIX */
 pgGrB_Matrix *
 DatumGetMatrix(Datum d) {
   pgGrB_Matrix *A;
+  
   if (VARATT_IS_EXTERNAL_EXPANDED_RW(DatumGetPointer(d))) {
     A = (pgGrB_Matrix *) DatumGetEOHP(d);
     Assert(A->em_magic == EM_MAGIC);
     return A;
   }
-  d = expand_matrix(d, CurrentMemoryContext);
+  elogn("DatumGetMatrix flat");
+  d = expand_flat_matrix(d, CurrentMemoryContext);
   return (pgGrB_Matrix *) DatumGetEOHP(d);
 }
 
@@ -252,6 +256,7 @@ Datum
 matrix_final_int8(PG_FUNCTION_ARGS) {
   GrB_Info info;
   pgGrB_Matrix *retval;
+  MemoryContext oldcxt, resultcxt;
 
   pgGrB_Matrix_AggState *mstate = (pgGrB_Matrix_AggState*)PG_GETARG_POINTER(0);
   size_t n = 0, count = list_length(mstate->rows);
@@ -263,6 +268,11 @@ matrix_final_int8(PG_FUNCTION_ARGS) {
   if (PG_ARGISNULL(0))
     PG_RETURN_NULL();
 
+  if (!AggCheckCallContext(fcinfo, &resultcxt)) {
+    resultcxt = CurrentMemoryContext;
+  }
+  
+  oldcxt = MemoryContextSwitchTo(resultcxt);
   mstate = (pgGrB_Matrix_AggState *)PG_GETARG_POINTER(0);
 
   row_indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * count);
@@ -279,7 +289,7 @@ matrix_final_int8(PG_FUNCTION_ARGS) {
   retval = construct_empty_expanded_matrix(count,
                                            count,
                                            GrB_INT64,
-                                           CurrentMemoryContext);
+                                           resultcxt);
 
   CHECKD(GrB_Matrix_build(retval->A,
                          row_indices,
@@ -288,7 +298,8 @@ matrix_final_int8(PG_FUNCTION_ARGS) {
                          count,
                          GrB_SECOND_INT64));
 
-  return EOHPGetRWDatum(&retval->hdr);
+  MemoryContextSwitchTo(oldcxt);
+  PGGRB_RETURN_MATRIX(retval);
 }
 
 
@@ -364,8 +375,6 @@ matrix_in(PG_FUNCTION_ARGS)
   GrB_Info info;
   pgGrB_Matrix *retval;
 
-  MemoryContextCallback *ctxcb;
-
   Datum arr;
   ArrayType *vals;
   FunctionCallInfoData locfcinfo;
@@ -435,15 +444,6 @@ matrix_in(PG_FUNCTION_ARGS)
                                            GrB_INT64,
                                            CurrentMemoryContext);
 
-  /* retval = (pgGrB_Matrix*) palloc(sizeof(pgGrB_Matrix)); */
-
-  /* ctxcb = (MemoryContextCallback*) palloc(sizeof(MemoryContextCallback)); */
-  /* ctxcb->func = context_callback_matrix_free; */
-  /* ctxcb->arg = retval; */
-  /* MemoryContextRegisterResetCallback(CurrentMemoryContext, ctxcb); */
-
-  /* CHECKD(GrB_Matrix_new(&(retval->A), GrB_INT64, maxrows+1, maxcols+1)); */
-
   CHECKD(GrB_Matrix_build(retval->A,
                          row_indices,
                          col_indices,
@@ -451,14 +451,14 @@ matrix_in(PG_FUNCTION_ARGS)
                          count,
                          GrB_PLUS_INT64));
 
-  return EOHPGetRWDatum(&retval->hdr);
+  PGGRB_RETURN_MATRIX(retval);
 }
 
 Datum
 matrix_out(PG_FUNCTION_ARGS)
 {
   GrB_Info info;
-  pgGrB_Matrix *mat = (pgGrB_Matrix *) PGGRB_GETARG_MATRIX(0);
+  pgGrB_Matrix *mat = PGGRB_GETARG_MATRIX(0);
   char *result;
   GrB_Index nrows, ncols, nvals;
   GrB_Index *row_indices, *col_indices;

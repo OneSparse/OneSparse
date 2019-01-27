@@ -102,7 +102,9 @@ LANGUAGE C STABLE STRICT;
 CREATE TYPE matrix (
     internallength = 8,
     input = matrix_in,
-    output = matrix_out
+    output = matrix_out,
+    passedbyvalue,
+    alignment = double
 );
 
 CREATE AGGREGATE matrix_agg (bigint, bigint, bigint) (

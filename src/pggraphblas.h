@@ -21,7 +21,7 @@
 /* GraphBLAS API checking macros */
 
 #define CHECKD(method)                                      \
-{                                                           \
+  {                                                         \
     info = method ;                                         \
     if (! (info == GrB_SUCCESS || info == GrB_NO_VALUE))    \
     {                                                       \
@@ -66,7 +66,6 @@ typedef struct pgGrB_FlatMatrix {
   GrB_Index ncols;
   GrB_Index nvals;
   GrB_Type type;
-  Oid elemtype;
 } pgGrB_FlatMatrix;
 
 /* ID for debugging crosschecks */
@@ -80,9 +79,6 @@ build the matrix with GrB_Matrix_build.
 typedef struct pgGrB_Matrix  {
   ExpandedObjectHeader hdr;
   int em_magic;
-  GrB_Index nrows;
-  GrB_Index ncols;
-  GrB_Index nvals;
   GrB_Type type;
   GrB_Matrix A;
   Size flat_size;
@@ -116,8 +112,8 @@ context_callback_matrix_free(void*);
 
 /* Utility function that expands a flattened matrix datum. */
 Datum
-expand_matrix(Datum matrixdatum,
-              MemoryContext parentcontext);
+expand_flat_matrix(Datum matrixdatum,
+                   MemoryContext parentcontext);
 
 /* Helper function that either detoasts or expands matrices. */
 pgGrB_Matrix *
@@ -125,9 +121,9 @@ DatumGetMatrix(Datum d);
 
 /* Helper function to create an empty flattened matrix. */
 pgGrB_FlatMatrix *
-construct_empty_matrix(GrB_Index nrows,
-                       GrB_Index ncols,
-                       GrB_Type type);
+construct_empty_flat_matrix(GrB_Index nrows,
+                            GrB_Index ncols,
+                            GrB_Type type);
 
 /* Helper function that creates an expanded empty matrix. */
 pgGrB_Matrix *
