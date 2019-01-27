@@ -50,9 +50,9 @@ pggraphblas wraps the [SuiteSparse
 GraphBLAS](http://faculty.cse.tamu.edu/davis/suitesparse.html)
 implementation of the GraphBLAS API and provides access to sparse
 matrix and vector types, as well much of the APIs functionality.  The
-SuiteSparse:GraphBLAS implementation is brought to us by Dr. Tim
-Davis, professor in the Department of Computer Science and Engineering
-at Texas A&M University.  [News and
+SuiteSparse:GraphBLAS implementation is brought to us by the work of
+Dr. Tim Davis, professor in the Department of Computer Science and
+Engineering at Texas A&M University, and others.  [News and
 information](http://faculty.cse.tamu.edu/davis/news.html) can provide
 you with a lot more background information, in addition to the
 references below.
