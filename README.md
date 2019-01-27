@@ -26,11 +26,19 @@ of them would have meaningful values, leaving only 0.0000001 percent
 of the graph being utilized.
 
 By using a sparse matrix instead of dense, problems of this size are
-solvable on modern computing hardware.  Furthermore, expertise in the
-field of sparse matrix programming undertaken by [The
-GraphBLAS](http://graphblas.org) organization brings a powerful,
-abstract algebraic approach to solving graph problems with various
-combinations of matrix operations, or "semirings".
+solvable on modern computing hardware.  pggraphblas leverages the
+expertise in the field of sparse matrix programming by [The
+GraphBLAS](http://graphblas.org) organization. GraphBLAS brings a
+powerful, abstract algebraic approach to solving graph problems with
+various combinations of matrix operations, or "semirings".
+
+pggraphblas is a postgres extension that provides access to two new
+types: matrix and vector, as well as the GraphBLAS api to manipulate
+these types.  Aggregate functions are provided to build matrices from
+SQL queries, and set-returning functions are also provided to turn
+graphs back into relational sets.  From a SQL point of view, matrices
+look a certain bit like arrays, being stored as variable length column
+values.
 
 pggraphblas wraps the [SuiteSparse
 GraphBLAS](http://faculty.cse.tamu.edu/davis/suitesparse.html)
@@ -60,6 +68,31 @@ argument to test.sh the container will not be immediately cleaned up,
 and the argument will be run in a tmux in the container, so to launch
 a psql, do `./test.sh psql`.  GDB is installed so create another pane
 and attach to the current database pid to debug the C code.
+
+# 0.1 goals
+
+To run common graph algorithms on matrices, for example, breadth first search:
+```
+create function bfs(A matrix, source index) returns vector as $$
+declare
+    n index := matrix_nrows(A);
+    q vector :vector_new('int32', n)
+    v vector := vector_new('bool', n);
+    desc descriptor := descriptor_new('mask', 'scmp', 'outp', 'replace');
+    level integer := 1;
+    not_done bool := true;
+begin
+    perform matrix_set_element(q, true, source);
+    while not_done and level <= n loop
+        v := assign(level, 'all', n, mask=q);
+        q := mxv(A, q, semiring='lor_land_bool', mask=v, desc=desc);
+        not_done := vector_reduce_bool(q, operator='lor_bool_monoid');
+        level := level + 1;
+    end loop;
+    return v;
+end;
+$$ language plpgsql;
+```        
 
 DONE-ish:
 
