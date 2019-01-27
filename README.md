@@ -83,18 +83,27 @@ To run common graph algorithms on matrices, for example, breadth first search:
 ```
 create function bfs(A matrix, source index) returns vector as $$
 declare
-    n index := matrix_nrows(A);
-    q vector :vector_new('int32', n)
-    v vector := vector_new('bool', n);
-    desc descriptor := descriptor_new('mask', 'scmp', 'outp', 'replace');
-    level integer := 1;
+    n index := matrix_nrows(A);          -- The number of result rows
+    v vector := vector_new('int32', n)   -- int32 result vector of vertex levels
+    q vector := vector_new('bool', n);   -- bool mask of completed vertices
+    desc descriptor := descriptor_new(   -- MxM descriptor:
+        'mask', 'scmp',                  -- negate the mask
+        'outp', 'replace');              -- clear results first
+    level integer := 1;                  -- start at level 1
     not_done bool := true;
 begin
-    perform matrix_set_element(q, true, source);
-    while not_done and level <= n loop
-        v := assign(level, 'all', n, mask=q);
-        q := mxv(A, q, semiring='lor_land_bool', mask=v, desc=desc);
-        not_done := vector_reduce_bool(q, operator='lor_bool_monoid');
+    perform matrix_set_element(q, true, source);  -- set the source element to true
+    while not_done and level <= n loop            -- while still work to do
+        v := assign(level, 'all', n, mask=q);     -- assign the current level to
+                                                  -- all results not masked
+        q := mxv(A, q,                            -- multiply
+            semiring='lor_land_bool',             -- using this semiring
+            mask=v,                               -- only those not masked
+            desc=desc);
+    
+        not_done := vector_reduce_bool(q,         -- are there more neighbors
+            operator='lor_bool_monoid');          -- to consider?
+    
         level := level + 1;
     end loop;
     return v;
@@ -120,7 +129,4 @@ TODO:
 * polymorphic matrix_agg support all types
 * overload all the operators
 * parallel aggregates of subgraphs with final merging
-
-UNKNOWNS:
-
-* operation descriptors, how to mask, invert, clear destination?
+* composite user defined element types, semirings, and monoid UDFs
