@@ -46,6 +46,22 @@ graphs back into relational sets.  From a SQL point of view, matrices
 look a certain bit like arrays, being stored as variable length column
 values.
 
+Postgres is already an excellent database for graph storage, many
+real-world foreign key relationships describe sparse graphs.  Graph
+traversal and manipulation can be acheived in SQL using recursive
+common table expressions in a very flexible and general way, but this
+approach has a drawback: sparse relational graphs are scattered across
+indexes and table blocks, having poor locality.  Interpreted sql code
+works by considering rows one at a time, vertex by vertex.
+
+Using pggraphblas bring high memory density encoding and optimized
+numerical computing methods to solving sparse graph problems.
+GraphBLAS is designed to be optimized for this situation where dense
+matrices are not.  GraphBLAS is also an actively developed project
+with future plans such as GPU/TPU integration, bringing high numeric
+computing density to the problem with no change code that uses the
+API.
+
 pggraphblas wraps the [SuiteSparse
 GraphBLAS](http://faculty.cse.tamu.edu/davis/suitesparse.html)
 implementation of the GraphBLAS API and provides access to sparse
@@ -92,14 +108,16 @@ declare
     level integer := 1;                  -- start at level 1
     not_done bool := true;
 begin
-    perform matrix_set_element(q, true, source);  -- set the source element to true
+    perform matrix_set_element(q, true, source);  -- set the source element to done
+    
     while not_done and level <= n loop            -- while still work to do
         v := assign(level, 'all', n, mask=q);     -- assign the current level to
                                                   -- all results not masked
+    
         q := mxv(A, q,                            -- multiply
             semiring='lor_land_bool',             -- using this semiring
             mask=v,                               -- only those not masked
-            desc=desc);
+            desc=desc);                           -- and clear results first
     
         not_done := vector_reduce_bool(q,         -- are there more neighbors
             operator='lor_bool_monoid');          -- to consider?
