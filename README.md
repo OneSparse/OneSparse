@@ -7,16 +7,41 @@ real/integer matrix algebras, GraphBLAS supports up to 960 different
 "semiring" algebras, that can be used to sparsely encode and solve
 graph problems.
 
+# manifesto
+
+For a long time, mathematicians have known that [matrices are a
+powerful representation of
+graphs](http://www.mit.edu/~kepner/GraphBLAS/GraphBLAS-Math-release.pdf).
+One practical problem with matrix-encoding graphs is that most
+real-world graphs tend to be sparse, so dense linear algebra libraries
+like BLAS do not efficiently encode them in memory or operate on them
+efficiently, as most matrix elements are unused.
+
+For example, suppose a fictional social network has 1 billion users,
+and each user has about 100 friends, which means there are about 100
+billion (1e+11) connections in the graph.  A dense matrix large enough
+to hold this graph would need (1 billion)^2 or
+(1,000,000,000,000,000,000), a "quintillion" elements, but only 1e+11
+of them would have meaningful values, leaving only 0.0000001 percent
+of the graph being utilized.
+
+By using a sparse matrix instead of dense, problems of this size are
+solvable on modern computing hardware.  Furthermore, expertise in the
+field of sparse matrix programming undertaken by [The
+GraphBLAS](http://graphblas.org) organization brings a powerful,
+abstract algebraic approach to solving graph problems with various
+combinations of matrix operations, or "semirings".
+
 pggraphblas wraps the [SuiteSparse
 GraphBLAS](http://faculty.cse.tamu.edu/davis/suitesparse.html)
-implementation and provides access to the matrix and vector types, as
-well much of the APIs functionality.  This is a currently a very
-"alpha" quality integration, much of the API is not supported yet but
-is an active work in progress.  See TODO below.
+implementation of the GraphBLAS API and provides access to sparse
+matrix and vector types, as well much of the APIs functionality.
+
+This is a currently a very "alpha" quality integration, much of the
+API is not supported yet but is an active work in progress.  See TODO
+below.
 
 # references
-
-[GraphBLAS Mathematics](http://www.mit.edu/~kepner/GraphBLAS/GraphBLAS-Math-release.pdf)
 
 [Lower Latency Graph Queries in Cypher with Redis GraphRoi Lipman, Redis LabsTim Davis, Texas A&M U](https://www.youtube.com/watch?v=xnez6tloNSQ)
 
