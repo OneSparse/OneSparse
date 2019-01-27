@@ -1,11 +1,17 @@
 # pggraphblas
 High Performance Graph Processing with Postgres using Linear Algebra
 
+# summary
+
 GraphBLAS is a sparse linear algebra API optimized for processing
 graphs encoded as sparse matrices and vectors.  In addition to common
 real/integer matrix algebras, GraphBLAS supports up to 960 different
 "semiring" algebras, that can be used to sparsely encode and solve
-graph problems.
+graph problems.  pggraphblas is a postgres extension that exposes the
+matrix and vector types and their API to SQL.
+
+This is a currently very alpha quality integration, much of the API is
+not supported yet but is an active work in progress.  See TODO below.
 
 # manifesto
 
@@ -14,19 +20,19 @@ powerful representation of
 graphs](http://www.mit.edu/~kepner/GraphBLAS/GraphBLAS-Math-release.pdf).
 One practical problem with matrix-encoding graphs is that most
 real-world graphs tend to be sparse, so dense linear algebra libraries
-like BLAS do not efficiently encode them in memory or operate on them
-efficiently, as most matrix elements are unused.
+like BLAS or numpy do not efficiently encode them in memory or operate
+on them efficiently, as most matrix elements are unused.
 
 For example, suppose a fictional social network has 1 billion users,
 and each user has about 100 friends, which means there are about 100
 billion (1e+11) connections in the graph.  A dense matrix large enough
 to hold this graph would need (1 billion)^2 or
 (1,000,000,000,000,000,000), a "quintillion" elements, but only 1e+11
-of them would have meaningful values, leaving only 0.0000001 percent
-of the graph being utilized.
+of them would have meaningful values, leaving only 0.0000001 of the
+graph being utilized.
 
 By using a sparse matrix instead of dense, problems of this size are
-solvable on modern computing hardware.  pggraphblas leverages the
+encodable on modern computing hardware.  pggraphblas leverages the
 expertise in the field of sparse matrix programming by [The
 GraphBLAS](http://graphblas.org) organization. GraphBLAS brings a
 powerful, abstract algebraic approach to solving graph problems with
@@ -43,11 +49,13 @@ values.
 pggraphblas wraps the [SuiteSparse
 GraphBLAS](http://faculty.cse.tamu.edu/davis/suitesparse.html)
 implementation of the GraphBLAS API and provides access to sparse
-matrix and vector types, as well much of the APIs functionality.
-
-This is a currently a very "alpha" quality integration, much of the
-API is not supported yet but is an active work in progress.  See TODO
-below.
+matrix and vector types, as well much of the APIs functionality.  The
+SuiteSparse:GraphBLAS implementation is brought to us by Dr. Tim
+Davis, professor in the Department of Computer Science and Engineering
+at Texas A&M University.  [News and
+information](http://faculty.cse.tamu.edu/davis/news.html) can provide
+you with a lot more background information, in addition to the
+references below.
 
 # references
 
