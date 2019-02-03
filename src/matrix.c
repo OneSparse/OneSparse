@@ -32,14 +32,11 @@ EM_get_flat_size(ExpandedObjectHeader *eohptr) {
   if (A->flat_size)
     return A->flat_size;
 
-  nbytes = 0;
-
-  nbytes = PGGRB_MATRIX_OVERHEAD();
-
   CHECKD(GrB_Matrix_nrows(&nrows, A->A));
   CHECKD(GrB_Matrix_ncols(&ncols, A->A));
   CHECKD(GrB_Matrix_nvals(&nvals, A->A));
 
+  nbytes = PGGRB_MATRIX_OVERHEAD();
   nbytes += nrows * sizeof(GrB_Index);
   nbytes += ncols * sizeof(GrB_Index);
   nbytes += nvals * sizeof(int64);
@@ -67,16 +64,19 @@ EM_flatten_into(ExpandedObjectHeader *eohptr,
   Assert(allocated_size == A->flat_size);
 
   memset(flat, 0, allocated_size);
-  start = (GrB_Index*)VARDATA(flat)+PGGRB_MATRIX_OVERHEAD();
-
+  
   CHECKV(GrB_Matrix_nrows(&flat->nrows, A->A));
   CHECKV(GrB_Matrix_ncols(&flat->ncols, A->A));
   CHECKV(GrB_Matrix_nvals(&flat->nvals, A->A));
+  
+  start = PGGRB_MATRIX_DATA(flat);
   CHECKV(GrB_Matrix_extractTuples(start,
-                                  start + (sizeof(GrB_Index) * flat->nrows),
-                                  start + (sizeof(GrB_Index) * flat->nrows * 2),
+                                  start + flat->nrows,
+                                  start + flat->nrows + flat->ncols,
                                   &flat->nvals,
                                   A->A));
+
+  flat->type = GrB_INT64;
 
   SET_VARSIZE(flat, allocated_size);
 }
@@ -120,7 +120,7 @@ expand_flat_matrix(Datum flatdatum,
   oldcxt = MemoryContextSwitchTo(objcxt);
 
   /* Copy the flat datum into our context */
-  flat = (pgGrB_FlatMatrix*)PG_DETOAST_DATUM_COPY(flatdatum);
+  flat = (pgGrB_FlatMatrix*)flatdatum;
 
   /* Get dimensional information from flat */
   nrows = flat->nrows;
@@ -129,9 +129,10 @@ expand_flat_matrix(Datum flatdatum,
   type = flat->type;
 
   /* Rows, cols, and vals are pointers into the vardata area */
-  rows = (GrB_Index*)VARDATA(flat)+PGGRB_MATRIX_OVERHEAD();
-  cols = (GrB_Index*)rows + (nrows * sizeof(GrB_Index));
-  vals = (int64*)cols + (ncols * sizeof(GrB_Index));
+  
+  rows = PGGRB_MATRIX_DATA(flat);
+  cols = rows + nrows;
+  vals = (int64*)(cols + ncols);
 
   /* Initialize the new matrix */
   CHECKD(GrB_Matrix_new(&A->A,
@@ -158,8 +159,8 @@ expand_flat_matrix(Datum flatdatum,
                             GrB_SECOND_INT64));
   }
 
-  A->flat_size = VARSIZE(flat);
-  A->flat_value = flat;
+  A->flat_size = 0;
+  A->flat_value = NULL;
 
   /* Switch back to old context */
   MemoryContextSwitchTo(oldcxt);
@@ -208,7 +209,6 @@ DatumGetMatrix(Datum d) {
     Assert(A->em_magic == EM_MAGIC);
     return A;
   }
-  elogn("DatumGetMatrix flat");
   d = expand_flat_matrix(d, CurrentMemoryContext);
   return (pgGrB_Matrix *) DatumGetEOHP(d);
 }

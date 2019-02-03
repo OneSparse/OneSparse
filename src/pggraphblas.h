@@ -142,7 +142,9 @@ construct_empty_expanded_matrix(GrB_Index nrows,
 /* Helper to compute flat matrix header size */
 #define PGGRB_MATRIX_OVERHEAD() MAXALIGN(sizeof(pgGrB_FlatMatrix))
 
-/* Public API functions */
+#define PGGRB_MATRIX_DATA(a) (GrB_Index *)(((char *) (a)) + PGGRB_MATRIX_OVERHEAD())
+
+ /* Public API functions */
 
 PG_FUNCTION_INFO_V1(matrix_agg_acc);
 PG_FUNCTION_INFO_V1(matrix_final_int8);

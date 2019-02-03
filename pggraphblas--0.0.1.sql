@@ -100,11 +100,9 @@ AS '$libdir/pggraphblas', 'matrix_ewise_add'
 LANGUAGE C STABLE STRICT;
     
 CREATE TYPE matrix (
-    internallength = 8,
     input = matrix_in,
     output = matrix_out,
-    passedbyvalue,
-    alignment = double
+    alignment = int4
 );
 
 CREATE AGGREGATE matrix_agg (bigint, bigint, bigint) (
