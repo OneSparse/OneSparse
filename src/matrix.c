@@ -3,7 +3,7 @@
 static void
 context_callback_matrix_free(void* m) {
   pgGrB_Matrix *mat = (pgGrB_Matrix *) m;
-  GrB_Matrix_free(&mat->A);
+  GrB_Matrix_free(&mat->M);
 }
 
 /* Expanded Object Header "methods" for flattening matrices for storage */
@@ -32,9 +32,9 @@ EM_get_flat_size(ExpandedObjectHeader *eohptr) {
   if (A->flat_size)
     return A->flat_size;
 
-  CHECKD(GrB_Matrix_nrows(&nrows, A->A));
-  CHECKD(GrB_Matrix_ncols(&ncols, A->A));
-  CHECKD(GrB_Matrix_nvals(&nvals, A->A));
+  CHECKD(GrB_Matrix_nrows(&nrows, A->M));
+  CHECKD(GrB_Matrix_ncols(&ncols, A->M));
+  CHECKD(GrB_Matrix_nvals(&nvals, A->M));
 
   nbytes = PGGRB_MATRIX_OVERHEAD();
   nbytes += nrows * sizeof(GrB_Index);
@@ -65,16 +65,16 @@ EM_flatten_into(ExpandedObjectHeader *eohptr,
 
   memset(flat, 0, allocated_size);
   
-  CHECKV(GrB_Matrix_nrows(&flat->nrows, A->A));
-  CHECKV(GrB_Matrix_ncols(&flat->ncols, A->A));
-  CHECKV(GrB_Matrix_nvals(&flat->nvals, A->A));
+  CHECKV(GrB_Matrix_nrows(&flat->nrows, A->M));
+  CHECKV(GrB_Matrix_ncols(&flat->ncols, A->M));
+  CHECKV(GrB_Matrix_nvals(&flat->nvals, A->M));
   
   start = PGGRB_MATRIX_DATA(flat);
   CHECKV(GrB_Matrix_extractTuples(start,
                                   start + flat->nrows,
                                   start + flat->nrows + flat->ncols,
                                   &flat->nvals,
-                                  A->A));
+                                  A->M));
 
   flat->type = GrB_INT64;
 
@@ -135,7 +135,7 @@ expand_flat_matrix(Datum flatdatum,
   vals = (int64*)(cols + ncols);
 
   /* Initialize the new matrix */
-  CHECKD(GrB_Matrix_new(&A->A,
+  CHECKD(GrB_Matrix_new(&A->M,
                         type,
                         nrows,
                         ncols));
@@ -151,7 +151,7 @@ expand_flat_matrix(Datum flatdatum,
 
   /* If there's actual values, build the matrix */
   if (nvals > 0) {
-    CHECKD(GrB_Matrix_build(A->A,
+    CHECKD(GrB_Matrix_build(A->M,
                             rows,
                             cols,
                             vals,
@@ -204,7 +204,7 @@ pgGrB_Matrix *
 DatumGetMatrix(Datum d) {
   pgGrB_Matrix *A;
   
-  if (VARATT_IS_EXTERNAL_EXPANDED_RW(DatumGetPointer(d))) {
+  if (VARATT_IS_EXTERNAL_EXPANDED(DatumGetPointer(d))) {
     A = (pgGrB_Matrix *) DatumGetEOHP(d);
     Assert(A->em_magic == EM_MAGIC);
     return A;
@@ -291,7 +291,7 @@ matrix_final_int8(PG_FUNCTION_ARGS) {
                                            GrB_INT64,
                                            resultcxt);
 
-  CHECKD(GrB_Matrix_build(retval->A,
+  CHECKD(GrB_Matrix_build(retval->M,
                          row_indices,
                          col_indices,
                          matrix_vals,
@@ -325,7 +325,7 @@ matrix_tuples(PG_FUNCTION_ARGS) {
     mat = (pgGrB_Matrix *) PGGRB_GETARG_MATRIX(0);
 
     state = (pgGrB_Matrix_ExtractState*)palloc(sizeof(pgGrB_Matrix_ExtractState));
-    CHECKD(GrB_Matrix_nvals(&nvals, mat->A));
+    CHECKD(GrB_Matrix_nvals(&nvals, mat->M));
 
     state->rows = (GrB_Index*) palloc0(sizeof(GrB_Index) * nvals);
     state->cols = (GrB_Index*) palloc0(sizeof(GrB_Index) * nvals);
@@ -335,7 +335,7 @@ matrix_tuples(PG_FUNCTION_ARGS) {
                                    state->cols,
                                    state->vals,
                                    &nvals,
-                                   mat->A));
+                                   mat->M));
     state->mat = mat;
     funcctx->max_calls = nvals;
     funcctx->user_fctx = (void*)state;
@@ -444,7 +444,7 @@ matrix_in(PG_FUNCTION_ARGS)
                                            GrB_INT64,
                                            CurrentMemoryContext);
 
-  CHECKD(GrB_Matrix_build(retval->A,
+  CHECKD(GrB_Matrix_build(retval->M,
                          row_indices,
                          col_indices,
                          matrix_vals,
@@ -464,9 +464,9 @@ matrix_out(PG_FUNCTION_ARGS)
   GrB_Index *row_indices, *col_indices;
   int64 *matrix_vals;
 
-  CHECKD(GrB_Matrix_nrows(&nrows, mat->A));
-  CHECKD(GrB_Matrix_ncols(&ncols, mat->A));
-  CHECKD(GrB_Matrix_nvals(&nvals, mat->A));
+  CHECKD(GrB_Matrix_nrows(&nrows, mat->M));
+  CHECKD(GrB_Matrix_ncols(&ncols, mat->M));
+  CHECKD(GrB_Matrix_nvals(&nvals, mat->M));
 
   row_indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * nvals);
   col_indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * ncols);
@@ -476,7 +476,7 @@ matrix_out(PG_FUNCTION_ARGS)
                                  col_indices,
                                  matrix_vals,
                                  &nvals,
-                                 mat->A));
+                                 mat->M));
 
   result = psprintf("{{");
 
@@ -510,7 +510,7 @@ matrix_nrows(PG_FUNCTION_ARGS) {
   pgGrB_Matrix *mat;
   GrB_Index count;
   mat = (pgGrB_Matrix *) PGGRB_GETARG_MATRIX(0);
-  CHECKD(GrB_Matrix_nrows(&count, mat->A));
+  CHECKD(GrB_Matrix_nrows(&count, mat->M));
   return Int64GetDatum(count);
 }
 
@@ -520,7 +520,7 @@ matrix_ncols(PG_FUNCTION_ARGS) {
   pgGrB_Matrix *mat;
   GrB_Index count;
   mat = (pgGrB_Matrix *) PGGRB_GETARG_MATRIX(0);
-  CHECKD(GrB_Matrix_ncols(&count, mat->A));
+  CHECKD(GrB_Matrix_ncols(&count, mat->M));
   return Int64GetDatum(count);
 }
 
@@ -530,7 +530,7 @@ matrix_nvals(PG_FUNCTION_ARGS) {
   pgGrB_Matrix *mat;
   GrB_Index count;
   mat = (pgGrB_Matrix *) PGGRB_GETARG_MATRIX(0);
-  CHECKD(GrB_Matrix_nvals(&count, mat->A));
+  CHECKD(GrB_Matrix_nvals(&count, mat->M));
   return Int64GetDatum(count);
 }
 
@@ -543,7 +543,7 @@ matrix_eq(PG_FUNCTION_ARGS) {
   A = PGGRB_GETARG_MATRIX(0);
   B = PGGRB_GETARG_MATRIX(1);
 
-  CHECKD(isequal(&result, A->A, B->A, NULL));
+  CHECKD(isequal(&result, A->M, B->M, NULL));
   PG_RETURN_BOOL(result);
 }
 
@@ -556,7 +556,7 @@ matrix_neq(PG_FUNCTION_ARGS) {
   A = PGGRB_GETARG_MATRIX(0);
   B = PGGRB_GETARG_MATRIX(1);
 
-  CHECKD(isequal(&result, A->A, B->A, NULL));
+  CHECKD(isequal(&result, A->M, B->M, NULL));
   PG_RETURN_BOOL(!result);
 }
 
@@ -568,11 +568,11 @@ matrix_x_matrix(PG_FUNCTION_ARGS) {
   A = PGGRB_GETARG_MATRIX(0);
   B = PGGRB_GETARG_MATRIX(1);
 
-  CHECKD(GrB_Matrix_nrows(&m, A->A));
-  CHECKD(GrB_Matrix_ncols(&n, B->A));
+  CHECKD(GrB_Matrix_nrows(&m, A->M));
+  CHECKD(GrB_Matrix_ncols(&n, B->M));
 
   C = construct_empty_expanded_matrix(m, n, GrB_INT64, CurrentMemoryContext);
-  CHECKD(GrB_mxm(C->A, NULL, NULL, GxB_PLUS_TIMES_INT64, A->A, B->A, NULL));
+  CHECKD(GrB_mxm(C->M, NULL, NULL, GxB_PLUS_TIMES_INT64, A->M, B->M, NULL));
   PGGRB_RETURN_MATRIX(C);
 }
 
@@ -590,7 +590,7 @@ matrix_x_vector(PG_FUNCTION_ARGS) {
   CHECKD(GrB_Vector_size(&size, B->V));
   CHECKD(GrB_Vector_new (&(C->V), GrB_INT64, size));
 
-  CHECKD(GrB_mxv(C->V, NULL, NULL, GxB_PLUS_TIMES_INT64, A->A, B->V, NULL));
+  CHECKD(GrB_mxv(C->V, NULL, NULL, GxB_PLUS_TIMES_INT64, A->M, B->V, NULL));
   PG_RETURN_POINTER(C);
 }
 
@@ -608,7 +608,7 @@ vector_x_matrix(PG_FUNCTION_ARGS) {
   CHECKD(GrB_Vector_size(&size, A->V));
   CHECKD(GrB_Vector_new (&(C->V), GrB_INT64, size));
 
-  CHECKD(GrB_vxm(C->V, NULL, NULL, GxB_PLUS_TIMES_INT64, A->V, B->A, NULL));
+  CHECKD(GrB_vxm(C->V, NULL, NULL, GxB_PLUS_TIMES_INT64, A->V, B->M, NULL));
   PG_RETURN_POINTER(C);
 }
 
@@ -620,11 +620,11 @@ matrix_ewise_mult(PG_FUNCTION_ARGS) {
   A = PGGRB_GETARG_MATRIX(0);
   B = PGGRB_GETARG_MATRIX(1);
 
-  CHECKD(GrB_Matrix_nrows(&m, A->A));
-  CHECKD(GrB_Matrix_ncols(&n, A->A));
+  CHECKD(GrB_Matrix_nrows(&m, A->M));
+  CHECKD(GrB_Matrix_ncols(&n, A->M));
 
   C = construct_empty_expanded_matrix(m, n, GrB_INT64, CurrentMemoryContext);
-  CHECKD(GrB_eWiseMult(C->A, NULL, NULL, GrB_TIMES_INT64, A->A, B->A, NULL));
+  CHECKD(GrB_eWiseMult(C->M, NULL, NULL, GrB_TIMES_INT64, A->M, B->M, NULL));
   PGGRB_RETURN_MATRIX(C);
 }
 
@@ -636,10 +636,10 @@ matrix_ewise_add(PG_FUNCTION_ARGS) {
   A = PGGRB_GETARG_MATRIX(0);
   B = PGGRB_GETARG_MATRIX(1);
 
-  CHECKD(GrB_Matrix_nrows(&m, A->A));
-  CHECKD(GrB_Matrix_ncols(&n, A->A));
+  CHECKD(GrB_Matrix_nrows(&m, A->M));
+  CHECKD(GrB_Matrix_ncols(&n, A->M));
 
   C = construct_empty_expanded_matrix(m, n, GrB_INT64, CurrentMemoryContext);
-  CHECKD(GrB_eWiseAdd(C->A, NULL, NULL, GrB_PLUS_INT64, A->A, B->A, NULL));
+  CHECKD(GrB_eWiseAdd(C->M, NULL, NULL, GrB_PLUS_INT64, A->M, B->M, NULL));
   PGGRB_RETURN_MATRIX(C);
 }

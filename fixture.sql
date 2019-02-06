@@ -67,5 +67,5 @@ $$ language plpgsql;
 
 \prompt 'Crash it? (y/n)' store
 \if :store        
-select matrix_agg(i, j, v) from edge;
+select matrix_agg(i, j, v) * matrix_agg(i, j, v) from edge;
 \endif

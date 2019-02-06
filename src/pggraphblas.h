@@ -80,7 +80,7 @@ typedef struct pgGrB_Matrix  {
   ExpandedObjectHeader hdr;
   int em_magic;
   GrB_Type type;
-  GrB_Matrix A;
+  GrB_Matrix M;
   Size flat_size;
   pgGrB_FlatMatrix *flat_value;
 } pgGrB_Matrix;
