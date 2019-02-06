@@ -1,19 +1,19 @@
--- \set ECHO none
--- \set QUIET 1
+\set ECHO none
+\set QUIET 1
 
--- \pset format unaligned
--- \pset tuples_only true
--- \pset pager
+\pset format unaligned
+\pset tuples_only true
+\pset pager
 
--- \set ON_ERROR_ROLLBACK 1
--- \set ON_ERROR_STOP true
--- \set QUIET 1
+\set ON_ERROR_ROLLBACK 1
+\set ON_ERROR_STOP true
+\set QUIET 1
 
--- create extension pgtap;
+create extension pgtap;
 create extension pggraphblas;
 
--- begin;
--- select plan(14);
+begin;
+select plan(5);
 
 -- -- dense vectors
         
@@ -67,64 +67,57 @@ create extension pggraphblas;
     
 -- -- matrices
         
--- select is(
---     '{{0,1,2},{1,2,3},{4,5,6}}'::matrix,
---     '{{0,1,2},{1,2,3},{4,5,6}}'::matrix,
---     'dense literal matrix');
+select is(
+    '{{0,1,2},{1,2,0},{4,5,6}}'::matrix,
+    '{{0,1,2},{1,2,0},{4,5,6}}'::matrix,
+    'literal matrix');
 
--- select is(
---     '{{0,1,2},{1,2,3},{4,5,6}}'::matrix || '{{0,1,2},{1,2,3},{4,5,6}}'::matrix,
---     '{{0,1,2},{1,2,3},{8,10,12}}'::matrix,
---     'dense literal matrix ewise add');
+select is(
+    '{{0,1,2},{1,2,0},{4,5,6}}'::matrix || '{{0,1,2},{1,2,0},{4,5,6}}'::matrix,
+    '{{0,1,2},{1,2,0},{8,10,12}}'::matrix,
+    'literal matrix ewise add');
 
--- select is(
---     '{{0,1,2},{1,2,3},{4,5,6}}'::matrix && '{{0,1,2},{1,2,3},{4,5,6}}'::matrix,
---     '{{0,1,2},{1,2,3},{16,25,36}}'::matrix,
---     'dense literal matrix ewise mul');
+select is(
+    '{{0,1,2},{1,2,0},{4,5,6}}'::matrix && '{{0,1,2},{1,2,0},{4,5,6}}'::matrix,
+    '{{0,1,2},{1,2,0},{16,25,36}}'::matrix,
+    'literal matrix ewise mul');
     
--- select is(
---     '{{0,1,2},{1,2,3},{4,5,6}}'::matrix * '{{0,1,2},{1,2,3},{4,5,6}}'::matrix,
---     '{{0,1,2},{1,2,3},{16,25,36}}'::matrix,
---     'dense literal matrix mul');
+select is(
+    '{{0,1,2},{1,2,0},{4,5,6}}'::matrix * '{{0,1,2},{1,2,0},{4,5,6}}'::matrix,
+    '{{0,1,2},{2,0,1},{20,30,24}}'::matrix,
+    'literal matrix mul');
     
--- create table graph (
---     i bigint,
---     j bigint,
---     v bigint
---     );
+create table graph (
+    i bigint,
+    j bigint,
+    v bigint
+    );
 
--- insert into graph (i, j, v) values 
---     (1, 4, 1),
---     (1, 2, 2),
---     (2, 7, 3),
---     (2, 5, 4),
---     (3, 6, 5),
---     (4, 3, 6),
---     (4, 1, 7),
---     (5, 6, 8),
---     (6, 3, 9),
---     (7, 3, 10);
+insert into graph (i, j, v) values 
+    (1, 4, 1),
+    (1, 2, 2),
+    (2, 7, 3),
+    (2, 5, 4),
+    (3, 6, 5),
+    (4, 3, 6),
+    (4, 1, 7),
+    (5, 6, 8),
+    (6, 3, 9),
+    (7, 3, 10);
 
 create function matrix_from_table() returns matrix as $$
     declare m matrix;
     begin
-        raise notice 'sql before agg';
         select matrix_agg(i, j, v) from graph into m;
-        raise notice 'sql before return';
-        return m || m;
+        return m;
     end;
 $$ language plpgsql;
 
--- select is(
---     matrix_from_table(),
---     '{{1,1,2,2,3,4,4,5,6,7},{2,4,5,7,6,1,3,6,3,3},{2,1,4,3,5,7,6,8,9,10}}'::matrix,
---     'matrix from table.');
+select is(
+    matrix_from_table(),
+    '{{1,1,2,2,3,4,4,5,6,7},{2,4,5,7,6,1,3,6,3,3},{2,1,4,3,5,7,6,8,9,10}}'::matrix,
+    'matrix from table.');
         
--- select * from finish();
--- rollback;
+select * from finish();
+rollback;
 
-\i fixture.sql
-
--- select '{{0,1,2},{1,2,3},{4,5,6}}'::matrix;
-    
-select * from matrix_from_table();
