@@ -144,7 +144,7 @@ construct_empty_expanded_matrix(GrB_Index nrows,
 
 #define PGGRB_MATRIX_DATA(a) (GrB_Index *)(((char *) (a)) + PGGRB_MATRIX_OVERHEAD())
 
- /* Public API functions */
+/* Public API functions */
 
 PG_FUNCTION_INFO_V1(matrix_agg_acc);
 PG_FUNCTION_INFO_V1(matrix_final_int8);
@@ -169,8 +169,32 @@ PG_FUNCTION_INFO_V1(matrix_ewise_add);
 
 /* Vectors */
 
-typedef struct pgGrB_Vector {
+/* Flattened representation of vector, used to store to disk.
+
+Actual array data is appended and for the moment cannot exceed 1GB.
+*/
+typedef struct pgGrB_FlatVector {
+  int32 vl_len_;
+  GrB_Index size;
+  GrB_Index nvals;
+  GrB_Type type;
+} pgGrB_FlatVector;
+
+/* ID for debugging crosschecks */
+#define EV_MAGIC 681276813
+
+/* Expanded representation of vector.
+
+When loaded from storage, the flattened representation is used to
+build the vector with GrB_Vector_build.
+*/
+typedef struct pgGrB_Vector  {
+  ExpandedObjectHeader hdr;
+  int ev_magic;
+  GrB_Type type;
   GrB_Vector V;
+  Size flat_size;
+  pgGrB_FlatVector *flat_value;
 } pgGrB_Vector;
 
 typedef struct pgGrB_Vector_AggState {
@@ -186,6 +210,37 @@ typedef struct pgGrB_Vector_ExtractState {
 } pgGrB_Vector_ExtractState;
 
 static void context_callback_vector_free(void*);
+
+/* Helper function that either detoasts or expands vectors. */
+pgGrB_Vector *
+DatumGetVector(Datum d);
+
+/* Utility function that expands a flattened vector datum. */
+Datum
+expand_flat_vector(Datum vectordatum,
+                   MemoryContext parentcontext);
+
+/* Helper function to create an empty flattened vector. */
+pgGrB_FlatVector *
+construct_empty_flat_vector(GrB_Index size,
+                            GrB_Type type);
+
+/* Helper function that creates an expanded empty vector. */
+pgGrB_Vector *
+construct_empty_expanded_vector(GrB_Index size,
+                                GrB_Type type,
+                                MemoryContext parentcontext);
+
+/* Helper to detoast and expand vectors arguments */
+#define PGGRB_GETARG_VECTOR(n)  DatumGetVector(PG_GETARG_DATUM(n))
+
+/* Helper to return Expanded Object Header Pointer from vector. */
+#define PGGRB_RETURN_VECTOR(A) return EOHPGetRWDatum(&(A)->hdr)
+
+/* Helper to compute flat vector header size */
+#define PGGRB_VECTOR_OVERHEAD() MAXALIGN(sizeof(pgGrB_FlatVector))
+
+#define PGGRB_VECTOR_DATA(a) (GrB_Index *)(((char *) (a)) + PGGRB_VECTOR_OVERHEAD())
 
 PG_FUNCTION_INFO_V1(vector_agg_acc);
 PG_FUNCTION_INFO_V1(vector_final_int8);

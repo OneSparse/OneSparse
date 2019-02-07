@@ -46,11 +46,12 @@ graph being utilized.
 
 By using a sparse matrix instead of dense, only the elements used are
 actually stored in the matrix. The "empty" part of the matrix is not
-stored and assumes a default "zero" value.  GraphBLAS brings a
-powerful, abstract algebraic approach to solving graph problems with
-various combinations of matrix operations, or "semirings".  Different
-algebraic semirings can accomplish different common steps in graph
-problems, such as finding shortest or most optimal paths.
+stored and assumes a default "algebraic zero" value.  GraphBLAS brings
+a powerful, abstract algebra to solving graph problems with various
+combinations of math operations on matrix elements. The combinations
+of operations are called "semirings".  Different semirings can
+accomplish different common steps in graph problems, such as finding
+shortest or most optimal paths.
 
 pggraphblas is a postgres extension that provides access to two new
 types: matrix and vector, as well as the GraphBLAS api to manipulate
@@ -61,12 +62,13 @@ look a certain bit like arrays, being stored as variable length column
 values.
 
 Postgres is already an excellent database for graph storage, many
-real-world foreign key relationships describe sparse graphs.  Graph
-traversal and manipulation can be acheived in SQL using recursive
-common table expressions in a very flexible and general way, but this
-approach has a drawback: sparse relational graphs are scattered across
-indexes and table blocks, having poor locality.  Interpreted sql code
-works by considering rows one at a time, vertex by vertex.
+real-world foreign key relationships, common structures in most
+postgres databases, describe sparse graphs.  Graph traversal and
+manipulation can be acheived in SQL using recursive common table
+expressions in a very flexible and general way, but this approach has
+a drawback: sparse relational graphs are scattered across indexes and
+table blocks, having poor locality.  Interpreted sql code works by
+considering rows one at a time, vertex by vertex.
 
 Using pggraphblas bring high memory density encoding and optimized
 numerical computing methods to solving sparse graph problems.
@@ -110,23 +112,24 @@ declare
         'mask', 'scmp',                  -- negate the mask
         'outp', 'replace');              -- clear results first
     level integer := 1;                  -- start at level 1
-    not_done bool := true;
+    not_done bool := true;               -- flag to indicate still work to do
+    
 begin
     perform matrix_set_element(q, true, source);  -- set the source element to done
     
     while not_done and level <= n loop            -- while still work to do
-        v := assign(level, 'all', n, mask=q);     -- assign the current level to
-                                                  -- all results not masked
+        v := assign(level, 'all', v, mask=q);     -- assign the current level to all
+                                                  -- results not masked as done by q
     
-        q := mxv(A, q,                            -- multiply
-            semiring='lor_land_bool',             -- using this semiring
+        q := mxv(A, q,                            -- multiply A by q
+            semiring='lor_land_bool',             -- using lor_land_bool semiring
             mask=v,                               -- only those not masked
-            desc=desc);                           -- and clear results first
+            desc=desc);                           -- clearing results first
     
         not_done := vector_reduce_bool(q,         -- are there more neighbors
             operator='lor_bool_monoid');          -- to consider?
     
-        level := level + 1;
+        level := level + 1;                       -- increment the level
     end loop;
     return v;
 end;

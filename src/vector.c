@@ -1,8 +1,204 @@
 
+/* MemoryContextCallback function to free matrices */
 static void
-context_callback_vector_free(void* v) {
-  pgGrB_Vector *vec = (pgGrB_Vector *) v;
-  GrB_Vector_free(&vec->V);
+context_callback_vector_free(void* a) {
+  pgGrB_Vector *A = (pgGrB_Vector *) a;
+  GrB_Vector_free(&A->V);
+}
+
+/* Expanded Object Header "methods" for flattening matrices for storage */
+static Size EV_get_flat_size(ExpandedObjectHeader *eohptr);
+static void EV_flatten_into(ExpandedObjectHeader *eohptr,
+                            void *result, Size allocated_size);
+
+static const ExpandedObjectMethods EV_methods = {
+  EV_get_flat_size,
+  EV_flatten_into
+};
+
+/* Compute size of storage needed for vector */
+static Size
+EV_get_flat_size(ExpandedObjectHeader *eohptr) {
+  GrB_Info info;
+  pgGrB_Vector *A = (pgGrB_Vector *) eohptr;
+  Size nbytes;
+  GrB_Index size, nvals;
+
+  Assert(A->ev_magic == EV_MAGIC);
+
+  if (A->flat_value)
+   return VARSIZE(A->flat_value);
+
+  if (A->flat_size)
+    return A->flat_size;
+
+  CHECKD(GrB_Vector_size(&size, A->V));
+  CHECKD(GrB_Vector_nvals(&nvals, A->V));
+
+  nbytes = PGGRB_VECTOR_OVERHEAD();
+  nbytes += size * sizeof(GrB_Index);
+  nbytes += nvals * sizeof(int64);
+
+  A->flat_size = nbytes;
+  return nbytes;
+}
+
+/* Flatten vector into allocated result buffer  */
+static void
+EV_flatten_into(ExpandedObjectHeader *eohptr,
+                void *result, Size allocated_size)  {
+  GrB_Info info;
+  GrB_Index *start;
+  pgGrB_Vector *A = (pgGrB_Vector *) eohptr;
+  pgGrB_FlatVector *flat = (pgGrB_FlatVector *) result;
+
+  if (A->flat_value) {
+    Assert(allocated_size == VARSIZE(A->flat_value));
+    memcpy(flat, A->flat_value, allocated_size);
+    return;
+  }
+
+  Assert(A->ev_magic == EV_MAGIC);
+  Assert(allocated_size == A->flat_size);
+
+  memset(flat, 0, allocated_size);
+  
+  CHECKV(GrB_Vector_size(&flat->size, A->V));
+  CHECKV(GrB_Vector_nvals(&flat->nvals, A->V));
+  
+  start = PGGRB_VECTOR_DATA(flat);
+  CHECKV(GrB_Vector_extractTuples(start,
+                                  start + flat->size,
+                                  &flat->nvals,
+                                  A->V));
+  flat->type = GrB_INT64;
+
+  SET_VARSIZE(flat, allocated_size);
+}
+
+/* Expand a flat vector. */
+Datum
+expand_flat_vector(Datum flatdatum,
+                   MemoryContext parentcontext) {
+  GrB_Info info;
+  
+  pgGrB_Vector *A;
+  pgGrB_FlatVector *flat;
+  
+  MemoryContext objcxt, oldcxt;
+  MemoryContextCallback *ctxcb;
+  
+  GrB_Index size, nvals;
+  GrB_Index *indices;
+  int64 *vals;
+  GrB_Type type;
+
+  /* Create a new context that will hold the expanded object. */
+  objcxt = AllocSetContextCreate(
+          parentcontext,
+          "expanded vector",
+          ALLOCSET_DEFAULT_SIZES);
+
+  /* Allocate a new expanded vector */
+  A = (pgGrB_Vector*)MemoryContextAlloc(
+          objcxt,
+          sizeof(pgGrB_Vector));
+
+  /* Initialize the ExpandedObjectHeader member with flattening
+   * methods and new object context */
+  EOH_init_header(&A->hdr, &EV_methods, objcxt);
+
+  /* Used for debugging checks */
+  A->ev_magic = EV_MAGIC;
+
+  /* Switch to new object context */
+  oldcxt = MemoryContextSwitchTo(objcxt);
+
+  /* Copy the flat datum into our context */
+  flat = (pgGrB_FlatVector*)flatdatum;
+
+  /* Get dimensional information from flat */
+  size = flat->size;
+  nvals = flat->nvals;
+  type = flat->type;
+
+  /* indices and vals are pointers into the vardata area */
+  
+  indices = PGGRB_VECTOR_DATA(flat);
+  vals = (int64*)(indices + size);
+
+  /* Initialize the new vector */
+  CHECKD(GrB_Vector_new(&A->V,
+                        type,
+                        size));
+
+  /* Create a context callback to free vector when context is cleared */
+  ctxcb = (MemoryContextCallback*)MemoryContextAlloc(
+          objcxt,
+          sizeof(MemoryContextCallback));
+  
+  ctxcb->func = context_callback_vector_free;
+  ctxcb->arg = A;
+  MemoryContextRegisterResetCallback(objcxt, ctxcb);
+
+  /* If there's actual values, build the vector */
+  if (nvals > 0) {
+    CHECKD(GrB_Vector_build(A->V,
+                            indices,
+                            vals,
+                            nvals,
+                            GrB_SECOND_INT64));
+  }
+
+  A->flat_size = 0;
+  A->flat_value = NULL;
+
+  /* Switch back to old context */
+  MemoryContextSwitchTo(oldcxt);
+  PGGRB_RETURN_VECTOR(A);
+}
+
+/* Construct an empty flat vector. */
+pgGrB_FlatVector *
+construct_empty_flat_vector(GrB_Index size,
+                            GrB_Type type) {
+  pgGrB_FlatVector *result;
+
+  result = (pgGrB_FlatVector *) palloc0(sizeof(pgGrB_FlatVector));
+  SET_VARSIZE(result, sizeof(pgGrB_FlatVector));
+  result->size = size;
+  result->nvals = 0;
+  result->type = type;
+  return result;
+}
+
+/* Construct an empty expanded vector. */
+pgGrB_Vector *
+construct_empty_expanded_vector(GrB_Index size,
+                                GrB_Type type,
+                                MemoryContext parentcontext) {
+  pgGrB_FlatVector  *flat;
+  Datum	d;
+  flat = construct_empty_flat_vector(size, type);
+  d = expand_flat_vector(PointerGetDatum(flat), parentcontext);
+  pfree(flat);
+  return (pgGrB_Vector *) DatumGetEOHP(d);
+}
+
+/* Helper function to always expanded datum
+
+This is used by PGGRB_GETARG_VECTOR */
+pgGrB_Vector *
+DatumGetVector(Datum d) {
+  pgGrB_Vector *A;
+  
+  if (VARATT_IS_EXTERNAL_EXPANDED(DatumGetPointer(d))) {
+    A = (pgGrB_Vector *) DatumGetEOHP(d);
+    Assert(A->ev_magic == EV_MAGIC);
+    return A;
+  }
+  d = expand_flat_vector(d, CurrentMemoryContext);
+  return (pgGrB_Vector *) DatumGetEOHP(d);
 }
 
 Datum
@@ -78,7 +274,7 @@ vector_final_int8(PG_FUNCTION_ARGS) {
   ctxcb->arg = retval;
   MemoryContextRegisterResetCallback(CurrentMemoryContext, ctxcb);
 
-  CHECKD(GrB_Vector_new(&(retval->V),
+  CHECKD(GrB_Vector_new(&retval->V,
                        GrB_INT64,
                        count));
 
@@ -87,7 +283,7 @@ vector_final_int8(PG_FUNCTION_ARGS) {
                          vector_vals,
                          count,
                          GrB_SECOND_INT64));
-  PG_RETURN_POINTER(retval);
+  PGGRB_RETURN_VECTOR(retval);
 }
 
 Datum
@@ -109,7 +305,7 @@ vector_tuples(PG_FUNCTION_ARGS) {
 
     funcctx = SRF_FIRSTCALL_INIT();
     oldcontext = MemoryContextSwitchTo(funcctx->multi_call_memory_ctx);
-    vec = (pgGrB_Vector *) PG_GETARG_POINTER(0);
+    vec = (pgGrB_Vector *) PGGRB_GETARG_VECTOR(0);
 
     state = (pgGrB_Vector_ExtractState*)palloc(sizeof(pgGrB_Vector_ExtractState));
     CHECKD(GrB_Vector_size(&size, vec->V));
@@ -162,8 +358,6 @@ vector_in(PG_FUNCTION_ARGS)
 
   GrB_Info info;
   pgGrB_Vector *retval;
-
-  MemoryContextCallback *ctxcb;
 
   Datum arr;
   ArrayType *vals;
@@ -242,14 +436,7 @@ vector_in(PG_FUNCTION_ARGS)
             (errmsg("One (dense) or two (sparse) dimensional arrays required")));
   }
 
-  retval = (pgGrB_Vector*) palloc(sizeof(pgGrB_Vector));
-
-  ctxcb = (MemoryContextCallback*) palloc(sizeof(MemoryContextCallback));
-  ctxcb->func = context_callback_vector_free;
-  ctxcb->arg = retval;
-  MemoryContextRegisterResetCallback(CurrentMemoryContext, ctxcb);
-
-  CHECKD(GrB_Vector_new(&(retval->V), GrB_INT64, max));
+  retval = construct_empty_expanded_vector(max, GrB_INT64, CurrentMemoryContext);
 
   CHECKD(GrB_Vector_build(retval->V,
                          row_indices,
@@ -257,7 +444,7 @@ vector_in(PG_FUNCTION_ARGS)
                          count,
                          GrB_PLUS_INT64));
 
-  PG_RETURN_POINTER(retval);
+  PGGRB_RETURN_VECTOR(retval);
 }
 
 Datum
@@ -268,7 +455,7 @@ vector_out(PG_FUNCTION_ARGS)
      the ::array API. */
 
   GrB_Info info;
-  pgGrB_Vector *vec = (pgGrB_Vector *) PG_GETARG_POINTER(0);
+  pgGrB_Vector *vec = PGGRB_GETARG_VECTOR(0);
   char *result;
   GrB_Index size, nvals;
 
@@ -305,11 +492,11 @@ vector_out(PG_FUNCTION_ARGS)
   PG_RETURN_CSTRING(result);
 }
 
-#define VECTOR_BINOP_PREAMBLE()                         \
-  do {                                                  \
-    A = (pgGrB_Vector *) PG_GETARG_POINTER(0);          \
-    B = (pgGrB_Vector *) PG_GETARG_POINTER(1);          \
-    C = (pgGrB_Vector *) palloc0(sizeof(pgGrB_Vector)); \
+#define VECTOR_BINOP_PREAMBLE()                           \
+  do {                                                    \
+    A = PGGRB_GETARG_VECTOR(0);                           \
+    B = PGGRB_GETARG_VECTOR(1);                           \
+    C = (pgGrB_Vector *) palloc0(sizeof(pgGrB_Vector));   \
   } while (0)
 
 
@@ -317,28 +504,26 @@ Datum
 vector_ewise_mult(PG_FUNCTION_ARGS) {
   GrB_Info info;
   pgGrB_Vector *A, *B, *C;
-  GrB_Index m;
+  GrB_Index size;
   VECTOR_BINOP_PREAMBLE();
 
-  CHECKD(GrB_Vector_size(&m, A->V));
-  CHECKD(GrB_Vector_new (&(C->V), GrB_INT64, m));
-
+  CHECKD(GrB_Vector_size(&size, A->V));
+  C = construct_empty_expanded_vector(size, GrB_INT64, CurrentMemoryContext);
   CHECKD(GrB_eWiseMult(C->V, NULL, NULL, GrB_TIMES_INT64, A->V, B->V, NULL));
-  PG_RETURN_POINTER(C);
+  PGGRB_RETURN_VECTOR(C);
 }
 
 Datum
 vector_ewise_add(PG_FUNCTION_ARGS) {
   GrB_Info info;
   pgGrB_Vector *A, *B, *C;
-  GrB_Index m;
+  GrB_Index size;
   VECTOR_BINOP_PREAMBLE();
 
-  CHECKD(GrB_Vector_size(&m, A->V));
-  CHECKD(GrB_Vector_new (&(C->V), GrB_INT64, m));
-
+  CHECKD(GrB_Vector_size(&size, A->V));
+  C = construct_empty_expanded_vector(size, GrB_INT64, CurrentMemoryContext);
   CHECKD(GrB_eWiseAdd(C->V, NULL, NULL, GrB_PLUS_INT64, A->V, B->V, NULL));
-  PG_RETURN_POINTER(C);
+  PGGRB_RETURN_VECTOR(C);
 }
 
 Datum
@@ -351,13 +536,17 @@ vector_eq(PG_FUNCTION_ARGS) {
   VECTOR_BINOP_PREAMBLE();
   CHECKD(GrB_Vector_size(&asize, A->V));
   CHECKD(GrB_Vector_size(&bsize, B->V));
+  
+  if (asize != bsize)
+    PG_RETURN_BOOL(result);
+  
   CHECKD(GrB_Vector_nvals(&anvals, A->V));
   CHECKD(GrB_Vector_nvals(&bnvals, B->V));
 
-  if (asize != bsize || anvals != bnvals)
+  if (anvals != bnvals)
     PG_RETURN_BOOL(result);
 
-  CHECKD(GrB_Vector_new (&(C->V), GrB_BOOL, asize));
+  CHECKD(GrB_Vector_new (&C->V, GrB_BOOL, asize));
 
   CHECKD(GrB_eWiseMult(C->V, NULL, NULL, GxB_ISEQ_INT64, A->V, B->V, NULL));
   CHECKD(GrB_Vector_reduce_BOOL(&result, NULL, GxB_LAND_BOOL_MONOID, C->V, NULL));
@@ -391,18 +580,18 @@ Datum
 vector_nvals(PG_FUNCTION_ARGS) {
   GrB_Info info;
   pgGrB_Vector *vec;
-  GrB_Index count;
-  vec = (pgGrB_Vector *) PG_GETARG_POINTER(0);
-  CHECKD(GrB_Vector_nvals(&count, vec->V));
-  return Int64GetDatum(count);
+  GrB_Index nvals;
+  vec = PGGRB_GETARG_VECTOR(0);
+  CHECKD(GrB_Vector_nvals(&nvals, vec->V));
+  return Int64GetDatum(nvals);
 }
 
 Datum
 vector_size(PG_FUNCTION_ARGS) {
   GrB_Info info;
   pgGrB_Vector *vec;
-  GrB_Index count;
-  vec = (pgGrB_Vector *) PG_GETARG_POINTER(0);
-  CHECKD(GrB_Vector_size(&count, vec->V));
-  return Int64GetDatum(count);
+  GrB_Index size;
+  vec = PGGRB_GETARG_VECTOR(0);
+  CHECKD(GrB_Vector_size(&size, vec->V));
+  return Int64GetDatum(size);
 }

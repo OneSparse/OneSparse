@@ -9,63 +9,63 @@
 \set ON_ERROR_STOP true
 \set QUIET 1
 
-create extension pgtap;
-create extension pggraphblas;
+create extension if not exists pgtap;
+create extension if not exists pggraphblas;
 
 begin;
-select plan(5);
+select plan(15);
 
--- -- dense vectors
+-- vectors
         
--- select is(
---     '{1,2,3}'::vector,
---     '{1,2,3}'::vector,
---     'dense literal vector');
+select is(
+    '{1,2,3}'::vector,
+    '{1,2,3}'::vector,
+    'literal vector');
     
--- select is(
---     '{1,2,3}'::vector + '{2,3,4}'::vector,
---     '{3,5,7}'::vector,
---     'dense literal vector add');
+select is(
+    '{1,2,3}'::vector + '{2,3,4}'::vector,
+    '{3,5,7}'::vector,
+    'literal vector add');
 
--- select is(
---     '{1,2,3}'::vector * '{2,3,4}'::vector,
---     '{2,6,12}'::vector,
---     'dense literal vector mul');
+select is(
+    '{1,2,3}'::vector * '{2,3,4}'::vector,
+    '{2,6,12}'::vector,
+    'literal vector mul');
 
--- select is(
---     vector_size('{1,2,3}'::vector), 3::bigint,
---     'dense literal vector size');
+select is(
+    vector_size('{1,2,3}'::vector), 3::bigint,
+    'literal vector size');
 
--- select is(
---     vector_nvals('{1,2,3}'::vector), 3::bigint,
---     'dense literal vector nvals');
+select is(
+    vector_nvals('{1,2,3}'::vector), 3::bigint,
+    'literal vector nvals');
 
--- -- sparse vectors
+-- sparse vectors
     
--- select is(
---     '{{1,4,9},{1,2,3}}'::vector,
---     '{{1,4,9},{1,2,3}}'::vector,
---     'sparse literal vector');
+select is(
+    '{{1,4,9},{1,2,3}}'::vector,
+    '{{1,4,9},{1,2,3}}'::vector,
+    'sparse literal vector');
     
--- select is(
---     '{{1,4,9},{1,2,3}}'::vector + '{{1,4,9},{2,3,4}}'::vector,
---     '{{1,4,9},{3,5,7}}'::vector,
---     'sparse literal vector add');
+select is(
+    '{{1,4,9},{1,2,3}}'::vector + '{{1,4,9},{2,3,4}}'::vector,
+    '{{1,4,9},{3,5,7}}'::vector,
+    'sparse literal vector add');
 
--- select is(
---     '{{1,4,9},{1,2,3}}'::vector * '{{1,4,9},{2,3,4}}'::vector,
---     '{{1,4,9},{2,6,12}}'::vector,
---     'sparse literal vector mul');
+select is(
+    '{{1,4,9},{1,2,3}}'::vector * '{{1,4,9},{2,3,4}}'::vector,
+    '{{1,4,9},{2,6,12}}'::vector,
+    'sparse literal vector mul');
 
--- select is(
---     vector_size('{{1,4,9},{1,2,3}}'::vector), 10::bigint,
---     'sparse literal vector size');
+select is(
+    vector_size('{{1,4,9},{1,2,3}}'::vector), 10::bigint,
+    'sparse literal vector size');
 
--- select is(
---     vector_nvals('{{1,4,9},{1,2,3}}'::vector), 3::bigint,
---     'sparse literal vector nvals');
+select is(
+    vector_nvals('{{1,4,9},{1,2,3}}'::vector), 3::bigint,
+    'sparse literal vector nvals');
     
--- -- matrices
+-- matrices
         
 select is(
     '{{0,1,2},{1,2,0},{4,5,6}}'::matrix,
