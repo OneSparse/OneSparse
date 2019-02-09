@@ -69,7 +69,7 @@ typedef struct pgGrB_FlatMatrix {
 } pgGrB_FlatMatrix;
 
 /* ID for debugging crosschecks */
-#define EM_MAGIC 689276813
+#define matrix_MAGIC 689276813
 
 /* Expanded representation of matrix.
 
@@ -132,7 +132,6 @@ construct_empty_expanded_matrix(GrB_Index nrows,
                                 GrB_Type type,
                                 MemoryContext parentcontext);
 
-
 /* Helper to detoast and expand matrixs arguments */
 #define PGGRB_GETARG_MATRIX(n)  DatumGetMatrix(PG_GETARG_DATUM(n))
 
@@ -142,6 +141,7 @@ construct_empty_expanded_matrix(GrB_Index nrows,
 /* Helper to compute flat matrix header size */
 #define PGGRB_MATRIX_OVERHEAD() MAXALIGN(sizeof(pgGrB_FlatMatrix))
 
+/* pointer to beginning of matrix data. */
 #define PGGRB_MATRIX_DATA(a) (GrB_Index *)(((char *) (a)) + PGGRB_MATRIX_OVERHEAD())
 
 /* Public API functions */
@@ -157,9 +157,9 @@ PG_FUNCTION_INFO_V1(matrix_ncols);
 PG_FUNCTION_INFO_V1(matrix_nrows);
 PG_FUNCTION_INFO_V1(matrix_nvals);
 
-PG_FUNCTION_INFO_V1(matrix_x_matrix);
-PG_FUNCTION_INFO_V1(matrix_x_vector);
-PG_FUNCTION_INFO_V1(vector_x_matrix);
+PG_FUNCTION_INFO_V1(matrix_mxm);
+PG_FUNCTION_INFO_V1(matrix_mxv);
+PG_FUNCTION_INFO_V1(matrix_vxm);
 
 PG_FUNCTION_INFO_V1(matrix_eq);
 PG_FUNCTION_INFO_V1(matrix_neq);
@@ -181,7 +181,7 @@ typedef struct pgGrB_FlatVector {
 } pgGrB_FlatVector;
 
 /* ID for debugging crosschecks */
-#define EV_MAGIC 681276813
+#define vector_MAGIC 681276813
 
 /* Expanded representation of vector.
 
@@ -205,7 +205,7 @@ typedef struct pgGrB_Vector_AggState {
 
 typedef struct pgGrB_Vector_ExtractState {
   pgGrB_Vector *vec;
-  GrB_Index *rows;
+  GrB_Index *indices;
   int64 *vals;
 } pgGrB_Vector_ExtractState;
 
@@ -230,6 +230,11 @@ pgGrB_Vector *
 construct_empty_expanded_vector(GrB_Index size,
                                 GrB_Type type,
                                 MemoryContext parentcontext);
+
+/* function to choose implicit semirings for overloaded operators */
+GrB_Semiring mxm_semiring(pgGrB_Matrix *left, pgGrB_Matrix *right);
+GrB_Semiring mxv_semiring(pgGrB_Matrix *left, pgGrB_Vector *right);
+GrB_Semiring vxm_semiring(pgGrB_Vector *left, pgGrB_Matrix *right);
 
 /* Helper to detoast and expand vectors arguments */
 #define PGGRB_GETARG_VECTOR(n)  DatumGetVector(PG_GETARG_DATUM(n))

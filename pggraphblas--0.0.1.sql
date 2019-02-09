@@ -2,7 +2,7 @@
 \echo Use "CREATE EXTENSION pggraphblas" to load this file. \quit
 
 CREATE TYPE vector;
-CREATE TYPE vector_tuple AS (i bigint, j bigint);
+CREATE TYPE vector_tuple AS (index bigint, value bigint);
 
 CREATE FUNCTION vector_in(cstring)
 RETURNS vector
@@ -22,7 +22,7 @@ CREATE TYPE vector (
 
 CREATE TYPE matrix;
 
-CREATE TYPE matrix_tuple AS (i bigint, j bigint, v bigint);
+CREATE TYPE matrix_tuple AS (row bigint, col bigint, value bigint);
 
 CREATE FUNCTION matrix_agg_acc(internal, bigint, bigint, bigint)
 RETURNS internal
@@ -74,19 +74,19 @@ RETURNS bool
 AS '$libdir/pggraphblas', 'matrix_neq'
 LANGUAGE C STABLE STRICT;
     
-CREATE FUNCTION matrix_x_matrix(matrix, matrix)
+CREATE FUNCTION matrix_mxm(matrix, matrix)
 RETURNS matrix
-AS '$libdir/pggraphblas', 'matrix_x_matrix'
+AS '$libdir/pggraphblas', 'matrix_mxm'
 LANGUAGE C STABLE STRICT;
 
-CREATE FUNCTION matrix_x_vector(matrix, vector)
+CREATE FUNCTION matrix_mxv(matrix, vector)
 RETURNS vector
-AS '$libdir/pggraphblas', 'matrix_x_vector'
+AS '$libdir/pggraphblas', 'matrix_mxv'
 LANGUAGE C STABLE STRICT;
 
-CREATE FUNCTION vector_x_matrix(vector, matrix)
+CREATE FUNCTION matrix_vxm(vector, matrix)
 RETURNS vector
-AS '$libdir/pggraphblas', 'vector_x_matrix'
+AS '$libdir/pggraphblas', 'matrix_vxm'
 LANGUAGE C STABLE STRICT;
 
 CREATE FUNCTION matrix_ewise_mult(matrix, matrix)
@@ -128,19 +128,19 @@ CREATE OPERATOR <> (
 CREATE OPERATOR * (
     leftarg = matrix,
     rightarg = matrix,
-    procedure = matrix_x_matrix
+    procedure = matrix_mxm
 );
 
 CREATE OPERATOR * (
     leftarg = vector,
     rightarg = matrix,
-    procedure = vector_x_matrix
+    procedure = matrix_vxm
 );
     
 CREATE OPERATOR * (
     leftarg = matrix,
     rightarg = vector,
-    procedure = matrix_x_vector
+    procedure = matrix_mxv
 );
     
 CREATE OPERATOR && (

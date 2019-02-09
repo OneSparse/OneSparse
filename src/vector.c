@@ -7,24 +7,24 @@ context_callback_vector_free(void* a) {
 }
 
 /* Expanded Object Header "methods" for flattening matrices for storage */
-static Size EV_get_flat_size(ExpandedObjectHeader *eohptr);
-static void EV_flatten_into(ExpandedObjectHeader *eohptr,
+static Size vector_get_flat_size(ExpandedObjectHeader *eohptr);
+static void vector_flatten_into(ExpandedObjectHeader *eohptr,
                             void *result, Size allocated_size);
 
-static const ExpandedObjectMethods EV_methods = {
-  EV_get_flat_size,
-  EV_flatten_into
+static const ExpandedObjectMethods vector_methods = {
+  vector_get_flat_size,
+  vector_flatten_into
 };
 
 /* Compute size of storage needed for vector */
 static Size
-EV_get_flat_size(ExpandedObjectHeader *eohptr) {
+vector_get_flat_size(ExpandedObjectHeader *eohptr) {
   GrB_Info info;
   pgGrB_Vector *A = (pgGrB_Vector *) eohptr;
   Size nbytes;
   GrB_Index size, nvals;
 
-  Assert(A->ev_magic == EV_MAGIC);
+  Assert(A->ev_magic == vector_MAGIC);
 
   if (A->flat_value)
    return VARSIZE(A->flat_value);
@@ -45,7 +45,7 @@ EV_get_flat_size(ExpandedObjectHeader *eohptr) {
 
 /* Flatten vector into allocated result buffer  */
 static void
-EV_flatten_into(ExpandedObjectHeader *eohptr,
+vector_flatten_into(ExpandedObjectHeader *eohptr,
                 void *result, Size allocated_size)  {
   GrB_Info info;
   GrB_Index *start;
@@ -58,7 +58,7 @@ EV_flatten_into(ExpandedObjectHeader *eohptr,
     return;
   }
 
-  Assert(A->ev_magic == EV_MAGIC);
+  Assert(A->ev_magic == vector_MAGIC);
   Assert(allocated_size == A->flat_size);
 
   memset(flat, 0, allocated_size);
@@ -106,10 +106,10 @@ expand_flat_vector(Datum flatdatum,
 
   /* Initialize the ExpandedObjectHeader member with flattening
    * methods and new object context */
-  EOH_init_header(&A->hdr, &EV_methods, objcxt);
+  EOH_init_header(&A->hdr, &vector_methods, objcxt);
 
   /* Used for debugging checks */
-  A->ev_magic = EV_MAGIC;
+  A->ev_magic = vector_MAGIC;
 
   /* Switch to new object context */
   oldcxt = MemoryContextSwitchTo(objcxt);
@@ -194,7 +194,7 @@ DatumGetVector(Datum d) {
   
   if (VARATT_IS_EXTERNAL_EXPANDED(DatumGetPointer(d))) {
     A = (pgGrB_Vector *) DatumGetEOHP(d);
-    Assert(A->ev_magic == EV_MAGIC);
+    Assert(A->ev_magic == vector_MAGIC);
     return A;
   }
   d = expand_flat_vector(d, CurrentMemoryContext);
@@ -310,10 +310,10 @@ vector_tuples(PG_FUNCTION_ARGS) {
     state = (pgGrB_Vector_ExtractState*)palloc(sizeof(pgGrB_Vector_ExtractState));
     CHECKD(GrB_Vector_size(&size, vec->V));
 
-    state->rows = (GrB_Index*) palloc0(sizeof(GrB_Index) * size);
+    state->indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * size);
     state->vals = (int64*) palloc0(sizeof(int64) * size);
 
-    CHECKD(GrB_Vector_extractTuples(state->rows,
+    CHECKD(GrB_Vector_extractTuples(state->indices,
                                    state->vals,
                                    &size,
                                    vec->V));
@@ -338,7 +338,7 @@ vector_tuples(PG_FUNCTION_ARGS) {
   vec = state->vec;
 
   if (funcctx->call_cntr < funcctx->max_calls) {
-    values[0] = Int64GetDatum(state->rows[funcctx->call_cntr]);
+    values[0] = Int64GetDatum(state->indices[funcctx->call_cntr]);
     values[1] = Int64GetDatum(state->vals[funcctx->call_cntr]);
 
     tuple = heap_form_tuple(funcctx->tuple_desc, values, nulls);

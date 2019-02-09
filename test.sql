@@ -15,13 +15,13 @@ create extension if not exists pggraphblas;
 begin;
 select plan(15);
 
--- vectors
-        
+-- "dense" vectors constructed from 1-d arrays, indices go from 0...n
+
 select is(
     '{1,2,3}'::vector,
     '{1,2,3}'::vector,
     'literal vector');
-    
+
 select is(
     '{1,2,3}'::vector + '{2,3,4}'::vector,
     '{3,5,7}'::vector,
@@ -33,20 +33,22 @@ select is(
     'literal vector mul');
 
 select is(
-    vector_size('{1,2,3}'::vector), 3::bigint,
+    vector_size('{1,2,3}'::vector),
+    3::bigint,
     'literal vector size');
 
 select is(
-    vector_nvals('{1,2,3}'::vector), 3::bigint,
+    vector_nvals('{1,2,3}'::vector),
+    3::bigint,
     'literal vector nvals');
 
--- sparse vectors
-    
+-- sparse vectors from 2-d arrays of {{indices}{values}}
+
 select is(
     '{{1,4,9},{1,2,3}}'::vector,
     '{{1,4,9},{1,2,3}}'::vector,
     'sparse literal vector');
-    
+
 select is(
     '{{1,4,9},{1,2,3}}'::vector + '{{1,4,9},{2,3,4}}'::vector,
     '{{1,4,9},{3,5,7}}'::vector,
@@ -58,15 +60,17 @@ select is(
     'sparse literal vector mul');
 
 select is(
-    vector_size('{{1,4,9},{1,2,3}}'::vector), 10::bigint,
+    vector_size('{{1,4,9},{1,2,3}}'::vector),
+    10::bigint,
     'sparse literal vector size');
 
 select is(
-    vector_nvals('{{1,4,9},{1,2,3}}'::vector), 3::bigint,
+    vector_nvals('{{1,4,9},{1,2,3}}'::vector),
+     3::bigint,
     'sparse literal vector nvals');
-    
+
 -- matrices
-        
+
 select is(
     '{{0,1,2},{1,2,0},{4,5,6}}'::matrix,
     '{{0,1,2},{1,2,0},{4,5,6}}'::matrix,
@@ -81,19 +85,21 @@ select is(
     '{{0,1,2},{1,2,0},{4,5,6}}'::matrix && '{{0,1,2},{1,2,0},{4,5,6}}'::matrix,
     '{{0,1,2},{1,2,0},{16,25,36}}'::matrix,
     'literal matrix ewise mul');
-    
+
 select is(
     '{{0,1,2},{1,2,0},{4,5,6}}'::matrix * '{{0,1,2},{1,2,0},{4,5,6}}'::matrix,
     '{{0,1,2},{2,0,1},{20,30,24}}'::matrix,
     'literal matrix mul');
-    
-create table graph (
+
+-- lets make a table of edge data with a graph in it
+
+create table edge (
     i bigint,
     j bigint,
     v bigint
     );
 
-insert into graph (i, j, v) values 
+insert into edge (i, j, v) values
     (1, 4, 1),
     (1, 2, 2),
     (2, 7, 3),
@@ -108,7 +114,7 @@ insert into graph (i, j, v) values
 create function matrix_from_table() returns matrix as $$
     declare m matrix;
     begin
-        select matrix_agg(i, j, v) from graph into m;
+        select matrix_agg(i, j, v) from edge into m;
         return m;
     end;
 $$ language plpgsql;
@@ -117,7 +123,6 @@ select is(
     matrix_from_table(),
     '{{1,1,2,2,3,4,4,5,6,7},{2,4,5,7,6,1,3,6,3,3},{2,1,4,3,5,7,6,8,9,10}}'::matrix,
     'matrix from table.');
-        
+
 select * from finish();
 rollback;
-
