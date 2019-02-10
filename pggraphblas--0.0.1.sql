@@ -13,11 +13,11 @@ CREATE FUNCTION vector_out(vector)
 RETURNS cstring
 AS '$libdir/pggraphblas', 'vector_out'
 LANGUAGE C IMMUTABLE STRICT;
-    
+
 CREATE TYPE vector (
-    internallength = 8,
     input = vector_in,
-    output = vector_out
+    output = vector_out,
+    alignment = int4
 );
 
 CREATE TYPE matrix;
@@ -43,6 +43,16 @@ CREATE FUNCTION matrix_in(cstring)
 RETURNS matrix
 AS '$libdir/pggraphblas', 'matrix_in'
 LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION matrix(ncols bigint, nrows bigint)
+RETURNS matrix
+AS '$libdir/pggraphblas', 'matrix'
+LANGUAGE C STRICT;
+
+CREATE FUNCTION matrix(cols bigint[], rows bigint[], vals anyarray)
+RETURNS matrix
+AS '$libdir/pggraphblas', 'matrix'
+LANGUAGE C STRICT;
 
 CREATE FUNCTION matrix_out(matrix)
 RETURNS cstring
@@ -73,7 +83,7 @@ CREATE FUNCTION matrix_neq(matrix, matrix)
 RETURNS bool
 AS '$libdir/pggraphblas', 'matrix_neq'
 LANGUAGE C STABLE STRICT;
-    
+
 CREATE FUNCTION matrix_mxm(matrix, matrix)
 RETURNS matrix
 AS '$libdir/pggraphblas', 'matrix_mxm'
@@ -98,7 +108,7 @@ CREATE FUNCTION matrix_ewise_add(matrix, matrix)
 RETURNS matrix
 AS '$libdir/pggraphblas', 'matrix_ewise_add'
 LANGUAGE C STABLE STRICT;
-    
+
 CREATE TYPE matrix (
     input = matrix_in,
     output = matrix_out,
@@ -124,7 +134,7 @@ CREATE OPERATOR <> (
     procedure = matrix_neq,
     negator = =
 );
-    
+
 CREATE OPERATOR * (
     leftarg = matrix,
     rightarg = matrix,
@@ -136,13 +146,13 @@ CREATE OPERATOR * (
     rightarg = matrix,
     procedure = matrix_vxm
 );
-    
+
 CREATE OPERATOR * (
     leftarg = matrix,
     rightarg = vector,
     procedure = matrix_mxv
 );
-    
+
 CREATE OPERATOR && (
     leftarg = matrix,
     rightarg = matrix,
@@ -155,7 +165,14 @@ CREATE OPERATOR || (
     procedure = matrix_ewise_add
 );
 
-        
+CREATE FUNCTION vector(anyarray)
+RETURNS vector
+AS '$libdir/pggraphblas', 'vector'
+LANGUAGE C STRICT;
+
+CREATE CAST (bigint[] AS vector) WITH FUNCTION vector(anyarray) AS IMPLICIT;
+CREATE CAST (float[] AS vector) WITH FUNCTION vector(anyarray) AS IMPLICIT;
+
 CREATE FUNCTION vector_agg_acc(internal, bigint, bigint)
 RETURNS internal
 AS '$libdir/pggraphblas', 'vector_agg_acc'
@@ -190,12 +207,12 @@ CREATE FUNCTION vector_neq(vector, vector)
 RETURNS bool
 AS '$libdir/pggraphblas', 'vector_neq'
 LANGUAGE C STABLE STRICT;
-    
+
 CREATE FUNCTION vector_size(vector)
 RETURNS bigint
 AS '$libdir/pggraphblas', 'vector_size'
 LANGUAGE C STABLE STRICT;
-    
+
 CREATE FUNCTION vector_nvals(vector)
 RETURNS bigint
 AS '$libdir/pggraphblas', 'vector_nvals'

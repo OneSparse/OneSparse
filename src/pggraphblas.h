@@ -149,6 +149,7 @@ construct_empty_expanded_matrix(GrB_Index nrows,
 PG_FUNCTION_INFO_V1(matrix_agg_acc);
 PG_FUNCTION_INFO_V1(matrix_final_int8);
 
+PG_FUNCTION_INFO_V1(matrix);
 PG_FUNCTION_INFO_V1(matrix_tuples);
 PG_FUNCTION_INFO_V1(matrix_in);
 PG_FUNCTION_INFO_V1(matrix_out);
@@ -252,6 +253,7 @@ PG_FUNCTION_INFO_V1(vector_final_int8);
 
 PG_FUNCTION_INFO_V1(vector_tuples);
 
+PG_FUNCTION_INFO_V1(vector);
 PG_FUNCTION_INFO_V1(vector_in);
 PG_FUNCTION_INFO_V1(vector_out);
 
@@ -263,6 +265,9 @@ PG_FUNCTION_INFO_V1(vector_neq);
 
 PG_FUNCTION_INFO_V1(vector_nvals);
 PG_FUNCTION_INFO_V1(vector_size);
+
+char grb_type_to_name(GrB_Type t);
+GrB_Type grb_name_to_type(char* name);
 
 void _PG_init(void);
 

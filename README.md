@@ -6,19 +6,17 @@ High Performance Graph Processing with Postgres using Linear Algebra
 GraphBLAS is a sparse linear algebra API optimized for processing
 graphs encoded as sparse matrices and vectors.  In addition to common
 real/integer matrix algebras, GraphBLAS supports up to 960 different
-"semiring" algebras, that can be used to sparsely encode and solve
-graph problems.  pggraphblas is a postgres extension that exposes the
-matrix and vector types and their API to SQL.
+"semiring" algebras, that can be used as basic building blocks to
+solve common graph problems.  pggraphblas is a postgres extension that
+exposes the matrix and vector types and their functional API to SQL.
 
 pggraphblas leverages the expertise in the field of sparse matrix
-programming by [The GraphBLAS](http://graphblas.org) and wraps the
-[SuiteSparse
-GraphBLAS](http://faculty.cse.tamu.edu/davis/suitesparse.html)
-implementation of the GraphBLAS API which provides access to sparse
-matrix and vector types and functions.  The SuiteSparse:GraphBLAS
-implementation is brought to us by the work of Dr. Tim Davis,
-professor in the Department of Computer Science and Engineering at
-Texas A&M University, and others.  [News and
+programming by [The GraphBLAS Forum](http://graphblas.org) and uses
+the
+[SuiteSparse:GraphBLAS](http://faculty.cse.tamu.edu/davis/suitesparse.html)
+API implementation. SuiteSparse:GraphBLAS is brought to us by the work
+of Dr. Tim Davis, professor in the Department of Computer Science and
+Engineering at Texas A&M University.  [News and
 information](http://faculty.cse.tamu.edu/davis/news.html) can provide
 you with a lot more background information, in addition to the
 references below.

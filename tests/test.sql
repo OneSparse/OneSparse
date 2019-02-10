@@ -18,9 +18,9 @@ select plan(15);
 -- "dense" vectors constructed from 1-d arrays, indices go from 0...n
 
 select is(
-    '{1,2,3}'::vector,
-    '{1,2,3}'::vector,
-    'literal vector');
+    vector(array[1,2,3]::bigint[]),
+    array[1,2,3]::bigint[]::vector,
+    'literal vector casting');
 
 select is(
     '{1,2,3}'::vector + '{2,3,4}'::vector,
