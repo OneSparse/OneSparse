@@ -115,7 +115,7 @@ CREATE TYPE matrix (
     alignment = int4
 );
 
-CREATE AGGREGATE matrix_agg (bigint, bigint, bigint) (
+CREATE AGGREGATE matrix (bigint, bigint, bigint) (
     sfunc = matrix_agg_acc,
     stype = internal,
     finalfunc = matrix_final_int8
@@ -173,14 +173,14 @@ LANGUAGE C STRICT;
 CREATE CAST (bigint[] AS vector) WITH FUNCTION vector(anyarray) AS IMPLICIT;
 CREATE CAST (float[] AS vector) WITH FUNCTION vector(anyarray) AS IMPLICIT;
 
-CREATE FUNCTION vector_agg_acc(internal, bigint, bigint)
+CREATE FUNCTION vector_agg_acc_bigint(internal, bigint, bigint)
 RETURNS internal
-AS '$libdir/pggraphblas', 'vector_agg_acc'
+AS '$libdir/pggraphblas', 'vector_agg_acc_int64'
 LANGUAGE C CALLED ON NULL INPUT;
 
-CREATE FUNCTION vector_final_int8(internal)
+CREATE FUNCTION vector_final_bigint(internal)
 RETURNS vector
-AS '$libdir/pggraphblas', 'vector_final_int8'
+AS '$libdir/pggraphblas', 'vector_final_int64'
 LANGUAGE C CALLED ON NULL INPUT;
 
 CREATE FUNCTION vector_tuples(vector)
@@ -218,10 +218,10 @@ RETURNS bigint
 AS '$libdir/pggraphblas', 'vector_nvals'
 LANGUAGE C STABLE STRICT;
 
-CREATE AGGREGATE vector_agg (bigint, bigint) (
-    sfunc = vector_agg_acc,
+CREATE AGGREGATE vector(bigint, bigint) (
+    sfunc = vector_agg_acc_bigint,
     stype = internal,
-    finalfunc = vector_final_int8
+    finalfunc = vector_final_bigint
 );
 
 CREATE OPERATOR * (

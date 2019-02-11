@@ -60,7 +60,7 @@ vector_ewise_mult(PG_FUNCTION_ARGS) {
   VECTOR_BINOP_PREAMBLE();
 
   CHECKD(GrB_Vector_size(&size, A->V));
-  C = construct_empty_expanded_vector(size, GrB_INT64, CurrentMemoryContext);
+  C = construct_empty_expanded_vector_int64(size, GrB_INT64, CurrentMemoryContext);
   CHECKD(GrB_eWiseMult(C->V, NULL, NULL, GrB_TIMES_INT64, A->V, B->V, NULL));
   PGGRB_RETURN_VECTOR(C);
 }
@@ -73,7 +73,7 @@ vector_ewise_add(PG_FUNCTION_ARGS) {
   VECTOR_BINOP_PREAMBLE();
 
   CHECKD(GrB_Vector_size(&size, A->V));
-  C = construct_empty_expanded_vector(size, GrB_INT64, CurrentMemoryContext);
+  C = construct_empty_expanded_vector_int64(size, GrB_INT64, CurrentMemoryContext);
   CHECKD(GrB_eWiseAdd(C->V, NULL, NULL, GrB_PLUS_INT64, A->V, B->V, NULL));
   PGGRB_RETURN_VECTOR(C);
 }

@@ -110,11 +110,6 @@ typedef struct pgGrB_Matrix_ExtractState {
 static void
 context_callback_matrix_free(void*);
 
-/* Utility function that expands a flattened matrix datum. */
-Datum
-expand_flat_matrix(Datum matrixdatum,
-                   MemoryContext parentcontext);
-
 /* Helper function that either detoasts or expands matrices. */
 pgGrB_Matrix *
 DatumGetMatrix(Datum d);
@@ -216,21 +211,10 @@ static void context_callback_vector_free(void*);
 pgGrB_Vector *
 DatumGetVector(Datum d);
 
-/* Utility function that expands a flattened vector datum. */
-Datum
-expand_flat_vector(Datum vectordatum,
-                   MemoryContext parentcontext);
-
 /* Helper function to create an empty flattened vector. */
 pgGrB_FlatVector *
 construct_empty_flat_vector(GrB_Index size,
                             GrB_Type type);
-
-/* Helper function that creates an expanded empty vector. */
-pgGrB_Vector *
-construct_empty_expanded_vector(GrB_Index size,
-                                GrB_Type type,
-                                MemoryContext parentcontext);
 
 /* function to choose implicit semirings for overloaded operators */
 GrB_Semiring mxm_semiring(pgGrB_Matrix *left, pgGrB_Matrix *right);
@@ -247,9 +231,6 @@ GrB_Semiring vxm_semiring(pgGrB_Vector *left, pgGrB_Matrix *right);
 #define PGGRB_VECTOR_OVERHEAD() MAXALIGN(sizeof(pgGrB_FlatVector))
 
 #define PGGRB_VECTOR_DATA(a) (GrB_Index *)(((char *) (a)) + PGGRB_VECTOR_OVERHEAD())
-
-PG_FUNCTION_INFO_V1(vector_agg_acc);
-PG_FUNCTION_INFO_V1(vector_final_int8);
 
 PG_FUNCTION_INFO_V1(vector_tuples);
 

@@ -119,7 +119,7 @@ matrix_mxv(PG_FUNCTION_ARGS) {
 
   CHECKD(GrB_Vector_size(&size, B->V));
   
-  C = construct_empty_expanded_vector(size, GrB_INT64, CurrentMemoryContext);
+  C = construct_empty_expanded_vector_int64(size, GrB_INT64, CurrentMemoryContext);
   semiring = mxv_semiring(A, B);
 
   CHECKD(GrB_mxv(C->V, NULL, NULL, semiring, A->M, B->V, NULL));
@@ -138,7 +138,7 @@ matrix_vxm(PG_FUNCTION_ARGS) {
   B = (pgGrB_Matrix *) PGGRB_GETARG_MATRIX(1);
 
   CHECKD(GrB_Vector_size(&size, A->V));
-  C = construct_empty_expanded_vector(size, GrB_INT64, CurrentMemoryContext);
+  C = construct_empty_expanded_vector_int64(size, GrB_INT64, CurrentMemoryContext);
   semiring = vxm_semiring(A, B);
 
   CHECKD(GrB_vxm(C->V, NULL, NULL, semiring, A->V, B->M, NULL));

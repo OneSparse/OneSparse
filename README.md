@@ -104,9 +104,9 @@ To run common graph algorithms on matrices, for example, breadth first search:
 create function bfs(A matrix, source index) returns vector as $$
 declare
     n index := matrix_nrows(A);          -- The number of result rows
-    v vector := vector_new('int32', n)   -- int32 result vector of vertex levels
-    q vector := vector_new('bool', n);   -- bool mask of completed vertices
-    desc descriptor := descriptor_new(   -- MxM descriptor:
+    v vector := vector_int(n)            -- int32 result vector of vertex levels
+    q vector := vector_bool(n);          -- bool mask of completed vertices
+    desc descriptor := descriptor(       -- MxM descriptor:
         'mask', 'scmp',                  -- negate the mask
         'outp', 'replace');              -- clear results first
     level integer := 1;                  -- start at level 1
