@@ -97,6 +97,38 @@ and the argument will be run in a tmux in the container, so to launch
 a psql, do `./test.sh psql`.  GDB is installed so create another pane
 and attach to the current database pid to debug the C code.
 
+# types
+
+GraphBLAS has an extremely rich type system that encompases not only
+common "artithmetic" algegbra, but also many other algebras using
+semirings.  The combinations of 7 matrix types and 960 semiring
+operations offer hundreds of thousands of possible legitimate building
+blocks for solving graph problems.
+
+PostgreSQL is a strongly typed language that comes with many built-in
+data types, the following types map from GraphBLAS to PostgreSQL:
+
+    - GrB_BOOL maps to bool
+    - GrB_INT8 maps to char(1)
+    - GrB_INT16 maps to smallint
+    - GrB_INT32 maps to integer
+    - GrB_INT64 maps to bigint
+    - GrB_FP32 maps to real
+    - GrB_FP64 maps to float aka "double precision"
+
+Postgres does not support unsigned integers like GraphBLAS (is there a
+workaround?  support the uint extension?)
+
+pggraphblas matrix and vector objects have an intrinsic type of data
+that they store.  So, a matrix can store booleans, and various sized
+integers and floats.  Once a matrix is created with a specific type it
+cannot be changed.
+
+When combining matrices (and vectors) it is possible to not only use
+the common arithmetic plus and multiply operators on any given type,
+it is also possible to mix various semiring operations on any
+supported type.  Put example here of {R,min,+,0,+inf}.
+
 # 0.1 goals
 
 To run common graph algorithms on matrices, for example, breadth first search:

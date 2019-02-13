@@ -14,3 +14,5 @@ REGRESS      = $(patsubst test/sql/%.sql,%,$(TESTS))
 REGRESS_OPTS = --inputdir=test --load-language=plpgsql
 include $(PGXS)
 
+sql: pggraphblas--0.0.1.sql
+	bash pggraphblas--0.0.1-gen.sql.sh

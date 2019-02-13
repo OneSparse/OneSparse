@@ -14,6 +14,23 @@
 #include "utils/lsyscache.h"
 #include "nodes/pg_list.h"
 
+#define CCAT2(x, y) x ## y
+#define CCAT(x, y) CCAT2(x, y)
+#define FN(x) CCAT(x, SUFFIX)
+
+#define DATUM_TYPE_APPLY(T, F, ...)               \
+  (T) == GrB_INT64?                               \
+    F ## _int64(__VA_ARGS__) :                    \
+    (T)  == GrB_INT32?                            \
+    F ## _int32(__VA_ARGS__) :                    \
+    (T)  == GrB_INT16?                            \
+    F ## _int16(__VA_ARGS__) :                    \
+    (T)  == GrB_BOOL?                             \
+    F ## _bool(__VA_ARGS__) :                     \
+    (T)  == GrB_FP32?                             \
+    F ## _float8(__VA_ARGS__) :                   \
+    (Datum)0
+
 /* dumb debug helper */
 #define elogn(s) elog(NOTICE, "%s", (s))
 #define elogn1(s, v) elog(NOTICE, "%s: %lu", (s), (v))
@@ -95,16 +112,9 @@ typedef struct pgGrB_Matrix_AggState {
   List *vals;
 } pgGrB_Matrix_AggState;
 
-/* Set Returning Function (matrix_tuples) state for generating tuples
-   from a matrix.
- */
-typedef struct pgGrB_Matrix_ExtractState {
-  pgGrB_Matrix *mat;
-  GrB_Index *rows;
-  GrB_Index *cols;
-  int64 *vals;
-} pgGrB_Matrix_ExtractState;
-
+/* helper to turn types into names. */
+char* grb_type_to_name(GrB_Type t);
+GrB_Type grb_name_to_type(char* n);
 
 /* Callback function for freeing matrices. */
 static void
@@ -120,13 +130,6 @@ construct_empty_flat_matrix(GrB_Index nrows,
                             GrB_Index ncols,
                             GrB_Type type);
 
-/* Helper function that creates an expanded empty matrix. */
-pgGrB_Matrix *
-construct_empty_expanded_matrix(GrB_Index nrows,
-                                GrB_Index ncols,
-                                GrB_Type type,
-                                MemoryContext parentcontext);
-
 /* Helper to detoast and expand matrixs arguments */
 #define PGGRB_GETARG_MATRIX(n)  DatumGetMatrix(PG_GETARG_DATUM(n))
 
@@ -141,11 +144,6 @@ construct_empty_expanded_matrix(GrB_Index nrows,
 
 /* Public API functions */
 
-PG_FUNCTION_INFO_V1(matrix_agg_acc);
-PG_FUNCTION_INFO_V1(matrix_final_int8);
-
-PG_FUNCTION_INFO_V1(matrix);
-PG_FUNCTION_INFO_V1(matrix_tuples);
 PG_FUNCTION_INFO_V1(matrix_in);
 PG_FUNCTION_INFO_V1(matrix_out);
 
@@ -199,12 +197,6 @@ typedef struct pgGrB_Vector_AggState {
   List     *X;
 } pgGrB_Vector_AggState;
 
-typedef struct pgGrB_Vector_ExtractState {
-  pgGrB_Vector *vec;
-  GrB_Index *indices;
-  int64 *vals;
-} pgGrB_Vector_ExtractState;
-
 static void context_callback_vector_free(void*);
 
 /* Helper function that either detoasts or expands vectors. */
@@ -221,6 +213,9 @@ GrB_Semiring mxm_semiring(pgGrB_Matrix *left, pgGrB_Matrix *right);
 GrB_Semiring mxv_semiring(pgGrB_Matrix *left, pgGrB_Vector *right);
 GrB_Semiring vxm_semiring(pgGrB_Vector *left, pgGrB_Matrix *right);
 
+#define VectorGetEOHP(d) (pgGrB_Vector *) DatumGetEOHP(d)
+#define MatrixGetEOHP(d) (pgGrB_Matrix *) DatumGetEOHP(d);
+
 /* Helper to detoast and expand vectors arguments */
 #define PGGRB_GETARG_VECTOR(n)  DatumGetVector(PG_GETARG_DATUM(n))
 
@@ -232,9 +227,6 @@ GrB_Semiring vxm_semiring(pgGrB_Vector *left, pgGrB_Matrix *right);
 
 #define PGGRB_VECTOR_DATA(a) (GrB_Index *)(((char *) (a)) + PGGRB_VECTOR_OVERHEAD())
 
-PG_FUNCTION_INFO_V1(vector_tuples);
-
-PG_FUNCTION_INFO_V1(vector);
 PG_FUNCTION_INFO_V1(vector_in);
 PG_FUNCTION_INFO_V1(vector_out);
 
@@ -246,9 +238,6 @@ PG_FUNCTION_INFO_V1(vector_neq);
 
 PG_FUNCTION_INFO_V1(vector_nvals);
 PG_FUNCTION_INFO_V1(vector_size);
-
-char grb_type_to_name(GrB_Type t);
-GrB_Type grb_name_to_type(char* name);
 
 void _PG_init(void);
 

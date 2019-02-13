@@ -1,13 +1,21 @@
-#ifndef PREFIX
-    #define PREFIX
-#endif
-#define CCAT2(x, y) x ## y
-#define CCAT(x, y) CCAT2(x, y)
-#define FN(x) CCAT(x, SUFFIX)
+/* This is a "header template" see matrix.c for specific instanciations */
 
 #ifndef T
     #error Template argument missing.
 #endif
+#ifndef SUFFIX
+    #error Suffix argument missing.
+#endif
+
+/* Set Returning Function (matrix_elements) state for generating tuples
+   from a matrix.
+ */
+typedef struct FN(pgGrB_Matrix_ExtractState) {
+  pgGrB_Matrix *mat;
+  GrB_Index *rows;
+  GrB_Index *cols;
+  T *vals;
+} FN(pgGrB_Matrix_ExtractState);
 
 /* Expanded Object Header "methods" for flattening matrices for storage */
 static Size FN(matrix_get_flat_size)(ExpandedObjectHeader *eohptr);
@@ -23,6 +31,15 @@ static const ExpandedObjectMethods FN(matrix_methods) = {
 Datum
 FN(expand_flat_matrix)(Datum matrixdatum,
                    MemoryContext parentcontext);
+
+pgGrB_Matrix *
+FN(construct_empty_expanded_matrix)(GrB_Index nrows,
+                                    GrB_Index ncols,
+                                    MemoryContext parentcontext);
+PG_FUNCTION_INFO_V1(FN(matrix));
+PG_FUNCTION_INFO_V1(FN(matrix_agg_acc));
+PG_FUNCTION_INFO_V1(FN(matrix_final));
+PG_FUNCTION_INFO_V1(FN(matrix_elements));
 
 /* Compute size of storage needed for matrix */
 static Size
@@ -175,8 +192,193 @@ FN(expand_flat_matrix)(Datum flatdatum,
   PGGRB_RETURN_MATRIX(A);
 }
 
+/* Construct an empty expanded matrix. */
+pgGrB_Matrix *
+FN(construct_empty_expanded_matrix)(GrB_Index nrows,
+                                GrB_Index ncols,
+                                MemoryContext parentcontext) {
+  pgGrB_FlatMatrix  *flat;
+  Datum	d;
+  flat = construct_empty_flat_matrix(nrows, ncols, GT);
+  d = FN(expand_flat_matrix)(PointerGetDatum(flat), parentcontext);
+  pfree(flat);
+  return (pgGrB_Matrix *) DatumGetEOHP(d);
+}
+
+Datum
+FN(matrix)(PG_FUNCTION_ARGS) {
+  pgGrB_Matrix *retval;
+  GrB_Index nrows, ncols;
+
+  nrows = PG_GETARG_INT64(0);
+  ncols = PG_GETARG_INT64(1);
+
+  retval = FN(construct_empty_expanded_matrix)(nrows,
+                                               ncols,
+                                               CurrentMemoryContext);
+  PGGRB_RETURN_MATRIX(retval);
+}
+
+Datum
+FN(matrix_agg_acc)(PG_FUNCTION_ARGS)
+{
+  pgGrB_Matrix_AggState *mstate;
+  MemoryContext aggcxt, oldcxt;
+  Datum *row, *col, *val;
+
+  if (!AggCheckCallContext(fcinfo, &aggcxt))
+    elog(ERROR, "aggregate function called in non-aggregate context");
+
+  if (PG_ARGISNULL(1) || PG_ARGISNULL(2) || PG_ARGISNULL(3))
+    elog(ERROR, "matrices cannot contain null values");
+
+  oldcxt = MemoryContextSwitchTo(aggcxt);
+
+  /* lazy create a new state */
+  if (PG_ARGISNULL(0)) {
+    mstate = palloc0(sizeof(pgGrB_Matrix_AggState));
+  }  else  {
+    mstate = (pgGrB_Matrix_AggState *)PG_GETARG_POINTER(0);
+  }
+
+  row = palloc(sizeof(T));
+  col = palloc(sizeof(T));
+  val = palloc(sizeof(T));
+
+  *row = PGT(1);
+  *col = PGT(2);
+  *val = PGT(3);
+
+  mstate->rows = lappend(mstate->rows, row);
+  mstate->cols = lappend(mstate->cols, col);
+  mstate->vals = lappend(mstate->vals, val);
+
+  MemoryContextSwitchTo(oldcxt);
+
+  PG_RETURN_POINTER(mstate);
+}
+
+Datum
+FN(matrix_final)(PG_FUNCTION_ARGS) {
+  GrB_Info info;
+  pgGrB_Matrix *retval;
+  MemoryContext oldcxt, resultcxt;
+
+  pgGrB_Matrix_AggState *mstate = (pgGrB_Matrix_AggState*)PG_GETARG_POINTER(0);
+  size_t n = 0, count = list_length(mstate->rows);
+  GrB_Index *row_indices, *col_indices;
+  T *values;
+
+  ListCell *li, *lj, *lv;
+
+  if (PG_ARGISNULL(0))
+    PG_RETURN_NULL();
+
+  if (!AggCheckCallContext(fcinfo, &resultcxt)) {
+    resultcxt = CurrentMemoryContext;
+  }
+  
+  oldcxt = MemoryContextSwitchTo(resultcxt);
+  mstate = (pgGrB_Matrix_AggState *)PG_GETARG_POINTER(0);
+
+  row_indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * count);
+  col_indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * count);
+  values = (T*) palloc0(sizeof(T) * count);
+
+  forthree (li, (mstate)->rows, lj, (mstate)->cols, lv, (mstate)->vals) {
+    row_indices[n] = DatumGetInt64(*(Datum*)lfirst(li));
+    col_indices[n] = DatumGetInt64(*(Datum*)lfirst(lj));
+    values[n] = DGT(*(Datum*)lfirst(lv));
+    n++;
+  }
+
+  retval = FN(construct_empty_expanded_matrix)(count,
+                                               count,
+                                               resultcxt);
+
+  CHECKD(GrB_Matrix_build(retval->M,
+                         row_indices,
+                         col_indices,
+                         values,
+                         count,
+                         GTT));
+
+  MemoryContextSwitchTo(oldcxt);
+  PGGRB_RETURN_MATRIX(retval);
+}
+
+
+Datum
+FN(matrix_elements)(PG_FUNCTION_ARGS) {
+  GrB_Info info;
+  FuncCallContext  *funcctx;
+  TupleDesc tupdesc;
+  Datum result;
+
+  Datum values[3];
+  bool nulls[3] = {false, false, false};
+  HeapTuple tuple;
+  GrB_Index nvals = 0;
+  pgGrB_Matrix *mat;
+  FN(pgGrB_Matrix_ExtractState) *state;
+
+  if (SRF_IS_FIRSTCALL()) {
+    MemoryContext oldcontext;
+
+    funcctx = SRF_FIRSTCALL_INIT();
+    oldcontext = MemoryContextSwitchTo(funcctx->multi_call_memory_ctx);
+    mat = (pgGrB_Matrix *) PGGRB_GETARG_MATRIX(0);
+
+    state = (FN(pgGrB_Matrix_ExtractState)*)palloc(sizeof(FN(pgGrB_Matrix_ExtractState)));
+    CHECKD(GrB_Matrix_nvals(&nvals, mat->M));
+
+    state->rows = (GrB_Index*) palloc0(sizeof(GrB_Index) * nvals);
+    state->cols = (GrB_Index*) palloc0(sizeof(GrB_Index) * nvals);
+    state->vals = (T*) palloc0(sizeof(T) * nvals);
+
+    CHECKD(GrB_Matrix_extractTuples(state->rows,
+                                   state->cols,
+                                   state->vals,
+                                   &nvals,
+                                   mat->M));
+    state->mat = mat;
+    funcctx->max_calls = nvals;
+    funcctx->user_fctx = (void*)state;
+
+    /* One-time setup code appears here: */
+    if (get_call_result_type(fcinfo, NULL, &tupdesc) != TYPEFUNC_COMPOSITE)
+      ereport(ERROR,
+              (errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
+               errmsg("function returning record called in context "
+                      "that cannot accept type record")));
+    BlessTupleDesc(tupdesc);
+    funcctx->tuple_desc = tupdesc;
+
+    MemoryContextSwitchTo(oldcontext);
+  }
+
+  funcctx = SRF_PERCALL_SETUP();
+  state = (FN(pgGrB_Matrix_ExtractState)*)funcctx->user_fctx;
+  mat = state->mat;
+
+  if (funcctx->call_cntr < funcctx->max_calls) {
+    values[0] = Int64GetDatum(state->rows[funcctx->call_cntr]);
+    values[1] = Int64GetDatum(state->cols[funcctx->call_cntr]);
+    values[2] = TGD(state->vals[funcctx->call_cntr]);
+
+    tuple = heap_form_tuple(funcctx->tuple_desc, values, nulls);
+    result = HeapTupleGetDatum(tuple);
+    SRF_RETURN_NEXT(funcctx, result);
+  } else {
+    SRF_RETURN_DONE(funcctx);
+  }
+}
+
+#undef SUFFIX
 #undef T
-#undef PREFIX
-#undef CCAT2
-#undef CCAT
-#undef FN
+#undef GT
+#undef GTT
+#undef PGT
+#undef DGT
+#undef TGD
+#undef FMT

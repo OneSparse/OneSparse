@@ -99,7 +99,7 @@ matrix_mxm(PG_FUNCTION_ARGS) {
   CHECKD(GrB_Matrix_nrows(&m, A->M));
   CHECKD(GrB_Matrix_ncols(&n, B->M));
 
-  C = construct_empty_expanded_matrix(m, n, GrB_INT64, CurrentMemoryContext);
+  C = construct_empty_expanded_matrix_int64(m, n, CurrentMemoryContext);
   semiring = mxm_semiring(A, B);
   
   CHECKD(GrB_mxm(C->M, NULL, NULL, semiring, A->M, B->M, NULL));
@@ -119,7 +119,7 @@ matrix_mxv(PG_FUNCTION_ARGS) {
 
   CHECKD(GrB_Vector_size(&size, B->V));
   
-  C = construct_empty_expanded_vector_int64(size, GrB_INT64, CurrentMemoryContext);
+  C = construct_empty_expanded_vector_int64(size, CurrentMemoryContext);
   semiring = mxv_semiring(A, B);
 
   CHECKD(GrB_mxv(C->V, NULL, NULL, semiring, A->M, B->V, NULL));
@@ -138,7 +138,7 @@ matrix_vxm(PG_FUNCTION_ARGS) {
   B = (pgGrB_Matrix *) PGGRB_GETARG_MATRIX(1);
 
   CHECKD(GrB_Vector_size(&size, A->V));
-  C = construct_empty_expanded_vector_int64(size, GrB_INT64, CurrentMemoryContext);
+  C = construct_empty_expanded_vector_int64(size, CurrentMemoryContext);
   semiring = vxm_semiring(A, B);
 
   CHECKD(GrB_vxm(C->V, NULL, NULL, semiring, A->V, B->M, NULL));
@@ -156,7 +156,7 @@ matrix_ewise_mult(PG_FUNCTION_ARGS) {
   CHECKD(GrB_Matrix_nrows(&m, A->M));
   CHECKD(GrB_Matrix_ncols(&n, A->M));
 
-  C = construct_empty_expanded_matrix(m, n, GrB_INT64, CurrentMemoryContext);
+  C = construct_empty_expanded_matrix_int64(m, n, CurrentMemoryContext);
   CHECKD(GrB_eWiseMult(C->M, NULL, NULL, GrB_TIMES_INT64, A->M, B->M, NULL));
   PGGRB_RETURN_MATRIX(C);
 }
@@ -172,7 +172,7 @@ matrix_ewise_add(PG_FUNCTION_ARGS) {
   CHECKD(GrB_Matrix_nrows(&m, A->M));
   CHECKD(GrB_Matrix_ncols(&n, A->M));
 
-  C = construct_empty_expanded_matrix(m, n, GrB_INT64, CurrentMemoryContext);
+  C = construct_empty_expanded_matrix_int64(m, n, CurrentMemoryContext);
   CHECKD(GrB_eWiseAdd(C->M, NULL, NULL, GrB_PLUS_INT64, A->M, B->M, NULL));
   PGGRB_RETURN_MATRIX(C);
 }
