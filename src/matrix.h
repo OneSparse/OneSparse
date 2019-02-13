@@ -38,7 +38,18 @@ FN(construct_empty_expanded_matrix)(GrB_Index nrows,
                                     MemoryContext parentcontext);
                                    
 Datum FN(matrix_out)(pgGrB_Matrix *mat);
+Datum FN(matrix_ewise_mult)(pgGrB_Matrix *A, pgGrB_Matrix *B);
+Datum FN(matrix_ewise_add)(pgGrB_Matrix *A, pgGrB_Matrix *B);
 
+Datum
+FN(mxm)(pgGrB_Matrix *A, pgGrB_Matrix *B);
+                                 
+Datum
+FN(mxv)(pgGrB_Matrix *A, pgGrB_Vector *B);
+
+Datum
+FN(vxm)(pgGrB_Vector *A, pgGrB_Matrix *B);
+       
 PG_FUNCTION_INFO_V1(FN(matrix));
 PG_FUNCTION_INFO_V1(FN(matrix_agg_acc));
 PG_FUNCTION_INFO_V1(FN(matrix_final));
@@ -428,11 +439,89 @@ FN(matrix_out)(pgGrB_Matrix *mat)
 
   PG_RETURN_CSTRING(result);
 }
+
+Datum
+FN(matrix_ewise_mult)(pgGrB_Matrix *A, pgGrB_Matrix *B) {
+  GrB_Info info;
+  pgGrB_Matrix *C;
+  GrB_Index m, n;
+
+  CHECKD(GrB_Matrix_nrows(&m, A->M));
+  CHECKD(GrB_Matrix_ncols(&n, A->M));
+
+  C = FN(construct_empty_expanded_matrix)(m, n, CurrentMemoryContext);
+  CHECKD(GrB_eWiseMult(C->M, NULL, NULL, GB_MUL, A->M, B->M, NULL));
+  PGGRB_RETURN_MATRIX(C);
+}
+
+Datum
+FN(matrix_ewise_add)(pgGrB_Matrix *A, pgGrB_Matrix *B) {
+  GrB_Info info;
+  pgGrB_Matrix *C;
+  GrB_Index m, n;
+
+  CHECKD(GrB_Matrix_nrows(&m, A->M));
+  CHECKD(GrB_Matrix_ncols(&n, A->M));
+
+  C = FN(construct_empty_expanded_matrix)(m, n, CurrentMemoryContext);
+  CHECKD(GrB_eWiseAdd(C->M, NULL, NULL, GB_ADD, A->M, B->M, NULL));
+  PGGRB_RETURN_MATRIX(C);
+}
+
+Datum
+FN(mxm)(pgGrB_Matrix *A, pgGrB_Matrix *B) {
+  GrB_Info info;
+  pgGrB_Matrix *C;
+  GrB_Index m, n;
+  GrB_Semiring semiring;
+  
+  CHECKD(GrB_Matrix_nrows(&m, A->M));
+  CHECKD(GrB_Matrix_ncols(&n, B->M));
+
+  C = FN(construct_empty_expanded_matrix)(m, n, CurrentMemoryContext);
+  semiring = mxm_semiring(A, B);
+  
+  CHECKD(GrB_mxm(C->M, NULL, NULL, semiring, A->M, B->M, NULL));
+  PGGRB_RETURN_MATRIX(C);
+}
+
+Datum
+FN(mxv)(pgGrB_Matrix *A, pgGrB_Vector *B) {
+  GrB_Info info;
+  pgGrB_Vector *C;
+  GrB_Index size;
+  GrB_Semiring semiring;
+
+  CHECKD(GrB_Vector_size(&size, B->V));
+  
+  C = FN(construct_empty_expanded_vector)(size, CurrentMemoryContext);
+  semiring = mxv_semiring(A, B);
+
+  CHECKD(GrB_mxv(C->V, NULL, NULL, semiring, A->M, B->V, NULL));
+  PGGRB_RETURN_VECTOR(C);
+}
+
+Datum
+FN(vxm)(pgGrB_Vector *A, pgGrB_Matrix *B) {
+  GrB_Info info;
+  pgGrB_Vector *C;
+  GrB_Index size;
+  GrB_Semiring semiring;
+
+  CHECKD(GrB_Vector_size(&size, A->V));
+  C = FN(construct_empty_expanded_vector)(size, CurrentMemoryContext);
+  semiring = vxm_semiring(A, B);
+
+  CHECKD(GrB_vxm(C->V, NULL, NULL, semiring, A->V, B->M, NULL));
+  PGGRB_RETURN_VECTOR(C);
+}
+
 #undef SUFFIX
 #undef PG_TYPE
 #undef GB_TYPE
 #undef GB_DUP
 #undef GB_MUL
+#undef GB_ADD
 #undef PG_GET
 #undef PG_DGT
 #undef PG_TGD

@@ -33,6 +33,22 @@
     F ## _float4(__VA_ARGS__) :                   \
     (Datum)0
 
+#define DEFAULT_SEMIRING(T)                       \
+  (T) == GrB_INT64?                               \
+    GxB_PLUS_TIMES_INT64 :                        \
+    (T)  == GrB_INT32?                            \
+    GxB_PLUS_TIMES_INT32 :                        \
+    (T)  == GrB_INT16?                            \
+    GxB_PLUS_TIMES_INT16 :                        \
+    (T)  == GrB_BOOL?                             \
+    GxB_LOR_LAND_BOOL :                           \
+    (T)  == GrB_FP64?                             \
+    GxB_PLUS_TIMES_FP64 :                         \
+    (T)  == GrB_FP32?                             \
+    GxB_PLUS_TIMES_FP32 :                         \
+    NULL
+
+
 /* dumb debug helper */
 #define elogn(s) elog(NOTICE, "%s", (s))
 #define elogn1(s, v) elog(NOTICE, "%s: %lu", (s), (v))
@@ -153,9 +169,9 @@ PG_FUNCTION_INFO_V1(matrix_ncols);
 PG_FUNCTION_INFO_V1(matrix_nrows);
 PG_FUNCTION_INFO_V1(matrix_nvals);
 
-PG_FUNCTION_INFO_V1(matrix_mxm);
-PG_FUNCTION_INFO_V1(matrix_mxv);
-PG_FUNCTION_INFO_V1(matrix_vxm);
+PG_FUNCTION_INFO_V1(mxm);
+PG_FUNCTION_INFO_V1(mxv);
+PG_FUNCTION_INFO_V1(vxm);
 
 PG_FUNCTION_INFO_V1(matrix_eq);
 PG_FUNCTION_INFO_V1(matrix_neq);

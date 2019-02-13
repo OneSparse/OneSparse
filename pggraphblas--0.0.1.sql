@@ -56,19 +56,19 @@ RETURNS bool
 AS '$libdir/pggraphblas', 'matrix_neq'
 LANGUAGE C STABLE STRICT;
 
-CREATE FUNCTION matrix_mxm(matrix, matrix)
+CREATE FUNCTION mxm(matrix, matrix)
 RETURNS matrix
-AS '$libdir/pggraphblas', 'matrix_mxm'
+AS '$libdir/pggraphblas', 'mxm'
 LANGUAGE C STABLE STRICT;
 
-CREATE FUNCTION matrix_mxv(matrix, vector)
+CREATE FUNCTION mxv(matrix, vector)
 RETURNS vector
-AS '$libdir/pggraphblas', 'matrix_mxv'
+AS '$libdir/pggraphblas', 'mxv'
 LANGUAGE C STABLE STRICT;
 
-CREATE FUNCTION matrix_vxm(vector, matrix)
+CREATE FUNCTION vxm(vector, matrix)
 RETURNS vector
-AS '$libdir/pggraphblas', 'matrix_vxm'
+AS '$libdir/pggraphblas', 'vxm'
 LANGUAGE C STABLE STRICT;
 
 CREATE FUNCTION matrix_ewise_mult(matrix, matrix)

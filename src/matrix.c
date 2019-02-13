@@ -1,4 +1,25 @@
 
+GrB_Semiring mxm_semiring(pgGrB_Matrix *left, pgGrB_Matrix *right) {
+  GrB_Info info;
+  GrB_Type type;
+  CHECKD(GxB_Matrix_type(&type, left->M));
+  return DEFAULT_SEMIRING(type);
+}
+
+GrB_Semiring mxv_semiring(pgGrB_Matrix *left, pgGrB_Vector *right) {
+  GrB_Info info;
+  GrB_Type type;
+  CHECKD(GxB_Matrix_type(&type, left->M));
+  return DEFAULT_SEMIRING(type);
+}
+
+GrB_Semiring vxm_semiring(pgGrB_Vector *left, pgGrB_Matrix *right) {
+  GrB_Info info;
+  GrB_Type type;
+  CHECKD(GxB_Vector_type(&type, left->V));
+  return DEFAULT_SEMIRING(type);
+}
+
 /* The same "header template" vector.h is used over and over to
    generate the various type specific functions. */
 
@@ -7,6 +28,7 @@
 #define GB_TYPE GrB_INT64            // graphblas vector type
 #define GB_DUP GrB_SECOND_INT64      // default duplicate index resolver
 #define GB_MUL GrB_TIMES_INT64       // times bin op
+#define GB_ADD GrB_PLUS_INT64       // times bin op
 #define PG_GET PG_GETARG_INT64       // how to get value args
 #define PG_DGT DatumGetInt64         // datum get type
 #define PG_TGD Int64GetDatum         // type get datum
@@ -18,6 +40,7 @@
 #define GB_TYPE GrB_INT32
 #define GB_DUP GrB_SECOND_INT32
 #define GB_MUL GrB_TIMES_INT32
+#define GB_ADD GrB_PLUS_INT32
 #define PG_GET PG_GETARG_INT32
 #define PG_DGT DatumGetInt32
 #define PG_TGD Int32GetDatum
@@ -29,6 +52,7 @@
 #define GB_TYPE GrB_INT16
 #define GB_DUP GrB_SECOND_INT16
 #define GB_MUL GrB_TIMES_INT16
+#define GB_ADD GrB_PLUS_INT16
 #define PG_GET PG_GETARG_INT16
 #define PG_DGT DatumGetInt16
 #define PG_TGD Int16GetDatum
@@ -40,6 +64,7 @@
 #define GB_TYPE GrB_FP64
 #define GB_DUP GrB_SECOND_FP64
 #define GB_MUL GrB_TIMES_FP64
+#define GB_ADD GrB_PLUS_FP64
 #define PG_GET PG_GETARG_FLOAT8
 #define PG_DGT DatumGetFloat8
 #define PG_TGD Float8GetDatum
@@ -51,6 +76,7 @@
 #define GB_TYPE GrB_FP32
 #define GB_DUP GrB_SECOND_FP32
 #define GB_MUL GrB_TIMES_FP32
+#define GB_ADD GrB_PLUS_FP32
 #define PG_GET PG_GETARG_FLOAT4
 #define PG_DGT DatumGetFloat4
 #define PG_TGD Float4GetDatum
@@ -62,6 +88,7 @@
 #define GB_TYPE GrB_BOOL
 #define GB_DUP GrB_SECOND_BOOL
 #define GB_MUL GrB_TIMES_BOOL
+#define GB_ADD GrB_PLUS_BOOL
 #define PG_GET PG_GETARG_BOOL
 #define PG_DGT DatumGetBool
 #define PG_TGD BoolGetDatum
@@ -167,5 +194,113 @@ matrix_nvals(PG_FUNCTION_ARGS) {
   mat = (pgGrB_Matrix *) PGGRB_GETARG_MATRIX(0);
   CHECKD(GrB_Matrix_nvals(&count, mat->M));
   return Int64GetDatum(count);
+}
+
+Datum
+matrix_eq(PG_FUNCTION_ARGS) {
+  GrB_Info info;
+  pgGrB_Matrix *A, *B;
+  bool result;
+
+  A = PGGRB_GETARG_MATRIX(0);
+  B = PGGRB_GETARG_MATRIX(1);
+
+  CHECKD(isequal(&result, A->M, B->M, NULL));
+  PG_RETURN_BOOL(result);
+}
+
+Datum
+matrix_neq(PG_FUNCTION_ARGS) {
+  GrB_Info info;
+  pgGrB_Matrix *A, *B;
+  bool result;
+
+  A = PGGRB_GETARG_MATRIX(0);
+  B = PGGRB_GETARG_MATRIX(1);
+
+  CHECKD(isequal(&result, A->M, B->M, NULL));
+  PG_RETURN_BOOL(!result);
+}
+
+Datum
+matrix_ewise_mult(PG_FUNCTION_ARGS) {
+  GrB_Info info;
+  pgGrB_Matrix *A, *B;
+  GrB_Type type;
+  Datum d;
+  A = PGGRB_GETARG_MATRIX(0);
+  B = PGGRB_GETARG_MATRIX(1);
+  CHECKD(GxB_Matrix_type(&type, A->M));
+
+  d = DATUM_TYPE_APPLY(type, matrix_ewise_mult, A, B);
+  if (d == (Datum)0)
+    elog(ERROR, "Unknown graphblas type");
+  return d;
+}
+
+Datum
+matrix_ewise_add(PG_FUNCTION_ARGS) {
+  GrB_Info info;
+  pgGrB_Matrix *A, *B;
+  GrB_Type type;
+  Datum d;
+  A = PGGRB_GETARG_MATRIX(0);
+  B = PGGRB_GETARG_MATRIX(1);
+  CHECKD(GxB_Matrix_type(&type, A->M));
+
+  d = DATUM_TYPE_APPLY(type, matrix_ewise_add, A, B);
+  if (d == (Datum)0)
+    elog(ERROR, "Unknown graphblas type");
+  return d;
+}
+
+Datum
+mxm(PG_FUNCTION_ARGS) {
+  GrB_Info info;
+  pgGrB_Matrix *A, *B;
+  GrB_Type type;
+  Datum d;
+  A = PGGRB_GETARG_MATRIX(0);
+  B = PGGRB_GETARG_MATRIX(1);
+  CHECKD(GxB_Matrix_type(&type, A->M));
+
+  d = DATUM_TYPE_APPLY(type, mxm, A, B);
+  if (d == (Datum)0)
+    elog(ERROR, "Unknown graphblas type");
+  return d;
+}
+
+Datum
+mxv(PG_FUNCTION_ARGS) {
+  GrB_Info info;
+  pgGrB_Matrix *A;
+  pgGrB_Vector *B;
+  GrB_Type type;
+  Datum d;
+  A = (pgGrB_Matrix *) PGGRB_GETARG_MATRIX(0);
+  B = (pgGrB_Vector *) PGGRB_GETARG_VECTOR(1);
+  CHECKD(GxB_Matrix_type(&type, A->M));
+
+  d = DATUM_TYPE_APPLY(type, mxv, A, B);
+  if (d == (Datum)0)
+    elog(ERROR, "Unknown graphblas type");
+  return d;
+}
+
+Datum
+vxm(PG_FUNCTION_ARGS) {
+  GrB_Info info;
+  pgGrB_Matrix *B;
+  pgGrB_Vector *A;
+  GrB_Type type;
+  Datum d;
+  A = (pgGrB_Vector *) PGGRB_GETARG_VECTOR(0);
+  B = (pgGrB_Matrix *) PGGRB_GETARG_MATRIX(1);
+  CHECKD(GxB_Vector_type(&type, A->V));
+
+  d = DATUM_TYPE_APPLY(type, vxm, A, B);
+  if (d == (Datum)0)
+    elog(ERROR, "Unknown graphblas type");
+  return d;
 }
 
