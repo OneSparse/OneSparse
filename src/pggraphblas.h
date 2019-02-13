@@ -27,8 +27,10 @@
     F ## _int16(__VA_ARGS__) :                    \
     (T)  == GrB_BOOL?                             \
     F ## _bool(__VA_ARGS__) :                     \
-    (T)  == GrB_FP32?                             \
+    (T)  == GrB_FP64?                             \
     F ## _float8(__VA_ARGS__) :                   \
+    (T)  == GrB_FP32?                             \
+    F ## _float4(__VA_ARGS__) :                   \
     (Datum)0
 
 /* dumb debug helper */

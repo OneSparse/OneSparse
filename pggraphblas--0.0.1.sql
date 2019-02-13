@@ -173,6 +173,16 @@ RETURNS matrix
 AS '$libdir/pggraphblas', 'matrix_final_float8'
 LANGUAGE C CALLED ON NULL INPUT;
 
+CREATE FUNCTION matrix_agg_acc_real(internal, bigint, bigint, real)
+RETURNS internal
+AS '$libdir/pggraphblas', 'matrix_agg_acc_float4'
+LANGUAGE C CALLED ON NULL INPUT;
+
+CREATE FUNCTION matrix_final_real(internal)
+RETURNS matrix
+AS '$libdir/pggraphblas', 'matrix_final_float4'
+LANGUAGE C CALLED ON NULL INPUT;
+
 CREATE FUNCTION matrix_agg_acc_bool(internal, bigint, bigint, bool)
 RETURNS internal
 AS '$libdir/pggraphblas', 'matrix_agg_acc_bool'
@@ -207,6 +217,12 @@ CREATE AGGREGATE matrix(bigint, bigint, float) (
     finalfunc = matrix_final_float
 );
 
+CREATE AGGREGATE matrix(bigint, bigint, real) (
+    stype = internal,
+    sfunc = matrix_agg_acc_real,
+    finalfunc = matrix_final_real
+);
+    
 CREATE AGGREGATE matrix(bigint, bigint, bool) (
     stype = internal,
     sfunc = matrix_agg_acc_bool,
@@ -217,6 +233,7 @@ CREATE TYPE matrix_element_bigint AS (index bigint, value bigint);
 CREATE TYPE matrix_element_integer AS (index bigint, value integer);
 CREATE TYPE matrix_element_smallint AS (index bigint, value smallint);
 CREATE TYPE matrix_element_float AS (index bigint, value float);
+CREATE TYPE matrix_element_real AS (index bigint, value real);
 CREATE TYPE matrix_element_bool AS (index bigint, value bool);
 
 CREATE FUNCTION matrix_elements_bigint(matrix)
@@ -237,6 +254,11 @@ LANGUAGE C STABLE STRICT;
 CREATE FUNCTION matrix_elements_float(matrix)
 RETURNS SETOF matrix_element_float
 AS '$libdir/pggraphblas', 'matrix_elements_float8'
+LANGUAGE C STABLE STRICT;
+
+CREATE FUNCTION matrix_elements_real(matrix)
+RETURNS SETOF matrix_element_real
+AS '$libdir/pggraphblas', 'matrix_elements_float4'
 LANGUAGE C STABLE STRICT;
 
 CREATE FUNCTION matrix_elements_bool(matrix)
@@ -332,6 +354,13 @@ LANGUAGE C STRICT;
 
 CREATE CAST (float[] AS vector) WITH FUNCTION vector(float[]) AS IMPLICIT;
     
+CREATE FUNCTION vector(real[])
+RETURNS vector
+AS '$libdir/pggraphblas', 'vector_float4'
+LANGUAGE C STRICT;
+
+CREATE CAST (real[] AS vector) WITH FUNCTION vector(real[]) AS IMPLICIT;
+    
 CREATE FUNCTION vector(bool[])
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_bool'
@@ -381,6 +410,16 @@ RETURNS vector
 AS '$libdir/pggraphblas', 'vector_final_float8'
 LANGUAGE C CALLED ON NULL INPUT;
 
+CREATE FUNCTION vector_agg_acc_real(internal, bigint, real)
+RETURNS internal
+AS '$libdir/pggraphblas', 'vector_agg_acc_float4'
+LANGUAGE C CALLED ON NULL INPUT;
+
+CREATE FUNCTION vector_final_real(internal)
+RETURNS vector
+AS '$libdir/pggraphblas', 'vector_final_float4'
+LANGUAGE C CALLED ON NULL INPUT;
+
 CREATE FUNCTION vector_agg_acc_bool(internal, bigint, bool)
 RETURNS internal
 AS '$libdir/pggraphblas', 'vector_agg_acc_bool'
@@ -415,6 +454,12 @@ CREATE AGGREGATE vector(bigint, float) (
     finalfunc = vector_final_float
 );
 
+CREATE AGGREGATE vector(bigint, real) (
+    stype = internal,
+    sfunc = vector_agg_acc_real,
+    finalfunc = vector_final_real
+);
+
 CREATE AGGREGATE vector(bigint, bool) (
     stype = internal,
     sfunc = vector_agg_acc_bool,
@@ -427,6 +472,7 @@ CREATE TYPE vector_element_bigint AS (index bigint, value bigint);
 CREATE TYPE vector_element_integer AS (index bigint, value integer);
 CREATE TYPE vector_element_smallint AS (index bigint, value smallint);
 CREATE TYPE vector_element_float AS (index bigint, value float);
+CREATE TYPE vector_element_real AS (index bigint, value real);
 CREATE TYPE vector_element_bool AS (index bigint, value bool);
     
 CREATE FUNCTION vector_elements_bigint(vector)
@@ -447,6 +493,11 @@ LANGUAGE C STABLE STRICT;
 CREATE FUNCTION vector_elements_float(vector)
 RETURNS SETOF vector_element_float
 AS '$libdir/pggraphblas', 'vector_elements_float8'
+LANGUAGE C STABLE STRICT;
+
+CREATE FUNCTION vector_elements_real(vector)
+RETURNS SETOF vector_element_real
+AS '$libdir/pggraphblas', 'vector_elements_float4'
 LANGUAGE C STABLE STRICT;
 
 CREATE FUNCTION vector_elements_bool(vector)

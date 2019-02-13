@@ -42,6 +42,16 @@
 #define FMT(v) "%f", v
 #include "vector.h"
 
+#define SUFFIX _float4
+#define T float4
+#define GT GrB_FP32
+#define GTT GrB_SECOND_FP32
+#define PGT PG_GETARG_FLOAT4
+#define DGT DatumGetFloat4
+#define TGD Float4GetDatum
+#define FMT(v) "%f", v
+#include "vector.h"
+
 #define SUFFIX _bool
 #define T bool
 #define GT GrB_BOOL

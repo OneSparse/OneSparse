@@ -1,6 +1,6 @@
 
 #define SUFFIX _int64
-#define T int64
+#define T int64                  // pg type
 #define GT GrB_INT64             // graphblas vector type
 #define GTT GrB_SECOND_INT64     // default duplicate index resolver
 #define PGT PG_GETARG_INT64      // how to get value args
@@ -36,6 +36,16 @@
 #define PGT PG_GETARG_FLOAT8
 #define DGT DatumGetFloat8
 #define TGD Float8GetDatum
+#define FMT(v) "%f", v
+#include "matrix.h"
+
+#define SUFFIX _float4
+#define T float4
+#define GT GrB_FP32
+#define GTT GrB_SECOND_FP32
+#define PGT PG_GETARG_FLOAT4
+#define DGT DatumGetFloat4
+#define TGD Float4GetDatum
 #define FMT(v) "%f", v
 #include "matrix.h"
 
@@ -96,46 +106,6 @@ DatumGetMatrix(Datum d) {
 Datum
 matrix_in(PG_FUNCTION_ARGS) {
   pgGrB_Matrix *retval;
-
-  Datum arr;
-  ArrayType *vals;
-  FunctionCallInfoData locfcinfo;
-  int ndim, *dims;
-
-  InitFunctionCallInfoData(locfcinfo,
-                           fcinfo->flinfo,
-                           3,
-                           InvalidOid,
-                           NULL,
-                           NULL);
-
-  locfcinfo.arg[0] = PG_GETARG_DATUM(0);
-  locfcinfo.arg[1] = ObjectIdGetDatum(INT8OID);
-  locfcinfo.arg[2] = Int32GetDatum(-1);
-  locfcinfo.argnull[0] = false;
-  locfcinfo.argnull[1] = false;
-  locfcinfo.argnull[2] = false;
-
-  arr = array_in(&locfcinfo);
-
-  Assert(!locfcinfo.isnull);
-
-  vals = DatumGetArrayTypeP(arr);
-
-  if (ARR_HASNULL(vals)) {
-    ereport(ERROR, (errmsg("Array may not contain NULLs")));
-  }
-
-  ndim = ARR_NDIM(vals);
-  if (ndim != 1) {
-    ereport(ERROR, (errmsg("One-dimesional array required")));
-  }
-
-  dims = ARR_DIMS(vals);
-
-  if (dims[0] != 3) {
-    ereport(ERROR, (errmsg("First dimension must contain 3 elements")));
-  }
 
   retval = construct_empty_expanded_matrix_int64(0,
                                            0,
