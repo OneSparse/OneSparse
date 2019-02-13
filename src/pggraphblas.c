@@ -4,7 +4,6 @@ PG_MODULE_MAGIC;
 #include "type.c"
 #include "isequal.c"
 #include "vector.c"
-#include "vector_ops.c"
 #include "matrix.c"
 #include "matrix_ops.c"
 

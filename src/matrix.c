@@ -1,62 +1,71 @@
 
-#define SUFFIX _int64
-#define T int64                  // pg type
-#define GT GrB_INT64             // graphblas type
-#define GTT GrB_SECOND_INT64     // default duplicate index resolver
-#define PGT PG_GETARG_INT64      // how to get value args
-#define DGT DatumGetInt64        // datum get type
-#define TGD Int64GetDatum        // type get datum
-#define FMT(v) "%lu", v           // printf fmt
-#include "matrix.h"
+/* The same "header template" vector.h is used over and over to
+   generate the various type specific functions. */
+
+#define SUFFIX _int64                // suffix for names
+#define PG_TYPE int64                // postgres type
+#define GB_TYPE GrB_INT64            // graphblas vector type
+#define GB_DUP GrB_SECOND_INT64      // default duplicate index resolver
+#define GB_MUL GrB_TIMES_INT64       // times bin op
+#define PG_GET PG_GETARG_INT64       // how to get value args
+#define PG_DGT DatumGetInt64         // datum get type
+#define PG_TGD Int64GetDatum         // type get datum
+#define PRINT_FMT(v) "%lu", v        // printf fmt
+#include "matrix.h"                  // "call" template
 
 #define SUFFIX _int32
-#define T int32
-#define GT GrB_INT32
-#define GTT GrB_SECOND_INT32
-#define PGT PG_GETARG_INT32
-#define DGT DatumGetInt32
-#define TGD Int32GetDatum
-#define FMT(v) "%i", v
+#define PG_TYPE int32
+#define GB_TYPE GrB_INT32
+#define GB_DUP GrB_SECOND_INT32
+#define GB_MUL GrB_TIMES_INT32
+#define PG_GET PG_GETARG_INT32
+#define PG_DGT DatumGetInt32
+#define PG_TGD Int32GetDatum
+#define PRINT_FMT(v) "%i", v
 #include "matrix.h"
 
 #define SUFFIX _int16
-#define T int16
-#define GT GrB_INT16
-#define GTT GrB_SECOND_INT16
-#define PGT PG_GETARG_INT16
-#define DGT DatumGetInt16
-#define TGD Int16GetDatum
-#define FMT(v) "%i", v
+#define PG_TYPE int16
+#define GB_TYPE GrB_INT16
+#define GB_DUP GrB_SECOND_INT16
+#define GB_MUL GrB_TIMES_INT16
+#define PG_GET PG_GETARG_INT16
+#define PG_DGT DatumGetInt16
+#define PG_TGD Int16GetDatum
+#define PRINT_FMT(v) "%i", v
 #include "matrix.h"
 
 #define SUFFIX _float8
-#define T float8
-#define GT GrB_FP64
-#define GTT GrB_SECOND_FP64
-#define PGT PG_GETARG_FLOAT8
-#define DGT DatumGetFloat8
-#define TGD Float8GetDatum
-#define FMT(v) "%f", v
+#define PG_TYPE float8
+#define GB_TYPE GrB_FP64
+#define GB_DUP GrB_SECOND_FP64
+#define GB_MUL GrB_TIMES_FP64
+#define PG_GET PG_GETARG_FLOAT8
+#define PG_DGT DatumGetFloat8
+#define PG_TGD Float8GetDatum
+#define PRINT_FMT(v) "%f", v
 #include "matrix.h"
 
 #define SUFFIX _float4
-#define T float4
-#define GT GrB_FP32
-#define GTT GrB_SECOND_FP32
-#define PGT PG_GETARG_FLOAT4
-#define DGT DatumGetFloat4
-#define TGD Float4GetDatum
-#define FMT(v) "%f", v
+#define PG_TYPE float4
+#define GB_TYPE GrB_FP32
+#define GB_DUP GrB_SECOND_FP32
+#define GB_MUL GrB_TIMES_FP32
+#define PG_GET PG_GETARG_FLOAT4
+#define PG_DGT DatumGetFloat4
+#define PG_TGD Float4GetDatum
+#define PRINT_FMT(v) "%f", v
 #include "matrix.h"
 
 #define SUFFIX _bool
-#define T bool
-#define GT GrB_BOOL
-#define GTT GrB_SECOND_BOOL
-#define PGT PG_GETARG_BOOL
-#define DGT DatumGetBool
-#define TGD BoolGetDatum
-#define FMT(v) "%s", v ? "t" : "f"
+#define PG_TYPE bool
+#define GB_TYPE GrB_BOOL
+#define GB_DUP GrB_SECOND_BOOL
+#define GB_MUL GrB_TIMES_BOOL
+#define PG_GET PG_GETARG_BOOL
+#define PG_DGT DatumGetBool
+#define PG_TGD BoolGetDatum
+#define PRINT_FMT(v) "%s", v ? "t" : "f"
 #include "matrix.h"
 
 /* MemoryContextCallback function to free matrices */

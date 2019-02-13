@@ -1,16 +1,25 @@
 /* This is a "header template" see vector.c for specific instanciations */
 
-#ifndef T
+#ifndef PG_TYPE
     #error Template argument missing.
 #endif
 #ifndef SUFFIX
     #error Suffix argument missing.
 #endif
 
+
+#define VECTOR_BINOP_PREAMBLE()                           \
+  do {                                                    \
+    A = PGGRB_GETARG_VECTOR(0);                           \
+    B = PGGRB_GETARG_VECTOR(1);                           \
+    C = (pgGrB_Vector *) palloc0(sizeof(pgGrB_Vector));   \
+  } while (0)
+
+
 typedef struct FN(pgGrB_Vector_ExtractState) {
   pgGrB_Vector *vec;
   GrB_Index *indices;
-  T *vals;
+  PG_TYPE *vals;
 } FN(pgGrB_Vector_ExtractState);
 
 /* Expanded Object Header "methods" for flattening vectors for storage */
@@ -34,6 +43,8 @@ FN(construct_empty_expanded_vector)(GrB_Index size,
                                     MemoryContext parentcontext);
 
 Datum FN(vector_out)(pgGrB_Vector *vec);
+Datum FN(vector_ewise_mult)(pgGrB_Vector *A, pgGrB_Vector *B);
+Datum FN(vector_ewise_add)(pgGrB_Vector *A, pgGrB_Vector *B);
 
 PG_FUNCTION_INFO_V1(FN(vector));
 PG_FUNCTION_INFO_V1(FN(vector_agg_acc));
@@ -61,7 +72,7 @@ FN(vector_get_flat_size)(ExpandedObjectHeader *eohptr) {
 
   nbytes = PGGRB_VECTOR_OVERHEAD();
   nbytes += size * sizeof(GrB_Index);
-  nbytes += nvals * sizeof(T);
+  nbytes += nvals * sizeof(PG_TYPE);
 
   A->flat_size = nbytes;
   return nbytes;
@@ -95,7 +106,7 @@ FN(vector_flatten_into)(ExpandedObjectHeader *eohptr,
                                   start + flat->size,
                                   &flat->nvals,
                                   A->V));
-  flat->type = GT;
+  flat->type = GB_TYPE;
 
   SET_VARSIZE(flat, allocated_size);
 }
@@ -114,7 +125,7 @@ FN(expand_flat_vector)(Datum flatdatum,
   
   GrB_Index size, nvals;
   GrB_Index *indices;
-  T *vals;
+  PG_TYPE *vals;
   GrB_Type type;
 
   /* Create a new context that will hold the expanded object. */
@@ -149,7 +160,7 @@ FN(expand_flat_vector)(Datum flatdatum,
   /* indices and vals are pointers into the vardata area */
   
   indices = PGGRB_VECTOR_DATA(flat);
-  vals = (T*)(indices + size);
+  vals = (PG_TYPE*)(indices + size);
 
   /* Initialize the new vector */
   CHECKD(GrB_Vector_new(&A->V,
@@ -171,7 +182,7 @@ FN(expand_flat_vector)(Datum flatdatum,
                             indices,
                             vals,
                             nvals,
-                            GTT));
+                            GB_DUP));
   }
 
   A->type = type;
@@ -189,7 +200,7 @@ FN(construct_empty_expanded_vector)(GrB_Index size,
                                     MemoryContext parentcontext) {
   pgGrB_FlatVector  *flat;
   Datum	d;
-  flat = construct_empty_flat_vector(size, GT);
+  flat = construct_empty_flat_vector(size, GB_TYPE);
   d = FN(expand_flat_vector)(PointerGetDatum(flat), parentcontext);
   pfree(flat);
   return (pgGrB_Vector *) DatumGetEOHP(d);
@@ -217,11 +228,11 @@ FN(vector_agg_acc)(PG_FUNCTION_ARGS)
     mstate = (pgGrB_Vector_AggState *)PG_GETARG_POINTER(0);
   }
 
-  row = palloc(sizeof(T));
-  val = palloc(sizeof(T));
+  row = palloc(sizeof(PG_TYPE));
+  val = palloc(sizeof(PG_TYPE));
 
-  *row = PGT(1);
-  *val = PGT(2);
+  *row = PG_GET(1);
+  *val = PG_GET(2);
 
   mstate->I = lappend(mstate->I, row);
   mstate->X = lappend(mstate->X, val);
@@ -241,7 +252,7 @@ FN(vector_final)(PG_FUNCTION_ARGS) {
   pgGrB_Vector_AggState *mstate = (pgGrB_Vector_AggState*)PG_GETARG_POINTER(0);
   size_t n = 0, count = list_length(mstate->I);
   GrB_Index *row_indices;
-  T *values;
+  PG_TYPE *values;
 
   ListCell *li, *lv;
 
@@ -251,11 +262,11 @@ FN(vector_final)(PG_FUNCTION_ARGS) {
   mstate = (pgGrB_Vector_AggState *)PG_GETARG_POINTER(0);
 
   row_indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * count);
-  values = (T*) palloc0(sizeof(T) * count);
+  values = (PG_TYPE*) palloc0(sizeof(PG_TYPE) * count);
 
   forboth (li, (mstate)->I, lv, (mstate)->X) {
     row_indices[n] = DatumGetInt64(*(Datum*)lfirst(li));
-    values[n] = DGT(*(Datum*)lfirst(lv));
+    values[n] = PG_DGT(*(Datum*)lfirst(lv));
     n++;
   }
 
@@ -267,14 +278,14 @@ FN(vector_final)(PG_FUNCTION_ARGS) {
   MemoryContextRegisterResetCallback(CurrentMemoryContext, ctxcb);
 
   CHECKD(GrB_Vector_new(&retval->V,
-                       GT,
+                       GB_TYPE,
                        count));
 
   CHECKD(GrB_Vector_build(retval->V,
                          row_indices,
                          values,
                          count,
-                         GTT));
+                         GB_DUP));
   PGGRB_RETURN_VECTOR(retval);
 }
 
@@ -288,7 +299,7 @@ FN(vector)(PG_FUNCTION_ARGS) {
   int count;
   
   GrB_Index *row_indices;
-  T *values, *data;
+  PG_TYPE *values, *data;
 
   vals = PG_GETARG_ARRAYTYPE_P(0);
 
@@ -299,9 +310,9 @@ FN(vector)(PG_FUNCTION_ARGS) {
   count = dims[0];
   
   row_indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * count);
-  values = (T*) palloc0(sizeof(T) * count);
+  values = (PG_TYPE*) palloc0(sizeof(PG_TYPE) * count);
 
-  data = (T*)ARR_DATA_PTR(vals);
+  data = (PG_TYPE*)ARR_DATA_PTR(vals);
 
   for (int i = 0; i < count; i++) {
     row_indices[i] = i;
@@ -314,7 +325,7 @@ FN(vector)(PG_FUNCTION_ARGS) {
                          row_indices,
                          values,
                          count,
-                         GTT));
+                         GB_DUP));
 
   PGGRB_RETURN_VECTOR(retval);
 }
@@ -344,7 +355,7 @@ FN(vector_elements)(PG_FUNCTION_ARGS) {
     CHECKD(GrB_Vector_size(&size, vec->V));
 
     state->indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * size);
-    state->vals = (T*) palloc0(sizeof(T) * size);
+    state->vals = (PG_TYPE*) palloc0(sizeof(PG_TYPE) * size);
 
     CHECKD(GrB_Vector_extractTuples(state->indices,
                                    state->vals,
@@ -372,7 +383,7 @@ FN(vector_elements)(PG_FUNCTION_ARGS) {
 
   if (funcctx->call_cntr < funcctx->max_calls) {
     values[0] = Int64GetDatum(state->indices[funcctx->call_cntr]);
-    values[1] = TGD(state->vals[funcctx->call_cntr]);
+    values[1] = PG_TGD(state->vals[funcctx->call_cntr]);
 
     tuple = heap_form_tuple(funcctx->tuple_desc, values, nulls);
     result = HeapTupleGetDatum(tuple);
@@ -391,13 +402,13 @@ FN(vector_out)(pgGrB_Vector *vec)
   GrB_Index size, nvals;
 
   GrB_Index *row_indices;
-  T *values;
+  PG_TYPE *values;
 
   CHECKD(GrB_Vector_size(&size, vec->V));
   CHECKD(GrB_Vector_nvals(&nvals, vec->V));
 
   row_indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * size);
-  values = (T*) palloc0(sizeof(T) * size);
+  values = (PG_TYPE*) palloc0(sizeof(PG_TYPE) * size);
 
   CHECKD(GrB_Vector_extractTuples(row_indices,
                                  values,
@@ -414,7 +425,7 @@ FN(vector_out)(pgGrB_Vector *vec)
   result = strcat(result, "][");
 
   for (int i = 0; i < nvals; i++) {
-    result = strcat(result, psprintf(FMT(values[i])));
+    result = strcat(result, psprintf(PRINT_FMT(values[i])));
     if (i != nvals - 1)
       result = strcat(result, ",");
   }
@@ -423,11 +434,40 @@ FN(vector_out)(pgGrB_Vector *vec)
   PG_RETURN_CSTRING(result);
 }
 
+Datum
+FN(vector_ewise_mult)(pgGrB_Vector *A, pgGrB_Vector *B) {
+  GrB_Info info;
+  GrB_Index size;
+  pgGrB_Vector *C;
+
+  CHECKD(GrB_Vector_size(&size, A->V));
+  C = (pgGrB_Vector *) palloc0(sizeof(pgGrB_Vector));
+  
+  C = FN(construct_empty_expanded_vector)(size, CurrentMemoryContext);
+  CHECKD(GrB_eWiseMult(C->V, NULL, NULL, GB_MUL, A->V, B->V, NULL));
+  PGGRB_RETURN_VECTOR(C);
+}
+
+Datum
+FN(vector_ewise_add)(pgGrB_Vector *A, pgGrB_Vector *B) {
+  GrB_Info info;
+  GrB_Index size;
+  pgGrB_Vector *C;
+
+  CHECKD(GrB_Vector_size(&size, A->V));
+  C = (pgGrB_Vector *) palloc0(sizeof(pgGrB_Vector));
+  C = FN(construct_empty_expanded_vector)(size, CurrentMemoryContext);
+  CHECKD(GrB_eWiseAdd(C->V, NULL, NULL, GB_ADD, A->V, B->V, NULL));
+  PGGRB_RETURN_VECTOR(C);
+}
+
 #undef SUFFIX
-#undef T
-#undef GT
-#undef GTT
-#undef PGT
-#undef DGT
-#undef TGD
-#undef FMT
+#undef PG_TYPE
+#undef GB_TYPE
+#undef GB_DUP
+#undef GB_MUL
+#undef GB_ADD
+#undef PG_GET
+#undef PG_DGT
+#undef PG_TGD
+#undef PRINT_FMT

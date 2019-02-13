@@ -1,6 +1,6 @@
 /* This is a "header template" see matrix.c for specific instanciations */
 
-#ifndef T
+#ifndef PG_TYPE
     #error Template argument missing.
 #endif
 #ifndef SUFFIX
@@ -14,7 +14,7 @@ typedef struct FN(pgGrB_Matrix_ExtractState) {
   pgGrB_Matrix *mat;
   GrB_Index *rows;
   GrB_Index *cols;
-  T *vals;
+  PG_TYPE *vals;
 } FN(pgGrB_Matrix_ExtractState);
 
 /* Expanded Object Header "methods" for flattening matrices for storage */
@@ -67,7 +67,7 @@ FN(matrix_get_flat_size)(ExpandedObjectHeader *eohptr) {
   nbytes = PGGRB_MATRIX_OVERHEAD();
   nbytes += nrows * sizeof(GrB_Index);
   nbytes += ncols * sizeof(GrB_Index);
-  nbytes += nvals * sizeof(T);
+  nbytes += nvals * sizeof(PG_TYPE);
 
   A->flat_size = nbytes;
   return nbytes;
@@ -104,7 +104,7 @@ FN(matrix_flatten_into)(ExpandedObjectHeader *eohptr,
                                   &flat->nvals,
                                   A->M));
 
-  flat->type = GrB_INT64;
+  flat->type = GB_TYPE;
 
   SET_VARSIZE(flat, allocated_size);
 }
@@ -123,7 +123,7 @@ FN(expand_flat_matrix)(Datum flatdatum,
   
   GrB_Index ncols, nrows, nvals;
   GrB_Index *rows, *cols;
-  T *vals;
+  PG_TYPE *vals;
   GrB_Type type;
 
   /* Create a new context that will hold the expanded object. */
@@ -160,7 +160,7 @@ FN(expand_flat_matrix)(Datum flatdatum,
   
   rows = PGGRB_MATRIX_DATA(flat);
   cols = rows + nrows;
-  vals = (T*)(cols + ncols);
+  vals = (PG_TYPE*)(cols + ncols);
 
   /* Initialize the new matrix */
   CHECKD(GrB_Matrix_new(&A->M,
@@ -184,7 +184,7 @@ FN(expand_flat_matrix)(Datum flatdatum,
                             cols,
                             vals,
                             nvals,
-                            GrB_SECOND_INT64));
+                            GB_DUP));
   }
 
   A->type = type;
@@ -203,7 +203,7 @@ FN(construct_empty_expanded_matrix)(GrB_Index nrows,
                                 MemoryContext parentcontext) {
   pgGrB_FlatMatrix  *flat;
   Datum	d;
-  flat = construct_empty_flat_matrix(nrows, ncols, GT);
+  flat = construct_empty_flat_matrix(nrows, ncols, GB_TYPE);
   d = FN(expand_flat_matrix)(PointerGetDatum(flat), parentcontext);
   pfree(flat);
   return (pgGrB_Matrix *) DatumGetEOHP(d);
@@ -245,13 +245,13 @@ FN(matrix_agg_acc)(PG_FUNCTION_ARGS)
     mstate = (pgGrB_Matrix_AggState *)PG_GETARG_POINTER(0);
   }
 
-  row = palloc(sizeof(T));
-  col = palloc(sizeof(T));
-  val = palloc(sizeof(T));
+  row = palloc(sizeof(PG_TYPE));
+  col = palloc(sizeof(PG_TYPE));
+  val = palloc(sizeof(PG_TYPE));
 
-  *row = PGT(1);
-  *col = PGT(2);
-  *val = PGT(3);
+  *row = PG_GET(1);
+  *col = PG_GET(2);
+  *val = PG_GET(3);
 
   mstate->rows = lappend(mstate->rows, row);
   mstate->cols = lappend(mstate->cols, col);
@@ -271,7 +271,7 @@ FN(matrix_final)(PG_FUNCTION_ARGS) {
   pgGrB_Matrix_AggState *mstate = (pgGrB_Matrix_AggState*)PG_GETARG_POINTER(0);
   size_t n = 0, count = list_length(mstate->rows);
   GrB_Index *row_indices, *col_indices;
-  T *values;
+  PG_TYPE *values;
 
   ListCell *li, *lj, *lv;
 
@@ -287,12 +287,12 @@ FN(matrix_final)(PG_FUNCTION_ARGS) {
 
   row_indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * count);
   col_indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * count);
-  values = (T*) palloc0(sizeof(T) * count);
+  values = (PG_TYPE*) palloc0(sizeof(PG_TYPE) * count);
 
   forthree (li, (mstate)->rows, lj, (mstate)->cols, lv, (mstate)->vals) {
     row_indices[n] = DatumGetInt64(*(Datum*)lfirst(li));
     col_indices[n] = DatumGetInt64(*(Datum*)lfirst(lj));
-    values[n] = DGT(*(Datum*)lfirst(lv));
+    values[n] = PG_DGT(*(Datum*)lfirst(lv));
     n++;
   }
 
@@ -305,7 +305,7 @@ FN(matrix_final)(PG_FUNCTION_ARGS) {
                          col_indices,
                          values,
                          count,
-                         GTT));
+                         GB_DUP));
 
   MemoryContextSwitchTo(oldcxt);
   PGGRB_RETURN_MATRIX(retval);
@@ -338,7 +338,7 @@ FN(matrix_elements)(PG_FUNCTION_ARGS) {
 
     state->rows = (GrB_Index*) palloc0(sizeof(GrB_Index) * nvals);
     state->cols = (GrB_Index*) palloc0(sizeof(GrB_Index) * nvals);
-    state->vals = (T*) palloc0(sizeof(T) * nvals);
+    state->vals = (PG_TYPE*) palloc0(sizeof(PG_TYPE) * nvals);
 
     CHECKD(GrB_Matrix_extractTuples(state->rows,
                                    state->cols,
@@ -368,7 +368,7 @@ FN(matrix_elements)(PG_FUNCTION_ARGS) {
   if (funcctx->call_cntr < funcctx->max_calls) {
     values[0] = Int64GetDatum(state->rows[funcctx->call_cntr]);
     values[1] = Int64GetDatum(state->cols[funcctx->call_cntr]);
-    values[2] = TGD(state->vals[funcctx->call_cntr]);
+    values[2] = PG_TGD(state->vals[funcctx->call_cntr]);
 
     tuple = heap_form_tuple(funcctx->tuple_desc, values, nulls);
     result = HeapTupleGetDatum(tuple);
@@ -387,7 +387,7 @@ FN(matrix_out)(pgGrB_Matrix *mat)
   GrB_Index nrows, ncols, nvals;
 
   GrB_Index *row_indices, *col_indices;
-  T *values;
+  PG_TYPE *values;
 
   CHECKD(GrB_Matrix_nvals(&nvals, mat->M));
   CHECKD(GrB_Matrix_nrows(&nrows, mat->M));
@@ -395,7 +395,7 @@ FN(matrix_out)(pgGrB_Matrix *mat)
 
   row_indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * nrows);
   col_indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * ncols);
-  values = (T*) palloc0(sizeof(T) * nvals);
+  values = (PG_TYPE*) palloc0(sizeof(PG_TYPE) * nvals);
 
   CHECKD(GrB_Matrix_extractTuples(row_indices,
                                   col_indices,
@@ -420,7 +420,7 @@ FN(matrix_out)(pgGrB_Matrix *mat)
   result = strcat(result, "][");
 
   for (int i = 0; i < nvals; i++) {
-    result = strcat(result, psprintf(FMT(values[i])));
+    result = strcat(result, psprintf(PRINT_FMT(values[i])));
     if (i != nvals - 1)
       result = strcat(result, ",");
   }
@@ -429,10 +429,11 @@ FN(matrix_out)(pgGrB_Matrix *mat)
   PG_RETURN_CSTRING(result);
 }
 #undef SUFFIX
-#undef T
-#undef GT
-#undef GTT
-#undef PGT
-#undef DGT
-#undef TGD
-#undef FMT
+#undef PG_TYPE
+#undef GB_TYPE
+#undef GB_DUP
+#undef GB_MUL
+#undef PG_GET
+#undef PG_DGT
+#undef PG_TGD
+#undef PRINT_FMT
