@@ -36,6 +36,9 @@ pgGrB_Matrix *
 FN(construct_empty_expanded_matrix)(GrB_Index nrows,
                                     GrB_Index ncols,
                                     MemoryContext parentcontext);
+                                   
+Datum FN(matrix_out)(pgGrB_Matrix *mat);
+
 PG_FUNCTION_INFO_V1(FN(matrix));
 PG_FUNCTION_INFO_V1(FN(matrix_agg_acc));
 PG_FUNCTION_INFO_V1(FN(matrix_final));
@@ -184,6 +187,7 @@ FN(expand_flat_matrix)(Datum flatdatum,
                             GrB_SECOND_INT64));
   }
 
+  A->type = type;
   A->flat_size = 0;
   A->flat_value = NULL;
 
@@ -374,6 +378,56 @@ FN(matrix_elements)(PG_FUNCTION_ARGS) {
   }
 }
 
+Datum
+FN(matrix_out)(pgGrB_Matrix *mat)
+{
+
+  GrB_Info info;
+  char *result;
+  GrB_Index nrows, ncols, nvals;
+
+  GrB_Index *row_indices, *col_indices;
+  T *values;
+
+  CHECKD(GrB_Matrix_nvals(&nvals, mat->M));
+  CHECKD(GrB_Matrix_nrows(&nrows, mat->M));
+  CHECKD(GrB_Matrix_ncols(&ncols, mat->M));
+
+  row_indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * nrows);
+  col_indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * ncols);
+  values = (T*) palloc0(sizeof(T) * nvals);
+
+  CHECKD(GrB_Matrix_extractTuples(row_indices,
+                                  col_indices,
+                                  values,
+                                  &nvals,
+                                  mat->M));
+
+  result = psprintf("<matrix_%s(%lu,%lu):[", grb_type_to_name(mat->type), nrows, ncols);
+
+  for (int i = 0; i < nrows; i++) {
+    result = strcat(result, psprintf("%lu", row_indices[i]));
+    if (i != nrows - 1)
+      result = strcat(result, ",");
+  }
+  result = strcat(result, "][");
+  
+  for (int i = 0; i < ncols; i++) {
+    result = strcat(result, psprintf("%lu", col_indices[i]));
+    if (i != nrows - 1)
+      result = strcat(result, ",");
+  }
+  result = strcat(result, "][");
+
+  for (int i = 0; i < nvals; i++) {
+    result = strcat(result, psprintf(FMT(values[i])));
+    if (i != nvals - 1)
+      result = strcat(result, ",");
+  }
+  result = strcat(result, "]>");
+
+  PG_RETURN_CSTRING(result);
+}
 #undef SUFFIX
 #undef T
 #undef GT

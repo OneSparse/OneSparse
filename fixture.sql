@@ -55,17 +55,11 @@ insert into edge (i, j, v) values
 --     end;
 -- $$ language plpgsql;
 
--- create function matrix_from_table() returns matrix as $$
---     declare m matrix;
---     begin
---         raise notice 'sql before agg';
---         select matrix_agg(i, j, v) from edge into m;
---         raise notice 'sql before return';
---         return m || m;
---     end;
--- $$ language plpgsql;
-
-\prompt 'Crash it? (y/n)' store
-\if :store        
-select matrix_agg(i, j, v) * matrix_agg(i, j, v) from edge;
-\endif
+create function matrix_from_table() returns matrix as $$
+    declare m matrix;
+    begin
+        raise notice 'sql before agg';
+        select matrix(i, j, v) from edge into m;
+        return m || m;
+    end;
+$$ language plpgsql;

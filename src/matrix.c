@@ -1,7 +1,7 @@
 
 #define SUFFIX _int64
 #define T int64                  // pg type
-#define GT GrB_INT64             // graphblas vector type
+#define GT GrB_INT64             // graphblas type
 #define GTT GrB_SECOND_INT64     // default duplicate index resolver
 #define PGT PG_GETARG_INT64      // how to get value args
 #define DGT DatumGetInt64        // datum get type
@@ -111,5 +111,52 @@ matrix_in(PG_FUNCTION_ARGS) {
                                            0,
                                            CurrentMemoryContext);
   PGGRB_RETURN_MATRIX(retval);
+}
+
+
+Datum
+matrix_out(PG_FUNCTION_ARGS)
+{
+  Datum d;
+  GrB_Info info;
+  GrB_Type type;
+  pgGrB_Matrix *mat = PGGRB_GETARG_MATRIX(0);
+
+  CHECKD(GxB_Matrix_type(&type, mat->M));
+
+  d = DATUM_TYPE_APPLY(type, matrix_out, mat);
+  if (d == (Datum)0)
+    elog(ERROR, "Unknown graphblas type");
+  return d;
+}
+
+Datum
+matrix_nrows(PG_FUNCTION_ARGS) {
+  GrB_Info info;
+  pgGrB_Matrix *mat;
+  GrB_Index count;
+  mat = (pgGrB_Matrix *) PGGRB_GETARG_MATRIX(0);
+  CHECKD(GrB_Matrix_nrows(&count, mat->M));
+  return Int64GetDatum(count);
+}
+
+Datum
+matrix_ncols(PG_FUNCTION_ARGS) {
+  GrB_Info info;
+  pgGrB_Matrix *mat;
+  GrB_Index count;
+  mat = (pgGrB_Matrix *) PGGRB_GETARG_MATRIX(0);
+  CHECKD(GrB_Matrix_ncols(&count, mat->M));
+  return Int64GetDatum(count);
+}
+
+Datum
+matrix_nvals(PG_FUNCTION_ARGS) {
+  GrB_Info info;
+  pgGrB_Matrix *mat;
+  GrB_Index count;
+  mat = (pgGrB_Matrix *) PGGRB_GETARG_MATRIX(0);
+  CHECKD(GrB_Matrix_nvals(&count, mat->M));
+  return Int64GetDatum(count);
 }
 
