@@ -214,14 +214,27 @@ matrix_neq(PG_FUNCTION_ARGS) {
 Datum
 matrix_ewise_mult(PG_FUNCTION_ARGS) {
   GrB_Info info;
-  pgGrB_Matrix *A, *B;
+  pgGrB_Matrix *A, *B, *C, *mask;
   GrB_Type type;
   Datum d;
+  char *binop_name;
+  GrB_BinaryOp binop;
+  
   A = PGGRB_GETARG_MATRIX(0);
   B = PGGRB_GETARG_MATRIX(1);
+  C = PG_ARGISNULL(2) ? NULL : PGGRB_GETARG_MATRIX(2);
+  mask = PG_ARGISNULL(3) ? NULL : PGGRB_GETARG_MATRIX(3);
+  binop_name = PG_ARGISNULL(4) ? \
+    plus_binop(A, B) :                               \
+    text_to_cstring(PG_GETARG_TEXT_PP(4));
+
+  binop = lookup_binop(binop_name);
+  if (binop == NULL)
+    elog(ERROR, "unknown binop name %s", binop_name);
+
   CHECKD(GxB_Matrix_type(&type, A->M));
 
-  d = DATUM_TYPE_APPLY(type, matrix_ewise_mult, A, B);
+  d = DATUM_TYPE_APPLY(type, matrix_ewise_mult, A, B, C, mask, binop);
   if (d == (Datum)0)
     elog(ERROR, "Unknown graphblas type");
   return d;
@@ -230,14 +243,27 @@ matrix_ewise_mult(PG_FUNCTION_ARGS) {
 Datum
 matrix_ewise_add(PG_FUNCTION_ARGS) {
   GrB_Info info;
-  pgGrB_Matrix *A, *B;
+  pgGrB_Matrix *A, *B, *C, *mask;
   GrB_Type type;
   Datum d;
+  char *binop_name;
+  GrB_BinaryOp binop;
+  
   A = PGGRB_GETARG_MATRIX(0);
   B = PGGRB_GETARG_MATRIX(1);
+  C = PG_ARGISNULL(2) ? NULL : PGGRB_GETARG_MATRIX(2);
+  mask = PG_ARGISNULL(3) ? NULL : PGGRB_GETARG_MATRIX(3);
+  binop_name = PG_ARGISNULL(4) ? \
+    plus_binop(A, B) :                               \
+    text_to_cstring(PG_GETARG_TEXT_PP(4));
+
+  binop = lookup_binop(binop_name);
+  if (binop == NULL)
+    elog(ERROR, "unknown binop name %s", binop_name);
+
   CHECKD(GxB_Matrix_type(&type, A->M));
 
-  d = DATUM_TYPE_APPLY(type, matrix_ewise_add, A, B);
+  d = DATUM_TYPE_APPLY(type, matrix_ewise_add, A, B, C, mask, binop);
   if (d == (Datum)0)
     elog(ERROR, "Unknown graphblas type");
   return d;

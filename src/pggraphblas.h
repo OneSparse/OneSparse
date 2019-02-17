@@ -51,6 +51,40 @@
     "PLUS_TIMES_FP32" :                           \
     "unknown"
 
+#define DEFAULT_TIMES_BINOP(T)                    \
+  (T) == GrB_INT64?                               \
+    "TIMES_INT64" :                               \
+    (T)  == GrB_INT32?                            \
+    "TIMES_INT32" :                               \
+    (T)  == GrB_INT16?                            \
+    "TIMES_INT16" :                               \
+    (T)  == GrB_INT8?                             \
+    "_TIMES_INT8" :                               \
+    (T)  == GrB_BOOL?                             \
+    "LAND_BOOL" :                                 \
+    (T)  == GrB_FP64?                             \
+    "TIMES_FP64" :                                \
+    (T)  == GrB_FP32?                             \
+    "TIMES_FP32" :                                \
+    "unknown"
+
+#define DEFAULT_PLUS_BINOP(T)                     \
+  (T) == GrB_INT64?                               \
+    "PLUS_INT64" :                                \
+    (T)  == GrB_INT32?                            \
+    "PLUS_INT32" :                                \
+    (T)  == GrB_INT16?                            \
+    "PLUS_INT16" :                                \
+    (T)  == GrB_INT8?                             \
+    "_PLUS_INT8" :                                \
+    (T)  == GrB_BOOL?                             \
+    "LAND_BOOL" :                                 \
+    (T)  == GrB_FP64?                             \
+    "PLUS_FP64" :                                 \
+    (T)  == GrB_FP32?                             \
+    "PLUS_FP32" :                                 \
+    "unknown"
+
 /* dumb debug helper */
 #define elogn(s) elog(NOTICE, "%s", (s))
 #define elogn1(s, v) elog(NOTICE, "%s: %lu", (s), (v))
@@ -232,7 +266,12 @@ construct_empty_flat_vector(GrB_Index size,
 char* mxm_semiring(pgGrB_Matrix *left, pgGrB_Matrix *right);
 char* mxv_semiring(pgGrB_Matrix *left, pgGrB_Vector *right);
 char* vxm_semiring(pgGrB_Vector *left, pgGrB_Matrix *right);
+
+char* times_binop(pgGrB_Matrix *left, pgGrB_Matrix *right);
+char* plus_binop(pgGrB_Matrix *left, pgGrB_Matrix *right);
+
 GrB_Semiring lookup_semiring(char *name);
+GrB_BinaryOp lookup_binop(char *name);
 
 #define VectorGetEOHP(d) (pgGrB_Vector *) DatumGetEOHP(d)
 #define MatrixGetEOHP(d) (pgGrB_Matrix *) DatumGetEOHP(d);
@@ -260,11 +299,15 @@ PG_FUNCTION_INFO_V1(vector_neq);
 PG_FUNCTION_INFO_V1(vector_nvals);
 PG_FUNCTION_INFO_V1(vector_size);
 
-
 typedef struct pgGrB_Semiring  {
   char name[255];
   GrB_Semiring R;
 } pgGrB_Semiring;
+
+typedef struct pgGrB_BinaryOp  {
+  char name[255];
+  GrB_BinaryOp B;
+} pgGrB_BinaryOp;
 
 #define SEMIRING(N, PLS, TMS, TYP) do {                             \
     strlcpy(semirings[(N)].name, #PLS #TMS #TYP, 255);              \
@@ -272,16 +315,16 @@ typedef struct pgGrB_Semiring  {
     } while (0)
 
 #define SEMIRING_TYPES(N, PLS, TMS) do {          \
-  SEMIRING (N, PLS, TMS, INT8);                   \
-    SEMIRING(N+1, PLS, TMS, UINT8);              \
-    SEMIRING(N+2, PLS, TMS, INT16);              \
-    SEMIRING(N+3, PLS, TMS, UINT16);             \
-    SEMIRING(N+4, PLS, TMS, INT32);              \
-    SEMIRING(N+5, PLS, TMS, UINT32);             \
-    SEMIRING(N+6, PLS, TMS, INT64);              \
-    SEMIRING(N+7, PLS, TMS, UINT64);             \
-    SEMIRING(N+8, PLS, TMS, FP32);               \
-    SEMIRING(N+9, PLS, TMS, FP64);               \
+    SEMIRING (N, PLS, TMS, INT8);                 \
+    SEMIRING(N+1, PLS, TMS, UINT8);               \
+    SEMIRING(N+2, PLS, TMS, INT16);               \
+    SEMIRING(N+3, PLS, TMS, UINT16);              \
+    SEMIRING(N+4, PLS, TMS, INT32);               \
+    SEMIRING(N+5, PLS, TMS, UINT32);              \
+    SEMIRING(N+6, PLS, TMS, INT64);               \
+    SEMIRING(N+7, PLS, TMS, UINT64);              \
+    SEMIRING(N+8, PLS, TMS, FP32);                \
+    SEMIRING(N+9, PLS, TMS, FP64);                \
     } while(0)
 
 #define SEMIRING_PURE_BOOL(N, PLS) do {             \
@@ -297,27 +340,44 @@ typedef struct pgGrB_Semiring  {
     SEMIRING(N+9, PLS, LE_, BOOL);                  \
   } while(0)
 
-#define SEMIRING_GROUP(N, TMS) do {                 \
-  SEMIRING_TYPES((N), MIN_, TMS);                   \
+#define SEMIRING_GROUP(N, TMS) do {                    \
+    SEMIRING_TYPES((N), MIN_, TMS);                    \
     SEMIRING_TYPES((N)+10, MAX_, TMS);                 \
     SEMIRING_TYPES((N)+20, PLUS_, TMS);                \
     SEMIRING_TYPES((N)+30, TIMES_, TMS);               \
   } while(0)
 
-#define SEMIRING_BOOL_GROUP(N, TMS) do {              \
-  SEMIRING_TYPES((N), LOR_, TMS);                     \
+#define SEMIRING_BOOL_GROUP(N, TMS) do {                 \
+    SEMIRING_TYPES((N), LOR_, TMS);                      \
     SEMIRING_TYPES((N)+10, LAND_, TMS);                  \
     SEMIRING_TYPES((N)+20, LXOR_, TMS);                  \
     SEMIRING_TYPES((N)+30, EQ_, TMS);                    \
   } while(0)
 
-#define SEMIRING_PURE_BOOL_GROUP(N) do {             \
-  SEMIRING_PURE_BOOL((N), LOR_);                     \
+#define SEMIRING_PURE_BOOL_GROUP(N) do {                \
+    SEMIRING_PURE_BOOL((N), LOR_);                      \
     SEMIRING_PURE_BOOL((N)+10, LAND_);                  \
     SEMIRING_PURE_BOOL((N)+20, LXOR_);                  \
     SEMIRING_PURE_BOOL((N)+30, EQ_);                    \
   } while(0)
 
+#define BINOP(N, PRE, OP, TYP) do {                                 \
+    strlcpy(binops[(N)].name, #OP #TYP, 255);                       \
+    binops[(N)].B = PRE ## OP ## TYP;                               \
+  } while (0)
+
+#define BINOP_TYPES(N, PRE, OP) do {          \
+    BINOP (N, PRE, OP, INT8);                 \
+    BINOP(N+1, PRE, OP, UINT8);               \
+    BINOP(N+2, PRE, OP, INT16);               \
+    BINOP(N+3, PRE, OP, UINT16);              \
+    BINOP(N+4, PRE, OP, INT32);               \
+    BINOP(N+5, PRE, OP, UINT32);              \
+    BINOP(N+6, PRE, OP, INT64);               \
+    BINOP(N+7, PRE, OP, UINT64);              \
+    BINOP(N+8, PRE, OP, FP32);                \
+    BINOP(N+9, PRE, OP, FP64);                \
+    } while(0)
 void _PG_init(void);
 
 #endif /* PGGRAPHBLAS_H */

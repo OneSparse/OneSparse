@@ -20,6 +20,4 @@ select pg_backend_pid() pid \gset
 create extension if not exists pgtap;
 create extension if not exists pggraphblas;
 
-\if go
 \ir vector.sql
-\endif

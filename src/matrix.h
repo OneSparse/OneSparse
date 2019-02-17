@@ -38,8 +38,17 @@ FN(construct_empty_expanded_matrix)(GrB_Index nrows,
                                     MemoryContext parentcontext);
 
 Datum FN(matrix_out)(pgGrB_Matrix *mat);
-Datum FN(matrix_ewise_mult)(pgGrB_Matrix *A, pgGrB_Matrix *B);
-Datum FN(matrix_ewise_add)(pgGrB_Matrix *A, pgGrB_Matrix *B);
+Datum FN(matrix_ewise_mult)(pgGrB_Matrix *A,
+                            pgGrB_Matrix *B,
+                            pgGrB_Matrix *C,
+                            pgGrB_Matrix *mask,
+                            GrB_BinaryOp binop);
+                           
+Datum FN(matrix_ewise_add)(pgGrB_Matrix *A,
+                           pgGrB_Matrix *B,
+                           pgGrB_Matrix *C,
+                           pgGrB_Matrix *mask,
+                           GrB_BinaryOp binop);
 
 Datum
 FN(mxm)(pgGrB_Matrix *A,
@@ -453,30 +462,40 @@ FN(matrix_out)(pgGrB_Matrix *mat)
 }
 
 Datum
-FN(matrix_ewise_mult)(pgGrB_Matrix *A, pgGrB_Matrix *B) {
+FN(matrix_ewise_mult)(pgGrB_Matrix *A,
+                      pgGrB_Matrix *B,
+                      pgGrB_Matrix *C,
+                      pgGrB_Matrix *mask,
+                      GrB_BinaryOp binop) {
   GrB_Info info;
-  pgGrB_Matrix *C;
   GrB_Index m, n;
 
-  CHECKD(GrB_Matrix_nrows(&m, A->M));
-  CHECKD(GrB_Matrix_ncols(&n, A->M));
-
-  C = FN(construct_empty_expanded_matrix)(m, n, CurrentMemoryContext);
-  CHECKD(GrB_eWiseMult(C->M, NULL, NULL, GB_MUL, A->M, B->M, NULL));
+  if (C == NULL) {
+    CHECKD(GrB_Matrix_nrows(&m, A->M));
+    CHECKD(GrB_Matrix_ncols(&n, A->M));
+    C = FN(construct_empty_expanded_matrix)(m, n, CurrentMemoryContext);
+  }
+  CHECKD(GrB_eWiseMult(C->M, mask ? mask->M : NULL, NULL, binop, A->M, B->M, NULL));
   PGGRB_RETURN_MATRIX(C);
 }
 
 Datum
-FN(matrix_ewise_add)(pgGrB_Matrix *A, pgGrB_Matrix *B) {
+FN(matrix_ewise_add)(pgGrB_Matrix *A,
+                     pgGrB_Matrix *B,
+                     pgGrB_Matrix *C,
+                     pgGrB_Matrix *mask,
+                     GrB_BinaryOp binop
+                     ) {
   GrB_Info info;
-  pgGrB_Matrix *C;
   GrB_Index m, n;
 
-  CHECKD(GrB_Matrix_nrows(&m, A->M));
-  CHECKD(GrB_Matrix_ncols(&n, A->M));
+  if (C == NULL) {
+    CHECKD(GrB_Matrix_nrows(&m, A->M));
+    CHECKD(GrB_Matrix_ncols(&n, A->M));
+    C = FN(construct_empty_expanded_matrix)(m, n, CurrentMemoryContext);
+  }
 
-  C = FN(construct_empty_expanded_matrix)(m, n, CurrentMemoryContext);
-  CHECKD(GrB_eWiseAdd(C->M, NULL, NULL, GB_ADD, A->M, B->M, NULL));
+  CHECKD(GrB_eWiseAdd(C->M, mask ? mask->M : NULL, NULL, binop, A->M, B->M, NULL));
   PGGRB_RETURN_MATRIX(C);
 }
 

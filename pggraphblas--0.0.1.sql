@@ -31,17 +31,17 @@ RETURNS cstring
 AS '$libdir/pggraphblas', 'matrix_out'
 LANGUAGE C IMMUTABLE STRICT;
 
-CREATE FUNCTION matrix_nrows(matrix)
+CREATE FUNCTION nrows(matrix)
 RETURNS bigint
 AS '$libdir/pggraphblas', 'matrix_nrows'
 LANGUAGE C STABLE STRICT;
 
-CREATE FUNCTION matrix_ncols(matrix)
+CREATE FUNCTION ncols(matrix)
 RETURNS bigint
 AS '$libdir/pggraphblas', 'matrix_ncols'
 LANGUAGE C STABLE STRICT;
 
-CREATE FUNCTION matrix_nvals(matrix)
+CREATE FUNCTION nvals(matrix)
 RETURNS bigint
 AS '$libdir/pggraphblas', 'matrix_nvals'
 LANGUAGE C STABLE STRICT;
@@ -56,12 +56,12 @@ RETURNS bool
 AS '$libdir/pggraphblas', 'matrix_neq'
 LANGUAGE C STABLE STRICT;
 
-CREATE FUNCTION matrix_ewise_mult(matrix, matrix)
+CREATE FUNCTION matrix_ewise_mult_op(matrix, matrix)
 RETURNS matrix
 AS '$libdir/pggraphblas', 'matrix_ewise_mult'
 LANGUAGE C STABLE STRICT;
 
-CREATE FUNCTION matrix_ewise_add(matrix, matrix)
+CREATE FUNCTION matrix_ewise_add_op(matrix, matrix)
 RETURNS matrix
 AS '$libdir/pggraphblas', 'matrix_ewise_add'
 LANGUAGE C STABLE STRICT;
@@ -90,16 +90,42 @@ RETURNS matrix
 AS '$libdir/pggraphblas', 'mxm'
 LANGUAGE C STABLE;
     
-CREATE FUNCTION mxv(matrix, vector)
+CREATE FUNCTION mxv(
+    A matrix,
+    B vector,
+    inout C vector default null,
+    mask vector default null,
+    semiring text default null,
+    descriptor text default null,
+    accum text default null
+    )
 RETURNS vector
 AS '$libdir/pggraphblas', 'mxv'
 LANGUAGE C STABLE STRICT;
 
-CREATE FUNCTION vxm(vector, matrix)
+CREATE FUNCTION mxv_op(matrix, vector)
+RETURNS vector
+AS '$libdir/pggraphblas', 'mxv'
+LANGUAGE C STABLE;
+    
+CREATE FUNCTION vxm(
+    A vector,
+    B matrix,
+    inout C vector default null,
+    mask vector default null,
+    semiring text default null,
+    descriptor text default null,
+    accum text default null
+    )
 RETURNS vector
 AS '$libdir/pggraphblas', 'vxm'
 LANGUAGE C STABLE STRICT;
 
+CREATE FUNCTION vxm_op(vector, matrix)
+RETURNS vector
+AS '$libdir/pggraphblas', 'mxm'
+LANGUAGE C STABLE;
+    
 CREATE OPERATOR = (
     leftarg = matrix,
     rightarg = matrix,
@@ -123,25 +149,25 @@ CREATE OPERATOR * (
 CREATE OPERATOR * (
     leftarg = vector,
     rightarg = matrix,
-    procedure = vxm
+    procedure = vxm_op
 );
 
 CREATE OPERATOR * (
     leftarg = matrix,
     rightarg = vector,
-    procedure = mxv
+    procedure = mxv_op
 );
 
 CREATE OPERATOR && (
     leftarg = matrix,
     rightarg = matrix,
-    procedure = matrix_ewise_mult
+    procedure = matrix_ewise_mult_op
 );
 
 CREATE OPERATOR || (
     leftarg = matrix,
     rightarg = matrix,
-    procedure = matrix_ewise_add
+    procedure = matrix_ewise_add_op
 );
 
 -- aggregators
@@ -301,12 +327,12 @@ RETURNS bool
 AS '$libdir/pggraphblas', 'vector_neq'
 LANGUAGE C STABLE STRICT;
 
-CREATE FUNCTION vector_size(vector)
+CREATE FUNCTION size(vector)
 RETURNS bigint
 AS '$libdir/pggraphblas', 'vector_size'
 LANGUAGE C STABLE STRICT;
 
-CREATE FUNCTION vector_nvals(vector)
+CREATE FUNCTION nvals(vector)
 RETURNS bigint
 AS '$libdir/pggraphblas', 'vector_nvals'
 LANGUAGE C STABLE STRICT;

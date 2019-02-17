@@ -34,7 +34,7 @@ done
 if [ $# -eq 0 ]
 then
     echo running tests
-    $EXEC tmux new-session -d -s pggraphblas psql
+    $EXEC tmux new-session -d -s pggraphblas 
     $EXECIT tmux attach-session -t pggraphblas
 else
     echo running repl

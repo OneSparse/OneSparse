@@ -2,6 +2,7 @@
 PG_MODULE_MAGIC;
 
 pgGrB_Semiring semirings[960];
+pgGrB_BinaryOp binops[256];
 
 #include "type.c"
 #include "isequal.c"
@@ -43,4 +44,35 @@ _PG_init(void)
   SEMIRING_BOOL_GROUP(840, GE_);
   SEMIRING_BOOL_GROUP(880, LE_);
   SEMIRING_PURE_BOOL_GROUP(920);
+
+  BINOP_TYPES(0, GrB_, FIRST_);
+  BINOP_TYPES(10, GrB_, SECOND_);
+  BINOP_TYPES(20, GrB_, MIN_);
+  BINOP_TYPES(30, GrB_, MAX_);
+  BINOP_TYPES(40, GrB_, PLUS_);
+  BINOP_TYPES(50, GrB_, MINUS_);
+  BINOP_TYPES(60, GrB_, TIMES_);
+  BINOP_TYPES(70, GrB_, DIV_);
+  
+  BINOP_TYPES(80, GxB_, ISEQ_);
+  BINOP_TYPES(90, GxB_, ISNE_);
+  BINOP_TYPES(100, GxB_, ISGT_);
+  BINOP_TYPES(110, GxB_, ISLT_);
+  BINOP_TYPES(120, GxB_, ISGE_);
+  BINOP_TYPES(130, GxB_, ISLE_);
+  
+  BINOP_TYPES(140, GrB_, EQ_);
+  BINOP_TYPES(150, GrB_, NE_);
+  BINOP_TYPES(160, GrB_, GT_);
+  BINOP_TYPES(170, GrB_, LT_);
+  BINOP_TYPES(180, GrB_, GE_);
+  BINOP_TYPES(190, GrB_, LE_);
+  
+  BINOP_TYPES(200, GxB_, LOR_);
+  BINOP_TYPES(210, GxB_, LAND_);
+  BINOP_TYPES(220, GxB_, LXOR_);
+  
+  BINOP(221, GrB_, LOR,);
+  BINOP(222, GrB_, LAND,);
+  BINOP(223, GrB_, LXOR,);
 }

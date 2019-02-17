@@ -7,7 +7,6 @@
     #error Suffix argument missing.
 #endif
 
-
 #define VECTOR_BINOP_PREAMBLE()                           \
   do {                                                    \
     A = PGGRB_GETARG_VECTOR(0);                           \

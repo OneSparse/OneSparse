@@ -7,6 +7,13 @@ GrB_Semiring lookup_semiring(char *name) {
   return NULL;
 }
 
+GrB_BinaryOp lookup_binop(char *name) {
+  for (int i = 0; i < 256; i++) {
+    if (strcmp(binops[i].name, name) == 0)
+        return binops[i].B;
+  }
+  return NULL;
+}
 char* mxm_semiring(pgGrB_Matrix *left, pgGrB_Matrix *right) {
   GrB_Info info;
   GrB_Type type;
@@ -21,11 +28,18 @@ char* mxv_semiring(pgGrB_Matrix *left, pgGrB_Vector *right) {
   return DEFAULT_SEMIRING(type);
 }
 
-char* vxm_semiring(pgGrB_Vector *left, pgGrB_Matrix *right) {
+char* times_binop(pgGrB_Matrix *left, pgGrB_Matrix *right) {
   GrB_Info info;
   GrB_Type type;
-  CHECKD(GxB_Vector_type(&type, left->V));
-  return DEFAULT_SEMIRING(type);
+  CHECKD(GxB_Matrix_type(&type, left->M));
+  return DEFAULT_TIMES_BINOP(type);
+}
+
+char* plus_binop(pgGrB_Matrix *left, pgGrB_Matrix *right) {
+  GrB_Info info;
+  GrB_Type type;
+  CHECKD(GxB_Matrix_type(&type, left->M));
+  return DEFAULT_PLUS_BINOP(type);
 }
 
 char* grb_type_to_name(GrB_Type t) {
