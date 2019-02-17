@@ -56,21 +56,6 @@ RETURNS bool
 AS '$libdir/pggraphblas', 'matrix_neq'
 LANGUAGE C STABLE STRICT;
 
-CREATE FUNCTION mxm(matrix, matrix)
-RETURNS matrix
-AS '$libdir/pggraphblas', 'mxm'
-LANGUAGE C STABLE STRICT;
-
-CREATE FUNCTION mxv(matrix, vector)
-RETURNS vector
-AS '$libdir/pggraphblas', 'mxv'
-LANGUAGE C STABLE STRICT;
-
-CREATE FUNCTION vxm(vector, matrix)
-RETURNS vector
-AS '$libdir/pggraphblas', 'vxm'
-LANGUAGE C STABLE STRICT;
-
 CREATE FUNCTION matrix_ewise_mult(matrix, matrix)
 RETURNS matrix
 AS '$libdir/pggraphblas', 'matrix_ewise_mult'
@@ -86,6 +71,34 @@ CREATE TYPE matrix (
     output = matrix_out,
     alignment = int4
 );
+
+CREATE FUNCTION mxm(
+    A matrix,
+    B matrix,
+    inout C matrix default null,
+    mask matrix default null,
+    semiring text default null,
+    descriptor text default null,
+    accum text default null
+    )
+RETURNS matrix
+AS '$libdir/pggraphblas', 'mxm'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION mxm_op(matrix, matrix)
+RETURNS matrix
+AS '$libdir/pggraphblas', 'mxm'
+LANGUAGE C STABLE;
+    
+CREATE FUNCTION mxv(matrix, vector)
+RETURNS vector
+AS '$libdir/pggraphblas', 'mxv'
+LANGUAGE C STABLE STRICT;
+
+CREATE FUNCTION vxm(vector, matrix)
+RETURNS vector
+AS '$libdir/pggraphblas', 'vxm'
+LANGUAGE C STABLE STRICT;
 
 CREATE OPERATOR = (
     leftarg = matrix,
@@ -104,19 +117,19 @@ CREATE OPERATOR <> (
 CREATE OPERATOR * (
     leftarg = matrix,
     rightarg = matrix,
-    procedure = matrix_mxm
+    procedure = mxm_op
 );
 
 CREATE OPERATOR * (
     leftarg = vector,
     rightarg = matrix,
-    procedure = matrix_vxm
+    procedure = vxm
 );
 
 CREATE OPERATOR * (
     leftarg = matrix,
     rightarg = vector,
-    procedure = matrix_mxv
+    procedure = mxv
 );
 
 CREATE OPERATOR && (

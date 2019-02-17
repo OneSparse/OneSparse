@@ -21,7 +21,7 @@ typedef struct FN(pgGrB_Matrix_ExtractState) {
 static Size FN(matrix_get_flat_size)(ExpandedObjectHeader *eohptr);
 static void FN(matrix_flatten_into)(ExpandedObjectHeader *eohptr,
                             void *result, Size allocated_size);
-                                   
+
 static const ExpandedObjectMethods FN(matrix_methods) = {
   FN(matrix_get_flat_size),
   FN(matrix_flatten_into)
@@ -36,20 +36,32 @@ pgGrB_Matrix *
 FN(construct_empty_expanded_matrix)(GrB_Index nrows,
                                     GrB_Index ncols,
                                     MemoryContext parentcontext);
-                                   
+
 Datum FN(matrix_out)(pgGrB_Matrix *mat);
 Datum FN(matrix_ewise_mult)(pgGrB_Matrix *A, pgGrB_Matrix *B);
 Datum FN(matrix_ewise_add)(pgGrB_Matrix *A, pgGrB_Matrix *B);
 
 Datum
-FN(mxm)(pgGrB_Matrix *A, pgGrB_Matrix *B);
-                                 
-Datum
-FN(mxv)(pgGrB_Matrix *A, pgGrB_Vector *B);
+FN(mxm)(pgGrB_Matrix *A,
+        pgGrB_Matrix *B,
+        pgGrB_Matrix *C,
+        pgGrB_Matrix *mask,
+        GrB_Semiring semiring);
 
 Datum
-FN(vxm)(pgGrB_Vector *A, pgGrB_Matrix *B);
-       
+FN(mxv)(pgGrB_Matrix *A,
+        pgGrB_Vector *B,
+        pgGrB_Vector *C,
+        pgGrB_Vector *mask,
+        GrB_Semiring semiring);
+
+Datum
+FN(vxm)(pgGrB_Vector *A,
+        pgGrB_Matrix *B,
+        pgGrB_Vector *C,
+        pgGrB_Vector *mask,
+        GrB_Semiring semiring);
+
 PG_FUNCTION_INFO_V1(FN(matrix));
 PG_FUNCTION_INFO_V1(FN(matrix_agg_acc));
 PG_FUNCTION_INFO_V1(FN(matrix_final));
@@ -103,11 +115,11 @@ FN(matrix_flatten_into)(ExpandedObjectHeader *eohptr,
   Assert(allocated_size == A->flat_size);
 
   memset(flat, 0, allocated_size);
-  
+
   CHECKV(GrB_Matrix_nrows(&flat->nrows, A->M));
   CHECKV(GrB_Matrix_ncols(&flat->ncols, A->M));
   CHECKV(GrB_Matrix_nvals(&flat->nvals, A->M));
-  
+
   start = PGGRB_MATRIX_DATA(flat);
   CHECKV(GrB_Matrix_extractTuples(start,
                                   start + flat->nrows,
@@ -125,13 +137,13 @@ Datum
 FN(expand_flat_matrix)(Datum flatdatum,
                    MemoryContext parentcontext) {
   GrB_Info info;
-  
+
   pgGrB_Matrix *A;
   pgGrB_FlatMatrix *flat;
-  
+
   MemoryContext objcxt, oldcxt;
   MemoryContextCallback *ctxcb;
-  
+
   GrB_Index ncols, nrows, nvals;
   GrB_Index *rows, *cols;
   PG_TYPE *vals;
@@ -168,7 +180,7 @@ FN(expand_flat_matrix)(Datum flatdatum,
   type = flat->type;
 
   /* Rows, cols, and vals are pointers into the vardata area */
-  
+
   rows = PGGRB_MATRIX_DATA(flat);
   cols = rows + nrows;
   vals = (PG_TYPE*)(cols + ncols);
@@ -183,7 +195,7 @@ FN(expand_flat_matrix)(Datum flatdatum,
   ctxcb = (MemoryContextCallback*)MemoryContextAlloc(
           objcxt,
           sizeof(MemoryContextCallback));
-  
+
   ctxcb->func = context_callback_matrix_free;
   ctxcb->arg = A;
   MemoryContextRegisterResetCallback(objcxt, ctxcb);
@@ -292,7 +304,7 @@ FN(matrix_final)(PG_FUNCTION_ARGS) {
   if (!AggCheckCallContext(fcinfo, &resultcxt)) {
     resultcxt = CurrentMemoryContext;
   }
-  
+
   oldcxt = MemoryContextSwitchTo(resultcxt);
   mstate = (pgGrB_Matrix_AggState *)PG_GETARG_POINTER(0);
 
@@ -422,7 +434,7 @@ FN(matrix_out)(pgGrB_Matrix *mat)
       result = strcat(result, ",");
   }
   result = strcat(result, "][");
-  
+
   for (int i = 0; i < ncols; i++) {
     result = strcat(result, psprintf("%lu", col_indices[i]));
     if (i != nrows - 1)
@@ -469,50 +481,54 @@ FN(matrix_ewise_add)(pgGrB_Matrix *A, pgGrB_Matrix *B) {
 }
 
 Datum
-FN(mxm)(pgGrB_Matrix *A, pgGrB_Matrix *B) {
+FN(mxm)(pgGrB_Matrix *A,
+        pgGrB_Matrix *B,
+        pgGrB_Matrix *C,
+        pgGrB_Matrix *mask,
+        GrB_Semiring semiring) {
   GrB_Info info;
-  pgGrB_Matrix *C;
-  GrB_Index m, n;
-  GrB_Semiring semiring;
-  
-  CHECKD(GrB_Matrix_nrows(&m, A->M));
-  CHECKD(GrB_Matrix_ncols(&n, B->M));
 
-  C = FN(construct_empty_expanded_matrix)(m, n, CurrentMemoryContext);
-  semiring = mxm_semiring(A, B);
-  
-  CHECKD(GrB_mxm(C->M, NULL, NULL, semiring, A->M, B->M, NULL));
+  if (C == NULL) {
+    GrB_Index m, n;
+    CHECKD(GrB_Matrix_nrows(&m, A->M));
+    CHECKD(GrB_Matrix_ncols(&n, B->M));
+    C = FN(construct_empty_expanded_matrix)(m, n, CurrentMemoryContext);
+  }
+  CHECKD(GrB_mxm(C->M, mask ? mask->M : NULL, NULL, semiring, A->M, B->M, NULL));
   PGGRB_RETURN_MATRIX(C);
 }
 
 Datum
-FN(mxv)(pgGrB_Matrix *A, pgGrB_Vector *B) {
+FN(mxv)(pgGrB_Matrix *A,
+        pgGrB_Vector *B,
+        pgGrB_Vector *C,
+        pgGrB_Vector *mask,
+        GrB_Semiring semiring) {
   GrB_Info info;
-  pgGrB_Vector *C;
   GrB_Index size;
-  GrB_Semiring semiring;
 
-  CHECKD(GrB_Vector_size(&size, B->V));
-  
-  C = FN(construct_empty_expanded_vector)(size, CurrentMemoryContext);
-  semiring = mxv_semiring(A, B);
-
-  CHECKD(GrB_mxv(C->V, NULL, NULL, semiring, A->M, B->V, NULL));
+  if (C == NULL) {
+    CHECKD(GrB_Vector_size(&size, B->V));
+    C = FN(construct_empty_expanded_vector)(size, CurrentMemoryContext);
+  }
+  CHECKD(GrB_mxv(C->V, mask ? mask->V : NULL, NULL, semiring, A->M, B->V, NULL));
   PGGRB_RETURN_VECTOR(C);
 }
 
 Datum
-FN(vxm)(pgGrB_Vector *A, pgGrB_Matrix *B) {
+FN(vxm)(pgGrB_Vector *A,
+        pgGrB_Matrix *B,
+        pgGrB_Vector *C,
+        pgGrB_Vector *mask,
+        GrB_Semiring semiring) {
   GrB_Info info;
-  pgGrB_Vector *C;
   GrB_Index size;
-  GrB_Semiring semiring;
 
-  CHECKD(GrB_Vector_size(&size, A->V));
-  C = FN(construct_empty_expanded_vector)(size, CurrentMemoryContext);
-  semiring = vxm_semiring(A, B);
-
-  CHECKD(GrB_vxm(C->V, NULL, NULL, semiring, A->V, B->M, NULL));
+  if (C == NULL) {
+    CHECKD(GrB_Vector_size(&size, A->V));
+    C = FN(construct_empty_expanded_vector)(size, CurrentMemoryContext);
+  }
+  CHECKD(GrB_vxm(C->V, mask ? mask->V : NULL, NULL, semiring, A->V, B->M, NULL));
   PGGRB_RETURN_VECTOR(C);
 }
 

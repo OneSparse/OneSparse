@@ -2,27 +2,27 @@
 /* The same "header template" vector.h is used over and over to
    generate the various type specific functions. */
 
-#define SUFFIX _int64                // suffix for names
-#define PG_TYPE int64                // postgres type
-#define GB_TYPE GrB_INT64            // graphblas vector type
-#define GB_DUP GrB_SECOND_INT64      // default duplicate index resolver
-#define GB_MUL GrB_TIMES_INT64       // times bin op
-#define GB_ADD GrB_PLUS_INT64         // times bin op
-#define PG_GET PG_GETARG_INT64       // how to get value args
-#define PG_DGT DatumGetInt64         // datum get type
-#define PG_TGD Int64GetDatum         // type get datum
-#define PRINT_FMT(v) "%lu", v        // printf fmt
-#include "vector.h"                  // "call" template
+#define SUFFIX _bool
+#define PG_TYPE bool
+#define GB_TYPE GrB_BOOL
+#define GB_DUP GrB_SECOND_BOOL
+#define GB_MUL GrB_TIMES_BOOL
+#define GB_ADD GrB_PLUS_BOOL
+#define PG_GET PG_GETARG_BOOL
+#define PG_DGT DatumGetBool
+#define PG_TGD BoolGetDatum
+#define PRINT_FMT(v) "%s", v ? "t" : "f"
+#include "vector.h"
 
-#define SUFFIX _int32
-#define PG_TYPE int32
-#define GB_TYPE GrB_INT32
-#define GB_DUP GrB_SECOND_INT32
-#define GB_MUL GrB_TIMES_INT32
-#define GB_ADD GrB_PLUS_INT32
-#define PG_GET PG_GETARG_INT32
-#define PG_DGT DatumGetInt32
-#define PG_TGD Int32GetDatum
+#define SUFFIX _int8
+#define PG_TYPE int8
+#define GB_TYPE GrB_INT8
+#define GB_DUP GrB_SECOND_INT8
+#define GB_MUL GrB_TIMES_INT8
+#define GB_ADD GrB_PLUS_INT8
+#define PG_GET PG_GETARG_CHAR
+#define PG_DGT DatumGetChar
+#define PG_TGD CharGetDatum
 #define PRINT_FMT(v) "%i", v
 #include "vector.h"
 
@@ -38,17 +38,29 @@
 #define PRINT_FMT(v) "%i", v
 #include "vector.h"
 
-#define SUFFIX _float8
-#define PG_TYPE float8
-#define GB_TYPE GrB_FP64
-#define GB_DUP GrB_SECOND_FP64
-#define GB_MUL GrB_TIMES_FP64
-#define GB_ADD GrB_PLUS_FP64
-#define PG_GET PG_GETARG_FLOAT8
-#define PG_DGT DatumGetFloat8
-#define PG_TGD Float8GetDatum
-#define PRINT_FMT(v) "%f", v
+#define SUFFIX _int32
+#define PG_TYPE int32
+#define GB_TYPE GrB_INT32
+#define GB_DUP GrB_SECOND_INT32
+#define GB_MUL GrB_TIMES_INT32
+#define GB_ADD GrB_PLUS_INT32
+#define PG_GET PG_GETARG_INT32
+#define PG_DGT DatumGetInt32
+#define PG_TGD Int32GetDatum
+#define PRINT_FMT(v) "%i", v
 #include "vector.h"
+
+#define SUFFIX _int64                // suffix for names
+#define PG_TYPE int64                // postgres type
+#define GB_TYPE GrB_INT64            // graphblas vector type
+#define GB_DUP GrB_SECOND_INT64      // default duplicate index resolver
+#define GB_MUL GrB_TIMES_INT64       // times bin op
+#define GB_ADD GrB_PLUS_INT64         // times bin op
+#define PG_GET PG_GETARG_INT64       // how to get value args
+#define PG_DGT DatumGetInt64         // datum get type
+#define PG_TGD Int64GetDatum         // type get datum
+#define PRINT_FMT(v) "%lu", v        // printf fmt
+#include "vector.h"                  // "call" template
 
 #define SUFFIX _float4
 #define PG_TYPE float4
@@ -62,16 +74,16 @@
 #define PRINT_FMT(v) "%f", v
 #include "vector.h"
 
-#define SUFFIX _bool
-#define PG_TYPE bool
-#define GB_TYPE GrB_BOOL
-#define GB_DUP GrB_SECOND_BOOL
-#define GB_MUL GrB_TIMES_BOOL
-#define GB_ADD GrB_PLUS_BOOL
-#define PG_GET PG_GETARG_BOOL
-#define PG_DGT DatumGetBool
-#define PG_TGD BoolGetDatum
-#define PRINT_FMT(v) "%s", v ? "t" : "f"
+#define SUFFIX _float8
+#define PG_TYPE float8
+#define GB_TYPE GrB_FP64
+#define GB_DUP GrB_SECOND_FP64
+#define GB_MUL GrB_TIMES_FP64
+#define GB_ADD GrB_PLUS_FP64
+#define PG_GET PG_GETARG_FLOAT8
+#define PG_DGT DatumGetFloat8
+#define PG_TGD Float8GetDatum
+#define PRINT_FMT(v) "%f", v
 #include "vector.h"
 
 /* MemoryContextCallback function to free matrices */
@@ -201,19 +213,19 @@ vector_eq(PG_FUNCTION_ARGS) {
   bool result = 0;
 
   VECTOR_BINOP_PREAMBLE();
-  
+
   CHECKD(GxB_Vector_type(&atype, A->V));
   CHECKD(GxB_Vector_type(&btype, B->V));
-  
+
   if (atype != btype)
     PG_RETURN_BOOL(result);
-  
+
   CHECKD(GrB_Vector_size(&asize, A->V));
   CHECKD(GrB_Vector_size(&bsize, B->V));
-  
+
   if (asize != bsize)
     PG_RETURN_BOOL(result);
-  
+
   CHECKD(GrB_Vector_nvals(&anvals, A->V));
   CHECKD(GrB_Vector_nvals(&bnvals, B->V));
 
@@ -238,16 +250,16 @@ vector_neq(PG_FUNCTION_ARGS) {
   VECTOR_BINOP_PREAMBLE();
   CHECKD(GxB_Vector_type(&atype, A->V));
   CHECKD(GxB_Vector_type(&btype, B->V));
-  
+
   if (atype != btype)
     PG_RETURN_BOOL(result);
-  
+
   CHECKD(GrB_Vector_size(&asize, A->V));
   CHECKD(GrB_Vector_size(&bsize, B->V));
-  
+
   if (asize != bsize)
     PG_RETURN_BOOL(result);
-  
+
   CHECKD(GrB_Vector_nvals(&anvals, A->V));
   CHECKD(GrB_Vector_nvals(&bnvals, B->V));
 

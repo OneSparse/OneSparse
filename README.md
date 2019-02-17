@@ -129,6 +129,25 @@ the common arithmetic plus and multiply operators on any given type,
 it is also possible to mix various semiring operations on any
 supported type.  Put example here of {R,min,+,0,+inf}.
 
+# API
+
+Pggraphblas tries to adhere closely to the spirit of the GraphBLAS C
+API.  It provides sixe new types: vector, matrix descriptor, binop,
+monoid and semiring.  It also exposes a number of functions that
+operate with or on those types.
+
+## vector
+
+## matrix
+
+## descriptor
+
+## binop
+
+## monoid
+
+## semiring
+    
 # 0.1 goals
 
 To run common graph algorithms on matrices, for example, breadth first search:
@@ -148,10 +167,10 @@ begin
     perform matrix_set_element(q, true, source);  -- set the source element to done
     
     while not_done and level <= n loop            -- while still work to do
-        v := assign(level, 'all', v, mask=q);     -- assign the current level to all
+        assign(level, 'all', v, mask=q);     -- assign the current level to all
                                                   -- results not masked as done by q
     
-        q := mxv(A, q,                            -- multiply A by q
+        perform mxv(A, q, q                       -- multiply q<mask> = Aq
             semiring='lor_land_bool',             -- using lor_land_bool semiring
             mask=v,                               -- only those not masked
             desc=desc);                           -- clearing results first

@@ -13,6 +13,7 @@
 #include "catalog/pg_type.h"
 #include "utils/lsyscache.h"
 #include "nodes/pg_list.h"
+#include "utils/varlena.h"
 
 #define CCAT2(x, y) x ## y
 #define CCAT(x, y) CCAT2(x, y)
@@ -35,19 +36,20 @@
 
 #define DEFAULT_SEMIRING(T)                       \
   (T) == GrB_INT64?                               \
-    GxB_PLUS_TIMES_INT64 :                        \
+    "PLUS_TIMES_INT64" :                          \
     (T)  == GrB_INT32?                            \
-    GxB_PLUS_TIMES_INT32 :                        \
+    "PLUS_TIMES_INT32" :                          \
     (T)  == GrB_INT16?                            \
-    GxB_PLUS_TIMES_INT16 :                        \
+    "PLUS_TIMES_INT16" :                          \
+    (T)  == GrB_INT8?                             \
+    "PLUS_TIMES_INT8" :                           \
     (T)  == GrB_BOOL?                             \
-    GxB_LOR_LAND_BOOL :                           \
+    "LOR_LAND_BOOL" :                             \
     (T)  == GrB_FP64?                             \
-    GxB_PLUS_TIMES_FP64 :                         \
+    "PLUS_TIMES_FP64" :                           \
     (T)  == GrB_FP32?                             \
-    GxB_PLUS_TIMES_FP32 :                         \
-    NULL
-
+    "PLUS_TIMES_FP32" :                           \
+    "unknown"
 
 /* dumb debug helper */
 #define elogn(s) elog(NOTICE, "%s", (s))
@@ -227,9 +229,10 @@ construct_empty_flat_vector(GrB_Index size,
                             GrB_Type type);
 
 /* function to choose implicit semirings for overloaded operators */
-GrB_Semiring mxm_semiring(pgGrB_Matrix *left, pgGrB_Matrix *right);
-GrB_Semiring mxv_semiring(pgGrB_Matrix *left, pgGrB_Vector *right);
-GrB_Semiring vxm_semiring(pgGrB_Vector *left, pgGrB_Matrix *right);
+char* mxm_semiring(pgGrB_Matrix *left, pgGrB_Matrix *right);
+char* mxv_semiring(pgGrB_Matrix *left, pgGrB_Vector *right);
+char* vxm_semiring(pgGrB_Vector *left, pgGrB_Matrix *right);
+GrB_Semiring lookup_semiring(char *name);
 
 #define VectorGetEOHP(d) (pgGrB_Vector *) DatumGetEOHP(d)
 #define MatrixGetEOHP(d) (pgGrB_Matrix *) DatumGetEOHP(d);
@@ -256,6 +259,64 @@ PG_FUNCTION_INFO_V1(vector_neq);
 
 PG_FUNCTION_INFO_V1(vector_nvals);
 PG_FUNCTION_INFO_V1(vector_size);
+
+
+typedef struct pgGrB_Semiring  {
+  char name[255];
+  GrB_Semiring R;
+} pgGrB_Semiring;
+
+#define SEMIRING(N, PLS, TMS, TYP) do {                             \
+    strlcpy(semirings[(N)].name, #PLS #TMS #TYP, 255);              \
+    semirings[(N)].R = GxB_ ## PLS ## TMS ## TYP;                   \
+    } while (0)
+
+#define SEMIRING_TYPES(N, PLS, TMS) do {          \
+  SEMIRING (N, PLS, TMS, INT8);                   \
+    SEMIRING(N+1, PLS, TMS, UINT8);              \
+    SEMIRING(N+2, PLS, TMS, INT16);              \
+    SEMIRING(N+3, PLS, TMS, UINT16);             \
+    SEMIRING(N+4, PLS, TMS, INT32);              \
+    SEMIRING(N+5, PLS, TMS, UINT32);             \
+    SEMIRING(N+6, PLS, TMS, INT64);              \
+    SEMIRING(N+7, PLS, TMS, UINT64);             \
+    SEMIRING(N+8, PLS, TMS, FP32);               \
+    SEMIRING(N+9, PLS, TMS, FP64);               \
+    } while(0)
+
+#define SEMIRING_PURE_BOOL(N, PLS) do {             \
+  SEMIRING(N, PLS, FIRST_, BOOL);                   \
+    SEMIRING(N+1, PLS, SECOND_, BOOL);              \
+    SEMIRING(N+2, PLS, LOR_, BOOL);                 \
+    SEMIRING(N+3, PLS, LAND_, BOOL);                \
+    SEMIRING(N+4, PLS, LXOR_, BOOL);                \
+    SEMIRING(N+5, PLS, EQ_, BOOL);                  \
+    SEMIRING(N+6, PLS, GT_, BOOL);                  \
+    SEMIRING(N+7, PLS, LT_, BOOL);                  \
+    SEMIRING(N+8, PLS, GE_, BOOL);                  \
+    SEMIRING(N+9, PLS, LE_, BOOL);                  \
+  } while(0)
+
+#define SEMIRING_GROUP(N, TMS) do {                 \
+  SEMIRING_TYPES((N), MIN_, TMS);                   \
+    SEMIRING_TYPES((N)+10, MAX_, TMS);                 \
+    SEMIRING_TYPES((N)+20, PLUS_, TMS);                \
+    SEMIRING_TYPES((N)+30, TIMES_, TMS);               \
+  } while(0)
+
+#define SEMIRING_BOOL_GROUP(N, TMS) do {              \
+  SEMIRING_TYPES((N), LOR_, TMS);                     \
+    SEMIRING_TYPES((N)+10, LAND_, TMS);                  \
+    SEMIRING_TYPES((N)+20, LXOR_, TMS);                  \
+    SEMIRING_TYPES((N)+30, EQ_, TMS);                    \
+  } while(0)
+
+#define SEMIRING_PURE_BOOL_GROUP(N) do {             \
+  SEMIRING_PURE_BOOL((N), LOR_);                     \
+    SEMIRING_PURE_BOOL((N)+10, LAND_);                  \
+    SEMIRING_PURE_BOOL((N)+20, LXOR_);                  \
+    SEMIRING_PURE_BOOL((N)+30, EQ_);                    \
+  } while(0)
 
 void _PG_init(void);
 

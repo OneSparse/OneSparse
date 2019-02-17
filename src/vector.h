@@ -97,10 +97,10 @@ FN(vector_flatten_into)(ExpandedObjectHeader *eohptr,
   Assert(allocated_size == A->flat_size);
 
   memset(flat, 0, allocated_size);
-  
+
   CHECKV(GrB_Vector_size(&flat->size, A->V));
   CHECKV(GrB_Vector_nvals(&flat->nvals, A->V));
-  
+
   start = PGGRB_VECTOR_DATA(flat);
   CHECKV(GrB_Vector_extractTuples(start,
                                   start + flat->size,
@@ -116,13 +116,13 @@ Datum
 FN(expand_flat_vector)(Datum flatdatum,
                        MemoryContext parentcontext) {
   GrB_Info info;
-  
+
   pgGrB_Vector *A;
   pgGrB_FlatVector *flat;
-  
+
   MemoryContext objcxt, oldcxt;
   MemoryContextCallback *ctxcb;
-  
+
   GrB_Index size, nvals;
   GrB_Index *indices;
   PG_TYPE *vals;
@@ -158,7 +158,7 @@ FN(expand_flat_vector)(Datum flatdatum,
   type = flat->type;
 
   /* indices and vals are pointers into the vardata area */
-  
+
   indices = PGGRB_VECTOR_DATA(flat);
   vals = (PG_TYPE*)(indices + size);
 
@@ -171,7 +171,7 @@ FN(expand_flat_vector)(Datum flatdatum,
   ctxcb = (MemoryContextCallback*)MemoryContextAlloc(
           objcxt,
           sizeof(MemoryContextCallback));
-  
+
   ctxcb->func = context_callback_vector_free;
   ctxcb->arg = A;
   MemoryContextRegisterResetCallback(objcxt, ctxcb);
@@ -297,7 +297,7 @@ FN(vector)(PG_FUNCTION_ARGS) {
   ArrayType *vals;
   int *dims;
   int count;
-  
+
   GrB_Index *row_indices;
   PG_TYPE *values, *data;
 
@@ -308,7 +308,7 @@ FN(vector)(PG_FUNCTION_ARGS) {
 
   dims = ARR_DIMS(vals);
   count = dims[0];
-  
+
   row_indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * count);
   values = (PG_TYPE*) palloc0(sizeof(PG_TYPE) * count);
 
@@ -442,7 +442,7 @@ FN(vector_ewise_mult)(pgGrB_Vector *A, pgGrB_Vector *B) {
 
   CHECKD(GrB_Vector_size(&size, A->V));
   C = (pgGrB_Vector *) palloc0(sizeof(pgGrB_Vector));
-  
+
   C = FN(construct_empty_expanded_vector)(size, CurrentMemoryContext);
   CHECKD(GrB_eWiseMult(C->V, NULL, NULL, GB_MUL, A->V, B->V, NULL));
   PGGRB_RETURN_VECTOR(C);

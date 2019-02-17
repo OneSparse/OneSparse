@@ -7,20 +7,20 @@ select pg_backend_pid() pid \gset
 create table edge (
     i bigint,
     j bigint,
-    v real
+    v bigint
     );
 
 insert into edge (i, j, v) values 
-    (1, 4, 1.1),
-    (1, 2, 2.2),
-    (2, 7, 3.3),
-    (2, 5, 4.4),
-    (3, 6, 5.5),
-    (4, 3, 6.6),
-    (4, 1, 7.7),
-    (5, 6, 8.8),
-    (6, 3, 9.8),
-    (7, 3, 0.0);
+    (1, 4, 1),
+    (1, 2, 2),
+    (2, 7, 3),
+    (2, 5, 4),
+    (3, 6, 5),
+    (4, 3, 6),
+    (4, 1, 7),
+    (5, 6, 8),
+    (6, 3, 9),
+    (7, 3, 0);
 
 -- create function test_m_ewise_mult() returns setof matrix_tuple as $$
 --     declare m matrix;
@@ -63,3 +63,6 @@ create function matrix_from_table() returns matrix as $$
         return m || m;
     end;
 $$ language plpgsql;
+
+\prompt crash? go
+select mxm(matrix(i, j, v), matrix(i, j, v), semiring=>'LOR_LAND_BOOL') from edge;    
