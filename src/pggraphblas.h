@@ -19,22 +19,22 @@
 #define CCAT(x, y) CCAT2(x, y)
 #define FN(x) CCAT(x, SUFFIX)
 
-#define DATUM_TYPE_APPLY(T, F, ...)               \
-  (T) == GrB_INT64?                               \
-    F ## _int64(__VA_ARGS__) :                    \
-    (T)  == GrB_INT32?                            \
-    F ## _int32(__VA_ARGS__) :                    \
-    (T)  == GrB_INT16?                            \
-    F ## _int16(__VA_ARGS__) :                    \
-    (T)  == GrB_INT8?                             \
-    F ## _int8(__VA_ARGS__) :                     \
-    (T)  == GrB_BOOL?                             \
-    F ## _bool(__VA_ARGS__) :                     \
-    (T)  == GrB_FP64?                             \
-    F ## _float8(__VA_ARGS__) :                   \
-    (T)  == GrB_FP32?                             \
-    F ## _float4(__VA_ARGS__) :                   \
-    (Datum)0
+#define DATUM_TYPE_APPLY(D, T, F, ...) do {       \
+  if ((T) == GrB_INT64)                           \
+    D = F ## _int64(__VA_ARGS__);                 \
+  else if ((T)  == GrB_INT32)                     \
+    D = F ## _int32(__VA_ARGS__);                 \
+  else if ((T)  == GrB_INT16)                     \
+    D = F ## _int16(__VA_ARGS__);                 \
+  else if ((T)  == GrB_INT8)                      \
+    D = F ## _int8(__VA_ARGS__);                  \
+  else if ((T)  == GrB_BOOL)                      \
+    D = F ## _bool(__VA_ARGS__);                  \
+  else if ((T)  == GrB_FP64)                      \
+    D = F ## _float8(__VA_ARGS__);                \
+  else if((T)  == GrB_FP32)                       \
+    D = F ## _float4(__VA_ARGS__);                \
+  } while(0)
 
 #define DEFAULT_SEMIRING(T)                       \
   (T) == GrB_INT64?                               \
@@ -300,7 +300,7 @@ PG_FUNCTION_INFO_V1(vector_ewise_mult);
 PG_FUNCTION_INFO_V1(vector_ewise_add);
 
 PG_FUNCTION_INFO_V1(vector_eq);
-PG_FUNCTION_INFO_V1(vector_neq);
+PG_FUNCTION_INFO_V1(vector_ne);
 
 PG_FUNCTION_INFO_V1(vector_nvals);
 PG_FUNCTION_INFO_V1(vector_size);

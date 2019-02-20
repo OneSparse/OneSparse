@@ -122,10 +122,7 @@ DatumGetMatrix(Datum d) {
     return A;
   }
   flat = (pgGrB_FlatMatrix*)d;
-  d = DATUM_TYPE_APPLY(flat->type, expand_flat_matrix, d, CurrentMemoryContext);
-  if (d == (Datum)0)
-    elog(ERROR, "Unknown graphblas type");
-
+  DATUM_TYPE_APPLY(d, flat->type, expand_flat_matrix, d, CurrentMemoryContext);
   return MatrixGetEOHP(d);
 }
 
@@ -134,8 +131,8 @@ matrix_in(PG_FUNCTION_ARGS) {
   pgGrB_Matrix *retval;
 
   retval = construct_empty_expanded_matrix_int64(0,
-                                           0,
-                                           CurrentMemoryContext);
+                                                 0,
+                                                 CurrentMemoryContext);
   PGGRB_RETURN_MATRIX(retval);
 }
 
@@ -149,9 +146,7 @@ matrix_out(PG_FUNCTION_ARGS)
 
   CHECKD(GxB_Matrix_type(&type, mat->M));
 
-  d = DATUM_TYPE_APPLY(type, matrix_out, mat);
-  if (d == (Datum)0)
-    elog(ERROR, "Unknown graphblas type");
+  DATUM_TYPE_APPLY(d, type, matrix_out, mat);
   return d;
 }
 
@@ -219,7 +214,7 @@ matrix_ewise_mult(PG_FUNCTION_ARGS) {
   Datum d;
   char *binop_name;
   GrB_BinaryOp binop;
-  
+
   A = PGGRB_GETARG_MATRIX(0);
   B = PGGRB_GETARG_MATRIX(1);
   C = PG_ARGISNULL(2) ? NULL : PGGRB_GETARG_MATRIX(2);
@@ -234,9 +229,7 @@ matrix_ewise_mult(PG_FUNCTION_ARGS) {
 
   CHECKD(GxB_Matrix_type(&type, A->M));
 
-  d = DATUM_TYPE_APPLY(type, matrix_ewise_mult, A, B, C, mask, binop);
-  if (d == (Datum)0)
-    elog(ERROR, "Unknown graphblas type");
+  DATUM_TYPE_APPLY(d, type, matrix_ewise_mult, A, B, C, mask, binop);
   return d;
 }
 
@@ -248,7 +241,7 @@ matrix_ewise_add(PG_FUNCTION_ARGS) {
   Datum d;
   char *binop_name;
   GrB_BinaryOp binop;
-  
+
   A = PGGRB_GETARG_MATRIX(0);
   B = PGGRB_GETARG_MATRIX(1);
   C = PG_ARGISNULL(2) ? NULL : PGGRB_GETARG_MATRIX(2);
@@ -263,9 +256,7 @@ matrix_ewise_add(PG_FUNCTION_ARGS) {
 
   CHECKD(GxB_Matrix_type(&type, A->M));
 
-  d = DATUM_TYPE_APPLY(type, matrix_ewise_add, A, B, C, mask, binop);
-  if (d == (Datum)0)
-    elog(ERROR, "Unknown graphblas type");
+  DATUM_TYPE_APPLY(d, type, matrix_ewise_add, A, B, C, mask, binop);
   return d;
 }
 
@@ -292,9 +283,7 @@ mxm(PG_FUNCTION_ARGS) {
 
   CHECKD(GxB_Matrix_type(&type, A->M));
 
-  d = DATUM_TYPE_APPLY(type, mxm, A, B, C, mask, semiring);
-  if (d == (Datum)0)
-    elog(ERROR, "Unknown graphblas type");
+  DATUM_TYPE_APPLY(d, type, mxm, A, B, C, mask, semiring);
   return d;
 }
 
@@ -320,9 +309,7 @@ mxv(PG_FUNCTION_ARGS) {
 
   CHECKD(GxB_Matrix_type(&type, A->M));
 
-  d = DATUM_TYPE_APPLY(type, mxv, A, B, C, mask, semiring);
-  if (d == (Datum)0)
-    elog(ERROR, "Unknown graphblas type");
+  DATUM_TYPE_APPLY(d, type, mxv, A, B, C, mask, semiring);
   return d;
 }
 
@@ -348,28 +335,25 @@ vxm(PG_FUNCTION_ARGS) {
 
   CHECKD(GxB_Vector_type(&type, A->V));
 
-  d = DATUM_TYPE_APPLY(type, vxm, A, B, C, mask, semiring);
-  if (d == (Datum)0)
-    elog(ERROR, "Unknown graphblas type");
+  DATUM_TYPE_APPLY(d, type, vxm, A, B, C, mask, semiring);
   return d;
 }
 
 
-Datum
-matrix_new(PG_FUNCTION_ARGS) {
-  GrB_Info info;
-  pgGrB_Matrix *result;
-  ExpandedArrayHeader *I, *J, *V;
-  GrB_Type type;
-  Datum d;
+/* Datum */
+/* matrix_new(PG_FUNCTION_ARGS) { */
+/*   GrB_Info info; */
+/*   pgGrB_Matrix *result; */
+/*   ExpandedArrayHeader *I, *J, *V; */
+/*   GrB_Type type; */
+/*   Datum d; */
 
-  I = PG_GETARG_EXPANDED_ARRAY(0);
-  J = PG_GETARG_EXPANDED_ARRAY(1);
-  V = PG_GETARG_EXPANDED_ARRAY(1);
-  
-  d = DATUM_TYPE_APPLY(type, matrix_new, I, J, V);
-  if (d == (Datum)0)
-    elog(ERROR, "Unknown graphblas type");
-  return d;
-}
+/*   I = PG_GETARG_EXPANDED_ARRAY(0); */
+/*   J = PG_GETARG_EXPANDED_ARRAY(1); */
+/*   V = PG_GETARG_EXPANDED_ARRAY(1); */
 
+/*   d = DATUM_TYPE_APPLY(type, matrix_new, I, J, V); */
+/*   if (d == (Datum)0) */
+/*     elog(ERROR, "Unknown graphblas type"); */
+/*   return d; */
+/* } */

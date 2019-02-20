@@ -20,7 +20,7 @@ CREATE TYPE vector (
 );
 
 CREATE TYPE matrix;
-    
+
 CREATE FUNCTION matrix_in(cstring)
 RETURNS matrix
 AS '$libdir/pggraphblas', 'matrix_in'
@@ -79,7 +79,7 @@ CREATE FUNCTION mxm_op(matrix, matrix)
 RETURNS matrix
 AS '$libdir/pggraphblas', 'mxm'
 LANGUAGE C STABLE;
-    
+
 CREATE FUNCTION mxv(
     A matrix,
     B vector,
@@ -97,7 +97,7 @@ CREATE FUNCTION mxv_op(matrix, vector)
 RETURNS vector
 AS '$libdir/pggraphblas', 'mxv'
 LANGUAGE C STABLE;
-    
+
 CREATE FUNCTION vxm(
     A vector,
     B matrix,
@@ -115,7 +115,7 @@ CREATE FUNCTION vxm_op(vector, matrix)
 RETURNS vector
 AS '$libdir/pggraphblas', 'vxm'
 LANGUAGE C STABLE;
-    
+
 CREATE FUNCTION ewise_mult(
     A matrix,
     B matrix,
@@ -142,7 +142,7 @@ CREATE FUNCTION ewise_add(
 RETURNS matrix
 AS '$libdir/pggraphblas', 'matrix_ewise_add'
 LANGUAGE C STABLE STRICT;
-    
+
 CREATE FUNCTION matrix_ewise_mult_op(matrix, matrix)
 RETURNS matrix
 AS '$libdir/pggraphblas', 'matrix_ewise_mult'
@@ -198,7 +198,7 @@ CREATE OPERATOR || (
 );
 
 -- aggregators
-    
+
 CREATE FUNCTION matrix_agg_acc_bigint(internal, bigint, bigint, bigint)
 RETURNS internal
 AS '$libdir/pggraphblas', 'matrix_agg_acc_int64'
@@ -218,7 +218,7 @@ CREATE FUNCTION matrix_final_integer(internal)
 RETURNS matrix
 AS '$libdir/pggraphblas', 'matrix_final_int32'
 LANGUAGE C CALLED ON NULL INPUT;
-    
+
 CREATE FUNCTION matrix_agg_acc_smallint(internal, bigint, bigint, smallint)
 RETURNS internal
 AS '$libdir/pggraphblas', 'matrix_agg_acc_int16'
@@ -228,7 +228,7 @@ CREATE FUNCTION matrix_final_smallint(internal)
 RETURNS matrix
 AS '$libdir/pggraphblas', 'matrix_final_int16'
 LANGUAGE C CALLED ON NULL INPUT;
-    
+
 CREATE FUNCTION matrix_agg_acc_float(internal, bigint, bigint, float)
 RETURNS internal
 AS '$libdir/pggraphblas', 'matrix_agg_acc_float8'
@@ -258,7 +258,7 @@ CREATE FUNCTION matrix_final_bool(internal)
 RETURNS matrix
 AS '$libdir/pggraphblas', 'matrix_final_bool'
 LANGUAGE C CALLED ON NULL INPUT;
-    
+
 CREATE AGGREGATE matrix(bigint, bigint, bigint) (
     stype = internal,
     sfunc = matrix_agg_acc_bigint,
@@ -270,13 +270,13 @@ CREATE AGGREGATE matrix(bigint, bigint, integer) (
     sfunc = matrix_agg_acc_integer,
     finalfunc = matrix_final_integer
 );
-    
+
 CREATE AGGREGATE matrix(bigint, bigint, smallint) (
     stype = internal,
     sfunc = matrix_agg_acc_smallint,
     finalfunc = matrix_final_smallint
 );
-    
+
 CREATE AGGREGATE matrix(bigint, bigint, float) (
     stype = internal,
     sfunc = matrix_agg_acc_float,
@@ -288,13 +288,13 @@ CREATE AGGREGATE matrix(bigint, bigint, real) (
     sfunc = matrix_agg_acc_real,
     finalfunc = matrix_final_real
 );
-    
+
 CREATE AGGREGATE matrix(bigint, bigint, bool) (
     stype = internal,
     sfunc = matrix_agg_acc_bool,
     finalfunc = matrix_final_bool
 );
-    
+
 CREATE TYPE matrix_element_bigint AS (index bigint, value bigint);
 CREATE TYPE matrix_element_integer AS (index bigint, value integer);
 CREATE TYPE matrix_element_smallint AS (index bigint, value smallint);
@@ -311,12 +311,12 @@ CREATE FUNCTION matrix_elements_integer(matrix)
 RETURNS SETOF matrix_element_integer
 AS '$libdir/pggraphblas', 'matrix_elements_int32'
 LANGUAGE C STABLE STRICT;
-    
+
 CREATE FUNCTION matrix_elements_smallint(matrix)
 RETURNS SETOF matrix_element_smallint
 AS '$libdir/pggraphblas', 'matrix_elements_int16'
 LANGUAGE C STABLE STRICT;
-    
+
 CREATE FUNCTION matrix_elements_float(matrix)
 RETURNS SETOF matrix_element_float
 AS '$libdir/pggraphblas', 'matrix_elements_float8'
@@ -359,7 +359,7 @@ CREATE FUNCTION ewise_add(
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_ewise_add'
 LANGUAGE C STABLE STRICT;
-    
+
 CREATE FUNCTION vector_ewise_mult_op(vector, vector)
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_ewise_mult'
@@ -375,9 +375,9 @@ RETURNS bool
 AS '$libdir/pggraphblas', 'vector_eq'
 LANGUAGE C STABLE STRICT;
 
-CREATE FUNCTION vector_neq(vector, vector)
+CREATE FUNCTION vector_ne(vector, vector)
 RETURNS bool
-AS '$libdir/pggraphblas', 'vector_neq'
+AS '$libdir/pggraphblas', 'vector_ne'
 LANGUAGE C STABLE STRICT;
 
 CREATE FUNCTION size(vector)
@@ -412,12 +412,12 @@ CREATE OPERATOR = (
 CREATE OPERATOR <> (
     leftarg = vector,
     rightarg = vector,
-    procedure = vector_neq,
+    procedure = vector_ne,
     negator = =
 );
 
 -- casting arrays to vectors
-    
+
 CREATE FUNCTION vector(bigint[])
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_int64'
@@ -431,28 +431,28 @@ AS '$libdir/pggraphblas', 'vector_int32'
 LANGUAGE C STRICT;
 
 CREATE CAST (integer[] AS vector) WITH FUNCTION vector(integer[]) AS IMPLICIT;
-    
+
 CREATE FUNCTION vector(smallint[])
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_int16'
 LANGUAGE C STRICT;
 
 CREATE CAST (smallint[] AS vector) WITH FUNCTION vector(smallint[]) AS IMPLICIT;
-    
+
 CREATE FUNCTION vector(float[])
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_float8'
 LANGUAGE C STRICT;
 
 CREATE CAST (float[] AS vector) WITH FUNCTION vector(float[]) AS IMPLICIT;
-    
+
 CREATE FUNCTION vector(real[])
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_float4'
 LANGUAGE C STRICT;
 
 CREATE CAST (real[] AS vector) WITH FUNCTION vector(real[]) AS IMPLICIT;
-    
+
 CREATE FUNCTION vector(bool[])
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_bool'
@@ -460,8 +460,40 @@ LANGUAGE C STRICT;
 
 CREATE CAST (bool[] AS vector) WITH FUNCTION vector(bool[]) AS IMPLICIT;
 
+-- sparse construction
+
+CREATE FUNCTION vector(bigint[], bigint[])
+RETURNS vector
+AS '$libdir/pggraphblas', 'vector_int64'
+LANGUAGE C STRICT;
+
+CREATE FUNCTION vector(integer[], bigint[])
+RETURNS vector
+AS '$libdir/pggraphblas', 'vector_int32'
+LANGUAGE C STRICT;
+
+CREATE FUNCTION vector(smallint[], bigint[])
+RETURNS vector
+AS '$libdir/pggraphblas', 'vector_int16'
+LANGUAGE C STRICT;
+
+CREATE FUNCTION vector(float[], bigint[])
+RETURNS vector
+AS '$libdir/pggraphblas', 'vector_float8'
+LANGUAGE C STRICT;
+
+CREATE FUNCTION vector(real[], bigint[])
+RETURNS vector
+AS '$libdir/pggraphblas', 'vector_float4'
+LANGUAGE C STRICT;
+
+CREATE FUNCTION vector(bool[], bigint[])
+RETURNS vector
+AS '$libdir/pggraphblas', 'vector_bool'
+LANGUAGE C STRICT;
+
 -- aggregators
-    
+
 CREATE FUNCTION vector_agg_acc_bigint(internal, bigint, bigint)
 RETURNS internal
 AS '$libdir/pggraphblas', 'vector_agg_acc_int64'
@@ -481,7 +513,7 @@ CREATE FUNCTION vector_final_integer(internal)
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_final_int32'
 LANGUAGE C CALLED ON NULL INPUT;
-    
+
 CREATE FUNCTION vector_agg_acc_smallint(internal, bigint, smallint)
 RETURNS internal
 AS '$libdir/pggraphblas', 'vector_agg_acc_int16'
@@ -491,7 +523,7 @@ CREATE FUNCTION vector_final_smallint(internal)
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_final_int16'
 LANGUAGE C CALLED ON NULL INPUT;
-    
+
 CREATE FUNCTION vector_agg_acc_float(internal, bigint, float)
 RETURNS internal
 AS '$libdir/pggraphblas', 'vector_agg_acc_float8'
@@ -521,7 +553,7 @@ CREATE FUNCTION vector_final_bool(internal)
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_final_bool'
 LANGUAGE C CALLED ON NULL INPUT;
-    
+
 CREATE AGGREGATE vector(bigint, bigint) (
     stype = internal,
     sfunc = vector_agg_acc_bigint,
@@ -533,13 +565,13 @@ CREATE AGGREGATE vector(bigint, integer) (
     sfunc = vector_agg_acc_integer,
     finalfunc = vector_final_integer
 );
-    
+
 CREATE AGGREGATE vector(bigint, smallint) (
     stype = internal,
     sfunc = vector_agg_acc_smallint,
     finalfunc = vector_final_smallint
 );
-    
+
 CREATE AGGREGATE vector(bigint, float) (
     stype = internal,
     sfunc = vector_agg_acc_float,
@@ -566,7 +598,7 @@ CREATE TYPE vector_element_smallint AS (index bigint, value smallint);
 CREATE TYPE vector_element_float AS (index bigint, value float);
 CREATE TYPE vector_element_real AS (index bigint, value real);
 CREATE TYPE vector_element_bool AS (index bigint, value bool);
-    
+
 CREATE FUNCTION vector_elements_bigint(vector)
 RETURNS SETOF vector_element_bigint
 AS '$libdir/pggraphblas', 'vector_elements_int64'
@@ -576,12 +608,12 @@ CREATE FUNCTION vector_elements_integer(vector)
 RETURNS SETOF vector_element_integer
 AS '$libdir/pggraphblas', 'vector_elements_int32'
 LANGUAGE C STABLE STRICT;
-    
+
 CREATE FUNCTION vector_elements_smallint(vector)
 RETURNS SETOF vector_element_smallint
 AS '$libdir/pggraphblas', 'vector_elements_int16'
 LANGUAGE C STABLE STRICT;
-    
+
 CREATE FUNCTION vector_elements_float(vector)
 RETURNS SETOF vector_element_float
 AS '$libdir/pggraphblas', 'vector_elements_float8'
@@ -596,4 +628,3 @@ CREATE FUNCTION vector_elements_bool(vector)
 RETURNS SETOF vector_element_bool
 AS '$libdir/pggraphblas', 'vector_elements_bool'
 LANGUAGE C STABLE STRICT;
-

@@ -1,38 +1,38 @@
 begin;
-select plan(7);
+select plan(12);
 
--- "dense" vectors constructed from 1-d arrays, indices go from 0...n
+-- dense vectors construction from 1-d arrays, indices go from 0...n
 
 select is(
     vector(array[1,2,3]),
     array[1,2,3]::vector,
     'literal vector casting');
-    
+
 select is(
     size(vector(array[1,2,3])),
     3::bigint,
     'vector size');
-    
+
 select is(
     nvals(vector(array[1,2,3])),
     3::bigint,
     'vector nvals');
-    
+
 select is(
     size(vector(array[1,2,3])),
     nvals(vector(array[1,2,3])),
     'vector size');
-    
+
 select is(
     vector(array[1,2,3]) + vector(array[1,2,3]),
     array[2,4,6]::vector,
     'vector ewise add');
-    
+
 select is(
     vector(array[1,2,3]) * vector(array[1,2,3]),
     array[1,4,9]::vector,
     'vector ewise mul');
-    
+
 select is(
     vector(array[1,2,3]) = vector(array[1,2,3]),
     true,
@@ -42,6 +42,39 @@ select is(
     vector(array[1,2,3]) <> vector(array[1,2,3]),
     false,
     'vector not equal');
-    
+
+
+-- sparse construction, second array defines indices
+
+select is(
+    size(vector(array[1,2,3], array[1,4,9])),
+    10::bigint,
+    'sparse size');
+
+select is(
+    nvals(vector(array[1,2,3], array[1,4,9])),
+    3::bigint,
+    'sparse nvals');
+
+select is(
+    vector(array[1,2,3], array[1,4,9]) + vector(array[1,2,3], array[1,4,9]),
+    vector(array[2,4,6], array[1,4,9]),
+    'sparse vector add');
+
+select is(
+    vector(array[1,2,3], array[1,4,9]) * vector(array[1,2,3], array[1,4,9]),
+    vector(array[1,4,9], array[1,4,9]),
+    'sparse vector mult');
+
+select is(
+    vector(array[1,2,3], array[1,4,9]) = vector(array[1,2,3], array[1,4,9]),
+    true,
+    'sparse vector eq');
+
+select is(
+    vector(array[1,2,3], array[1,4,9]) <> vector(array[1,2,4], array[1,4,9]),
+    true,
+    'sparse vector neq');
+
 select * from finish();
 rollback;

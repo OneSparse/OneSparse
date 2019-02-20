@@ -46,26 +46,28 @@ By using a sparse matrix instead of dense, only the elements used are
 actually stored in the matrix. The "empty" part of the matrix is not
 stored and assumes a default "algebraic zero" value.  GraphBLAS brings
 a powerful, abstract algebra to solving graph problems with various
-combinations of math operations on matrix elements. The combinations
-of operations are called "semirings".  Different semirings can
-accomplish different common steps in graph problems, such as finding
-shortest or most optimal paths.
+combinations of
+[Matrix multiplication](https://en.wikipedia.org/wiki/Matrix_multiplication)
+operations and groups of types and operations called "semirings".
+Different semirings can accomplish different common steps in graph
+problems, such as finding shortest or most optimal paths.
 
 pggraphblas is a postgres extension that provides access to two new
 types: matrix and vector, as well as the GraphBLAS api to manipulate
 these types.  Aggregate functions are provided to build matrices from
 SQL queries, and set-returning functions are also provided to turn
-graphs back into relational sets.  From a SQL point of view, matrices
-look a certain bit like arrays, being stored as variable length column
-values.
+graphs back into relational sets.  From a PostgreSQL point of view,
+matrices look a little bit like arrays, being stored as variable
+length column values.
 
-Postgres is already an excellent database for graph storage, many
-real-world foreign key relationships, common structures in most
-postgres databases, describe sparse graphs.  Graph traversal and
-manipulation can be acheived in SQL using recursive common table
-expressions in a very flexible and general way, but this approach has
-a drawback: sparse relational graphs are scattered across indexes and
-table blocks, having poor locality.  Interpreted sql code works by
+pggraphblas is not a "graph database" using postgres. Postgres is
+*already* an excellent database for graph storage Many real-world
+foreign key relationships, common structures in most postgres
+databases, describe sparse graphs.  Graph traversal and manipulation
+can be acheived in PostgreSQL using recursive common table expressions
+("WITH" queries) in a very flexible and general way, but this approach
+has a drawback: sparse relational graphs are scattered across indexes
+and table blocks, having poor locality.  Interpreted sql code works by
 considering rows one at a time, vertex by vertex.
 
 Using pggraphblas bring high memory density encoding and optimized
@@ -75,7 +77,6 @@ matrices are not.  GraphBLAS is also an actively developed project
 with future plans such as GPU/TPU integration, bringing high numeric
 computing density to the problem with no change code that uses the
 API.
-
 
 # references
 
@@ -100,9 +101,9 @@ and attach to the current database pid to debug the C code.
 # types
 
 GraphBLAS has an extremely rich type system that encompases not only
-common "artithmetic" algegbra, but also many other algebras using
-semirings.  The combinations of 7 matrix types and 960 semiring
-operations offer hundreds of thousands of possible legitimate building
+common "artithmetic" algegbra, but also many other algebras using an
+algebraic structures called semirings.  The combinations of 7 matrix
+types and 960 semiring operations offer a huge number of building
 blocks for solving graph problems.
 
 PostgreSQL is a strongly typed language that comes with many built-in

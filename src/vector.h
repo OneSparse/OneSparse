@@ -1,12 +1,5 @@
 /* This is a "header template" see vector.c for specific instanciations */
 
-#ifndef PG_TYPE
-    #error Template argument missing.
-#endif
-#ifndef SUFFIX
-    #error Suffix argument missing.
-#endif
-
 #define VECTOR_BINOP_PREAMBLE()                           \
   do {                                                    \
     A = PGGRB_GETARG_VECTOR(0);                           \
@@ -52,6 +45,12 @@ Datum FN(vector_ewise_add)(pgGrB_Vector *A,
                             pgGrB_Vector *C,
                             pgGrB_Vector *mask,
                             GrB_BinaryOp binop);
+
+Datum FN(vector_eq)(pgGrB_Vector *A,
+                    pgGrB_Vector *B);
+
+Datum FN(vector_ne)(pgGrB_Vector *A,
+                    pgGrB_Vector *B);
 
 PG_FUNCTION_INFO_V1(FN(vector));
 PG_FUNCTION_INFO_V1(FN(vector_agg_acc));
@@ -301,32 +300,58 @@ Datum
 FN(vector)(PG_FUNCTION_ARGS) {
   GrB_Info info;
   pgGrB_Vector *retval;
-  ArrayType *vals;
-  int *dims;
-  int count;
+  ArrayType *indexes, *vals;
+  int *idims, *vdims;
+  int i, count;
 
-  GrB_Index *row_indices;
-  PG_TYPE *values, *data;
+  GrB_Index *row_indices, max_index;
+  PG_TYPE *values;
+  ArrayIterator array_iterator;
+  Datum	value;
+  bool isnull;
 
   vals = PG_GETARG_ARRAYTYPE_P(0);
-
   if (ARR_HASNULL(vals))
-    ereport(ERROR, (errmsg("Array may not contain NULLs")));
+    ereport(ERROR, (errmsg("Value array may not contain NULLs")));
 
-  dims = ARR_DIMS(vals);
-  count = dims[0];
+  vdims = ARR_DIMS(vals);
+
+  if (PG_NARGS() == 2) {
+    indexes = PG_GETARG_ARRAYTYPE_P(1);
+    idims = ARR_DIMS(indexes);
+    if (idims[0] != vdims[0])
+      ereport(ERROR, (errmsg("Index and Value arrays must be same size.")));
+  }
+  else
+    indexes = NULL;
+
+  max_index = count = vdims[0];
 
   row_indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * count);
   values = (PG_TYPE*) palloc0(sizeof(PG_TYPE) * count);
 
-  data = (PG_TYPE*)ARR_DATA_PTR(vals);
-
-  for (int i = 0; i < count; i++) {
-    row_indices[i] = i;
-    values[i] = data[i];
+  i = 0;
+  array_iterator = array_create_iterator(vals, 0, NULL);
+  while (array_iterate(array_iterator, &value, &isnull))
+	{
+      if (indexes == NULL)
+        row_indices[i] = i;
+      values[i] = PG_DGT(value);
+      i++;
   }
 
-  retval = FN(construct_empty_expanded_vector)(count, CurrentMemoryContext);
+  i = 0;
+  if (indexes != NULL) {
+    array_iterator = array_create_iterator(indexes, 0, NULL);
+    while (array_iterate(array_iterator, &value, &isnull)) {
+      row_indices[i] = DatumGetInt64(value);
+      if (row_indices[i] > max_index)
+        max_index = row_indices[i] + 1;
+      i++;
+    }
+  }
+
+  retval = FN(construct_empty_expanded_vector)(max_index, CurrentMemoryContext);
 
   CHECKD(GrB_Vector_build(retval->V,
                          row_indices,
@@ -473,12 +498,45 @@ FN(vector_ewise_add)(pgGrB_Vector *A,
   PGGRB_RETURN_VECTOR(C);
 }
 
+Datum FN(vector_eq)(pgGrB_Vector *A,
+                    pgGrB_Vector *B) {
+  GrB_Info info;
+  pgGrB_Vector *C;
+  GrB_Index size;
+  bool result = 0;
+
+  CHECKD(GrB_Vector_size(&size, A->V));
+  C = FN(construct_empty_expanded_vector)(size, CurrentMemoryContext);
+
+  CHECKD(GrB_eWiseMult(C->V, NULL, NULL, GB_EQ, A->V, B->V, NULL));
+  CHECKD(GrB_Vector_reduce_BOOL(&result, NULL, GxB_LAND_BOOL_MONOID, C->V, NULL));
+  PG_RETURN_BOOL(result);
+
+}
+
+Datum FN(vector_ne)(pgGrB_Vector *A,
+                     pgGrB_Vector *B) {
+  GrB_Info info;
+  pgGrB_Vector *C;
+  GrB_Index size;
+  bool result = 1;
+
+  CHECKD(GrB_Vector_size(&size, A->V));
+  C = FN(construct_empty_expanded_vector)(size, CurrentMemoryContext);
+
+  CHECKD(GrB_eWiseMult(C->V, NULL, NULL, GB_NE, A->V, B->V, NULL));
+  CHECKD(GrB_Vector_reduce_BOOL(&result, NULL, GxB_LAND_BOOL_MONOID, C->V, NULL));
+  PG_RETURN_BOOL(result);
+}
+
 #undef SUFFIX
 #undef PG_TYPE
 #undef GB_TYPE
 #undef GB_DUP
 #undef GB_MUL
 #undef GB_ADD
+#undef GB_EQ
+#undef GB_NE
 #undef PG_GET
 #undef PG_DGT
 #undef PG_TGD

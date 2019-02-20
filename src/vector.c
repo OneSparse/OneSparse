@@ -8,6 +8,8 @@
 #define GB_DUP GrB_SECOND_BOOL
 #define GB_MUL GrB_TIMES_BOOL
 #define GB_ADD GrB_PLUS_BOOL
+#define GB_EQ  GxB_ISEQ_BOOL
+#define GB_NE  GxB_ISNE_BOOL
 #define PG_GET PG_GETARG_BOOL
 #define PG_DGT DatumGetBool
 #define PG_TGD BoolGetDatum
@@ -20,6 +22,8 @@
 #define GB_DUP GrB_SECOND_INT8
 #define GB_MUL GrB_TIMES_INT8
 #define GB_ADD GrB_PLUS_INT8
+#define GB_EQ  GxB_ISEQ_INT8
+#define GB_NE  GxB_ISNE_INT8
 #define PG_GET PG_GETARG_CHAR
 #define PG_DGT DatumGetChar
 #define PG_TGD CharGetDatum
@@ -32,6 +36,8 @@
 #define GB_DUP GrB_SECOND_INT16
 #define GB_MUL GrB_TIMES_INT16
 #define GB_ADD GrB_PLUS_INT16
+#define GB_EQ  GxB_ISEQ_INT16
+#define GB_NE  GxB_ISNE_INT16
 #define PG_GET PG_GETARG_INT16
 #define PG_DGT DatumGetInt16
 #define PG_TGD Int16GetDatum
@@ -44,6 +50,8 @@
 #define GB_DUP GrB_SECOND_INT32
 #define GB_MUL GrB_TIMES_INT32
 #define GB_ADD GrB_PLUS_INT32
+#define GB_EQ  GxB_ISEQ_INT32
+#define GB_NE  GxB_ISNE_INT32
 #define PG_GET PG_GETARG_INT32
 #define PG_DGT DatumGetInt32
 #define PG_TGD Int32GetDatum
@@ -56,6 +64,8 @@
 #define GB_DUP GrB_SECOND_INT64      // default duplicate index resolver
 #define GB_MUL GrB_TIMES_INT64       // times bin op
 #define GB_ADD GrB_PLUS_INT64         // times bin op
+#define GB_EQ  GxB_ISEQ_INT64        // equality operator
+#define GB_NE  GxB_ISNE_INT64
 #define PG_GET PG_GETARG_INT64       // how to get value args
 #define PG_DGT DatumGetInt64         // datum get type
 #define PG_TGD Int64GetDatum         // type get datum
@@ -68,6 +78,8 @@
 #define GB_DUP GrB_SECOND_FP32
 #define GB_MUL GrB_TIMES_FP32
 #define GB_ADD GrB_PLUS_FP32
+#define GB_EQ  GxB_ISEQ_FP32
+#define GB_NE  GxB_ISNE_FP32
 #define PG_GET PG_GETARG_FLOAT4
 #define PG_DGT DatumGetFloat4
 #define PG_TGD Float4GetDatum
@@ -80,6 +92,8 @@
 #define GB_DUP GrB_SECOND_FP64
 #define GB_MUL GrB_TIMES_FP64
 #define GB_ADD GrB_PLUS_FP64
+#define GB_EQ  GxB_ISEQ_FP64
+#define GB_NE  GxB_ISNE_FP64
 #define PG_GET PG_GETARG_FLOAT8
 #define PG_DGT DatumGetFloat8
 #define PG_TGD Float8GetDatum
@@ -120,9 +134,7 @@ DatumGetVector(Datum d) {
     return A;
   }
   flat = (pgGrB_FlatVector*)d;
-  d = DATUM_TYPE_APPLY(flat->type, expand_flat_vector, d, CurrentMemoryContext);
-  if (d == (Datum)0)
-    elog(ERROR, "Unknown graphblas type");
+  DATUM_TYPE_APPLY(d, flat->type, expand_flat_vector, d, CurrentMemoryContext);
   return VectorGetEOHP(d);
 }
 
@@ -145,9 +157,7 @@ vector_out(PG_FUNCTION_ARGS)
   pgGrB_Vector *vec = PGGRB_GETARG_VECTOR(0);
   CHECKD(GxB_Vector_type(&typ, vec->V));
 
-  d = DATUM_TYPE_APPLY(typ, vector_out, vec);
-  if (d == (Datum)0)
-    elog(ERROR, "Unknown graphblas type");
+  DATUM_TYPE_APPLY(d, typ, vector_out, vec);
   return d;
 }
 
@@ -165,23 +175,21 @@ vector_ewise_mult(PG_FUNCTION_ARGS) {
   B = PGGRB_GETARG_VECTOR(1);
 
   binop_name = vector_times_binop(A, B);
-  
+
   if (PG_NARGS() > 2) {
     C = PG_ARGISNULL(2) ? NULL : PGGRB_GETARG_VECTOR(2);
     mask = PG_ARGISNULL(3) ? NULL : PGGRB_GETARG_VECTOR(3);
     binop_name = PG_ARGISNULL(4) ?
       binop_name : text_to_cstring(PG_GETARG_TEXT_PP(4));
   }
-  
+
   binop = lookup_binop(binop_name);
   if (binop == NULL)
     elog(ERROR, "unknown binop name %s", binop_name);
-  
+
   CHECKD(GxB_Vector_type(&type, A->V));
 
-  d = DATUM_TYPE_APPLY(type, vector_ewise_mult, A, B, C, mask, binop);
-  if (d == (Datum)0)
-    elog(ERROR, "Unknown graphblas type");
+  DATUM_TYPE_APPLY(d, type, vector_ewise_mult, A, B, C, mask, binop);
   return d;
 }
 
@@ -194,28 +202,26 @@ vector_ewise_add(PG_FUNCTION_ARGS) {
   Datum d;
   char *binop_name;
   GrB_BinaryOp binop;
-  
+
   A = PGGRB_GETARG_VECTOR(0);
   B = PGGRB_GETARG_VECTOR(1);
 
   binop_name = vector_times_binop(A, B);
-  
+
   if (PG_NARGS() > 2) {
     C = PG_ARGISNULL(2) ? NULL : PGGRB_GETARG_VECTOR(2);
     mask = PG_ARGISNULL(3) ? NULL : PGGRB_GETARG_VECTOR(3);
     binop_name = PG_ARGISNULL(4) ?
       binop_name : text_to_cstring(PG_GETARG_TEXT_PP(4));
   }
-    
+
   binop = lookup_binop(binop_name);
   if (binop == NULL)
     elog(ERROR, "unknown binop name %s", binop_name);
 
   CHECKD(GxB_Vector_type(&type, A->V));
 
-  d = DATUM_TYPE_APPLY(type, vector_ewise_add, A, B, C, mask, binop);
-  if (d == (Datum)0)
-    elog(ERROR, "Unknown graphblas type");
+  DATUM_TYPE_APPLY(d, type, vector_ewise_add, A, B, C, mask, binop);
   return d;
 }
 
@@ -243,12 +249,14 @@ vector_size(PG_FUNCTION_ARGS) {
 Datum
 vector_eq(PG_FUNCTION_ARGS) {
   GrB_Info info;
-  pgGrB_Vector *A, *B, *C;
+  pgGrB_Vector *A, *B;
   GrB_Index asize, bsize, anvals, bnvals;
   GrB_Type atype, btype;
   bool result = 0;
+  Datum d;
 
-  VECTOR_BINOP_PREAMBLE();
+  A = PGGRB_GETARG_VECTOR(0);
+  B = PGGRB_GETARG_VECTOR(1);
 
   CHECKD(GxB_Vector_type(&atype, A->V));
   CHECKD(GxB_Vector_type(&btype, B->V));
@@ -268,22 +276,22 @@ vector_eq(PG_FUNCTION_ARGS) {
   if (anvals != bnvals)
     PG_RETURN_BOOL(result);
 
-  CHECKD(GrB_Vector_new (&C->V, GrB_BOOL, asize));
-
-  CHECKD(GrB_eWiseMult(C->V, NULL, NULL, GxB_ISEQ_INT64, A->V, B->V, NULL));
-  CHECKD(GrB_Vector_reduce_BOOL(&result, NULL, GxB_LAND_BOOL_MONOID, C->V, NULL));
-  PG_RETURN_BOOL(result);
+  DATUM_TYPE_APPLY(d, atype, vector_eq, A, B);
+  return d;
 }
 
 Datum
-vector_neq(PG_FUNCTION_ARGS) {
+vector_ne(PG_FUNCTION_ARGS) {
   GrB_Info info;
-  pgGrB_Vector *A, *B, *C;
-  GrB_Type atype, btype;
+  pgGrB_Vector *A, *B;
   GrB_Index asize, bsize, anvals, bnvals;
+  GrB_Type atype, btype;
   bool result = 1;
+  Datum d;
 
-  VECTOR_BINOP_PREAMBLE();
+  A = PGGRB_GETARG_VECTOR(0);
+  B = PGGRB_GETARG_VECTOR(1);
+
   CHECKD(GxB_Vector_type(&atype, A->V));
   CHECKD(GxB_Vector_type(&btype, B->V));
 
@@ -302,9 +310,6 @@ vector_neq(PG_FUNCTION_ARGS) {
   if (anvals != bnvals)
     PG_RETURN_BOOL(result);
 
-  CHECKD(GrB_Vector_new (&(C->V), GrB_BOOL, asize));
-
-  CHECKD(GrB_eWiseMult(C->V, NULL, NULL, GxB_ISNE_INT64, A->V, B->V, NULL));
-  CHECKD(GrB_Vector_reduce_BOOL(&result, NULL, GxB_LAND_BOOL_MONOID, C->V, NULL));
-  PG_RETURN_BOOL(result);
+  DATUM_TYPE_APPLY(d, atype, vector_ne, A, B);
+  return d;
 }
