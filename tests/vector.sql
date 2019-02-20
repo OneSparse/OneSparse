@@ -19,6 +19,11 @@ select is(
     'vector nvals');
     
 select is(
+    size(vector(array[1,2,3])),
+    nvals(vector(array[1,2,3])),
+    'vector size');
+    
+select is(
     vector(array[1,2,3]) + vector(array[1,2,3]),
     array[2,4,6]::vector,
     'vector ewise add');

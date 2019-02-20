@@ -138,16 +138,85 @@ operate with or on those types.
 
 ## vector
 
+Vectors can be constructed from arrays by calling `vector(array[])` or
+casting from an array:
+
+    postgres=# select vector(array[1,2,3]) = array[1,2,3]::vector;
+     t
+
+This constructs a "dense" integer vector, because it's size and it's
+number of values are the same:
+
+    postgres=# select size(vector(array[1,2,3])) = nvals(array[1,2,3]::vector);
+    t
+
+The supported types are bigint (64 bit), integer (32 bit), smallint
+(16 bit), bool (t/f), real (32 bit single precision) and float (64 bit
+double precision).  While GraphBLAS supports unsigned types, all
+currently supported types are signed but unsigned may be supported in
+the future.
+
+Sparse vectors can be constructed by calling vector with two array
+arguments , the first array are the indexes, and must be coercible to
+bigint, and the second array are the values, and can be any supported
+type:
+
+  XXX
+
+Both arrays must be the exact same length.  The size of the vector
+will be the maximum element from the first list, but the vector will
+only store the values that are defined.  This is the "sparse" nature
+of the object, it can be efficiently used in matrix math involving
+millions of elements, when only a few actual values are in play.
+
+Vectors can be added and multiplied in element-wise fashion using
+either operator or functional notation:
+
+    postgres=# select vector(array[1,2,3]) + vector(array[1,2,3]) = vector(array[2,4,6]);
+     t
+
+    postgres=# select vector(array[1,2,3]) * vector(array[1,2,3]) = vector(array[1,4,9]);
+     t
+
+    postgres=# select ewise_add(vector(array[1,2,3]), vector(array[1,2,3])) = vector(array[2,4,6]);
+     t
+
+    postgres=# select ewise_mult(vector(array[1,2,3]) * vector(array[1,2,3])) = vector(array[1,4,9]);
+     t
+
+The "functional" form is provided so that other graphblas parameters
+and features can be used during the operation.  For example, a
+different binaryop can be selected for the operation:
+
+XXX
+
 ## matrix
+
+Matrices can be constructed with `matrix(bigint[], bigint[], array[])`
+where the first array are the row indexes, the second array the column
+indexes, and the third array the values.  Matrices support all the
+same types as vectors.
+
+## mxm
+
+Matrices can be multiplied using a default semiring via the '*'
+operator, or called explicity using functional notation so that
+different semirings can be used to carry out the operation.
+Functional notation also allows passing other graphblas options like a
+masking matrix, an accumulator operation, and a graphblas descriptor
+object which can specify replacement and transposition rules for
+inputs and outputs.
+
+## mxv
+
+## vxm
 
 ## descriptor
 
-## binop
-
-## monoid
-
-## semiring
+## semirings
     
+## binops
+
 # 0.1 goals
 
 To run common graph algorithms on matrices, for example, breadth first search:
@@ -175,7 +244,7 @@ begin
             mask=v,                               -- only those not masked
             desc=desc);                           -- clearing results first
     
-        not_done := vector_reduce_bool(q,         -- are there more neighbors
+        not_done := reduce_bool(q,                -- are there more neighbors
             operator='lor_bool_monoid');          -- to consider?
     
         level := level + 1;                       -- increment the level
@@ -185,22 +254,18 @@ end;
 $$ language plpgsql;
 ```        
 
-DONE-ish:
+# TODO
+    
+* Generalize matrix type (DONE)
+* polymorphic matrix_agg support all types (DONE)
+* overload all the operators (DONE)
+* Semiring (DONE)
+* Binary Ops (DONE)
 
-* Matrix type for INT64 (bigint)
-* matrix_agg/matrix_tuples to GrB_Matrix_build
-* matrix_tuples from GrB_Matrix_extractTuples
-* vector type for INT64 (float4)
-* vector_agg to GrB_Matrix_build
-* matrix_tuples from GrB_Vector_extractTuples
-* most of the GrB_PLUS_TIMES_INT64 semiring.
-* overloaded operators for plus,times,set-union/intersection
-* "expanded" object API
+* Unary Ops (WIP)
+* Assignment (WIP)
+* Reduction (WIP)
+* Subgraphing (WIP)
+* parallel aggregates of subgraphs with final merging (WIP)
+* parsable vector/matrix formats for vaild db dumps and literals (WIP)
 
-TODO:
-
-* Generalize matrix type
-* polymorphic matrix_agg support all types
-* overload all the operators
-* parallel aggregates of subgraphs with final merging
-* composite user defined element types, semirings, and monoid UDFs

@@ -353,3 +353,23 @@ vxm(PG_FUNCTION_ARGS) {
     elog(ERROR, "Unknown graphblas type");
   return d;
 }
+
+
+Datum
+matrix_new(PG_FUNCTION_ARGS) {
+  GrB_Info info;
+  pgGrB_Matrix *result;
+  ExpandedArrayHeader *I, *J, *V;
+  GrB_Type type;
+  Datum d;
+
+  I = PG_GETARG_EXPANDED_ARRAY(0);
+  J = PG_GETARG_EXPANDED_ARRAY(1);
+  V = PG_GETARG_EXPANDED_ARRAY(1);
+  
+  d = DATUM_TYPE_APPLY(type, matrix_new, I, J, V);
+  if (d == (Datum)0)
+    elog(ERROR, "Unknown graphblas type");
+  return d;
+}
+

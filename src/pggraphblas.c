@@ -3,6 +3,7 @@ PG_MODULE_MAGIC;
 
 pgGrB_Semiring semirings[960];
 pgGrB_BinaryOp binops[256];
+pgGrB_UnaryOp uops[67];
 
 #include "type.c"
 #include "isequal.c"
@@ -75,4 +76,12 @@ _PG_init(void)
   BINOP(221, GrB_, LOR,);
   BINOP(222, GrB_, LAND,);
   BINOP(223, GrB_, LXOR,);
+
+  UOP_TYPES(0, GrB_, IDENTITY_);
+  UOP_TYPES(11, GrB_, AINV_);
+  UOP_TYPES(22, GrB_, MINV_);
+  UOP_TYPES(33, GxB_, LNOT_);
+  UOP_TYPES(44, GxB_, ONE_);
+  UOP_TYPES(55, GxB_, ABS_);
+  UOP(67, GrB_, LNOT,);
 }

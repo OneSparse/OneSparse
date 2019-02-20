@@ -155,13 +155,31 @@ Datum
 vector_ewise_mult(PG_FUNCTION_ARGS) {
   GrB_Info info;
   pgGrB_Vector *A, *B;
+  pgGrB_Vector *C = NULL, *mask = NULL;
   GrB_Type type;
   Datum d;
+  char *binop_name;
+  GrB_BinaryOp binop;
+
   A = PGGRB_GETARG_VECTOR(0);
   B = PGGRB_GETARG_VECTOR(1);
+
+  binop_name = vector_times_binop(A, B);
+  
+  if (PG_NARGS() > 2) {
+    C = PG_ARGISNULL(2) ? NULL : PGGRB_GETARG_VECTOR(2);
+    mask = PG_ARGISNULL(3) ? NULL : PGGRB_GETARG_VECTOR(3);
+    binop_name = PG_ARGISNULL(4) ?
+      binop_name : text_to_cstring(PG_GETARG_TEXT_PP(4));
+  }
+  
+  binop = lookup_binop(binop_name);
+  if (binop == NULL)
+    elog(ERROR, "unknown binop name %s", binop_name);
+  
   CHECKD(GxB_Vector_type(&type, A->V));
 
-  d = DATUM_TYPE_APPLY(type, vector_ewise_mult, A, B);
+  d = DATUM_TYPE_APPLY(type, vector_ewise_mult, A, B, C, mask, binop);
   if (d == (Datum)0)
     elog(ERROR, "Unknown graphblas type");
   return d;
@@ -171,13 +189,31 @@ Datum
 vector_ewise_add(PG_FUNCTION_ARGS) {
   GrB_Info info;
   pgGrB_Vector *A, *B;
+  pgGrB_Vector *C = NULL, *mask = NULL;
   GrB_Type type;
   Datum d;
+  char *binop_name;
+  GrB_BinaryOp binop;
+  
   A = PGGRB_GETARG_VECTOR(0);
   B = PGGRB_GETARG_VECTOR(1);
+
+  binop_name = vector_times_binop(A, B);
+  
+  if (PG_NARGS() > 2) {
+    C = PG_ARGISNULL(2) ? NULL : PGGRB_GETARG_VECTOR(2);
+    mask = PG_ARGISNULL(3) ? NULL : PGGRB_GETARG_VECTOR(3);
+    binop_name = PG_ARGISNULL(4) ?
+      binop_name : text_to_cstring(PG_GETARG_TEXT_PP(4));
+  }
+    
+  binop = lookup_binop(binop_name);
+  if (binop == NULL)
+    elog(ERROR, "unknown binop name %s", binop_name);
+
   CHECKD(GxB_Vector_type(&type, A->V));
 
-  d = DATUM_TYPE_APPLY(type, vector_ewise_add, A, B);
+  d = DATUM_TYPE_APPLY(type, vector_ewise_add, A, B, C, mask, binop);
   if (d == (Datum)0)
     elog(ERROR, "Unknown graphblas type");
   return d;

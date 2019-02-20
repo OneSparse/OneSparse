@@ -26,6 +26,8 @@
     F ## _int32(__VA_ARGS__) :                    \
     (T)  == GrB_INT16?                            \
     F ## _int16(__VA_ARGS__) :                    \
+    (T)  == GrB_INT8?                             \
+    F ## _int8(__VA_ARGS__) :                     \
     (T)  == GrB_BOOL?                             \
     F ## _bool(__VA_ARGS__) :                     \
     (T)  == GrB_FP64?                             \
@@ -198,6 +200,7 @@ construct_empty_flat_matrix(GrB_Index nrows,
 
 /* Public API functions */
 
+PG_FUNCTION_INFO_V1(matrix_new);
 PG_FUNCTION_INFO_V1(matrix_in);
 PG_FUNCTION_INFO_V1(matrix_out);
 
@@ -270,6 +273,9 @@ char* vxm_semiring(pgGrB_Vector *left, pgGrB_Matrix *right);
 char* times_binop(pgGrB_Matrix *left, pgGrB_Matrix *right);
 char* plus_binop(pgGrB_Matrix *left, pgGrB_Matrix *right);
 
+char* vector_times_binop(pgGrB_Vector *left, pgGrB_Vector *right);
+char* vector_plus_binop(pgGrB_Vector *left, pgGrB_Vector *right);
+
 GrB_Semiring lookup_semiring(char *name);
 GrB_BinaryOp lookup_binop(char *name);
 
@@ -308,6 +314,11 @@ typedef struct pgGrB_BinaryOp  {
   char name[255];
   GrB_BinaryOp B;
 } pgGrB_BinaryOp;
+
+typedef struct pgGrB_UnaryOp  {
+  char name[255];
+  GrB_UnaryOp U;
+} pgGrB_UnaryOp;
 
 #define SEMIRING(N, PLS, TMS, TYP) do {                             \
     strlcpy(semirings[(N)].name, #PLS #TMS #TYP, 255);              \
@@ -378,6 +389,26 @@ typedef struct pgGrB_BinaryOp  {
     BINOP(N+8, PRE, OP, FP32);                \
     BINOP(N+9, PRE, OP, FP64);                \
     } while(0)
+
+
+#define UOP(N, PRE, OP, TYP) do {                                 \
+    strlcpy(uops[(N)].name, #OP #TYP, 255);                       \
+    uops[(N)].U = PRE ## OP ## TYP;                               \
+  } while (0)
+
+#define UOP_TYPES(N, PRE, OP) do {          \
+    UOP (N, PRE, OP, INT8);                 \
+    UOP(N+1, PRE, OP, UINT8);               \
+    UOP(N+2, PRE, OP, INT16);               \
+    UOP(N+3, PRE, OP, UINT16);              \
+    UOP(N+4, PRE, OP, INT32);               \
+    UOP(N+5, PRE, OP, UINT32);              \
+    UOP(N+6, PRE, OP, INT64);               \
+    UOP(N+7, PRE, OP, UINT64);              \
+    UOP(N+8, PRE, OP, FP32);                \
+    UOP(N+9, PRE, OP, FP64);                \
+    } while(0)
+
 void _PG_init(void);
 
 #endif /* PGGRAPHBLAS_H */

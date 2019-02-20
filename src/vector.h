@@ -42,8 +42,16 @@ FN(construct_empty_expanded_vector)(GrB_Index size,
                                     MemoryContext parentcontext);
 
 Datum FN(vector_out)(pgGrB_Vector *vec);
-Datum FN(vector_ewise_mult)(pgGrB_Vector *A, pgGrB_Vector *B);
-Datum FN(vector_ewise_add)(pgGrB_Vector *A, pgGrB_Vector *B);
+Datum FN(vector_ewise_mult)(pgGrB_Vector *A,
+                            pgGrB_Vector *B,
+                            pgGrB_Vector *C,
+                            pgGrB_Vector *mask,
+                            GrB_BinaryOp binop);
+Datum FN(vector_ewise_add)(pgGrB_Vector *A,
+                           pgGrB_Vector *B,
+                            pgGrB_Vector *C,
+                            pgGrB_Vector *mask,
+                            GrB_BinaryOp binop);
 
 PG_FUNCTION_INFO_V1(FN(vector));
 PG_FUNCTION_INFO_V1(FN(vector_agg_acc));
@@ -395,11 +403,9 @@ FN(vector_elements)(PG_FUNCTION_ARGS) {
 Datum
 FN(vector_out)(pgGrB_Vector *vec)
 {
-
   GrB_Info info;
   char *result;
   GrB_Index size, nvals;
-
   GrB_Index *row_indices;
   PG_TYPE *values;
 
@@ -434,28 +440,35 @@ FN(vector_out)(pgGrB_Vector *vec)
 }
 
 Datum
-FN(vector_ewise_mult)(pgGrB_Vector *A, pgGrB_Vector *B) {
+FN(vector_ewise_mult)(pgGrB_Vector *A,
+                      pgGrB_Vector *B,
+                      pgGrB_Vector *C,
+                      pgGrB_Vector *mask,
+                      GrB_BinaryOp binop) {
   GrB_Info info;
   GrB_Index size;
-  pgGrB_Vector *C;
 
-  CHECKD(GrB_Vector_size(&size, A->V));
-  C = (pgGrB_Vector *) palloc0(sizeof(pgGrB_Vector));
-
-  C = FN(construct_empty_expanded_vector)(size, CurrentMemoryContext);
-  CHECKD(GrB_eWiseMult(C->V, NULL, NULL, GB_MUL, A->V, B->V, NULL));
+  if (C == NULL) {
+    CHECKD(GrB_Vector_size(&size, A->V));
+    C = FN(construct_empty_expanded_vector)(size, CurrentMemoryContext);
+  }
+  CHECKD(GrB_eWiseMult(C->V, mask ? mask->V : NULL, NULL, binop, A->V, B->V, NULL));
   PGGRB_RETURN_VECTOR(C);
 }
 
 Datum
-FN(vector_ewise_add)(pgGrB_Vector *A, pgGrB_Vector *B) {
+FN(vector_ewise_add)(pgGrB_Vector *A,
+                     pgGrB_Vector *B,
+                      pgGrB_Vector *C,
+                      pgGrB_Vector *mask,
+                      GrB_BinaryOp binop) {
   GrB_Info info;
   GrB_Index size;
-  pgGrB_Vector *C;
 
-  CHECKD(GrB_Vector_size(&size, A->V));
-  C = (pgGrB_Vector *) palloc0(sizeof(pgGrB_Vector));
-  C = FN(construct_empty_expanded_vector)(size, CurrentMemoryContext);
+  if (C == NULL) {
+    CHECKD(GrB_Vector_size(&size, A->V));
+    C = FN(construct_empty_expanded_vector)(size, CurrentMemoryContext);
+  }
   CHECKD(GrB_eWiseAdd(C->V, NULL, NULL, GB_ADD, A->V, B->V, NULL));
   PGGRB_RETURN_VECTOR(C);
 }

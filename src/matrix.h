@@ -71,7 +71,12 @@ FN(vxm)(pgGrB_Vector *A,
         pgGrB_Vector *mask,
         GrB_Semiring semiring);
 
-PG_FUNCTION_INFO_V1(FN(matrix));
+Datum
+FN(matrix_new)(ExpandedArrayHeader *I,
+               ExpandedArrayHeader *J,
+               ExpandedArrayHeader *V);
+       
+PG_FUNCTION_INFO_V1(FN(matrix_empty));
 PG_FUNCTION_INFO_V1(FN(matrix_agg_acc));
 PG_FUNCTION_INFO_V1(FN(matrix_final));
 PG_FUNCTION_INFO_V1(FN(matrix_elements));
@@ -242,7 +247,7 @@ FN(construct_empty_expanded_matrix)(GrB_Index nrows,
 }
 
 Datum
-FN(matrix)(PG_FUNCTION_ARGS) {
+FN(matrix_empty)(PG_FUNCTION_ARGS) {
   pgGrB_Matrix *retval;
   GrB_Index nrows, ncols;
 
@@ -277,12 +282,12 @@ FN(matrix_agg_acc)(PG_FUNCTION_ARGS)
     mstate = (pgGrB_Matrix_AggState *)PG_GETARG_POINTER(0);
   }
 
-  row = palloc(sizeof(PG_TYPE));
-  col = palloc(sizeof(PG_TYPE));
-  val = palloc(sizeof(PG_TYPE));
+  row = palloc(sizeof(Datum));
+  col = palloc(sizeof(Datum));
+  val = palloc(sizeof(Datum));
 
-  *row = PG_GET(1);
-  *col = PG_GET(2);
+  *row = PG_GETARG_DATUM(1);
+  *col = PG_GETARG_DATUM(2);
   *val = PG_GET(3);
 
   mstate->rows = lappend(mstate->rows, row);
@@ -549,6 +554,14 @@ FN(vxm)(pgGrB_Vector *A,
   }
   CHECKD(GrB_vxm(C->V, mask ? mask->V : NULL, NULL, semiring, A->V, B->M, NULL));
   PGGRB_RETURN_VECTOR(C);
+}
+
+Datum
+FN(matrix_new)(ExpandedArrayHeader *I,
+               ExpandedArrayHeader *J,
+               ExpandedArrayHeader *V) {
+  return (Datum)0;
+
 }
 
 #undef SUFFIX

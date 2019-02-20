@@ -21,3 +21,4 @@ create extension if not exists pgtap;
 create extension if not exists pggraphblas;
 
 \ir vector.sql
+\ir matrix.sql

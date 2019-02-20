@@ -20,7 +20,7 @@ CREATE TYPE vector (
 );
 
 CREATE TYPE matrix;
-
+    
 CREATE FUNCTION matrix_in(cstring)
 RETURNS matrix
 AS '$libdir/pggraphblas', 'matrix_in'
@@ -54,16 +54,6 @@ LANGUAGE C STABLE STRICT;
 CREATE FUNCTION matrix_neq(matrix, matrix)
 RETURNS bool
 AS '$libdir/pggraphblas', 'matrix_neq'
-LANGUAGE C STABLE STRICT;
-
-CREATE FUNCTION matrix_ewise_mult_op(matrix, matrix)
-RETURNS matrix
-AS '$libdir/pggraphblas', 'matrix_ewise_mult'
-LANGUAGE C STABLE STRICT;
-
-CREATE FUNCTION matrix_ewise_add_op(matrix, matrix)
-RETURNS matrix
-AS '$libdir/pggraphblas', 'matrix_ewise_add'
 LANGUAGE C STABLE STRICT;
 
 CREATE TYPE matrix (
@@ -123,9 +113,46 @@ LANGUAGE C STABLE STRICT;
 
 CREATE FUNCTION vxm_op(vector, matrix)
 RETURNS vector
-AS '$libdir/pggraphblas', 'mxm'
+AS '$libdir/pggraphblas', 'vxm'
 LANGUAGE C STABLE;
     
+CREATE FUNCTION ewise_mult(
+    A matrix,
+    B matrix,
+    inout C matrix default null,
+    mask matrix default null,
+    op text default null,
+    descriptor text default null,
+    accum text default null
+    )
+
+RETURNS matrix
+AS '$libdir/pggraphblas', 'matrix_ewise_mult'
+LANGUAGE C STABLE STRICT;
+
+CREATE FUNCTION ewise_add(
+    A matrix,
+    B matrix,
+    inout C matrix default null,
+    mask matrix default null,
+    op text default null,
+    descriptor text default null,
+    accum text default null)
+
+RETURNS matrix
+AS '$libdir/pggraphblas', 'matrix_ewise_add'
+LANGUAGE C STABLE STRICT;
+    
+CREATE FUNCTION matrix_ewise_mult_op(matrix, matrix)
+RETURNS matrix
+AS '$libdir/pggraphblas', 'matrix_ewise_mult'
+LANGUAGE C STABLE STRICT;
+
+CREATE FUNCTION matrix_ewise_add_op(matrix, matrix)
+RETURNS matrix
+AS '$libdir/pggraphblas', 'matrix_ewise_add'
+LANGUAGE C STABLE STRICT;
+
 CREATE OPERATOR = (
     leftarg = matrix,
     rightarg = matrix,
@@ -307,12 +334,38 @@ LANGUAGE C STABLE STRICT;
 
 -- vectors
 
-CREATE FUNCTION vector_ewise_mult(vector, vector)
+CREATE FUNCTION ewise_mult(
+    A vector,
+    B vector,
+    inout C vector default null,
+    mask vector default null,
+    op text default null,
+    descriptor text default null,
+    accum text default null
+    )
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_ewise_mult'
 LANGUAGE C STABLE STRICT;
 
-CREATE FUNCTION vector_ewise_add(vector, vector)
+CREATE FUNCTION ewise_add(
+    A vector,
+    B vector,
+    inout C vector default null,
+    mask vector default null,
+    op text default null,
+    descriptor text default null,
+    accum text default null
+    )
+RETURNS vector
+AS '$libdir/pggraphblas', 'vector_ewise_add'
+LANGUAGE C STABLE STRICT;
+    
+CREATE FUNCTION vector_ewise_mult_op(vector, vector)
+RETURNS vector
+AS '$libdir/pggraphblas', 'vector_ewise_mult'
+LANGUAGE C STABLE STRICT;
+
+CREATE FUNCTION vector_ewise_add_op(vector, vector)
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_ewise_add'
 LANGUAGE C STABLE STRICT;
@@ -340,13 +393,13 @@ LANGUAGE C STABLE STRICT;
 CREATE OPERATOR * (
     leftarg = vector,
     rightarg = vector,
-    procedure = vector_ewise_mult
+    procedure = vector_ewise_mult_op
 );
 
 CREATE OPERATOR + (
     leftarg = vector,
     rightarg = vector,
-    procedure = vector_ewise_add
+    procedure = vector_ewise_add_op
 );
 
 CREATE OPERATOR = (

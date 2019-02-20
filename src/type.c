@@ -28,6 +28,13 @@ char* mxv_semiring(pgGrB_Matrix *left, pgGrB_Vector *right) {
   return DEFAULT_SEMIRING(type);
 }
 
+char* vxm_semiring(pgGrB_Vector *right, pgGrB_Matrix *left) {
+  GrB_Info info;
+  GrB_Type type;
+  CHECKD(GxB_Matrix_type(&type, left->M));
+  return DEFAULT_SEMIRING(type);
+}
+
 char* times_binop(pgGrB_Matrix *left, pgGrB_Matrix *right) {
   GrB_Info info;
   GrB_Type type;
@@ -39,6 +46,20 @@ char* plus_binop(pgGrB_Matrix *left, pgGrB_Matrix *right) {
   GrB_Info info;
   GrB_Type type;
   CHECKD(GxB_Matrix_type(&type, left->M));
+  return DEFAULT_PLUS_BINOP(type);
+}
+
+char* vector_times_binop(pgGrB_Vector *left, pgGrB_Vector *right) {
+  GrB_Info info;
+  GrB_Type type;
+  CHECKD(GxB_Vector_type(&type, left->V));
+  return DEFAULT_TIMES_BINOP(type);
+}
+
+char* vector_plus_binop(pgGrB_Vector *left, pgGrB_Vector *right) {
+  GrB_Info info;
+  GrB_Type type;
+  CHECKD(GxB_Vector_type(&type, left->V));
   return DEFAULT_PLUS_BINOP(type);
 }
 
