@@ -7,8 +7,7 @@ GraphBLAS is a sparse linear algebra API optimized for processing
 graphs encoded as sparse matrices and vectors.  In addition to common
 real/integer matrix algebras, GraphBLAS supports up to 960 different
 "semiring" algebras, that can be used as basic building blocks to
-solve common graph problems.  pggraphblas is a postgres extension that
-exposes the matrix and vector types and their functional API to SQL.
+implement graph algorithms.
 
 pggraphblas leverages the expertise in the field of sparse matrix
 programming by [The GraphBLAS Forum](http://graphblas.org) and uses
@@ -44,13 +43,10 @@ graph being utilized.
 
 By using a sparse matrix instead of dense, only the elements used are
 actually stored in the matrix. The "empty" part of the matrix is not
-stored and assumes a default "algebraic zero" value.  GraphBLAS brings
-a powerful, abstract algebra to solving graph problems with various
-combinations of
-[Matrix multiplication](https://en.wikipedia.org/wiki/Matrix_multiplication)
-operations and groups of types and operations called "semirings".
-Different semirings can accomplish different common steps in graph
-problems, such as finding shortest or most optimal paths.
+stored and is interpreted as an "algebraic zero" value, which might
+not be the actual number zero, but other values like positive or
+negative infinity depending on the particular algebraic operations
+applied.
 
 pggraphblas is a postgres extension that provides access to two new
 types: matrix and vector, as well as the GraphBLAS api to manipulate
@@ -64,22 +60,24 @@ pggraphblas is not a "graph database" using postgres. Postgres is
 *already* an excellent database for graph storage and retrieval. Many
 real-world foreign key relationships, common structures in most
 postgres databases, describe sparse graphs.  pggraphblas provides
-building blocks for solving graph algorithms over those graphs.
+building blocks for solving graph algorithms over with those graphs.
 
 Graph traversal and manipulation can be acheived in PostgreSQL using
 recursive common table expressions ("WITH" queries) in a very flexible
 and general way, but this approach has a drawback: sparse relational
 graphs are scattered across indexes and table blocks, having poor
-locality.  Interpreted sql code works by considering rows one at a
-time, vertex by vertex.
+locality.  Interpreted sql code works by considering row based
+expressions one at a time, vertex by vertex so to speak.
 
 Using pggraphblas brings high density memory encoding and optimized
 numerical computing methods to solving sparse graph problems.
-GraphBLAS is designed to be optimized for densly storing sparse values
-where dense matrices are not.  GraphBLAS is also an actively developed
-project with future plans such as GPU/TPU integration, bringing high
-density numeric computing to the problem with no change code that uses
-the API.
+GraphBLAS is designed to be optimized for storing values where dense
+matrices are not, and is optimized for accessing sparse values where
+database tables are not.
+
+GraphBLAS is also an actively developed project with future plans such
+as GPU/TPU integration, bringing higher density numeric computing to
+the problem with no change code that uses the API.
 
 # references
 
@@ -215,7 +213,21 @@ inputs and outputs.
 
 ## vxm
 
-## descriptor
+## ewise add
+
+## ewise mul
+
+## extract
+
+## assign
+
+## apply
+
+## select
+
+## reduce
+
+## descriptors
 
 ## semirings
     
