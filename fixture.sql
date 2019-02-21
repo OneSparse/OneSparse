@@ -5,9 +5,9 @@ select pg_backend_pid() pid \gset
 \! tmux send-keys 'gdb /usr/bin/postgres ' $PID  'C-m' 'cont' 'C-m'
 
 create table edge (
-    i bigint,
-    j bigint,
-    v bigint
+    i integer,
+    j integer,
+    v integer
     );
 
 insert into edge (i, j, v) values 

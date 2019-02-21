@@ -250,7 +250,7 @@ matrix_ewise_add(PG_FUNCTION_ARGS) {
   A = PGGRB_GETARG_MATRIX(0);
   B = PGGRB_GETARG_MATRIX(1);
 
-  binop_name = matrix_times_binop(A, B);
+  binop_name = matrix_plus_binop(A, B);
   
   if (PG_NARGS() > 2)
     C = PG_ARGISNULL(2) ? NULL : PGGRB_GETARG_MATRIX(2);

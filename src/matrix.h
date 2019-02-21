@@ -619,8 +619,8 @@ FN(matrix_new)(PG_FUNCTION_ARGS) {
                                                CurrentMemoryContext);
 
   CHECKD(GrB_Matrix_build(retval->M,
-                          col_indices,
                           row_indices,
+                          col_indices,
                           values,
                           count,
                           GB_DUP));
