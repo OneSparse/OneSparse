@@ -51,9 +51,9 @@ RETURNS bool
 AS '$libdir/pggraphblas', 'matrix_eq'
 LANGUAGE C STABLE STRICT;
 
-CREATE FUNCTION matrix_neq(matrix, matrix)
+CREATE FUNCTION matrix_ne(matrix, matrix)
 RETURNS bool
-AS '$libdir/pggraphblas', 'matrix_neq'
+AS '$libdir/pggraphblas', 'matrix_ne'
 LANGUAGE C STABLE STRICT;
 
 CREATE TYPE matrix (
@@ -62,6 +62,37 @@ CREATE TYPE matrix (
     alignment = int4
 );
 
+CREATE FUNCTION matrix(bigint[], bigint[], bool[])
+RETURNS matrix
+AS '$libdir/pggraphblas', 'matrix_new_bool'
+LANGUAGE C STABLE STRICT;
+
+CREATE FUNCTION matrix(bigint[], bigint[], bigint[])
+RETURNS matrix
+AS '$libdir/pggraphblas', 'matrix_new_int64'
+LANGUAGE C STABLE STRICT;
+
+CREATE FUNCTION matrix(bigint[], bigint[], integer[])
+RETURNS matrix
+AS '$libdir/pggraphblas', 'matrix_new_int32'
+LANGUAGE C STABLE STRICT;
+
+CREATE FUNCTION matrix(bigint[], bigint[], smallint[])
+RETURNS matrix
+AS '$libdir/pggraphblas', 'matrix_new_int16'
+LANGUAGE C STABLE STRICT;
+
+CREATE FUNCTION matrix(bigint[], bigint[], real[])
+RETURNS matrix
+AS '$libdir/pggraphblas', 'matrix_new_float4'
+LANGUAGE C STABLE STRICT;
+
+CREATE FUNCTION matrix(bigint[], bigint[], float[])
+RETURNS matrix
+AS '$libdir/pggraphblas', 'matrix_new_float8'
+LANGUAGE C STABLE STRICT;
+
+        
 CREATE FUNCTION mxm(
     A matrix,
     B matrix,
@@ -91,7 +122,7 @@ CREATE FUNCTION mxv(
     )
 RETURNS vector
 AS '$libdir/pggraphblas', 'mxv'
-LANGUAGE C STABLE STRICT;
+LANGUAGE C STABLE;
 
 CREATE FUNCTION mxv_op(matrix, vector)
 RETURNS vector
@@ -109,7 +140,7 @@ CREATE FUNCTION vxm(
     )
 RETURNS vector
 AS '$libdir/pggraphblas', 'vxm'
-LANGUAGE C STABLE STRICT;
+LANGUAGE C STABLE;
 
 CREATE FUNCTION vxm_op(vector, matrix)
 RETURNS vector
@@ -128,7 +159,7 @@ CREATE FUNCTION ewise_mult(
 
 RETURNS matrix
 AS '$libdir/pggraphblas', 'matrix_ewise_mult'
-LANGUAGE C STABLE STRICT;
+LANGUAGE C STABLE;
 
 CREATE FUNCTION ewise_add(
     A matrix,
@@ -141,7 +172,7 @@ CREATE FUNCTION ewise_add(
 
 RETURNS matrix
 AS '$libdir/pggraphblas', 'matrix_ewise_add'
-LANGUAGE C STABLE STRICT;
+LANGUAGE C STABLE;
 
 CREATE FUNCTION matrix_ewise_mult_op(matrix, matrix)
 RETURNS matrix
@@ -163,7 +194,7 @@ CREATE OPERATOR = (
 CREATE OPERATOR <> (
     leftarg = matrix,
     rightarg = matrix,
-    procedure = matrix_neq,
+    procedure = matrix_ne,
     negator = =
 );
 
@@ -334,7 +365,7 @@ LANGUAGE C STABLE STRICT;
 
 -- vectors
 
-CREATE FUNCTION ewise_mult(
+CREATE FUNCTION vector_ewise_mult(
     A vector,
     B vector,
     inout C vector default null,
@@ -347,7 +378,7 @@ RETURNS vector
 AS '$libdir/pggraphblas', 'vector_ewise_mult'
 LANGUAGE C STABLE STRICT;
 
-CREATE FUNCTION ewise_add(
+CREATE FUNCTION vector_ewise_add(
     A vector,
     B vector,
     inout C vector default null,

@@ -1,12 +1,5 @@
 /* This is a "header template" see matrix.c for specific instanciations */
 
-#ifndef PG_TYPE
-    #error Template argument missing.
-#endif
-#ifndef SUFFIX
-    #error Suffix argument missing.
-#endif
-
 /* Set Returning Function (matrix_elements) state for generating tuples
    from a matrix.
  */
@@ -20,7 +13,7 @@ typedef struct FN(pgGrB_Matrix_ExtractState) {
 /* Expanded Object Header "methods" for flattening matrices for storage */
 static Size FN(matrix_get_flat_size)(ExpandedObjectHeader *eohptr);
 static void FN(matrix_flatten_into)(ExpandedObjectHeader *eohptr,
-                            void *result, Size allocated_size);
+                                    void *result, Size allocated_size);
 
 static const ExpandedObjectMethods FN(matrix_methods) = {
   FN(matrix_get_flat_size),
@@ -71,11 +64,8 @@ FN(vxm)(pgGrB_Vector *A,
         pgGrB_Vector *mask,
         GrB_Semiring semiring);
 
-Datum
-FN(matrix_new)(ExpandedArrayHeader *I,
-               ExpandedArrayHeader *J,
-               ExpandedArrayHeader *V);
        
+PG_FUNCTION_INFO_V1(FN(matrix_new));
 PG_FUNCTION_INFO_V1(FN(matrix_empty));
 PG_FUNCTION_INFO_V1(FN(matrix_agg_acc));
 PG_FUNCTION_INFO_V1(FN(matrix_final));
@@ -430,8 +420,8 @@ FN(matrix_out)(pgGrB_Matrix *mat)
   CHECKD(GrB_Matrix_nrows(&nrows, mat->M));
   CHECKD(GrB_Matrix_ncols(&ncols, mat->M));
 
-  row_indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * nrows);
-  col_indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * ncols);
+  row_indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * nvals);
+  col_indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * nvals);
   values = (PG_TYPE*) palloc0(sizeof(PG_TYPE) * nvals);
 
   CHECKD(GrB_Matrix_extractTuples(row_indices,
@@ -442,16 +432,16 @@ FN(matrix_out)(pgGrB_Matrix *mat)
 
   result = psprintf("<matrix_%s(%lu,%lu):[", grb_type_to_name(mat->type), nrows, ncols);
 
-  for (int i = 0; i < nrows; i++) {
+  for (int i = 0; i < nvals; i++) {
     result = strcat(result, psprintf("%lu", row_indices[i]));
-    if (i != nrows - 1)
+    if (i != nvals - 1)
       result = strcat(result, ",");
   }
   result = strcat(result, "][");
 
-  for (int i = 0; i < ncols; i++) {
+  for (int i = 0; i < nvals; i++) {
     result = strcat(result, psprintf("%lu", col_indices[i]));
-    if (i != nrows - 1)
+    if (i != nvals - 1)
       result = strcat(result, ",");
   }
   result = strcat(result, "][");
@@ -557,11 +547,85 @@ FN(vxm)(pgGrB_Vector *A,
 }
 
 Datum
-FN(matrix_new)(ExpandedArrayHeader *I,
-               ExpandedArrayHeader *J,
-               ExpandedArrayHeader *V) {
-  return (Datum)0;
+FN(matrix_new)(PG_FUNCTION_ARGS) {
+  GrB_Info info;
+  pgGrB_Matrix *retval;
+  ArrayType *rows, *cols, *vals;
+  int *idims, *jdims, *vdims;
+  int i, count;
 
+  GrB_Index *row_indices, *col_indices;
+  GrB_Index max_row_index, max_col_index;
+  PG_TYPE *values;
+  ArrayIterator array_iterator;
+  Datum	value;
+  bool isnull;
+
+  rows = PG_GETARG_ARRAYTYPE_P(0);
+  cols = PG_GETARG_ARRAYTYPE_P(1);
+  vals = PG_GETARG_ARRAYTYPE_P(2);
+  
+  if (ARR_HASNULL(rows) || ARR_HASNULL(cols) || ARR_HASNULL(vals))
+    ereport(ERROR, (errmsg("Matrix values may not be null")));
+
+  idims = ARR_DIMS(rows);
+  jdims = ARR_DIMS(cols);
+  vdims =  ARR_DIMS(vals);
+  
+  max_row_index = idims[0];
+  max_col_index = jdims[0];
+  count = vdims[0];
+
+  if ((idims[0] != jdims[0]) || (jdims[0] != vdims[0]))
+    ereport(ERROR, (errmsg("Row, column, and value arrays must be same size.")));
+
+  row_indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * max_row_index);
+  col_indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * max_col_index);
+  values = (PG_TYPE*) palloc0(sizeof(PG_TYPE) * count);
+
+  i = 0;
+  array_iterator = array_create_iterator(rows, 0, NULL);
+  while (array_iterate(array_iterator, &value, &isnull))
+	{
+      row_indices[i] = DatumGetInt64(value);
+      if (row_indices[i] > max_row_index)
+        max_row_index = row_indices[i] + 1;
+      i++;
+  }
+  array_free_iterator(array_iterator);
+  
+  i = 0;
+  array_iterator = array_create_iterator(cols, 0, NULL);
+  while (array_iterate(array_iterator, &value, &isnull))
+	{
+      col_indices[i] = DatumGetInt64(value);
+      if (col_indices[i] > max_col_index)
+        max_col_index = col_indices[i] + 1;
+      i++;
+  }
+  array_free_iterator(array_iterator);
+
+  i = 0;
+  array_iterator = array_create_iterator(vals, 0, NULL);
+  while (array_iterate(array_iterator, &value, &isnull))
+	{
+      values[i] = PG_DGT(value);
+      i++;
+  }
+  array_free_iterator(array_iterator);
+
+  retval = FN(construct_empty_expanded_matrix)(max_row_index,
+                                               max_col_index,
+                                               CurrentMemoryContext);
+
+  CHECKD(GrB_Matrix_build(retval->M,
+                          col_indices,
+                          row_indices,
+                          values,
+                          count,
+                          GB_DUP));
+
+  PGGRB_RETURN_MATRIX(retval);
 }
 
 #undef SUFFIX

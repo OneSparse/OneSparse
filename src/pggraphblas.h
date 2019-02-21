@@ -34,6 +34,8 @@
     D = F ## _float8(__VA_ARGS__);                \
   else if((T)  == GrB_FP32)                       \
     D = F ## _float4(__VA_ARGS__);                \
+  else                                            \
+    elog(ERROR, "unsupported type");             \
   } while(0)
 
 #define DEFAULT_SEMIRING(T)                       \
@@ -200,7 +202,7 @@ construct_empty_flat_matrix(GrB_Index nrows,
 
 /* Public API functions */
 
-PG_FUNCTION_INFO_V1(matrix_new);
+PG_FUNCTION_INFO_V1(matrix);
 PG_FUNCTION_INFO_V1(matrix_in);
 PG_FUNCTION_INFO_V1(matrix_out);
 
@@ -213,7 +215,7 @@ PG_FUNCTION_INFO_V1(mxv);
 PG_FUNCTION_INFO_V1(vxm);
 
 PG_FUNCTION_INFO_V1(matrix_eq);
-PG_FUNCTION_INFO_V1(matrix_neq);
+PG_FUNCTION_INFO_V1(matrix_ne);
 
 PG_FUNCTION_INFO_V1(matrix_ewise_mult);
 PG_FUNCTION_INFO_V1(matrix_ewise_add);
@@ -270,8 +272,8 @@ char* mxm_semiring(pgGrB_Matrix *left, pgGrB_Matrix *right);
 char* mxv_semiring(pgGrB_Matrix *left, pgGrB_Vector *right);
 char* vxm_semiring(pgGrB_Vector *left, pgGrB_Matrix *right);
 
-char* times_binop(pgGrB_Matrix *left, pgGrB_Matrix *right);
-char* plus_binop(pgGrB_Matrix *left, pgGrB_Matrix *right);
+char* matrix_times_binop(pgGrB_Matrix *left, pgGrB_Matrix *right);
+char* matrix_plus_binop(pgGrB_Matrix *left, pgGrB_Matrix *right);
 
 char* vector_times_binop(pgGrB_Vector *left, pgGrB_Vector *right);
 char* vector_plus_binop(pgGrB_Vector *left, pgGrB_Vector *right);

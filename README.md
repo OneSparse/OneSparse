@@ -61,22 +61,25 @@ matrices look a little bit like arrays, being stored as variable
 length column values.
 
 pggraphblas is not a "graph database" using postgres. Postgres is
-*already* an excellent database for graph storage Many real-world
-foreign key relationships, common structures in most postgres
-databases, describe sparse graphs.  Graph traversal and manipulation
-can be acheived in PostgreSQL using recursive common table expressions
-("WITH" queries) in a very flexible and general way, but this approach
-has a drawback: sparse relational graphs are scattered across indexes
-and table blocks, having poor locality.  Interpreted sql code works by
-considering rows one at a time, vertex by vertex.
+*already* an excellent database for graph storage and retrieval. Many
+real-world foreign key relationships, common structures in most
+postgres databases, describe sparse graphs.  pggraphblas provides
+building blocks for solving graph algorithms over those graphs.
 
-Using pggraphblas bring high memory density encoding and optimized
+Graph traversal and manipulation can be acheived in PostgreSQL using
+recursive common table expressions ("WITH" queries) in a very flexible
+and general way, but this approach has a drawback: sparse relational
+graphs are scattered across indexes and table blocks, having poor
+locality.  Interpreted sql code works by considering rows one at a
+time, vertex by vertex.
+
+Using pggraphblas brings high density memory encoding and optimized
 numerical computing methods to solving sparse graph problems.
-GraphBLAS is designed to be optimized for this situation where dense
-matrices are not.  GraphBLAS is also an actively developed project
-with future plans such as GPU/TPU integration, bringing high numeric
-computing density to the problem with no change code that uses the
-API.
+GraphBLAS is designed to be optimized for densly storing sparse values
+where dense matrices are not.  GraphBLAS is also an actively developed
+project with future plans such as GPU/TPU integration, bringing high
+density numeric computing to the problem with no change code that uses
+the API.
 
 # references
 
@@ -269,4 +272,3 @@ $$ language plpgsql;
 * Subgraphing (WIP)
 * parallel aggregates of subgraphs with final merging (WIP)
 * parsable vector/matrix formats for vaild db dumps and literals (WIP)
-
