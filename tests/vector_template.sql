@@ -58,17 +58,20 @@ select is(
     'sparse vector add ' || :'TYPE');
 
 select is(
-    vector(cast(array[:VALS] as :TYPE []), array[:IDXS]) * vector(cast(array[:VALS] as :TYPE []), array[:IDXS]),
+    vector(cast(array[:VALS] as :TYPE []), array[:IDXS]) *
+    vector(cast(array[:VALS] as :TYPE []), array[:IDXS]),
     vector(cast(array[:EMX] as :TYPE []), array[:IDXS]),
     'sparse vector mult ' || :'TYPE');
 
 select is(
-    vector(cast(array[:VALS] as :TYPE []), array[:IDXS]) = vector(cast(array[:VALS] as :TYPE []), array[:IDXS]),
+    vector(cast(array[:VALS] as :TYPE []), array[:IDXS]) =
+    vector(cast(array[:VALS] as :TYPE []), array[:IDXS]),
     true,
     'sparse vector eq ' || :'TYPE');
 
 select is(
-    vector(cast(array[:VALS] as :TYPE []), array[:IDXS]) <> vector(cast(array[:VALS] as :TYPE []), array[:IDXS]),
+    vector(cast(array[:VALS] as :TYPE []), array[:IDXS]) <>
+    vector(cast(array[:VALS] as :TYPE []), array[:IDXS]),
     true,
     'sparse vector neq ' || :'TYPE');
 

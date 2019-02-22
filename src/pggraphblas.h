@@ -412,6 +412,10 @@ typedef struct pgGrB_UnaryOp  {
     UOP(N+9, PRE, OP, FP64);                \
     } while(0)
 
+#define TYPECHCK(A, B, OP, TYP)             \
+  if ((A) == GrB_##TYP || (B) == GrB_##TYP) \
+    return #OP "_" #TYP
+  
 void _PG_init(void);
 
 #endif /* PGGRAPHBLAS_H */

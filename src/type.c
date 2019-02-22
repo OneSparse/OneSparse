@@ -14,25 +14,48 @@ GrB_BinaryOp lookup_binop(char *name) {
   }
   return NULL;
 }
+
 char* mxm_semiring(pgGrB_Matrix *left, pgGrB_Matrix *right) {
   GrB_Info info;
-  GrB_Type type;
-  CHECKD(GxB_Matrix_type(&type, left->M));
-  return DEFAULT_SEMIRING(type);
+  GrB_Type atype, btype;
+  CHECKD(GxB_Matrix_type(&atype, left->M));
+  CHECKD(GxB_Matrix_type(&btype, right->M));
+  TYPECHCK(atype, btype, PLUS_TIMES, FP64);
+  TYPECHCK(atype, btype, PLUS_TIMES, FP32);
+  TYPECHCK(atype, btype, PLUS_TIMES, INT64);
+  TYPECHCK(atype, btype, PLUS_TIMES, INT32);
+  TYPECHCK(atype, btype, PLUS_TIMES, INT16);
+  TYPECHCK(atype, btype, LOR_LAND, BOOL);
+  return "";
 }
 
 char* mxv_semiring(pgGrB_Matrix *left, pgGrB_Vector *right) {
   GrB_Info info;
-  GrB_Type type;
-  CHECKD(GxB_Matrix_type(&type, left->M));
-  return DEFAULT_SEMIRING(type);
+  GrB_Type atype, btype;
+  CHECKD(GxB_Matrix_type(&atype, left->M));
+  CHECKD(GxB_Vector_type(&btype, right->V));
+  TYPECHCK(atype, btype, PLUS_TIMES, FP64);
+  TYPECHCK(atype, btype, PLUS_TIMES, FP32);
+  TYPECHCK(atype, btype, PLUS_TIMES, INT64);
+  TYPECHCK(atype, btype, PLUS_TIMES, INT32);
+  TYPECHCK(atype, btype, PLUS_TIMES, INT16);
+  TYPECHCK(atype, btype, LOR_LAND, BOOL);
+  return "";
 }
 
-char* vxm_semiring(pgGrB_Vector *right, pgGrB_Matrix *left) {
+char* vxm_semiring(pgGrB_Vector *left, pgGrB_Matrix *right) {
   GrB_Info info;
-  GrB_Type type;
-  CHECKD(GxB_Matrix_type(&type, left->M));
-  return DEFAULT_SEMIRING(type);
+  GrB_Type atype, btype;
+  CHECKD(GxB_Vector_type(&atype, left->V));
+  CHECKD(GxB_Matrix_type(&btype, right->M));
+  TYPECHCK(atype, btype, PLUS_TIMES, FP64);
+  TYPECHCK(atype, btype, PLUS_TIMES, FP32);
+  TYPECHCK(atype, btype, PLUS_TIMES, INT64);
+  TYPECHCK(atype, btype, PLUS_TIMES, INT32);
+  TYPECHCK(atype, btype, PLUS_TIMES, INT16);
+  TYPECHCK(atype, btype, LOR_LAND, BOOL);
+  return "";
+
 }
 
 char* matrix_times_binop(pgGrB_Matrix *left, pgGrB_Matrix *right) {
