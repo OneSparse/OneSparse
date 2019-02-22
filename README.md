@@ -272,15 +272,16 @@ $$ language plpgsql;
 
 # TODO
     
-* Generalize matrix type (DONE)
-* polymorphic matrix_agg support all types (DONE)
-* overload all the operators (DONE)
-* Semiring (DONE)
-* Binary Ops (DONE)
-
-* Unary Ops (WIP)
-* Assignment (WIP)
-* Reduction (WIP)
-* Subgraphing (WIP)
-* parallel aggregates of subgraphs with final merging (WIP)
-* parsable vector/matrix formats for vaild db dumps and literals (WIP)
+    * Generalize matrix/vector type (DONE)
+    * polymorphic constructors/aggregates support all types (DONE)
+    * element types and set returning functions for tuple extraction (DONE)
+    * overload all the operators (DONE)
+    * Semiring (DONE)
+    * Binary Ops (DONE)
+    
+    * Unary Ops (WIP)
+    * Assignment (WIP)
+    * Subgraph extract (WIP)
+    * Reduction (WIP)
+    * parallel aggregates of subgraphs with final merging (WIP)
+    * parsable vector/matrix formats for vaild db dumps and literals (WIP)

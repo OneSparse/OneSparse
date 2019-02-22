@@ -1,71 +1,59 @@
 begin;
 select plan(5);
 
-create table edge (
-    i integer,
-    j integer,
-    v integer
-    );
-
-insert into edge (i, j, v) values 
-    (1, 4, 1),
-    (1, 2, 2),
-    (2, 7, 3),
-    (2, 5, 4),
-    (3, 6, 5),
-    (4, 3, 6),
-    (4, 1, 7),
-    (5, 6, 8),
-    (6, 3, 9),
-    (7, 3, 0);
-
-select is(
-    ncols(matrix(
-        array[1,1,2,2,3,4,4,5,6,7],
-        array[2,4,5,7,6,1,3,6,3,3],
-        array[2,1,4,3,5,7,6,8,9,0])),
-    10::bigint,
-    'matrix ncols');
-        
-select is(
-    nrows(matrix(
-        array[1,1,2,2,3,4,4,5,6,7],
-        array[2,4,5,7,6,1,3,6,3,3],
-        array[2,1,4,3,5,7,6,8,9,0])),
-    10::bigint,
-    'matrix nrows');
+\set ROWS 0,1,2
+\set COLS 0,1,2
     
-select is(
-    nvals(matrix(
-        array[1,1,2,2,3,4,4,5,6,7],
-        array[2,4,5,7,6,1,3,6,3,3],
-        array[2,1,4,3,5,7,6,8,9,0])),
-    10::bigint,
-    'matrix nvals');
+\set A 1
+\set B 2
+\set C 3
+\set D 1
+\set E 2
+\set F 3
 
-select is(
-    matrix(array[0,1,2],
-            array[1,2,0],
-            array[4,5,6]) &&
-    matrix(array[0,1,2],
-            array[1,2,0],
-            array[4,5,6]),
-    matrix(array[0,1,2],
-    array[1,2,0],
-    array[16,25,36]),
-    'matrix ewise mult');
+\set EAX 2
+\set EAY 4
+\set EAZ 6
     
-select is(
-    matrix(array[0,1,2],
-            array[1,2,0],
-            array[4,5,6]) ||
-    matrix(array[0,1,2],
-            array[1,2,0],
-            array[4,5,6]),
-    matrix(array[0,1,2],
-    array[1,2,0],
-    array[8,10,12]),
-    'matrix ewise add');
+\set TYPE integer
+\ir matrix_template.sql    
+    
+\set TYPE bigint
+\ir matrix_template.sql    
+    
+\set TYPE smallint
+\ir matrix_template.sql    
+    
+\set TYPE real
+\set A 1.1
+\set B 2.2
+\set C 3.3
+\set A 1.1
+\set B 2.2
+\set C 3.3
+    
+\set EAX 2.1
+\set EAY 4.2
+\set EAZ 6.3
+
+\ir matrix_template.sql    
+    
+\set TYPE float
+\ir matrix_template.sql    
+    
+\set TYPE bool
+\set A true
+\set B false
+\set C true
+\set D true
+\set E true
+\set F false
+    
+\set EAX true
+\set EAY true
+\set EAZ true
+    
+\ir matrix_template.sql
     
 select * from finish();
 rollback;

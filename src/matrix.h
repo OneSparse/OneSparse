@@ -572,8 +572,16 @@ FN(matrix_new)(PG_FUNCTION_ARGS) {
   jdims = ARR_DIMS(cols);
   vdims =  ARR_DIMS(vals);
   
-  max_row_index = idims[0];
-  max_col_index = jdims[0];
+  if (!PG_ARGISNULL(3))
+    max_row_index = PG_GETARG_INT64(3);
+  else 
+    max_row_index = idims[0];
+
+  if (!PG_ARGISNULL(4))
+    max_col_index = PG_GETARG_INT64(4);
+  else
+    max_col_index = jdims[0];
+
   count = vdims[0];
 
   if ((idims[0] != jdims[0]) || (jdims[0] != vdims[0]))

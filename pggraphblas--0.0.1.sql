@@ -62,35 +62,41 @@ CREATE TYPE matrix (
     alignment = int4
 );
 
-CREATE FUNCTION matrix(bigint[], bigint[], bool[])
+CREATE FUNCTION matrix(bigint[], bigint[], bool[],
+    bigint default null, bigint default null)
 RETURNS matrix
 AS '$libdir/pggraphblas', 'matrix_new_bool'
-LANGUAGE C STABLE STRICT;
+LANGUAGE C STABLE;
 
-CREATE FUNCTION matrix(bigint[], bigint[], bigint[])
+CREATE FUNCTION matrix(bigint[], bigint[], bigint[],
+    bigint default null, bigint default null)
 RETURNS matrix
 AS '$libdir/pggraphblas', 'matrix_new_int64'
-LANGUAGE C STABLE STRICT;
+LANGUAGE C STABLE;
 
-CREATE FUNCTION matrix(bigint[], bigint[], integer[])
+CREATE FUNCTION matrix(bigint[], bigint[], integer[],
+    bigint default null, bigint default null)
 RETURNS matrix
 AS '$libdir/pggraphblas', 'matrix_new_int32'
-LANGUAGE C STABLE STRICT;
+LANGUAGE C STABLE;
 
-CREATE FUNCTION matrix(bigint[], bigint[], smallint[])
+CREATE FUNCTION matrix(bigint[], bigint[], smallint[],
+    bigint default null, bigint default null)
 RETURNS matrix
 AS '$libdir/pggraphblas', 'matrix_new_int16'
-LANGUAGE C STABLE STRICT;
+LANGUAGE C STABLE;
 
-CREATE FUNCTION matrix(bigint[], bigint[], real[])
+CREATE FUNCTION matrix(bigint[], bigint[], real[],
+    bigint default null, bigint default null)
 RETURNS matrix
 AS '$libdir/pggraphblas', 'matrix_new_float4'
-LANGUAGE C STABLE STRICT;
+LANGUAGE C STABLE;
 
-CREATE FUNCTION matrix(bigint[], bigint[], float[])
+CREATE FUNCTION matrix(bigint[], bigint[], float[],
+    bigint default null, bigint default null)
 RETURNS matrix
 AS '$libdir/pggraphblas', 'matrix_new_float8'
-LANGUAGE C STABLE STRICT;
+LANGUAGE C STABLE;
 
         
 CREATE FUNCTION mxm(

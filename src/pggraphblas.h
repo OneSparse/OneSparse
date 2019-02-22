@@ -63,9 +63,9 @@
     (T)  == GrB_INT16?                            \
     "TIMES_INT16" :                               \
     (T)  == GrB_INT8?                             \
-    "_TIMES_INT8" :                               \
+    "TIMES_INT8" :                               \
     (T)  == GrB_BOOL?                             \
-    "LAND_BOOL" :                                 \
+    "TIMES_BOOL" :                                 \
     (T)  == GrB_FP64?                             \
     "TIMES_FP64" :                                \
     (T)  == GrB_FP32?                             \
@@ -80,9 +80,9 @@
     (T)  == GrB_INT16?                            \
     "PLUS_INT16" :                                \
     (T)  == GrB_INT8?                             \
-    "_PLUS_INT8" :                                \
+    "PLUS_INT8" :                                \
     (T)  == GrB_BOOL?                             \
-    "LAND_BOOL" :                                 \
+    "PLUS_BOOL" :                                 \
     (T)  == GrB_FP64?                             \
     "PLUS_FP64" :                                 \
     (T)  == GrB_FP32?                             \
@@ -390,6 +390,7 @@ typedef struct pgGrB_UnaryOp  {
     BINOP(N+7, PRE, OP, UINT64);              \
     BINOP(N+8, PRE, OP, FP32);                \
     BINOP(N+9, PRE, OP, FP64);                \
+    BINOP (N+10, PRE, OP, BOOL);              \
     } while(0)
 
 
