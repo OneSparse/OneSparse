@@ -72,6 +72,6 @@ select is(
 select is(
     vector(cast(array[:VALS] as :TYPE []), array[:IDXS]) <>
     vector(cast(array[:VALS] as :TYPE []), array[:IDXS]),
-    true,
+    false,
     'sparse vector neq ' || :'TYPE');
 

@@ -131,6 +131,21 @@ GrB_Info isequal
     GrB_BinaryOp userop
  );
 
+GrB_Info visequal_type
+(
+    bool *result,
+    GrB_Vector A,
+    GrB_Vector B,
+    GrB_BinaryOp op
+ );
+
+GrB_Info visequal
+(
+    bool *result,
+    GrB_Vector A,
+    GrB_Vector B,
+    GrB_BinaryOp userop
+ );
 /* Flattened representation of matrix, used to store to disk.
 
 Actual array data is appended and for the moment cannot exceed 1GB.
@@ -266,6 +281,10 @@ DatumGetVector(Datum d);
 pgGrB_FlatVector *
 construct_empty_flat_vector(GrB_Index size,
                             GrB_Type type);
+
+GrB_Type mxm_type(pgGrB_Matrix *left, pgGrB_Matrix *right);
+GrB_Type mxv_type(pgGrB_Matrix *left, pgGrB_Vector *right);
+GrB_Type vxm_type(pgGrB_Vector *left, pgGrB_Matrix *right);
 
 /* function to choose implicit semirings for overloaded operators */
 char* mxm_semiring(pgGrB_Matrix *left, pgGrB_Matrix *right);
@@ -412,10 +431,14 @@ typedef struct pgGrB_UnaryOp  {
     UOP(N+9, PRE, OP, FP64);                \
     } while(0)
 
-#define TYPECHCK(A, B, OP, TYP)             \
+#define RETURN_TYPECHCK1(A, B, OP, TYP)     \
   if ((A) == GrB_##TYP || (B) == GrB_##TYP) \
     return #OP "_" #TYP
   
+#define RETURN_TYPECHCK2(A, B, TYP)     \
+  if ((A) == GrB_##TYP || (B) == GrB_##TYP) \
+    return GrB_##TYP
+
 void _PG_init(void);
 
 #endif /* PGGRAPHBLAS_H */

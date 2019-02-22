@@ -6,6 +6,7 @@ pgGrB_BinaryOp binops[256];
 pgGrB_UnaryOp uops[67];
 
 #include "type.c"
+#include "visequal.c"
 #include "isequal.c"
 #include "vector.c"
 #include "matrix.c"

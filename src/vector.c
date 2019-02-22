@@ -250,66 +250,24 @@ Datum
 vector_eq(PG_FUNCTION_ARGS) {
   GrB_Info info;
   pgGrB_Vector *A, *B;
-  GrB_Index asize, bsize, anvals, bnvals;
-  GrB_Type atype, btype;
-  bool result = 0;
-  Datum d;
+  bool result;
 
   A = PGGRB_GETARG_VECTOR(0);
   B = PGGRB_GETARG_VECTOR(1);
 
-  CHECKD(GxB_Vector_type(&atype, A->V));
-  CHECKD(GxB_Vector_type(&btype, B->V));
-
-  if (atype != btype)
-    PG_RETURN_BOOL(result);
-
-  CHECKD(GrB_Vector_size(&asize, A->V));
-  CHECKD(GrB_Vector_size(&bsize, B->V));
-
-  if (asize != bsize)
-    PG_RETURN_BOOL(result);
-
-  CHECKD(GrB_Vector_nvals(&anvals, A->V));
-  CHECKD(GrB_Vector_nvals(&bnvals, B->V));
-
-  if (anvals != bnvals)
-    PG_RETURN_BOOL(result);
-
-  DATUM_TYPE_APPLY(d, atype, vector_eq, A, B);
-  return d;
+  CHECKD(visequal(&result, A->V, B->V, NULL));
+  PG_RETURN_BOOL(result);
 }
 
 Datum
 vector_ne(PG_FUNCTION_ARGS) {
   GrB_Info info;
   pgGrB_Vector *A, *B;
-  GrB_Index asize, bsize, anvals, bnvals;
-  GrB_Type atype, btype;
-  bool result = 1;
-  Datum d;
+  bool result;
 
   A = PGGRB_GETARG_VECTOR(0);
   B = PGGRB_GETARG_VECTOR(1);
 
-  CHECKD(GxB_Vector_type(&atype, A->V));
-  CHECKD(GxB_Vector_type(&btype, B->V));
-
-  if (atype != btype)
-    PG_RETURN_BOOL(result);
-
-  CHECKD(GrB_Vector_size(&asize, A->V));
-  CHECKD(GrB_Vector_size(&bsize, B->V));
-
-  if (asize != bsize)
-    PG_RETURN_BOOL(result);
-
-  CHECKD(GrB_Vector_nvals(&anvals, A->V));
-  CHECKD(GrB_Vector_nvals(&bnvals, B->V));
-
-  if (anvals != bnvals)
-    PG_RETURN_BOOL(result);
-
-  DATUM_TYPE_APPLY(d, atype, vector_ne, A, B);
-  return d;
+  CHECKD(visequal(&result, A->V, B->V, NULL));
+  PG_RETURN_BOOL(!result);
 }

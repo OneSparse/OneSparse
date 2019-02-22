@@ -272,7 +272,6 @@ matrix_ewise_add(PG_FUNCTION_ARGS) {
 
 Datum
 mxm(PG_FUNCTION_ARGS) {
-  GrB_Info info;
   pgGrB_Matrix *A, *B, *C = NULL, *mask = NULL;
   GrB_Type type;
   Datum d;
@@ -297,7 +296,7 @@ mxm(PG_FUNCTION_ARGS) {
   if (semiring == NULL)
     elog(ERROR, "unknown semiring name %s", semiring_name);
 
-  CHECKD(GxB_Matrix_type(&type, A->M));
+  type = mxm_type(A, B);
 
   DATUM_TYPE_APPLY(d, type, mxm, A, B, C, mask, semiring);
   return d;
@@ -305,9 +304,8 @@ mxm(PG_FUNCTION_ARGS) {
 
 Datum
 mxv(PG_FUNCTION_ARGS) {
-  GrB_Info info;
   pgGrB_Matrix *A;
-  pgGrB_Vector *B, *C, *mask;
+  pgGrB_Vector *B, *C = NULL, *mask = NULL;
   GrB_Type type;
   Datum d;
   char *semiring_name;
@@ -331,7 +329,7 @@ mxv(PG_FUNCTION_ARGS) {
   if (semiring == NULL)
     elog(ERROR, "unknown semiring name %s", semiring_name);
 
-  CHECKD(GxB_Matrix_type(&type, A->M));
+  type = mxv_type(A, B);
 
   DATUM_TYPE_APPLY(d, type, mxv, A, B, C, mask, semiring);
   return d;
@@ -339,7 +337,6 @@ mxv(PG_FUNCTION_ARGS) {
 
 Datum
 vxm(PG_FUNCTION_ARGS) {
-  GrB_Info info;
   pgGrB_Matrix *B;
   pgGrB_Vector *A, *C = NULL, *mask = NULL;
   GrB_Type type;
@@ -363,7 +360,7 @@ vxm(PG_FUNCTION_ARGS) {
   if (semiring == NULL)
     elog(ERROR, "unknown semiring name %s", semiring_name);
 
-  CHECKD(GxB_Vector_type(&type, A->V));
+  type = vxm_type(A, B);
 
   DATUM_TYPE_APPLY(d, type, vxm, A, B, C, mask, semiring);
   return d;

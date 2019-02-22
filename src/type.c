@@ -15,17 +15,59 @@ GrB_BinaryOp lookup_binop(char *name) {
   return NULL;
 }
 
+GrB_Type mxm_type(pgGrB_Matrix *left, pgGrB_Matrix *right) {
+  GrB_Info info;
+  GrB_Type atype, btype;
+  CHECKD(GxB_Matrix_type(&atype, left->M));
+  CHECKD(GxB_Matrix_type(&btype, right->M));
+  RETURN_TYPECHCK2(atype, btype, FP64);
+  RETURN_TYPECHCK2(atype, btype, FP32);
+  RETURN_TYPECHCK2(atype, btype, INT64);
+  RETURN_TYPECHCK2(atype, btype, INT32);
+  RETURN_TYPECHCK2(atype, btype, INT16);
+  RETURN_TYPECHCK2(atype, btype, BOOL);
+  return NULL;
+}
+
+GrB_Type mxv_type(pgGrB_Matrix *left, pgGrB_Vector *right) {
+  GrB_Info info;
+  GrB_Type atype, btype;
+  CHECKD(GxB_Matrix_type(&atype, left->M));
+  CHECKD(GxB_Vector_type(&btype, right->V));
+  RETURN_TYPECHCK2(atype, btype, FP64);
+  RETURN_TYPECHCK2(atype, btype, FP32);
+  RETURN_TYPECHCK2(atype, btype, INT64);
+  RETURN_TYPECHCK2(atype, btype, INT32);
+  RETURN_TYPECHCK2(atype, btype, INT16);
+  RETURN_TYPECHCK2(atype, btype, BOOL);
+  return NULL;
+}
+
+GrB_Type vxm_type(pgGrB_Vector *left, pgGrB_Matrix *right) {
+  GrB_Info info;
+  GrB_Type atype, btype;
+  CHECKD(GxB_Vector_type(&atype, left->V));
+  CHECKD(GxB_Matrix_type(&btype, right->M));
+  RETURN_TYPECHCK2(atype, btype, FP64);
+  RETURN_TYPECHCK2(atype, btype, FP32);
+  RETURN_TYPECHCK2(atype, btype, INT64);
+  RETURN_TYPECHCK2(atype, btype, INT32);
+  RETURN_TYPECHCK2(atype, btype, INT16);
+  RETURN_TYPECHCK2(atype, btype, BOOL);
+  return NULL;
+}
+
 char* mxm_semiring(pgGrB_Matrix *left, pgGrB_Matrix *right) {
   GrB_Info info;
   GrB_Type atype, btype;
   CHECKD(GxB_Matrix_type(&atype, left->M));
   CHECKD(GxB_Matrix_type(&btype, right->M));
-  TYPECHCK(atype, btype, PLUS_TIMES, FP64);
-  TYPECHCK(atype, btype, PLUS_TIMES, FP32);
-  TYPECHCK(atype, btype, PLUS_TIMES, INT64);
-  TYPECHCK(atype, btype, PLUS_TIMES, INT32);
-  TYPECHCK(atype, btype, PLUS_TIMES, INT16);
-  TYPECHCK(atype, btype, LOR_LAND, BOOL);
+  RETURN_TYPECHCK1(atype, btype, PLUS_TIMES, FP64);
+  RETURN_TYPECHCK1(atype, btype, PLUS_TIMES, FP32);
+  RETURN_TYPECHCK1(atype, btype, PLUS_TIMES, INT64);
+  RETURN_TYPECHCK1(atype, btype, PLUS_TIMES, INT32);
+  RETURN_TYPECHCK1(atype, btype, PLUS_TIMES, INT16);
+  RETURN_TYPECHCK1(atype, btype, LOR_LAND, BOOL);
   return "";
 }
 
@@ -34,12 +76,12 @@ char* mxv_semiring(pgGrB_Matrix *left, pgGrB_Vector *right) {
   GrB_Type atype, btype;
   CHECKD(GxB_Matrix_type(&atype, left->M));
   CHECKD(GxB_Vector_type(&btype, right->V));
-  TYPECHCK(atype, btype, PLUS_TIMES, FP64);
-  TYPECHCK(atype, btype, PLUS_TIMES, FP32);
-  TYPECHCK(atype, btype, PLUS_TIMES, INT64);
-  TYPECHCK(atype, btype, PLUS_TIMES, INT32);
-  TYPECHCK(atype, btype, PLUS_TIMES, INT16);
-  TYPECHCK(atype, btype, LOR_LAND, BOOL);
+  RETURN_TYPECHCK1(atype, btype, PLUS_TIMES, FP64);
+  RETURN_TYPECHCK1(atype, btype, PLUS_TIMES, FP32);
+  RETURN_TYPECHCK1(atype, btype, PLUS_TIMES, INT64);
+  RETURN_TYPECHCK1(atype, btype, PLUS_TIMES, INT32);
+  RETURN_TYPECHCK1(atype, btype, PLUS_TIMES, INT16);
+  RETURN_TYPECHCK1(atype, btype, LOR_LAND, BOOL);
   return "";
 }
 
@@ -48,12 +90,12 @@ char* vxm_semiring(pgGrB_Vector *left, pgGrB_Matrix *right) {
   GrB_Type atype, btype;
   CHECKD(GxB_Vector_type(&atype, left->V));
   CHECKD(GxB_Matrix_type(&btype, right->M));
-  TYPECHCK(atype, btype, PLUS_TIMES, FP64);
-  TYPECHCK(atype, btype, PLUS_TIMES, FP32);
-  TYPECHCK(atype, btype, PLUS_TIMES, INT64);
-  TYPECHCK(atype, btype, PLUS_TIMES, INT32);
-  TYPECHCK(atype, btype, PLUS_TIMES, INT16);
-  TYPECHCK(atype, btype, LOR_LAND, BOOL);
+  RETURN_TYPECHCK1(atype, btype, PLUS_TIMES, FP64);
+  RETURN_TYPECHCK1(atype, btype, PLUS_TIMES, FP32);
+  RETURN_TYPECHCK1(atype, btype, PLUS_TIMES, INT64);
+  RETURN_TYPECHCK1(atype, btype, PLUS_TIMES, INT32);
+  RETURN_TYPECHCK1(atype, btype, PLUS_TIMES, INT16);
+  RETURN_TYPECHCK1(atype, btype, LOR_LAND, BOOL);
   return "";
 
 }
