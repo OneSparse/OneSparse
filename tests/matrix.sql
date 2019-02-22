@@ -1,5 +1,5 @@
 begin;
-select plan(5);
+select plan(30);
 
 \set ROWS 0,1,2
 \set COLS 0,1,2
@@ -14,6 +14,10 @@ select plan(5);
 \set EAX 2
 \set EAY 4
 \set EAZ 6
+    
+\set EMX 1
+\set EMY 4
+\set EMZ 9
     
 \set TYPE integer
 \ir matrix_template.sql    
@@ -36,6 +40,10 @@ select plan(5);
 \set EAY 4.2
 \set EAZ 6.3
 
+\set EMX 1.1
+\set EMY 4.4
+\set EMZ 9.9
+    
 \ir matrix_template.sql    
     
 \set TYPE float
@@ -52,6 +60,10 @@ select plan(5);
 \set EAX true
 \set EAY true
 \set EAZ true
+    
+\set EMX true
+\set EMY false
+\set EMZ false
     
 \ir matrix_template.sql
     

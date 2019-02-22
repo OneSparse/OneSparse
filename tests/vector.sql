@@ -1,80 +1,37 @@
 begin;
-select plan(12);
+select plan(84);
 
--- dense vectors construction from 1-d arrays, indices go from 0...n
+\set IDXS 1,4,9
+\set VALS 1,2,3
+    
+\set EAX 2,4,6
+\set EMX 1,4,9
 
-select is(
-    vector(array[1,2,3]),
-    array[1,2,3]::vector,
-    'literal vector casting');
-
-select is(
-    size(vector(array[1,2,3])),
-    3::bigint,
-    'vector size');
-
-select is(
-    nvals(vector(array[1,2,3])),
-    3::bigint,
-    'vector nvals');
-
-select is(
-    size(vector(array[1,2,3])),
-    nvals(vector(array[1,2,3])),
-    'vector size');
-
-select is(
-    vector(array[1,2,3]) + vector(array[1,2,3]),
-    array[2,4,6]::vector,
-    'vector ewise add');
-
-select is(
-    vector(array[1,2,3]) * vector(array[1,2,3]),
-    array[1,4,9]::vector,
-    'vector ewise mul');
-
-select is(
-    vector(array[1,2,3]) = vector(array[1,2,3]),
-    true,
-    'vector equal');
-
-select is(
-    vector(array[1,2,3]) <> vector(array[1,2,3]),
-    false,
-    'vector not equal');
-
-
--- sparse construction, second array defines indices
-
-select is(
-    size(vector(array[1,2,3], array[1,4,9])),
-    10::bigint,
-    'sparse size');
-
-select is(
-    nvals(vector(array[1,2,3], array[1,4,9])),
-    3::bigint,
-    'sparse nvals');
-
-select is(
-    vector(array[1,2,3], array[1,4,9]) + vector(array[1,2,3], array[1,4,9]),
-    vector(array[2,4,6], array[1,4,9]),
-    'sparse vector add');
-
-select is(
-    vector(array[1,2,3], array[1,4,9]) * vector(array[1,2,3], array[1,4,9]),
-    vector(array[1,4,9], array[1,4,9]),
-    'sparse vector mult');
-
-select is(
-    vector(array[1,2,3], array[1,4,9]) = vector(array[1,2,3], array[1,4,9]),
-    true,
-    'sparse vector eq');
-
-select is(
-    vector(array[1,2,3], array[1,4,9]) <> vector(array[1,2,4], array[1,4,9]),
-    true,
-    'sparse vector neq');
-
+\set TYPE integer
+\ir vector_template.sql    
+    
+\set TYPE bigint
+\ir vector_template.sql    
+    
+\set TYPE smallint
+\ir vector_template.sql    
+    
+\set TYPE real
+\set VALS 1.25,2.5,5.0
+\set EAX 2.500000,5.000000,10.000000
+\set EMX 1.562500,6.250000,25.000000
+    
+\ir vector_template.sql    
+    
+\set TYPE float
+\ir vector_template.sql    
+    
+\set TYPE bool
+\set VALS true,false,true
+\set EAX true,false,true
+\set EMX true,false,true
+    
+\ir vector_template.sql
+    
 select * from finish();
 rollback;

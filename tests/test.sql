@@ -7,7 +7,6 @@ select pg_backend_pid() pid \gset
 \prompt 'Go? (y/n) ' go
 
 \set ECHO none
-\set QUIET 1
 
 \pset format unaligned
 \pset tuples_only true
@@ -20,5 +19,4 @@ select pg_backend_pid() pid \gset
 create extension if not exists pgtap;
 create extension if not exists pggraphblas;
 
-\ir vector.sql
-\ir matrix.sql
+\ir init.sql

@@ -35,3 +35,16 @@ select is(
     'matrix ewise add');
 
 
+select is(
+    matrix(array[:ROWS],
+            array[:COLS],
+            cast(array[:A,:B,:C] as :TYPE [])) &&
+    matrix(array[:ROWS],
+            array[:COLS],
+            cast(array[:D,:E,:F] as :TYPE [])),
+    matrix(array[:ROWS],
+            array[:COLS],
+            cast(array[:EMX,:EMY,:EMZ] as :TYPE [])),
+    'matrix ewise mul');
+
+
