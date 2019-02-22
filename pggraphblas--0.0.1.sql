@@ -65,39 +65,69 @@ CREATE TYPE matrix (
 CREATE FUNCTION matrix(bigint[], bigint[], bool[],
     bigint default null, bigint default null)
 RETURNS matrix
-AS '$libdir/pggraphblas', 'matrix_new_bool'
+AS '$libdir/pggraphblas', 'matrix_bool'
 LANGUAGE C STABLE;
 
 CREATE FUNCTION matrix(bigint[], bigint[], bigint[],
     bigint default null, bigint default null)
 RETURNS matrix
-AS '$libdir/pggraphblas', 'matrix_new_int64'
+AS '$libdir/pggraphblas', 'matrix_int64'
 LANGUAGE C STABLE;
 
 CREATE FUNCTION matrix(bigint[], bigint[], integer[],
     bigint default null, bigint default null)
 RETURNS matrix
-AS '$libdir/pggraphblas', 'matrix_new_int32'
+AS '$libdir/pggraphblas', 'matrix_int32'
 LANGUAGE C STABLE;
 
 CREATE FUNCTION matrix(bigint[], bigint[], smallint[],
     bigint default null, bigint default null)
 RETURNS matrix
-AS '$libdir/pggraphblas', 'matrix_new_int16'
+AS '$libdir/pggraphblas', 'matrix_int16'
 LANGUAGE C STABLE;
 
 CREATE FUNCTION matrix(bigint[], bigint[], real[],
     bigint default null, bigint default null)
 RETURNS matrix
-AS '$libdir/pggraphblas', 'matrix_new_float4'
+AS '$libdir/pggraphblas', 'matrix_float4'
 LANGUAGE C STABLE;
 
 CREATE FUNCTION matrix(bigint[], bigint[], float[],
     bigint default null, bigint default null)
 RETURNS matrix
-AS '$libdir/pggraphblas', 'matrix_new_float8'
+AS '$libdir/pggraphblas', 'matrix_float8'
 LANGUAGE C STABLE;
 
+CREATE FUNCTION matrix_bool(bigint, bigint)
+RETURNS matrix
+AS '$libdir/pggraphblas', 'matrix_bool'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION matrix_bigint(bigint, bigint)
+RETURNS matrix
+AS '$libdir/pggraphblas', 'matrix_int64'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION matrix_integer(bigint, bigint)
+RETURNS matrix
+AS '$libdir/pggraphblas', 'matrix_int32'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION matrix_smallint(bigint, bigint)
+RETURNS matrix
+AS '$libdir/pggraphblas', 'matrix_int16'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION matrix_real(bigint, bigint)
+RETURNS matrix
+AS '$libdir/pggraphblas', 'matrix_float4'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION matrix_float(bigint, bigint)
+RETURNS matrix
+AS '$libdir/pggraphblas', 'matrix_float8'
+LANGUAGE C STABLE;
+    
         
 CREATE FUNCTION mxm(
     A matrix,
@@ -371,7 +401,7 @@ LANGUAGE C STABLE STRICT;
 
 -- vectors
 
-CREATE FUNCTION vector_ewise_mult(
+CREATE FUNCTION ewise_mult(
     A vector,
     B vector,
     inout C vector default null,
@@ -382,9 +412,9 @@ CREATE FUNCTION vector_ewise_mult(
     )
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_ewise_mult'
-LANGUAGE C STABLE STRICT;
+LANGUAGE C STABLE;
 
-CREATE FUNCTION vector_ewise_add(
+CREATE FUNCTION ewise_add(
     A vector,
     B vector,
     inout C vector default null,
@@ -395,7 +425,7 @@ CREATE FUNCTION vector_ewise_add(
     )
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_ewise_add'
-LANGUAGE C STABLE STRICT;
+LANGUAGE C STABLE;
 
 CREATE FUNCTION vector_ewise_mult_op(vector, vector)
 RETURNS vector
@@ -496,6 +526,38 @@ AS '$libdir/pggraphblas', 'vector_bool'
 LANGUAGE C STRICT;
 
 CREATE CAST (bool[] AS vector) WITH FUNCTION vector(bool[]) AS IMPLICIT;
+
+-- empty construction
+
+CREATE FUNCTION vector_bigint(bigint)
+RETURNS vector
+AS '$libdir/pggraphblas', 'vector_empty_int64'
+LANGUAGE C STRICT;
+
+CREATE FUNCTION vector_integer(bigint)
+RETURNS vector
+AS '$libdir/pggraphblas', 'vector_empty_int32'
+LANGUAGE C STRICT;
+
+CREATE FUNCTION vector_smallint(bigint)
+RETURNS vector
+AS '$libdir/pggraphblas', 'vector_empty_int16'
+LANGUAGE C STRICT;
+
+CREATE FUNCTION vector_float(bigint)
+RETURNS vector
+AS '$libdir/pggraphblas', 'vector_empty_float8'
+LANGUAGE C STRICT;
+
+CREATE FUNCTION vector_real(bigint)
+RETURNS vector
+AS '$libdir/pggraphblas', 'vector_empty_float4'
+LANGUAGE C STRICT;
+
+CREATE FUNCTION vector_bool(bigint)
+RETURNS vector
+AS '$libdir/pggraphblas', 'vector_empty_bool'
+LANGUAGE C STRICT;
 
 -- sparse construction
 

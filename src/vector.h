@@ -53,6 +53,7 @@ Datum FN(vector_ne)(pgGrB_Vector *A,
                     pgGrB_Vector *B);
 
 PG_FUNCTION_INFO_V1(FN(vector));
+PG_FUNCTION_INFO_V1(FN(vector_empty));
 PG_FUNCTION_INFO_V1(FN(vector_agg_acc));
 PG_FUNCTION_INFO_V1(FN(vector_final));
 PG_FUNCTION_INFO_V1(FN(vector_elements));
@@ -295,6 +296,15 @@ FN(vector_final)(PG_FUNCTION_ARGS) {
   PGGRB_RETURN_VECTOR(retval);
 }
 
+Datum
+FN(vector_empty)(PG_FUNCTION_ARGS) {
+  pgGrB_Vector *retval;
+  GrB_Index max_index;
+  max_index = PG_GETARG_INT64(0);
+  retval = FN(construct_empty_expanded_vector)(max_index, CurrentMemoryContext);
+  PGGRB_RETURN_VECTOR(retval);
+  }
+
 /* cast implementation function. */
 Datum
 FN(vector)(PG_FUNCTION_ARGS) {
@@ -494,7 +504,7 @@ FN(vector_ewise_add)(pgGrB_Vector *A,
     CHECKD(GrB_Vector_size(&size, A->V));
     C = FN(construct_empty_expanded_vector)(size, CurrentMemoryContext);
   }
-  CHECKD(GrB_eWiseAdd(C->V, NULL, NULL, GB_ADD, A->V, B->V, NULL));
+  CHECKD(GrB_eWiseAdd(C->V, mask ? mask->V : NULL, NULL, GB_ADD, A->V, B->V, NULL));
   PGGRB_RETURN_VECTOR(C);
 }
 

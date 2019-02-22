@@ -65,7 +65,7 @@ FN(vxm)(pgGrB_Vector *A,
         GrB_Semiring semiring);
 
        
-PG_FUNCTION_INFO_V1(FN(matrix_new));
+PG_FUNCTION_INFO_V1(FN(matrix));
 PG_FUNCTION_INFO_V1(FN(matrix_empty));
 PG_FUNCTION_INFO_V1(FN(matrix_agg_acc));
 PG_FUNCTION_INFO_V1(FN(matrix_final));
@@ -547,7 +547,7 @@ FN(vxm)(pgGrB_Vector *A,
 }
 
 Datum
-FN(matrix_new)(PG_FUNCTION_ARGS) {
+FN(matrix)(PG_FUNCTION_ARGS) {
   GrB_Info info;
   pgGrB_Matrix *retval;
   ArrayType *rows, *cols, *vals;
@@ -560,6 +560,15 @@ FN(matrix_new)(PG_FUNCTION_ARGS) {
   ArrayIterator array_iterator;
   Datum	value;
   bool isnull;
+
+  if (PG_NARGS() == 2) {
+    max_row_index = PG_GETARG_INT64(0);
+    max_col_index = PG_GETARG_INT64(1);
+    retval = FN(construct_empty_expanded_matrix)(max_row_index,
+                                                 max_col_index,
+                                                 CurrentMemoryContext);
+    PGGRB_RETURN_MATRIX(retval);
+  }
 
   rows = PG_GETARG_ARRAYTYPE_P(0);
   cols = PG_GETARG_ARRAYTYPE_P(1);

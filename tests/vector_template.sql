@@ -5,6 +5,16 @@ select is(
     'literal vector casting ' || :'TYPE');
 
 select is(
+    size(vector_:TYPE(10)),
+    10::bigint,
+    'empty vector size ' || :'TYPE');
+    
+select is(
+    nvals(vector_:TYPE(10)),
+    0::bigint,
+    'empty vector nvals ' || :'TYPE');
+    
+select is(
     size(vector(cast(array[:VALS] as :TYPE []))),
     3::bigint,
     'vector size ' || :'TYPE');
@@ -20,22 +30,26 @@ select is(
     'vector size equals vals ' || :'TYPE');
 
 select is(
-    vector(cast(array[:VALS] as :TYPE [])) + vector(cast(array[:VALS] as :TYPE [])),
+    vector(cast(array[:VALS] as :TYPE [])) +
+    vector(cast(array[:VALS] as :TYPE [])),
     cast(array[:EAX] as :TYPE [])::vector,
     'vector ewise add ' || :'TYPE');
 
 select is(
-    vector(cast(array[:VALS] as :TYPE [])) * vector(cast(array[:VALS] as :TYPE [])),
+    vector(cast(array[:VALS] as :TYPE [])) *
+    vector(cast(array[:VALS] as :TYPE [])),
     cast(array[:EMX] as :TYPE [])::vector,
     'vector ewise mul ' || :'TYPE');
 
 select is(
-    vector(cast(array[:VALS] as :TYPE [])) = vector(cast(array[:VALS] as :TYPE [])),
+    vector(cast(array[:VALS] as :TYPE [])) =
+    vector(cast(array[:VALS] as :TYPE [])),
     true,
     'vector equal ' || :'TYPE');
 
 select is(
-    vector(cast(array[:VALS] as :TYPE [])) <> vector(cast(array[:VALS] as :TYPE [])),
+    vector(cast(array[:VALS] as :TYPE [])) <>
+    vector(cast(array[:VALS] as :TYPE [])),
     false,
     'vector not equal ' || :'TYPE');
 
@@ -58,11 +72,25 @@ select is(
     'sparse vector add ' || :'TYPE');
 
 select is(
+    ewise_add(vector(cast(array[:VALS] as :TYPE []), array[:IDXS]),
+    vector(cast(array[:VALS] as :TYPE []), array[:IDXS]),
+    mask=>vector(array[:MASK], array[:IDXS])),
+    vector(cast(array[:M_EAX] as :TYPE []), array[:M_IDXS]),
+    'sparse vector add masked ' || :'TYPE');
+    
+select is(
     vector(cast(array[:VALS] as :TYPE []), array[:IDXS]) *
     vector(cast(array[:VALS] as :TYPE []), array[:IDXS]),
     vector(cast(array[:EMX] as :TYPE []), array[:IDXS]),
     'sparse vector mult ' || :'TYPE');
 
+select is(
+    ewise_mult(vector(cast(array[:VALS] as :TYPE []), array[:IDXS]),
+    vector(cast(array[:VALS] as :TYPE []), array[:IDXS]),
+    mask=>vector(array[:MASK], array[:IDXS])),
+    vector(cast(array[:M_EMX] as :TYPE []), array[:M_IDXS]),
+    'sparse vector mult masked ' || :'TYPE');
+    
 select is(
     vector(cast(array[:VALS] as :TYPE []), array[:IDXS]) =
     vector(cast(array[:VALS] as :TYPE []), array[:IDXS]),
