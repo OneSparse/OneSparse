@@ -115,7 +115,7 @@ select is(
   matrix(array[:ROWS],
     array[:ROLS],
     cast(array[:MMX] as :TYPE [])),
-  'matrix  mul ' || :'TYPE');
+  'matrix mxm ' || :'TYPE');
 
 select is(
   mxm(matrix(
@@ -135,4 +135,44 @@ select is(
   matrix(array[:M_ROWS],
     array[:M_ROLS],
     cast(array[:M_MMX] as :TYPE []), 3, 3),
-  'matrix ewise add masked ' || :'TYPE');
+  'matrix mxm masked ' || :'TYPE');
+
+select is(
+  mxm(
+    matrix(
+      array[:ROWS],
+      array[:COLS],
+      cast(array[:VALS] as :TYPE [])),
+    matrix(
+      array[:ROWS],
+      array[:COLS],
+      cast(array[:VALS] as :TYPE [])),
+    matrix(
+      array[:ROWS],
+      array[:ROLS],
+      cast(array[:VALS2] as :TYPE [])),
+        accum=>'TIMES_' || :'C_TYPE'),
+    matrix(
+      array[:ROWS],
+      array[:ROLS],
+      cast(array[:A_MMX] as :TYPE [])),
+    'matrix mxm accum ' || :'TYPE');
+
+select is(
+  matrix(array[:ROWS],
+    array[:COLS],
+    cast(array[:VALS] as :TYPE [])) *
+  vector(cast(array[:VALS2] as :TYPE [])),
+
+  vector(cast(array[:MMX] as :TYPE [])),
+  'matrix mxv ' || :'TYPE');
+
+select is(
+  vector(cast(array[:VALS2] as :TYPE [])) *
+  matrix(array[:ROWS],
+    array[:COLS],
+    cast(array[:VALS] as :TYPE [])),
+
+  vector(cast(array[:VMX] as :TYPE [])),
+  'matrix mxv ' || :'TYPE');
+

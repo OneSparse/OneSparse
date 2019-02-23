@@ -1,6 +1,6 @@
 
 begin;
-select plan(72);
+select plan(90);
 
 -- The following variables are substituted into matrix_template.sql.
 -- Each support type is defined and the expected values, the template
@@ -25,18 +25,24 @@ select plan(72);
 \set EAX 3,5,7
 \set EMX 2,6,12
 \set MMX 3,8,6
+\set VMX 12,2,6
     
 \set M_EAX 3,5
 \set M_EMX 2,6
 \set M_MMX 3,8
     
+\set A_MMX 4,18,12
+    
 \set TYPE bigint
+\set C_TYPE INT64
 \ir matrix_template.sql    
     
 \set TYPE integer
+\set C_TYPE INT32
 \ir matrix_template.sql    
     
 \set TYPE smallint
+\set C_TYPE INT16
 \ir matrix_template.sql
 
 -- real/float expected values
@@ -47,15 +53,20 @@ select plan(72);
 \set EAX 3.750000,7.500000,15.000000
 \set EMX 3.125000,12.500000,50.000000
 \set MMX 6.250000,25.000000,12.500000
+\set VMX 50.000000,3.125000,12.500000
     
 \set M_EAX 3.750000,7.500000
 \set M_EMX 3.125000,12.500000
 \set M_MMX 6.250000,25.000000
         
+\set A_MMX 7.812500,62.500000,62.500000
+    
 \set TYPE real
+\set C_TYPE FP32
 \ir matrix_template.sql
     
 \set TYPE float
+\set C_TYPE FP64
 \ir matrix_template.sql
 
 -- bool
@@ -66,12 +77,16 @@ select plan(72);
 \set EAX true,true,true
 \set EMX true,false,false
 \set MMX true,false,true
+\set VMX false,true,false
     
 \set M_EAX true,true
 \set M_EMX true,false
 \set M_MMX true,false
     
+\set A_MMX false,false,false
+    
 \set TYPE bool
+\set C_TYPE BOOL
 \ir matrix_template.sql
     
 select * from finish();

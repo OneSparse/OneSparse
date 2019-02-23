@@ -135,8 +135,8 @@ CREATE FUNCTION mxm(
     inout C matrix default null,
     mask matrix default null,
     semiring text default null,
-    descriptor text default null,
-    accum text default null
+    accum text default null,
+    descriptor text default null
     )
 RETURNS matrix
 AS '$libdir/pggraphblas', 'mxm'
@@ -153,8 +153,8 @@ CREATE FUNCTION mxv(
     inout C vector default null,
     mask vector default null,
     semiring text default null,
-    descriptor text default null,
-    accum text default null
+    accum text default null,
+    descriptor text default null
     )
 RETURNS vector
 AS '$libdir/pggraphblas', 'mxv'
@@ -171,8 +171,8 @@ CREATE FUNCTION vxm(
     inout C vector default null,
     mask vector default null,
     semiring text default null,
-    descriptor text default null,
-    accum text default null
+    accum text default null,
+    descriptor text default null
     )
 RETURNS vector
 AS '$libdir/pggraphblas', 'vxm'
@@ -189,8 +189,8 @@ CREATE FUNCTION ewise_mult(
     inout C matrix default null,
     mask matrix default null,
     op text default null,
-    descriptor text default null,
-    accum text default null
+    accum text default null,
+    descriptor text default null
     )
 
 RETURNS matrix
@@ -203,8 +203,9 @@ CREATE FUNCTION ewise_add(
     inout C matrix default null,
     mask matrix default null,
     op text default null,
-    descriptor text default null,
-    accum text default null)
+    accum text default null,
+    descriptor text default null
+    )
 
 RETURNS matrix
 AS '$libdir/pggraphblas', 'matrix_ewise_add'
@@ -407,8 +408,8 @@ CREATE FUNCTION ewise_mult(
     inout C vector default null,
     mask vector default null,
     op text default null,
-    descriptor text default null,
-    accum text default null
+    accum text default null,
+    descriptor text default null
     )
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_ewise_mult'
@@ -420,8 +421,8 @@ CREATE FUNCTION ewise_add(
     inout C vector default null,
     mask vector default null,
     op text default null,
-    descriptor text default null,
-    accum text default null
+    accum text default null,
+    descriptor text default null
     )
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_ewise_add'

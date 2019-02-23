@@ -275,8 +275,10 @@ mxm(PG_FUNCTION_ARGS) {
   pgGrB_Matrix *A, *B, *C = NULL, *mask = NULL;
   GrB_Type type;
   Datum d;
-  char *semiring_name;
+  char *semiring_name, *binop_name;
   GrB_Semiring semiring;
+  GrB_BinaryOp binop = NULL;
+  GrB_Descriptor desc = NULL;
 
   A = PGGRB_GETARG_MATRIX(0);
   B = PGGRB_GETARG_MATRIX(1);
@@ -291,14 +293,24 @@ mxm(PG_FUNCTION_ARGS) {
     semiring_name = PG_ARGISNULL(4) ? 
       semiring_name : 
       text_to_cstring(PG_GETARG_TEXT_PP(4));
+  if (PG_NARGS() > 5)
+    binop_name = PG_ARGISNULL(5) ? 
+      NULL : 
+      text_to_cstring(PG_GETARG_TEXT_PP(5));
 
   semiring = lookup_semiring(semiring_name);
   if (semiring == NULL)
     elog(ERROR, "unknown semiring name %s", semiring_name);
 
+  if (binop_name != NULL)
+    binop = lookup_binop(binop_name);
+  
+  if (semiring == NULL)
+      elog(ERROR, "unknown semiring name %s", semiring_name);
+  
   type = mxm_type(A, B);
 
-  DATUM_TYPE_APPLY(d, type, mxm, A, B, C, mask, semiring);
+  DATUM_TYPE_APPLY(d, type, mxm, A, B, C, mask, semiring, binop, desc);
   return d;
 }
 
@@ -308,8 +320,10 @@ mxv(PG_FUNCTION_ARGS) {
   pgGrB_Vector *B, *C = NULL, *mask = NULL;
   GrB_Type type;
   Datum d;
-  char *semiring_name;
+  char *semiring_name, *binop_name;
   GrB_Semiring semiring;
+  GrB_BinaryOp binop = NULL;
+  GrB_Descriptor desc = NULL;
 
   A = (pgGrB_Matrix *) PGGRB_GETARG_MATRIX(0);
   B = (pgGrB_Vector *) PGGRB_GETARG_VECTOR(1);
@@ -324,6 +338,13 @@ mxv(PG_FUNCTION_ARGS) {
     semiring_name = PG_ARGISNULL(4) ? 
       semiring_name : 
       text_to_cstring(PG_GETARG_TEXT_PP(4));
+  if (PG_NARGS() > 5)
+    binop_name = PG_ARGISNULL(5) ? 
+      NULL : 
+      text_to_cstring(PG_GETARG_TEXT_PP(5));
+  
+  if (binop_name != NULL)
+    binop = lookup_binop(binop_name);
   
   semiring = lookup_semiring(semiring_name);
   if (semiring == NULL)
@@ -331,18 +352,20 @@ mxv(PG_FUNCTION_ARGS) {
 
   type = mxv_type(A, B);
 
-  DATUM_TYPE_APPLY(d, type, mxv, A, B, C, mask, semiring);
+  DATUM_TYPE_APPLY(d, type, mxv, A, B, C, mask, semiring, binop, desc);
   return d;
 }
 
 Datum
 vxm(PG_FUNCTION_ARGS) {
-  pgGrB_Matrix *B;
+ pgGrB_Matrix *B;
   pgGrB_Vector *A, *C = NULL, *mask = NULL;
   GrB_Type type;
   Datum d;
-  char *semiring_name;
+  char *semiring_name, *binop_name;
   GrB_Semiring semiring;
+  GrB_BinaryOp binop = NULL;
+  GrB_Descriptor desc = NULL;
 
   A = (pgGrB_Vector *) PGGRB_GETARG_VECTOR(0);
   B = (pgGrB_Matrix *) PGGRB_GETARG_MATRIX(1);
@@ -355,14 +378,22 @@ vxm(PG_FUNCTION_ARGS) {
     mask = PG_ARGISNULL(3) ? NULL : PGGRB_GETARG_VECTOR(3);
   if (PG_NARGS() > 4)
     semiring_name = PG_ARGISNULL(4) ? semiring_name : PG_GETARG_CSTRING(4);
+  if (PG_NARGS() > 5)
+    binop_name = PG_ARGISNULL(5) ? 
+      NULL : 
+      text_to_cstring(PG_GETARG_TEXT_PP(5));
 
+
+  if (binop_name != NULL)
+    binop = lookup_binop(binop_name);
+  
   semiring = lookup_semiring(semiring_name);
   if (semiring == NULL)
     elog(ERROR, "unknown semiring name %s", semiring_name);
 
   type = vxm_type(A, B);
 
-  DATUM_TYPE_APPLY(d, type, vxm, A, B, C, mask, semiring);
+  DATUM_TYPE_APPLY(d, type, vxm, A, B, C, mask, semiring, binop, desc);
   return d;
 }
 

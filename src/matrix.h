@@ -48,21 +48,27 @@ FN(mxm)(pgGrB_Matrix *A,
         pgGrB_Matrix *B,
         pgGrB_Matrix *C,
         pgGrB_Matrix *mask,
-        GrB_Semiring semiring);
+        GrB_Semiring semiring,
+        GrB_BinaryOp binop,
+        GrB_Descriptor desc);
 
 Datum
 FN(mxv)(pgGrB_Matrix *A,
         pgGrB_Vector *B,
         pgGrB_Vector *C,
         pgGrB_Vector *mask,
-        GrB_Semiring semiring);
+        GrB_Semiring semiring,
+        GrB_BinaryOp binop,
+        GrB_Descriptor desc);
 
 Datum
 FN(vxm)(pgGrB_Vector *A,
         pgGrB_Matrix *B,
         pgGrB_Vector *C,
         pgGrB_Vector *mask,
-        GrB_Semiring semiring);
+        GrB_Semiring semiring,
+        GrB_BinaryOp binop,
+        GrB_Descriptor desc);
 
        
 PG_FUNCTION_INFO_V1(FN(matrix));
@@ -499,7 +505,9 @@ FN(mxm)(pgGrB_Matrix *A,
         pgGrB_Matrix *B,
         pgGrB_Matrix *C,
         pgGrB_Matrix *mask,
-        GrB_Semiring semiring) {
+        GrB_Semiring semiring,
+        GrB_BinaryOp binop,
+        GrB_Descriptor desc) {
   GrB_Info info;
 
   if (C == NULL) {
@@ -508,7 +516,7 @@ FN(mxm)(pgGrB_Matrix *A,
     CHECKD(GrB_Matrix_ncols(&n, B->M));
     C = FN(construct_empty_expanded_matrix)(m, n, CurrentMemoryContext);
   }
-  CHECKD(GrB_mxm(C->M, mask ? mask->M : NULL, NULL, semiring, A->M, B->M, NULL));
+  CHECKD(GrB_mxm(C->M, mask ? mask->M : NULL, binop, semiring, A->M, B->M, desc));
   PGGRB_RETURN_MATRIX(C);
 }
 
@@ -517,7 +525,9 @@ FN(mxv)(pgGrB_Matrix *A,
         pgGrB_Vector *B,
         pgGrB_Vector *C,
         pgGrB_Vector *mask,
-        GrB_Semiring semiring) {
+        GrB_Semiring semiring,
+        GrB_BinaryOp binop,
+        GrB_Descriptor desc) {
   GrB_Info info;
   GrB_Index size;
 
@@ -525,7 +535,7 @@ FN(mxv)(pgGrB_Matrix *A,
     CHECKD(GrB_Vector_size(&size, B->V));
     C = FN(construct_empty_expanded_vector)(size, CurrentMemoryContext);
   }
-  CHECKD(GrB_mxv(C->V, mask ? mask->V : NULL, NULL, semiring, A->M, B->V, NULL));
+  CHECKD(GrB_mxv(C->V, mask ? mask->V : NULL, binop, semiring, A->M, B->V, desc));
   PGGRB_RETURN_VECTOR(C);
 }
 
@@ -534,7 +544,9 @@ FN(vxm)(pgGrB_Vector *A,
         pgGrB_Matrix *B,
         pgGrB_Vector *C,
         pgGrB_Vector *mask,
-        GrB_Semiring semiring) {
+        GrB_Semiring semiring,
+        GrB_BinaryOp binop,
+        GrB_Descriptor desc) {
   GrB_Info info;
   GrB_Index size;
 
@@ -542,7 +554,7 @@ FN(vxm)(pgGrB_Vector *A,
     CHECKD(GrB_Vector_size(&size, A->V));
     C = FN(construct_empty_expanded_vector)(size, CurrentMemoryContext);
   }
-  CHECKD(GrB_vxm(C->V, mask ? mask->V : NULL, NULL, semiring, A->V, B->M, NULL));
+  CHECKD(GrB_vxm(C->V, mask ? mask->V : NULL, binop, semiring, A->V, B->M, desc));
   PGGRB_RETURN_VECTOR(C);
 }
 
