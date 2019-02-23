@@ -439,6 +439,18 @@ typedef struct pgGrB_UnaryOp  {
   if ((A) == GrB_##TYP || (B) == GrB_##TYP) \
     return GrB_##TYP
 
+#define GETARG_DESCRIPTOR_VAL(ARG, DVAL, DESC, FIELD, VAL) do {         \
+    if (!PG_ARGISNULL(ARG)) {                                           \
+      (DVAL) = text_to_cstring(PG_GETARG_TEXT_PP(ARG));                 \
+      if (strcmp((DVAL), "default") == 0) {                             \
+        CHECKD(GrB_Descriptor_set((DESC), GrB_##FIELD, GxB_DEFAULT));   \
+      } else if (strcmp(desc_val, "replace") == 0) {                    \
+        CHECKD(GrB_Descriptor_set((DESC), GrB_##FIELD, GrB_##VAL));     \
+      } else                                                            \
+        elog(ERROR, "unknown outp descriptor value %s", desc_val);      \
+    }                                                                   \
+  } while(0)
+
 void _PG_init(void);
 
 #endif /* PGGRAPHBLAS_H */

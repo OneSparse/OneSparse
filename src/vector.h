@@ -1,13 +1,5 @@
 /* This is a "header template" see vector.c for specific instanciations */
 
-#define VECTOR_BINOP_PREAMBLE()                           \
-  do {                                                    \
-    A = PGGRB_GETARG_VECTOR(0);                           \
-    B = PGGRB_GETARG_VECTOR(1);                           \
-    C = (pgGrB_Vector *) palloc0(sizeof(pgGrB_Vector));   \
-  } while (0)
-
-
 typedef struct FN(pgGrB_Vector_ExtractState) {
   pgGrB_Vector *vec;
   GrB_Index *indices;

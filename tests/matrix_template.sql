@@ -130,7 +130,12 @@ select is(
   mask=>matrix(
     array[:ROWS],
     array[:ROLS],
-    array[:M_VALS])
+    array[:M_VALS]),
+    
+  doutp=>'default',
+  dmask=>'default',
+  dinp0=>'default',
+  dinp1=>'default'
   ),
   matrix(array[:M_ROWS],
     array[:M_ROLS],
@@ -151,7 +156,7 @@ select is(
       array[:ROWS],
       array[:ROLS],
       cast(array[:VALS2] as :TYPE [])),
-        accum=>'TIMES_' || :'C_TYPE'),
+    accum=>'TIMES_' || :'C_TYPE'),
     matrix(
       array[:ROWS],
       array[:ROLS],
@@ -174,5 +179,5 @@ select is(
     cast(array[:VALS] as :TYPE [])),
 
   vector(cast(array[:VMX] as :TYPE [])),
-  'matrix mxv ' || :'TYPE');
+  'matrix vxm ' || :'TYPE');
 

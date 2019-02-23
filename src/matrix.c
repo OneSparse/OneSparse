@@ -273,9 +273,10 @@ matrix_ewise_add(PG_FUNCTION_ARGS) {
 Datum
 mxm(PG_FUNCTION_ARGS) {
   pgGrB_Matrix *A, *B, *C = NULL, *mask = NULL;
+  GrB_Info info;
   GrB_Type type;
   Datum d;
-  char *semiring_name, *binop_name;
+  char *semiring_name, *binop_name, *desc_val;
   GrB_Semiring semiring;
   GrB_BinaryOp binop = NULL;
   GrB_Descriptor desc = NULL;
@@ -285,18 +286,24 @@ mxm(PG_FUNCTION_ARGS) {
 
   semiring_name = mxm_semiring(A, B);
   
-  if (PG_NARGS() > 2)
+  if (PG_NARGS() > 2) {
     C = PG_ARGISNULL(2) ? NULL : PGGRB_GETARG_MATRIX(2);
-  if (PG_NARGS() > 3)
     mask = PG_ARGISNULL(3) ? NULL : PGGRB_GETARG_MATRIX(3);
-  if (PG_NARGS() > 4)
     semiring_name = PG_ARGISNULL(4) ? 
       semiring_name : 
       text_to_cstring(PG_GETARG_TEXT_PP(4));
-  if (PG_NARGS() > 5)
     binop_name = PG_ARGISNULL(5) ? 
       NULL : 
       text_to_cstring(PG_GETARG_TEXT_PP(5));
+  
+    if (PG_NARGS() > 6) {
+      CHECKD(GrB_Descriptor_new(&desc));
+      GETARG_DESCRIPTOR_VAL(6, desc_val, desc, OUTP, REPLACE);
+      GETARG_DESCRIPTOR_VAL(7, desc_val, desc, MASK, SCMP);
+      GETARG_DESCRIPTOR_VAL(8, desc_val, desc, INP0, TRAN);
+      GETARG_DESCRIPTOR_VAL(9, desc_val, desc, INP1, TRAN);
+    }
+  }
 
   semiring = lookup_semiring(semiring_name);
   if (semiring == NULL)
@@ -316,11 +323,12 @@ mxm(PG_FUNCTION_ARGS) {
 
 Datum
 mxv(PG_FUNCTION_ARGS) {
+  GrB_Info info;
   pgGrB_Matrix *A;
   pgGrB_Vector *B, *C = NULL, *mask = NULL;
   GrB_Type type;
   Datum d;
-  char *semiring_name, *binop_name;
+  char *semiring_name, *binop_name, *desc_val;
   GrB_Semiring semiring;
   GrB_BinaryOp binop = NULL;
   GrB_Descriptor desc = NULL;
@@ -330,18 +338,23 @@ mxv(PG_FUNCTION_ARGS) {
 
   semiring_name = mxv_semiring(A, B);
   
-  if (PG_NARGS() > 2)
+  if (PG_NARGS() > 2) {
     C = PG_ARGISNULL(2) ? NULL : PGGRB_GETARG_VECTOR(2);
-  if (PG_NARGS() > 3)
     mask = PG_ARGISNULL(3) ? NULL : PGGRB_GETARG_VECTOR(3);
-  if (PG_NARGS() > 4)
     semiring_name = PG_ARGISNULL(4) ? 
       semiring_name : 
       text_to_cstring(PG_GETARG_TEXT_PP(4));
-  if (PG_NARGS() > 5)
     binop_name = PG_ARGISNULL(5) ? 
       NULL : 
       text_to_cstring(PG_GETARG_TEXT_PP(5));
+    if (PG_NARGS() > 6) {
+      CHECKD(GrB_Descriptor_new(&desc));
+      GETARG_DESCRIPTOR_VAL(6, desc_val, desc, OUTP, REPLACE);
+      GETARG_DESCRIPTOR_VAL(7, desc_val, desc, MASK, SCMP);
+      GETARG_DESCRIPTOR_VAL(8, desc_val, desc, INP0, TRAN);
+      GETARG_DESCRIPTOR_VAL(9, desc_val, desc, INP1, TRAN);
+    }
+  }
   
   if (binop_name != NULL)
     binop = lookup_binop(binop_name);
@@ -358,11 +371,12 @@ mxv(PG_FUNCTION_ARGS) {
 
 Datum
 vxm(PG_FUNCTION_ARGS) {
- pgGrB_Matrix *B;
+  pgGrB_Matrix *B;
   pgGrB_Vector *A, *C = NULL, *mask = NULL;
   GrB_Type type;
+  GrB_Info info;
   Datum d;
-  char *semiring_name, *binop_name;
+  char *semiring_name, *binop_name, *desc_val;
   GrB_Semiring semiring;
   GrB_BinaryOp binop = NULL;
   GrB_Descriptor desc = NULL;
@@ -372,17 +386,21 @@ vxm(PG_FUNCTION_ARGS) {
 
   semiring_name = vxm_semiring(A, B);
 
-  if (PG_NARGS() > 2)
+  if (PG_NARGS() > 2) {
     C = PG_ARGISNULL(2) ? NULL : PGGRB_GETARG_VECTOR(2);
-  if (PG_NARGS() > 3)
     mask = PG_ARGISNULL(3) ? NULL : PGGRB_GETARG_VECTOR(3);
-  if (PG_NARGS() > 4)
     semiring_name = PG_ARGISNULL(4) ? semiring_name : PG_GETARG_CSTRING(4);
-  if (PG_NARGS() > 5)
     binop_name = PG_ARGISNULL(5) ? 
       NULL : 
       text_to_cstring(PG_GETARG_TEXT_PP(5));
-
+    if (PG_NARGS() > 6) {
+      CHECKD(GrB_Descriptor_new(&desc));
+      GETARG_DESCRIPTOR_VAL(6, desc_val, desc, OUTP, REPLACE);
+      GETARG_DESCRIPTOR_VAL(7, desc_val, desc, MASK, SCMP);
+      GETARG_DESCRIPTOR_VAL(8, desc_val, desc, INP0, TRAN);
+      GETARG_DESCRIPTOR_VAL(9, desc_val, desc, INP1, TRAN);
+    }
+  }
 
   if (binop_name != NULL)
     binop = lookup_binop(binop_name);
@@ -396,22 +414,3 @@ vxm(PG_FUNCTION_ARGS) {
   DATUM_TYPE_APPLY(d, type, vxm, A, B, C, mask, semiring, binop, desc);
   return d;
 }
-
-/* Datum */
-/* matrix_new(PG_FUNCTION_ARGS) { */
-/*   GrB_Info info; */
-/*   pgGrB_Matrix *result; */
-/*   ExpandedArrayHeader *I, *J, *V; */
-/*   GrB_Type type; */
-/*   Datum d; */
-
-/*   I = PG_GETARG_EXPANDED_ARRAY(0); */
-/*   J = PG_GETARG_EXPANDED_ARRAY(1); */
-/*   V = PG_GETARG_EXPANDED_ARRAY(1); */
-  
-/*   d = DATUM_TYPE_APPLY(type, matrix_new, I, J, V); */
-/*   if (d == (Datum)0) */
-/*     elog(ERROR, "Unknown graphblas type"); */
-/*   return d; */
-/* } */
-
