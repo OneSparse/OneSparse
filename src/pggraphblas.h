@@ -19,7 +19,7 @@
 #define CCAT(x, y) CCAT2(x, y)
 #define FN(x) CCAT(x, SUFFIX)
 
-#define DATUM_TYPE_APPLY(D, T, F, ...) do {       \
+#define TYPE_APPLY(D, T, F, ...) do {       \
   if ((T) == GrB_INT64)                           \
     D = F ## _int64(__VA_ARGS__);                 \
   else if ((T)  == GrB_INT32)                     \
@@ -325,6 +325,8 @@ PG_FUNCTION_INFO_V1(vector_ne);
 
 PG_FUNCTION_INFO_V1(vector_nvals);
 PG_FUNCTION_INFO_V1(vector_size);
+
+PG_FUNCTION_INFO_V1(vector_xtract);
 
 typedef struct pgGrB_Semiring  {
   char name[255];

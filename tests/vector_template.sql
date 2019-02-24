@@ -61,6 +61,11 @@ select is(
     'sparse size ' || :'TYPE');
 
 select is(
+    size(vector(cast(array[:VALS] as :TYPE []), array[:IDXS], 20)),
+    20::bigint,
+    'sparse explicit size ' || :'TYPE');
+
+select is(
     nvals(vector(cast(array[:VALS] as :TYPE []), array[:IDXS])),
     3::bigint,
     'sparse nvals ' || :'TYPE');

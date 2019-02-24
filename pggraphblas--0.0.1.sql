@@ -478,6 +478,11 @@ RETURNS bigint
 AS '$libdir/pggraphblas', 'vector_nvals'
 LANGUAGE C STABLE STRICT;
 
+CREATE FUNCTION xtract(vector, vector)
+RETURNS vector
+AS '$libdir/pggraphblas', 'vector_xtract'
+LANGUAGE C STABLE STRICT;
+
 CREATE OPERATOR * (
     leftarg = vector,
     rightarg = vector,
@@ -582,35 +587,35 @@ LANGUAGE C STRICT;
 
 -- sparse construction
 
-CREATE FUNCTION vector(bigint[], bigint[])
+CREATE FUNCTION vector(bigint[], bigint[], bigint default null)
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_int64'
-LANGUAGE C STRICT;
+LANGUAGE C;
 
-CREATE FUNCTION vector(integer[], bigint[])
+CREATE FUNCTION vector(integer[], bigint[], bigint default null)
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_int32'
-LANGUAGE C STRICT;
+LANGUAGE C;
 
-CREATE FUNCTION vector(smallint[], bigint[])
+CREATE FUNCTION vector(smallint[], bigint[], bigint default null)
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_int16'
-LANGUAGE C STRICT;
+LANGUAGE C;
 
-CREATE FUNCTION vector(float[], bigint[])
+CREATE FUNCTION vector(float[], bigint[], bigint default null)
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_float8'
-LANGUAGE C STRICT;
+LANGUAGE C;
 
-CREATE FUNCTION vector(real[], bigint[])
+CREATE FUNCTION vector(real[], bigint[], bigint default null)
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_float4'
-LANGUAGE C STRICT;
+LANGUAGE C;
 
-CREATE FUNCTION vector(bool[], bigint[])
+CREATE FUNCTION vector(bool[], bigint[], bigint default null)
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_bool'
-LANGUAGE C STRICT;
+LANGUAGE C;
 
 -- aggregators
 

@@ -122,7 +122,7 @@ DatumGetMatrix(Datum d) {
     return A;
   }
   flat = (pgGrB_FlatMatrix*)d;
-  DATUM_TYPE_APPLY(d, flat->type, expand_flat_matrix, d, CurrentMemoryContext);
+  TYPE_APPLY(d, flat->type, expand_flat_matrix, d, CurrentMemoryContext);
   return MatrixGetEOHP(d);
 }
 
@@ -146,7 +146,7 @@ matrix_out(PG_FUNCTION_ARGS)
 
   CHECKD(GxB_Matrix_type(&type, mat->M));
 
-  DATUM_TYPE_APPLY(d, type, matrix_out, mat);
+  TYPE_APPLY(d, type, matrix_out, mat);
   return d;
 }
 
@@ -234,7 +234,7 @@ matrix_ewise_mult(PG_FUNCTION_ARGS) {
 
   CHECKD(GxB_Matrix_type(&type, A->M));
 
-  DATUM_TYPE_APPLY(d, type, matrix_ewise_mult, A, B, C, mask, binop);
+  TYPE_APPLY(d, type, matrix_ewise_mult, A, B, C, mask, binop);
   return d;
 }
 
@@ -266,7 +266,7 @@ matrix_ewise_add(PG_FUNCTION_ARGS) {
 
   CHECKD(GxB_Matrix_type(&type, A->M));
 
-  DATUM_TYPE_APPLY(d, type, matrix_ewise_add, A, B, C, mask, binop);
+  TYPE_APPLY(d, type, matrix_ewise_add, A, B, C, mask, binop);
   return d;
 }
 
@@ -285,6 +285,7 @@ mxm(PG_FUNCTION_ARGS) {
   B = PGGRB_GETARG_MATRIX(1);
 
   semiring_name = mxm_semiring(A, B);
+  binop_name = NULL;
   
   if (PG_NARGS() > 2) {
     C = PG_ARGISNULL(2) ? NULL : PGGRB_GETARG_MATRIX(2);
@@ -317,7 +318,7 @@ mxm(PG_FUNCTION_ARGS) {
   
   type = mxm_type(A, B);
 
-  DATUM_TYPE_APPLY(d, type, mxm, A, B, C, mask, semiring, binop, desc);
+  TYPE_APPLY(d, type, mxm, A, B, C, mask, semiring, binop, desc);
   return d;
 }
 
@@ -337,6 +338,7 @@ mxv(PG_FUNCTION_ARGS) {
   B = (pgGrB_Vector *) PGGRB_GETARG_VECTOR(1);
 
   semiring_name = mxv_semiring(A, B);
+  binop_name = NULL;
   
   if (PG_NARGS() > 2) {
     C = PG_ARGISNULL(2) ? NULL : PGGRB_GETARG_VECTOR(2);
@@ -365,7 +367,7 @@ mxv(PG_FUNCTION_ARGS) {
 
   type = mxv_type(A, B);
 
-  DATUM_TYPE_APPLY(d, type, mxv, A, B, C, mask, semiring, binop, desc);
+  TYPE_APPLY(d, type, mxv, A, B, C, mask, semiring, binop, desc);
   return d;
 }
 
@@ -385,6 +387,7 @@ vxm(PG_FUNCTION_ARGS) {
   B = (pgGrB_Matrix *) PGGRB_GETARG_MATRIX(1);
 
   semiring_name = vxm_semiring(A, B);
+  binop_name = NULL;
 
   if (PG_NARGS() > 2) {
     C = PG_ARGISNULL(2) ? NULL : PGGRB_GETARG_VECTOR(2);
@@ -411,6 +414,6 @@ vxm(PG_FUNCTION_ARGS) {
 
   type = vxm_type(A, B);
 
-  DATUM_TYPE_APPLY(d, type, vxm, A, B, C, mask, semiring, binop, desc);
+  TYPE_APPLY(d, type, vxm, A, B, C, mask, semiring, binop, desc);
   return d;
 }

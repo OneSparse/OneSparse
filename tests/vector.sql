@@ -1,5 +1,5 @@
 begin;
-select plan(108);
+select plan(114);
 
 \set IDXS 1,4,9
 \set MASK false,false,true

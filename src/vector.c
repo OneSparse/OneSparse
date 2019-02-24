@@ -134,7 +134,7 @@ DatumGetVector(Datum d) {
     return A;
   }
   flat = (pgGrB_FlatVector*)d;
-  DATUM_TYPE_APPLY(d, flat->type, expand_flat_vector, d, CurrentMemoryContext);
+  TYPE_APPLY(d, flat->type, expand_flat_vector, d, CurrentMemoryContext);
   return VectorGetEOHP(d);
 }
 
@@ -157,7 +157,7 @@ vector_out(PG_FUNCTION_ARGS)
   pgGrB_Vector *vec = PGGRB_GETARG_VECTOR(0);
   CHECKD(GxB_Vector_type(&typ, vec->V));
 
-  DATUM_TYPE_APPLY(d, typ, vector_out, vec);
+  TYPE_APPLY(d, typ, vector_out, vec);
   return d;
 }
 
@@ -189,7 +189,7 @@ vector_ewise_mult(PG_FUNCTION_ARGS) {
 
   CHECKD(GxB_Vector_type(&type, A->V));
 
-  DATUM_TYPE_APPLY(d, type, vector_ewise_mult, A, B, C, mask, binop);
+  TYPE_APPLY(d, type, vector_ewise_mult, A, B, C, mask, binop);
   return d;
 }
 
@@ -221,7 +221,7 @@ vector_ewise_add(PG_FUNCTION_ARGS) {
 
   CHECKD(GxB_Vector_type(&type, A->V));
 
-  DATUM_TYPE_APPLY(d, type, vector_ewise_add, A, B, C, mask, binop);
+  TYPE_APPLY(d, type, vector_ewise_add, A, B, C, mask, binop);
   return d;
 }
 
@@ -270,4 +270,26 @@ vector_ne(PG_FUNCTION_ARGS) {
 
   CHECKD(visequal(&result, A->V, B->V, NULL));
   PG_RETURN_BOOL(!result);
+}
+
+Datum
+vector_xtract(PG_FUNCTION_ARGS) {
+  GrB_Info info;
+  pgGrB_Vector *A, *B, *C = NULL;
+  GrB_Index size, *indexes;
+  GrB_Type type;
+
+  A = PGGRB_GETARG_VECTOR(0);
+  B = PGGRB_GETARG_VECTOR(1);
+
+  CHECKD(GxB_Vector_type(&type, A->V));
+  CHECKD(GrB_Vector_size(&size, A->V));
+  if (C == NULL) {
+    TYPE_APPLY(C, type, construct_empty_expanded_vector, size, CurrentMemoryContext);
+  }
+
+  TYPE_APPLY(indexes, type, extract_indexes, B, size);
+
+  CHECKD(GrB_Vector_extract(C->V, NULL, NULL, A->V, indexes, size, NULL));
+  PGGRB_RETURN_VECTOR(C);
 }

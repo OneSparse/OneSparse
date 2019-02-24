@@ -44,6 +44,8 @@ Datum FN(vector_eq)(pgGrB_Vector *A,
 Datum FN(vector_ne)(pgGrB_Vector *A,
                     pgGrB_Vector *B);
 
+GrB_Index *FN(extract_indexes)(pgGrB_Vector *A, GrB_Index size);
+
 PG_FUNCTION_INFO_V1(FN(vector));
 PG_FUNCTION_INFO_V1(FN(vector_empty));
 PG_FUNCTION_INFO_V1(FN(vector_agg_acc));
@@ -304,9 +306,10 @@ FN(vector)(PG_FUNCTION_ARGS) {
   pgGrB_Vector *retval;
   ArrayType *indexes, *vals;
   int *idims, *vdims;
-  int i, count;
+  int i;
+  GrB_Index vcount, size;
 
-  GrB_Index *row_indices, max_index;
+  GrB_Index *row_indices;
   PG_TYPE *values;
   ArrayIterator array_iterator;
   Datum	value;
@@ -318,7 +321,7 @@ FN(vector)(PG_FUNCTION_ARGS) {
 
   vdims = ARR_DIMS(vals);
 
-  if (PG_NARGS() == 2) {
+  if (PG_NARGS() > 1) {
     indexes = PG_GETARG_ARRAYTYPE_P(1);
     idims = ARR_DIMS(indexes);
     if (idims[0] != vdims[0])
@@ -327,10 +330,13 @@ FN(vector)(PG_FUNCTION_ARGS) {
   else
     indexes = NULL;
 
-  max_index = count = vdims[0];
+  size = vcount = vdims[0];
 
-  row_indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * count);
-  values = (PG_TYPE*) palloc0(sizeof(PG_TYPE) * count);
+  if (PG_NARGS() > 2 && !PG_ARGISNULL(2))
+    size = PG_GETARG_INT64(2);
+
+  row_indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * vcount);
+  values = (PG_TYPE*) palloc0(sizeof(PG_TYPE) * vcount);
 
   i = 0;
   array_iterator = array_create_iterator(vals, 0, NULL);
@@ -347,18 +353,18 @@ FN(vector)(PG_FUNCTION_ARGS) {
     array_iterator = array_create_iterator(indexes, 0, NULL);
     while (array_iterate(array_iterator, &value, &isnull)) {
       row_indices[i] = DatumGetInt64(value);
-      if (row_indices[i] > max_index)
-        max_index = row_indices[i] + 1;
+      if (row_indices[i] > size)
+        size = row_indices[i] + 1;
       i++;
     }
   }
 
-  retval = FN(construct_empty_expanded_vector)(max_index, CurrentMemoryContext);
+  retval = FN(construct_empty_expanded_vector)(size, CurrentMemoryContext);
 
   CHECKD(GrB_Vector_build(retval->V,
                          row_indices,
                          values,
-                         count,
+                         vcount,
                          GB_DUP));
 
   PGGRB_RETURN_VECTOR(retval);
@@ -529,6 +535,22 @@ Datum FN(vector_ne)(pgGrB_Vector *A,
   CHECKD(GrB_eWiseMult(C->V, NULL, NULL, GB_NE, A->V, B->V, NULL));
   CHECKD(GrB_Vector_reduce_BOOL(&result, NULL, GxB_LAND_BOOL_MONOID, C->V, NULL));
   PG_RETURN_BOOL(result);
+}
+
+GrB_Index *FN(extract_indexes)(pgGrB_Vector *A,
+                               GrB_Index size) {
+  GrB_Index *row_indices;
+  PG_TYPE *values;
+  GrB_Info info;
+
+  row_indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * size);
+  values = (PG_TYPE*) palloc0(sizeof(PG_TYPE) * size);
+
+  CHECKD(GrB_Vector_extractTuples(row_indices,
+                                 values,
+                                 &size,
+                                 A->V));
+  return row_indices;
 }
 
 #undef SUFFIX
