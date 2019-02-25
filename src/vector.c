@@ -10,6 +10,7 @@
 #define GB_ADD GrB_PLUS_BOOL
 #define GB_EQ  GxB_ISEQ_BOOL
 #define GB_NE  GxB_ISNE_BOOL
+#define GB_RNG GxB_LOR_LAND_BOOL
 #define PG_GET PG_GETARG_BOOL
 #define PG_RET PG_RETURN_BOOL
 #define PG_DGT DatumGetBool
@@ -25,6 +26,7 @@
 #define GB_ADD GrB_PLUS_INT8
 #define GB_EQ  GxB_ISEQ_INT8
 #define GB_NE  GxB_ISNE_INT8
+#define GB_RNG GxB_PLUS_TIMES_INT8
 #define PG_GET PG_GETARG_CHAR
 #define PG_RET PG_RETURN_CHAR
 #define PG_DGT DatumGetChar
@@ -40,6 +42,7 @@
 #define GB_ADD GrB_PLUS_INT16
 #define GB_EQ  GxB_ISEQ_INT16
 #define GB_NE  GxB_ISNE_INT16
+#define GB_RNG GxB_PLUS_TIMES_INT16
 #define PG_GET PG_GETARG_INT16
 #define PG_RET PG_RETURN_INT16
 #define PG_DGT DatumGetInt16
@@ -55,6 +58,7 @@
 #define GB_ADD GrB_PLUS_INT32
 #define GB_EQ  GxB_ISEQ_INT32
 #define GB_NE  GxB_ISNE_INT32
+#define GB_RNG GxB_PLUS_TIMES_INT32
 #define PG_GET PG_GETARG_INT32
 #define PG_RET PG_RETURN_INT32
 #define PG_DGT DatumGetInt32
@@ -70,6 +74,7 @@
 #define GB_ADD GrB_PLUS_INT64         // times bin op
 #define GB_EQ  GxB_ISEQ_INT64        // equality operator
 #define GB_NE  GxB_ISNE_INT64
+#define GB_RNG GxB_PLUS_TIMES_INT64
 #define PG_GET PG_GETARG_INT64       // how to get value args
 #define PG_RET PG_RETURN_INT64
 #define PG_DGT DatumGetInt64         // datum get type
@@ -85,6 +90,7 @@
 #define GB_ADD GrB_PLUS_FP32
 #define GB_EQ  GxB_ISEQ_FP32
 #define GB_NE  GxB_ISNE_FP32
+#define GB_RNG GxB_PLUS_TIMES_FP32
 #define PG_GET PG_GETARG_FLOAT4
 #define PG_RET PG_RETURN_FLOAT4
 #define PG_DGT DatumGetFloat4
@@ -100,6 +106,7 @@
 #define GB_ADD GrB_PLUS_FP64
 #define GB_EQ  GxB_ISEQ_FP64
 #define GB_NE  GxB_ISNE_FP64
+#define GB_RNG GxB_PLUS_TIMES_FP64
 #define PG_GET PG_GETARG_FLOAT8
 #define PG_RET PG_RETURN_FLOAT8
 #define PG_DGT DatumGetFloat8
@@ -299,15 +306,4 @@ vector_xtract(PG_FUNCTION_ARGS) {
 
   CHECKD(GrB_Vector_extract(C->V, NULL, NULL, A->V, indexes, size, NULL));
   PGGRB_RETURN_VECTOR(C);
-}
-
-Datum
-vector_assign(PG_FUNCTION_ARGS) {
-  GrB_Info info;
-  pgGrB_Vector *A;
-  GrB_Type type;
-
-  A = PGGRB_GETARG_VECTOR(0);
-  CHECKD(GxB_Vector_type(&type, A->V));
-  PGGRB_RETURN_VECTOR(A);
 }

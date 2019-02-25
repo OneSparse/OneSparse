@@ -237,42 +237,42 @@ LANGUAGE C STABLE STRICT;
 
 -- matrix reduce to vector
 
-CREATE FUNCTION reduce(matrix, text)
+CREATE FUNCTION reduce(matrix, text default null)
 RETURNS vector
 AS '$libdir/pggraphblas', 'matrix_reduce_vector'
-LANGUAGE C STABLE STRICT;
+LANGUAGE C STABLE;
 
 -- matrix reduce scalar
     
-CREATE FUNCTION reduce_bool(matrix, text)
+CREATE FUNCTION reduce_bool(matrix, text default null)
 RETURNS bool
 AS '$libdir/pggraphblas', 'matrix_reduce_bool'
-LANGUAGE C STABLE STRICT;
+LANGUAGE C STABLE;
     
-CREATE FUNCTION reduce_bigint(matrix, text)
+CREATE FUNCTION reduce_bigint(matrix, text default null)
 RETURNS bigint
 AS '$libdir/pggraphblas', 'matrix_reduce_int64'
-LANGUAGE C STABLE STRICT;
+LANGUAGE C STABLE;
     
-CREATE FUNCTION reduce_integer(matrix, text)
+CREATE FUNCTION reduce_integer(matrix, text default null)
 RETURNS integer
 AS '$libdir/pggraphblas', 'matrix_reduce_int32'
-LANGUAGE C STABLE STRICT;
+LANGUAGE C STABLE;
     
-CREATE FUNCTION reduce_smallint(matrix, text)
+CREATE FUNCTION reduce_smallint(matrix, text default null)
 RETURNS smallint
 AS '$libdir/pggraphblas', 'matrix_reduce_int16'
-LANGUAGE C STABLE STRICT;
+LANGUAGE C STABLE;
     
-CREATE FUNCTION reduce_real(matrix, text)
+CREATE FUNCTION reduce_real(matrix, text default null)
 RETURNS real
 AS '$libdir/pggraphblas', 'matrix_reduce_float4'
-LANGUAGE C STABLE STRICT;
+LANGUAGE C STABLE;
     
-CREATE FUNCTION reduce_float(matrix, text)
+CREATE FUNCTION reduce_float(matrix, text default null)
 RETURNS float
 AS '$libdir/pggraphblas', 'matrix_reduce_float8'
-LANGUAGE C STABLE STRICT;
+LANGUAGE C STABLE;
     
 
 CREATE OPERATOR = (
@@ -523,35 +523,69 @@ RETURNS vector
 AS '$libdir/pggraphblas', 'vector_xtract'
 LANGUAGE C STABLE STRICT;
 
-CREATE FUNCTION reduce_bool(vector, text)
+-- vector reduce
+
+CREATE FUNCTION reduce_bool(vector, text default null)
 RETURNS bool
 AS '$libdir/pggraphblas', 'vector_reduce_bool'
-LANGUAGE C STABLE STRICT;
+LANGUAGE C STABLE;
     
-CREATE FUNCTION reduce_bigint(vector, text)
+CREATE FUNCTION reduce_bigint(vector, text default null)
 RETURNS bigint
 AS '$libdir/pggraphblas', 'vector_reduce_int64'
-LANGUAGE C STABLE STRICT;
+LANGUAGE C STABLE;
     
-CREATE FUNCTION reduce_integer(vector, text)
+CREATE FUNCTION reduce_integer(vector, text default null)
 RETURNS integer
 AS '$libdir/pggraphblas', 'vector_reduce_int32'
-LANGUAGE C STABLE STRICT;
+LANGUAGE C STABLE;
     
-CREATE FUNCTION reduce_smallint(vector, text)
+CREATE FUNCTION reduce_smallint(vector, text default null)
 RETURNS smallint
 AS '$libdir/pggraphblas', 'vector_reduce_int16'
-LANGUAGE C STABLE STRICT;
+LANGUAGE C STABLE;
     
-CREATE FUNCTION reduce_real(vector, text)
+CREATE FUNCTION reduce_real(vector, text default null)
 RETURNS real
 AS '$libdir/pggraphblas', 'vector_reduce_float4'
-LANGUAGE C STABLE STRICT;
+LANGUAGE C STABLE;
     
-CREATE FUNCTION reduce_float(vector, text)
+CREATE FUNCTION reduce_float(vector, text default null)
 RETURNS float
 AS '$libdir/pggraphblas', 'vector_reduce_float8'
-LANGUAGE C STABLE STRICT;
+LANGUAGE C STABLE;
+
+-- vector assign
+    
+CREATE FUNCTION assign(vector, bool, vector default null)
+RETURNS vector
+AS '$libdir/pggraphblas', 'vector_assign_bool'
+LANGUAGE C STABLE;
+    
+CREATE FUNCTION assign(vector, bigint, vector default null)
+RETURNS vector
+AS '$libdir/pggraphblas', 'vector_assign_int64'
+LANGUAGE C STABLE;
+    
+CREATE FUNCTION assign(vector, integer, vector default null)
+RETURNS vector
+AS '$libdir/pggraphblas', 'vector_assign_int32'
+LANGUAGE C STABLE;
+    
+CREATE FUNCTION assign(vector, smallint, vector default null)
+RETURNS vector
+AS '$libdir/pggraphblas', 'vector_assign_int16'
+LANGUAGE C STABLE;
+    
+CREATE FUNCTION assign(vector, real, vector default null)
+RETURNS vector
+AS '$libdir/pggraphblas', 'vector_assign_float4'
+LANGUAGE C STABLE;
+    
+CREATE FUNCTION assign(vector, float, vector default null)
+RETURNS vector
+AS '$libdir/pggraphblas', 'vector_assign_float8'
+LANGUAGE C STABLE;
     
 CREATE OPERATOR * (
     leftarg = vector,

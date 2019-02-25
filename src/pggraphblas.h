@@ -328,7 +328,6 @@ PG_FUNCTION_INFO_V1(vector_nvals);
 PG_FUNCTION_INFO_V1(vector_size);
 
 PG_FUNCTION_INFO_V1(vector_xtract);
-PG_FUNCTION_INFO_V1(vector_assign);
 
 typedef struct pgGrB_Semiring  {
   char name[255];

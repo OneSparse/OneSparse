@@ -124,3 +124,13 @@ select is(
     reduce_:TYPE(vector(cast(array[:VALS] as :TYPE [])), :'SRING'),
     cast(:VRS as :TYPE),
     'vector reduce scalar ' || :'TYPE');
+
+select is(
+    reduce_:TYPE(vector(cast(array[:VALS] as :TYPE [])), :'SRING'),
+    cast(:VRS as :TYPE),
+    'vector reduce scalar ' || :'TYPE');
+    
+select is(
+    assign(vector_:TYPE(2), :VAL),
+    vector(cast(array[:VAL, :VAL] AS :TYPE [])),
+    'vector assign ' || :'TYPE');

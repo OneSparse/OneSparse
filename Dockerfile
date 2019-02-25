@@ -12,8 +12,8 @@ RUN /bin/rm -Rf "$PGDATA" && mkdir "$PGDATA" && chown -R postgres:postgres "$PGD
 WORKDIR "/home/postgres"
 
 # get SuiteSparse, compile graphblas with debug symbols    
-RUN curl -s -L http://faculty.cse.tamu.edu/davis/SuiteSparse/SuiteSparse-5.4.0.tar.gz | \
-    tar zxvf - SuiteSparse/GraphBLAS && cd SuiteSparse/GraphBLAS && \
+RUN curl -s -L http://faculty.cse.tamu.edu/davis/GraphBLAS/GraphBLAS-2.3.0.tar.gz | \
+    tar zxvf - && cd GraphBLAS && \
     make library CMAKE_OPTIONS='-DCMAKE_BUILD_TYPE=Debug' && make install
 RUN /bin/rm -Rf SuitSparse
 

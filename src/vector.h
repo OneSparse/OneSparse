@@ -52,6 +52,7 @@ PG_FUNCTION_INFO_V1(FN(vector_agg_acc));
 PG_FUNCTION_INFO_V1(FN(vector_final));
 PG_FUNCTION_INFO_V1(FN(vector_elements));
 PG_FUNCTION_INFO_V1(FN(vector_reduce));
+PG_FUNCTION_INFO_V1(FN(vector_assign));
 
 /* Compute size of storage needed for vector */
 static Size
@@ -564,13 +565,35 @@ FN(vector_reduce)(PG_FUNCTION_ARGS) {
   PG_TYPE val;
 
   A = PGGRB_GETARG_VECTOR(0);
-  semiring_name = text_to_cstring(PG_GETARG_TEXT_PP(1));
-  semiring = lookup_semiring(semiring_name);
+  semiring_name = PG_ARGISNULL(1) ? NULL : text_to_cstring(PG_GETARG_TEXT_PP(1));
+  
+  semiring = semiring_name ? lookup_semiring(semiring_name) : GB_RNG;
   CHECKD(GxB_Semiring_add(&monoid, semiring));
   CHECKD(GrB_reduce(&val, NULL, monoid, A->V, NULL));
   PG_RET(val);
 }
 
+Datum
+FN(vector_assign)(PG_FUNCTION_ARGS) {
+  GrB_Info info;
+  pgGrB_Vector *A, *B;
+  GrB_Index size, *indexes = NULL;
+  GrB_Type type;
+  PG_TYPE val;
+
+  A = PGGRB_GETARG_VECTOR(0);
+  val = PG_GET(1);
+  B = PG_ARGISNULL(2) ? NULL : PGGRB_GETARG_VECTOR(2);
+
+  CHECKD(GxB_Vector_type(&type, A->V));
+  CHECKD(GrB_Vector_size(&size, A->V));
+  
+  if (B != NULL)
+    indexes = FN(extract_indexes)(B, size);
+
+  CHECKD(GrB_assign(A->V, NULL, NULL, val, indexes ? indexes : GrB_ALL, size, NULL));
+  PGGRB_RETURN_VECTOR(A);
+}
 
 #undef SUFFIX
 #undef PG_TYPE
@@ -580,6 +603,7 @@ FN(vector_reduce)(PG_FUNCTION_ARGS) {
 #undef GB_ADD
 #undef GB_EQ
 #undef GB_NE
+#undef GB_RNG
 #undef PG_GET
 #undef PG_RET
 #undef PG_DGT
