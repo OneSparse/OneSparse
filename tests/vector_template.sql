@@ -8,12 +8,12 @@ select is(
     size(vector_:TYPE(10)),
     10::bigint,
     'empty vector size ' || :'TYPE');
-    
+
 select is(
     nvals(vector_:TYPE(10)),
     0::bigint,
     'empty vector nvals ' || :'TYPE');
-    
+
 select is(
     size(vector(cast(array[:VALS] as :TYPE []))),
     3::bigint,
@@ -94,7 +94,7 @@ select is(
     mask=>vector(array[:MASK], array[:IDXS])),
     vector(cast(array[:M_EAX] as :TYPE []), array[:M_IDXS]),
     'sparse vector add masked ' || :'TYPE');
-    
+
 select is(
     vector(cast(array[:VALS] as :TYPE []), array[:IDXS]) *
     vector(cast(array[:VALS] as :TYPE []), array[:IDXS]),
@@ -107,7 +107,7 @@ select is(
     mask=>vector(array[:MASK], array[:IDXS])),
     vector(cast(array[:M_EMX] as :TYPE []), array[:M_IDXS]),
     'sparse vector mult masked ' || :'TYPE');
-    
+
 select is(
     vector(cast(array[:VALS] as :TYPE []), array[:IDXS]) =
     vector(cast(array[:VALS] as :TYPE []), array[:IDXS]),
@@ -129,8 +129,19 @@ select is(
     reduce_:TYPE(vector(cast(array[:VALS] as :TYPE [])), :'SRING'),
     cast(:VRS as :TYPE),
     'vector reduce scalar ' || :'TYPE');
-    
+
 select is(
     assign(vector_:TYPE(2), :VAL),
     vector(cast(array[:VAL, :VAL] AS :TYPE [])),
     'vector assign ' || :'TYPE');
+
+select is(
+    nvals(assign(vector_:TYPE(2), cast(:VAL as :TYPE),
+                  mask=>vector(array[true,false]))),
+    1::bigint,
+    'vector assign mask ' || :'TYPE');
+
+select is(
+    set_element(assign(vector_:TYPE(2), :VAL), 1, :VAL2),
+    vector(cast(array[:VAL, :VAL2] as :TYPE [])),
+    'vector set_element ' || :'TYPE');

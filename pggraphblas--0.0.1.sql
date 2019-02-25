@@ -8,7 +8,7 @@ RETURNS vector
 AS '$libdir/pggraphblas', 'vector_in'
 LANGUAGE C IMMUTABLE STRICT;
 
-CREATE FUNCTION vector_out(vector)
+CREATE FUNCTION vector_out(A vector)
 RETURNS cstring
 AS '$libdir/pggraphblas', 'vector_out'
 LANGUAGE C IMMUTABLE STRICT;
@@ -488,105 +488,173 @@ RETURNS vector
 AS '$libdir/pggraphblas', 'vector_ewise_add'
 LANGUAGE C STABLE;
 
-CREATE FUNCTION vector_ewise_mult_op(vector, vector)
+CREATE FUNCTION vector_ewise_mult_op(A vector, B vector)
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_ewise_mult'
 LANGUAGE C STABLE STRICT;
 
-CREATE FUNCTION vector_ewise_add_op(vector, vector)
+CREATE FUNCTION vector_ewise_add_op(A vector, B vector)
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_ewise_add'
 LANGUAGE C STABLE STRICT;
 
-CREATE FUNCTION vector_eq(vector, vector)
+CREATE FUNCTION vector_eq(A vector, B vector)
 RETURNS bool
 AS '$libdir/pggraphblas', 'vector_eq'
 LANGUAGE C STABLE STRICT;
 
-CREATE FUNCTION vector_ne(vector, vector)
+CREATE FUNCTION vector_ne(A vector, B vector)
 RETURNS bool
 AS '$libdir/pggraphblas', 'vector_ne'
 LANGUAGE C STABLE STRICT;
 
-CREATE FUNCTION size(vector)
+CREATE FUNCTION size(A vector)
 RETURNS bigint
 AS '$libdir/pggraphblas', 'vector_size'
 LANGUAGE C STABLE STRICT;
 
-CREATE FUNCTION nvals(vector)
+CREATE FUNCTION nvals(A vector)
 RETURNS bigint
 AS '$libdir/pggraphblas', 'vector_nvals'
 LANGUAGE C STABLE STRICT;
 
-CREATE FUNCTION xtract(vector, vector)
+CREATE FUNCTION xtract(A vector, B vector)
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_xtract'
 LANGUAGE C STABLE STRICT;
 
 -- vector reduce
 
-CREATE FUNCTION reduce_bool(vector, text default null)
+CREATE FUNCTION reduce_bool(
+    A vector,
+    semiring text default null)
 RETURNS bool
 AS '$libdir/pggraphblas', 'vector_reduce_bool'
 LANGUAGE C STABLE;
     
-CREATE FUNCTION reduce_bigint(vector, text default null)
+CREATE FUNCTION reduce_bigint(
+    A vector,
+    semiring text default null)
 RETURNS bigint
 AS '$libdir/pggraphblas', 'vector_reduce_int64'
 LANGUAGE C STABLE;
     
-CREATE FUNCTION reduce_integer(vector, text default null)
+CREATE FUNCTION reduce_integer(
+    A vector,
+    semiring text default null)
 RETURNS integer
 AS '$libdir/pggraphblas', 'vector_reduce_int32'
 LANGUAGE C STABLE;
     
-CREATE FUNCTION reduce_smallint(vector, text default null)
+CREATE FUNCTION reduce_smallint(
+    A vector,
+    semiring text default null)
 RETURNS smallint
 AS '$libdir/pggraphblas', 'vector_reduce_int16'
 LANGUAGE C STABLE;
     
-CREATE FUNCTION reduce_real(vector, text default null)
+CREATE FUNCTION reduce_real(
+    A vector,
+    semiring text default null)
 RETURNS real
 AS '$libdir/pggraphblas', 'vector_reduce_float4'
 LANGUAGE C STABLE;
     
-CREATE FUNCTION reduce_float(vector, text default null)
+CREATE FUNCTION reduce_float(
+    A vector,
+    semiring text default null)
 RETURNS float
 AS '$libdir/pggraphblas', 'vector_reduce_float8'
 LANGUAGE C STABLE;
 
 -- vector assign
     
-CREATE FUNCTION assign(vector, bool, vector default null)
+CREATE FUNCTION assign(
+    A vector,
+    value bool,
+    C vector default null,
+    mask vector default null)
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_assign_bool'
 LANGUAGE C STABLE;
     
-CREATE FUNCTION assign(vector, bigint, vector default null)
+CREATE FUNCTION assign(
+    A vector,
+    value bigint,
+    C vector default null,
+    mask vector default null)
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_assign_int64'
 LANGUAGE C STABLE;
     
-CREATE FUNCTION assign(vector, integer, vector default null)
+CREATE FUNCTION assign(
+    A vector,
+    value integer,
+    C vector default null,
+    mask vector default null)
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_assign_int32'
 LANGUAGE C STABLE;
     
-CREATE FUNCTION assign(vector, smallint, vector default null)
+CREATE FUNCTION assign(
+    A vector,
+    value smallint,
+    C vector default null,
+    mask vector default null)
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_assign_int16'
 LANGUAGE C STABLE;
     
-CREATE FUNCTION assign(vector, real, vector default null)
+CREATE FUNCTION assign(
+    A vector,
+    value real,
+    C vector default null,
+    mask vector default null)
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_assign_float4'
 LANGUAGE C STABLE;
     
-CREATE FUNCTION assign(vector, float, vector default null)
+CREATE FUNCTION assign(
+    A vector,
+    value float,
+    C vector default null,
+    mask vector default null)
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_assign_float8'
 LANGUAGE C STABLE;
     
+-- vector set element
+    
+CREATE FUNCTION set_element(vector, bigint, bool)
+RETURNS vector
+AS '$libdir/pggraphblas', 'vector_set_element_bool'
+LANGUAGE C STABLE;
+    
+CREATE FUNCTION set_element(vector, bigint, bigint)
+RETURNS vector
+AS '$libdir/pggraphblas', 'vector_set_element_int64'
+LANGUAGE C STABLE;
+    
+CREATE FUNCTION set_element(vector, bigint, integer)
+RETURNS vector
+AS '$libdir/pggraphblas', 'vector_set_element_int32'
+LANGUAGE C STABLE;
+    
+CREATE FUNCTION set_element(vector, bigint, smallint)
+RETURNS vector
+AS '$libdir/pggraphblas', 'vector_set_element_int16'
+LANGUAGE C STABLE;
+    
+CREATE FUNCTION set_element(vector, bigint, real)
+RETURNS vector
+AS '$libdir/pggraphblas', 'vector_set_element_float4'
+LANGUAGE C STABLE;
+    
+CREATE FUNCTION set_element(vector, bigint, float)
+RETURNS vector
+AS '$libdir/pggraphblas', 'vector_set_element_float8'
+LANGUAGE C STABLE;
+
 CREATE OPERATOR * (
     leftarg = vector,
     rightarg = vector,
@@ -828,32 +896,32 @@ CREATE TYPE vector_element_float AS (index bigint, value float);
 CREATE TYPE vector_element_real AS (index bigint, value real);
 CREATE TYPE vector_element_bool AS (index bigint, value bool);
 
-CREATE FUNCTION vector_elements_bigint(vector)
+CREATE FUNCTION vector_elements_bigint(A vector)
 RETURNS SETOF vector_element_bigint
 AS '$libdir/pggraphblas', 'vector_elements_int64'
 LANGUAGE C STABLE STRICT;
 
-CREATE FUNCTION vector_elements_integer(vector)
+CREATE FUNCTION vector_elements_integer(A vector)
 RETURNS SETOF vector_element_integer
 AS '$libdir/pggraphblas', 'vector_elements_int32'
 LANGUAGE C STABLE STRICT;
 
-CREATE FUNCTION vector_elements_smallint(vector)
+CREATE FUNCTION vector_elements_smallint(A vector)
 RETURNS SETOF vector_element_smallint
 AS '$libdir/pggraphblas', 'vector_elements_int16'
 LANGUAGE C STABLE STRICT;
 
-CREATE FUNCTION vector_elements_float(vector)
+CREATE FUNCTION vector_elements_float(A vector)
 RETURNS SETOF vector_element_float
 AS '$libdir/pggraphblas', 'vector_elements_float8'
 LANGUAGE C STABLE STRICT;
 
-CREATE FUNCTION vector_elements_real(vector)
+CREATE FUNCTION vector_elements_real(A vector)
 RETURNS SETOF vector_element_real
 AS '$libdir/pggraphblas', 'vector_elements_float4'
 LANGUAGE C STABLE STRICT;
 
-CREATE FUNCTION vector_elements_bool(vector)
+CREATE FUNCTION vector_elements_bool(A vector)
 RETURNS SETOF vector_element_bool
 AS '$libdir/pggraphblas', 'vector_elements_bool'
 LANGUAGE C STABLE STRICT;

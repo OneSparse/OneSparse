@@ -53,6 +53,7 @@ PG_FUNCTION_INFO_V1(FN(vector_final));
 PG_FUNCTION_INFO_V1(FN(vector_elements));
 PG_FUNCTION_INFO_V1(FN(vector_reduce));
 PG_FUNCTION_INFO_V1(FN(vector_assign));
+PG_FUNCTION_INFO_V1(FN(vector_set_element));
 
 /* Compute size of storage needed for vector */
 static Size
@@ -576,7 +577,7 @@ FN(vector_reduce)(PG_FUNCTION_ARGS) {
 Datum
 FN(vector_assign)(PG_FUNCTION_ARGS) {
   GrB_Info info;
-  pgGrB_Vector *A, *B;
+  pgGrB_Vector *A, *B, *mask;
   GrB_Index size, *indexes = NULL;
   GrB_Type type;
   PG_TYPE val;
@@ -584,6 +585,7 @@ FN(vector_assign)(PG_FUNCTION_ARGS) {
   A = PGGRB_GETARG_VECTOR(0);
   val = PG_GET(1);
   B = PG_ARGISNULL(2) ? NULL : PGGRB_GETARG_VECTOR(2);
+  mask = PG_ARGISNULL(3)? NULL : PGGRB_GETARG_VECTOR(3);
 
   CHECKD(GxB_Vector_type(&type, A->V));
   CHECKD(GrB_Vector_size(&size, A->V));
@@ -591,7 +593,22 @@ FN(vector_assign)(PG_FUNCTION_ARGS) {
   if (B != NULL)
     indexes = FN(extract_indexes)(B, size);
 
-  CHECKD(GrB_assign(A->V, NULL, NULL, val, indexes ? indexes : GrB_ALL, size, NULL));
+  CHECKD(GrB_assign(A->V, mask? mask->V: NULL, NULL, val, indexes ? indexes : GrB_ALL, size, NULL));
+  PGGRB_RETURN_VECTOR(A);
+}
+
+Datum
+FN(vector_set_element)(PG_FUNCTION_ARGS) {
+  GrB_Info info;
+  pgGrB_Vector *A;
+  GrB_Index index;
+  PG_TYPE val;
+
+  A = PGGRB_GETARG_VECTOR(0);
+  index = PG_GETARG_INT64(1);
+  val = PG_GET(2);
+
+  CHECKD(GrB_Vector_setElement(A->V, val, index));
   PGGRB_RETURN_VECTOR(A);
 }
 

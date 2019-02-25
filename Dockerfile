@@ -11,11 +11,10 @@ ENV PGDATA /home/postgres/data
 RUN /bin/rm -Rf "$PGDATA" && mkdir "$PGDATA" && chown -R postgres:postgres "$PGDATA"
 WORKDIR "/home/postgres"
 
-# get SuiteSparse, compile graphblas with debug symbols    
+# get GraphBLAS, compile with debug symbols    
 RUN curl -s -L http://faculty.cse.tamu.edu/davis/GraphBLAS/GraphBLAS-2.3.0.tar.gz | \
     tar zxvf - && cd GraphBLAS && \
     make library CMAKE_OPTIONS='-DCMAKE_BUILD_TYPE=Debug' && make install
-RUN /bin/rm -Rf SuitSparse
 
 # get postgres source and compile with debug and no optimization
 RUN git clone --branch REL_11_STABLE https://github.com/postgres/postgres.git --depth=1 && \
