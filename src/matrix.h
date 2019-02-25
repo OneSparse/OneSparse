@@ -76,6 +76,7 @@ PG_FUNCTION_INFO_V1(FN(matrix_empty));
 PG_FUNCTION_INFO_V1(FN(matrix_agg_acc));
 PG_FUNCTION_INFO_V1(FN(matrix_final));
 PG_FUNCTION_INFO_V1(FN(matrix_elements));
+PG_FUNCTION_INFO_V1(FN(matrix_reduce));
 
 /* Compute size of storage needed for matrix */
 static Size
@@ -657,6 +658,23 @@ FN(matrix)(PG_FUNCTION_ARGS) {
   PGGRB_RETURN_MATRIX(retval);
 }
 
+Datum
+FN(matrix_reduce)(PG_FUNCTION_ARGS) {
+  GrB_Info info;
+  pgGrB_Matrix *A;
+  GrB_Semiring semiring;
+  GrB_Monoid monoid;
+  char *semiring_name;
+  PG_TYPE val;
+
+  A = PGGRB_GETARG_MATRIX(0);
+  semiring_name = text_to_cstring(PG_GETARG_TEXT_PP(1));
+  semiring = lookup_semiring(semiring_name);
+  CHECKD(GxB_Semiring_add(&monoid, semiring));
+  CHECKD(GrB_reduce(&val, NULL, monoid, A->M, NULL));
+  PG_RET(val);
+}
+
 #undef SUFFIX
 #undef PG_TYPE
 #undef GB_TYPE
@@ -664,6 +682,7 @@ FN(matrix)(PG_FUNCTION_ARGS) {
 #undef GB_MUL
 #undef GB_ADD
 #undef PG_GET
+#undef PG_RET
 #undef PG_DGT
 #undef PG_TGD
 #undef PRINT_FMT

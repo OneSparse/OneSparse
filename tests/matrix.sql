@@ -1,6 +1,6 @@
 
 begin;
-select plan(90);
+select plan(96);
 
 -- The following variables are substituted into matrix_template.sql.
 -- Each support type is defined and the expected values, the template
@@ -26,6 +26,7 @@ select plan(90);
 \set EMX 2,6,12
 \set MMX 3,8,6
 \set VMX 12,2,6
+\set VRS 6
     
 \set M_EAX 3,5
 \set M_EMX 2,6
@@ -35,14 +36,17 @@ select plan(90);
     
 \set TYPE bigint
 \set C_TYPE INT64
+\set SRING PLUS_TIMES_INT64
 \ir matrix_template.sql    
     
 \set TYPE integer
 \set C_TYPE INT32
+\set SRING PLUS_TIMES_INT32
 \ir matrix_template.sql    
     
 \set TYPE smallint
 \set C_TYPE INT16
+\set SRING PLUS_TIMES_INT16
 \ir matrix_template.sql
 
 -- real/float expected values
@@ -54,6 +58,7 @@ select plan(90);
 \set EMX 3.125000,12.500000,50.000000
 \set MMX 6.250000,25.000000,12.500000
 \set VMX 50.000000,3.125000,12.500000
+\set VRS 8.75
     
 \set M_EAX 3.750000,7.500000
 \set M_EMX 3.125000,12.500000
@@ -63,10 +68,12 @@ select plan(90);
     
 \set TYPE real
 \set C_TYPE FP32
+\set SRING PLUS_TIMES_FP32
 \ir matrix_template.sql
     
 \set TYPE float
 \set C_TYPE FP64
+\set SRING PLUS_TIMES_FP64
 \ir matrix_template.sql
 
 -- bool
@@ -78,6 +85,7 @@ select plan(90);
 \set EMX true,false,false
 \set MMX true,false,true
 \set VMX false,true,false
+\set VRS true
     
 \set M_EAX true,true
 \set M_EMX true,false
@@ -87,6 +95,7 @@ select plan(90);
     
 \set TYPE bool
 \set C_TYPE BOOL
+\set SRING LOR_LAND_BOOL
 \ir matrix_template.sql
     
 select * from finish();

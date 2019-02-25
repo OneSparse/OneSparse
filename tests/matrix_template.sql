@@ -5,17 +5,17 @@
 select is(
     nrows(matrix_:TYPE(10, 10)),
     10::bigint,
-    'empty construction nrows. ' || :'TYPE');
+    'empty construction nrows ' || :'TYPE');
 
 select is(
     ncols(matrix_:TYPE(10, 10)),
     10::bigint,
-    'empty construction ncols. ' || :'TYPE');
+    'empty construction ncols ' || :'TYPE');
     
 select is(
     nvals(matrix_:TYPE(10, 10)),
     0::bigint,
-    'empty construction nvals. ' || :'TYPE');
+    'empty construction nvals ' || :'TYPE');
 
 select is(
     ncols(matrix(
@@ -181,3 +181,9 @@ select is(
   vector(cast(array[:VMX] as :TYPE [])),
   'matrix vxm ' || :'TYPE');
 
+select is(
+  reduce_:TYPE(matrix(array[:ROWS],
+    array[:COLS],
+    cast(array[:VALS] as :TYPE [])), :'SRING'),
+    cast(:VRS AS :TYPE),
+    'matrix reduce scalar ' || :'TYPE');

@@ -25,6 +25,18 @@ select is(
     'vector nvals ' || :'TYPE');
 
 select is(
+    vector(cast(array[:VALS] as :TYPE [])) =
+    vector(cast(array[:VALS] as :TYPE [])),
+    true,
+    'vector eq ' || :'TYPE');
+
+select is(
+    vector(cast(array[:VALS] as :TYPE [])) <>
+    vector(cast(array[:VALS] as :TYPE [])),
+    false,
+    'vector neq ' || :'TYPE');
+
+select is(
     size(vector(cast(array[:VALS] as :TYPE []))),
     nvals(vector(cast(array[:VALS] as :TYPE []))),
     'vector size equals vals ' || :'TYPE');
@@ -108,3 +120,7 @@ select is(
     false,
     'sparse vector neq ' || :'TYPE');
 
+select is(
+    reduce_:TYPE(vector(cast(array[:VALS] as :TYPE [])), :'SRING'),
+    cast(:VRS as :TYPE),
+    'vector reduce scalar ' || :'TYPE');

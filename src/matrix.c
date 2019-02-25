@@ -8,6 +8,7 @@
 #define GB_MUL GrB_TIMES_BOOL
 #define GB_ADD GrB_PLUS_BOOL
 #define PG_GET PG_GETARG_BOOL
+#define PG_RET PG_RETURN_BOOL
 #define PG_DGT DatumGetBool
 #define PG_TGD BoolGetDatum
 #define PRINT_FMT(v) "%s", v ? "t" : "f"
@@ -20,6 +21,7 @@
 #define GB_MUL GrB_TIMES_INT8
 #define GB_ADD GrB_PLUS_INT8
 #define PG_GET PG_GETARG_CHAR
+#define PG_RET PG_RETURN_CHAR
 #define PG_DGT DatumGetChar
 #define PG_TGD CharGetDatum
 #define PRINT_FMT(v) "%i", v
@@ -32,6 +34,7 @@
 #define GB_MUL GrB_TIMES_INT16
 #define GB_ADD GrB_PLUS_INT16
 #define PG_GET PG_GETARG_INT16
+#define PG_RET PG_RETURN_INT16
 #define PG_DGT DatumGetInt16
 #define PG_TGD Int16GetDatum
 #define PRINT_FMT(v) "%i", v
@@ -44,6 +47,7 @@
 #define GB_MUL GrB_TIMES_INT32
 #define GB_ADD GrB_PLUS_INT32
 #define PG_GET PG_GETARG_INT32
+#define PG_RET PG_RETURN_INT32
 #define PG_DGT DatumGetInt32
 #define PG_TGD Int32GetDatum
 #define PRINT_FMT(v) "%i", v
@@ -56,6 +60,7 @@
 #define GB_MUL GrB_TIMES_INT64       // times bin op
 #define GB_ADD GrB_PLUS_INT64       // times bin op
 #define PG_GET PG_GETARG_INT64       // how to get value args
+#define PG_RET PG_RETURN_INT64
 #define PG_DGT DatumGetInt64         // datum get type
 #define PG_TGD Int64GetDatum         // type get datum
 #define PRINT_FMT(v) "%lu", v        // printf fmt
@@ -68,6 +73,7 @@
 #define GB_MUL GrB_TIMES_FP32
 #define GB_ADD GrB_PLUS_FP32
 #define PG_GET PG_GETARG_FLOAT4
+#define PG_RET PG_RETURN_FLOAT4
 #define PG_DGT DatumGetFloat4
 #define PG_TGD Float4GetDatum
 #define PRINT_FMT(v) "%f", v
@@ -80,6 +86,7 @@
 #define GB_MUL GrB_TIMES_FP64
 #define GB_ADD GrB_PLUS_FP64
 #define PG_GET PG_GETARG_FLOAT8
+#define PG_RET PG_RETURN_FLOAT8
 #define PG_DGT DatumGetFloat8
 #define PG_TGD Float8GetDatum
 #define PRINT_FMT(v) "%f", v
@@ -416,4 +423,27 @@ vxm(PG_FUNCTION_ARGS) {
 
   TYPE_APPLY(d, type, vxm, A, B, C, mask, semiring, binop, desc);
   return d;
+}
+
+Datum
+matrix_reduce_vector(PG_FUNCTION_ARGS) {
+  GrB_Info info;
+  pgGrB_Matrix *A;
+  GrB_Semiring semiring;
+  GrB_Monoid monoid;
+  char *semiring_name;
+  pgGrB_Vector *val;
+  GrB_Type type;
+  GrB_Index size;
+
+  A = PGGRB_GETARG_MATRIX(0);
+  
+  semiring_name = text_to_cstring(PG_GETARG_TEXT_PP(1));
+  semiring = lookup_semiring(semiring_name);
+  CHECKD(GxB_Semiring_add(&monoid, semiring));
+  CHECKD(GxB_Matrix_type(&type, A->M));
+  CHECKD(GrB_Matrix_ncols(&size, A->M));
+  TYPE_APPLY(val, type, construct_empty_expanded_vector, size, CurrentMemoryContext);
+  CHECKD(GrB_reduce(val->V, NULL, monoid, A->M, NULL));
+  PGGRB_RETURN_VECTOR(val);
 }

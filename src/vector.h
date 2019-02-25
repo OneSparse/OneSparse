@@ -51,6 +51,7 @@ PG_FUNCTION_INFO_V1(FN(vector_empty));
 PG_FUNCTION_INFO_V1(FN(vector_agg_acc));
 PG_FUNCTION_INFO_V1(FN(vector_final));
 PG_FUNCTION_INFO_V1(FN(vector_elements));
+PG_FUNCTION_INFO_V1(FN(vector_reduce));
 
 /* Compute size of storage needed for vector */
 static Size
@@ -553,6 +554,24 @@ GrB_Index *FN(extract_indexes)(pgGrB_Vector *A,
   return row_indices;
 }
 
+Datum
+FN(vector_reduce)(PG_FUNCTION_ARGS) {
+  GrB_Info info;
+  pgGrB_Vector *A;
+  GrB_Semiring semiring;
+  GrB_Monoid monoid;
+  char *semiring_name;
+  PG_TYPE val;
+
+  A = PGGRB_GETARG_VECTOR(0);
+  semiring_name = text_to_cstring(PG_GETARG_TEXT_PP(1));
+  semiring = lookup_semiring(semiring_name);
+  CHECKD(GxB_Semiring_add(&monoid, semiring));
+  CHECKD(GrB_reduce(&val, NULL, monoid, A->V, NULL));
+  PG_RET(val);
+}
+
+
 #undef SUFFIX
 #undef PG_TYPE
 #undef GB_TYPE
@@ -562,6 +581,7 @@ GrB_Index *FN(extract_indexes)(pgGrB_Vector *A,
 #undef GB_EQ
 #undef GB_NE
 #undef PG_GET
+#undef PG_RET
 #undef PG_DGT
 #undef PG_TGD
 #undef PRINT_FMT

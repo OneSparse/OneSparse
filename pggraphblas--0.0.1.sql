@@ -235,6 +235,46 @@ RETURNS matrix
 AS '$libdir/pggraphblas', 'matrix_ewise_add'
 LANGUAGE C STABLE STRICT;
 
+-- matrix reduce to vector
+
+CREATE FUNCTION reduce(matrix, text)
+RETURNS vector
+AS '$libdir/pggraphblas', 'matrix_reduce_vector'
+LANGUAGE C STABLE STRICT;
+
+-- matrix reduce scalar
+    
+CREATE FUNCTION reduce_bool(matrix, text)
+RETURNS bool
+AS '$libdir/pggraphblas', 'matrix_reduce_bool'
+LANGUAGE C STABLE STRICT;
+    
+CREATE FUNCTION reduce_bigint(matrix, text)
+RETURNS bigint
+AS '$libdir/pggraphblas', 'matrix_reduce_int64'
+LANGUAGE C STABLE STRICT;
+    
+CREATE FUNCTION reduce_integer(matrix, text)
+RETURNS integer
+AS '$libdir/pggraphblas', 'matrix_reduce_int32'
+LANGUAGE C STABLE STRICT;
+    
+CREATE FUNCTION reduce_smallint(matrix, text)
+RETURNS smallint
+AS '$libdir/pggraphblas', 'matrix_reduce_int16'
+LANGUAGE C STABLE STRICT;
+    
+CREATE FUNCTION reduce_real(matrix, text)
+RETURNS real
+AS '$libdir/pggraphblas', 'matrix_reduce_float4'
+LANGUAGE C STABLE STRICT;
+    
+CREATE FUNCTION reduce_float(matrix, text)
+RETURNS float
+AS '$libdir/pggraphblas', 'matrix_reduce_float8'
+LANGUAGE C STABLE STRICT;
+    
+
 CREATE OPERATOR = (
     leftarg = matrix,
     rightarg = matrix,
@@ -483,6 +523,36 @@ RETURNS vector
 AS '$libdir/pggraphblas', 'vector_xtract'
 LANGUAGE C STABLE STRICT;
 
+CREATE FUNCTION reduce_bool(vector, text)
+RETURNS bool
+AS '$libdir/pggraphblas', 'vector_reduce_bool'
+LANGUAGE C STABLE STRICT;
+    
+CREATE FUNCTION reduce_bigint(vector, text)
+RETURNS bigint
+AS '$libdir/pggraphblas', 'vector_reduce_int64'
+LANGUAGE C STABLE STRICT;
+    
+CREATE FUNCTION reduce_integer(vector, text)
+RETURNS integer
+AS '$libdir/pggraphblas', 'vector_reduce_int32'
+LANGUAGE C STABLE STRICT;
+    
+CREATE FUNCTION reduce_smallint(vector, text)
+RETURNS smallint
+AS '$libdir/pggraphblas', 'vector_reduce_int16'
+LANGUAGE C STABLE STRICT;
+    
+CREATE FUNCTION reduce_real(vector, text)
+RETURNS real
+AS '$libdir/pggraphblas', 'vector_reduce_float4'
+LANGUAGE C STABLE STRICT;
+    
+CREATE FUNCTION reduce_float(vector, text)
+RETURNS float
+AS '$libdir/pggraphblas', 'vector_reduce_float8'
+LANGUAGE C STABLE STRICT;
+    
 CREATE OPERATOR * (
     leftarg = vector,
     rightarg = vector,
