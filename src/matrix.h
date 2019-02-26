@@ -533,7 +533,7 @@ FN(mxv)(pgGrB_Matrix *A,
   GrB_Index size;
 
   if (C == NULL) {
-    CHECKD(GrB_Vector_size(&size, B->V));
+    CHECKD(GrB_Matrix_ncols(&size, A->M));
     C = FN(construct_empty_expanded_vector)(size, CurrentMemoryContext);
   }
   CHECKD(GrB_mxv(C->V, mask ? mask->V : NULL, binop, semiring, A->M, B->V, desc));

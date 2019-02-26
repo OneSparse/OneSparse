@@ -447,7 +447,9 @@ typedef struct pgGrB_UnaryOp  {
       (DVAL) = text_to_cstring(PG_GETARG_TEXT_PP(ARG));                 \
       if (strcmp((DVAL), "default") == 0) {                             \
         CHECKD(GrB_Descriptor_set((DESC), GrB_##FIELD, GxB_DEFAULT));   \
-      } else if (strcmp(desc_val, "replace") == 0) {                    \
+      } else if (strcmp((DVAL), "replace") == 0) {                      \
+        CHECKD(GrB_Descriptor_set((DESC), GrB_##FIELD, GrB_##VAL));     \
+      } else if (strcmp((DVAL), "scmp") == 0) {                         \
         CHECKD(GrB_Descriptor_set((DESC), GrB_##FIELD, GrB_##VAL));     \
       } else                                                            \
         elog(ERROR, "unknown outp descriptor value %s", desc_val);      \
