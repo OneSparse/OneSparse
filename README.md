@@ -43,10 +43,11 @@ On the left is a graph, and on the right, the adjacency matrix that
 represents it. The matrix has a row and column for every vertex.  If
 there is an edge between nodes A and B, then there will be a value
 present in the intersection of As row with Bs column.  For example,
-vertex 1 connects to 4, but 4 also connects to 1 (this is an example
-of a *directed* graph) so there are two values in the matrix to
-represent these two edges, one at the (1, 4) position and the other at
-the (4,1) position.
+vertex 1 connects to 4, so there is a value (dot) at the intersction
+of the first row and the fourth column.  4 also connects *back* to 1
+(this is an example of a *directed* graph) so there are two values in
+the matrix to represent these two edges, the one at the (1, 4)
+position and the other at the (4,1) position.
 
 One practical problem with matrix-encoding graphs is that most
 real-world graphs tend to be sparse, as above, only 12 of 49 possible
@@ -89,6 +90,30 @@ sparse relational graphs are scattered across indexes and table
 blocks, having poor locality.  Interpreted sql code works by
 considering row base expressions one at a time, vertex by vertex so
 to speak.
+
+For example, it's very easy to represent graph data as a table in
+postgres.  The following code creates the same graph as shown in the
+figure above as a postgres table:
+
+```
+    create table edge (
+        i integer,
+        j integer,
+        v bool default true
+        );
+
+    insert into edge (i, j) values 
+        (1, 4),
+        (1, 2),
+        (2, 7),
+        (2, 5),
+        (3, 6),
+        (4, 3),
+        (4, 1),
+        (5, 6),
+        (6, 3),
+        (7, 3);
+```
 
 Using pggraphblas brings high density memory encoding and optimized
 numerical computing methods to solving graph problems with an elegant,
