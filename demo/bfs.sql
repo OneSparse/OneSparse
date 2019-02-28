@@ -1,5 +1,5 @@
-
-\ir fixtures.sql   -- include test table fixtures from SuiteSparse Demo/Matrix
+-- include test table fixtures from SuiteSparse Demo/Matrix
+\ir fixtures.sql
         
 create or replace function bfs(A matrix, source bigint) returns vector as $$
 declare
