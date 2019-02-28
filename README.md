@@ -1,8 +1,7 @@
 # summary
 
-pggraphblas is a postgres extension bridges
-[The GraphBLAS API](http://graphblas.org) provides sparse matrix and
-vector types and their operations to the
+pggraphblas is a postgres extension that bridges
+[The GraphBLAS API](http://graphblas.org) with the
 [PostgreSQL](https://postgresql.org) relation database.
 
 GraphBLAS is a sparse linear algebra API optimized for processing
