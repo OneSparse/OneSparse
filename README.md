@@ -8,8 +8,8 @@ building blocks to implement graph algorithms.
 
 pggraphblas leverages the expertise in the field of sparse matrix
 programming by [The GraphBLAS Forum](http://graphblas.org) and uses
-the SuiteSparse
-[GraphBLAS](http://faculty.cse.tamu.edu/davis/GraphBLAS.html) API
+the [SuiteSparse
+ GraphBLAS](http://faculty.cse.tamu.edu/davis/GraphBLAS.html) API
 implementation. SuiteSparse:GraphBLAS is brought to us by the work of
 [Dr. Tim Davis](http://faculty.cse.tamu.edu/davis/welcome.html), professor in the Department of Computer Science and
 Engineering at Texas A&M University.
