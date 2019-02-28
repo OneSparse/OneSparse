@@ -2,21 +2,20 @@ drop table if exists test;
 
 create table test (
     i integer,
-    j integer,
-    v integer
+    j integer
     );
 
-insert into test (i, j, v) values
-    (1, 4, 1),
-    (1, 2, 2),
-    (2, 7, 3),
-    (2, 5, 4),
-    (3, 6, 5),
-    (4, 3, 6),
-    (4, 1, 7),
-    (5, 6, 8),
-    (6, 3, 9),
-    (7, 3, 0);
+insert into test (i, j) values
+    (1, 4),
+    (1, 2),
+    (2, 7),
+    (2, 5),
+    (3, 6),
+    (4, 3),
+    (4, 1),
+    (5, 6),
+    (6, 3),
+    (7, 3);
 
 drop table if exists mbeacxc;
 

@@ -1,6 +1,6 @@
 
 begin;
-select plan(96);
+select plan(102);
 
 -- The following variables are substituted into matrix_template.sql.
 -- Each support type is defined and the expected values, the template
@@ -21,6 +21,7 @@ select plan(96);
     
 \set VALS 1,2,3
 \set VALS2 2,3,4
+\set TVALS 2,3,1
     
 \set EAX 3,5,7
 \set EMX 2,6,12
@@ -53,6 +54,7 @@ select plan(96);
     
 \set VALS 1.25,2.5,5.0
 \set VALS2 2.5,5.0,10.0
+\set TVALS 2.5,5.0,1.25
     
 \set EAX 3.750000,7.500000,15.000000
 \set EMX 3.125000,12.500000,50.000000
@@ -80,6 +82,7 @@ select plan(96);
     
 \set VALS true,false,true
 \set VALS2 true,true,false
+\set TVALS false,true,true
     
 \set EAX true,true,true
 \set EMX true,false,false

@@ -144,6 +144,20 @@ RETURNS matrix
 AS '$libdir/pggraphblas', 'mxm'
 LANGUAGE C STABLE;
 
+CREATE FUNCTION transpose(
+    A matrix,
+    inout C matrix default null,
+    mask matrix default null,
+    accum text default null,
+    doutp text default null,
+    dmask text default null,
+    dinp0 text default null,
+    dinp1 text default null
+    )
+RETURNS matrix
+AS '$libdir/pggraphblas', 'matrix_transpose'
+LANGUAGE C STABLE;
+    
 CREATE FUNCTION mxm_op(A matrix, B matrix)
 RETURNS matrix
 AS '$libdir/pggraphblas', 'mxm'

@@ -187,3 +187,8 @@ select is(
     cast(array[:VALS] as :TYPE [])), :'SRING'),
     cast(:VRS AS :TYPE),
     'matrix reduce scalar ' || :'TYPE');
+
+select is(
+       transpose(matrix(array[:ROWS], array[:COLS], cast(array[:VALS] AS :TYPE []))),
+       matrix(array[:ROLS], array[:COLS], cast(array[:TVALS] AS :TYPE [])),
+       'matrix transpose ' || :'TYPE');

@@ -447,3 +447,37 @@ matrix_reduce_vector(PG_FUNCTION_ARGS) {
   CHECKD(GrB_reduce(val->V, NULL, monoid, A->M, NULL));
   PGGRB_RETURN_VECTOR(val);
 }
+
+Datum
+matrix_transpose(PG_FUNCTION_ARGS) {
+  GrB_Info info;
+  pgGrB_Matrix *A, *C = NULL, *mask;
+  GrB_Index m, n;
+  GrB_Type type;
+  GrB_Descriptor desc = NULL;
+  char *desc_val;
+
+  A = PGGRB_GETARG_MATRIX(0);
+  
+  if (PG_NARGS() > 0) {
+    C = PG_ARGISNULL(1) ? NULL : PGGRB_GETARG_MATRIX(2);
+    mask = PG_ARGISNULL(2) ? NULL : PGGRB_GETARG_MATRIX(3);
+    if (PG_NARGS() > 3) {
+      CHECKD(GrB_Descriptor_new(&desc));
+      GETARG_DESCRIPTOR_VAL(4, desc_val, desc, OUTP, REPLACE);
+      GETARG_DESCRIPTOR_VAL(5, desc_val, desc, MASK, SCMP);
+      GETARG_DESCRIPTOR_VAL(6, desc_val, desc, INP0, TRAN);
+      GETARG_DESCRIPTOR_VAL(7, desc_val, desc, INP1, TRAN);
+    }
+  }
+
+  if (C == NULL) {
+    CHECKD(GrB_Matrix_nrows(&m, A->M));
+    CHECKD(GrB_Matrix_ncols(&n, A->M));
+    CHECKD(GxB_Matrix_type(&type, A->M));
+    TYPE_APPLY(C, type, construct_empty_expanded_matrix, m, n, CurrentMemoryContext);
+  }
+
+  CHECKD(GrB_transpose(C->M, mask? mask->M:NULL, NULL, A->M, desc));
+  PGGRB_RETURN_MATRIX(C);
+}
