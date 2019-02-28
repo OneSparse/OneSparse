@@ -1,6 +1,3 @@
-# pggraphblas
-High Performance Graph Processing with Postgres using Linear Algebra
-
 # summary
 
 GraphBLAS is a sparse linear algebra API optimized for processing
