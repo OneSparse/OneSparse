@@ -38,6 +38,8 @@ details.
 
 ![Alt text](./docs/AdjacencyMatrix.svg)
 
+### Image Credit: [Dr. Jermey Kepner](http://www.mit.edu/~kepner/)
+
 On the left is a graph, and on the right, the adjacency matrix that
 represents it. The matrix has a row and column for every vertex.  If
 there is an edge between nodes A and B, then there will be a value
