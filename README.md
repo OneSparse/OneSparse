@@ -1,5 +1,10 @@
 # summary
 
+pggraphblas is a postgres extension bridges
+[The GraphBLAS API](http://graphblas.org) provides sparse matrix and
+vector types and their operations to the
+[PostgreSQL](https://postgresql.org) relation database.
+
 GraphBLAS is a sparse linear algebra API optimized for processing
 graphs encoded as sparse matrices and vectors.  In addition to common
 real/integer matrix algebra operations, GraphBLAS supports up to 960
