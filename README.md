@@ -42,12 +42,16 @@ to switch back and forth between them.
 On the left is a graph, and on the right, the adjacency matrix that
 represents it. The matrix has a row and column for every vertex.  If
 there is an edge between nodes A and B, then there will be a value
-present in the intersection of As row with Bs column.
+present in the intersection of As row with Bs column.  For example,
+vertex 1 connects to 4, but 4 also connects to 1 (this is an example
+of a *directed* graph) so there are two values in the matrix to
+represent these two edges, one at the (1, 4) position and the other at
+the (4,1) position.
 
 One practical problem with matrix-encoding graphs is that most
 real-world graphs tend to be sparse, as above, only 12 of 49 possible
 elements have a value. Those that have values tend to be "scattered"
-uniformally across the matrix (for "normal" graphs), so dense linear
+uniformally across the matrix (for "typical" graphs), so dense linear
 algebra libraries like BLAS or numpy do not encode or operate on them
 efficiently, as the relevant data is mostly empty memory with actual
 data elements spaced far apart.  This wastes memory and cpu resources,
@@ -75,6 +79,8 @@ SQL queries, and set-returning functions are also provided to turn
 graphs back into relational sets.  From a PostgreSQL point of view,
 matrices look a little bit like arrays, being stored as variable
 length column values.
+
+# sql graph traversal
 
 Graph traversal and manipulation can already be acheived in PostgreSQL
 using recursive Common Table Expressions (CTE or "WITH" queries) in a
