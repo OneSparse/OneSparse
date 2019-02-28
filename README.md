@@ -33,12 +33,11 @@ As Kepner's paper describes, there are two useful matrix
 representations of graphs: *Adjacency Matrices* and *Incidence
 Matrices*.  For this introduction we will focus on the adjacency type
 as they are simpler, but the same ideas apply to both, and it is easy
-to switch back and forth between them.  See the paper for more
-details.
+to switch back and forth between them.
 
 ![Alt text](./docs/AdjacencyMatrix.svg)
 
-### Image Credit: [Dr. Jermey Kepner](http://www.mit.edu/~kepner/)
+(Image Credit: [Dr. Jermey Kepner](http://www.mit.edu/~kepner/))
 
 On the left is a graph, and on the right, the adjacency matrix that
 represents it. The matrix has a row and column for every vertex.  If
