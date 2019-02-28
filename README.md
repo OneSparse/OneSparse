@@ -41,7 +41,7 @@ column for every vertex.  If there is an edge between nodes A and B,
 then there will be a value present in the intersection of As row with
 Bs column.
 
-[image]
+![Alt text](./docs/AdjacencyMatrix.svg)
 
 One practical problem with matrix-encoding graphs is that most
 real-world graphs tend to be sparse, so dense linear algebra libraries
