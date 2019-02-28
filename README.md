@@ -14,7 +14,7 @@ programming by [The GraphBLAS Forum](http://graphblas.org) and uses
 the SuiteSparse
 [GraphBLAS](http://faculty.cse.tamu.edu/davis/GraphBLAS.html) API
 implementation. SuiteSparse:GraphBLAS is brought to us by the work of
-Dr. Tim Davis, professor in the Department of Computer Science and
+[Dr. Tim Davis](http://faculty.cse.tamu.edu/davis/welcome.html), professor in the Department of Computer Science and
 Engineering at Texas A&M University.
 [News and information](http://faculty.cse.tamu.edu/davis/news.html)
 can provide you with a lot more background information, in addition to
@@ -27,7 +27,7 @@ not supported yet but is an active work in progress.  See TODO below.
 
 For a long time, mathematicians have known that matrices are powerful
 representations of graphs, as described [in this mathmatical
-introduction](http://www.mit.edu/~kepner/GraphBLAS/GraphBLAS-Math-release.pdf)
+introduction to GraphBLAS](http://www.mit.edu/~kepner/GraphBLAS/GraphBLAS-Math-release.pdf)
 by [Dr. Jermey Kepner](http://www.mit.edu/~kepner/) head and founder
 of
 [MIT Lincoln Laboratory Supercomputing Center](http://news.mit.edu/2016/lincoln-laboratory-establishes-supercomputing-center-0511).
@@ -41,7 +41,7 @@ forth between them.  See the paper for more details.
 Graphs that are represented by adjacency matrices have a row and
 column for every vertex.  If there is an edge between nodes A and B,
 then there will be a value present in the intersection of As row with
-Bs column:
+Bs column.
 
 [image]
 
@@ -98,6 +98,10 @@ as GPU/TPU integration, bringing higher density numeric computing to
 the problem with no change code that uses the API.
 
 # references
+
+[One page poster summary of GraphBLAS](https://resources.sei.cmu.edu/asset_files/Poster/2016_020_001_484268.pdf)
+
+[GraphBLAS: A Programming Specification for Graph Analysis](https://resources.sei.cmu.edu/asset_files/Presentation/2016_017_001_474272.pdf)
 
 [Lower Latency Graph Queries in Cypher with Redis GraphRoi Lipman, Redis LabsTim Davis, Texas A&M U](https://www.youtube.com/watch?v=xnez6tloNSQ)
 
