@@ -36,18 +36,21 @@ as they are simpler, but the same ideas apply to both, and it is easy
 to switch back and forth between them.  See the paper for more
 details.
 
-Graphs that are represented by adjacency matrices have a row and
-column for every vertex.  If there is an edge between nodes A and B,
-then there will be a value present in the intersection of As row with
-Bs column.
-
 ![Alt text](./docs/AdjacencyMatrix.svg)
 
+On the left is a graph, and on the right, the adjacency matrix that
+represents it. The matrix has a row and column for every vertex.  If
+there is an edge between nodes A and B, then there will be a value
+present in the intersection of As row with Bs column.
+
 One practical problem with matrix-encoding graphs is that most
-real-world graphs tend to be sparse, so dense linear algebra libraries
-like BLAS or numpy do not efficiently encode them in memory or operate
-on them efficiently, as the relevant data is scattered around mostly
-empty memory as most matrix elements are unused.
+real-world graphs tend to be sparse, as above, only 12 of 49 possible
+elements have a value. Those that have values tend to be "scattered"
+uniformally across the matrix (for "normal" graphs), so dense linear
+algebra libraries like BLAS or numpy do not encode or operate on them
+efficiently, as the relevant data is mostly empty memory with actual
+data elements spaced far apart.  This wastes memory and cpu resources,
+and defeats CPU caching mechanisms.
 
 For example, suppose a fictional social network has 1 billion users,
 and each user has about 100 friends, which means there are about 100
