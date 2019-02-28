@@ -32,8 +32,9 @@ of
 As Kepner's paper describes, there are two useful matrix
 representations of graphs: *Adjacency Matrices* and *Incidence
 Matrices*.  For this introduction we will focus on the adjacency type
-but the same ideas apply to both, and it is easy to switch back and
-forth between them.  See the paper for more details.
+as they are simpler, but the same ideas apply to both, and it is easy
+to switch back and forth between them.  See the paper for more
+details.
 
 Graphs that are represented by adjacency matrices have a row and
 column for every vertex.  If there is an edge between nodes A and B,
@@ -54,14 +55,14 @@ billion (1e+11) connections in the graph.  A dense matrix large enough
 to hold this graph would need (1 billion)^2 or
 (1,000,000,000,000,000,000), a "quintillion" elements, but only 1e+11
 of them would have meaningful values, leaving only 0.0000001 of the
-graph being utilized.
+matrix being utilized.
 
 By using a sparse matrix instead of dense, only the elements used are
 actually stored in the matrix. The "empty" part of the matrix is not
 stored and is interpreted as an "algebraic zero" value, which might
 not be the actual number zero, but other values like positive or
-negative infinity depending on the particular algebraic operations
-applied.
+negative infinity depending on the particular semiring operations
+applied to the matrix.
 
 pggraphblas is a postgres extension that provides access to two new
 types: matrix and vector, as well as the GraphBLAS api to manipulate
@@ -71,24 +72,19 @@ graphs back into relational sets.  From a PostgreSQL point of view,
 matrices look a little bit like arrays, being stored as variable
 length column values.
 
-pggraphblas is not a "graph database" using postgres. Postgres is
-*already* an excellent database for graph storage and retrieval. Many
-real-world foreign key relationships, common structures in most
-postgres databases, describe sparse graphs.  pggraphblas provides
-building blocks for solving graph algorithms over with those graphs.
-
-Graph traversal and manipulation can be acheived in PostgreSQL using
-recursive common table expressions ("WITH" queries) in a very flexible
-and general way, but this approach has a drawback: sparse relational
-graphs are scattered across indexes and table blocks, having poor
-locality.  Interpreted sql code works by considering row based
-expressions one at a time, vertex by vertex so to speak.
+Graph traversal and manipulation can already be acheived in PostgreSQL
+using recursive Common Table Expressions (CTE or "WITH" queries) in a
+very flexible and general way, but this approach has a drawback:
+sparse relational graphs are scattered across indexes and table
+blocks, having poor locality.  Interpreted sql code works by
+considering row based expressions one at a time, vertex by vertex so
+to speak.
 
 Using pggraphblas brings high density memory encoding and optimized
-numerical computing methods to solving sparse graph problems.
-GraphBLAS is designed to be optimized for storing values where dense
-matrices are not, and is optimized for accessing sparse values where
-database tables are not.
+numerical computing methods to solving graph problems with an elegant,
+composable mathmaticaly sound API.  GraphBLAS is designed to be
+optimized for storing values where dense matrices are not, and is
+optimized for accessing sparse values where database tables are not.
 
 GraphBLAS is also an actively developed project with future plans such
 as GPU/TPU integration, bringing higher density numeric computing to
@@ -110,21 +106,19 @@ the problem with no change code that uses the API.
 
 # development
 
-If you have docker installed, run `./test.sh` to build a docker
+If you have docker installed, run `./test.sh psql` to build a docker
 container with postgres:11 and GraphBLAS compiled with debug symbols
-on.  This will automatically run test.sql.  If you provide any
-argument to test.sh the container will not be immediately cleaned up,
-and the argument will be run in a tmux in the container, so to launch
-a psql, do `./test.sh psql`.  GDB is installed so create another pane
-and attach to the current database pid to debug the C code.
+on.  This will eventually drop you into a psql interpreter.  You can
+run the tests from that point with `\i /here/tests/test.sql`
 
 # types
 
 GraphBLAS has an extremely rich type system that encompases not only
-common "artithmetic" algegbra, but also many other algebras using an
-algebraic structures called semirings.  The combinations of 7 matrix
-types and 960 semiring operations offer a huge number of building
-blocks for solving graph problems.
+common artithmetic algegbraic operations like addition and
+multiplication, but also many other operations using algebraic
+structures called semirings.  The combinations of 7 matrix types and
+960 semiring operations offer a huge number of building blocks for
+solving graph problems.
 
 PostgreSQL is a strongly typed language that comes with many built-in
 data types, the following types map from GraphBLAS to PostgreSQL:
