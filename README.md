@@ -125,6 +125,22 @@ GraphBLAS is also an actively developed project with future plans such
 as GPU/TPU integration, bringing higher density numeric computing to
 the problem with no change code that uses the API.
 
+# matrix multplication
+
+They key operation of GraphBLAS is the matrix multiply as provided by
+the `mxm` (matrix times matrix), `mxv` (matrix times vector), and
+`vxm` (vector times matrix) functions.  Matrix multplication has a
+remarkable dual property of being useful for finding the "next" step
+in a graph algorithm, and for reducing values accumulated across a
+graph during traversal.  By using different combinations of operations
+(semiring) different graph algorithms can step and accumulate
+different results, interpreting the data in unique ways, even over the
+same graphs.
+
+![Alt text](./docs/AdjacencyMatrixBFS.svg)
+
+(Image Credit: [Dr. Jermey Kepner](http://www.mit.edu/~kepner/))
+
 # references
 
 [One page poster summary of GraphBLAS](https://resources.sei.cmu.edu/asset_files/Poster/2016_020_001_484268.pdf)
