@@ -87,7 +87,7 @@ using recursive Common Table Expressions (CTE or "WITH" queries) in a
 very flexible and general way, but this approach has a drawback:
 sparse relational graphs are scattered across indexes and table
 blocks, having poor locality.  Interpreted sql code works by
-considering row based expressions one at a time, vertex by vertex so
+considering row base expressions one at a time, vertex by vertex so
 to speak.
 
 Using pggraphblas brings high density memory encoding and optimized
@@ -134,12 +134,12 @@ PostgreSQL is a strongly typed language that comes with many built-in
 data types, the following types map from GraphBLAS to PostgreSQL:
 
     - GrB_BOOL maps to bool
-    - GrB_INT8 maps to char(1)
+    - GrB_INT8 maps to char (aka character(1))
     - GrB_INT16 maps to smallint
     - GrB_INT32 maps to integer
     - GrB_INT64 maps to bigint
     - GrB_FP32 maps to real
-    - GrB_FP64 maps to float aka "double precision"
+    - GrB_FP64 maps to float (aka "double precision")
 
 Postgres does not support unsigned integers like GraphBLAS (is there a
 workaround?  support the uint extension?)
