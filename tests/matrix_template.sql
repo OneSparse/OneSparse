@@ -192,3 +192,8 @@ select is(
        transpose(matrix(array[:ROWS], array[:COLS], cast(array[:VALS] AS :TYPE []))),
        matrix(array[:ROLS], array[:COLS], cast(array[:TVALS] AS :TYPE [])),
        'matrix transpose ' || :'TYPE');
+
+select is(
+       assign(matrix_:TYPE(3,3), matrix(array[:ROWS], array[:COLS], cast(array[:VALS] AS :TYPE []))),
+       matrix(array[:ROWS], array[:ROLS], cast(array[:VALS] AS :TYPE [])),
+       'matrix assign from matrix ' || :'TYPE');

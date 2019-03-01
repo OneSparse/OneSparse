@@ -481,3 +481,35 @@ matrix_transpose(PG_FUNCTION_ARGS) {
   CHECKD(GrB_transpose(C->M, mask? mask->M:NULL, NULL, A->M, desc));
   PGGRB_RETURN_MATRIX(C);
 }
+
+Datum
+matrix_assign_matrix(PG_FUNCTION_ARGS) {
+  GrB_Info info;
+  pgGrB_Matrix *A, *B, *mask;
+  GrB_Index nvals, *rows = NULL, *cols = NULL;
+  GrB_Type type;
+
+  A = PGGRB_GETARG_MATRIX(0);
+  B = PGGRB_GETARG_MATRIX(1);
+  mask = PG_ARGISNULL(2)? NULL : PGGRB_GETARG_MATRIX(2);
+
+  CHECKD(GrB_Matrix_nvals(&nvals, B->M));
+  
+  if (B != NULL) {
+    CHECKD(GxB_Matrix_type(&type, B->M));
+    TYPE_APPLY(nvals, type, extract_rowscols, B, &rows, &cols, nvals);
+  }
+
+  CHECKD(GrB_assign(A->M,
+                    mask? mask->M: NULL,
+                    NULL,
+                    B->M,
+                    rows? rows : GrB_ALL,
+                    nvals,
+                    cols? cols : GrB_ALL,
+                    nvals,
+                    NULL));
+  PGGRB_RETURN_MATRIX(A);
+}
+
+

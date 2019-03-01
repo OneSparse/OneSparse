@@ -1,7 +1,7 @@
 
 GrB_Semiring lookup_semiring(char *name) {
   for (int i = 0; i < 960; i++) {
-    if (strcmp(semirings[i].name, name) == 0)
+    if (strcasecmp(semirings[i].name, name) == 0)
         return semirings[i].R;
   }
   return NULL;
@@ -9,7 +9,7 @@ GrB_Semiring lookup_semiring(char *name) {
 
 GrB_BinaryOp lookup_binop(char *name) {
   for (int i = 0; i < 256; i++) {
-    if (strcmp(binops[i].name, name) == 0)
+    if (strcasecmp(binops[i].name, name) == 0)
         return binops[i].B;
   }
   return NULL;

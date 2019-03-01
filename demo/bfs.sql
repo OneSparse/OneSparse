@@ -15,7 +15,7 @@ begin
     while not_done and level <= n loop             -- While still work to do.
         v := assign(v, level, mask=>q);            -- Assign the current level to all
 
-        q := mxv(A, q, q,                          -- Multiply q<mask> = Aq,
+        q := vxm(A, q, q,                          -- Multiply q<mask> = Aq,
             semiring=>'LOR_LAND_BOOL',             -- using LOR_LAND_BOOL semiring
             mask=>v,                               -- only those *not* masked
             dmask=>'scmp',                         -- by complementing the mask

@@ -287,8 +287,17 @@ CREATE FUNCTION reduce_float(A matrix, semiring text default null)
 RETURNS float
 AS '$libdir/pggraphblas', 'matrix_reduce_float8'
 LANGUAGE C STABLE;
-    
 
+CREATE FUNCTION assign(
+    A matrix,
+    B matrix,
+    mask matrix default null)
+RETURNS matrix
+AS '$libdir/pggraphblas', 'matrix_assign_matrix'
+LANGUAGE C STABLE;
+        
+-- matrix operators
+    
 CREATE OPERATOR = (
     leftarg = matrix,
     rightarg = matrix,

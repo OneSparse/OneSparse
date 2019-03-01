@@ -1,3 +1,4 @@
+create extension if not exists pggraphblas;
 drop table if exists test;
 
 create table test (

@@ -25,6 +25,11 @@ Datum
 FN(expand_flat_matrix)(Datum matrixdatum,
                    MemoryContext parentcontext);
 
+GrB_Index FN(extract_rowscols)(pgGrB_Matrix *A,
+                         GrB_Index **rows,
+                         GrB_Index **cols,
+                         GrB_Index nvals);
+                             
 pgGrB_Matrix *
 FN(construct_empty_expanded_matrix)(GrB_Index nrows,
                                     GrB_Index ncols,
@@ -77,7 +82,7 @@ PG_FUNCTION_INFO_V1(FN(matrix_agg_acc));
 PG_FUNCTION_INFO_V1(FN(matrix_final));
 PG_FUNCTION_INFO_V1(FN(matrix_elements));
 PG_FUNCTION_INFO_V1(FN(matrix_reduce));
-
+       
 /* Compute size of storage needed for matrix */
 static Size
 FN(matrix_get_flat_size)(ExpandedObjectHeader *eohptr) {
@@ -285,7 +290,7 @@ FN(matrix_agg_acc)(PG_FUNCTION_ARGS)
 
   *row = PG_GETARG_DATUM(1);
   *col = PG_GETARG_DATUM(2);
-  *val = PG_GET(3);
+  *val = PG_GETARG_DATUM(3);
 
   mstate->rows = lappend(mstate->rows, row);
   mstate->cols = lappend(mstate->cols, col);
@@ -302,8 +307,8 @@ FN(matrix_final)(PG_FUNCTION_ARGS) {
   pgGrB_Matrix *retval;
   MemoryContext oldcxt, resultcxt;
 
-  pgGrB_Matrix_AggState *mstate = (pgGrB_Matrix_AggState*)PG_GETARG_POINTER(0);
-  size_t n = 0, count = list_length(mstate->rows);
+  pgGrB_Matrix_AggState *mstate;
+  size_t n = 0, count;
   GrB_Index *row_indices, *col_indices;
   PG_TYPE *values;
 
@@ -318,6 +323,7 @@ FN(matrix_final)(PG_FUNCTION_ARGS) {
 
   oldcxt = MemoryContextSwitchTo(resultcxt);
   mstate = (pgGrB_Matrix_AggState *)PG_GETARG_POINTER(0);
+  count = list_length(mstate->rows);
 
   row_indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * count);
   col_indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * count);
@@ -674,6 +680,26 @@ FN(matrix_reduce)(PG_FUNCTION_ARGS) {
   CHECKD(GrB_reduce(&val, NULL, monoid, A->M, NULL));
   PG_RET(val);
 }
+
+GrB_Index FN(extract_rowscols)(pgGrB_Matrix *A,
+                         GrB_Index **rows,
+                         GrB_Index **cols,
+                         GrB_Index nvals) {
+  PG_TYPE *values;
+  GrB_Info info;
+
+  *rows = (GrB_Index*) palloc0(sizeof(GrB_Index) * nvals);
+  *cols = (GrB_Index*) palloc0(sizeof(GrB_Index) * nvals);
+  values = (PG_TYPE*) palloc0(sizeof(PG_TYPE) * nvals);
+
+  CHECKD(GrB_Matrix_extractTuples(*rows,
+                                  *cols,
+                                  values,
+                                  &nvals,
+                                  A->M));
+  return nvals;
+}
+
 
 #undef SUFFIX
 #undef PG_TYPE

@@ -75,15 +75,17 @@ actually stored in the matrix. The "empty" part of the matrix is not
 stored and is interpreted as an "algebraic zero" value, which might
 not be the actual number zero, but other values like positive or
 negative infinity depending on the particular semiring operations
-applied to the matrix.
+applied to the matrix.  The math used with sparse matrices is exactly
+the same as dense, the sparsity of the data doesn't matter to the
+math, but it does matter to how the matrix is implemented internally.
 
 pggraphblas is a postgres extension that provides access to two new
-types: matrix and vector, as well as the GraphBLAS api to manipulate
-these types.  Aggregate functions are provided to build matrices from
-SQL queries, and set-returning functions are also provided to turn
-graphs back into relational sets.  From a PostgreSQL point of view,
-matrices look a little bit like arrays, being stored as variable
-length column values.
+types: `matrix` and `vector`, as well as the GraphBLAS api to
+manipulate these types.  Aggregate functions are provided to build
+matrices from SQL queries, and set-returning functions are also
+provided to turn graphs back into relational sets.  From a PostgreSQL
+point of view, matrices look a little bit like arrays, being stored as
+variable length column values.
 
 # sql graph traversal
 

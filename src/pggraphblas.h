@@ -236,6 +236,7 @@ PG_FUNCTION_INFO_V1(matrix_ewise_mult);
 PG_FUNCTION_INFO_V1(matrix_ewise_add);
 PG_FUNCTION_INFO_V1(matrix_reduce_vector);
 PG_FUNCTION_INFO_V1(matrix_transpose);
+PG_FUNCTION_INFO_V1(matrix_assign_matrix);
 
 /* Vectors */
 
