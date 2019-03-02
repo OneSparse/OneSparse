@@ -30,19 +30,21 @@ begin
 end;
 $$ language plpgsql;
 
-create or replace function bfscte(start integer) returns table(id integer, level integer) as $$
+create or replace function bfscte(start integer)
+returns table(id integer, level integer) as
+$$
   with recursive test_cte (i, j, level, path) 
      as
      ( 
        select i, j, 0 as level, array[i] as path
-       from test
+       from fs_183_1
        where i = start
        union all
        select nxt.i, nxt.j, level + 1, array_append(prv.path, nxt.i)
-       from test nxt, test_cte prv
+       from fs_183_1 nxt, test_cte prv
        where nxt.i = prv.j
        and nxt.i != ALL(prv.path)
      )
      select distinct on (i) i, level
 from test_cte order by i, array_length(path, 1);
-    $$ language sql;
+$$ language sql;

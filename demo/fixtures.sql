@@ -26,6 +26,8 @@ create table mbeacxc (
     v float
     );
 
+create index on mbeacxc (i) include (j);
+
 \copy mbeacxc from 'GraphBLAS/Demo/Matrix/mbeacxc' with (delimiter ' ');
 
 drop table if exists bcsstk16;
@@ -37,3 +39,26 @@ create table bcsstk16 (
     );
 
 \copy bcsstk16 from 'GraphBLAS/Demo/Matrix/bcsstk16' with (delimiter ' ');
+
+drop table if exists ash219;
+
+create table ash219 (
+    i integer,
+    j integer,
+    v integer
+    );
+
+\copy ash219 from 'GraphBLAS/Demo/Matrix/ash219' with (delimiter ' ');
+    
+
+drop table if exists fs_183_1;
+
+create table fs_183_1 (
+    i integer,
+    j integer,
+    v real
+    );
+
+\copy fs_183_1 from 'GraphBLAS/Demo/Matrix/fs_183_1' with (delimiter ' ');
+    
+    

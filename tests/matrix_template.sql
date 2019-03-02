@@ -42,6 +42,30 @@ select is(
     'matrix nvals ' || :'TYPE');
 
 select is(
+    ncols(matrix(
+        array[:ROWS],
+        array[:COLS],
+        cast(array[:VALS] as :TYPE []), 10, 10)),
+    10::bigint,
+    'matrix explicit ncols ' || :'TYPE');
+
+select is(
+    nrows(matrix(
+        array[:ROWS],
+        array[:COLS],
+        cast(array[:VALS] as :TYPE []), 10, 10)),
+    10::bigint,
+    'matrix explicit nrows ' || :'TYPE');
+
+select is(
+    nvals(matrix(
+        array[:ROWS],
+        array[:COLS],
+        cast(array[:VALS] as :TYPE []), 10, 10)),
+     3::bigint,
+    'matrix explicit nvals ' || :'TYPE');
+    
+select is(
   matrix(array[:ROWS],
       array[:COLS],
       cast(array[:VALS] as :TYPE [])) ||

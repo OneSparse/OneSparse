@@ -98,6 +98,8 @@ RETURNS matrix
 AS '$libdir/pggraphblas', 'matrix_float8'
 LANGUAGE C STABLE;
 
+-- empty matrix construction
+
 CREATE FUNCTION matrix_bool(nrows bigint, ncols bigint)
 RETURNS matrix
 AS '$libdir/pggraphblas', 'matrix_bool'
@@ -710,7 +712,7 @@ LANGUAGE C STRICT;
 
 CREATE CAST (bool[] AS vector) WITH FUNCTION vector(bool[]) AS IMPLICIT;
 
--- empty construction
+-- empty vector construction
 
 CREATE FUNCTION vector_bigint(size bigint)
 RETURNS vector

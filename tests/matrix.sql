@@ -1,6 +1,6 @@
 
 begin;
-select plan(114);
+select plan(132);
 
 -- The following variables are substituted into matrix_template.sql.
 -- Each support type is defined and the expected values, the template
@@ -106,4 +106,3 @@ select plan(114);
     
 select * from finish();
 rollback;
-
