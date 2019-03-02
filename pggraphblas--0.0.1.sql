@@ -288,6 +288,8 @@ RETURNS float
 AS '$libdir/pggraphblas', 'matrix_reduce_float8'
 LANGUAGE C STABLE;
 
+-- matrix assign matrix
+
 CREATE FUNCTION assign(
     A matrix,
     B matrix,
@@ -295,7 +297,65 @@ CREATE FUNCTION assign(
 RETURNS matrix
 AS '$libdir/pggraphblas', 'matrix_assign_matrix'
 LANGUAGE C STABLE;
-        
+
+-- matrix assign scalar
+
+CREATE FUNCTION assign(
+    A matrix,
+    value bool,
+    C matrix default null,
+    mask matrix default null)
+RETURNS matrix
+AS '$libdir/pggraphblas', 'matrix_assign_bool'
+LANGUAGE C STABLE;
+    
+CREATE FUNCTION assign(
+    A matrix,
+    value bigint,
+    C matrix default null,
+    mask matrix default null)
+RETURNS matrix
+AS '$libdir/pggraphblas', 'matrix_assign_int64'
+LANGUAGE C STABLE;
+    
+CREATE FUNCTION assign(
+    A matrix,
+    value integer,
+    C matrix default null,
+    mask matrix default null)
+RETURNS matrix
+AS '$libdir/pggraphblas', 'matrix_assign_int32'
+LANGUAGE C STABLE;
+    
+CREATE FUNCTION assign(
+    A matrix,
+    value smallint,
+    C matrix default null,
+    mask matrix default null)
+RETURNS matrix
+AS '$libdir/pggraphblas', 'matrix_assign_int16'
+LANGUAGE C STABLE;
+    
+CREATE FUNCTION assign(
+    A matrix,
+    value real,
+    C matrix default null,
+    mask matrix default null)
+RETURNS matrix
+AS '$libdir/pggraphblas', 'matrix_assign_float4'
+LANGUAGE C STABLE;
+    
+CREATE FUNCTION assign(
+    A matrix,
+    value float,
+    C matrix default null,
+    mask matrix default null)
+RETURNS matrix
+AS '$libdir/pggraphblas', 'matrix_assign_float8'
+LANGUAGE C STABLE;
+    
+
+    
 -- matrix operators
     
 CREATE OPERATOR = (
@@ -340,104 +400,6 @@ CREATE OPERATOR || (
     leftarg = matrix,
     rightarg = matrix,
     procedure = matrix_ewise_add_op
-);
-
--- aggregators
-
-CREATE FUNCTION matrix_agg_acc_bigint(internal, bigint, bigint, bigint)
-RETURNS internal
-AS '$libdir/pggraphblas', 'matrix_agg_acc_int64'
-LANGUAGE C CALLED ON NULL INPUT;
-
-CREATE FUNCTION matrix_final_bigint(internal)
-RETURNS matrix
-AS '$libdir/pggraphblas', 'matrix_final_int64'
-LANGUAGE C CALLED ON NULL INPUT;
-
-CREATE FUNCTION matrix_agg_acc_integer(internal, bigint, bigint, integer)
-RETURNS internal
-AS '$libdir/pggraphblas', 'matrix_agg_acc_int32'
-LANGUAGE C CALLED ON NULL INPUT;
-
-CREATE FUNCTION matrix_final_integer(internal)
-RETURNS matrix
-AS '$libdir/pggraphblas', 'matrix_final_int32'
-LANGUAGE C CALLED ON NULL INPUT;
-
-CREATE FUNCTION matrix_agg_acc_smallint(internal, bigint, bigint, smallint)
-RETURNS internal
-AS '$libdir/pggraphblas', 'matrix_agg_acc_int16'
-LANGUAGE C CALLED ON NULL INPUT;
-
-CREATE FUNCTION matrix_final_smallint(internal)
-RETURNS matrix
-AS '$libdir/pggraphblas', 'matrix_final_int16'
-LANGUAGE C CALLED ON NULL INPUT;
-
-CREATE FUNCTION matrix_agg_acc_float(internal, bigint, bigint, float)
-RETURNS internal
-AS '$libdir/pggraphblas', 'matrix_agg_acc_float8'
-LANGUAGE C CALLED ON NULL INPUT;
-
-CREATE FUNCTION matrix_final_float(internal)
-RETURNS matrix
-AS '$libdir/pggraphblas', 'matrix_final_float8'
-LANGUAGE C CALLED ON NULL INPUT;
-
-CREATE FUNCTION matrix_agg_acc_real(internal, bigint, bigint, real)
-RETURNS internal
-AS '$libdir/pggraphblas', 'matrix_agg_acc_float4'
-LANGUAGE C CALLED ON NULL INPUT;
-
-CREATE FUNCTION matrix_final_real(internal)
-RETURNS matrix
-AS '$libdir/pggraphblas', 'matrix_final_float4'
-LANGUAGE C CALLED ON NULL INPUT;
-
-CREATE FUNCTION matrix_agg_acc_bool(internal, bigint, bigint, bool)
-RETURNS internal
-AS '$libdir/pggraphblas', 'matrix_agg_acc_bool'
-LANGUAGE C CALLED ON NULL INPUT;
-
-CREATE FUNCTION matrix_final_bool(internal)
-RETURNS matrix
-AS '$libdir/pggraphblas', 'matrix_final_bool'
-LANGUAGE C CALLED ON NULL INPUT;
-
-CREATE AGGREGATE matrix(bigint, bigint, bigint) (
-    stype = internal,
-    sfunc = matrix_agg_acc_bigint,
-    finalfunc = matrix_final_bigint
-);
-
-CREATE AGGREGATE matrix(bigint, bigint, integer) (
-    stype = internal,
-    sfunc = matrix_agg_acc_integer,
-    finalfunc = matrix_final_integer
-);
-
-CREATE AGGREGATE matrix(bigint, bigint, smallint) (
-    stype = internal,
-    sfunc = matrix_agg_acc_smallint,
-    finalfunc = matrix_final_smallint
-);
-
-CREATE AGGREGATE matrix(bigint, bigint, float) (
-    stype = internal,
-    sfunc = matrix_agg_acc_float,
-    finalfunc = matrix_final_float
-);
-
-CREATE AGGREGATE matrix(bigint, bigint, real) (
-    stype = internal,
-    sfunc = matrix_agg_acc_real,
-    finalfunc = matrix_final_real
-);
-
-CREATE AGGREGATE matrix(bigint, bigint, bool) (
-    stype = internal,
-    sfunc = matrix_agg_acc_bool,
-    finalfunc = matrix_final_bool
 );
 
 CREATE TYPE matrix_element_bigint AS (index bigint, value bigint);
@@ -811,104 +773,6 @@ CREATE FUNCTION vector(bool[], bigint[], bigint default null)
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_bool'
 LANGUAGE C;
-
--- aggregators
-
-CREATE FUNCTION vector_agg_acc_bigint(internal, bigint, bigint)
-RETURNS internal
-AS '$libdir/pggraphblas', 'vector_agg_acc_int64'
-LANGUAGE C CALLED ON NULL INPUT;
-
-CREATE FUNCTION vector_final_bigint(internal)
-RETURNS vector
-AS '$libdir/pggraphblas', 'vector_final_int64'
-LANGUAGE C CALLED ON NULL INPUT;
-
-CREATE FUNCTION vector_agg_acc_integer(internal, bigint, integer)
-RETURNS internal
-AS '$libdir/pggraphblas', 'vector_agg_acc_int32'
-LANGUAGE C CALLED ON NULL INPUT;
-
-CREATE FUNCTION vector_final_integer(internal)
-RETURNS vector
-AS '$libdir/pggraphblas', 'vector_final_int32'
-LANGUAGE C CALLED ON NULL INPUT;
-
-CREATE FUNCTION vector_agg_acc_smallint(internal, bigint, smallint)
-RETURNS internal
-AS '$libdir/pggraphblas', 'vector_agg_acc_int16'
-LANGUAGE C CALLED ON NULL INPUT;
-
-CREATE FUNCTION vector_final_smallint(internal)
-RETURNS vector
-AS '$libdir/pggraphblas', 'vector_final_int16'
-LANGUAGE C CALLED ON NULL INPUT;
-
-CREATE FUNCTION vector_agg_acc_float(internal, bigint, float)
-RETURNS internal
-AS '$libdir/pggraphblas', 'vector_agg_acc_float8'
-LANGUAGE C CALLED ON NULL INPUT;
-
-CREATE FUNCTION vector_final_float(internal)
-RETURNS vector
-AS '$libdir/pggraphblas', 'vector_final_float8'
-LANGUAGE C CALLED ON NULL INPUT;
-
-CREATE FUNCTION vector_agg_acc_real(internal, bigint, real)
-RETURNS internal
-AS '$libdir/pggraphblas', 'vector_agg_acc_float4'
-LANGUAGE C CALLED ON NULL INPUT;
-
-CREATE FUNCTION vector_final_real(internal)
-RETURNS vector
-AS '$libdir/pggraphblas', 'vector_final_float4'
-LANGUAGE C CALLED ON NULL INPUT;
-
-CREATE FUNCTION vector_agg_acc_bool(internal, bigint, bool)
-RETURNS internal
-AS '$libdir/pggraphblas', 'vector_agg_acc_bool'
-LANGUAGE C CALLED ON NULL INPUT;
-
-CREATE FUNCTION vector_final_bool(internal)
-RETURNS vector
-AS '$libdir/pggraphblas', 'vector_final_bool'
-LANGUAGE C CALLED ON NULL INPUT;
-
-CREATE AGGREGATE vector(bigint, bigint) (
-    stype = internal,
-    sfunc = vector_agg_acc_bigint,
-    finalfunc = vector_final_bigint
-);
-
-CREATE AGGREGATE vector(bigint, integer) (
-    stype = internal,
-    sfunc = vector_agg_acc_integer,
-    finalfunc = vector_final_integer
-);
-
-CREATE AGGREGATE vector(bigint, smallint) (
-    stype = internal,
-    sfunc = vector_agg_acc_smallint,
-    finalfunc = vector_final_smallint
-);
-
-CREATE AGGREGATE vector(bigint, float) (
-    stype = internal,
-    sfunc = vector_agg_acc_float,
-    finalfunc = vector_final_float
-);
-
-CREATE AGGREGATE vector(bigint, real) (
-    stype = internal,
-    sfunc = vector_agg_acc_real,
-    finalfunc = vector_final_real
-);
-
-CREATE AGGREGATE vector(bigint, bool) (
-    stype = internal,
-    sfunc = vector_agg_acc_bool,
-    finalfunc = vector_final_bool
-);
 
 -- tuple formats for vector edges
 

@@ -11,10 +11,17 @@ pgGrB_UnaryOp uops[67];
 #include "vector.c"
 #include "matrix.c"
 
+void *calloc_function(size_t, size_t);
+
+void *calloc_function(size_t num, size_t size) {
+  return palloc0(num * size);
+}
+
 void
 _PG_init(void)
 {
   GrB_Info info;
+  //  info = GxB_init (GrB_BLOCKING, palloc, calloc_function, repalloc, pfree);
   info = GrB_init (GrB_BLOCKING);
   if (! (info == GrB_SUCCESS || info == GrB_NO_VALUE))
     {

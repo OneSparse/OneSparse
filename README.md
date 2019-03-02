@@ -55,7 +55,7 @@ position and the other at the (4,1) position.
 
 One practical problem with matrix-encoding graphs is that most
 real-world graphs tend to be sparse, as above, only 12 of 49 possible
-elements have a value. Those that have values tend to be "scattered"
+elements have a value. Those that have values tend to be scattered
 uniformally across the matrix (for "typical" graphs), so dense linear
 algebra libraries like BLAS or numpy do not encode or operate on them
 efficiently, as the relevant data is mostly empty memory with actual
@@ -71,8 +71,8 @@ of them would have meaningful values, leaving only 0.0000001 of the
 matrix being utilized.
 
 By using a sparse matrix instead of dense, only the elements used are
-actually stored in the matrix. The "empty" part of the matrix is not
-stored and is interpreted as an "algebraic zero" value, which might
+actually stored in the matrix. The parts of the matrix with no value
+are stored and interpreted as an "algebraic zero" value, which might
 not be the actual number zero, but other values like positive or
 negative infinity depending on the particular semiring operations
 applied to the matrix.  The math used with sparse matrices is exactly
@@ -90,22 +90,29 @@ variable length column values.
 # sql graph traversal
 
 Graph traversal and manipulation can already be acheived in PostgreSQL
-using recursive Common Table Expressions (CTE or "WITH" queries) in a
+using recursive Common Table Expressions (CTE or `WITH` queries) in a
 very flexible and general way, but this approach has a drawback:
 sparse relational graphs are scattered across indexes and table
 blocks, having poor locality.  Interpreted sql code works by
-considering row base expressions one at a time, vertex by vertex so
-to speak.
+considering row base expressions one at a time, vertex by vertex so to
+speak.
 
-For example, it's very easy to represent graph data as a table in
-postgres.  The following code creates the same graph as shown in the
+A good example to consider is *breadth-first search* (BFS).  Starting
+from any vertex, label that vertex as zero, then follow the edges to
+that vertex's neighbors and label them 1, then follow their edges and
+so on, eventually labeling every vertex in the graph with a label that
+can represent the distance from the starting node.  Since we're
+dealing with cyclical graphs, the algorithm also must make sure not to
+re-label vertices already considered.
+
+For example, here is the above Figure 1 graph data as a table in
+SQL.  The following code creates the same graph as shown in the
 figure above as a postgres table:
 
 ```
     create table edge (
         i integer,
-        j integer,
-        v bool default true
+        j integer
         );
 
     insert into edge (i, j) values 
@@ -119,6 +126,29 @@ figure above as a postgres table:
         (5, 6),
         (6, 3),
         (7, 3);
+```
+
+Doing a BFS on this data in SQL requires a recursive CTE query.
+
+```
+create or replace function bfscte(start integer)
+returns table(id integer, level integer) as
+$$
+  with recursive test_cte (i, j, level, path) 
+     as
+     ( 
+       select i, j, 0 as level, array[i] as path
+       from test
+       where i = start
+       union all
+       select nxt.i, nxt.j, level + 1, array_append(prv.path, nxt.i)
+       from test nxt, test_cte prv
+       where nxt.i = prv.j
+       and nxt.i != ALL(prv.path)
+     )
+     select distinct on (i) i, level
+from test_cte order by i, array_length(path, 1);
+$$ language sql;
 ```
 
 Using pggraphblas brings high density memory encoding and optimized

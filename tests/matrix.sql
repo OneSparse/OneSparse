@@ -1,6 +1,6 @@
 
 begin;
-select plan(108);
+select plan(114);
 
 -- The following variables are substituted into matrix_template.sql.
 -- Each support type is defined and the expected values, the template
@@ -18,7 +18,8 @@ select plan(108);
 \set M_VALS true,true,false
 
 -- Integer expected values
-    
+
+\set VAL 1    
 \set VALS 1,2,3
 \set VALS2 2,3,4
 \set TVALS 2,3,1
@@ -52,6 +53,7 @@ select plan(108);
 
 -- real/float expected values
     
+\set VAL 1.25    
 \set VALS 1.25,2.5,5.0
 \set VALS2 2.5,5.0,10.0
 \set TVALS 2.5,5.0,1.25
@@ -80,6 +82,7 @@ select plan(108);
 
 -- bool
     
+\set VAL true
 \set VALS true,false,true
 \set VALS2 true,true,false
 \set TVALS false,true,true

@@ -78,10 +78,9 @@ FN(vxm)(pgGrB_Vector *A,
        
 PG_FUNCTION_INFO_V1(FN(matrix));
 PG_FUNCTION_INFO_V1(FN(matrix_empty));
-PG_FUNCTION_INFO_V1(FN(matrix_agg_acc));
-PG_FUNCTION_INFO_V1(FN(matrix_final));
 PG_FUNCTION_INFO_V1(FN(matrix_elements));
 PG_FUNCTION_INFO_V1(FN(matrix_reduce));
+PG_FUNCTION_INFO_V1(FN(matrix_assign));
        
 /* Compute size of storage needed for matrix */
 static Size
@@ -261,96 +260,6 @@ FN(matrix_empty)(PG_FUNCTION_ARGS) {
                                                CurrentMemoryContext);
   PGGRB_RETURN_MATRIX(retval);
 }
-
-Datum
-FN(matrix_agg_acc)(PG_FUNCTION_ARGS)
-{
-  pgGrB_Matrix_AggState *mstate;
-  MemoryContext aggcxt, oldcxt;
-  Datum *row, *col, *val;
-
-  if (!AggCheckCallContext(fcinfo, &aggcxt))
-    elog(ERROR, "aggregate function called in non-aggregate context");
-
-  if (PG_ARGISNULL(1) || PG_ARGISNULL(2) || PG_ARGISNULL(3))
-    elog(ERROR, "matrices cannot contain null values");
-
-  oldcxt = MemoryContextSwitchTo(aggcxt);
-
-  /* lazy create a new state */
-  if (PG_ARGISNULL(0)) {
-    mstate = palloc0(sizeof(pgGrB_Matrix_AggState));
-  }  else  {
-    mstate = (pgGrB_Matrix_AggState *)PG_GETARG_POINTER(0);
-  }
-
-  row = palloc(sizeof(Datum));
-  col = palloc(sizeof(Datum));
-  val = palloc(sizeof(Datum));
-
-  *row = PG_GETARG_DATUM(1);
-  *col = PG_GETARG_DATUM(2);
-  *val = PG_GETARG_DATUM(3);
-
-  mstate->rows = lappend(mstate->rows, row);
-  mstate->cols = lappend(mstate->cols, col);
-  mstate->vals = lappend(mstate->vals, val);
-
-  MemoryContextSwitchTo(oldcxt);
-
-  PG_RETURN_POINTER(mstate);
-}
-
-Datum
-FN(matrix_final)(PG_FUNCTION_ARGS) {
-  GrB_Info info;
-  pgGrB_Matrix *retval;
-  MemoryContext oldcxt, resultcxt;
-
-  pgGrB_Matrix_AggState *mstate;
-  size_t n = 0, count;
-  GrB_Index *row_indices, *col_indices;
-  PG_TYPE *values;
-
-  ListCell *li, *lj, *lv;
-
-  if (PG_ARGISNULL(0))
-    PG_RETURN_NULL();
-
-  if (!AggCheckCallContext(fcinfo, &resultcxt)) {
-    resultcxt = CurrentMemoryContext;
-  }
-
-  oldcxt = MemoryContextSwitchTo(resultcxt);
-  mstate = (pgGrB_Matrix_AggState *)PG_GETARG_POINTER(0);
-  count = list_length(mstate->rows);
-
-  row_indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * count);
-  col_indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * count);
-  values = (PG_TYPE*) palloc0(sizeof(PG_TYPE) * count);
-
-  forthree (li, (mstate)->rows, lj, (mstate)->cols, lv, (mstate)->vals) {
-    row_indices[n] = DatumGetInt64(*(Datum*)lfirst(li));
-    col_indices[n] = DatumGetInt64(*(Datum*)lfirst(lj));
-    values[n] = PG_DGT(*(Datum*)lfirst(lv));
-    n++;
-  }
-
-  retval = FN(construct_empty_expanded_matrix)(count,
-                                               count,
-                                               resultcxt);
-
-  CHECKD(GrB_Matrix_build(retval->M,
-                         row_indices,
-                         col_indices,
-                         values,
-                         count,
-                         GB_DUP));
-
-  MemoryContextSwitchTo(oldcxt);
-  PGGRB_RETURN_MATRIX(retval);
-}
-
 
 Datum
 FN(matrix_elements)(PG_FUNCTION_ARGS) {
@@ -699,6 +608,37 @@ GrB_Index FN(extract_rowscols)(pgGrB_Matrix *A,
                                   A->M));
   return nvals;
 }
+
+Datum
+FN(matrix_assign)(PG_FUNCTION_ARGS) {
+  GrB_Info info;
+  pgGrB_Matrix *A, *B, *mask;
+  GrB_Index nvals, *rows = NULL, *cols = NULL;
+  PG_TYPE val;
+
+  A = PGGRB_GETARG_MATRIX(0);
+  val = PG_GET(1);
+  B = PG_ARGISNULL(2) ? NULL : PGGRB_GETARG_MATRIX(2);
+  mask = PG_ARGISNULL(3)? NULL : PGGRB_GETARG_MATRIX(3);
+
+  if (B != NULL) {
+    CHECKD(GrB_Matrix_nvals(&nvals, B->M));
+    nvals = FN(extract_rowscols)(B, &rows, &cols, nvals);
+  }
+  
+  CHECKD(GrB_assign(A->M, mask? mask->M:
+                    NULL,
+                    NULL,
+                    val,
+                    rows? rows : GrB_ALL,
+                    nvals,
+                    cols? cols : GrB_ALL,
+                    nvals,
+                    NULL));
+
+  PGGRB_RETURN_MATRIX(A);
+}
+
 
 
 #undef SUFFIX

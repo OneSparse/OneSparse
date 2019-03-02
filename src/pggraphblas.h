@@ -176,15 +176,6 @@ typedef struct pgGrB_Matrix  {
 } pgGrB_Matrix;
 
 
-/* Aggregate function state (matrix_agg) for accumulating tuples into a matrix.
- */
-typedef struct pgGrB_Matrix_AggState {
-  /* Oid      elemtype; */
-  List *rows;
-  List *cols;
-  List *vals;
-} pgGrB_Matrix_AggState;
-
 /* helper to turn types into names. */
 char* grb_type_to_name(GrB_Type t);
 GrB_Type grb_name_to_type(char* n);
@@ -267,12 +258,6 @@ typedef struct pgGrB_Vector  {
   Size flat_size;
   pgGrB_FlatVector *flat_value;
 } pgGrB_Vector;
-
-typedef struct pgGrB_Vector_AggState {
-  /* Oid      elemtype; */
-  List     *I;
-  List     *X;
-} pgGrB_Vector_AggState;
 
 static void context_callback_vector_free(void*);
 

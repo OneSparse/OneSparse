@@ -48,8 +48,6 @@ GrB_Index *FN(extract_indexes)(pgGrB_Vector *A, GrB_Index size);
 
 PG_FUNCTION_INFO_V1(FN(vector));
 PG_FUNCTION_INFO_V1(FN(vector_empty));
-PG_FUNCTION_INFO_V1(FN(vector_agg_acc));
-PG_FUNCTION_INFO_V1(FN(vector_final));
 PG_FUNCTION_INFO_V1(FN(vector_elements));
 PG_FUNCTION_INFO_V1(FN(vector_reduce));
 PG_FUNCTION_INFO_V1(FN(vector_assign));
@@ -208,89 +206,6 @@ FN(construct_empty_expanded_vector)(GrB_Index size,
   d = FN(expand_flat_vector)(PointerGetDatum(flat), parentcontext);
   pfree(flat);
   return (pgGrB_Vector *) DatumGetEOHP(d);
-}
-
-Datum
-FN(vector_agg_acc)(PG_FUNCTION_ARGS)
-{
-  pgGrB_Vector_AggState *mstate;
-  MemoryContext aggcxt, oldcxt;
-  Datum *row, *val;
-
-  if (!AggCheckCallContext(fcinfo, &aggcxt))
-    elog(ERROR, "aggregate function called in non-aggregate context");
-
-  if (PG_ARGISNULL(1) || PG_ARGISNULL(2))
-    elog(ERROR, "vectors cannot contain null values");
-
-  oldcxt = MemoryContextSwitchTo(aggcxt);
-
-  /* lazy create a new state */
-  if (PG_ARGISNULL(0)) {
-    mstate = palloc0(sizeof(pgGrB_Vector_AggState));
-  }  else  {
-    mstate = (pgGrB_Vector_AggState *)PG_GETARG_POINTER(0);
-  }
-
-  row = palloc(sizeof(PG_TYPE));
-  val = palloc(sizeof(PG_TYPE));
-
-  *row = PG_GET(1);
-  *val = PG_GET(2);
-
-  mstate->I = lappend(mstate->I, row);
-  mstate->X = lappend(mstate->X, val);
-
-  MemoryContextSwitchTo(oldcxt);
-
-  PG_RETURN_POINTER(mstate);
-}
-
-Datum
-FN(vector_final)(PG_FUNCTION_ARGS) {
-  GrB_Info info;
-  pgGrB_Vector *retval;
-
-  MemoryContextCallback *ctxcb;
-
-  pgGrB_Vector_AggState *mstate = (pgGrB_Vector_AggState*)PG_GETARG_POINTER(0);
-  size_t n = 0, count = list_length(mstate->I);
-  GrB_Index *row_indices;
-  PG_TYPE *values;
-
-  ListCell *li, *lv;
-
-  if (PG_ARGISNULL(0))
-    PG_RETURN_NULL();
-
-  mstate = (pgGrB_Vector_AggState *)PG_GETARG_POINTER(0);
-
-  row_indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * count);
-  values = (PG_TYPE*) palloc0(sizeof(PG_TYPE) * count);
-
-  forboth (li, (mstate)->I, lv, (mstate)->X) {
-    row_indices[n] = DatumGetInt64(*(Datum*)lfirst(li));
-    values[n] = PG_DGT(*(Datum*)lfirst(lv));
-    n++;
-  }
-
-  retval = (pgGrB_Vector*)palloc(sizeof(pgGrB_Vector));
-
-  ctxcb = (MemoryContextCallback*) palloc(sizeof(MemoryContextCallback));
-  ctxcb->func = context_callback_vector_free;
-  ctxcb->arg = retval;
-  MemoryContextRegisterResetCallback(CurrentMemoryContext, ctxcb);
-
-  CHECKD(GrB_Vector_new(&retval->V,
-                       GB_TYPE,
-                       count));
-
-  CHECKD(GrB_Vector_build(retval->V,
-                         row_indices,
-                         values,
-                         count,
-                         GB_DUP));
-  PGGRB_RETURN_VECTOR(retval);
 }
 
 Datum

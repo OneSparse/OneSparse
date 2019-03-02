@@ -197,3 +197,10 @@ select is(
        assign(matrix_:TYPE(3,3), matrix(array[:ROWS], array[:COLS], cast(array[:VALS] AS :TYPE []))),
        matrix(array[:ROWS], array[:ROLS], cast(array[:VALS] AS :TYPE [])),
        'matrix assign from matrix ' || :'TYPE');
+
+select is(
+       assign(matrix_:TYPE(1,1), :VAL),
+       matrix(array[0], array[0], cast(array[:VAL] AS :TYPE [])),
+       'matrix assign scalar ' || :'TYPE');
+
+       
