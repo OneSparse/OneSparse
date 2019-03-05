@@ -11,10 +11,9 @@ select pg_backend_pid() pid \gset
 \! tmux split-window -h
 \! tmux send-keys 'gdb /usr/bin/postgres ' $PID  'C-m' 'cont' 'C-m'
 \! tmux select-pane -l
+create extension pggraphblas;
 
 \prompt 'Go? (y/n) ' go
-
-create extension pggraphblas;
 
 -- two matrix multiplies, the second fails
 

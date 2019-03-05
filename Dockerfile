@@ -3,12 +3,12 @@ FROM ubuntu:latest
 # install base dependences    
 RUN apt-get update && \
     apt-get install -y make cmake git curl build-essential m4 sudo gdbserver \
-    gdb libreadline-dev bison flex zlib1g-dev tmux emacs25-nox zile zip
+    gdb libreadline-dev bison flex zlib1g-dev tmux emacs25-nox zile zip vim
 
 # add postgres user and make data dir        
 RUN groupadd -r postgres && useradd --no-log-init -r -m -s /bin/bash -g postgres -G sudo postgres
 ENV PGDATA /home/postgres/data
-RUN /bin/rm -Rf "$PGDATA" && mkdir "$PGDATA" && chown -R postgres:postgres "$PGDATA"
+RUN /bin/rm -Rf "$PGDATA" && mkdir "$PGDATA"
 WORKDIR "/home/postgres"
 
 # get GraphBLAS, compile with debug symbols    
@@ -20,12 +20,17 @@ RUN curl -s -L http://faculty.cse.tamu.edu/davis/GraphBLAS/GraphBLAS-2.3.0.tar.g
 
 # get postgres source and compile with debug and no optimization
 RUN git clone --branch REL_11_STABLE https://github.com/postgres/postgres.git --depth=1 && \
-    cd postgres && ./configure CFLAGS="-O0 -g" --prefix=/usr/ --enable-depend --enable-cassert --enable-debug && \
+#    cd postgres && ./configure CFLAGS="-ggdb -Og -g3 -fno-omit-frame-pointer" \
+    cd postgres && ./configure CFLAGS="-Og -g3" \
+    --prefix=/usr/ --enable-depend --enable-cassert --enable-debug --enable-profiling && \
     make -j 4 && make install
 
 RUN curl -s -L https://github.com/theory/pgtap/archive/v0.99.0.tar.gz | tar zxvf - && \   
     cd pgtap-0.99.0 && make && make install
 
+# chown dependencies    
+RUN chown -R postgres:postgres /home/postgres
+    
 # put test stuff into pg home        
 RUN mkdir "/home/postgres/pggraphblas"
 WORKDIR "/home/postgres/pggraphblas"
@@ -36,6 +41,9 @@ COPY gdbinit ../.gdbinit
 RUN make && make install && make clean
 RUN ldconfig
 
+# chown just pggraphblas
+RUN chown -R postgres:postgres /home/postgres/pggraphblas
+    
 # make postgres a sudoer        
 RUN echo "postgres ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/user && \
     chmod 0440 /etc/sudoers.d/user

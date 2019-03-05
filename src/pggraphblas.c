@@ -4,6 +4,7 @@ PG_MODULE_MAGIC;
 pgGrB_Semiring semirings[960];
 pgGrB_BinaryOp binops[256];
 pgGrB_UnaryOp uops[67];
+MemoryContext gb_context;
 
 #include "type.c"
 #include "visequal.c"
@@ -14,15 +15,54 @@ pgGrB_UnaryOp uops[67];
 void *calloc_function(size_t, size_t);
 
 void *calloc_function(size_t num, size_t size) {
-  return palloc0(num * size);
+  MemoryContext oldcxt;
+  void *p;
+  oldcxt = MemoryContextSwitchTo(TopMemoryContext);
+  p = palloc0(num * size);
+  MemoryContextSwitchTo(oldcxt);
+  return p;
+}
+
+void *malloc_function(size_t);
+
+void *malloc_function(size_t size) {
+  MemoryContext oldcxt;
+  void *p;
+  oldcxt = MemoryContextSwitchTo(TopMemoryContext);
+  p = palloc(size);
+  MemoryContextSwitchTo(oldcxt);
+  return p;
+}
+
+void *realloc_function(void*, size_t);
+
+void *realloc_function(void *p, size_t size) {
+  MemoryContext oldcxt;
+  oldcxt = MemoryContextSwitchTo(TopMemoryContext);
+  p = repalloc(p, size);
+  MemoryContextSwitchTo(oldcxt);
+  return p;
+}
+
+void free_function(void*);
+
+void free_function(void *p) {
+  MemoryContext oldcxt;
+  oldcxt = MemoryContextSwitchTo(TopMemoryContext);
+  pfree(p);
+  MemoryContextSwitchTo(oldcxt);
 }
 
 void
 _PG_init(void)
 {
   GrB_Info info;
-  info = GxB_init (GrB_BLOCKING, palloc, calloc_function, repalloc, pfree);
-  //info = GrB_init (GrB_BLOCKING);
+
+#ifdef IMPORT_EXPORT
+  info = GxB_init (GrB_NONBLOCKING, malloc_function, calloc_function, realloc_function, pfree);
+#else
+  info = GrB_init (GrB_BLOCKING);
+#endif
   if (! (info == GrB_SUCCESS || info == GrB_NO_VALUE))
     {
       elog(ERROR, "%s", GrB_error());

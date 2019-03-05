@@ -85,10 +85,14 @@ static void
 FN(vector_flatten_into)(ExpandedObjectHeader *eohptr,
                 void *result, Size allocated_size)  {
   GrB_Info info;
-  GrB_Index *start;
+  GrB_Index *start, size, nvals;
   pgGrB_Vector *A = (pgGrB_Vector *) eohptr;
   pgGrB_FlatVector *flat = (pgGrB_FlatVector *) result;
-
+#ifdef IMPORT_EXPORT
+  void *values;
+  GrB_Type type;
+#endif
+  
   if (A->flat_value) {
     Assert(allocated_size == VARSIZE(A->flat_value));
     memcpy(flat, A->flat_value, allocated_size);
@@ -100,14 +104,33 @@ FN(vector_flatten_into)(ExpandedObjectHeader *eohptr,
 
   memset(flat, 0, allocated_size);
 
-  CHECKV(GrB_Vector_size(&flat->size, A->V));
-  CHECKV(GrB_Vector_nvals(&flat->nvals, A->V));
+  CHECKV(GrB_Vector_nvals(&nvals, A->V));
+  CHECKV(GrB_Vector_size(&size, A->V));
 
+#ifdef IMPORT_EXPORT
+  CHECKV(GxB_Vector_export(&A->V,
+                           &type,
+                           &size,
+                           &nvals,
+                           &start,
+                           &values,
+                           NULL));
+  
+  memcpy(PGGRB_VECTOR_DATA(flat), start, nvals*sizeof(GrB_Index));
+  memcpy((PGGRB_VECTOR_DATA(flat) + nvals), values, nvals*sizeof(PG_TYPE));
+
+  pfree(start);
+  pfree(values);
+#else
   start = PGGRB_VECTOR_DATA(flat);
   CHECKV(GrB_Vector_extractTuples(start,
-                                  start + flat->size,
-                                  &flat->nvals,
-                                  A->V));
+                                  start + size,
+                                  &nvals,
+                                  A->V));  
+#endif
+  
+  flat->size = size;
+  flat->nvals = nvals;
   flat->type = GB_TYPE;
 
   SET_VARSIZE(flat, allocated_size);
@@ -356,7 +379,7 @@ FN(vector_out)(pgGrB_Vector *vec)
 {
   GrB_Info info;
   char *result;
-  GrB_Index size, nvals;
+  GrB_Index size, nvals, i;
   GrB_Index *row_indices;
   PG_TYPE *values;
 
@@ -373,14 +396,14 @@ FN(vector_out)(pgGrB_Vector *vec)
 
   result = psprintf("<vector_%s(%lu):[", grb_type_to_name(vec->type), size);
 
-  for (int i = 0; i < size; i++) {
+  for (i = 0; i < size; i++) {
     result = strcat(result, psprintf("%lu", row_indices[i]));
     if (i != size - 1)
       result = strcat(result, ",");
   }
   result = strcat(result, "][");
 
-  for (int i = 0; i < nvals; i++) {
+  for (i = 0; i < nvals; i++) {
     result = strcat(result, psprintf(PRINT_FMT(values[i])));
     if (i != nvals - 1)
       result = strcat(result, ",");

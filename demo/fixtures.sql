@@ -3,7 +3,8 @@ drop table if exists test;
 
 create table test (
     i integer,
-    j integer
+    j integer,
+    v boolean default true
     );
 
 insert into test (i, j) values

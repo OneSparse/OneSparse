@@ -445,4 +445,6 @@ typedef struct pgGrB_UnaryOp  {
 
 void _PG_init(void);
 
+#define IMPORT_EXPORT // Use import export 
+
 #endif /* PGGRAPHBLAS_H */
