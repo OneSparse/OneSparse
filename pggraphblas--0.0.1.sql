@@ -129,7 +129,7 @@ CREATE FUNCTION matrix_float(nrows bigint, ncols bigint)
 RETURNS matrix
 AS '$libdir/pggraphblas', 'matrix_float8'
 LANGUAGE C STABLE;
-    
+
 CREATE FUNCTION mxm(
     A matrix,
     B matrix,
@@ -146,6 +146,22 @@ RETURNS matrix
 AS '$libdir/pggraphblas', 'mxm'
 LANGUAGE C STABLE;
 
+CREATE FUNCTION kron(
+    A matrix,
+    B matrix,
+    inout C matrix default null,
+    mask matrix default null,
+    accum text default null,
+    mulop text default null,
+    doutp text default null,
+    dmask text default null,
+    dinp0 text default null,
+    dinp1 text default null
+    )
+RETURNS matrix
+AS '$libdir/pggraphblas', 'matrix_kron'
+LANGUAGE C STABLE;
+
 CREATE FUNCTION transpose(
     A matrix,
     inout C matrix default null,
@@ -159,7 +175,7 @@ CREATE FUNCTION transpose(
 RETURNS matrix
 AS '$libdir/pggraphblas', 'matrix_transpose'
 LANGUAGE C STABLE;
-    
+
 CREATE FUNCTION mxm_op(A matrix, B matrix)
 RETURNS matrix
 AS '$libdir/pggraphblas', 'mxm'
@@ -259,32 +275,32 @@ AS '$libdir/pggraphblas', 'matrix_reduce_vector'
 LANGUAGE C STABLE;
 
 -- matrix reduce scalar
-    
+
 CREATE FUNCTION reduce_bool(A matrix, semiring text default null)
 RETURNS bool
 AS '$libdir/pggraphblas', 'matrix_reduce_bool'
 LANGUAGE C STABLE;
-    
+
 CREATE FUNCTION reduce_bigint(A matrix, semiring text default null)
 RETURNS bigint
 AS '$libdir/pggraphblas', 'matrix_reduce_int64'
 LANGUAGE C STABLE;
-    
+
 CREATE FUNCTION reduce_integer(A matrix, semiring text default null)
 RETURNS integer
 AS '$libdir/pggraphblas', 'matrix_reduce_int32'
 LANGUAGE C STABLE;
-    
+
 CREATE FUNCTION reduce_smallint(A matrix, semiring text default null)
 RETURNS smallint
 AS '$libdir/pggraphblas', 'matrix_reduce_int16'
 LANGUAGE C STABLE;
-    
+
 CREATE FUNCTION reduce_real(A matrix, semiring text default null)
 RETURNS real
 AS '$libdir/pggraphblas', 'matrix_reduce_float4'
 LANGUAGE C STABLE;
-    
+
 CREATE FUNCTION reduce_float(A matrix, semiring text default null)
 RETURNS float
 AS '$libdir/pggraphblas', 'matrix_reduce_float8'
@@ -310,7 +326,7 @@ CREATE FUNCTION assign(
 RETURNS matrix
 AS '$libdir/pggraphblas', 'matrix_assign_bool'
 LANGUAGE C STABLE;
-    
+
 CREATE FUNCTION assign(
     A matrix,
     value bigint,
@@ -319,7 +335,7 @@ CREATE FUNCTION assign(
 RETURNS matrix
 AS '$libdir/pggraphblas', 'matrix_assign_int64'
 LANGUAGE C STABLE;
-    
+
 CREATE FUNCTION assign(
     A matrix,
     value integer,
@@ -328,7 +344,7 @@ CREATE FUNCTION assign(
 RETURNS matrix
 AS '$libdir/pggraphblas', 'matrix_assign_int32'
 LANGUAGE C STABLE;
-    
+
 CREATE FUNCTION assign(
     A matrix,
     value smallint,
@@ -337,7 +353,7 @@ CREATE FUNCTION assign(
 RETURNS matrix
 AS '$libdir/pggraphblas', 'matrix_assign_int16'
 LANGUAGE C STABLE;
-    
+
 CREATE FUNCTION assign(
     A matrix,
     value real,
@@ -346,7 +362,7 @@ CREATE FUNCTION assign(
 RETURNS matrix
 AS '$libdir/pggraphblas', 'matrix_assign_float4'
 LANGUAGE C STABLE;
-    
+
 CREATE FUNCTION assign(
     A matrix,
     value float,
@@ -355,11 +371,11 @@ CREATE FUNCTION assign(
 RETURNS matrix
 AS '$libdir/pggraphblas', 'matrix_assign_float8'
 LANGUAGE C STABLE;
-    
 
-    
+
+
 -- matrix operators
-    
+
 CREATE OPERATOR = (
     leftarg = matrix,
     rightarg = matrix,
@@ -404,12 +420,12 @@ CREATE OPERATOR || (
     procedure = matrix_ewise_add_op
 );
 
-CREATE TYPE matrix_element_bigint AS (index bigint, value bigint);
-CREATE TYPE matrix_element_integer AS (index bigint, value integer);
-CREATE TYPE matrix_element_smallint AS (index bigint, value smallint);
-CREATE TYPE matrix_element_float AS (index bigint, value float);
-CREATE TYPE matrix_element_real AS (index bigint, value real);
-CREATE TYPE matrix_element_bool AS (index bigint, value bool);
+CREATE TYPE matrix_element_bigint AS (row bigint, col bigint, value bigint);
+CREATE TYPE matrix_element_integer AS (row bigint, col bigint, value integer);
+CREATE TYPE matrix_element_smallint AS (row bigint, col bigint, value smallint);
+CREATE TYPE matrix_element_float AS (row bigint, col bigint, value float);
+CREATE TYPE matrix_element_real AS (row bigint, col bigint, value real);
+CREATE TYPE matrix_element_bool AS (row bigint, col bigint, value bool);
 
 CREATE FUNCTION matrix_elements_bigint(A matrix)
 RETURNS SETOF matrix_element_bigint
@@ -518,35 +534,35 @@ CREATE FUNCTION reduce_bool(
 RETURNS bool
 AS '$libdir/pggraphblas', 'vector_reduce_bool'
 LANGUAGE C STABLE;
-    
+
 CREATE FUNCTION reduce_bigint(
     A vector,
     semiring text default null)
 RETURNS bigint
 AS '$libdir/pggraphblas', 'vector_reduce_int64'
 LANGUAGE C STABLE;
-    
+
 CREATE FUNCTION reduce_integer(
     A vector,
     semiring text default null)
 RETURNS integer
 AS '$libdir/pggraphblas', 'vector_reduce_int32'
 LANGUAGE C STABLE;
-    
+
 CREATE FUNCTION reduce_smallint(
     A vector,
     semiring text default null)
 RETURNS smallint
 AS '$libdir/pggraphblas', 'vector_reduce_int16'
 LANGUAGE C STABLE;
-    
+
 CREATE FUNCTION reduce_real(
     A vector,
     semiring text default null)
 RETURNS real
 AS '$libdir/pggraphblas', 'vector_reduce_float4'
 LANGUAGE C STABLE;
-    
+
 CREATE FUNCTION reduce_float(
     A vector,
     semiring text default null)
@@ -555,7 +571,7 @@ AS '$libdir/pggraphblas', 'vector_reduce_float8'
 LANGUAGE C STABLE;
 
 -- vector assign
-    
+
 CREATE FUNCTION assign(
     A vector,
     value bool,
@@ -564,7 +580,7 @@ CREATE FUNCTION assign(
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_assign_bool'
 LANGUAGE C STABLE;
-    
+
 CREATE FUNCTION assign(
     A vector,
     value bigint,
@@ -573,7 +589,7 @@ CREATE FUNCTION assign(
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_assign_int64'
 LANGUAGE C STABLE;
-    
+
 CREATE FUNCTION assign(
     A vector,
     value integer,
@@ -582,7 +598,7 @@ CREATE FUNCTION assign(
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_assign_int32'
 LANGUAGE C STABLE;
-    
+
 CREATE FUNCTION assign(
     A vector,
     value smallint,
@@ -591,7 +607,7 @@ CREATE FUNCTION assign(
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_assign_int16'
 LANGUAGE C STABLE;
-    
+
 CREATE FUNCTION assign(
     A vector,
     value real,
@@ -600,7 +616,7 @@ CREATE FUNCTION assign(
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_assign_float4'
 LANGUAGE C STABLE;
-    
+
 CREATE FUNCTION assign(
     A vector,
     value float,
@@ -609,34 +625,34 @@ CREATE FUNCTION assign(
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_assign_float8'
 LANGUAGE C STABLE;
-    
+
 -- vector set element
-    
+
 CREATE FUNCTION set_element(A vector, index bigint, value bool)
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_set_element_bool'
 LANGUAGE C STABLE;
-    
+
 CREATE FUNCTION set_element(A vector, index bigint, value bigint)
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_set_element_int64'
 LANGUAGE C STABLE;
-    
+
 CREATE FUNCTION set_element(A vector, index bigint, value integer)
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_set_element_int32'
 LANGUAGE C STABLE;
-    
+
 CREATE FUNCTION set_element(A vector, index bigint, value smallint)
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_set_element_int16'
 LANGUAGE C STABLE;
-    
+
 CREATE FUNCTION set_element(A vector, index bigint, value real)
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_set_element_float4'
 LANGUAGE C STABLE;
-    
+
 CREATE FUNCTION set_element(A vector, index bigint, value float)
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_set_element_float8'

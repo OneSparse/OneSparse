@@ -219,6 +219,7 @@ PG_FUNCTION_INFO_V1(matrix_nvals);
 PG_FUNCTION_INFO_V1(mxm);
 PG_FUNCTION_INFO_V1(mxv);
 PG_FUNCTION_INFO_V1(vxm);
+PG_FUNCTION_INFO_V1(matrix_kron);
 
 PG_FUNCTION_INFO_V1(matrix_eq);
 PG_FUNCTION_INFO_V1(matrix_ne);
@@ -424,7 +425,7 @@ typedef struct pgGrB_UnaryOp  {
 #define RETURN_TYPECHCK1(A, B, OP, TYP)     \
   if ((A) == GrB_##TYP || (B) == GrB_##TYP) \
     return #OP "_" #TYP
-  
+
 #define RETURN_TYPECHCK2(A, B, TYP)     \
   if ((A) == GrB_##TYP || (B) == GrB_##TYP) \
     return GrB_##TYP
@@ -445,6 +446,6 @@ typedef struct pgGrB_UnaryOp  {
 
 void _PG_init(void);
 
-#define IMPORT_EXPORT // Use import export 
+#define IMPORT_EXPORT // Use import export
 
 #endif /* PGGRAPHBLAS_H */

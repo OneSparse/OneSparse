@@ -221,12 +221,12 @@ matrix_ewise_mult(PG_FUNCTION_ARGS) {
   Datum d;
   char *binop_name;
   GrB_BinaryOp binop;
-  
+
   A = PGGRB_GETARG_MATRIX(0);
   B = PGGRB_GETARG_MATRIX(1);
 
   binop_name = matrix_times_binop(A, B);
-  
+
   if (PG_NARGS() > 2)
     C = PG_ARGISNULL(2) ? NULL : PGGRB_GETARG_MATRIX(2);
   if (PG_NARGS() > 3)
@@ -253,12 +253,12 @@ matrix_ewise_add(PG_FUNCTION_ARGS) {
   Datum d;
   char *binop_name;
   GrB_BinaryOp binop;
-  
+
   A = PGGRB_GETARG_MATRIX(0);
   B = PGGRB_GETARG_MATRIX(1);
 
   binop_name = matrix_plus_binop(A, B);
-  
+
   if (PG_NARGS() > 2)
     C = PG_ARGISNULL(2) ? NULL : PGGRB_GETARG_MATRIX(2);
   if (PG_NARGS() > 3)
@@ -293,17 +293,17 @@ mxm(PG_FUNCTION_ARGS) {
 
   semiring_name = mxm_semiring(A, B);
   binop_name = NULL;
-  
+
   if (PG_NARGS() > 2) {
     C = PG_ARGISNULL(2) ? NULL : PGGRB_GETARG_MATRIX(2);
     mask = PG_ARGISNULL(3) ? NULL : PGGRB_GETARG_MATRIX(3);
-    semiring_name = PG_ARGISNULL(4) ? 
-      semiring_name : 
+    semiring_name = PG_ARGISNULL(4) ?
+      semiring_name :
       text_to_cstring(PG_GETARG_TEXT_PP(4));
-    binop_name = PG_ARGISNULL(5) ? 
-      NULL : 
+    binop_name = PG_ARGISNULL(5) ?
+      NULL :
       text_to_cstring(PG_GETARG_TEXT_PP(5));
-  
+
     if (PG_NARGS() > 6) {
       CHECKD(GrB_Descriptor_new(&desc));
       GETARG_DESCRIPTOR_VAL(6, desc_val, desc, OUTP, REPLACE);
@@ -319,10 +319,10 @@ mxm(PG_FUNCTION_ARGS) {
 
   if (binop_name != NULL)
     binop = lookup_binop(binop_name);
-  
+
   if (semiring == NULL)
       elog(ERROR, "unknown semiring name %s", semiring_name);
-  
+
   type = mxm_type(A, B);
 
   TYPE_APPLY(d, type, mxm, A, B, C, mask, semiring, binop, desc);
@@ -346,15 +346,15 @@ mxv(PG_FUNCTION_ARGS) {
 
   semiring_name = mxv_semiring(A, B);
   binop_name = NULL;
-  
+
   if (PG_NARGS() > 2) {
     C = PG_ARGISNULL(2) ? NULL : PGGRB_GETARG_VECTOR(2);
     mask = PG_ARGISNULL(3) ? NULL : PGGRB_GETARG_VECTOR(3);
-    semiring_name = PG_ARGISNULL(4) ? 
-      semiring_name : 
+    semiring_name = PG_ARGISNULL(4) ?
+      semiring_name :
       text_to_cstring(PG_GETARG_TEXT_PP(4));
-    binop_name = PG_ARGISNULL(5) ? 
-      NULL : 
+    binop_name = PG_ARGISNULL(5) ?
+      NULL :
       text_to_cstring(PG_GETARG_TEXT_PP(5));
     if (PG_NARGS() > 6) {
       CHECKD(GrB_Descriptor_new(&desc));
@@ -364,10 +364,10 @@ mxv(PG_FUNCTION_ARGS) {
       GETARG_DESCRIPTOR_VAL(9, desc_val, desc, INP1, TRAN);
     }
   }
-  
+
   if (binop_name != NULL)
     binop = lookup_binop(binop_name);
-  
+
   semiring = lookup_semiring(semiring_name);
   if (semiring == NULL)
     elog(ERROR, "unknown semiring name %s", semiring_name);
@@ -400,8 +400,8 @@ vxm(PG_FUNCTION_ARGS) {
     C = PG_ARGISNULL(2) ? NULL : PGGRB_GETARG_VECTOR(2);
     mask = PG_ARGISNULL(3) ? NULL : PGGRB_GETARG_VECTOR(3);
     semiring_name = PG_ARGISNULL(4) ? semiring_name : PG_GETARG_CSTRING(4);
-    binop_name = PG_ARGISNULL(5) ? 
-      NULL : 
+    binop_name = PG_ARGISNULL(5) ?
+      NULL :
       text_to_cstring(PG_GETARG_TEXT_PP(5));
     if (PG_NARGS() > 6) {
       CHECKD(GrB_Descriptor_new(&desc));
@@ -414,7 +414,7 @@ vxm(PG_FUNCTION_ARGS) {
 
   if (binop_name != NULL)
     binop = lookup_binop(binop_name);
-  
+
   semiring = lookup_semiring(semiring_name);
   if (semiring == NULL)
     elog(ERROR, "unknown semiring name %s", semiring_name);
@@ -437,7 +437,7 @@ matrix_reduce_vector(PG_FUNCTION_ARGS) {
   GrB_Index size;
 
   A = PGGRB_GETARG_MATRIX(0);
-  
+
   semiring_name = text_to_cstring(PG_GETARG_TEXT_PP(1));
   semiring = lookup_semiring(semiring_name);
   CHECKD(GxB_Semiring_add(&monoid, semiring));
@@ -458,7 +458,7 @@ matrix_transpose(PG_FUNCTION_ARGS) {
   char *desc_val;
 
   A = PGGRB_GETARG_MATRIX(0);
-  
+
   if (PG_NARGS() > 0) {
     C = PG_ARGISNULL(1) ? NULL : PGGRB_GETARG_MATRIX(2);
     mask = PG_ARGISNULL(2) ? NULL : PGGRB_GETARG_MATRIX(3);
@@ -494,7 +494,7 @@ matrix_assign_matrix(PG_FUNCTION_ARGS) {
   mask = PG_ARGISNULL(2)? NULL : PGGRB_GETARG_MATRIX(2);
 
   CHECKD(GrB_Matrix_nvals(&nvals, B->M));
-  
+
   if (B != NULL) {
     CHECKD(GxB_Matrix_type(&type, B->M));
     TYPE_APPLY(nvals, type, extract_rowscols, B, &rows, &cols, nvals);
@@ -513,3 +513,50 @@ matrix_assign_matrix(PG_FUNCTION_ARGS) {
 }
 
 
+
+Datum
+matrix_kron(PG_FUNCTION_ARGS) {
+  pgGrB_Matrix *A, *B, *C = NULL, *mask = NULL;
+  GrB_Info info;
+  GrB_Type type;
+  Datum d;
+  char *accum_name, *mulop_name, *desc_val;
+  GrB_BinaryOp accum = NULL, mulop = NULL;
+  GrB_Descriptor desc = NULL;
+
+  A = PGGRB_GETARG_MATRIX(0);
+  B = PGGRB_GETARG_MATRIX(1);
+
+  accum_name = NULL;
+  mulop_name = NULL;
+
+  if (PG_NARGS() > 2) {
+    C = PG_ARGISNULL(2) ? NULL : PGGRB_GETARG_MATRIX(2);
+    mask = PG_ARGISNULL(3) ? NULL : PGGRB_GETARG_MATRIX(3);
+    accum_name = PG_ARGISNULL(4) ?
+      NULL :
+      text_to_cstring(PG_GETARG_TEXT_PP(4));
+    mulop_name = PG_ARGISNULL(5) ?
+      NULL :
+      text_to_cstring(PG_GETARG_TEXT_PP(5));
+
+    if (PG_NARGS() > 6) {
+      CHECKD(GrB_Descriptor_new(&desc));
+      GETARG_DESCRIPTOR_VAL(6, desc_val, desc, OUTP, REPLACE);
+      GETARG_DESCRIPTOR_VAL(7, desc_val, desc, MASK, SCMP);
+      GETARG_DESCRIPTOR_VAL(8, desc_val, desc, INP0, TRAN);
+      GETARG_DESCRIPTOR_VAL(9, desc_val, desc, INP1, TRAN);
+    }
+  }
+
+  if (accum_name != NULL)
+    accum = lookup_binop(accum_name);
+
+  if (mulop_name != NULL)
+    mulop = lookup_binop(mulop_name);
+
+  type = mxm_type(A, B);
+
+  TYPE_APPLY(d, type, matrix_kron, A, B, C, mask, accum, mulop, desc);
+  return d;
+}

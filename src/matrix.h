@@ -29,7 +29,7 @@ GrB_Index FN(extract_rowscols)(pgGrB_Matrix *A,
                          GrB_Index **rows,
                          GrB_Index **cols,
                          GrB_Index nvals);
-                             
+
 pgGrB_Matrix *
 FN(construct_empty_expanded_matrix)(GrB_Index nrows,
                                     GrB_Index ncols,
@@ -41,7 +41,7 @@ Datum FN(matrix_ewise_mult)(pgGrB_Matrix *A,
                             pgGrB_Matrix *C,
                             pgGrB_Matrix *mask,
                             GrB_BinaryOp binop);
-                           
+
 Datum FN(matrix_ewise_add)(pgGrB_Matrix *A,
                            pgGrB_Matrix *B,
                            pgGrB_Matrix *C,
@@ -55,6 +55,15 @@ FN(mxm)(pgGrB_Matrix *A,
         pgGrB_Matrix *mask,
         GrB_Semiring semiring,
         GrB_BinaryOp binop,
+        GrB_Descriptor desc);
+
+Datum
+FN(matrix_kron)(pgGrB_Matrix *A,
+        pgGrB_Matrix *B,
+        pgGrB_Matrix *C,
+        pgGrB_Matrix *mask,
+        GrB_BinaryOp accum,
+        GrB_BinaryOp mulop,
         GrB_Descriptor desc);
 
 Datum
@@ -75,13 +84,13 @@ FN(vxm)(pgGrB_Vector *A,
         GrB_BinaryOp binop,
         GrB_Descriptor desc);
 
-       
+
 PG_FUNCTION_INFO_V1(FN(matrix));
 PG_FUNCTION_INFO_V1(FN(matrix_empty));
 PG_FUNCTION_INFO_V1(FN(matrix_elements));
 PG_FUNCTION_INFO_V1(FN(matrix_reduce));
 PG_FUNCTION_INFO_V1(FN(matrix_assign));
-       
+
 /* Compute size of storage needed for matrix */
 static Size
 FN(matrix_get_flat_size)(ExpandedObjectHeader *eohptr) {
@@ -501,17 +510,17 @@ FN(matrix)(PG_FUNCTION_ARGS) {
   rows = PG_GETARG_ARRAYTYPE_P(0);
   cols = PG_GETARG_ARRAYTYPE_P(1);
   vals = PG_GETARG_ARRAYTYPE_P(2);
-  
+
   if (ARR_HASNULL(rows) || ARR_HASNULL(cols) || ARR_HASNULL(vals))
     ereport(ERROR, (errmsg("Matrix values may not be null")));
 
   idims = ARR_DIMS(rows);
   jdims = ARR_DIMS(cols);
   vdims =  ARR_DIMS(vals);
-  
+
   if (!PG_ARGISNULL(3))
     max_row_index = PG_GETARG_INT64(3);
-  else 
+  else
     max_row_index = idims[0];
 
   if (!PG_ARGISNULL(4))
@@ -538,7 +547,7 @@ FN(matrix)(PG_FUNCTION_ARGS) {
       i++;
   }
   array_free_iterator(array_iterator);
-  
+
   i = 0;
   array_iterator = array_create_iterator(cols, 0, NULL);
   while (array_iterate(array_iterator, &value, &isnull))
@@ -625,7 +634,7 @@ FN(matrix_assign)(PG_FUNCTION_ARGS) {
     CHECKD(GrB_Matrix_nvals(&nvals, B->M));
     nvals = FN(extract_rowscols)(B, &rows, &cols, nvals);
   }
-  
+
   CHECKD(GrB_assign(A->M, mask? mask->M:
                     NULL,
                     NULL,
@@ -639,6 +648,27 @@ FN(matrix_assign)(PG_FUNCTION_ARGS) {
   PGGRB_RETURN_MATRIX(A);
 }
 
+Datum
+FN(matrix_kron)(pgGrB_Matrix *A,
+        pgGrB_Matrix *B,
+        pgGrB_Matrix *C,
+        pgGrB_Matrix *mask,
+        GrB_BinaryOp accum,
+        GrB_BinaryOp mulop,
+        GrB_Descriptor desc) {
+  GrB_Info info;
+
+  if (C == NULL) {
+    GrB_Index m, n, p, q;
+    CHECKD(GrB_Matrix_nrows(&m, A->M));
+    CHECKD(GrB_Matrix_ncols(&n, A->M));
+    CHECKD(GrB_Matrix_nrows(&p, B->M));
+    CHECKD(GrB_Matrix_ncols(&q, B->M));
+    C = FN(construct_empty_expanded_matrix)(m*p, n*q, CurrentMemoryContext);
+  }
+  CHECKD(GxB_kron(C->M, mask ? mask->M : NULL, accum, mulop, A->M, B->M, desc));
+  PGGRB_RETURN_MATRIX(C);
+}
 
 
 #undef SUFFIX

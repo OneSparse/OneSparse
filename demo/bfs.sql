@@ -43,7 +43,7 @@ drop function if exists bfs;
 create function bfs(A matrix, source bigint) returns vector as $$
 declare
     n bigint := nrows(A);                          -- The number of result rows.
-    v vector := assign(vector_integer(n), 0);       -- int32 result vector of vertex levels.
+    v vector := vector_integer(n);                 -- int32 result vector of vertex levels.
     q vector := assign(vector_bool(n), false);     -- bool mask of completed vertices.
     level integer := 0;                            -- Start at level 1.
     not_done bool := true;                         -- Flag to indicate still work to do.
@@ -140,3 +140,15 @@ create or replace function go(tablename text, start integer) returns vector as $
     return bfs(m, start);
     end;
     $$ language plpgsql;
+
+
+-- select bfs(kron(matrix(array_agg(i), array_agg(j), array_agg(v)), matrix(array_agg(i), array_agg(j), array_agg(v)), mulop=>'plus_int32'), 1) from fs_183_1;
+
+
+-- select * from (select matrix_elements_float(kron(matrix(array_agg(i), array_agg(j), array_agg(v)), matrix(array_agg(i), array_agg(j), array_agg(v)), mulop=>'times_fp64')) from fs_183_1) i limit 10;
+
+-- select i.* from (select matrix(array_agg(t.i), array_agg(t.j), array_agg(t.v)) as mat from test t) m cross join lateral (select * from  matrix_elements_float(mat)) i ;
+
+
+-- postgres=# insert into test2 select i.* from (select kron(matrix(array_agg(t.i), array_agg(t.j), array_agg(t.v)), matrix(array_agg(t.i), array_agg(t.j), array_agg(t.v)), mulop=>'times_fp64') as mat from fs_183_1 t) m cross join lateral (select * from  matrix_elements_float(mat)) i ;
+    
