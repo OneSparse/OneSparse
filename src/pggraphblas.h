@@ -2,6 +2,7 @@
 #define PGGRAPHBLAS_H
 
 #include "GraphBLAS.h"
+#include "LAGraph.h"
 #include "postgres.h"
 #include "utils/builtins.h"
 #include "libpq/pqformat.h"
@@ -156,6 +157,7 @@ typedef struct pgGrB_FlatMatrix {
   GrB_Index ncols;
   GrB_Index nvals;
   GrB_Type type;
+  int64_t nonempty;
 } pgGrB_FlatMatrix;
 
 /* ID for debugging crosschecks */
@@ -204,7 +206,7 @@ construct_empty_flat_matrix(GrB_Index nrows,
 #define PGGRB_MATRIX_OVERHEAD() MAXALIGN(sizeof(pgGrB_FlatMatrix))
 
 /* pointer to beginning of matrix data. */
-#define PGGRB_MATRIX_DATA(a) (GrB_Index *)(((char *) (a)) + PGGRB_MATRIX_OVERHEAD())
+#define PGGRB_MATRIX_DATA(a) ((GrB_Index *)(((char *) (a)) + PGGRB_MATRIX_OVERHEAD()))
 
 /* Public API functions */
 
@@ -301,7 +303,7 @@ GrB_BinaryOp lookup_binop(char *name);
 /* Helper to compute flat vector header size */
 #define PGGRB_VECTOR_OVERHEAD() MAXALIGN(sizeof(pgGrB_FlatVector))
 
-#define PGGRB_VECTOR_DATA(a) (GrB_Index *)(((char *) (a)) + PGGRB_VECTOR_OVERHEAD())
+#define PGGRB_VECTOR_DATA(a) ((GrB_Index *)(((char *) (a)) + PGGRB_VECTOR_OVERHEAD()))
 
 PG_FUNCTION_INFO_V1(vector_in);
 PG_FUNCTION_INFO_V1(vector_out);
@@ -445,6 +447,11 @@ typedef struct pgGrB_UnaryOp  {
   } while(0)
 
 void _PG_init(void);
+
+void *malloc_function(size_t);
+void *calloc_function(size_t, size_t);
+void *realloc_function(void*, size_t);
+void free_function(void*);
 
 #define IMPORT_EXPORT // Use import export
 

@@ -1,21 +1,11 @@
-
- -- crashing on GxB_init tests
-
-\! tmux new-window /bin/bash
-\! tmux send-key -t 1 'pg_ctl restart' 'C-m'
-\! tmux next-window
-\! sleep 3
-\c
-select pg_backend_pid() pid \gset
-\setenv PID :'pid'
-\! tmux split-window -h
-\! tmux send-keys 'gdb /usr/bin/postgres ' $PID  'C-m' 'cont' 'C-m'
-\! tmux select-pane -l
-create extension pggraphblas;
-
-\prompt 'Go? (y/n) ' go
-
+create extension if not exists pggraphblas;
+    
+\ir gdb.sql
+    
 -- two matrix multiplies, the second fails
 
-select vector(array[2,3,4]) * matrix(array[0,1,2], array[1,2,0], array[1,2,3]);
-select vector(array[2,3,4]) * matrix(array[0,1,2], array[1,2,0], array[1,2,3]);
+create table t (v vector);
+insert into t (v) values (assign(vector_bool(10), true));
+
+create table f (m matrix);
+insert into f (m) values (matrix(array[0,1,2], array[2,1,0], array[1,2,3]));

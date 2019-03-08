@@ -162,7 +162,7 @@ matrix_nrows(PG_FUNCTION_ARGS) {
   GrB_Info info;
   pgGrB_Matrix *mat;
   GrB_Index count;
-  mat = (pgGrB_Matrix *) PGGRB_GETARG_MATRIX(0);
+  mat = PGGRB_GETARG_MATRIX(0);
   CHECKD(GrB_Matrix_nrows(&count, mat->M));
   return Int64GetDatum(count);
 }
@@ -172,7 +172,7 @@ matrix_ncols(PG_FUNCTION_ARGS) {
   GrB_Info info;
   pgGrB_Matrix *mat;
   GrB_Index count;
-  mat = (pgGrB_Matrix *) PGGRB_GETARG_MATRIX(0);
+  mat = PGGRB_GETARG_MATRIX(0);
   CHECKD(GrB_Matrix_ncols(&count, mat->M));
   return Int64GetDatum(count);
 }
@@ -182,7 +182,7 @@ matrix_nvals(PG_FUNCTION_ARGS) {
   GrB_Info info;
   pgGrB_Matrix *mat;
   GrB_Index count;
-  mat = (pgGrB_Matrix *) PGGRB_GETARG_MATRIX(0);
+  mat = PGGRB_GETARG_MATRIX(0);
   CHECKD(GrB_Matrix_nvals(&count, mat->M));
   return Int64GetDatum(count);
 }
@@ -341,8 +341,8 @@ mxv(PG_FUNCTION_ARGS) {
   GrB_BinaryOp binop = NULL;
   GrB_Descriptor desc = NULL;
 
-  A = (pgGrB_Matrix *) PGGRB_GETARG_MATRIX(0);
-  B = (pgGrB_Vector *) PGGRB_GETARG_VECTOR(1);
+  A = PGGRB_GETARG_MATRIX(0);
+  B = PGGRB_GETARG_VECTOR(1);
 
   semiring_name = mxv_semiring(A, B);
   binop_name = NULL;
@@ -390,8 +390,8 @@ vxm(PG_FUNCTION_ARGS) {
   GrB_BinaryOp binop = NULL;
   GrB_Descriptor desc = NULL;
 
-  A = (pgGrB_Vector *) PGGRB_GETARG_VECTOR(0);
-  B = (pgGrB_Matrix *) PGGRB_GETARG_MATRIX(1);
+  A = PGGRB_GETARG_VECTOR(0);
+  B = PGGRB_GETARG_MATRIX(1);
 
   semiring_name = vxm_semiring(A, B);
   binop_name = NULL;

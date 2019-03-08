@@ -12,8 +12,6 @@ MemoryContext gb_context;
 #include "vector.c"
 #include "matrix.c"
 
-void *calloc_function(size_t, size_t);
-
 void *calloc_function(size_t num, size_t size) {
   MemoryContext oldcxt;
   void *p;
@@ -22,8 +20,6 @@ void *calloc_function(size_t num, size_t size) {
   MemoryContextSwitchTo(oldcxt);
   return p;
 }
-
-void *malloc_function(size_t);
 
 void *malloc_function(size_t size) {
   MemoryContext oldcxt;
@@ -34,8 +30,6 @@ void *malloc_function(size_t size) {
   return p;
 }
 
-void *realloc_function(void*, size_t);
-
 void *realloc_function(void *p, size_t size) {
   MemoryContext oldcxt;
   oldcxt = MemoryContextSwitchTo(TopMemoryContext);
@@ -44,13 +38,11 @@ void *realloc_function(void *p, size_t size) {
   return p;
 }
 
-void free_function(void*);
-
 void free_function(void *p) {
   MemoryContext oldcxt;
-  oldcxt = MemoryContextSwitchTo(TopMemoryContext);
+  //  oldcxt = MemoryContextSwitchTo(TopMemoryContext);
   pfree(p);
-  MemoryContextSwitchTo(oldcxt);
+  //  MemoryContextSwitchTo(oldcxt);
 }
 
 void
@@ -59,7 +51,7 @@ _PG_init(void)
   GrB_Info info;
 
 #ifdef IMPORT_EXPORT
-  info = GxB_init (GrB_NONBLOCKING, malloc_function, calloc_function, realloc_function, pfree);
+  info = GxB_init (GrB_NONBLOCKING, malloc_function, calloc_function, realloc_function, free_function);
 #else
   info = GrB_init (GrB_BLOCKING);
 #endif
@@ -69,6 +61,13 @@ _PG_init(void)
       return;
     }
 
+  info = LAGraph_alloc_global ();
+  if (! (info == GrB_SUCCESS || info == GrB_NO_VALUE))
+    {
+      elog(ERROR, "%s", GrB_error());
+      return;
+    }
+  
   SEMIRING_GROUP(0, FIRST_);
   SEMIRING_GROUP(40, SECOND_);
   SEMIRING_GROUP(80, MIN_);

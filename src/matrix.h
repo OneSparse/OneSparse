@@ -112,9 +112,15 @@ FN(matrix_get_flat_size)(ExpandedObjectHeader *eohptr) {
   CHECKD(GrB_Matrix_nvals(&nvals, A->M));
 
   nbytes = PGGRB_MATRIX_OVERHEAD();
-  nbytes += nrows * sizeof(GrB_Index);
-  nbytes += ncols * sizeof(GrB_Index);
+#ifdef IMPORT_EXPORT
+  nbytes += (nrows + 1) * sizeof(GrB_Index);
+  nbytes += nvals * sizeof(GrB_Index);
   nbytes += nvals * sizeof(PG_TYPE);
+#else
+  nbytes += nvals * sizeof(GrB_Index);
+  nbytes += nvals * sizeof(GrB_Index);
+  nbytes += nvals * sizeof(PG_TYPE);
+#endif
 
   A->flat_size = nbytes;
   return nbytes;
@@ -125,9 +131,15 @@ static void
 FN(matrix_flatten_into)(ExpandedObjectHeader *eohptr,
                 void *result, Size allocated_size)  {
   GrB_Info info;
-  GrB_Index *start;
+  GrB_Index *rows, nrows, ncols, nvals;
   pgGrB_Matrix *A = (pgGrB_Matrix *) eohptr;
   pgGrB_FlatMatrix *flat = (pgGrB_FlatMatrix *) result;
+#ifdef IMPORT_EXPORT
+  int64_t nonempty = -1;
+  GrB_Index *cols;
+  void *values;
+  GrB_Type type;
+#endif
 
   if (A->flat_value) {
     Assert(allocated_size == VARSIZE(A->flat_value));
@@ -140,19 +152,44 @@ FN(matrix_flatten_into)(ExpandedObjectHeader *eohptr,
 
   memset(flat, 0, allocated_size);
 
-  CHECKV(GrB_Matrix_nrows(&flat->nrows, A->M));
-  CHECKV(GrB_Matrix_ncols(&flat->ncols, A->M));
-  CHECKV(GrB_Matrix_nvals(&flat->nvals, A->M));
+#ifdef IMPORT_EXPORT
+  CHECKV(GxB_Matrix_export_CSR(&A->M,
+                               &type,
+                               &nrows,
+                               &ncols,
+                               &nvals,
+                               &nonempty,
+                               &rows,
+                               &cols,
+                               &values,
+                               NULL));
 
-  start = PGGRB_MATRIX_DATA(flat);
-  CHECKV(GrB_Matrix_extractTuples(start,
-                                  start + flat->nrows,
-                                  start + flat->nrows + flat->ncols,
-                                  &flat->nvals,
+  if (nvals > 0) {
+    memcpy(PGGRB_MATRIX_DATA(flat), rows, (nrows+1)*sizeof(GrB_Index));
+    memcpy((PGGRB_MATRIX_DATA(flat) + nrows+1), cols, nvals*sizeof(GrB_Index));
+    memcpy((PGGRB_MATRIX_DATA(flat) + nrows+1 + nvals), values, nvals*sizeof(PG_TYPE));
+    pfree(rows);
+    pfree(cols);
+    pfree(values);
+  }
+#else
+  CHECKV(GrB_Matrix_nrows(&nrows, A->M));
+  CHECKV(GrB_Matrix_ncols(&ncols, A->M));
+  CHECKV(GrB_Matrix_nvals(&nvals, A->M));
+
+  rows = PGGRB_MATRIX_DATA(flat);
+  CHECKV(GrB_Matrix_extractTuples(rows,
+                                  rows + nvals,
+                                  rows + nvals + nvals,
+                                  &nvals,
                                   A->M));
-
+#endif
+  
   flat->type = GB_TYPE;
-
+  flat->nrows = nrows;
+  flat->ncols = ncols;
+  flat->nvals = nvals;
+  flat->nonempty = nonempty;
   SET_VARSIZE(flat, allocated_size);
 }
 
@@ -170,8 +207,9 @@ FN(expand_flat_matrix)(Datum flatdatum,
 
   GrB_Index ncols, nrows, nvals;
   GrB_Index *rows, *cols;
-  PG_TYPE *vals;
+  void *vals;
   GrB_Type type;
+  int64_t nonempty;
 
   /* Create a new context that will hold the expanded object. */
   objcxt = AllocSetContextCreate(
@@ -202,18 +240,53 @@ FN(expand_flat_matrix)(Datum flatdatum,
   ncols = flat->ncols;
   nvals = flat->nvals;
   type = flat->type;
+  nonempty = flat->nonempty;
 
-  /* Rows, cols, and vals are pointers into the vardata area */
-
-  rows = PGGRB_MATRIX_DATA(flat);
-  cols = rows + nrows;
-  vals = (PG_TYPE*)(cols + ncols);
-
+  /* If there's actual values, build the matrix */
+#ifdef IMPORT_EXPORT
+  rows = malloc_function((nrows+1)*sizeof(GrB_Index));
+  cols = malloc_function(nvals*sizeof(GrB_Index));
+  vals = malloc_function(nvals*sizeof(PG_TYPE));
+  memcpy(rows, PGGRB_MATRIX_DATA(flat), (nrows+1)*sizeof(GrB_Index));
+  memcpy(cols, PGGRB_MATRIX_DATA(flat) + nrows+1, nvals*sizeof(GrB_Index));
+  memcpy(vals, PGGRB_MATRIX_DATA(flat) + nrows+1 + nvals, nvals*sizeof(PG_TYPE));
+  
+  CHECKD(GxB_Matrix_import_CSR(&A->M,
+                               type,
+                               nrows,
+                               ncols,
+                               nvals,
+                               nonempty,
+                               &rows,
+                               &cols,
+                               &vals,
+                               NULL
+                                 ));
+#else
   /* Initialize the new matrix */
   CHECKD(GrB_Matrix_new(&A->M,
                         type,
                         nrows,
                         ncols));
+
+  if (nvals > 0) {
+    /* Rows, cols, and vals are pointers into the vardata area */
+    rows = PGGRB_MATRIX_DATA(flat);
+    cols = rows + nrows;
+    vals = (PG_TYPE*)(cols + ncols);
+    
+    CHECKD(GrB_Matrix_build(A->M,
+                            rows,
+                            cols,
+                            vals,
+                            nvals,
+                            GB_DUP));
+  }
+#endif
+  
+  A->type = type;
+  A->flat_size = 0;
+  A->flat_value = NULL;
 
   /* Create a context callback to free matrix when context is cleared */
   ctxcb = (MemoryContextCallback*)MemoryContextAlloc(
@@ -223,20 +296,6 @@ FN(expand_flat_matrix)(Datum flatdatum,
   ctxcb->func = context_callback_matrix_free;
   ctxcb->arg = A;
   MemoryContextRegisterResetCallback(objcxt, ctxcb);
-
-  /* If there's actual values, build the matrix */
-  if (nvals > 0) {
-    CHECKD(GrB_Matrix_build(A->M,
-                            rows,
-                            cols,
-                            vals,
-                            nvals,
-                            GB_DUP));
-  }
-
-  A->type = type;
-  A->flat_size = 0;
-  A->flat_value = NULL;
 
   /* Switch back to old context */
   MemoryContextSwitchTo(oldcxt);
@@ -621,8 +680,9 @@ GrB_Index FN(extract_rowscols)(pgGrB_Matrix *A,
 Datum
 FN(matrix_assign)(PG_FUNCTION_ARGS) {
   GrB_Info info;
-  pgGrB_Matrix *A, *B, *mask;
-  GrB_Index nvals, *rows = NULL, *cols = NULL;
+  pgGrB_Matrix *A, *B=NULL, *mask=NULL;
+  GrB_Index nrows, ncols, nvals;
+  GrB_Index *rows = NULL, *cols = NULL;
   PG_TYPE val;
 
   A = PGGRB_GETARG_MATRIX(0);
@@ -632,17 +692,20 @@ FN(matrix_assign)(PG_FUNCTION_ARGS) {
 
   if (B != NULL) {
     CHECKD(GrB_Matrix_nvals(&nvals, B->M));
-    nvals = FN(extract_rowscols)(B, &rows, &cols, nvals);
+    nrows = ncols = nvals = FN(extract_rowscols)(B, &rows, &cols, nvals);
+  } else {
+    CHECKD(GrB_Matrix_nrows(&nrows, A->M));
+    CHECKD(GrB_Matrix_ncols(&ncols, A->M));
   }
 
-  CHECKD(GrB_assign(A->M, mask? mask->M:
-                    NULL,
+  CHECKD(GrB_assign(A->M,
+                    mask? mask->M: NULL,
                     NULL,
                     val,
-                    rows? rows : GrB_ALL,
-                    nvals,
-                    cols? cols : GrB_ALL,
-                    nvals,
+                    rows?rows:GrB_ALL,
+                    nrows,
+                    cols?cols:GrB_ALL,
+                    ncols,
                     NULL));
 
   PGGRB_RETURN_MATRIX(A);

@@ -115,12 +115,13 @@ FN(vector_flatten_into)(ExpandedObjectHeader *eohptr,
                            &start,
                            &values,
                            NULL));
-  
-  memcpy(PGGRB_VECTOR_DATA(flat), start, nvals*sizeof(GrB_Index));
-  memcpy((PGGRB_VECTOR_DATA(flat) + nvals), values, nvals*sizeof(PG_TYPE));
 
-  pfree(start);
-  pfree(values);
+  if (nvals > 0) {
+    memcpy(PGGRB_VECTOR_DATA(flat), start, nvals*sizeof(GrB_Index));
+    memcpy((PGGRB_VECTOR_DATA(flat) + nvals), values, nvals*sizeof(PG_TYPE));
+    pfree(start);
+    pfree(values);
+  }
 #else
   start = PGGRB_VECTOR_DATA(flat);
   CHECKV(GrB_Vector_extractTuples(start,
