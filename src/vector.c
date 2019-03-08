@@ -165,22 +165,16 @@ vector_in(PG_FUNCTION_ARGS)
 Datum
 vector_out(PG_FUNCTION_ARGS)
 {
-  GrB_Info info;
-  GrB_Type typ;
   Datum d;
-  pgGrB_Vector *vec = PGGRB_GETARG_VECTOR(0);
-  CHECKD(GxB_Vector_type(&typ, vec->V));
-
-  TYPE_APPLY(d, typ, vector_out, vec);
+  pgGrB_Vector *A = PGGRB_GETARG_VECTOR(0);
+  TYPE_APPLY(d, A->type, vector_out, A);
   return d;
 }
 
 Datum
 vector_ewise_mult(PG_FUNCTION_ARGS) {
-  GrB_Info info;
   pgGrB_Vector *A, *B;
   pgGrB_Vector *C = NULL, *mask = NULL;
-  GrB_Type type;
   Datum d;
   char *binop_name;
   GrB_BinaryOp binop;
@@ -201,18 +195,14 @@ vector_ewise_mult(PG_FUNCTION_ARGS) {
   if (binop == NULL)
     elog(ERROR, "unknown binop name %s", binop_name);
 
-  CHECKD(GxB_Vector_type(&type, A->V));
-
-  TYPE_APPLY(d, type, vector_ewise_mult, A, B, C, mask, binop);
+  TYPE_APPLY(d, A->type, vector_ewise_mult, A, B, C, mask, binop);
   return d;
 }
 
 Datum
 vector_ewise_add(PG_FUNCTION_ARGS) {
-  GrB_Info info;
   pgGrB_Vector *A, *B;
   pgGrB_Vector *C = NULL, *mask = NULL;
-  GrB_Type type;
   Datum d;
   char *binop_name;
   GrB_BinaryOp binop;
@@ -233,9 +223,7 @@ vector_ewise_add(PG_FUNCTION_ARGS) {
   if (binop == NULL)
     elog(ERROR, "unknown binop name %s", binop_name);
 
-  CHECKD(GxB_Vector_type(&type, A->V));
-
-  TYPE_APPLY(d, type, vector_ewise_add, A, B, C, mask, binop);
+  TYPE_APPLY(d, A->type, vector_ewise_add, A, B, C, mask, binop);
   return d;
 }
 
@@ -291,18 +279,16 @@ vector_xtract(PG_FUNCTION_ARGS) {
   GrB_Info info;
   pgGrB_Vector *A, *B, *C = NULL;
   GrB_Index size, *indexes;
-  GrB_Type type;
 
   A = PGGRB_GETARG_VECTOR(0);
   B = PGGRB_GETARG_VECTOR(1);
 
-  CHECKD(GxB_Vector_type(&type, A->V));
   CHECKD(GrB_Vector_size(&size, A->V));
   if (C == NULL) {
-    TYPE_APPLY(C, type, construct_empty_expanded_vector, size, CurrentMemoryContext);
+    TYPE_APPLY(C, A->type, construct_empty_expanded_vector, size, CurrentMemoryContext);
   }
 
-  TYPE_APPLY(indexes, type, extract_indexes, B, size);
+  TYPE_APPLY(indexes, A->type, extract_indexes, B, size);
 
   CHECKD(GrB_Vector_extract(C->V, NULL, NULL, A->V, indexes, size, NULL));
   PGGRB_RETURN_VECTOR(C);

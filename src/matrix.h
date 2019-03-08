@@ -172,6 +172,7 @@ FN(matrix_flatten_into)(ExpandedObjectHeader *eohptr,
     pfree(cols);
     pfree(values);
   }
+  flat->nonempty = nonempty;
 #else
   CHECKV(GrB_Matrix_nrows(&nrows, A->M));
   CHECKV(GrB_Matrix_ncols(&ncols, A->M));
@@ -189,7 +190,6 @@ FN(matrix_flatten_into)(ExpandedObjectHeader *eohptr,
   flat->nrows = nrows;
   flat->ncols = ncols;
   flat->nvals = nvals;
-  flat->nonempty = nonempty;
   SET_VARSIZE(flat, allocated_size);
 }
 
@@ -209,7 +209,9 @@ FN(expand_flat_matrix)(Datum flatdatum,
   GrB_Index *rows, *cols;
   void *vals;
   GrB_Type type;
+#ifdef IMPORT_EXPORT
   int64_t nonempty;
+#endif
 
   /* Create a new context that will hold the expanded object. */
   objcxt = AllocSetContextCreate(
@@ -240,10 +242,11 @@ FN(expand_flat_matrix)(Datum flatdatum,
   ncols = flat->ncols;
   nvals = flat->nvals;
   type = flat->type;
-  nonempty = flat->nonempty;
-
+  
   /* If there's actual values, build the matrix */
 #ifdef IMPORT_EXPORT
+  nonempty = flat->nonempty;
+  
   rows = malloc_function((nrows+1)*sizeof(GrB_Index));
   cols = malloc_function(nvals*sizeof(GrB_Index));
   vals = malloc_function(nvals*sizeof(PG_TYPE));
@@ -262,6 +265,12 @@ FN(expand_flat_matrix)(Datum flatdatum,
                                &vals,
                                NULL
                                  ));
+  if (A->M == NULL) {
+    pfree(rows);
+    pfree(cols);
+    pfree(vals);
+    ereport(ERROR, (errmsg("Matrix import failed")));
+  }
 #else
   /* Initialize the new matrix */
   CHECKD(GrB_Matrix_new(&A->M,

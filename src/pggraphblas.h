@@ -453,6 +453,6 @@ void *calloc_function(size_t, size_t);
 void *realloc_function(void*, size_t);
 void free_function(void*);
 
-#define IMPORT_EXPORT // Use import export
+// #define IMPORT_EXPORT // Use import export
 
 #endif /* PGGRAPHBLAS_H */

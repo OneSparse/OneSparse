@@ -147,13 +147,9 @@ Datum
 matrix_out(PG_FUNCTION_ARGS)
 {
   Datum d;
-  GrB_Info info;
-  GrB_Type type;
-  pgGrB_Matrix *mat = PGGRB_GETARG_MATRIX(0);
+  pgGrB_Matrix *A = PGGRB_GETARG_MATRIX(0);
 
-  CHECKD(GxB_Matrix_type(&type, mat->M));
-
-  TYPE_APPLY(d, type, matrix_out, mat);
+  TYPE_APPLY(d, A->type, matrix_out, A);
   return d;
 }
 
@@ -215,9 +211,7 @@ matrix_ne(PG_FUNCTION_ARGS) {
 
 Datum
 matrix_ewise_mult(PG_FUNCTION_ARGS) {
-  GrB_Info info;
   pgGrB_Matrix *A, *B, *C = NULL, *mask = NULL;
-  GrB_Type type;
   Datum d;
   char *binop_name;
   GrB_BinaryOp binop;
@@ -227,29 +221,23 @@ matrix_ewise_mult(PG_FUNCTION_ARGS) {
 
   binop_name = matrix_times_binop(A, B);
 
-  if (PG_NARGS() > 2)
+  if (PG_NARGS() > 2) {
     C = PG_ARGISNULL(2) ? NULL : PGGRB_GETARG_MATRIX(2);
-  if (PG_NARGS() > 3)
     mask = PG_ARGISNULL(3) ? NULL : PGGRB_GETARG_MATRIX(3);
-  if (PG_NARGS() > 4)
     binop_name = PG_ARGISNULL(4) ?
       binop_name : text_to_cstring(PG_GETARG_TEXT_PP(4));
-
+  }
   binop = lookup_binop(binop_name);
   if (binop == NULL)
     elog(ERROR, "unknown binop name %s", binop_name);
 
-  CHECKD(GxB_Matrix_type(&type, A->M));
-
-  TYPE_APPLY(d, type, matrix_ewise_mult, A, B, C, mask, binop);
+  TYPE_APPLY(d, A->type, matrix_ewise_mult, A, B, C, mask, binop);
   return d;
 }
 
 Datum
 matrix_ewise_add(PG_FUNCTION_ARGS) {
-  GrB_Info info;
   pgGrB_Matrix *A, *B, *C = NULL, *mask = NULL;
-  GrB_Type type;
   Datum d;
   char *binop_name;
   GrB_BinaryOp binop;
@@ -271,9 +259,7 @@ matrix_ewise_add(PG_FUNCTION_ARGS) {
   if (binop == NULL)
     elog(ERROR, "unknown binop name %s", binop_name);
 
-  CHECKD(GxB_Matrix_type(&type, A->M));
-
-  TYPE_APPLY(d, type, matrix_ewise_add, A, B, C, mask, binop);
+  TYPE_APPLY(d, A->type, matrix_ewise_add, A, B, C, mask, binop);
   return d;
 }
 
@@ -433,7 +419,6 @@ matrix_reduce_vector(PG_FUNCTION_ARGS) {
   GrB_Monoid monoid;
   char *semiring_name;
   pgGrB_Vector *val;
-  GrB_Type type;
   GrB_Index size;
 
   A = PGGRB_GETARG_MATRIX(0);
@@ -441,9 +426,8 @@ matrix_reduce_vector(PG_FUNCTION_ARGS) {
   semiring_name = text_to_cstring(PG_GETARG_TEXT_PP(1));
   semiring = lookup_semiring(semiring_name);
   CHECKD(GxB_Semiring_add(&monoid, semiring));
-  CHECKD(GxB_Matrix_type(&type, A->M));
   CHECKD(GrB_Matrix_ncols(&size, A->M));
-  TYPE_APPLY(val, type, construct_empty_expanded_vector, size, CurrentMemoryContext);
+  TYPE_APPLY(val, A->type, construct_empty_expanded_vector, size, CurrentMemoryContext);
   CHECKD(GrB_reduce(val->V, NULL, monoid, A->M, NULL));
   PGGRB_RETURN_VECTOR(val);
 }
@@ -453,7 +437,6 @@ matrix_transpose(PG_FUNCTION_ARGS) {
   GrB_Info info;
   pgGrB_Matrix *A, *C = NULL, *mask;
   GrB_Index m, n;
-  GrB_Type type;
   GrB_Descriptor desc = NULL;
   char *desc_val;
 
@@ -474,8 +457,7 @@ matrix_transpose(PG_FUNCTION_ARGS) {
   if (C == NULL) {
     CHECKD(GrB_Matrix_nrows(&m, A->M));
     CHECKD(GrB_Matrix_ncols(&n, A->M));
-    CHECKD(GxB_Matrix_type(&type, A->M));
-    TYPE_APPLY(C, type, construct_empty_expanded_matrix, m, n, CurrentMemoryContext);
+    TYPE_APPLY(C, A->type, construct_empty_expanded_matrix, m, n, CurrentMemoryContext);
   }
 
   CHECKD(GrB_transpose(C->M, mask? mask->M:NULL, NULL, A->M, desc));
@@ -487,7 +469,6 @@ matrix_assign_matrix(PG_FUNCTION_ARGS) {
   GrB_Info info;
   pgGrB_Matrix *A, *B, *mask;
   GrB_Index nvals, *rows = NULL, *cols = NULL;
-  GrB_Type type;
 
   A = PGGRB_GETARG_MATRIX(0);
   B = PGGRB_GETARG_MATRIX(1);
@@ -496,8 +477,7 @@ matrix_assign_matrix(PG_FUNCTION_ARGS) {
   CHECKD(GrB_Matrix_nvals(&nvals, B->M));
 
   if (B != NULL) {
-    CHECKD(GxB_Matrix_type(&type, B->M));
-    TYPE_APPLY(nvals, type, extract_rowscols, B, &rows, &cols, nvals);
+    TYPE_APPLY(nvals, B->type, extract_rowscols, B, &rows, &cols, nvals);
   }
 
   CHECKD(GrB_assign(A->M,
