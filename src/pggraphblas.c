@@ -39,7 +39,7 @@ void *realloc_function(void *p, size_t size) {
 }
 
 void free_function(void *p) {
-  MemoryContext oldcxt;
+  //  MemoryContext oldcxt;
   //  oldcxt = MemoryContextSwitchTo(TopMemoryContext);
   pfree(p);
   //  MemoryContextSwitchTo(oldcxt);
