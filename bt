@@ -1,2 +1,0 @@
-#!/bin/bash
-sudo -u postgres gdb -q -c /var/lib/postgresql/data/core /usr/lib/postgresql/11/bin/postgres
