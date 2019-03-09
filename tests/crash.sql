@@ -1,11 +1,18 @@
 create extension if not exists pggraphblas;
     
 \ir gdb.sql
-    
--- two matrix multiplies, the second fails
 
-create table t (v vector);
-insert into t (v) values (assign(vector_bool(10), true));
+select  ewise_add(matrix(
+      array[0,1,2],
+      array[1,2,0],
+      cast(array[1,2,3] as bigint [])),
+    matrix(
+      array[0,1,2],
+      array[1,2,0],
+      cast(array[2,3,4] as bigint [])),
+    mask=>matrix(
+      array[0,1,2],
+      array[1,2,0],
+      array[true,true,false])
+  );
 
-create table f (m matrix);
-insert into f (m) values (matrix(array[0,1,2], array[2,1,0], array[1,2,3]));

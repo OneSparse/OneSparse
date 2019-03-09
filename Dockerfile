@@ -14,8 +14,8 @@ WORKDIR "/home/postgres"
 # get GraphBLAS, compile with debug symbols    
 RUN curl -s -L http://faculty.cse.tamu.edu/davis/GraphBLAS/GraphBLAS-2.3.0.tar.gz | \
     tar zxvf - && cd GraphBLAS && \
-#    sed -i 's/^\/\/ #undef NDEBUG/#undef NDEBUG/g' Source/GB.h && \
-#    sed -i 's/^\/\/ #define GB_PRINT_MALLOC 1/#define GB_PRINT_MALLOC 1/g' Source/GB.h && \
+    sed -i 's/^\/\/ #undef NDEBUG/#undef NDEBUG/g' Source/GB.h && \
+    sed -i 's/^\/\/ #define GB_PRINT_MALLOC 1/#define GB_PRINT_MALLOC 1/g' Source/GB.h && \
     make library \
     CMAKE_OPTIONS='-DCMAKE_BUILD_TYPE=Debug' \
     && make install

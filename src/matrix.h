@@ -246,31 +246,39 @@ FN(expand_flat_matrix)(Datum flatdatum,
   /* If there's actual values, build the matrix */
 #ifdef IMPORT_EXPORT
   nonempty = flat->nonempty;
-  
-  rows = malloc_function((nrows+1)*sizeof(GrB_Index));
-  cols = malloc_function(nvals*sizeof(GrB_Index));
-  vals = malloc_function(nvals*sizeof(PG_TYPE));
-  memcpy(rows, PGGRB_MATRIX_DATA(flat), (nrows+1)*sizeof(GrB_Index));
-  memcpy(cols, PGGRB_MATRIX_DATA(flat) + nrows+1, nvals*sizeof(GrB_Index));
-  memcpy(vals, PGGRB_MATRIX_DATA(flat) + nrows+1 + nvals, nvals*sizeof(PG_TYPE));
-  
-  CHECKD(GxB_Matrix_import_CSR(&A->M,
-                               type,
-                               nrows,
-                               ncols,
-                               nvals,
-                               nonempty,
-                               &rows,
-                               &cols,
-                               &vals,
-                               NULL
-                                 ));
-  if (A->M == NULL) {
-    pfree(rows);
-    pfree(cols);
-    pfree(vals);
-    ereport(ERROR, (errmsg("Matrix import failed")));
+
+  if (nvals > 0) {
+    rows = malloc_function((nrows+1)*sizeof(GrB_Index));
+    cols = malloc_function(nvals*sizeof(GrB_Index));
+    vals = malloc_function(nvals*sizeof(PG_TYPE));
+    memcpy(rows, PGGRB_MATRIX_DATA(flat), (nrows+1)*sizeof(GrB_Index));
+    memcpy(cols, PGGRB_MATRIX_DATA(flat) + nrows+1, nvals*sizeof(GrB_Index));
+    memcpy(vals, PGGRB_MATRIX_DATA(flat) + nrows+1 + nvals, nvals*sizeof(PG_TYPE));
+
+    CHECKD(GxB_Matrix_import_CSR(&A->M,
+                                 type,
+                                 nrows,
+                                 ncols,
+                                 nvals,
+                                 nonempty,
+                                 &rows,
+                                 &cols,
+                                 &vals,
+                                 NULL
+                                   ));
+    if (A->M == NULL) {
+      pfree(rows);
+      pfree(cols);
+      pfree(vals);
+      ereport(ERROR, (errmsg("Matrix import failed")));
+    }
+  } else {
+    CHECKD(GrB_Matrix_new(&A->M,
+                          type,
+                          nrows,
+                          ncols));
   }
+    
 #else
   /* Initialize the new matrix */
   CHECKD(GrB_Matrix_new(&A->M,

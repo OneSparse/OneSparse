@@ -518,7 +518,6 @@ FN(vector_assign)(PG_FUNCTION_ARGS) {
   GrB_Info info;
   pgGrB_Vector *A, *B, *mask;
   GrB_Index size, *indexes = NULL;
-  GrB_Type type;
   PG_TYPE val;
 
   A = PGGRB_GETARG_VECTOR(0);
@@ -526,7 +525,6 @@ FN(vector_assign)(PG_FUNCTION_ARGS) {
   B = PG_ARGISNULL(2) ? NULL : PGGRB_GETARG_VECTOR(2);
   mask = PG_ARGISNULL(3)? NULL : PGGRB_GETARG_VECTOR(3);
 
-  CHECKD(GxB_Vector_type(&type, A->V));
   CHECKD(GrB_Vector_size(&size, A->V));
   
   if (B != NULL)
