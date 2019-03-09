@@ -289,6 +289,7 @@ FN(expand_flat_matrix)(pgGrB_FlatMatrix *flat,
 #endif
 
   A->type = type;
+  A->flat_size = 0;
 
   /* Create a context callback to free matrix when context is cleared */
   ctxcb = (MemoryContextCallback*)MemoryContextAlloc(

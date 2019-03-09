@@ -145,3 +145,12 @@ select is(
     set_element(assign(vector_:TYPE(2), :VAL), 1, :VAL2),
     vector(cast(array[:VAL, :VAL2] as :TYPE [])),
     'vector set_element ' || :'TYPE');
+
+create table foo_:TYPE (v vector);
+insert into foo_:TYPE (v) values (vector(cast(array[:VALS] as :TYPE [])));
+
+select results_eq(
+    'select nvals(v) from foo_' || :'TYPE',
+    'select 3::bigint',
+    'select vector from table ' || :'TYPE');
+    

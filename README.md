@@ -8,14 +8,14 @@ GraphBLAS is a sparse linear algebra API optimized for processing
 graphs encoded as sparse matrices and vectors.  In addition to common
 real/integer matrix algebra operations, GraphBLAS supports up to 960
 different "semiring" algebra operations, that can be used as basic
-building blocks to implement graph algorithms.
+building blocks to implement a wide variety of graph algorithms.
 
 pggraphblas leverages the expertise in the field of sparse matrix
 programming by [The GraphBLAS Forum](http://graphblas.org) and uses
-the [SuiteSparse
-GraphBLAS](http://faculty.cse.tamu.edu/davis/GraphBLAS.html) API
-implementation. SuiteSparse:GraphBLAS is brought to us by the work of
-[Dr. Tim Davis](http://faculty.cse.tamu.edu/davis/welcome.html),
+the
+[SuiteSparse:GraphBLAS](http://faculty.cse.tamu.edu/davis/GraphBLAS.html)
+API implementation. SuiteSparse:GraphBLAS is brought to us by the work
+of [Dr. Tim Davis](http://faculty.cse.tamu.edu/davis/welcome.html),
 professor in the Department of Computer Science and Engineering at
 Texas A&M University.  [News and
 information](http://faculty.cse.tamu.edu/davis/news.html) can provide
@@ -33,24 +33,26 @@ of [MIT Lincoln Laboratory Supercomputing
 Center](http://news.mit.edu/2016/lincoln-laboratory-establishes-supercomputing-center-0511).
 
 As Kepner's paper describes, there are two useful matrix
-representations of graphs: *Adjacency Matrices* and *Incidence
-Matrices*.  For this introduction we will focus on the adjacency type
-as they are simpler, but the same ideas apply to both, and it is easy
-to switch back and forth between them.
+representations of graphs: [Adjacency
+Matrices](https://en.wikipedia.org/wiki/Adjacency_matrix) and
+[Incidence Matrices](https://en.wikipedia.org/wiki/Incidence_matrix).
+For this introduction we will focus on the adjacency type as they are
+simpler, but the same ideas apply to both, and it is easy to switch
+back and forth between them.
 
 ![Alt text](./docs/AdjacencyMatrix.svg)
 
 (Image Credit: [Dr. Jermey Kepner](http://www.mit.edu/~kepner/))
 
-On the left is a graph, and on the right, the adjacency matrix that
-represents it. The matrix has a row and column for every vertex.  If
-there is an edge between nodes A and B, then there will be a value
-present in the intersection of As row with Bs column.  For example,
-vertex 1 connects to 4, so there is a value (dot) at the intersction
-of the first row and the fourth column.  4 also connects *back* to 1
-(this is an example of a *directed* graph) so there are two values in
-the matrix to represent these two edges, the one at the (1, 4)
-position and the other at the (4,1) position.
+On the left is a *directed* graph, and on the right, the adjacency
+matrix that represents it. The matrix has a row and column for every
+vertex.  If there is an going from node A to B, then there will be a
+value present in the intersection of As row with Bs column.  For
+example, vertex 1 connects to 4, so there is a value (dot) at the
+intersction of the first row and the fourth column.  4 also connects
+*back* to 1 so there are two values in the matrix to represent these
+two edges, the one at the (1, 4) position and the other at the (4,1)
+position.
 
 One practical problem with matrix-encoding graphs is that most
 real-world graphs tend to be sparse, as above, only 12 of 49 possible
@@ -92,16 +94,27 @@ variable length column values.
 They key operation of GraphBLAS is the matrix multiply as provided by
 the `mxm` (matrix times matrix), `mxv` (matrix times vector), and
 `vxm` (vector times matrix) functions.  Matrix multplication has a
-remarkable dual property of being useful for finding the "next" step
-in a graph algorithm, and for reducing values accumulated across a
-graph during traversal.  By using different combinations of operations
-(semiring) different graph algorithms can step and accumulate
-different results, interpreting the data in unique ways, even over the
-same graphs.
+remarkable property of being useful for finding the neighbors of any
+node in a graph algorithm.  By using different combinations of
+operations (semiring) different graph algorithms can step and
+accumulate different results, interpreting the data in unique ways,
+even over the same graphs.
 
 ![Alt text](./docs/AdjacencyMatrixBFS.svg)
 
 (Image Credit: [Dr. Jermey Kepner](http://www.mit.edu/~kepner/))
+
+Above is the same graph and matrix from before, shown here as `A`.
+Next to it we see a *vector* `v`.  When you multiply the transpose of
+A and v, the result vector contains all of the neighboring nodes for
+the nodes specified in `v`.  In this case, `v` contains a value for
+node 4, shown in red.  By multiplying the matrix by the input vector,
+the result is the output vector with the 4's two neighboring nodes, 1
+and 3.  Interating this multiplication process produces the most
+common graph operation: [breadth-first
+search](https://en.wikipedia.org/wiki/Breadth-first_search).
+
+    ... more soon.
 
 # references
 

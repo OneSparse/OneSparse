@@ -228,3 +228,10 @@ select is(
        'matrix assign scalar ' || :'TYPE');
 
        
+create table foo_:TYPE (m matrix);
+insert into foo_:TYPE (m) values (matrix(array[:ROWS], array[:COLS], cast(array[:VALS] AS :TYPE [])));
+
+select results_eq(
+    'select nvals(m) from foo_' || :'TYPE',
+    'select 3::bigint',
+    'select matrix from table ' || :'TYPE');
