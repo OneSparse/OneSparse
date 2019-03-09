@@ -1,8 +1,8 @@
 # summary
 
-pggraphblas is a postgres extension that bridges
-[The GraphBLAS API](http://graphblas.org) with the
-[PostgreSQL](https://postgresql.org) relation database.
+pggraphblas is a postgres extension that bridges [The GraphBLAS
+API](http://graphblas.org) with the
+[PostgreSQL](https://postgresql.org) object relational database.
 
 GraphBLAS is a sparse linear algebra API optimized for processing
 graphs encoded as sparse matrices and vectors.  In addition to common
@@ -13,25 +13,24 @@ building blocks to implement graph algorithms.
 pggraphblas leverages the expertise in the field of sparse matrix
 programming by [The GraphBLAS Forum](http://graphblas.org) and uses
 the [SuiteSparse
- GraphBLAS](http://faculty.cse.tamu.edu/davis/GraphBLAS.html) API
+GraphBLAS](http://faculty.cse.tamu.edu/davis/GraphBLAS.html) API
 implementation. SuiteSparse:GraphBLAS is brought to us by the work of
-[Dr. Tim Davis](http://faculty.cse.tamu.edu/davis/welcome.html), professor in the Department of Computer Science and
-Engineering at Texas A&M University.
-[News and information](http://faculty.cse.tamu.edu/davis/news.html)
-can provide you with a lot more background information, in addition to
-the references below.
-
-This is a currently very alpha quality integration, much of the API is
-not supported yet but is an active work in progress.  See TODO below.
+[Dr. Tim Davis](http://faculty.cse.tamu.edu/davis/welcome.html),
+professor in the Department of Computer Science and Engineering at
+Texas A&M University.  [News and
+information](http://faculty.cse.tamu.edu/davis/news.html) can provide
+you with a lot more background information, in addition to the
+references below.
 
 # intro
 
 For a long time, mathematicians have known that matrices are powerful
 representations of graphs, as described [in this mathmatical
-introduction to GraphBLAS](http://www.mit.edu/~kepner/GraphBLAS/GraphBLAS-Math-release.pdf)
+introduction to
+GraphBLAS](http://www.mit.edu/~kepner/GraphBLAS/GraphBLAS-Math-release.pdf)
 by [Dr. Jermey Kepner](http://www.mit.edu/~kepner/) head and founder
-of
-[MIT Lincoln Laboratory Supercomputing Center](http://news.mit.edu/2016/lincoln-laboratory-establishes-supercomputing-center-0511).
+of [MIT Lincoln Laboratory Supercomputing
+Center](http://news.mit.edu/2016/lincoln-laboratory-establishes-supercomputing-center-0511).
 
 As Kepner's paper describes, there are two useful matrix
 representations of graphs: *Adjacency Matrices* and *Incidence
@@ -77,7 +76,8 @@ not be the actual number zero, but other values like positive or
 negative infinity depending on the particular semiring operations
 applied to the matrix.  The math used with sparse matrices is exactly
 the same as dense, the sparsity of the data doesn't matter to the
-math, but it does matter to how the matrix is implemented internally.
+math, but it does matter to how efficiently the matrix is implemented
+internally.
 
 pggraphblas is a postgres extension that provides access to two new
 types: `matrix` and `vector`, as well as the GraphBLAS api to
@@ -86,80 +86,6 @@ matrices from SQL queries, and set-returning functions are also
 provided to turn graphs back into relational sets.  From a PostgreSQL
 point of view, matrices look a little bit like arrays, being stored as
 variable length column values.
-
-# sql graph traversal
-
-Graph traversal and manipulation can already be acheived in PostgreSQL
-using recursive Common Table Expressions (CTE or `WITH` queries) in a
-very flexible and general way, but this approach has a drawback:
-sparse relational graphs are scattered across indexes and table
-blocks, having poor locality.  Interpreted sql code works by
-considering row base expressions one at a time, vertex by vertex so to
-speak.
-
-A good example to consider is *breadth-first search* (BFS).  Starting
-from any vertex, label that vertex as zero, then follow the edges to
-that vertex's neighbors and label them 1, then follow their edges and
-so on, eventually labeling every vertex in the graph with a label that
-can represent the distance from the starting node.  Since we're
-dealing with cyclical graphs, the algorithm also must make sure not to
-re-label vertices already considered.
-
-For example, here is the above Figure 1 graph data as a table in
-SQL.  The following code creates the same graph as shown in the
-figure above as a postgres table:
-
-```
-    create table edge (
-        i integer,
-        j integer
-        );
-
-    insert into edge (i, j) values 
-        (1, 4),
-        (1, 2),
-        (2, 7),
-        (2, 5),
-        (3, 6),
-        (4, 3),
-        (4, 1),
-        (5, 6),
-        (6, 3),
-        (7, 3);
-```
-
-Doing a BFS on this data in SQL requires a recursive CTE query.
-
-```
-create or replace function bfscte(start integer)
-returns table(id integer, level integer) as
-$$
-  with recursive test_cte (i, j, level, path) 
-     as
-     ( 
-       select i, j, 0 as level, array[i] as path
-       from test
-       where i = start
-       union all
-       select nxt.i, nxt.j, level + 1, array_append(prv.path, nxt.i)
-       from test nxt, test_cte prv
-       where nxt.i = prv.j
-       and nxt.i != ALL(prv.path)
-     )
-     select distinct on (i) i, level
-from test_cte order by i, array_length(path, 1);
-$$ language sql;
-```
-
-Using pggraphblas brings high density memory encoding and optimized
-numerical computing methods to solving graph problems with an elegant,
-composable mathmaticaly sound API.  GraphBLAS is designed to be
-optimized for storing values where dense matrices are not, and is
-optimized for accessing sparse values where database tables are not.
-
-GraphBLAS is also an actively developed project with future plans such
-as GPU/TPU integration, bringing higher density numeric computing to
-the problem with no change code that uses the API.
 
 # matrix multplication
 
@@ -196,7 +122,7 @@ same graphs.
 If you have docker installed, run `./test.sh psql` to build a docker
 container with postgres:11 and GraphBLAS compiled with debug symbols
 on.  This will eventually drop you into a psql interpreter.  You can
-run the tests from that point with `\i /here/tests/test.sql`
+run the tests from that point with `\i /tests/test.sql`
 
 # types
 
@@ -234,9 +160,7 @@ supported type.  Put example here of {R,min,+,0,+inf}.
 # API
 
 Pggraphblas tries to adhere closely to the spirit of the GraphBLAS C
-API.  It provides sixe new types: vector, matrix descriptor, binop,
-monoid and semiring.  It also exposes a number of functions that
-operate with or on those types.
+API.
 
 ## vector
 
@@ -311,25 +235,50 @@ inputs and outputs.
 
 ## mxv
 
+Matrix-vector multiplication.
+
 ## vxm
+
+Vector-matrix multiplication.
 
 ## ewise add
 
+Elementwise matrix addition.
+
 ## ewise mul
 
+Elementwise matrix multiplication.
+    
 ## xtract
+
+Extracting subgraphs.
 
 ## assign
 
+Assigning subgraphs.
+
 ## apply
+
+Applying functions to graphs.
 
 ## select
 
+Selecting
+
+Selecting elements of a matrix.
+
 ## reduce
 
-## descriptors
+Matrix, vector, and scalar reduction.
 
-## semirings
-    
-## binops
+## transpose
 
+Matrix transpose.
+
+## kron
+
+Kronecker product.
+
+## random_graph
+
+Random graph generation.
