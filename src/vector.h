@@ -63,9 +63,6 @@ FN(vector_get_flat_size)(ExpandedObjectHeader *eohptr) {
 
   Assert(A->ev_magic == vector_MAGIC);
 
-  if (A->flat_value)
-   return VARSIZE(A->flat_value);
-
   if (A->flat_size)
     return A->flat_size;
 
@@ -92,12 +89,6 @@ FN(vector_flatten_into)(ExpandedObjectHeader *eohptr,
   void *values;
   GrB_Type type;
 #endif
-
-  if (A->flat_value) {
-    Assert(allocated_size == VARSIZE(A->flat_value));
-    memcpy(flat, A->flat_value, allocated_size);
-    return;
-  }
 
   Assert(A->ev_magic == vector_MAGIC);
   Assert(allocated_size == A->flat_size);
@@ -209,7 +200,6 @@ FN(expand_flat_vector)(pgGrB_FlatVector *flat,
 
   A->type = type;
   A->flat_size = 0;
-  A->flat_value = NULL;
 
   /* Switch back to old context */
   MemoryContextSwitchTo(oldcxt);

@@ -174,7 +174,6 @@ typedef struct pgGrB_Matrix  {
   GrB_Type type;
   GrB_Matrix M;
   Size flat_size;
-  pgGrB_FlatMatrix *flat_value;
 } pgGrB_Matrix;
 
 
@@ -259,7 +258,6 @@ typedef struct pgGrB_Vector  {
   GrB_Type type;
   GrB_Vector V;
   Size flat_size;
-  pgGrB_FlatVector *flat_value;
 } pgGrB_Vector;
 
 static void context_callback_vector_free(void*);

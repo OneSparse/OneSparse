@@ -101,9 +101,6 @@ FN(matrix_get_flat_size)(ExpandedObjectHeader *eohptr) {
 
   Assert(A->em_magic == matrix_MAGIC);
 
-  if (A->flat_value)
-   return VARSIZE(A->flat_value);
-
   if (A->flat_size)
     return A->flat_size;
 
@@ -140,12 +137,6 @@ FN(matrix_flatten_into)(ExpandedObjectHeader *eohptr,
   void *values;
   GrB_Type type;
 #endif
-
-  if (A->flat_value) {
-    Assert(allocated_size == VARSIZE(A->flat_value));
-    memcpy(flat, A->flat_value, allocated_size);
-    return;
-  }
 
   Assert(A->em_magic == matrix_MAGIC);
   Assert(allocated_size == A->flat_size);
@@ -298,8 +289,6 @@ FN(expand_flat_matrix)(pgGrB_FlatMatrix *flat,
 #endif
 
   A->type = type;
-  A->flat_size = 0;
-  A->flat_value = NULL;
 
   /* Create a context callback to free matrix when context is cleared */
   ctxcb = (MemoryContextCallback*)MemoryContextAlloc(
