@@ -128,8 +128,8 @@ DatumGetMatrix(Datum d) {
     Assert(A->em_magic == matrix_MAGIC);
     return A;
   }
-  flat = (pgGrB_FlatMatrix*)d;
-  TYPE_APPLY(d, flat->type, expand_flat_matrix, d, CurrentMemoryContext);
+  flat = (pgGrB_FlatMatrix*)PG_DETOAST_DATUM(d);
+  TYPE_APPLY(d, flat->type, expand_flat_matrix, flat, CurrentMemoryContext);
   return MatrixGetEOHP(d);
 }
 

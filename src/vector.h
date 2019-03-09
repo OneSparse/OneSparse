@@ -18,8 +18,8 @@ static const ExpandedObjectMethods FN(vector_methods) = {
 
 /* Utility function that expands a flattened vector datum. */
 Datum
-FN(expand_flat_vector)(Datum vectordatum,
-                   MemoryContext parentcontext);
+FN(expand_flat_vector)(pgGrB_FlatVector *flat,
+                       MemoryContext parentcontext);
 
 /* Helper function that creates an expanded empty vector. */
 pgGrB_Vector *
@@ -92,7 +92,7 @@ FN(vector_flatten_into)(ExpandedObjectHeader *eohptr,
   void *values;
   GrB_Type type;
 #endif
-  
+
   if (A->flat_value) {
     Assert(allocated_size == VARSIZE(A->flat_value));
     memcpy(flat, A->flat_value, allocated_size);
@@ -127,9 +127,9 @@ FN(vector_flatten_into)(ExpandedObjectHeader *eohptr,
   CHECKV(GrB_Vector_extractTuples(start,
                                   start + size,
                                   &nvals,
-                                  A->V));  
+                                  A->V));
 #endif
-  
+
   flat->size = size;
   flat->nvals = nvals;
   flat->type = GB_TYPE;
@@ -139,12 +139,11 @@ FN(vector_flatten_into)(ExpandedObjectHeader *eohptr,
 
 /* Expand a flat vector. */
 Datum
-FN(expand_flat_vector)(Datum flatdatum,
+FN(expand_flat_vector)(pgGrB_FlatVector *flat,
                        MemoryContext parentcontext) {
   GrB_Info info;
 
   pgGrB_Vector *A;
-  pgGrB_FlatVector *flat;
 
   MemoryContext objcxt, oldcxt;
   MemoryContextCallback *ctxcb;
@@ -174,9 +173,6 @@ FN(expand_flat_vector)(Datum flatdatum,
 
   /* Switch to new object context */
   oldcxt = MemoryContextSwitchTo(objcxt);
-
-  /* Copy the flat datum into our context */
-  flat = (pgGrB_FlatVector*)flatdatum;
 
   /* Get dimensional information from flat */
   size = flat->size;
@@ -227,7 +223,7 @@ FN(construct_empty_expanded_vector)(GrB_Index size,
   pgGrB_FlatVector  *flat;
   Datum	d;
   flat = construct_empty_flat_vector(size, GB_TYPE);
-  d = FN(expand_flat_vector)(PointerGetDatum(flat), parentcontext);
+  d = FN(expand_flat_vector)(flat, parentcontext);
   pfree(flat);
   return (pgGrB_Vector *) DatumGetEOHP(d);
 }
@@ -506,7 +502,7 @@ FN(vector_reduce)(PG_FUNCTION_ARGS) {
 
   A = PGGRB_GETARG_VECTOR(0);
   semiring_name = PG_ARGISNULL(1) ? NULL : text_to_cstring(PG_GETARG_TEXT_PP(1));
-  
+
   semiring = semiring_name ? lookup_semiring(semiring_name) : GB_RNG;
   CHECKD(GxB_Semiring_add(&monoid, semiring));
   CHECKD(GrB_reduce(&val, NULL, monoid, A->V, NULL));
@@ -526,7 +522,7 @@ FN(vector_assign)(PG_FUNCTION_ARGS) {
   mask = PG_ARGISNULL(3)? NULL : PGGRB_GETARG_VECTOR(3);
 
   CHECKD(GrB_Vector_size(&size, A->V));
-  
+
   if (B != NULL)
     indexes = FN(extract_indexes)(B, size);
 

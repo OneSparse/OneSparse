@@ -22,8 +22,8 @@ static const ExpandedObjectMethods FN(matrix_methods) = {
 
 /* Utility function that expands a flattened matrix datum. */
 Datum
-FN(expand_flat_matrix)(Datum matrixdatum,
-                   MemoryContext parentcontext);
+FN(expand_flat_matrix)(pgGrB_FlatMatrix *flat,
+                       MemoryContext parentcontext);
 
 GrB_Index FN(extract_rowscols)(pgGrB_Matrix *A,
                          GrB_Index **rows,
@@ -185,7 +185,7 @@ FN(matrix_flatten_into)(ExpandedObjectHeader *eohptr,
                                   &nvals,
                                   A->M));
 #endif
-  
+
   flat->type = GB_TYPE;
   flat->nrows = nrows;
   flat->ncols = ncols;
@@ -195,12 +195,11 @@ FN(matrix_flatten_into)(ExpandedObjectHeader *eohptr,
 
 /* Expand a flat matrix. */
 Datum
-FN(expand_flat_matrix)(Datum flatdatum,
-                   MemoryContext parentcontext) {
+FN(expand_flat_matrix)(pgGrB_FlatMatrix *flat,
+                       MemoryContext parentcontext) {
   GrB_Info info;
 
   pgGrB_Matrix *A;
-  pgGrB_FlatMatrix *flat;
 
   MemoryContext objcxt, oldcxt;
   MemoryContextCallback *ctxcb;
@@ -234,15 +233,12 @@ FN(expand_flat_matrix)(Datum flatdatum,
   /* Switch to new object context */
   oldcxt = MemoryContextSwitchTo(objcxt);
 
-  /* Copy the flat datum into our context */
-  flat = (pgGrB_FlatMatrix*)flatdatum;
-
   /* Get dimensional information from flat */
   nrows = flat->nrows;
   ncols = flat->ncols;
   nvals = flat->nvals;
   type = flat->type;
-  
+
   /* If there's actual values, build the matrix */
 #ifdef IMPORT_EXPORT
   nonempty = flat->nonempty;
@@ -278,7 +274,7 @@ FN(expand_flat_matrix)(Datum flatdatum,
                           nrows,
                           ncols));
   }
-    
+
 #else
   /* Initialize the new matrix */
   CHECKD(GrB_Matrix_new(&A->M,
@@ -291,7 +287,7 @@ FN(expand_flat_matrix)(Datum flatdatum,
     rows = PGGRB_MATRIX_DATA(flat);
     cols = rows + nrows;
     vals = (PG_TYPE*)(cols + ncols);
-    
+
     CHECKD(GrB_Matrix_build(A->M,
                             rows,
                             cols,
@@ -300,7 +296,7 @@ FN(expand_flat_matrix)(Datum flatdatum,
                             GB_DUP));
   }
 #endif
-  
+
   A->type = type;
   A->flat_size = 0;
   A->flat_value = NULL;
@@ -327,7 +323,7 @@ FN(construct_empty_expanded_matrix)(GrB_Index nrows,
   pgGrB_FlatMatrix  *flat;
   Datum	d;
   flat = construct_empty_flat_matrix(nrows, ncols, GB_TYPE);
-  d = FN(expand_flat_matrix)(PointerGetDatum(flat), parentcontext);
+  d = FN(expand_flat_matrix)(flat, parentcontext);
   pfree(flat);
   return (pgGrB_Matrix *) DatumGetEOHP(d);
 }
@@ -437,28 +433,28 @@ FN(matrix_out)(pgGrB_Matrix *mat)
                                   &nvals,
                                   mat->M));
 
-  result = psprintf("<matrix_%s(%lu,%lu):[", grb_type_to_name(mat->type), nrows, ncols);
+  result = psprintf("<matrix_%s(%lu,%lu)", grb_type_to_name(mat->type), nrows, ncols);
 
-  for (int i = 0; i < nvals; i++) {
-    result = strcat(result, psprintf("%lu", row_indices[i]));
-    if (i != nvals - 1)
-      result = strcat(result, ",");
-  }
-  result = strcat(result, "][");
+  /* for (int i = 0; i < nvals; i++) { */
+  /*   result = strcat(result, psprintf("%lu", row_indices[i])); */
+  /*   if (i != nvals - 1) */
+  /*     result = strcat(result, ","); */
+  /* } */
+  /* result = strcat(result, "]["); */
 
-  for (int i = 0; i < nvals; i++) {
-    result = strcat(result, psprintf("%lu", col_indices[i]));
-    if (i != nvals - 1)
-      result = strcat(result, ",");
-  }
-  result = strcat(result, "][");
+  /* for (int i = 0; i < nvals; i++) { */
+  /*   result = strcat(result, psprintf("%lu", col_indices[i])); */
+  /*   if (i != nvals - 1) */
+  /*     result = strcat(result, ","); */
+  /* } */
+  /* result = strcat(result, "]["); */
 
-  for (int i = 0; i < nvals; i++) {
-    result = strcat(result, psprintf(PRINT_FMT(values[i])));
-    if (i != nvals - 1)
-      result = strcat(result, ",");
-  }
-  result = strcat(result, "]>");
+  /* for (int i = 0; i < nvals; i++) { */
+  /*   result = strcat(result, psprintf(PRINT_FMT(values[i]))); */
+  /*   if (i != nvals - 1) */
+  /*     result = strcat(result, ","); */
+  /* } */
+  /* result = strcat(result, "]>"); */
 
   PG_RETURN_CSTRING(result);
 }

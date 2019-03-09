@@ -16,7 +16,9 @@ LANGUAGE C IMMUTABLE STRICT;
 CREATE TYPE vector (
     input = vector_in,
     output = vector_out,
-    alignment = int4
+    alignment = int4,
+    storage = 'extended',
+    internallength = -1
 );
 
 CREATE TYPE matrix;
@@ -34,32 +36,34 @@ LANGUAGE C IMMUTABLE STRICT;
 CREATE FUNCTION nrows(matrix)
 RETURNS bigint
 AS '$libdir/pggraphblas', 'matrix_nrows'
-LANGUAGE C STABLE STRICT;
+LANGUAGE C STABLE;
 
 CREATE FUNCTION ncols(matrix)
 RETURNS bigint
 AS '$libdir/pggraphblas', 'matrix_ncols'
-LANGUAGE C STABLE STRICT;
+LANGUAGE C STABLE;
 
 CREATE FUNCTION nvals(matrix)
 RETURNS bigint
 AS '$libdir/pggraphblas', 'matrix_nvals'
-LANGUAGE C STABLE STRICT;
+LANGUAGE C STABLE;
 
 CREATE FUNCTION matrix_eq(A matrix, B matrix)
 RETURNS bool
 AS '$libdir/pggraphblas', 'matrix_eq'
-LANGUAGE C STABLE STRICT;
+LANGUAGE C STABLE;
 
 CREATE FUNCTION matrix_ne(A matrix, B matrix)
 RETURNS bool
 AS '$libdir/pggraphblas', 'matrix_ne'
-LANGUAGE C STABLE STRICT;
+LANGUAGE C STABLE;
 
 CREATE TYPE matrix (
     input = matrix_in,
     output = matrix_out,
-    alignment = int4
+    alignment = int4,
+    storage = 'extended',
+    internallength = -1
 );
 
 CREATE FUNCTION matrix(bigint[], bigint[], bool[],
@@ -260,12 +264,12 @@ LANGUAGE C STABLE;
 CREATE FUNCTION matrix_ewise_mult_op(A matrix, B matrix)
 RETURNS matrix
 AS '$libdir/pggraphblas', 'matrix_ewise_mult'
-LANGUAGE C STABLE STRICT;
+LANGUAGE C STABLE;
 
 CREATE FUNCTION matrix_ewise_add_op(A matrix, B matrix)
 RETURNS matrix
 AS '$libdir/pggraphblas', 'matrix_ewise_add'
-LANGUAGE C STABLE STRICT;
+LANGUAGE C STABLE;
 
 -- matrix reduce to vector
 
@@ -430,32 +434,32 @@ CREATE TYPE matrix_element_bool AS (row bigint, col bigint, value bool);
 CREATE FUNCTION matrix_elements_bigint(A matrix)
 RETURNS SETOF matrix_element_bigint
 AS '$libdir/pggraphblas', 'matrix_elements_int64'
-LANGUAGE C STABLE STRICT;
+LANGUAGE C STABLE;
 
 CREATE FUNCTION matrix_elements_integer(A matrix)
 RETURNS SETOF matrix_element_integer
 AS '$libdir/pggraphblas', 'matrix_elements_int32'
-LANGUAGE C STABLE STRICT;
+LANGUAGE C STABLE;
 
 CREATE FUNCTION matrix_elements_smallint(A matrix)
 RETURNS SETOF matrix_element_smallint
 AS '$libdir/pggraphblas', 'matrix_elements_int16'
-LANGUAGE C STABLE STRICT;
+LANGUAGE C STABLE;
 
 CREATE FUNCTION matrix_elements_float(A matrix)
 RETURNS SETOF matrix_element_float
 AS '$libdir/pggraphblas', 'matrix_elements_float8'
-LANGUAGE C STABLE STRICT;
+LANGUAGE C STABLE;
 
 CREATE FUNCTION matrix_elements_real(A matrix)
 RETURNS SETOF matrix_element_real
 AS '$libdir/pggraphblas', 'matrix_elements_float4'
-LANGUAGE C STABLE STRICT;
+LANGUAGE C STABLE;
 
 CREATE FUNCTION matrix_elements_bool(A matrix)
 RETURNS SETOF matrix_element_bool
 AS '$libdir/pggraphblas', 'matrix_elements_bool'
-LANGUAGE C STABLE STRICT;
+LANGUAGE C STABLE;
 
 -- vectors
 
@@ -494,37 +498,37 @@ LANGUAGE C STABLE;
 CREATE FUNCTION vector_ewise_mult_op(A vector, B vector)
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_ewise_mult'
-LANGUAGE C STABLE STRICT;
+LANGUAGE C STABLE;
 
 CREATE FUNCTION vector_ewise_add_op(A vector, B vector)
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_ewise_add'
-LANGUAGE C STABLE STRICT;
+LANGUAGE C STABLE;
 
 CREATE FUNCTION vector_eq(A vector, B vector)
 RETURNS bool
 AS '$libdir/pggraphblas', 'vector_eq'
-LANGUAGE C STABLE STRICT;
+LANGUAGE C STABLE;
 
 CREATE FUNCTION vector_ne(A vector, B vector)
 RETURNS bool
 AS '$libdir/pggraphblas', 'vector_ne'
-LANGUAGE C STABLE STRICT;
+LANGUAGE C STABLE;
 
 CREATE FUNCTION size(A vector)
 RETURNS bigint
 AS '$libdir/pggraphblas', 'vector_size'
-LANGUAGE C STABLE STRICT;
+LANGUAGE C STABLE;
 
 CREATE FUNCTION nvals(A vector)
 RETURNS bigint
 AS '$libdir/pggraphblas', 'vector_nvals'
-LANGUAGE C STABLE STRICT;
+LANGUAGE C STABLE;
 
 CREATE FUNCTION xtract(A vector, B vector)
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_xtract'
-LANGUAGE C STABLE STRICT;
+LANGUAGE C STABLE;
 
 -- vector reduce
 
@@ -689,42 +693,42 @@ CREATE OPERATOR <> (
 CREATE FUNCTION vector(bigint[])
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_int64'
-LANGUAGE C STRICT;
+LANGUAGE C;
 
 CREATE CAST (bigint[] AS vector) WITH FUNCTION vector(bigint[]) AS IMPLICIT;
 
 CREATE FUNCTION vector(integer[])
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_int32'
-LANGUAGE C STRICT;
+LANGUAGE C;
 
 CREATE CAST (integer[] AS vector) WITH FUNCTION vector(integer[]) AS IMPLICIT;
 
 CREATE FUNCTION vector(smallint[])
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_int16'
-LANGUAGE C STRICT;
+LANGUAGE C;
 
 CREATE CAST (smallint[] AS vector) WITH FUNCTION vector(smallint[]) AS IMPLICIT;
 
 CREATE FUNCTION vector(float[])
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_float8'
-LANGUAGE C STRICT;
+LANGUAGE C;
 
 CREATE CAST (float[] AS vector) WITH FUNCTION vector(float[]) AS IMPLICIT;
 
 CREATE FUNCTION vector(real[])
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_float4'
-LANGUAGE C STRICT;
+LANGUAGE C;
 
 CREATE CAST (real[] AS vector) WITH FUNCTION vector(real[]) AS IMPLICIT;
 
 CREATE FUNCTION vector(bool[])
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_bool'
-LANGUAGE C STRICT;
+LANGUAGE C;
 
 CREATE CAST (bool[] AS vector) WITH FUNCTION vector(bool[]) AS IMPLICIT;
 
@@ -733,32 +737,32 @@ CREATE CAST (bool[] AS vector) WITH FUNCTION vector(bool[]) AS IMPLICIT;
 CREATE FUNCTION vector_bigint(size bigint)
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_empty_int64'
-LANGUAGE C STRICT;
+LANGUAGE C;
 
 CREATE FUNCTION vector_integer(size bigint)
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_empty_int32'
-LANGUAGE C STRICT;
+LANGUAGE C;
 
 CREATE FUNCTION vector_smallint(size bigint)
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_empty_int16'
-LANGUAGE C STRICT;
+LANGUAGE C;
 
 CREATE FUNCTION vector_float(size bigint)
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_empty_float8'
-LANGUAGE C STRICT;
+LANGUAGE C;
 
 CREATE FUNCTION vector_real(size bigint)
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_empty_float4'
-LANGUAGE C STRICT;
+LANGUAGE C;
 
 CREATE FUNCTION vector_bool(size bigint)
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_empty_bool'
-LANGUAGE C STRICT;
+LANGUAGE C;
 
 -- sparse construction
 
@@ -804,29 +808,29 @@ CREATE TYPE vector_element_bool AS (index bigint, value bool);
 CREATE FUNCTION vector_elements_bigint(A vector)
 RETURNS SETOF vector_element_bigint
 AS '$libdir/pggraphblas', 'vector_elements_int64'
-LANGUAGE C STABLE STRICT;
+LANGUAGE C STABLE;
 
 CREATE FUNCTION vector_elements_integer(A vector)
 RETURNS SETOF vector_element_integer
 AS '$libdir/pggraphblas', 'vector_elements_int32'
-LANGUAGE C STABLE STRICT;
+LANGUAGE C STABLE;
 
 CREATE FUNCTION vector_elements_smallint(A vector)
 RETURNS SETOF vector_element_smallint
 AS '$libdir/pggraphblas', 'vector_elements_int16'
-LANGUAGE C STABLE STRICT;
+LANGUAGE C STABLE;
 
 CREATE FUNCTION vector_elements_float(A vector)
 RETURNS SETOF vector_element_float
 AS '$libdir/pggraphblas', 'vector_elements_float8'
-LANGUAGE C STABLE STRICT;
+LANGUAGE C STABLE;
 
 CREATE FUNCTION vector_elements_real(A vector)
 RETURNS SETOF vector_element_real
 AS '$libdir/pggraphblas', 'vector_elements_float4'
-LANGUAGE C STABLE STRICT;
+LANGUAGE C STABLE;
 
 CREATE FUNCTION vector_elements_bool(A vector)
 RETURNS SETOF vector_element_bool
 AS '$libdir/pggraphblas', 'vector_elements_bool'
-LANGUAGE C STABLE STRICT;
+LANGUAGE C STABLE;

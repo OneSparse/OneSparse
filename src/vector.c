@@ -147,8 +147,8 @@ DatumGetVector(Datum d) {
     Assert(A->ev_magic == vector_MAGIC);
     return A;
   }
-  flat = (pgGrB_FlatVector*)d;
-  TYPE_APPLY(d, flat->type, expand_flat_vector, d, CurrentMemoryContext);
+  flat = (pgGrB_FlatVector*)PG_DETOAST_DATUM(d);
+  TYPE_APPLY(d, flat->type, expand_flat_vector, flat, CurrentMemoryContext);
   return VectorGetEOHP(d);
 }
 
