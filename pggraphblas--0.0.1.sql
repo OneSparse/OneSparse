@@ -58,11 +58,18 @@ RETURNS bool
 AS '$libdir/pggraphblas', 'matrix_ne'
 LANGUAGE C STABLE;
 
-CREATE FUNCTION matrix_print(
+CREATE FUNCTION print(
     A matrix,
     level integer default 2)
 RETURNS text
 AS '$libdir/pggraphblas', 'matrix_print'
+LANGUAGE C STABLE;
+    
+CREATE FUNCTION print(
+    A vector,
+    level integer default 2)
+RETURNS text
+AS '$libdir/pggraphblas', 'vector_print'
 LANGUAGE C STABLE;
     
 CREATE TYPE matrix (

@@ -362,45 +362,6 @@ FN(vector_elements)(PG_FUNCTION_ARGS) {
 }
 
 Datum
-FN(vector_out)(pgGrB_Vector *vec)
-{
-  GrB_Info info;
-  char *result;
-  GrB_Index size, nvals, i;
-  GrB_Index *row_indices;
-  PG_TYPE *values;
-
-  CHECKD(GrB_Vector_size(&size, vec->V));
-  CHECKD(GrB_Vector_nvals(&nvals, vec->V));
-
-  row_indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * size);
-  values = (PG_TYPE*) palloc0(sizeof(PG_TYPE) * size);
-
-  CHECKD(GrB_Vector_extractTuples(row_indices,
-                                 values,
-                                 &size,
-                                 vec->V));
-
-  result = psprintf("<vector_%s(%lu):[", grb_type_to_name(vec->type), size);
-
-  for (i = 0; i < size; i++) {
-    result = strcat(result, psprintf("%lu", row_indices[i]));
-    if (i != size - 1)
-      result = strcat(result, ",");
-  }
-  result = strcat(result, "][");
-
-  for (i = 0; i < nvals; i++) {
-    result = strcat(result, psprintf(PRINT_FMT(values[i])));
-    if (i != nvals - 1)
-      result = strcat(result, ",");
-  }
-  result = strcat(result, "]>");
-
-  PG_RETURN_CSTRING(result);
-}
-
-Datum
 FN(vector_ewise_mult)(pgGrB_Vector *A,
                       pgGrB_Vector *B,
                       pgGrB_Vector *C,

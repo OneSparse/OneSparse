@@ -135,7 +135,6 @@ DatumGetMatrix(Datum d) {
 
 Datum
 matrix_in(PG_FUNCTION_ARGS) {
-  pgGrB_Matrix *retval;
   pgGrB_FlatMatrix *flat;
   char *input;
   size_t len;

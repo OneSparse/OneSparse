@@ -179,13 +179,36 @@ API.
 ## vector
 
 Vectors can be constructed from arrays by calling `vector(array[])` or
-casting from an array:
+casting from an array.  At the moment, there is no human parsable text
+representation for vectors or matrices, so pggraphblas provides a
+`print` function that can give a text description of vectors or
+matrices:
+
+    postgres=# select print(vector(array[1,2,3]));
+                                     print                                 
+    -----------------------------------------------------------------------
+                                                                          +
+     GraphBLAS vector: A->V                                               +
+     nrows: 3 ncols: 1 max # entries: 3                                   +
+     format: standard CSC vlen: 3 nvec_nonempty: 1 nvec: 1 plen: 1 vdim: 1+
+     hyper_ratio 0.0625                                                   +
+     GraphBLAS type:  int32_t size: 4                                     +
+     number of entries: 3                                                 +
+     column: 0 : 3 entries [0:2]                                          +
+         row 0: int32 1                                                   +
+         row 1: int32 2                                                   +
+         row 2: int32 3                                                   +
+
+    (1 row)
+
+Vectors and matrices can be compared for equality:
 
     postgres=# select vector(array[1,2,3]) = array[1,2,3]::vector;
      t
+    
 
-This constructs a "dense" integer vector, because it's size and it's
-number of values are the same:
+So far these example construct a "dense" integer vector, because it's
+size and it's number of values are the same:
 
     postgres=# select size(vector(array[1,2,3])) = nvals(array[1,2,3]::vector);
     t
@@ -201,13 +224,49 @@ arguments, the first array are the indexes, and must be coercible to
 bigint, and the second array are the values, and can be any supported
 type:
 
-  XXX
+    postgres=# select print(vector(array[1,4,9], array[1,2,3]));
+                                     print                                 
+    -----------------------------------------------------------------------
+                                                                          +
+     GraphBLAS vector: A->V                                               +
+     nrows: 3 ncols: 1 max # entries: 3                                   +
+     format: standard CSC vlen: 3 nvec_nonempty: 1 nvec: 1 plen: 1 vdim: 1+
+     hyper_ratio 0.0625                                                   +
+     GraphBLAS type:  int32_t size: 4                                     +
+     number of entries: 3                                                 +
+     column: 0 : 3 entries [0:2]                                          +
+         row 1: int32 1                                                   +
+         row 4: int32 2                                                   +
+         row 9: int32 3                                                   +
+
+    (1 row)
 
 Both arrays must be the exact same length.  The size of the vector
 will be the maximum element from the first list, but the vector will
 only store the values that are defined.  This is the "sparse" nature
 of the object, it can be efficiently used in matrix math involving
 millions of elements, when only a few actual values are in play.
+
+If you need to create a spare vector whose size is larger than the
+maximum index element, an optional size parameter can be passed to the
+constructor:
+
+    postgres=# select print(vector(array[1,2,3], array[0,1,2], 20));
+                                     print                                  
+    ------------------------------------------------------------------------
+                                                                           +
+     GraphBLAS vector: A->V                                                +
+     nrows: 20 ncols: 1 max # entries: 3                                   +
+     format: standard CSC vlen: 20 nvec_nonempty: 1 nvec: 1 plen: 1 vdim: 1+
+     hyper_ratio 0.0625                                                    +
+     GraphBLAS type:  int32_t size: 4                                      +
+     number of entries: 3                                                  +
+     column: 0 : 3 entries [0:2]                                           +
+         row 0: int32 1                                                    +
+         row 1: int32 2                                                    +
+         row 2: int32 3                                                    +
+
+    (1 row)
 
 Vectors can be added and multiplied in element-wise fashion using
 either operator or functional notation:
@@ -224,10 +283,6 @@ either operator or functional notation:
     postgres=# select ewise_mult(vector(array[1,2,3]) * vector(array[1,2,3])) = vector(array[1,4,9]);
      t
 
-The "functional" form is provided so that other graphblas parameters
-and features can be used during the operation.  For example, a
-different binaryop can be selected for the operation:
-
 XXX
 
 ## matrix
@@ -239,9 +294,9 @@ same types as vectors.
 
 ## mxm
 
-Matrices can be multiplied using a default semiring via the '*'
-operator, or called explicity using functional notation so that
-different semirings can be used to carry out the operation.
+Matrices can be multiplied using a default "plus/times" semiring via
+the '*' operator, or called explicity using functional notation so
+that different semirings can be used to carry out the operation.
 Functional notation also allows passing other graphblas options like a
 masking matrix, an accumulator operation, and a graphblas descriptor
 object which can specify replacement and transposition rules for

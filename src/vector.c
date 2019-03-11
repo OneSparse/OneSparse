@@ -155,20 +155,34 @@ DatumGetVector(Datum d) {
 Datum
 vector_in(PG_FUNCTION_ARGS)
 {
-  pgGrB_Vector *retval;
+  pgGrB_FlatVector *flat;
+  char *input;
+  size_t len;
+  int bc;
+  Datum d;
 
-  retval = construct_empty_expanded_vector_int64(0, CurrentMemoryContext);
-
-  PGGRB_RETURN_VECTOR(retval);
+  input = PG_GETARG_CSTRING(0);
+  len = strlen(input);
+  bc = (len) / 2 + VARHDRSZ;
+  flat = palloc(bc);
+  hex_decode(input, len, (char*)flat);
+  TYPE_APPLY(d, flat->type, expand_flat_vector, flat, CurrentMemoryContext);
+  return d;
 }
 
 Datum
 vector_out(PG_FUNCTION_ARGS)
 {
-  Datum d;
+  Size size;
+  char *rp, *result, *buf;
   pgGrB_Vector *A = PGGRB_GETARG_VECTOR(0);
-  TYPE_APPLY(d, A->type, vector_out, A);
-  return d;
+  size = EOH_get_flat_size(&A->hdr);
+  buf = palloc(size);
+  EOH_flatten_into(&A->hdr, buf, size);
+  rp = result = palloc((size * 2) + 1);
+  rp += hex_encode(buf, size, rp);
+  *rp = '\0';
+  PG_RETURN_CSTRING(result);
 }
 
 Datum
@@ -292,4 +306,25 @@ vector_xtract(PG_FUNCTION_ARGS) {
 
   CHECKD(GrB_Vector_extract(C->V, NULL, NULL, A->V, indexes, size, NULL));
   PGGRB_RETURN_VECTOR(C);
+}
+
+Datum
+vector_print(PG_FUNCTION_ARGS) {
+  pgGrB_Vector *A;
+  char *result, *buf;
+  size_t size;
+  FILE *fp;
+  int level;
+  A = PGGRB_GETARG_VECTOR(0);
+  level = PG_GETARG_INT32(1);
+  
+  fp = open_memstream(&buf, &size);
+  if (fp == NULL)
+    elog(ERROR, "unable to open memstream for vector_print");
+  GxB_fprint(A->V, level, fp);
+  fflush(fp);
+  result = palloc(size + 1);
+  memcpy(result, buf, size+1);
+  free(buf);
+  PG_RETURN_TEXT_P(cstring_to_text_with_len(result, size+1));
 }
