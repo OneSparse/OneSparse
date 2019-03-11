@@ -26,9 +26,9 @@ FN(expand_flat_matrix)(pgGrB_FlatMatrix *flat,
                        MemoryContext parentcontext);
 
 GrB_Index FN(extract_rowscols)(pgGrB_Matrix *A,
-                         GrB_Index **rows,
-                         GrB_Index **cols,
-                         GrB_Index nvals);
+                               GrB_Index **rows,
+                               GrB_Index **cols,
+                               GrB_Index nvals);
 
 pgGrB_Matrix *
 FN(construct_empty_expanded_matrix)(GrB_Index nrows,
@@ -59,12 +59,12 @@ FN(mxm)(pgGrB_Matrix *A,
 
 Datum
 FN(matrix_kron)(pgGrB_Matrix *A,
-        pgGrB_Matrix *B,
-        pgGrB_Matrix *C,
-        pgGrB_Matrix *mask,
-        GrB_BinaryOp accum,
-        GrB_BinaryOp mulop,
-        GrB_Descriptor desc);
+                pgGrB_Matrix *B,
+                pgGrB_Matrix *C,
+                pgGrB_Matrix *mask,
+                GrB_BinaryOp accum,
+                GrB_BinaryOp mulop,
+                GrB_Descriptor desc);
 
 Datum
 FN(mxv)(pgGrB_Matrix *A,
@@ -90,6 +90,7 @@ PG_FUNCTION_INFO_V1(FN(matrix_empty));
 PG_FUNCTION_INFO_V1(FN(matrix_elements));
 PG_FUNCTION_INFO_V1(FN(matrix_reduce));
 PG_FUNCTION_INFO_V1(FN(matrix_assign));
+PG_FUNCTION_INFO_V1(FN(matrix_random));
 
 /* Compute size of storage needed for matrix */
 static Size
@@ -126,7 +127,7 @@ FN(matrix_get_flat_size)(ExpandedObjectHeader *eohptr) {
 /* Flatten matrix into allocated result buffer  */
 static void
 FN(matrix_flatten_into)(ExpandedObjectHeader *eohptr,
-                void *result, Size allocated_size)  {
+                        void *result, Size allocated_size)  {
   GrB_Info info;
   GrB_Index *rows, nrows, ncols, nvals;
   pgGrB_Matrix *A = (pgGrB_Matrix *) eohptr;
@@ -156,9 +157,15 @@ FN(matrix_flatten_into)(ExpandedObjectHeader *eohptr,
                                NULL));
 
   if (nvals > 0) {
-    memcpy(PGGRB_MATRIX_DATA(flat), rows, (nrows+1)*sizeof(GrB_Index));
-    memcpy((PGGRB_MATRIX_DATA(flat) + nrows+1), cols, nvals*sizeof(GrB_Index));
-    memcpy((PGGRB_MATRIX_DATA(flat) + nrows+1 + nvals), values, nvals*sizeof(PG_TYPE));
+    memcpy(PGGRB_MATRIX_DATA(flat),
+           rows,
+           (nrows+1)*sizeof(GrB_Index));
+    memcpy((PGGRB_MATRIX_DATA(flat) + nrows+1),
+           cols,
+           nvals*sizeof(GrB_Index));
+    memcpy((PGGRB_MATRIX_DATA(flat) + nrows+1 + nvals),
+           values,
+           nvals*sizeof(PG_TYPE));
     pfree(rows);
     pfree(cols);
     pfree(values);
@@ -204,15 +211,13 @@ FN(expand_flat_matrix)(pgGrB_FlatMatrix *flat,
 #endif
 
   /* Create a new context that will hold the expanded object. */
-  objcxt = AllocSetContextCreate(
-          parentcontext,
-          "expanded matrix",
-          ALLOCSET_DEFAULT_SIZES);
+  objcxt = AllocSetContextCreate(parentcontext,
+                                 "expanded matrix",
+                                 ALLOCSET_DEFAULT_SIZES);
 
   /* Allocate a new expanded matrix */
-  A = (pgGrB_Matrix*)MemoryContextAlloc(
-          objcxt,
-          sizeof(pgGrB_Matrix));
+  A = (pgGrB_Matrix*)MemoryContextAlloc(objcxt,
+                                        sizeof(pgGrB_Matrix));
 
   /* Initialize the ExpandedObjectHeader member with flattening
    * methods and new object context */
@@ -238,9 +243,15 @@ FN(expand_flat_matrix)(pgGrB_FlatMatrix *flat,
     rows = malloc_function((nrows+1)*sizeof(GrB_Index));
     cols = malloc_function(nvals*sizeof(GrB_Index));
     vals = malloc_function(nvals*sizeof(PG_TYPE));
-    memcpy(rows, PGGRB_MATRIX_DATA(flat), (nrows+1)*sizeof(GrB_Index));
-    memcpy(cols, PGGRB_MATRIX_DATA(flat) + nrows+1, nvals*sizeof(GrB_Index));
-    memcpy(vals, PGGRB_MATRIX_DATA(flat) + nrows+1 + nvals, nvals*sizeof(PG_TYPE));
+    memcpy(rows,
+           PGGRB_MATRIX_DATA(flat),
+           (nrows+1)*sizeof(GrB_Index));
+    memcpy(cols,
+           PGGRB_MATRIX_DATA(flat) + nrows+1,
+           nvals*sizeof(GrB_Index));
+    memcpy(vals,
+           PGGRB_MATRIX_DATA(flat) + nrows+1 + nvals,
+           nvals*sizeof(PG_TYPE));
 
     CHECKD(GxB_Matrix_import_CSR(&A->M,
                                  type,
@@ -252,7 +263,7 @@ FN(expand_flat_matrix)(pgGrB_FlatMatrix *flat,
                                  &cols,
                                  &vals,
                                  NULL
-                                   ));
+                                 ));
     if (A->M == NULL) {
       pfree(rows);
       pfree(cols);
@@ -292,9 +303,8 @@ FN(expand_flat_matrix)(pgGrB_FlatMatrix *flat,
   A->flat_size = 0;
 
   /* Create a context callback to free matrix when context is cleared */
-  ctxcb = (MemoryContextCallback*)MemoryContextAlloc(
-          objcxt,
-          sizeof(MemoryContextCallback));
+  ctxcb = MemoryContextAlloc(objcxt,
+                             sizeof(MemoryContextCallback));
 
   ctxcb->func = context_callback_matrix_free;
   ctxcb->arg = A;
@@ -351,7 +361,7 @@ FN(matrix_elements)(PG_FUNCTION_ARGS) {
 
     funcctx = SRF_FIRSTCALL_INIT();
     oldcontext = MemoryContextSwitchTo(funcctx->multi_call_memory_ctx);
-    mat = (pgGrB_Matrix *) PGGRB_GETARG_MATRIX(0);
+    mat = PGGRB_GETARG_MATRIX(0);
 
     state = (FN(pgGrB_Matrix_ExtractState)*)palloc(sizeof(FN(pgGrB_Matrix_ExtractState)));
     CHECKD(GrB_Matrix_nvals(&nvals, mat->M));
@@ -736,6 +746,56 @@ FN(matrix_kron)(pgGrB_Matrix *A,
   PGGRB_RETURN_MATRIX(C);
 }
 
+Datum
+FN(matrix_random)(PG_FUNCTION_ARGS) {
+  GrB_Info info;
+  pgGrB_Matrix *A;
+  GrB_Index nrows, ncols, nvals;
+  bool make_pattern, make_symmetric, make_skew_symmetric, make_hermitian, no_diagonal;
+  uint64_t seed;
+  MemoryContext objcxt, oldcontext;
+  
+  nrows = PG_GETARG_INT64(0);
+  ncols = PG_GETARG_INT64(1);
+  nvals = PG_GETARG_INT64(2);
+  make_pattern = PG_GETARG_BOOL(3);
+  make_symmetric = PG_GETARG_BOOL(4);
+  make_skew_symmetric = PG_GETARG_BOOL(5);
+  make_hermitian = PG_GETARG_BOOL(6);
+  no_diagonal = PG_GETARG_BOOL(7);
+  /* Create a new context that will hold the expanded object. */
+  objcxt = AllocSetContextCreate(CurrentMemoryContext,
+                                 "expanded matrix",
+                                 ALLOCSET_DEFAULT_SIZES);
+
+  /* Allocate a new expanded matrix */
+  A = (pgGrB_Matrix*)MemoryContextAlloc(objcxt,
+                                        sizeof(pgGrB_Matrix));
+
+  /* Initialize the ExpandedObjectHeader member with flattening
+   * methods and new object context */
+  EOH_init_header(&A->hdr, &FN(matrix_methods), objcxt);
+
+  /* Used for debugging checks */
+  A->em_magic = matrix_MAGIC;
+
+  oldcontext = MemoryContextSwitchTo(objcxt);
+  
+  CHECKD(LAGraph_random(&A->M,
+                        GB_TYPE,
+                        nrows,
+                        ncols,
+                        nvals,
+                        make_pattern,
+                        make_symmetric,
+                        make_skew_symmetric,
+                        make_hermitian,
+                        no_diagonal,
+                        &seed));
+
+  MemoryContextSwitchTo(oldcontext);
+  PGGRB_RETURN_MATRIX(A);
+}
 
 #undef SUFFIX
 #undef PG_TYPE

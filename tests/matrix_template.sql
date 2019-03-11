@@ -227,7 +227,6 @@ select is(
        matrix(array[0], array[0], cast(array[:VAL] AS :TYPE [])),
        'matrix assign scalar ' || :'TYPE');
 
-       
 create table foo_:TYPE (m matrix);
 insert into foo_:TYPE (m) values (matrix(array[:ROWS], array[:COLS], cast(array[:VALS] AS :TYPE [])));
 

@@ -14,8 +14,8 @@ WORKDIR "/home/postgres"
 # get GraphBLAS, compile with debug symbols    
 RUN curl -s -L http://faculty.cse.tamu.edu/davis/GraphBLAS/GraphBLAS-2.3.0.tar.gz | \
     tar zxvf - && cd GraphBLAS && \
-    sed -i 's/^\/\/ #undef NDEBUG/#undef NDEBUG/g' Source/GB.h && \
-    sed -i 's/^\/\/ #define GB_PRINT_MALLOC 1/#define GB_PRINT_MALLOC 1/g' Source/GB.h && \
+#    sed -i 's/^\/\/ #undef NDEBUG/#undef NDEBUG/g' Source/GB.h && \
+#    sed -i 's/^\/\/ #define GB_PRINT_MALLOC 1/#define GB_PRINT_MALLOC 1/g' Source/GB.h && \
     make library \
     CMAKE_OPTIONS='-DCMAKE_BUILD_TYPE=Debug' \
     && make install
@@ -26,10 +26,11 @@ RUN git clone https://github.com/GraphBLAS/LAGraph.git && \
 # get postgres source and compile with debug and no optimization
 RUN git clone --branch REL_11_STABLE https://github.com/postgres/postgres.git --depth=1 && \
     cd postgres && ./configure \
-    CFLAGS="-ggdb -Og -g3 -fno-omit-frame-pointer" \
-#    CFLAGS="-Og -g3" \
-    --enable-depend --enable-cassert --enable-debug --enable-profiling \
     --prefix=/usr/ \
+#    --enable-depend --enable-cassert --enable-debug --enable-profiling \
+#    CFLAGS="-ggdb -Og -g3 -fno-omit-frame-pointer" \
+#    CFLAGS="-Og -g3" \
+    CFLAGS="-O3" \
     && make -j 4 && make install
 
 RUN curl -s -L https://github.com/theory/pgtap/archive/v0.99.0.tar.gz | tar zxvf - && \   

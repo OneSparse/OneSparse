@@ -102,8 +102,8 @@ context_callback_matrix_free(void* m) {
 /* Construct an empty flat matrix. */
 pgGrB_FlatMatrix *
 construct_empty_flat_matrix(GrB_Index nrows,
-                       GrB_Index ncols,
-                       GrB_Type type) {
+                            GrB_Index ncols,
+                            GrB_Type type) {
   pgGrB_FlatMatrix *result;
 
   result = (pgGrB_FlatMatrix *) palloc0(sizeof(pgGrB_FlatMatrix));
@@ -138,8 +138,8 @@ matrix_in(PG_FUNCTION_ARGS) {
   pgGrB_Matrix *retval;
 
   retval = construct_empty_expanded_matrix_int64(0,
-                                           0,
-                                           CurrentMemoryContext);
+                                                 0,
+                                                 CurrentMemoryContext);
   PGGRB_RETURN_MATRIX(retval);
 }
 
@@ -247,13 +247,12 @@ matrix_ewise_add(PG_FUNCTION_ARGS) {
 
   binop_name = matrix_plus_binop(A, B);
 
-  if (PG_NARGS() > 2)
+  if (PG_NARGS() > 2) {
     C = PG_ARGISNULL(2) ? NULL : PGGRB_GETARG_MATRIX(2);
-  if (PG_NARGS() > 3)
     mask = PG_ARGISNULL(3) ? NULL : PGGRB_GETARG_MATRIX(3);
-  if (PG_NARGS() > 4)
     binop_name = PG_ARGISNULL(4) ?
       binop_name : text_to_cstring(PG_GETARG_TEXT_PP(4));
+  }
 
   binop = lookup_binop(binop_name);
   if (binop == NULL)
@@ -492,8 +491,6 @@ matrix_assign_matrix(PG_FUNCTION_ARGS) {
   PGGRB_RETURN_MATRIX(A);
 }
 
-
-
 Datum
 matrix_kron(PG_FUNCTION_ARGS) {
   pgGrB_Matrix *A, *B, *C = NULL, *mask = NULL;
@@ -540,3 +537,4 @@ matrix_kron(PG_FUNCTION_ARGS) {
   TYPE_APPLY(d, type, matrix_kron, A, B, C, mask, accum, mulop, desc);
   return d;
 }
+

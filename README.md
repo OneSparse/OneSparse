@@ -135,7 +135,8 @@ search](https://en.wikipedia.org/wiki/Breadth-first_search).
 If you have docker installed, run `./test.sh psql` to build a docker
 container with postgres:11 and GraphBLAS compiled with debug symbols
 on.  This will eventually drop you into a psql interpreter.  You can
-run the tests from that point with `\i /tests/test.sql`
+run the tests from that point with `\i /tests/test.sql` There are many
+tests, in general one for each integrated feature.
 
 # types
 
@@ -196,7 +197,7 @@ currently supported types are signed but unsigned may be supported in
 the future.
 
 Sparse vectors can be constructed by calling vector with two array
-arguments , the first array are the indexes, and must be coercible to
+arguments, the first array are the indexes, and must be coercible to
 bigint, and the second array are the values, and can be any supported
 type:
 
@@ -261,7 +262,7 @@ Elementwise matrix addition.
 ## ewise mul
 
 Elementwise matrix multiplication.
-    
+
 ## xtract
 
 Extracting subgraphs.
