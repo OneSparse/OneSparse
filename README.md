@@ -73,13 +73,12 @@ matrix being utilized.
 
 By using a sparse matrix instead of dense, only the elements used are
 actually stored in the matrix. The parts of the matrix with no value
-are stored and interpreted as an "algebraic zero" value, which might
-not be the actual number zero, but other values like positive or
-negative infinity depending on the particular semiring operations
-applied to the matrix.  The math used with sparse matrices is exactly
-the same as dense, the sparsity of the data doesn't matter to the
-math, but it does matter to how efficiently the matrix is implemented
-internally.
+are interpreted as an "algebraic zero" value, which might not be the
+actual number zero, but other values like positive or negative
+infinity depending on the particular semiring operations applied to
+the matrix.  The math used with sparse matrices is exactly the same as
+dense, the sparsity of the data doesn't matter to the math, but it
+does matter to how efficiently the matrix is implemented internally.
 
 pggraphblas is a postgres extension that provides access to two new
 types: `matrix` and `vector`, as well as the GraphBLAS api to
@@ -332,13 +331,11 @@ Applying functions to graphs.
 
 ## select
 
-Selecting
-
 Selecting elements of a matrix.
 
 ## reduce
 
-Matrix, vector, and scalar reduction.
+Matrix and vector reduction.
 
 ## transpose
 
