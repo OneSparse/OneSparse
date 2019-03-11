@@ -136,21 +136,34 @@ DatumGetMatrix(Datum d) {
 Datum
 matrix_in(PG_FUNCTION_ARGS) {
   pgGrB_Matrix *retval;
+  pgGrB_FlatMatrix *flat;
+  char *input;
+  size_t len;
+  int bc;
+  Datum d;
 
-  retval = construct_empty_expanded_matrix_int64(0,
-                                                 0,
-                                                 CurrentMemoryContext);
-  PGGRB_RETURN_MATRIX(retval);
+  input = PG_GETARG_CSTRING(0);
+  len = strlen(input);
+  bc = (len) / 2 + VARHDRSZ;
+  flat = palloc(bc);
+  hex_decode(input, len, (char*)flat);
+  TYPE_APPLY(d, flat->type, expand_flat_matrix, flat, CurrentMemoryContext);
+  return d;
 }
 
 Datum
 matrix_out(PG_FUNCTION_ARGS)
 {
-  Datum d;
+  Size size;
+  char *rp, *result, *buf;
   pgGrB_Matrix *A = PGGRB_GETARG_MATRIX(0);
-
-  TYPE_APPLY(d, A->type, matrix_out, A);
-  return d;
+  size = EOH_get_flat_size(&A->hdr);
+  buf = palloc(size);
+  EOH_flatten_into(&A->hdr, buf, size);
+  rp = result = palloc((size * 2) + 1);
+  rp += hex_encode(buf, size, rp);
+  *rp = '\0';
+  PG_RETURN_CSTRING(result);
 }
 
 Datum
@@ -538,3 +551,23 @@ matrix_kron(PG_FUNCTION_ARGS) {
   return d;
 }
 
+Datum
+matrix_print(PG_FUNCTION_ARGS) {
+  pgGrB_Matrix *A;
+  char *result, *buf;
+  size_t size;
+  FILE *fp;
+  int level;
+  A = PGGRB_GETARG_MATRIX(0);
+  level = PG_GETARG_INT32(1);
+  
+  fp = open_memstream(&buf, &size);
+  if (fp == NULL)
+    elog(ERROR, "unable to open memstream for matrix_print");
+  GxB_fprint(A->M, level, fp);
+  fflush(fp);
+  result = palloc(size + 1);
+  memcpy(result, buf, size+1);
+  free(buf);
+  PG_RETURN_TEXT_P(cstring_to_text_with_len(result, size+1));
+}

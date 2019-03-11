@@ -27,10 +27,9 @@ RUN git clone https://github.com/GraphBLAS/LAGraph.git && \
 RUN git clone --branch REL_11_STABLE https://github.com/postgres/postgres.git --depth=1 && \
     cd postgres && ./configure \
     --prefix=/usr/ \
-#    --enable-depend --enable-cassert --enable-debug --enable-profiling \
-#    CFLAGS="-ggdb -Og -g3 -fno-omit-frame-pointer" \
-#    CFLAGS="-Og -g3" \
-    CFLAGS="-O3" \
+    --enable-depend --enable-cassert --enable-debug --enable-profiling \
+    CFLAGS="-ggdb -Og -g3 -fno-omit-frame-pointer" \
+#    CFLAGS="-O3" \
     && make -j 4 && make install
 
 RUN curl -s -L https://github.com/theory/pgtap/archive/v0.99.0.tar.gz | tar zxvf - && \   

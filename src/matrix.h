@@ -35,7 +35,6 @@ FN(construct_empty_expanded_matrix)(GrB_Index nrows,
                                     GrB_Index ncols,
                                     MemoryContext parentcontext);
 
-Datum FN(matrix_out)(pgGrB_Matrix *mat);
 Datum FN(matrix_ewise_mult)(pgGrB_Matrix *A,
                             pgGrB_Matrix *B,
                             pgGrB_Matrix *C,
@@ -406,57 +405,6 @@ FN(matrix_elements)(PG_FUNCTION_ARGS) {
   } else {
     SRF_RETURN_DONE(funcctx);
   }
-}
-
-Datum
-FN(matrix_out)(pgGrB_Matrix *mat)
-{
-
-  GrB_Info info;
-  char *result;
-  GrB_Index nrows, ncols, nvals;
-
-  GrB_Index *row_indices, *col_indices;
-  PG_TYPE *values;
-
-  CHECKD(GrB_Matrix_nvals(&nvals, mat->M));
-  CHECKD(GrB_Matrix_nrows(&nrows, mat->M));
-  CHECKD(GrB_Matrix_ncols(&ncols, mat->M));
-
-  row_indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * nvals);
-  col_indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * nvals);
-  values = (PG_TYPE*) palloc0(sizeof(PG_TYPE) * nvals);
-
-  CHECKD(GrB_Matrix_extractTuples(row_indices,
-                                  col_indices,
-                                  values,
-                                  &nvals,
-                                  mat->M));
-
-  result = psprintf("<matrix_%s(%lu,%lu)", grb_type_to_name(mat->type), nrows, ncols);
-
-  /* for (int i = 0; i < nvals; i++) { */
-  /*   result = strcat(result, psprintf("%lu", row_indices[i])); */
-  /*   if (i != nvals - 1) */
-  /*     result = strcat(result, ","); */
-  /* } */
-  /* result = strcat(result, "]["); */
-
-  /* for (int i = 0; i < nvals; i++) { */
-  /*   result = strcat(result, psprintf("%lu", col_indices[i])); */
-  /*   if (i != nvals - 1) */
-  /*     result = strcat(result, ","); */
-  /* } */
-  /* result = strcat(result, "]["); */
-
-  /* for (int i = 0; i < nvals; i++) { */
-  /*   result = strcat(result, psprintf(PRINT_FMT(values[i]))); */
-  /*   if (i != nvals - 1) */
-  /*     result = strcat(result, ","); */
-  /* } */
-  /* result = strcat(result, "]>"); */
-
-  PG_RETURN_CSTRING(result);
 }
 
 Datum
