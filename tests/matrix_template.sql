@@ -227,6 +227,12 @@ select is(
        matrix(array[0], array[0], cast(array[:VAL] AS :TYPE [])),
        'matrix assign scalar ' || :'TYPE');
 
+select is(
+       nvals(matrix_random_:TYPE(10,10,10)),
+       10::bigint,
+       'matrix random ' || :'TYPE');
+    
+
 create table foo_:TYPE (m matrix);
 insert into foo_:TYPE (m) values (matrix(array[:ROWS], array[:COLS], cast(array[:VALS] AS :TYPE [])));
 
