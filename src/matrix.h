@@ -726,6 +726,7 @@ FN(matrix_random)(PG_FUNCTION_ARGS) {
 
   /* Used for debugging checks */
   A->em_magic = matrix_MAGIC;
+  A->flat_size = 0;
 
   oldcontext = MemoryContextSwitchTo(objcxt);
   
