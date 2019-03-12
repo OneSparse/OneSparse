@@ -243,20 +243,24 @@ FN(vector)(PG_FUNCTION_ARGS) {
   Datum	value;
   bool isnull;
 
-  vals = PG_GETARG_ARRAYTYPE_P(0);
-  if (ARR_HASNULL(vals))
-    ereport(ERROR, (errmsg("Value array may not contain NULLs")));
-
-  vdims = ARR_DIMS(vals);
-
-  if (PG_NARGS() > 1) {
-    indexes = PG_GETARG_ARRAYTYPE_P(1);
+  if (PG_NARGS() == 1) {
+    indexes = NULL;
+    vals = PG_GETARG_ARRAYTYPE_P(0);
+    if (ARR_HASNULL(vals))
+      ereport(ERROR, (errmsg("Value array may not contain NULLs")));
+    vdims = ARR_DIMS(vals);
+  } else {
+    indexes = PG_GETARG_ARRAYTYPE_P(0);
+    vals = PG_GETARG_ARRAYTYPE_P(1);
+    if (ARR_HASNULL(vals) || ARR_HASNULL(indexes))
+      ereport(ERROR, (errmsg("Neither value or indexc arrays may not contain NULLs")));
+    
     idims = ARR_DIMS(indexes);
+    vdims = ARR_DIMS(vals);
+    
     if (idims[0] != vdims[0])
       ereport(ERROR, (errmsg("Index and Value arrays must be same size.")));
   }
-  else
-    indexes = NULL;
 
   size = vcount = vdims[0];
 

@@ -877,27 +877,27 @@ RETURNS vector
 AS '$libdir/pggraphblas', 'vector_int64'
 LANGUAGE C;
 
-CREATE FUNCTION vector(integer[], bigint[], bigint default null)
+CREATE FUNCTION vector(bigint[], integer[], bigint default null)
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_int32'
 LANGUAGE C;
 
-CREATE FUNCTION vector(smallint[], bigint[], bigint default null)
+CREATE FUNCTION vector(bigint[], smallint[], bigint default null)
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_int16'
 LANGUAGE C;
 
-CREATE FUNCTION vector(float[], bigint[], bigint default null)
+CREATE FUNCTION vector(bigint[], float[], bigint default null)
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_float8'
 LANGUAGE C;
 
-CREATE FUNCTION vector(real[], bigint[], bigint default null)
+CREATE FUNCTION vector(bigint[], real[], bigint default null)
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_float4'
 LANGUAGE C;
 
-CREATE FUNCTION vector(bool[], bigint[], bigint default null)
+CREATE FUNCTION vector(bigint[], bool[], bigint default null)
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_bool'
 LANGUAGE C;

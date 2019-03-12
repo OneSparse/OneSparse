@@ -68,55 +68,55 @@ select is(
 -- sparse construction, second array defines indices
 
 select is(
-    size(vector(cast(array[:VALS] as :TYPE []), array[:IDXS])),
+    size(vector(array[:IDXS], cast(array[:VALS] as :TYPE []))),
     10::bigint,
     'sparse size ' || :'TYPE');
 
 select is(
-    size(vector(cast(array[:VALS] as :TYPE []), array[:IDXS], 20)),
+    size(vector(array[:IDXS], cast(array[:VALS] as :TYPE []), 20)),
     20::bigint,
     'sparse explicit size ' || :'TYPE');
 
 select is(
-    nvals(vector(cast(array[:VALS] as :TYPE []), array[:IDXS])),
+    nvals(vector(array[:IDXS], cast(array[:VALS] as :TYPE []))),
     3::bigint,
     'sparse nvals ' || :'TYPE');
 
 select is(
-    vector(cast(array[:VALS] as :TYPE []), array[:IDXS]) +
-    vector(cast(array[:VALS] as :TYPE []), array[:IDXS]),
-    vector(cast(array[:EAX] as :TYPE []), array[:IDXS]),
+    vector(array[:IDXS], cast(array[:VALS] as :TYPE [])) +
+    vector(array[:IDXS], cast(array[:VALS] as :TYPE [])),
+    vector(array[:IDXS], cast(array[:EAX] as :TYPE [])),
     'sparse vector add ' || :'TYPE');
 
 select is(
-    ewise_add(vector(cast(array[:VALS] as :TYPE []), array[:IDXS]),
-    vector(cast(array[:VALS] as :TYPE []), array[:IDXS]),
-    mask=>vector(array[:MASK], array[:IDXS])),
-    vector(cast(array[:M_EAX] as :TYPE []), array[:M_IDXS]),
+    ewise_add(vector(array[:IDXS], cast(array[:VALS] as :TYPE [])),
+    vector(array[:IDXS], cast(array[:VALS] as :TYPE [])),
+    mask=>vector(array[:IDXS], array[:MASK])),
+    vector(array[:M_IDXS], cast(array[:M_EAX] as :TYPE [])),
     'sparse vector add masked ' || :'TYPE');
 
 select is(
-    vector(cast(array[:VALS] as :TYPE []), array[:IDXS]) *
-    vector(cast(array[:VALS] as :TYPE []), array[:IDXS]),
-    vector(cast(array[:EMX] as :TYPE []), array[:IDXS]),
+    vector(array[:IDXS], cast(array[:VALS] as :TYPE [])) *
+    vector(array[:IDXS], cast(array[:VALS] as :TYPE [])),
+    vector(array[:IDXS], cast(array[:EMX] as :TYPE [])),
     'sparse vector mult ' || :'TYPE');
 
 select is(
-    ewise_mult(vector(cast(array[:VALS] as :TYPE []), array[:IDXS]),
-    vector(cast(array[:VALS] as :TYPE []), array[:IDXS]),
-    mask=>vector(array[:MASK], array[:IDXS])),
-    vector(cast(array[:M_EMX] as :TYPE []), array[:M_IDXS]),
+    ewise_mult(vector(array[:IDXS], cast(array[:VALS] as :TYPE [])),
+    vector(array[:IDXS], cast(array[:VALS] as :TYPE [])),
+    mask=>vector(array[:IDXS], array[:MASK])),
+    vector(array[:M_IDXS], cast(array[:M_EMX] as :TYPE [])),
     'sparse vector mult masked ' || :'TYPE');
 
 select is(
-    vector(cast(array[:VALS] as :TYPE []), array[:IDXS]) =
-    vector(cast(array[:VALS] as :TYPE []), array[:IDXS]),
+    vector(array[:IDXS], cast(array[:VALS] as :TYPE [])) =
+    vector(array[:IDXS], cast(array[:VALS] as :TYPE [])),
     true,
     'sparse vector eq ' || :'TYPE');
 
 select is(
-    vector(cast(array[:VALS] as :TYPE []), array[:IDXS]) <>
-    vector(cast(array[:VALS] as :TYPE []), array[:IDXS]),
+    vector(array[:IDXS], cast(array[:VALS] as :TYPE [])) <>
+    vector(array[:IDXS], cast(array[:VALS] as :TYPE [])),
     false,
     'sparse vector neq ' || :'TYPE');
 
