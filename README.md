@@ -321,7 +321,91 @@ true for matrices as shown below.
 Matrices can be constructed with `matrix(bigint[], bigint[], array[])`
 where the first array are the row indexes, the second array the column
 indexes, and the third array the values.  Matrices support all the
-same types as vectors.
+same types as vectors.  A useful way to construct matrices is with
+array aggregate functions to build them from tables, for example:
+
+    postgres=# create table test (
+        i integer,
+        j integer
+        );
+    CREATE TABLE
+    
+    postgres=# insert into test (i, j) values
+        (1, 4),
+        (1, 2),
+        (2, 7),
+        (2, 5),
+        (3, 6),
+        (4, 3),
+        (4, 1),
+        (5, 6),
+        (6, 3),
+        (7, 3);
+    INSERT 0 10
+
+    postgres=# select print(matrix(array_agg(i), array_agg(j), array_agg(true))) from test;
+                                       print                                   
+    ---------------------------------------------------------------------------
+                                                                              +
+     GraphBLAS matrix: A->M                                                   +
+     nrows: 10 ncols: 10 max # entries: 10                                    +
+     format: standard CSR vlen: 10 nvec_nonempty: 7 nvec: 10 plen: 10 vdim: 10+
+     hyper_ratio 0.0625                                                       +
+     GraphBLAS type:  bool size: 1                                            +
+     number of entries: 10                                                    +
+     row: 1 : 2 entries [0:1]                                                 +
+         column 2: bool 1                                                     +
+         column 4: bool 1                                                     +
+     row: 2 : 2 entries [2:3]                                                 +
+         column 5: bool 1                                                     +
+         column 7: bool 1                                                     +
+     row: 3 : 1 entries [4:4]                                                 +
+         column 6: bool 1                                                     +
+     row: 4 : 2 entries [5:6]                                                 +
+         column 1: bool 1                                                     +
+         column 3: bool 1                                                     +
+     row: 5 : 1 entries [7:7]                                                 +
+         column 6: bool 1                                                     +
+     row: 6 : 1 entries [8:8]                                                 +
+         column 3: bool 1                                                     +
+     row: 7 : 1 entries [9:9]                                                 +
+         column 3: bool 1                                                     +
+
+    (1 row)
+
+Matrices can also be turned back into relational tuples using
+`matrix_elements_<type>`:
+
+    postgres=# select * from matrix_elements_bool((select matrix(array_agg(i), array_agg(j), array_agg(true)) from test));
+     row | col | value 
+    -----+-----+-------
+       1 |   2 | t
+       1 |   4 | t
+       2 |   5 | t
+       2 |   7 | t
+       3 |   6 | t
+       4 |   1 | t
+       4 |   3 | t
+       5 |   6 | t
+       6 |   3 | t
+       7 |   3 | t
+    (10 rows)
+
+Empty matrices can be constructed with bigint arguments:
+
+    postgres=# select print(matrix_integer(10, 10));
+                                       print                                    
+    ----------------------------------------------------------------------------
+                                                                               +
+     GraphBLAS matrix: A->M                                                    +
+     nrows: 10 ncols: 10 max # entries: 0                                      +
+     format: hypersparse CSR vlen: 10 nvec_nonempty: 0 nvec: 0 plen: 1 vdim: 10+
+     hyper_ratio 0.0625                                                        +
+     GraphBLAS type:  int32_t size: 4                                          +
+     empty                                                                     +
+     number of entries: 0                                                      +
+
+    (1 row)    
 
 ## mxm
 
