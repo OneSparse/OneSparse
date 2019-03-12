@@ -113,7 +113,36 @@ and 3.  Interating this multiplication process produces the most
 common graph operation: [breadth-first
 search](https://en.wikipedia.org/wiki/Breadth-first_search).
 
-    ... more soon.
+    create function bfs(A matrix, source bigint) returns vector as $$
+    declare
+        n bigint := nrows(A);                          -- The number of result rows.
+        v vector := vector_integer(n);                 -- int32 result vector of vertex levels.
+        q vector := assign(vector_bool(n), false);     -- bool mask of completed vertices.
+        level integer := 0;                            -- Start at level 1.
+        not_done bool := true;                         -- Flag to indicate still work to do.
+    begin
+        q := set_element(q, source, true);             -- Set the source element to done.
+
+        while not_done and level <= n loop             -- While still work to do.
+            v := assign(v, level, mask=>q);            -- Assign the current level to all
+
+            q := mxv(transpose(A), q, q,               -- Multiply q<mask> = T(A)q,
+                semiring=>'lor_land_bool',             -- using LOR_LAND_BOOL semiring
+                mask=>v,                               -- only those *not* masked
+                dmask=>'scmp',                         -- by complementing the mask
+                doutp=>'replace');                     -- clearing results in q first
+
+            not_done := reduce_bool(q);                -- are there more neighbors?
+
+            level := level + 1;                        -- increment the level
+        end loop;
+        return v;
+    end;
+    $$ language plpgsql;
+
+ The above code is written in `plpgsql` which is postgres' procedural
+ query language.  This language works well with pggraphblas
+ algorithmic approach.
 
 # references
 
@@ -175,10 +204,11 @@ supported type.  Put example here of {R,min,+,0,+inf}.
 Pggraphblas tries to adhere closely to the spirit of the GraphBLAS C
 API.
 
-## vector
+## dense vector
 
-Vectors can be constructed from arrays by calling `vector(array[])` or
-casting from an array.  At the moment, there is no human parsable text
+Dense vectors contain as many elements as their size.  They can be
+constructed from arrays by calling `vector(array[])` or casting from
+an array.  At the moment, there is no human parsable text
 representation for vectors or matrices, so pggraphblas provides a
 `print` function that can give a text description of vectors or
 matrices:
@@ -205,9 +235,7 @@ Vectors and matrices can be compared for equality:
     postgres=# select vector(array[1,2,3]) = array[1,2,3]::vector;
      t
     
-
-So far these example construct a "dense" integer vector, because it's
-size and it's number of values are the same:
+As this vector is dense its size and number of values are the same:
 
     postgres=# select size(vector(array[1,2,3])) = nvals(array[1,2,3]::vector);
     t
@@ -282,7 +310,11 @@ either operator or functional notation:
     postgres=# select ewise_mult(vector(array[1,2,3]) * vector(array[1,2,3])) = vector(array[1,4,9]);
      t
 
-XXX
+Element wise operations also have another important property,
+elementwise addition takes the union of all the vector positions of
+both operands, whereas elementwise multiplication takes only the
+common intersection of it's operand's indexes.  This propery is also
+true for matrices as shown below.
 
 ## matrix
 
