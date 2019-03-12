@@ -327,7 +327,7 @@ If you need to create a spare vector whose size is larger than the
 maximum index element, an optional size parameter can be passed to the
 constructor:
 
-    postgres=# select print(vector(array[1,2,3], array[0,1,2], 20));
+    postgres=# select print(vector(array[0,1,2], array[1,2,3], 20));
                                      print
     ------------------------------------------------------------------------
                                                                            +
@@ -362,8 +362,7 @@ either operator or functional notation:
 Element wise operations also have another important property,
 elementwise addition takes the union of all the vector positions of
 both operands, whereas elementwise multiplication takes only the
-common intersection of it's operand's indexes.  This propery is also
-true for matrices as shown below.
+common intersection of it's operand's indexes.
 
 ## matrix
 
