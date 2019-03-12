@@ -185,7 +185,8 @@ search](https://en.wikipedia.org/wiki/Breadth-first_search).
     Time: 364.490 ms
 
 In the above simple benchmark, the GraphBLAS version of BFS can be
-seen to be almost 12x faster than the [plpgsql procedural version]().
+seen to be almost 12x faster than the [plpgsql procedural
+version](https://github.com/michelp/pggraphblas/blob/master/demo/bfs.sql#L97).
 
 # references
 
