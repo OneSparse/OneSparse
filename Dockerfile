@@ -45,8 +45,7 @@ RUN chown -R postgres:postgres /home/postgres
 RUN mkdir "/home/postgres/pggraphblas"
 WORKDIR "/home/postgres/pggraphblas"
 COPY . .
-COPY gdbinit ../.gdbinit
-
+    
 # make the extension    
 RUN make && make install && make clean
 RUN ldconfig

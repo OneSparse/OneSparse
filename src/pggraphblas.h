@@ -221,6 +221,7 @@ PG_FUNCTION_INFO_V1(mxm);
 PG_FUNCTION_INFO_V1(mxv);
 PG_FUNCTION_INFO_V1(vxm);
 PG_FUNCTION_INFO_V1(matrix_kron);
+PG_FUNCTION_INFO_V1(matrix_xtract);
 PG_FUNCTION_INFO_V1(matrix_print);
 
 PG_FUNCTION_INFO_V1(matrix_eq);

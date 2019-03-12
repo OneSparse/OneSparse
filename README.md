@@ -252,6 +252,23 @@ postgres.  For a more complete introduction see [the
 SuiteSparse:GraphBLAS User
 Guide](https://github.com/sergiud/SuiteSparse/blob/master/GraphBLAS/Doc/GraphBLAS_UserGuide.pdf).
 
+## masks and descriptors
+
+GraphBLAS operations all take an optional `mask` argument.  Check the
+GraphBLAS Users Guide for more information on masking operations.
+GraphBLAS operations can also take a descriptor argument, which in
+pggraphblas is broken out into four optional arguments supported by
+every function:
+
+  - doutp text default null
+  - dmask text default null
+  - dinp0 text default null
+  - dinp1 text default null
+
+The arguments effect the way the operation is performed, for example,
+if `dmask=>'scmp'` then the structured complement of the mask is used.
+See the GraphBLAS Users Guide for more info.
+
 ## printing
 
 At the moment, there is no human parsable text
@@ -465,6 +482,29 @@ masking matrix, an accumulator operation, and a graphblas descriptor
 object which can specify replacement and transposition rules for
 inputs and outputs.
 
+    postgres=# \e
+    select print(matrix(array[0,1,2], array[1,2,0], array[1,2,3]) *
+                 matrix(array[0,1,2], array[1,2,0], array[2,3,4]));
+                                     print                                 
+    -----------------------------------------------------------------------
+                                                                          +
+     GraphBLAS matrix: A->M                                               +
+     nrows: 3 ncols: 3 max # entries: 3                                   +
+     format: standard CSR vlen: 3 nvec_nonempty: 3 nvec: 3 plen: 3 vdim: 3+
+     hyper_ratio 0.0625                                                   +
+     GraphBLAS type:  int32_t size: 4                                     +
+     last method used for GrB_mxm, vxm, or mxv: heap                      +
+     number of entries: 3                                                 +
+     row: 0 : 1 entries [0:0]                                             +
+         column 2: int32 3                                                +
+     row: 1 : 1 entries [1:1]                                             +
+         column 0: int32 8                                                +
+     row: 2 : 1 entries [2:2]                                             +
+         column 1: int32 6                                                +
+
+    (1 row)
+    
+
 ## mxv
 
 Matrix-vector multiplication.
@@ -475,11 +515,17 @@ Vector-matrix multiplication.
 
 ## ewise_add
 
-Elementwise matrix addition.
+Elementwise matrix addition can be done with the `||` operator or the
+`ewise_add(matrix, matrix, ...)` function.  The `||` is relevant in
+that matrix elementwise adding takes the union ("OR") of the two
+operands indexes.
 
 ## ewise_mul
 
-Elementwise matrix multiplication.
+Elementwise matrix multiplication can be done with the `&&` operator
+or the `ewise_mul(matrix, matrix, ...)` function.  The `&&` is
+relevant in that matrix elementwise adding takes the intersection
+("AND") of the two operands indexes.
 
 ## xtract
 

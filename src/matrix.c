@@ -551,6 +551,29 @@ matrix_kron(PG_FUNCTION_ARGS) {
 }
 
 Datum
+matrix_xtract(PG_FUNCTION_ARGS) {
+  GrB_Info info;
+  pgGrB_Matrix *A, *B, *C = NULL;
+  GrB_Index nrows, ncols, nvals, *rows, *cols;
+
+  A = PGGRB_GETARG_MATRIX(0);
+  B = PGGRB_GETARG_MATRIX(1);
+
+  CHECKD(GrB_Matrix_nrows(&nrows, A->M));
+  CHECKD(GrB_Matrix_ncols(&ncols, A->M));
+  
+  if (C == NULL) {
+    TYPE_APPLY(C, A->type, construct_empty_expanded_matrix, nrows, ncols, CurrentMemoryContext);
+  }
+
+  CHECKD(GrB_Matrix_nvals(&nvals, A->M));
+  TYPE_APPLY(nvals, A->type, extract_rowscols, B, &rows, &cols, nvals);
+
+  CHECKD(GrB_Matrix_extract(C->M, NULL, NULL, A->M, rows, nrows, cols, ncols, NULL));
+  PGGRB_RETURN_MATRIX(C);
+}
+
+Datum
 matrix_print(PG_FUNCTION_ARGS) {
   pgGrB_Matrix *A;
   char *result, *buf;

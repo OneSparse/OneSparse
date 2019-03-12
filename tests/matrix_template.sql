@@ -68,15 +68,17 @@ select is(
 select is(
   matrix(array[:ROWS],
       array[:COLS],
-      cast(array[:VALS] as :TYPE [])) ||
+      cast(array[:VALS] as :TYPE []),
+      10, 10) ||
   matrix(array[:ROWS],
       array[:COLS],
-      cast(array[:VALS2] as :TYPE [])),
+      cast(array[:VALS2] as :TYPE []),
+      10, 10),
   matrix(array[:ROWS],
-      array[:COLS],
-      cast(array[:EAX] as :TYPE [])),
+         array[:COLS],
+         cast(array[:EAX] as :TYPE []),
+         10, 10),
   'matrix ewise add ' || :'TYPE');
-
 
 select is(
   ewise_add(matrix(

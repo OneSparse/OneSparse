@@ -58,6 +58,11 @@ RETURNS bool
 AS '$libdir/pggraphblas', 'matrix_ne'
 LANGUAGE C STABLE;
 
+CREATE FUNCTION xtract(A matrix, B matrix)
+RETURNS matrix
+AS '$libdir/pggraphblas', 'matrix_xtract'
+LANGUAGE C STABLE;
+
 CREATE FUNCTION print(
     A matrix,
     level integer default 2)
