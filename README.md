@@ -201,8 +201,11 @@ supported type.  Put example here of {R,min,+,0,+inf}.
 
 # API
 
-Pggraphblas tries to adhere closely to the spirit of the GraphBLAS C
-API.
+Pggraphblas tries to adhere closely to the spirit of the [GraphBLAS C
+API](https://github.com/sergiud/SuiteSparse/blob/master/GraphBLAS/Doc/GraphBLAS_API_C.pdf).
+This documentation focused on the specific of interfacing with
+postgres.  For a more complete introduction see [the GraphBLAS User
+Guide](https://github.com/sergiud/SuiteSparse/blob/master/GraphBLAS/Doc/GraphBLAS_UserGuide.pdf).
 
 ## dense vector
 
