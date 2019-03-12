@@ -144,6 +144,49 @@ search](https://en.wikipedia.org/wiki/Breadth-first_search).
  query language.  This language works well with pggraphblas
  algorithmic approach.
 
+    postgres=# create table t (m matrix);
+    CREATE TABLE
+
+    postgres=# create table f (i bigint, j bigint);
+    CREATE TABLE
+
+    postgres=# create index on f (i) include (j);
+    CREATE INDEX
+
+    postgres=# insert into t (m) values (matrix_random_bool(10000,10000,1000000));
+    INSERT 0 1
+    Time: 1464.482 ms (00:01.464)
+
+    postgres=# insert into f select row, col from matrix_elements_bool((select m from t));
+    INSERT 0 994944
+    Time: 11110.765 ms (00:11.111)
+
+    postgres=# select count(*) from plbfs(100);
+     count
+    -------
+      9999
+    (1 row)
+
+    Time: 4329.555 ms (00:04.330)
+
+    postgres=# select print(bfs(m, 100), 1) from t;
+                                       print
+    ---------------------------------------------------------------------------
+                                                                              +
+     GraphBLAS vector: A->V                                                   +
+     nrows: 10000 ncols: 1 max # entries: 15000                               +
+     format: standard CSC vlen: 10000 nvec_nonempty: 1 nvec: 1 plen: 1 vdim: 1+
+     hyper_ratio 0.0625                                                       +
+     GraphBLAS type:  int32_t size: 4                                         +
+     number of entries: 9999                                                  +
+
+    (1 row)
+
+    Time: 364.490 ms
+
+In the above simple benchmark, the GraphBLAS version of BFS can be
+seen to be almost 12x faster than the [plpgsql procedural version]().
+
 # references
 
 [One page poster summary of GraphBLAS](https://resources.sei.cmu.edu/asset_files/Poster/2016_020_001_484268.pdf)
@@ -204,20 +247,19 @@ supported type.  Put example here of {R,min,+,0,+inf}.
 Pggraphblas tries to adhere closely to the spirit of the [GraphBLAS C
 API](https://github.com/sergiud/SuiteSparse/blob/master/GraphBLAS/Doc/GraphBLAS_API_C.pdf).
 This documentation focused on the specific of interfacing with
-postgres.  For a more complete introduction see [the GraphBLAS User
+postgres.  For a more complete introduction see [the
+SuiteSparse:GraphBLAS User
 Guide](https://github.com/sergiud/SuiteSparse/blob/master/GraphBLAS/Doc/GraphBLAS_UserGuide.pdf).
 
-## dense vector
+## printing
 
-Dense vectors contain as many elements as their size.  They can be
-constructed from arrays by calling `vector(array[])` or casting from
-an array.  At the moment, there is no human parsable text
+At the moment, there is no human parsable text
 representation for vectors or matrices, so pggraphblas provides a
 `print` function that can give a text description of vectors or
 matrices:
 
     postgres=# select print(vector(array[1,2,3]));
-                                     print                                 
+                                     print
     -----------------------------------------------------------------------
                                                                           +
      GraphBLAS vector: A->V                                               +
@@ -233,11 +275,14 @@ matrices:
 
     (1 row)
 
+As shown above, dense vectors can be constructed from arrays by
+calling `vector(array[])` or casting from an array.
+
 Vectors and matrices can be compared for equality:
 
     postgres=# select vector(array[1,2,3]) = array[1,2,3]::vector;
      t
-    
+
 As this vector is dense its size and number of values are the same:
 
     postgres=# select size(vector(array[1,2,3])) = nvals(array[1,2,3]::vector);
@@ -255,7 +300,7 @@ bigint, and the second array are the values, and can be any supported
 type:
 
     postgres=# select print(vector(array[1,4,9], array[1,2,3]));
-                                     print                                 
+                                     print
     -----------------------------------------------------------------------
                                                                           +
      GraphBLAS vector: A->V                                               +
@@ -282,7 +327,7 @@ maximum index element, an optional size parameter can be passed to the
 constructor:
 
     postgres=# select print(vector(array[1,2,3], array[0,1,2], 20));
-                                     print                                  
+                                     print
     ------------------------------------------------------------------------
                                                                            +
      GraphBLAS vector: A->V                                                +
@@ -332,7 +377,7 @@ array aggregate functions to build them from tables, for example:
         j integer
         );
     CREATE TABLE
-    
+
     postgres=# insert into test (i, j) values
         (1, 4),
         (1, 2),
@@ -347,7 +392,7 @@ array aggregate functions to build them from tables, for example:
     INSERT 0 10
 
     postgres=# select print(matrix(array_agg(i), array_agg(j), array_agg(true))) from test;
-                                       print                                   
+                                       print
     ---------------------------------------------------------------------------
                                                                               +
      GraphBLAS matrix: A->M                                                   +
@@ -380,7 +425,7 @@ Matrices can also be turned back into relational tuples using
 `matrix_elements_<type>`:
 
     postgres=# select * from matrix_elements_bool((select matrix(array_agg(i), array_agg(j), array_agg(true)) from test));
-     row | col | value 
+     row | col | value
     -----+-----+-------
        1 |   2 | t
        1 |   4 | t
@@ -397,7 +442,7 @@ Matrices can also be turned back into relational tuples using
 Empty matrices can be constructed with bigint arguments:
 
     postgres=# select print(matrix_integer(10, 10));
-                                       print                                    
+                                       print
     ----------------------------------------------------------------------------
                                                                                +
      GraphBLAS matrix: A->M                                                    +
@@ -408,7 +453,7 @@ Empty matrices can be constructed with bigint arguments:
      empty                                                                     +
      number of entries: 0                                                      +
 
-    (1 row)    
+    (1 row)
 
 ## mxm
 
@@ -428,11 +473,11 @@ Matrix-vector multiplication.
 
 Vector-matrix multiplication.
 
-## ewise add
+## ewise_add
 
 Elementwise matrix addition.
 
-## ewise mul
+## ewise_mul
 
 Elementwise matrix multiplication.
 
@@ -446,7 +491,7 @@ Assigning subgraphs.
 
 ## apply
 
-Applying functions to graphs.
+Applying functions to a graph.
 
 ## select
 

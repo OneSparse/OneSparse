@@ -21,7 +21,10 @@ RUN curl -s -L http://faculty.cse.tamu.edu/davis/GraphBLAS/GraphBLAS-2.3.0.tar.g
     && make install
 
 RUN git clone https://github.com/GraphBLAS/LAGraph.git && \
-    cd LAGraph && make library CMAKE_OPTIONS='-DCMAKE_BUILD_TYPE=Debug' && make install
+    cd LAGraph && \
+    make library \
+    CMAKE_OPTIONS='-DCMAKE_BUILD_TYPE=Debug' \
+    && make install
     
 # get postgres source and compile with debug and no optimization
 RUN git clone --branch REL_11_STABLE https://github.com/postgres/postgres.git --depth=1 && \
