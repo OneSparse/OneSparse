@@ -605,6 +605,7 @@ FN(matrix)(PG_FUNCTION_ARGS) {
 Datum
 FN(matrix_reduce)(PG_FUNCTION_ARGS) {
   GrB_Info info;
+  GrB_Type type;
   pgGrB_Matrix *A;
   GrB_Semiring semiring;
   GrB_Monoid monoid;
@@ -612,7 +613,14 @@ FN(matrix_reduce)(PG_FUNCTION_ARGS) {
   PG_TYPE val;
 
   A = PGGRB_GETARG_MATRIX(0);
-  semiring_name = text_to_cstring(PG_GETARG_TEXT_PP(1));
+  semiring_name = PG_ARGISNULL(1)?
+    NULL:
+    text_to_cstring(PG_GETARG_TEXT_PP(1));
+
+  if (semiring_name == NULL) {
+    CHECKD(GxB_Matrix_type(&type, A->M));
+    semiring_name = DEFAULT_SEMIRING(type);
+  }
   semiring = lookup_semiring(semiring_name);
   CHECKD(GxB_Semiring_add(&monoid, semiring));
   CHECKD(GrB_reduce(&val, NULL, monoid, A->M, NULL));

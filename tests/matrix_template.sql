@@ -208,9 +208,10 @@ select is(
   'matrix vxm ' || :'TYPE');
 
 select is(
-  reduce_:TYPE(matrix(array[:ROWS],
-    array[:COLS],
-    cast(array[:VALS] as :TYPE [])), :'SRING'),
+  reduce_:TYPE(
+    matrix(array[:ROWS],
+           array[:COLS],
+           cast(array[:VALS] as :TYPE [])), :'SRING'),
     cast(:VRS AS :TYPE),
     'matrix reduce scalar ' || :'TYPE');
 

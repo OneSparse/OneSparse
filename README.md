@@ -535,17 +535,49 @@ Extracting subgraphs.
 
 Assigning subgraphs.
 
+    postgres=# select print(assign(matrix_real(3,3), 3.14));
+                                      print                                   
+    --------------------------------------------------------------------------
+                                                                             +
+     GraphBLAS matrix: A->M                                                  +
+     nrows: 3 ncols: 3 max # entries: 0                                      +
+     format: hypersparse CSR vlen: 3 nvec_nonempty: 0 nvec: 0 plen: 1 vdim: 3+
+     hyper_ratio 0.0625                                                      +
+     GraphBLAS type:  float size: 4                                          +
+     empty                                                                   +
+     number of entries: 0                                                    +
+     pending tuples: 9 max pending: 256 zombies: 0                           +
+     pending tuples:                                                         +
+     GraphBLAS type:  double size: 8                                         +
+     row: 0 col: 0 double 3.14                                               +
+     row: 0 col: 1 double 3.14                                               +
+     row: 0 col: 2 double 3.14                                               +
+     row: 1 col: 0 double 3.14                                               +
+     row: 1 col: 1 double 3.14                                               +
+     row: 1 col: 2 double 3.14                                               +
+     row: 2 col: 0 double 3.14                                               +
+     row: 2 col: 1 double 3.14                                               +
+     row: 2 col: 2 double 3.14                                               +
+     pending operator: implicit 2nd                                          +
+    (1 row)
+
 ## apply
 
-Applying functions to a graph.
+TODO. Applying functions to a graph.
 
 ## select
 
-Selecting elements of a matrix.
+TODO. Selecting elements of a matrix.
 
 ## reduce
 
-Matrix and vector reduction.
+Matrix reduce to scalar:
+    
+    postgres=# select reduce_integer(assign(matrix_integer(10,10), 1));
+     reduce_integer 
+    ----------------
+                100
+    (1 row)
 
 ## transpose
 
@@ -617,4 +649,8 @@ Matrix transpose.
 
     - pg_bench demos
 
+    - apply/select
+
     - more tests!
+
+    
