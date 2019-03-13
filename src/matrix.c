@@ -329,7 +329,7 @@ mxv(PG_FUNCTION_ARGS) {
   pgGrB_Vector *B, *C = NULL, *mask = NULL;
   GrB_Type type;
   Datum d;
-  char *semiring_name, *binop_name, *desc_val;
+  char *semiring_name, *binop_name;
   GrB_Semiring semiring;
   GrB_BinaryOp binop = NULL;
   GrB_Descriptor desc = NULL;
@@ -374,7 +374,7 @@ vxm(PG_FUNCTION_ARGS) {
   GrB_Type type;
   GrB_Info info;
   Datum d;
-  char *semiring_name, *binop_name, *desc_val;
+  char *semiring_name, *binop_name;
   GrB_Semiring semiring;
   GrB_BinaryOp binop = NULL;
   GrB_Descriptor desc = NULL;
@@ -437,7 +437,6 @@ matrix_transpose(PG_FUNCTION_ARGS) {
   pgGrB_Matrix *A, *C = NULL, *mask;
   GrB_Index m, n;
   GrB_Descriptor desc = NULL;
-  char *desc_val;
 
   A = PGGRB_GETARG_MATRIX(0);
 
@@ -493,7 +492,7 @@ matrix_kron(PG_FUNCTION_ARGS) {
   GrB_Info info;
   GrB_Type type;
   Datum d;
-  char *accum_name, *mulop_name, *desc_val;
+  char *accum_name, *mulop_name;
   GrB_BinaryOp accum = NULL, mulop = NULL;
   GrB_Descriptor desc = NULL;
 
