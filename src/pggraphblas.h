@@ -433,19 +433,30 @@ typedef struct pgGrB_UnaryOp  {
   if ((A) == GrB_##TYP || (B) == GrB_##TYP) \
     return GrB_##TYP
 
-#define GETARG_DESCRIPTOR_VAL(ARG, DVAL, DESC, FIELD, VAL) do {         \
+#define GETARG_DESCRIPTOR_VAL(ARG, DESC, FIELD, VAL) do {   \
+    char *desc_val;                                                     \
     if (!PG_ARGISNULL(ARG)) {                                           \
-      (DVAL) = text_to_cstring(PG_GETARG_TEXT_PP(ARG));                 \
-      if (strcmp((DVAL), "default") == 0) {                             \
+      (desc_val) = text_to_cstring(PG_GETARG_TEXT_PP(ARG));             \
+      if (strcmp((desc_val), "default") == 0) {                         \
         CHECKD(GrB_Descriptor_set((DESC), GrB_##FIELD, GxB_DEFAULT));   \
-      } else if (strcmp((DVAL), "replace") == 0) {                      \
+      } else if (strcmp((desc_val), "replace") == 0) {                  \
         CHECKD(GrB_Descriptor_set((DESC), GrB_##FIELD, GrB_##VAL));     \
-      } else if (strcmp((DVAL), "scmp") == 0) {                         \
+      } else if (strcmp((desc_val), "scmp") == 0) {                     \
+        CHECKD(GrB_Descriptor_set((DESC), GrB_##FIELD, GrB_##VAL));     \
+      } else if (strcmp((desc_val), "tran") == 0) {                     \
         CHECKD(GrB_Descriptor_set((DESC), GrB_##FIELD, GrB_##VAL));     \
       } else                                                            \
         elog(ERROR, "unknown outp descriptor value %s", desc_val);      \
     }                                                                   \
   } while(0)
+
+#define GET_DESCRIPTOR(N, D) do {                               \
+    CHECKD(GrB_Descriptor_new(&D));                             \
+    GETARG_DESCRIPTOR_VAL(N, D, OUTP, REPLACE);                 \
+    GETARG_DESCRIPTOR_VAL(N+1, D, MASK, SCMP);                  \
+    GETARG_DESCRIPTOR_VAL(N+2, D, INP0, TRAN);                  \
+    GETARG_DESCRIPTOR_VAL(N+3, D, INP1, TRAN);                  \
+  } while (0)
 
 void _PG_init(void);
 

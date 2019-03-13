@@ -280,7 +280,7 @@ mxm(PG_FUNCTION_ARGS) {
   GrB_Info info;
   GrB_Type type;
   Datum d;
-  char *semiring_name, *binop_name, *desc_val;
+  char *semiring_name, *binop_name;
   GrB_Semiring semiring;
   GrB_BinaryOp binop = NULL;
   GrB_Descriptor desc = NULL;
@@ -302,11 +302,7 @@ mxm(PG_FUNCTION_ARGS) {
       text_to_cstring(PG_GETARG_TEXT_PP(5));
 
     if (PG_NARGS() > 6) {
-      CHECKD(GrB_Descriptor_new(&desc));
-      GETARG_DESCRIPTOR_VAL(6, desc_val, desc, OUTP, REPLACE);
-      GETARG_DESCRIPTOR_VAL(7, desc_val, desc, MASK, SCMP);
-      GETARG_DESCRIPTOR_VAL(8, desc_val, desc, INP0, TRAN);
-      GETARG_DESCRIPTOR_VAL(9, desc_val, desc, INP1, TRAN);
+      GET_DESCRIPTOR(6, desc); 
     }
   }
 
@@ -354,11 +350,7 @@ mxv(PG_FUNCTION_ARGS) {
       NULL :
       text_to_cstring(PG_GETARG_TEXT_PP(5));
     if (PG_NARGS() > 6) {
-      CHECKD(GrB_Descriptor_new(&desc));
-      GETARG_DESCRIPTOR_VAL(6, desc_val, desc, OUTP, REPLACE);
-      GETARG_DESCRIPTOR_VAL(7, desc_val, desc, MASK, SCMP);
-      GETARG_DESCRIPTOR_VAL(8, desc_val, desc, INP0, TRAN);
-      GETARG_DESCRIPTOR_VAL(9, desc_val, desc, INP1, TRAN);
+      GET_DESCRIPTOR(6, desc);
     }
   }
 
@@ -401,11 +393,7 @@ vxm(PG_FUNCTION_ARGS) {
       NULL :
       text_to_cstring(PG_GETARG_TEXT_PP(5));
     if (PG_NARGS() > 6) {
-      CHECKD(GrB_Descriptor_new(&desc));
-      GETARG_DESCRIPTOR_VAL(6, desc_val, desc, OUTP, REPLACE);
-      GETARG_DESCRIPTOR_VAL(7, desc_val, desc, MASK, SCMP);
-      GETARG_DESCRIPTOR_VAL(8, desc_val, desc, INP0, TRAN);
-      GETARG_DESCRIPTOR_VAL(9, desc_val, desc, INP1, TRAN);
+      GET_DESCRIPTOR(6, desc);
     }
   }
 
@@ -457,11 +445,7 @@ matrix_transpose(PG_FUNCTION_ARGS) {
     C = PG_ARGISNULL(1) ? NULL : PGGRB_GETARG_MATRIX(2);
     mask = PG_ARGISNULL(2) ? NULL : PGGRB_GETARG_MATRIX(3);
     if (PG_NARGS() > 3) {
-      CHECKD(GrB_Descriptor_new(&desc));
-      GETARG_DESCRIPTOR_VAL(4, desc_val, desc, OUTP, REPLACE);
-      GETARG_DESCRIPTOR_VAL(5, desc_val, desc, MASK, SCMP);
-      GETARG_DESCRIPTOR_VAL(6, desc_val, desc, INP0, TRAN);
-      GETARG_DESCRIPTOR_VAL(7, desc_val, desc, INP1, TRAN);
+      GET_DESCRIPTOR(3, desc);
     }
   }
 
@@ -530,11 +514,7 @@ matrix_kron(PG_FUNCTION_ARGS) {
       text_to_cstring(PG_GETARG_TEXT_PP(5));
 
     if (PG_NARGS() > 6) {
-      CHECKD(GrB_Descriptor_new(&desc));
-      GETARG_DESCRIPTOR_VAL(6, desc_val, desc, OUTP, REPLACE);
-      GETARG_DESCRIPTOR_VAL(7, desc_val, desc, MASK, SCMP);
-      GETARG_DESCRIPTOR_VAL(8, desc_val, desc, INP0, TRAN);
-      GETARG_DESCRIPTOR_VAL(9, desc_val, desc, INP1, TRAN);
+      GET_DESCRIPTOR(6, desc);
     }
   }
 
