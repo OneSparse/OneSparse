@@ -643,7 +643,11 @@ Matrix transpose.
 
  # todo
 
+    - more docs and better examples
+
     - typmod for matrix storage type (CSR, CSC, hyper...)
+
+    - human/machine parsable text representation
 
     - more LAGraph integration
 
