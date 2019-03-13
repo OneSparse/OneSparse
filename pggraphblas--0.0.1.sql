@@ -58,7 +58,14 @@ RETURNS bool
 AS '$libdir/pggraphblas', 'matrix_ne'
 LANGUAGE C STABLE;
 
-CREATE FUNCTION xtract(A matrix, B matrix)
+CREATE FUNCTION xtract(
+    A matrix,
+    B matrix,
+    doutp text default null,
+    dmask text default null,
+    dinp0 text default null,
+    dinp1 text default null
+    )
 RETURNS matrix
 AS '$libdir/pggraphblas', 'matrix_xtract'
 LANGUAGE C STABLE;
@@ -636,7 +643,14 @@ RETURNS bigint
 AS '$libdir/pggraphblas', 'vector_nvals'
 LANGUAGE C STABLE;
 
-CREATE FUNCTION xtract(A vector, B vector)
+CREATE FUNCTION xtract(
+    A vector,
+    B vector,
+    doutp text default null,
+    dmask text default null,
+    dinp0 text default null,
+    dinp1 text default null
+    )   
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_xtract'
 LANGUAGE C STABLE;

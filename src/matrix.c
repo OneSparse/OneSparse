@@ -498,7 +498,6 @@ matrix_kron(PG_FUNCTION_ARGS) {
 
   A = PGGRB_GETARG_MATRIX(0);
   B = PGGRB_GETARG_MATRIX(1);
-
   accum_name = NULL;
   mulop_name = NULL;
 
@@ -520,8 +519,10 @@ matrix_kron(PG_FUNCTION_ARGS) {
   if (accum_name != NULL)
     accum = lookup_binop(accum_name);
 
-  if (mulop_name != NULL)
-    mulop = lookup_binop(mulop_name);
+  if (mulop_name == NULL)
+        mulop_name = matrix_times_binop(A, NULL);
+
+  mulop = lookup_binop(mulop_name);
 
   type = mxm_type(A, B);
 
@@ -534,9 +535,14 @@ matrix_xtract(PG_FUNCTION_ARGS) {
   GrB_Info info;
   pgGrB_Matrix *A, *B, *C = NULL;
   GrB_Index nrows, ncols, nvals, *rows, *cols;
+  GrB_Descriptor desc;
 
   A = PGGRB_GETARG_MATRIX(0);
   B = PGGRB_GETARG_MATRIX(1);
+  
+  if (PG_NARGS() > 2) {
+    GET_DESCRIPTOR(2, desc);
+  }
 
   CHECKD(GrB_Matrix_nrows(&nrows, A->M));
   CHECKD(GrB_Matrix_ncols(&ncols, A->M));

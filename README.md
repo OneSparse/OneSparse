@@ -553,8 +553,58 @@ Matrix transpose.
 
 ## kron
 
-Kronecker product.
+    postgres=# select print(kron(matrix_random_integer(3,3,3), matrix_random_integer(3,3,3)));
+                                     print                                 
+    -----------------------------------------------------------------------
+                                                                          +
+     GraphBLAS matrix: A->M                                               +
+     nrows: 9 ncols: 9 max # entries: 6                                   +
+     format: standard CSR vlen: 9 nvec_nonempty: 4 nvec: 9 plen: 9 vdim: 9+
+     hyper_ratio 0.0625                                                   +
+     GraphBLAS type:  int32_t size: 4                                     +
+     number of entries: 6                                                 +
+     row: 1 : 2 entries [0:1]                                             +
+         column 2: int32 -1504114166                                      +
+         column 8: int32 125696432                                        +
+     row: 2 : 2 entries [2:3]                                             +
+         column 0: int32 933498562                                        +
+         column 6: int32 40209392                                         +
+     row: 4 : 1 entries [4:4]                                             +
+         column 5: int32 -75496048                                        +
+     row: 5 : 1 entries [5:5]                                             +
+         column 3: int32 1903866448                                       +
+
+    (1 row)
 
 ## random_graph
 
-Random graph generation.
+ The `matrix_random_graph` function will create a random graph with
+ the specified number of rows, columns, and values.
+
+    postgres=# select print(matrix_random_smallint(10,10,10));
+                                       print                                    
+    ----------------------------------------------------------------------------
+                                                                               +
+     GraphBLAS matrix: A->M                                                    +
+     nrows: 10 ncols: 10 max # entries: 0                                      +
+     format: hypersparse CSR vlen: 10 nvec_nonempty: 0 nvec: 0 plen: 1 vdim: 10+
+     hyper_ratio 0.0625                                                        +
+     GraphBLAS type:  int16_t size: 2                                          +
+     empty                                                                     +
+     number of entries: 0                                                      +
+     pending tuples: 10 max pending: 256 zombies: 0                            +
+     pending tuples:                                                           +
+     GraphBLAS type:  int16_t size: 2                                          +
+     row: 6 col: 2 int16 -19635                                                +
+     row: 7 col: 9 int16 -27251                                                +
+     row: 2 col: 1 int16 -22892                                                +
+     row: 1 col: 7 int16 -2874                                                 +
+     row: 0 col: 3 int16 19031                                                 +
+     row: 1 col: 0 int16 -27991                                                +
+     row: 6 col: 4 int16 21838                                                 +
+     row: 8 col: 4 int16 -4275                                                 +
+     row: 6 col: 5 int16 30101                                                 +
+     row: 6 col: 9 int16 14151                                                 +
+     pending operator: implicit 2nd                                            +
+
+    (1 row)
