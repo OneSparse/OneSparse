@@ -58,18 +58,6 @@ RETURNS bool
 AS '$libdir/pggraphblas', 'matrix_ne'
 LANGUAGE C STABLE;
 
-CREATE FUNCTION xtract(
-    A matrix,
-    B matrix,
-    doutp text default null,
-    dmask text default null,
-    dinp0 text default null,
-    dinp1 text default null
-    )
-RETURNS matrix
-AS '$libdir/pggraphblas', 'matrix_xtract'
-LANGUAGE C STABLE;
-
 CREATE FUNCTION print(
     A matrix,
     level integer default 2)
@@ -128,6 +116,21 @@ RETURNS matrix
 AS '$libdir/pggraphblas', 'matrix_float8'
 LANGUAGE C STABLE;
 
+-- matrix extract
+
+CREATE FUNCTION xtract(
+    A matrix,
+    B matrix,
+    C matrix default null,
+    doutp text default null,
+    dmask text default null,
+    dinp0 text default null,
+    dinp1 text default null
+    )
+RETURNS matrix
+AS '$libdir/pggraphblas', 'matrix_xtract'
+LANGUAGE C STABLE;
+    
 -- empty matrix construction
 
 CREATE FUNCTION matrix_bool(nrows bigint, ncols bigint)
@@ -646,6 +649,7 @@ LANGUAGE C STABLE;
 CREATE FUNCTION xtract(
     A vector,
     B vector,
+    C vector default null,
     doutp text default null,
     dmask text default null,
     dinp0 text default null,

@@ -230,8 +230,8 @@ select is(
        'matrix assign scalar ' || :'TYPE');
 
 select is(
-       nvals(matrix_random_:TYPE(10,10,10)),
-       10::bigint,
+       pg_typeof(nvals(matrix_random_:TYPE(10,10,10))),
+       'bigint',
        'matrix random ' || :'TYPE');
     
 

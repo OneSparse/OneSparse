@@ -608,3 +608,13 @@ Matrix transpose.
      pending operator: implicit 2nd                                            +
 
     (1 row)
+
+ # todo
+
+    - typmod for matrix storage type (CSR, CSC, hyper...)
+
+    - more LAGraph integration
+
+    - pg_bench demos
+
+    - more tests!

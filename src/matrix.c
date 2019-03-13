@@ -539,10 +539,8 @@ matrix_xtract(PG_FUNCTION_ARGS) {
 
   A = PGGRB_GETARG_MATRIX(0);
   B = PGGRB_GETARG_MATRIX(1);
-  
-  if (PG_NARGS() > 2) {
-    GET_DESCRIPTOR(2, desc);
-  }
+  C = PG_ARGISNULL(2) ? NULL : PGGRB_GETARG_MATRIX(2);
+  GET_DESCRIPTOR(3, desc);
 
   CHECKD(GrB_Matrix_nrows(&nrows, A->M));
   CHECKD(GrB_Matrix_ncols(&ncols, A->M));

@@ -296,6 +296,7 @@ vector_xtract(PG_FUNCTION_ARGS) {
 
   A = PGGRB_GETARG_VECTOR(0);
   B = PGGRB_GETARG_VECTOR(1);
+  C = PG_ARGISNULL(2) ? NULL : PGGRB_GETARG_VECTOR(2);
 
   CHECKD(GrB_Vector_size(&size, A->V));
   if (C == NULL) {
