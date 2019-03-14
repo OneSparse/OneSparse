@@ -7,8 +7,6 @@ pgGrB_UnaryOp uops[67];
 MemoryContext gb_context;
 
 #include "type.c"
-#include "visequal.c"
-#include "isequal.c"
 #include "vector.c"
 #include "matrix.c"
 

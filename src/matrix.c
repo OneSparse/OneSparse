@@ -204,7 +204,7 @@ matrix_eq(PG_FUNCTION_ARGS) {
   A = PGGRB_GETARG_MATRIX(0);
   B = PGGRB_GETARG_MATRIX(1);
 
-  CHECKD(isequal(&result, A->M, B->M, NULL));
+  CHECKD(LAGraph_isequal(&result, A->M, B->M, NULL));
   PG_RETURN_BOOL(result);
 }
 
@@ -217,7 +217,7 @@ matrix_ne(PG_FUNCTION_ARGS) {
   A = PGGRB_GETARG_MATRIX(0);
   B = PGGRB_GETARG_MATRIX(1);
 
-  CHECKD(isequal(&result, A->M, B->M, NULL));
+  CHECKD(LAGraph_isequal(&result, A->M, B->M, NULL));
   PG_RETURN_BOOL(!result);
 }
 

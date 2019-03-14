@@ -271,7 +271,7 @@ vector_eq(PG_FUNCTION_ARGS) {
   A = PGGRB_GETARG_VECTOR(0);
   B = PGGRB_GETARG_VECTOR(1);
 
-  CHECKD(visequal(&result, A->V, B->V, NULL));
+  CHECKD(LAGraph_Vector_isequal(&result, A->V, B->V, NULL));
   PG_RETURN_BOOL(result);
 }
 
@@ -284,7 +284,7 @@ vector_ne(PG_FUNCTION_ARGS) {
   A = PGGRB_GETARG_VECTOR(0);
   B = PGGRB_GETARG_VECTOR(1);
 
-  CHECKD(visequal(&result, A->V, B->V, NULL));
+  CHECKD(LAGraph_Vector_isequal(&result, A->V, B->V, NULL));
   PG_RETURN_BOOL(!result);
 }
 
