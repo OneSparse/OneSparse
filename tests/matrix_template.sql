@@ -243,3 +243,9 @@ select results_eq(
     'select nvals(m) from foo_' || :'TYPE',
     'select 3::bigint',
     'select matrix from table ' || :'TYPE');
+
+select is(
+    from_mm(to_mm(matrix(array[:ROWS], array[:COLS], cast(array[:VALS] AS :TYPE [])))),
+    matrix(array[:ROWS], array[:COLS], cast(array[:VALS] AS :TYPE [])),
+    'mmwrite ' || :'TYPE');
+

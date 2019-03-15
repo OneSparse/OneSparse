@@ -1,6 +1,6 @@
 
 begin;
-select plan(144);
+select plan(150);
 
 -- The following variables are substituted into matrix_template.sql.
 -- Each support type is defined and the expected values, the template

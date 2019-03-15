@@ -706,11 +706,11 @@ Datum
 FN(matrix_random)(PG_FUNCTION_ARGS) {
   GrB_Info info;
   pgGrB_Matrix *A;
+  GrB_Matrix M;
   GrB_Index nrows, ncols, nvals;
   bool make_pattern, make_symmetric, make_skew_symmetric, make_hermitian, no_diagonal;
   uint64_t seed;
-  MemoryContext objcxt, oldcontext;
-  
+
   nrows = PG_GETARG_INT64(0);
   ncols = PG_GETARG_INT64(1);
   nvals = PG_GETARG_INT64(2);
@@ -719,27 +719,12 @@ FN(matrix_random)(PG_FUNCTION_ARGS) {
   make_skew_symmetric = PG_GETARG_BOOL(5);
   make_hermitian = PG_GETARG_BOOL(6);
   no_diagonal = PG_GETARG_BOOL(7);
-  /* Create a new context that will hold the expanded object. */
-  objcxt = AllocSetContextCreate(CurrentMemoryContext,
-                                 "expanded matrix",
-                                 ALLOCSET_DEFAULT_SIZES);
 
-  /* Allocate a new expanded matrix */
-  A = (pgGrB_Matrix*)MemoryContextAlloc(objcxt,
-                                        sizeof(pgGrB_Matrix));
-
-  /* Initialize the ExpandedObjectHeader member with flattening
-   * methods and new object context */
-  EOH_init_header(&A->hdr, &FN(matrix_methods), objcxt);
-
-  /* Used for debugging checks */
-  A->em_magic = matrix_MAGIC;
-  A->flat_size = 0;
-  A->type = GB_TYPE;
-
-  oldcontext = MemoryContextSwitchTo(objcxt);
+  A = FN(construct_empty_expanded_matrix)(nrows,
+                                          ncols,
+                                          CurrentMemoryContext);
   
-  CHECKD(LAGraph_random(&A->M,
+  CHECKD(LAGraph_random(&M,
                         GB_TYPE,
                         nrows,
                         ncols,
@@ -751,7 +736,8 @@ FN(matrix_random)(PG_FUNCTION_ARGS) {
                         no_diagonal,
                         &seed));
 
-  MemoryContextSwitchTo(oldcontext);
+  CHECKD(GrB_free(&A->M));
+  A->M = M;
   PGGRB_RETURN_MATRIX(A);
 }
 

@@ -223,6 +223,8 @@ PG_FUNCTION_INFO_V1(vxm);
 PG_FUNCTION_INFO_V1(matrix_kron);
 PG_FUNCTION_INFO_V1(matrix_xtract);
 PG_FUNCTION_INFO_V1(matrix_print);
+PG_FUNCTION_INFO_V1(matrix_mmwrite);
+PG_FUNCTION_INFO_V1(matrix_mmread);
 
 PG_FUNCTION_INFO_V1(matrix_eq);
 PG_FUNCTION_INFO_V1(matrix_ne);

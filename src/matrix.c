@@ -302,7 +302,7 @@ mxm(PG_FUNCTION_ARGS) {
       text_to_cstring(PG_GETARG_TEXT_PP(5));
 
     if (PG_NARGS() > 6) {
-      GET_DESCRIPTOR(6, desc); 
+      GET_DESCRIPTOR(6, desc);
     }
   }
 
@@ -544,7 +544,7 @@ matrix_xtract(PG_FUNCTION_ARGS) {
 
   CHECKD(GrB_Matrix_nrows(&nrows, A->M));
   CHECKD(GrB_Matrix_ncols(&ncols, A->M));
-  
+
   if (C == NULL) {
     TYPE_APPLY(C, A->type, construct_empty_expanded_matrix, nrows, ncols, CurrentMemoryContext);
   }
@@ -565,7 +565,7 @@ matrix_print(PG_FUNCTION_ARGS) {
   int level;
   A = PGGRB_GETARG_MATRIX(0);
   level = PG_GETARG_INT32(1);
-  
+
   fp = open_memstream(&buf, &size);
   if (fp == NULL)
     elog(ERROR, "unable to open memstream for matrix_print");
@@ -575,4 +575,53 @@ matrix_print(PG_FUNCTION_ARGS) {
   memcpy(result, buf, size+1);
   free(buf);
   PG_RETURN_TEXT_P(cstring_to_text_with_len(result, size+1));
+}
+
+Datum
+matrix_mmwrite(PG_FUNCTION_ARGS) {
+  pgGrB_Matrix *A;
+  char *result, *buf;
+  size_t size;
+  FILE *fp;
+  A = PGGRB_GETARG_MATRIX(0);
+
+  fp = open_memstream(&buf, &size);
+  if (fp == NULL)
+    elog(ERROR, "unable to open memstream for matrix_mmwrite");
+  LAGraph_mmwrite(A->M, fp);
+  fflush(fp);
+  result = palloc(size + 1);
+  memcpy(result, buf, size+1);
+  free(buf);
+  PG_RETURN_TEXT_P(cstring_to_text_with_len(result, size+1));
+}
+
+Datum
+matrix_mmread(PG_FUNCTION_ARGS) {
+  GrB_Matrix M;
+  pgGrB_Matrix *A;
+  GrB_Info info;
+  GrB_Index nrows, ncols;
+  GrB_Type type;
+  size_t size;
+  FILE *fp;
+  char *textdata;
+  text *input = PG_GETARG_TEXT_PP(0);
+
+  textdata = text_to_cstring(input);
+  size = strlen(textdata);
+  fp = fmemopen(textdata, size, "r");
+  if (fp == NULL)
+    elog(ERROR, "unable to open memstream for matrix_mmread");
+  
+  LAGraph_mmread(&M, fp);
+  CHECKD(GrB_Matrix_nrows(&nrows, M));
+  CHECKD(GrB_Matrix_ncols(&ncols, M));
+  CHECKD(GxB_Matrix_type(&type, M));
+
+  
+  TYPE_APPLY(A, type, construct_empty_expanded_matrix, nrows, ncols, CurrentMemoryContext);
+  CHECKD(GrB_free(&A->M));
+  A->M = M;
+  PGGRB_RETURN_MATRIX(A);
 }

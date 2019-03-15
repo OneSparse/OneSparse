@@ -58,6 +58,16 @@ RETURNS bool
 AS '$libdir/pggraphblas', 'matrix_ne'
 LANGUAGE C STABLE;
 
+CREATE FUNCTION to_mm(A matrix)
+RETURNS text
+AS '$libdir/pggraphblas', 'matrix_mmwrite'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION from_mm(A text)
+RETURNS matrix
+AS '$libdir/pggraphblas', 'matrix_mmread'
+LANGUAGE C STABLE;
+
 CREATE FUNCTION print(
     A matrix,
     level integer default 2)
