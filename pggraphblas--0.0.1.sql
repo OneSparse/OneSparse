@@ -146,32 +146,32 @@ LANGUAGE C STABLE;
 CREATE FUNCTION matrix_bool(nrows bigint, ncols bigint)
 RETURNS matrix
 AS '$libdir/pggraphblas', 'matrix_bool'
-LANGUAGE C STABLE;
+LANGUAGE C STABLE STRICT;
 
 CREATE FUNCTION matrix_bigint(nrows bigint, ncols bigint)
 RETURNS matrix
 AS '$libdir/pggraphblas', 'matrix_int64'
-LANGUAGE C STABLE;
+LANGUAGE C STABLE STRICT;
 
 CREATE FUNCTION matrix_integer(nrows bigint, ncols bigint)
 RETURNS matrix
 AS '$libdir/pggraphblas', 'matrix_int32'
-LANGUAGE C STABLE;
+LANGUAGE C STABLE STRICT;
 
 CREATE FUNCTION matrix_smallint(nrows bigint, ncols bigint)
 RETURNS matrix
 AS '$libdir/pggraphblas', 'matrix_int16'
-LANGUAGE C STABLE;
+LANGUAGE C STABLE STRICT;
 
 CREATE FUNCTION matrix_real(nrows bigint, ncols bigint)
 RETURNS matrix
 AS '$libdir/pggraphblas', 'matrix_float4'
-LANGUAGE C STABLE;
+LANGUAGE C STABLE STRICT;
 
 CREATE FUNCTION matrix_float(nrows bigint, ncols bigint)
 RETURNS matrix
 AS '$libdir/pggraphblas', 'matrix_float8'
-LANGUAGE C STABLE;
+LANGUAGE C STABLE STRICT;
 
 CREATE FUNCTION mxm(
     A matrix,
@@ -876,32 +876,32 @@ CREATE CAST (bool[] AS vector) WITH FUNCTION vector(bool[]) AS IMPLICIT;
 CREATE FUNCTION vector_bigint(size bigint)
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_empty_int64'
-LANGUAGE C;
+LANGUAGE C STRICT;
 
 CREATE FUNCTION vector_integer(size bigint)
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_empty_int32'
-LANGUAGE C;
+LANGUAGE C STRICT;
 
 CREATE FUNCTION vector_smallint(size bigint)
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_empty_int16'
-LANGUAGE C;
+LANGUAGE C STRICT;
 
 CREATE FUNCTION vector_float(size bigint)
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_empty_float8'
-LANGUAGE C;
+LANGUAGE C STRICT;
 
 CREATE FUNCTION vector_real(size bigint)
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_empty_float4'
-LANGUAGE C;
+LANGUAGE C STRICT;
 
 CREATE FUNCTION vector_bool(size bigint)
 RETURNS vector
 AS '$libdir/pggraphblas', 'vector_empty_bool'
-LANGUAGE C;
+LANGUAGE C STRICT;
 
 -- sparse construction
 
