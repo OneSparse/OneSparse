@@ -90,6 +90,7 @@ PG_FUNCTION_INFO_V1(FN(matrix_elements));
 PG_FUNCTION_INFO_V1(FN(matrix_reduce));
 PG_FUNCTION_INFO_V1(FN(matrix_assign));
 PG_FUNCTION_INFO_V1(FN(matrix_random));
+PG_FUNCTION_INFO_V1(FN(matrix_set_element));
 
 /* Compute size of storage needed for matrix */
 static Size
@@ -738,6 +739,22 @@ FN(matrix_random)(PG_FUNCTION_ARGS) {
 
   CHECKD(GrB_free(&A->M));
   A->M = M;
+  PGGRB_RETURN_MATRIX(A);
+}
+
+Datum
+FN(matrix_set_element)(PG_FUNCTION_ARGS) {
+  GrB_Info info;
+  pgGrB_Matrix *A;
+  GrB_Index row, col;
+  PG_TYPE val;
+
+  A = PGGRB_GETARG_MATRIX(0);
+  row = PG_GETARG_INT64(1);
+  col = PG_GETARG_INT64(2);
+  val = PG_GET(3);
+
+  CHECKD(GrB_Matrix_setElement(A->M, val, row, col));
   PGGRB_RETURN_MATRIX(A);
 }
 
