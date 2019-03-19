@@ -254,5 +254,3 @@ select is(
     matrix(array[1], array[1], CAST(array[:VAL] AS :TYPE []), 3, 3),
     'matrix set_element ' || :'TYPE');
     
-
-
