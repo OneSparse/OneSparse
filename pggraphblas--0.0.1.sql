@@ -624,6 +624,15 @@ RETURNS SETOF matrix_element_bool
 AS '$libdir/pggraphblas', 'matrix_elements_bool'
 LANGUAGE C STABLE STRICT;
 
+CREATE FUNCTION matrix_bfs(A matrix, size bigint)
+RETURNS vector
+AS '$libdir/pggraphblas', 'matrix_bfs'
+LANGUAGE C STABLE STRICT;
+
+
+
+
+
 -- vectors
 
 CREATE FUNCTION ewise_mult(

@@ -618,12 +618,30 @@ matrix_mmread(PG_FUNCTION_ARGS) {
   CHECKD(GrB_Matrix_nrows(&nrows, M));
   CHECKD(GrB_Matrix_ncols(&ncols, M));
   CHECKD(GxB_Matrix_type(&type, M));
-
   
   TYPE_APPLY(A, type, construct_empty_expanded_matrix, nrows, ncols, CurrentMemoryContext);
   CHECKD(GrB_free(&A->M));
   A->M = M;
   PGGRB_RETURN_MATRIX(A);
+}
+
+Datum
+matrix_bfs(PG_FUNCTION_ARGS) {
+  pgGrB_Matrix *A;
+  pgGrB_Vector *R;
+  GrB_Vector V;
+  GrB_Index size, start;
+  GrB_Info info;
+  
+  A = PGGRB_GETARG_MATRIX(0);
+  start = PG_GETARG_INT64(1);
+  
+  CHECKD(LAGraph_bfs_pushpull(&V, NULL, A->M, NULL, start, 0, true));
+  CHECKD(GrB_Matrix_nrows(&size, A->M));
+  TYPE_APPLY(R, GrB_INT32, construct_empty_expanded_vector, size, CurrentMemoryContext);
+  CHECKD(GrB_free(&R->V));
+  R->V = V;
+  PGGRB_RETURN_VECTOR(R);
 }
 
 /* Datum */

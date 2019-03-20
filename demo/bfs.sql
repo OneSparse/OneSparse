@@ -40,7 +40,7 @@ $$ language plpgsql;
 
 drop function if exists bfs;
         
-create function bfs(A matrix, source bigint) returns vector as $$
+create function bfs3(A matrix, source bigint) returns vector as $$
 declare
     n bigint := nrows(A);                          -- The number of result rows.
     v vector := vector_integer(n);                 -- int32 result vector of vertex levels.
