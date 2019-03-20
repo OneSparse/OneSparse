@@ -3,7 +3,7 @@ FROM ubuntu:latest
 # install base dependences    
 RUN apt-get update && \
     apt-get install -y make cmake git curl build-essential m4 sudo gdbserver \
-    gdb libreadline-dev bison flex zlib1g-dev tmux emacs25-nox zile zip vim
+    gdb libreadline-dev bison flex zlib1g-dev tmux emacs25-nox zile zip vim gawk
 
 # add postgres user and make data dir        
 RUN groupadd -r postgres && useradd --no-log-init -r -m -s /bin/bash -g postgres -G sudo postgres

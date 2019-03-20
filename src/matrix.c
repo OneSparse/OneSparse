@@ -625,3 +625,17 @@ matrix_mmread(PG_FUNCTION_ARGS) {
   A->M = M;
   PGGRB_RETURN_MATRIX(A);
 }
+
+/* Datum */
+/* matrix_pagerank(PG_FUNCTION_ARGS) { */
+/*   GrB_Matrix *M; */
+/*   pgGrB_Matrix A; */
+/*   int itermax; */
+/*   double tol; */
+/*   int iters; */
+/*   A = PGGRB_GETARG_MATRIX(0); */
+/*   LAGraph_pagerank(&M, A->M, 30, 0.0001, &iters); */
+/*   CHECKD(GrB_free(&A->M)); */
+/*   A->M = M; */
+/*   PGGRB_RETURN_MATRIX(A); */
+/* } */
