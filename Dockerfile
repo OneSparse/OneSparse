@@ -3,7 +3,7 @@ FROM ubuntu:latest
 # install base dependences    
 RUN apt-get update && \
     apt-get install -y make cmake git curl build-essential m4 sudo gdbserver \
-    gdb libreadline-dev bison flex zlib1g-dev tmux emacs25-nox zile zip vim
+    gdb libreadline-dev bison flex zlib1g-dev tmux emacs25-nox zile zip vim gawk
 
 # add postgres user and make data dir        
 RUN groupadd -r postgres && useradd --no-log-init -r -m -s /bin/bash -g postgres -G sudo postgres
@@ -17,22 +17,22 @@ RUN curl -s -L http://faculty.cse.tamu.edu/davis/GraphBLAS/GraphBLAS-2.3.0.tar.g
 #    sed -i 's/^\/\/ #undef NDEBUG/#undef NDEBUG/g' Source/GB.h && \
 #    sed -i 's/^\/\/ #define GB_PRINT_MALLOC 1/#define GB_PRINT_MALLOC 1/g' Source/GB.h && \
     make library \
-    CMAKE_OPTIONS='-DCMAKE_BUILD_TYPE=Debug' \
+#    CMAKE_OPTIONS='-DCMAKE_BUILD_TYPE=Debug' \
     && make install
 
 RUN git clone https://github.com/GraphBLAS/LAGraph.git && \
     cd LAGraph && \
     make library \
-    CMAKE_OPTIONS='-DCMAKE_BUILD_TYPE=Debug' \
+#    CMAKE_OPTIONS='-DCMAKE_BUILD_TYPE=Debug' \
     && make install
     
 # get postgres source and compile with debug and no optimization
 RUN git clone --branch REL_11_STABLE https://github.com/postgres/postgres.git --depth=1 && \
     cd postgres && ./configure \
     --prefix=/usr/ \
-    --enable-depend --enable-cassert --enable-debug --enable-profiling \
-    CFLAGS="-ggdb -Og -g3 -fno-omit-frame-pointer" \
-#    CFLAGS="-O3" \
+#    --enable-depend --enable-cassert --enable-debug --enable-profiling \
+#    CFLAGS="-ggdb -Og -g3 -fno-omit-frame-pointer" \
+    CFLAGS="-O3" \
     && make -j 4 && make install
 
 RUN curl -s -L https://github.com/theory/pgtap/archive/v0.99.0.tar.gz | tar zxvf - && \   

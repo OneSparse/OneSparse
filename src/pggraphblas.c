@@ -14,7 +14,8 @@ void *calloc_function(size_t num, size_t size) {
   MemoryContext oldcxt;
   void *p;
   oldcxt = MemoryContextSwitchTo(TopMemoryContext);
-  p = palloc0(num * size);
+  p = palloc_extended(size, MCXT_ALLOC_HUGE);
+  memset(p, 0, size);
   MemoryContextSwitchTo(oldcxt);
   return p;
 }
@@ -23,7 +24,7 @@ void *malloc_function(size_t size) {
   MemoryContext oldcxt;
   void *p;
   oldcxt = MemoryContextSwitchTo(TopMemoryContext);
-  p = palloc(size);
+  p = palloc_extended(size, MCXT_ALLOC_HUGE);
   MemoryContextSwitchTo(oldcxt);
   return p;
 }
@@ -31,7 +32,7 @@ void *malloc_function(size_t size) {
 void *realloc_function(void *p, size_t size) {
   MemoryContext oldcxt;
   oldcxt = MemoryContextSwitchTo(TopMemoryContext);
-  p = repalloc(p, size);
+  p = repalloc_huge(p, size);
   MemoryContextSwitchTo(oldcxt);
   return p;
 }
