@@ -1,6 +1,8 @@
 #include "pggraphblas.h"
 PG_MODULE_MAGIC;
 
+#define HUGE_ALLOC
+
 pgGrB_Semiring semirings[960];
 pgGrB_BinaryOp binops[256];
 pgGrB_UnaryOp uops[67];
@@ -13,12 +15,13 @@ MemoryContext gb_context;
 void *calloc_function(size_t num, size_t size) {
   MemoryContext oldcxt;
   void *p;
+  size_t total;
+  total = num * size;
   oldcxt = MemoryContextSwitchTo(TopMemoryContext);
 #ifdef HUGE_ALLOC
-  p = palloc_extended(size, MCXT_ALLOC_HUGE);
-  MemSetAligned(p, 0, size);
+  p = palloc_extended(total, MCXT_ALLOC_HUGE | MCXT_ALLOC_ZERO);
 #else
-  p = palloc0(num * size);
+  p = palloc0(total);
 #endif
   MemoryContextSwitchTo(oldcxt);
   return p;

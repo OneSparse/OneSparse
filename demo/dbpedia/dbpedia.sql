@@ -30,7 +30,7 @@ insert into article_x_article
     select s.id, o.id
     from page_link l
     join article s on (l.subject = s.code)
-    join article o on (l.subject = o.code)
+    join article o on (l.object = o.code)
     where o.code is not null and s.code is not null;
 
 create index on article_x_article (source) include (dest);

@@ -176,6 +176,9 @@ typedef struct pgGrB_Matrix  {
   Size flat_size;
 } pgGrB_Matrix;
 
+typedef struct pgGrB_Matrix_PageRankState {
+  LAGraph_PageRank *ranks;
+} pgGrB_Matrix_PageRankState;
 
 /* helper to turn types into names. */
 char* grb_type_to_name(GrB_Type t);
@@ -235,6 +238,7 @@ PG_FUNCTION_INFO_V1(matrix_reduce_vector);
 PG_FUNCTION_INFO_V1(matrix_transpose);
 PG_FUNCTION_INFO_V1(matrix_assign_matrix);
 PG_FUNCTION_INFO_V1(matrix_bfs);
+PG_FUNCTION_INFO_V1(matrix_pagerank);
 
 /* Vectors */
 

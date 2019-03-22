@@ -628,10 +628,13 @@ CREATE FUNCTION matrix_bfs(A matrix, size bigint)
 RETURNS vector
 AS '$libdir/pggraphblas', 'matrix_bfs'
 LANGUAGE C STABLE STRICT;
+    
+CREATE TYPE matrix_pagerank AS (page bigint, rank float);
 
-
-
-
+CREATE FUNCTION matrix_pagerank(A matrix)
+RETURNS matrix_pagerank
+AS '$libdir/pggraphblas', 'matrix_pagerank'
+LANGUAGE C STABLE STRICT;
 
 -- vectors
 

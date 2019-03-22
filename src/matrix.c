@@ -644,16 +644,60 @@ matrix_bfs(PG_FUNCTION_ARGS) {
   PGGRB_RETURN_VECTOR(R);
 }
 
-/* Datum */
-/* matrix_pagerank(PG_FUNCTION_ARGS) { */
-/*   GrB_Matrix *M; */
-/*   pgGrB_Matrix A; */
-/*   int itermax; */
-/*   double tol; */
-/*   int iters; */
-/*   A = PGGRB_GETARG_MATRIX(0); */
-/*   LAGraph_pagerank(&M, A->M, 30, 0.0001, &iters); */
-/*   CHECKD(GrB_free(&A->M)); */
-/*   A->M = M; */
-/*   PGGRB_RETURN_MATRIX(A); */
-/* } */
+Datum
+matrix_pagerank(PG_FUNCTION_ARGS) {
+  GrB_Info info;
+  FuncCallContext  *funcctx;
+  TupleDesc tupdesc;
+  Datum result;
+
+  Datum values[2];
+  bool nulls[2] = {false, false};
+  HeapTuple tuple;
+  GrB_Index nrows = 0;
+  pgGrB_Matrix *mat;
+  pgGrB_Matrix_PageRankState *state;
+  int iters;
+  LAGraph_PageRank *ranks = NULL;
+
+  if (SRF_IS_FIRSTCALL()) {
+    MemoryContext oldcontext;
+
+    funcctx = SRF_FIRSTCALL_INIT();
+    oldcontext = MemoryContextSwitchTo(funcctx->multi_call_memory_ctx);
+    mat = PGGRB_GETARG_MATRIX(0);
+
+    state = (pgGrB_Matrix_PageRankState*)palloc(sizeof(pgGrB_Matrix_PageRankState));
+    CHECKD(GrB_Matrix_nrows(&nrows, mat->M));
+    CHECKD(LAGraph_pagerank(&ranks, mat->M, 100, 0.0001, &iters));
+
+    state->ranks = ranks;
+    funcctx->max_calls = nrows;
+    funcctx->user_fctx = (void*)state;
+
+    if (get_call_result_type(fcinfo, NULL, &tupdesc) != TYPEFUNC_COMPOSITE)
+      ereport(ERROR,
+              (errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
+               errmsg("function returning record called in context "
+                      "that cannot accept type record")));
+    BlessTupleDesc(tupdesc);
+    funcctx->tuple_desc = tupdesc;
+
+    MemoryContextSwitchTo(oldcontext);
+  }
+
+  funcctx = SRF_PERCALL_SETUP();
+  state = (pgGrB_Matrix_PageRankState*)funcctx->user_fctx;
+
+  if (funcctx->call_cntr < funcctx->max_calls) {
+    values[0] = Int64GetDatum(state->ranks[funcctx->call_cntr].page);
+    values[1] = Float8GetDatum(state->ranks[funcctx->call_cntr].pagerank);
+
+    tuple = heap_form_tuple(funcctx->tuple_desc, values, nulls);
+    result = HeapTupleGetDatum(tuple);
+    SRF_RETURN_NEXT(funcctx, result);
+  } else {
+    SRF_RETURN_DONE(funcctx);
+  }
+}
+
