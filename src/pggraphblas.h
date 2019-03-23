@@ -180,6 +180,16 @@ typedef struct pgGrB_Matrix_PageRankState {
   LAGraph_PageRank *ranks;
 } pgGrB_Matrix_PageRankState;
 
+GrB_Info LAGraph_pagerank2       // GrB_SUCCESS or error condition
+(
+    LAGraph_PageRank **Phandle, // output: array of LAGraph_PageRank structs
+    GrB_Matrix A,               // binary input graph, not modified
+    int itermax,                // max number of iterations
+    double tol,                 // stop when norm (r-rnew,2) < tol
+    int *iters                  // number of iterations taken
+) ;
+
+
 /* helper to turn types into names. */
 char* grb_type_to_name(GrB_Type t);
 GrB_Type grb_name_to_type(char* n);

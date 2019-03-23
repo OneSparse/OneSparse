@@ -29,7 +29,7 @@ create table mbeacxc (
 
 create index on mbeacxc (i) include (j);
 
-\copy mbeacxc from 'GraphBLAS/Demo/Matrix/mbeacxc' with (delimiter ' ');
+\copy mbeacxc from '/home/postgres/GraphBLAS/Demo/Matrix/mbeacxc' with (delimiter ' ');
 
 drop table if exists bcsstk16;
     
@@ -39,7 +39,7 @@ create table bcsstk16 (
     v float
     );
 
-\copy bcsstk16 from 'GraphBLAS/Demo/Matrix/bcsstk16' with (delimiter ' ');
+\copy bcsstk16 from '/home/postgres/GraphBLAS/Demo/Matrix/bcsstk16' with (delimiter ' ');
 
 drop table if exists ash219;
 
@@ -49,7 +49,7 @@ create table ash219 (
     v integer
     );
 
-\copy ash219 from 'GraphBLAS/Demo/Matrix/ash219' with (delimiter ' ');
+\copy ash219 from '/home/postgres/GraphBLAS/Demo/Matrix/ash219' with (delimiter ' ');
     
 
 drop table if exists fs_183_1;
@@ -60,6 +60,6 @@ create table fs_183_1 (
     v real
     );
 
-\copy fs_183_1 from 'GraphBLAS/Demo/Matrix/fs_183_1' with (delimiter ' ');
+\copy fs_183_1 from '/home/postgres/GraphBLAS/Demo/Matrix/fs_183_1' with (delimiter ' ');
     
     

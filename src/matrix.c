@@ -669,7 +669,7 @@ matrix_pagerank(PG_FUNCTION_ARGS) {
 
     state = (pgGrB_Matrix_PageRankState*)palloc(sizeof(pgGrB_Matrix_PageRankState));
     CHECKD(GrB_Matrix_nrows(&nrows, mat->M));
-    CHECKD(LAGraph_pagerank(&ranks, mat->M, 100, 0.0001, &iters));
+    CHECKD(LAGraph_pagerank2(&ranks, mat->M, 100, 0.0001, &iters));
 
     state->ranks = ranks;
     funcctx->max_calls = nrows;
@@ -700,4 +700,3 @@ matrix_pagerank(PG_FUNCTION_ARGS) {
     SRF_RETURN_DONE(funcctx);
   }
 }
-

@@ -11,6 +11,7 @@ MemoryContext gb_context;
 #include "type.c"
 #include "vector.c"
 #include "matrix.c"
+#include "LAGraph_pagerank.c"
 
 void *calloc_function(size_t num, size_t size) {
   MemoryContext oldcxt;
@@ -31,6 +32,7 @@ void *malloc_function(size_t size) {
   MemoryContext oldcxt;
   void *p;
   oldcxt = MemoryContextSwitchTo(TopMemoryContext);
+
 #ifdef HUGE_ALLOC
   p = palloc_extended(size, MCXT_ALLOC_HUGE);
 #else
