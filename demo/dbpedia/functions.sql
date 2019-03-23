@@ -3,8 +3,12 @@ create or replace function build_dbpedia_matrix() returns matrix language plpgsq
 declare
     node_count integer := (select count(*) from article_x_article);
     A matrix := matrix_bool(node_count, node_count);
+    s bigint;
+    d bigint;
 begin
-    perform set_element(A, source, dest, true) from article_x_article;
+    for s, d in select source, dest from article_x_article loop
+        A := set_element(A, s, d, true);
+    end loop;
     return A;
 end;
 $$;
