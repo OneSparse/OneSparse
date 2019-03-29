@@ -39,13 +39,17 @@ Datum FN(matrix_ewise_mult)(pgGrB_Matrix *A,
                             pgGrB_Matrix *B,
                             pgGrB_Matrix *C,
                             pgGrB_Matrix *mask,
-                            GrB_BinaryOp binop);
+                            GrB_BinaryOp binop,
+                            GrB_BinaryOp accum,
+                            GrB_Descriptor desc);
 
 Datum FN(matrix_ewise_add)(pgGrB_Matrix *A,
                            pgGrB_Matrix *B,
                            pgGrB_Matrix *C,
                            pgGrB_Matrix *mask,
-                           GrB_BinaryOp binop);
+                           GrB_BinaryOp binop,
+                           GrB_BinaryOp accum,
+                           GrB_Descriptor desc);
 
 Datum
 FN(mxm)(pgGrB_Matrix *A,
@@ -413,7 +417,10 @@ FN(matrix_ewise_mult)(pgGrB_Matrix *A,
                       pgGrB_Matrix *B,
                       pgGrB_Matrix *C,
                       pgGrB_Matrix *mask,
-                      GrB_BinaryOp binop) {
+                      GrB_BinaryOp binop,
+                      GrB_BinaryOp accum,
+                      GrB_Descriptor desc
+                      ) {
   GrB_Info info;
   GrB_Index m, n;
 
@@ -422,7 +429,7 @@ FN(matrix_ewise_mult)(pgGrB_Matrix *A,
     CHECKD(GrB_Matrix_ncols(&n, A->M));
     C = FN(construct_empty_expanded_matrix)(m, n, CurrentMemoryContext);
   }
-  CHECKD(GrB_eWiseMult(C->M, mask ? mask->M : NULL, NULL, binop, A->M, B->M, NULL));
+  CHECKD(GrB_eWiseMult(C->M, mask ? mask->M : NULL, accum, binop, A->M, B->M, desc));
   PGGRB_RETURN_MATRIX(C);
 }
 
@@ -431,7 +438,9 @@ FN(matrix_ewise_add)(pgGrB_Matrix *A,
                      pgGrB_Matrix *B,
                      pgGrB_Matrix *C,
                      pgGrB_Matrix *mask,
-                     GrB_BinaryOp binop
+                     GrB_BinaryOp binop,
+                     GrB_BinaryOp accum,
+                     GrB_Descriptor desc
                      ) {
   GrB_Info info;
   GrB_Index m, n;
@@ -442,7 +451,7 @@ FN(matrix_ewise_add)(pgGrB_Matrix *A,
     C = FN(construct_empty_expanded_matrix)(m, n, CurrentMemoryContext);
   }
 
-  CHECKD(GrB_eWiseAdd(C->M, mask ? mask->M : NULL, NULL, binop, A->M, B->M, NULL));
+  CHECKD(GrB_eWiseAdd(C->M, mask ? mask->M : NULL, accum, binop, A->M, B->M, desc));
   PGGRB_RETURN_MATRIX(C);
 }
 

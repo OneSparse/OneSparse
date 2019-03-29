@@ -23,17 +23,17 @@ RUN curl -s -L http://faculty.cse.tamu.edu/davis/GraphBLAS/GraphBLAS-2.3.0.tar.g
 RUN git clone https://github.com/GraphBLAS/LAGraph.git && \
     cd LAGraph && \
     make library \
-#    CMAKE_OPTIONS='-DCMAKE_BUILD_TYPE=Debug' \
+    CMAKE_OPTIONS='-DCMAKE_BUILD_TYPE=Debug' \
     && make install
     
 # get postgres source and compile with debug and no optimization
 RUN git clone --branch REL_11_STABLE https://github.com/postgres/postgres.git --depth=1 && \
     cd postgres && ./configure \
     --prefix=/usr/ \
-#    --enable-debug \
-#    --enable-depend --enable-cassert --enable-profiling \
-#    CFLAGS="-ggdb -Og -g3 -fno-omit-frame-pointer" \
-    CFLAGS="-O3" \
+    --enable-debug \
+    --enable-depend --enable-cassert --enable-profiling \
+    CFLAGS="-ggdb -Og -g3 -fno-omit-frame-pointer" \
+#    CFLAGS="-O3" \
     && make -j 4 && make install
 
 RUN curl -s -L https://github.com/theory/pgtap/archive/v0.99.0.tar.gz | tar zxvf - && \   
