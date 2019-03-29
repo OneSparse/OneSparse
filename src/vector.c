@@ -190,26 +190,37 @@ vector_ewise_mult(PG_FUNCTION_ARGS) {
   pgGrB_Vector *A, *B;
   pgGrB_Vector *C = NULL, *mask = NULL;
   Datum d;
-  char *binop_name;
-  GrB_BinaryOp binop;
+  char *binop_name, *accum_name;
+  GrB_BinaryOp binop = NULL, accum = NULL;
+  GrB_Descriptor desc = NULL;
+  GrB_Info info;
 
   A = PGGRB_GETARG_VECTOR(0);
   B = PGGRB_GETARG_VECTOR(1);
 
+  accum_name = NULL;
   binop_name = vector_times_binop(A, B);
 
   if (PG_NARGS() > 2) {
     C = PG_ARGISNULL(2) ? NULL : PGGRB_GETARG_VECTOR(2);
-    mask = PG_ARGISNULL(3) ? NULL : PGGRB_GETARG_VECTOR(3);
+   mask = PG_ARGISNULL(3) ? NULL : PGGRB_GETARG_VECTOR(3);
     binop_name = PG_ARGISNULL(4) ?
       binop_name : text_to_cstring(PG_GETARG_TEXT_PP(4));
+    accum_name = PG_ARGISNULL(5) ?
+      accum_name : text_to_cstring(PG_GETARG_TEXT_PP(5));
+    if (PG_NARGS() > 6) {
+      GET_DESCRIPTOR(6, desc);
+    }
   }
 
   binop = lookup_binop(binop_name);
   if (binop == NULL)
     elog(ERROR, "unknown binop name %s", binop_name);
+  if (accum_name != NULL)
+    accum = lookup_binop(accum_name);
 
-  TYPE_APPLY(d, A->type, vector_ewise_mult, A, B, C, mask, binop);
+
+  TYPE_APPLY(d, A->type, vector_ewise_mult, A, B, C, mask, binop, accum, desc);
   return d;
 }
 
@@ -218,12 +229,15 @@ vector_ewise_add(PG_FUNCTION_ARGS) {
   pgGrB_Vector *A, *B;
   pgGrB_Vector *C = NULL, *mask = NULL;
   Datum d;
-  char *binop_name;
-  GrB_BinaryOp binop;
+  char *binop_name, *accum_name;
+  GrB_BinaryOp binop = NULL, accum = NULL;
+  GrB_Descriptor desc = NULL;
+  GrB_Info info;
 
   A = PGGRB_GETARG_VECTOR(0);
   B = PGGRB_GETARG_VECTOR(1);
 
+  accum_name = NULL;
   binop_name = vector_times_binop(A, B);
 
   if (PG_NARGS() > 2) {
@@ -231,13 +245,21 @@ vector_ewise_add(PG_FUNCTION_ARGS) {
     mask = PG_ARGISNULL(3) ? NULL : PGGRB_GETARG_VECTOR(3);
     binop_name = PG_ARGISNULL(4) ?
       binop_name : text_to_cstring(PG_GETARG_TEXT_PP(4));
+    accum_name = PG_ARGISNULL(5) ?
+      accum_name : text_to_cstring(PG_GETARG_TEXT_PP(5));
+    if (PG_NARGS() > 6) {
+      GET_DESCRIPTOR(6, desc);
+    }
   }
 
   binop = lookup_binop(binop_name);
   if (binop == NULL)
     elog(ERROR, "unknown binop name %s", binop_name);
+  if (accum_name != NULL)
+    accum = lookup_binop(accum_name);
 
-  TYPE_APPLY(d, A->type, vector_ewise_add, A, B, C, mask, binop);
+
+  TYPE_APPLY(d, A->type, vector_ewise_add, A, B, C, mask, binop, accum, desc);
   return d;
 }
 

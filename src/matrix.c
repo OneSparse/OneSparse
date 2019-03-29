@@ -555,7 +555,7 @@ matrix_xtract(PG_FUNCTION_ARGS) {
   GrB_Info info;
   pgGrB_Matrix *A, *B, *C = NULL;
   GrB_Index nrows, ncols, nvals, *rows, *cols;
-  GrB_Descriptor desc;
+  GrB_Descriptor desc = NULL;
 
   A = PGGRB_GETARG_MATRIX(0);
   B = PGGRB_GETARG_MATRIX(1);
