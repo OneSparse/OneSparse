@@ -439,14 +439,24 @@ matrix_reduce_vector(PG_FUNCTION_ARGS) {
   char *semiring_name;
   pgGrB_Vector *val;
   GrB_Index size;
+  GrB_Type type;
 
   A = PGGRB_GETARG_MATRIX(0);
+  semiring_name = PG_ARGISNULL(1)?
+    NULL:
+    text_to_cstring(PG_GETARG_TEXT_PP(1));
 
-  semiring_name = text_to_cstring(PG_GETARG_TEXT_PP(1));
+  if (semiring_name == NULL) {
+    CHECKD(GxB_Matrix_type(&type, A->M));
+    semiring_name = DEFAULT_SEMIRING(type);
+  }
+
   semiring = lookup_semiring(semiring_name);
   CHECKD(GxB_Semiring_add(&monoid, semiring));
+
   CHECKD(GrB_Matrix_ncols(&size, A->M));
   TYPE_APPLY(val, A->type, construct_empty_expanded_vector, size, CurrentMemoryContext);
+
   CHECKD(GrB_reduce(val->V, NULL, monoid, A->M, NULL));
   PGGRB_RETURN_VECTOR(val);
 }

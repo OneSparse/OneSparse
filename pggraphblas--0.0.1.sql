@@ -594,45 +594,45 @@ CREATE TYPE matrix_element_float AS (i bigint, j bigint, value float);
 CREATE TYPE matrix_element_real AS (i bigint, j bigint, value real);
 CREATE TYPE matrix_element_bool AS (i bigint, j bigint, value bool);
 
-CREATE FUNCTION matrix_elements_bigint(A matrix)
+CREATE FUNCTION elements_bigint(A matrix)
 RETURNS SETOF matrix_element_bigint
 AS '$libdir/pggraphblas', 'matrix_elements_int64'
 LANGUAGE C STABLE STRICT;
 
-CREATE FUNCTION matrix_elements_integer(A matrix)
+CREATE FUNCTION elements_integer(A matrix)
 RETURNS SETOF matrix_element_integer
 AS '$libdir/pggraphblas', 'matrix_elements_int32'
 LANGUAGE C STABLE STRICT;
 
-CREATE FUNCTION matrix_elements_smallint(A matrix)
+CREATE FUNCTION elements_smallint(A matrix)
 RETURNS SETOF matrix_element_smallint
 AS '$libdir/pggraphblas', 'matrix_elements_int16'
 LANGUAGE C STABLE STRICT;
 
-CREATE FUNCTION matrix_elements_float(A matrix)
+CREATE FUNCTION elements_float(A matrix)
 RETURNS SETOF matrix_element_float
 AS '$libdir/pggraphblas', 'matrix_elements_float8'
 LANGUAGE C STABLE STRICT;
 
-CREATE FUNCTION matrix_elements_real(A matrix)
+CREATE FUNCTION elements_real(A matrix)
 RETURNS SETOF matrix_element_real
 AS '$libdir/pggraphblas', 'matrix_elements_float4'
 LANGUAGE C STABLE STRICT;
 
-CREATE FUNCTION matrix_elements_bool(A matrix)
+CREATE FUNCTION elements_bool(A matrix)
 RETURNS SETOF matrix_element_bool
 AS '$libdir/pggraphblas', 'matrix_elements_bool'
 LANGUAGE C STABLE STRICT;
 
-CREATE FUNCTION matrix_bfs(A matrix, size bigint)
+CREATE FUNCTION bfs(A matrix, size bigint)
 RETURNS vector
 AS '$libdir/pggraphblas', 'matrix_bfs'
 LANGUAGE C STABLE STRICT;
     
-CREATE TYPE matrix_pagerank AS (page bigint, rank float);
+CREATE TYPE pageranking AS (page bigint, rank float);
 
-CREATE FUNCTION matrix_pagerank(A matrix)
-RETURNS matrix_pagerank
+CREATE FUNCTION pagerank(A matrix)
+RETURNS pageranking
 AS '$libdir/pggraphblas', 'matrix_pagerank'
 LANGUAGE C STABLE STRICT;
 
@@ -988,32 +988,32 @@ CREATE TYPE vector_element_float AS (index bigint, value float);
 CREATE TYPE vector_element_real AS (index bigint, value real);
 CREATE TYPE vector_element_bool AS (index bigint, value bool);
 
-CREATE FUNCTION vector_elements_bigint(A vector)
+CREATE FUNCTION elements_bigint(A vector)
 RETURNS SETOF vector_element_bigint
 AS '$libdir/pggraphblas', 'vector_elements_int64'
 LANGUAGE C STABLE STRICT;
 
-CREATE FUNCTION vector_elements_integer(A vector)
+CREATE FUNCTION elements_integer(A vector)
 RETURNS SETOF vector_element_integer
 AS '$libdir/pggraphblas', 'vector_elements_int32'
 LANGUAGE C STABLE STRICT;
 
-CREATE FUNCTION vector_elements_smallint(A vector)
+CREATE FUNCTION elements_smallint(A vector)
 RETURNS SETOF vector_element_smallint
 AS '$libdir/pggraphblas', 'vector_elements_int16'
 LANGUAGE C STABLE STRICT;
 
-CREATE FUNCTION vector_elements_float(A vector)
+CREATE FUNCTION elements_float(A vector)
 RETURNS SETOF vector_element_float
 AS '$libdir/pggraphblas', 'vector_elements_float8'
 LANGUAGE C STABLE STRICT;
 
-CREATE FUNCTION vector_elements_real(A vector)
+CREATE FUNCTION elements_real(A vector)
 RETURNS SETOF vector_element_real
 AS '$libdir/pggraphblas', 'vector_elements_float4'
 LANGUAGE C STABLE STRICT;
 
-CREATE FUNCTION vector_elements_bool(A vector)
+CREATE FUNCTION elements_bool(A vector)
 RETURNS SETOF vector_element_bool
 AS '$libdir/pggraphblas', 'vector_elements_bool'
 LANGUAGE C STABLE STRICT;
