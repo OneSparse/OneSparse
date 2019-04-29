@@ -15,7 +15,7 @@ echo building test image
 docker build . -t pggraphblas/test
 
 echo running test container
-docker run -v $(pwd)/tests/:/tests -v $(pwd)/demo/:/demo --cap-add=SYS_PTRACE --security-opt seccomp=unconfined -d --name "$DB_HOST" pggraphblas/test
+docker run -v $(pwd)/tests/:/tests -v $(pwd)/demo/:/demo -v $(pwd)/../LAGraph/:/LAGraph --cap-add=SYS_PTRACE --security-opt seccomp=unconfined -d --name "$DB_HOST" pggraphblas/test
 
 $EXECIT pg_ctl start
 # $EXEC make clean

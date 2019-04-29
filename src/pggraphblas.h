@@ -180,15 +180,11 @@ typedef struct pgGrB_Matrix_PageRankState {
   LAGraph_PageRank *ranks;
 } pgGrB_Matrix_PageRankState;
 
-GrB_Info LAGraph_pagerank2       // GrB_SUCCESS or error condition
-(
-    LAGraph_PageRank **Phandle, // output: array of LAGraph_PageRank structs
-    GrB_Matrix A,               // binary input graph, not modified
-    int itermax,                // max number of iterations
-    double tol,                 // stop when norm (r-rnew,2) < tol
-    int *iters                  // number of iterations taken
-) ;
-
+typedef struct pgGrB_Matrix_SSSPState {
+  GrB_Vector pd;
+  GrB_Vector ppi;
+  GrB_Vector ph;
+} pgGrB_Matrix_SSSPState;
 
 /* helper to turn types into names. */
 char* grb_type_to_name(GrB_Type t);
@@ -249,6 +245,7 @@ PG_FUNCTION_INFO_V1(matrix_transpose);
 PG_FUNCTION_INFO_V1(matrix_assign_matrix);
 PG_FUNCTION_INFO_V1(matrix_bfs);
 PG_FUNCTION_INFO_V1(matrix_pagerank);
+PG_FUNCTION_INFO_V1(sssp_bf);
 
 /* Vectors */
 

@@ -11,7 +11,6 @@ MemoryContext gb_context;
 #include "type.c"
 #include "vector.c"
 #include "matrix.c"
-#include "LAGraph_pagerank.c"
 
 void *calloc_function(size_t num, size_t size) {
   MemoryContext oldcxt;
@@ -36,7 +35,7 @@ void *malloc_function(size_t size) {
 #ifdef HUGE_ALLOC
   p = palloc_extended(size, MCXT_ALLOC_HUGE);
 #else
-  p = palloc(size);  
+  p = palloc(size);
 #endif
   MemoryContextSwitchTo(oldcxt);
   return p;
@@ -67,22 +66,19 @@ _PG_init(void)
   GrB_Info info;
 
 #ifdef IMPORT_EXPORT
-  info = GxB_init (GrB_NONBLOCKING, malloc_function, calloc_function, realloc_function, free_function);
+  info = LAGraph_xinit (malloc_function,
+                        calloc_function,
+                        realloc_function,
+                        free_function,
+                        false);
 #else
-  info = GrB_init (GrB_BLOCKING);
+  info = LAGraph_init (GrB_BLOCKING);
 #endif
-  if (! (info == GrB_SUCCESS || info == GrB_NO_VALUE))
-    {
-      elog(ERROR, "%s", GrB_error());
-      return;
-    }
 
-  info = LAGraph_alloc_global ();
-  if (! (info == GrB_SUCCESS || info == GrB_NO_VALUE))
-    {
-      elog(ERROR, "%s", GrB_error());
-      return;
-    }
+  if (! (info == GrB_SUCCESS || info == GrB_NO_VALUE))  {
+    elog(ERROR, "%s", GrB_error());
+    return;
+  }
   
   SEMIRING_GROUP(0, FIRST_);
   SEMIRING_GROUP(40, SECOND_);

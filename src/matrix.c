@@ -657,16 +657,17 @@ matrix_mmread(PG_FUNCTION_ARGS) {
 
 Datum
 matrix_bfs(PG_FUNCTION_ARGS) {
-  pgGrB_Matrix *A;
+  pgGrB_Matrix *A, *AT;
   pgGrB_Vector *R;
-  GrB_Vector V;
+  GrB_Vector V, P;
   GrB_Index size, start;
   GrB_Info info;
   
   A = PGGRB_GETARG_MATRIX(0);
   start = PG_GETARG_INT64(1);
+  AT = PG_ARGISNULL(2)? NULL : PGGRB_GETARG_MATRIX(2);
   
-  CHECKD(LAGraph_bfs_pushpull(&V, NULL, A->M, NULL, start, 0, true));
+  CHECKD(LAGraph_bfs_pushpull(&V, &P, A->M, AT? AT->M : NULL, start, 0, true));
   CHECKD(GrB_Matrix_nrows(&size, A->M));
   TYPE_APPLY(R, GrB_INT32, construct_empty_expanded_vector, size, CurrentMemoryContext);
   CHECKD(GrB_free(&R->V));
@@ -699,7 +700,7 @@ matrix_pagerank(PG_FUNCTION_ARGS) {
 
     state = (pgGrB_Matrix_PageRankState*)palloc(sizeof(pgGrB_Matrix_PageRankState));
     CHECKD(GrB_Matrix_nrows(&nrows, mat->M));
-    CHECKD(LAGraph_pagerank2(&ranks, mat->M, 100, 0.0001, &iters));
+    CHECKD(LAGraph_pagerank(&ranks, mat->M, 100, 0.0001, &iters));
 
     state->ranks = ranks;
     funcctx->max_calls = nrows;
@@ -729,4 +730,95 @@ matrix_pagerank(PG_FUNCTION_ARGS) {
   } else {
     SRF_RETURN_DONE(funcctx);
   }
+}
+
+
+  GrB_Info LAGraph_BF_full
+(
+    GrB_Vector *pd,             //the pointer to the vector of distance
+    GrB_Vector *ppi,            //the pointer to the vector of parent
+    GrB_Vector *ph,             //the pointer to the vector of hops
+    const GrB_Matrix A,         //matrix for the graph
+    const GrB_Index s           //given index of the source
+ );
+
+  
+Datum sssp_bf(PG_FUNCTION_ARGS) {
+  pgGrB_Matrix *A;
+  GrB_Vector pd, ppi, ph;
+  GrB_Index start, n;
+  GrB_Info info;
+  FuncCallContext  *funcctx;
+  GrB_Index cnt, nrows;
+  TupleDesc tupdesc;
+  Datum result;
+  pgGrB_Matrix_SSSPState *state;
+  float8 distance;
+  int64 parent;
+  int64 hops;
+
+  Datum values[4];
+  bool nulls[4] = {false, false, false, false};
+  HeapTuple tuple;
+
+
+  if (SRF_IS_FIRSTCALL()) {
+    MemoryContext oldcontext;
+
+    funcctx = SRF_FIRSTCALL_INIT();
+    oldcontext = MemoryContextSwitchTo(funcctx->multi_call_memory_ctx);
+    A = PGGRB_GETARG_MATRIX(0);
+    start = PG_GETARG_INT64(1);
+    
+    state = (pgGrB_Matrix_SSSPState*)palloc(sizeof(pgGrB_Matrix_SSSPState));
+
+    CHECKD(GrB_Matrix_nrows(&n, A->M));
+    for (GrB_Index i = 0; i < n; i++) {
+      CHECKD(GrB_Matrix_setElement_FP64 (A->M, 0, i, i));
+    }
+
+    CHECKD(LAGraph_BF_full(&pd, &ppi, &ph, A->M, start));
+
+    state->pd = pd;
+    state->ppi = ppi;
+    state->ph = ph;
+
+    funcctx->max_calls = n;
+    funcctx->user_fctx = (void*)state;
+
+    if (get_call_result_type(fcinfo, NULL, &tupdesc) != TYPEFUNC_COMPOSITE)
+      ereport(ERROR,
+              (errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
+               errmsg("function returning record called in context "
+                      "that cannot accept type record")));
+    BlessTupleDesc(tupdesc);
+    funcctx->tuple_desc = tupdesc;
+
+    MemoryContextSwitchTo(oldcontext);
+  }
+
+  funcctx = SRF_PERCALL_SETUP();
+  state = (pgGrB_Matrix_SSSPState*)funcctx->user_fctx;
+
+  cnt = funcctx->call_cntr;
+  if (cnt < funcctx->max_calls) {
+
+    CHECKD(GrB_Vector_extractElement(&distance, state->pd, cnt));
+    CHECKD(GrB_Vector_extractElement(&parent, state->ppi, cnt));
+    CHECKD(GrB_Vector_extractElement(&hops, state->ph, cnt));
+    
+    values[0] = Int64GetDatum(cnt);
+
+    values[1] = distance == INFINITY? get_float8_infinity() : Float8GetDatum(distance);
+    
+    values[2] = Int64GetDatum(parent);
+    values[3] = Int64GetDatum(hops);
+
+    tuple = heap_form_tuple(funcctx->tuple_desc, values, nulls);
+    result = HeapTupleGetDatum(tuple);
+    SRF_RETURN_NEXT(funcctx, result);
+  } else {
+    SRF_RETURN_DONE(funcctx);
+  }
+  
 }

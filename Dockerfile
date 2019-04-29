@@ -11,21 +11,6 @@ ENV PGDATA /home/postgres/data
 RUN /bin/rm -Rf "$PGDATA" && mkdir "$PGDATA"
 WORKDIR "/home/postgres"
 
-# get GraphBLAS, compile with debug symbols    
-RUN curl -s -L http://faculty.cse.tamu.edu/davis/GraphBLAS/GraphBLAS-2.3.0.tar.gz | \
-    tar zxvf - && cd GraphBLAS && \
-#    sed -i 's/^\/\/ #undef NDEBUG/#undef NDEBUG/g' Source/GB.h && \
-#    sed -i 's/^\/\/ #define GB_PRINT_MALLOC 1/#define GB_PRINT_MALLOC 1/g' Source/GB.h && \
-    make library \
-    CMAKE_OPTIONS='-DCMAKE_BUILD_TYPE=Debug' \
-    && make install
-
-RUN git clone https://github.com/GraphBLAS/LAGraph.git && \
-    cd LAGraph && \
-    make library \
-    CMAKE_OPTIONS='-DCMAKE_BUILD_TYPE=Debug' \
-    && make install
-    
 # get postgres source and compile with debug and no optimization
 RUN git clone --branch REL_11_STABLE https://github.com/postgres/postgres.git --depth=1 && \
     cd postgres && ./configure \
@@ -35,6 +20,21 @@ RUN git clone --branch REL_11_STABLE https://github.com/postgres/postgres.git --
     CFLAGS="-ggdb -Og -g3 -fno-omit-frame-pointer" \
 #    CFLAGS="-O3" \
     && make -j 4 && make install
+
+# get GraphBLAS, compile with debug symbols    
+RUN curl -s -L http://faculty.cse.tamu.edu/davis/GraphBLAS/GraphBLAS-2.3.0.tar.gz | \
+    tar zxvf - && cd GraphBLAS && \
+#    sed -i 's/^\/\/ #undef NDEBUG/#undef NDEBUG/g' Source/GB.h && \
+#    sed -i 's/^\/\/ #define GB_PRINT_MALLOC 1/#define GB_PRINT_MALLOC 1/g' Source/GB.h && \
+    make library \
+    CMAKE_OPTIONS='-DCMAKE_BUILD_TYPE=Debug' \
+    && make install
+
+#RUN git clone https://github.com/GraphBLAS/LAGraph.git && \
+#    cd LAGraph && \
+#    make library \
+#    CMAKE_OPTIONS='-DCMAKE_BUILD_TYPE=Debug' \
+#    && make install
 
 RUN curl -s -L https://github.com/theory/pgtap/archive/v0.99.0.tar.gz | tar zxvf - && \   
     cd pgtap-0.99.0 && make && make install
@@ -46,6 +46,14 @@ RUN chown -R postgres:postgres /home/postgres
 RUN mkdir "/home/postgres/pggraphblas"
 WORKDIR "/home/postgres/pggraphblas"
 COPY . .
+    
+RUN mkdir "/home/postgres/LAGraph"
+COPY LAGraph /home/postgres/LAGraph
+
+RUN cd /home/postgres/LAGraph && \
+    make library \
+    CMAKE_OPTIONS='-DCMAKE_BUILD_TYPE=Debug' \
+    && make install
     
 # make the extension    
 RUN make && make install && make clean
