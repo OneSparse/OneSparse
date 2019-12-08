@@ -245,7 +245,7 @@ PG_FUNCTION_INFO_V1(matrix_transpose);
 PG_FUNCTION_INFO_V1(matrix_assign_matrix);
 PG_FUNCTION_INFO_V1(matrix_bfs);
 PG_FUNCTION_INFO_V1(matrix_pagerank);
-PG_FUNCTION_INFO_V1(sssp_bf);
+/* PG_FUNCTION_INFO_V1(sssp_bf); */
 
 /* Vectors */
 

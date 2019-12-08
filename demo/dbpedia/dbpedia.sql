@@ -22,9 +22,9 @@ drop table if exists article_x_article;
     dest integer
     );
 
-copy article (code, label) from program 'bzcat /demo/dbpedia/labels_wkd_uris_en.ttl.bz2 | gawk ''FNR > 1 {match($1, /<http:\/\/wikidata.dbpedia.org\/resource\/(.*)>/, a); $1 = ""; $2 = ""; match($0, /(\"[^\"]+\")/, b); print a[1]","b[1]}''' with (format csv);
+copy article (code, label) from program 'bzcat /demo/dbpedia/dump/labels_wkd_uris_en.ttl.bz2 | gawk ''FNR > 1 {match($1, /<http:\/\/wikidata.dbpedia.org\/resource\/(.*)>/, a); $1 = ""; $2 = ""; match($0, /(\"[^\"]+\")/, b); print a[1]","b[1]}''' with (format csv);
 
-copy page_link (subject, object) from program 'bzcat /demo/dbpedia/page_links_wkd_uris_en.ttl.bz2 | gawk ''FNR > 1 {match($1, /<http:\/\/wikidata.dbpedia.org\/resource\/(.*)>/, a); match($3, /<http:\/\/wikidata.dbpedia.org\/resource\/(.*)>/, b); print a[1]","b[1]}''' with (format csv);
+copy page_link (subject, object) from program 'bzcat /demo/dbpedia/dump/page_links_wkd_uris_en.ttl.bz2 | gawk ''FNR > 1 {match($1, /<http:\/\/wikidata.dbpedia.org\/resource\/(.*)>/, a); match($3, /<http:\/\/wikidata.dbpedia.org\/resource\/(.*)>/, b); print a[1]","b[1]}''' with (format csv);
 
 insert into article_x_article
     select s.id, o.id

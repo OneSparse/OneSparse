@@ -638,10 +638,10 @@ LANGUAGE C STABLE;
 
 CREATE TYPE ssspath AS (source bigint, distance float, parent bigint, hops bigint);
 
-CREATE FUNCTION sssp_bf(A matrix, start bigint)
-RETURNS ssspath
-AS '$libdir/pggraphblas', 'sssp_bf'
-LANGUAGE C STABLE;
+-- CREATE FUNCTION sssp_bf(A matrix, start bigint)
+-- RETURNS ssspath
+-- AS '$libdir/pggraphblas', 'sssp_bf'
+-- LANGUAGE C STABLE;
     
 -- vectors
 
