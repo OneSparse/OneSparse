@@ -28,7 +28,7 @@ For a long time, mathematicians have known that matrices are powerful
 representations of graphs, as described [in this mathmatical
 introduction to
 GraphBLAS](http://www.mit.edu/~kepner/GraphBLAS/GraphBLAS-Math-release.pdf)
-by [Dr. Jermey Kepner](http://www.mit.edu/~kepner/) head and founder
+by [Dr. Jeremy Kepner](http://www.mit.edu/~kepner/) head and founder
 of [MIT Lincoln Laboratory Supercomputing
 Center](http://news.mit.edu/2016/lincoln-laboratory-establishes-supercomputing-center-0511).
 
@@ -42,7 +42,7 @@ back and forth between them.
 
 ![Alt text](./docs/AdjacencyMatrix.svg)
 
-(Image Credit: [Dr. Jermey Kepner](http://www.mit.edu/~kepner/))
+(Image Credit: [Dr. Jeremy Kepner](http://www.mit.edu/~kepner/))
 
 On the left is a *directed* graph, and on the right, the adjacency
 matrix that represents it. The matrix has a row and column for every
@@ -101,7 +101,7 @@ even over the same graphs.
 
 ![Alt text](./docs/AdjacencyMatrixBFS.svg)
 
-(Image Credit: [Dr. Jermey Kepner](http://www.mit.edu/~kepner/))
+(Image Credit: [Dr. Jeremy Kepner](http://www.mit.edu/~kepner/))
 
 Above is the same graph and matrix from before, shown here as `A`.
 Next to it we see a *vector* `v`.  When you multiply the transpose of
