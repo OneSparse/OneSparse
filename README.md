@@ -213,7 +213,7 @@ tests, in general one for each integrated feature.
 # types
 
 GraphBLAS has an extremely rich type system that encompases not only
-common artithmetic algegbraic operations like addition and
+common arithmetic algegbraic operations like addition and
 multiplication, but also many other operations using algebraic
 structures called semirings.  The combinations of 7 matrix types and
 960 semiring operations offer a huge number of building blocks for
