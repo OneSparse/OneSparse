@@ -109,9 +109,9 @@ FN(matrix_get_flat_size)(ExpandedObjectHeader *eohptr) {
   if (A->flat_size)
     return A->flat_size;
 
-  CHECKD(GrB_Matrix_nrows(&nrows, A->M));
-  CHECKD(GrB_Matrix_ncols(&ncols, A->M));
-  CHECKD(GrB_Matrix_nvals(&nvals, A->M));
+  CHECKD(GrB_Matrix_nrows(&nrows, A->M), A->M);
+  CHECKD(GrB_Matrix_ncols(&ncols, A->M), A->M);
+  CHECKD(GrB_Matrix_nvals(&nvals, A->M), A->M);
 
   nbytes = PGGRB_MATRIX_OVERHEAD();
 #ifdef IMPORT_EXPORT
@@ -158,7 +158,7 @@ FN(matrix_flatten_into)(ExpandedObjectHeader *eohptr,
                                &rows,
                                &cols,
                                &values,
-                               NULL));
+                               NULL), A->M);
 
   if (nvals > 0) {
     memcpy(PGGRB_MATRIX_DATA(flat),
@@ -176,16 +176,16 @@ FN(matrix_flatten_into)(ExpandedObjectHeader *eohptr,
   }
   flat->nonempty = nonempty;
 #else
-  CHECKV(GrB_Matrix_nrows(&nrows, A->M));
-  CHECKV(GrB_Matrix_ncols(&ncols, A->M));
-  CHECKV(GrB_Matrix_nvals(&nvals, A->M));
+  CHECKV(GrB_Matrix_nrows(&nrows, A->M), A->M);
+  CHECKV(GrB_Matrix_ncols(&ncols, A->M), A->M);
+  CHECKV(GrB_Matrix_nvals(&nvals, A->M), A->M);
 
   rows = PGGRB_MATRIX_DATA(flat);
   CHECKV(GrB_Matrix_extractTuples(rows,
                                   rows + nvals,
                                   rows + nvals + nvals,
                                   &nvals,
-                                  A->M));
+                                  A->M), A->M);
 #endif
 
   flat->type = GB_TYPE;
@@ -267,7 +267,7 @@ FN(expand_flat_matrix)(pgGrB_FlatMatrix *flat,
                                  &cols,
                                  &vals,
                                  NULL
-                                 ));
+                                 ), A->M);
     if (A->M == NULL) {
       pfree(rows);
       pfree(cols);
@@ -278,7 +278,7 @@ FN(expand_flat_matrix)(pgGrB_FlatMatrix *flat,
     CHECKD(GrB_Matrix_new(&A->M,
                           type,
                           nrows,
-                          ncols));
+                          ncols), A->M);
   }
 
 #else
@@ -286,7 +286,7 @@ FN(expand_flat_matrix)(pgGrB_FlatMatrix *flat,
   CHECKD(GrB_Matrix_new(&A->M,
                         type,
                         nrows,
-                        ncols));
+                        ncols), A->M);
 
   if (nvals > 0) {
     /* Rows, cols, and vals are pointers into the vardata area */
@@ -299,7 +299,7 @@ FN(expand_flat_matrix)(pgGrB_FlatMatrix *flat,
                             cols,
                             vals,
                             nvals,
-                            GB_DUP));
+                            GB_DUP), A->M);
   }
 #endif
 
@@ -368,7 +368,7 @@ FN(matrix_elements)(PG_FUNCTION_ARGS) {
     mat = PGGRB_GETARG_MATRIX(0);
 
     state = (FN(pgGrB_Matrix_ExtractState)*)palloc(sizeof(FN(pgGrB_Matrix_ExtractState)));
-    CHECKD(GrB_Matrix_nvals(&nvals, mat->M));
+    CHECKD(GrB_Matrix_nvals(&nvals, mat->M), mat->M);
 
     state->rows = (GrB_Index*) palloc0(sizeof(GrB_Index) * nvals);
     state->cols = (GrB_Index*) palloc0(sizeof(GrB_Index) * nvals);
@@ -378,7 +378,7 @@ FN(matrix_elements)(PG_FUNCTION_ARGS) {
                                    state->cols,
                                    state->vals,
                                    &nvals,
-                                   mat->M));
+                                   mat->M), mat->M);
     state->mat = mat;
     funcctx->max_calls = nvals;
     funcctx->user_fctx = (void*)state;
@@ -425,11 +425,11 @@ FN(matrix_ewise_mult)(pgGrB_Matrix *A,
   GrB_Index m, n;
 
   if (C == NULL) {
-    CHECKD(GrB_Matrix_nrows(&m, A->M));
-    CHECKD(GrB_Matrix_ncols(&n, A->M));
+    CHECKD(GrB_Matrix_nrows(&m, A->M), A->M);
+    CHECKD(GrB_Matrix_ncols(&n, A->M), A->M);
     C = FN(construct_empty_expanded_matrix)(m, n, CurrentMemoryContext);
   }
-  CHECKD(GrB_eWiseMult(C->M, mask ? mask->M : NULL, accum, binop, A->M, B->M, desc));
+  CHECKD(GrB_eWiseMult(C->M, mask ? mask->M : NULL, accum, binop, A->M, B->M, desc), A->M);
   PGGRB_RETURN_MATRIX(C);
 }
 
@@ -446,12 +446,12 @@ FN(matrix_ewise_add)(pgGrB_Matrix *A,
   GrB_Index m, n;
 
   if (C == NULL) {
-    CHECKD(GrB_Matrix_nrows(&m, A->M));
-    CHECKD(GrB_Matrix_ncols(&n, A->M));
+    CHECKD(GrB_Matrix_nrows(&m, A->M), A->M);
+    CHECKD(GrB_Matrix_ncols(&n, A->M), A->M);
     C = FN(construct_empty_expanded_matrix)(m, n, CurrentMemoryContext);
   }
 
-  CHECKD(GrB_eWiseAdd(C->M, mask ? mask->M : NULL, accum, binop, A->M, B->M, desc));
+  CHECKD(GrB_eWiseAdd(C->M, mask ? mask->M : NULL, accum, binop, A->M, B->M, desc), A->M);
   PGGRB_RETURN_MATRIX(C);
 }
 
@@ -467,11 +467,11 @@ FN(mxm)(pgGrB_Matrix *A,
 
   if (C == NULL) {
     GrB_Index m, n;
-    CHECKD(GrB_Matrix_nrows(&m, A->M));
-    CHECKD(GrB_Matrix_ncols(&n, B->M));
+    CHECKD(GrB_Matrix_nrows(&m, A->M), A->M);
+    CHECKD(GrB_Matrix_ncols(&n, B->M), A->M);
     C = FN(construct_empty_expanded_matrix)(m, n, CurrentMemoryContext);
   }
-  CHECKD(GrB_mxm(C->M, mask ? mask->M : NULL, binop, semiring, A->M, B->M, desc));
+  CHECKD(GrB_mxm(C->M, mask ? mask->M : NULL, binop, semiring, A->M, B->M, desc), A->M);
   PGGRB_RETURN_MATRIX(C);
 }
 
@@ -487,10 +487,10 @@ FN(mxv)(pgGrB_Matrix *A,
   GrB_Index size;
 
   if (C == NULL) {
-    CHECKD(GrB_Matrix_ncols(&size, A->M));
+    CHECKD(GrB_Matrix_ncols(&size, A->M), A->M);
     C = FN(construct_empty_expanded_vector)(size, CurrentMemoryContext);
   }
-  CHECKD(GrB_mxv(C->V, mask ? mask->V : NULL, binop, semiring, A->M, B->V, desc));
+  CHECKD(GrB_mxv(C->V, mask ? mask->V : NULL, binop, semiring, A->M, B->V, desc), A->M);
   PGGRB_RETURN_VECTOR(C);
 }
 
@@ -506,10 +506,10 @@ FN(vxm)(pgGrB_Vector *A,
   GrB_Index size;
 
   if (C == NULL) {
-    CHECKD(GrB_Vector_size(&size, A->V));
+    CHECKD(GrB_Vector_size(&size, A->V), A->M);
     C = FN(construct_empty_expanded_vector)(size, CurrentMemoryContext);
   }
-  CHECKD(GrB_vxm(C->V, mask ? mask->V : NULL, binop, semiring, A->V, B->M, desc));
+  CHECKD(GrB_vxm(C->V, mask ? mask->V : NULL, binop, semiring, A->V, B->M, desc), A->M);
   PGGRB_RETURN_VECTOR(C);
 }
 
@@ -607,7 +607,7 @@ FN(matrix)(PG_FUNCTION_ARGS) {
                           col_indices,
                           values,
                           count,
-                          GB_DUP));
+                          GB_DUP), A->M);
 
   PGGRB_RETURN_MATRIX(retval);
 }
@@ -628,12 +628,12 @@ FN(matrix_reduce)(PG_FUNCTION_ARGS) {
     text_to_cstring(PG_GETARG_TEXT_PP(1));
 
   if (semiring_name == NULL) {
-    CHECKD(GxB_Matrix_type(&type, A->M));
+    CHECKD(GxB_Matrix_type(&type, A->M), A->M);
     semiring_name = DEFAULT_SEMIRING(type);
   }
   semiring = lookup_semiring(semiring_name);
-  CHECKD(GxB_Semiring_add(&monoid, semiring));
-  CHECKD(GrB_reduce(&val, NULL, monoid, A->M, NULL));
+  CHECKD(GxB_Semiring_add(&monoid, semiring), A->M);
+  CHECKD(GrB_reduce(&val, NULL, monoid, A->M, NULL), A->M);
   PG_RET(val);
 }
 
@@ -652,7 +652,7 @@ GrB_Index FN(extract_rowscols)(pgGrB_Matrix *A,
                                   *cols,
                                   values,
                                   &nvals,
-                                  A->M));
+                                  A->M), A->M);
   return nvals;
 }
 
@@ -670,11 +670,11 @@ FN(matrix_assign)(PG_FUNCTION_ARGS) {
   mask = PG_ARGISNULL(3)? NULL : PGGRB_GETARG_MATRIX(3);
 
   if (B != NULL) {
-    CHECKD(GrB_Matrix_nvals(&nvals, B->M));
+    CHECKD(GrB_Matrix_nvals(&nvals, B->M), A->M);
     nrows = ncols = nvals = FN(extract_rowscols)(B, &rows, &cols, nvals);
   } else {
-    CHECKD(GrB_Matrix_nrows(&nrows, A->M));
-    CHECKD(GrB_Matrix_ncols(&ncols, A->M));
+    CHECKD(GrB_Matrix_nrows(&nrows, A->M), A->M);
+    CHECKD(GrB_Matrix_ncols(&ncols, A->M), A->M);
   }
 
   CHECKD(GrB_assign(A->M,
@@ -685,7 +685,7 @@ FN(matrix_assign)(PG_FUNCTION_ARGS) {
                     nrows,
                     cols?cols:GrB_ALL,
                     ncols,
-                    NULL));
+                    NULL), A->M);
 
   PGGRB_RETURN_MATRIX(A);
 }
@@ -702,13 +702,13 @@ FN(matrix_kron)(pgGrB_Matrix *A,
 
   if (C == NULL) {
     GrB_Index m, n, p, q;
-    CHECKD(GrB_Matrix_nrows(&m, A->M));
-    CHECKD(GrB_Matrix_ncols(&n, A->M));
-    CHECKD(GrB_Matrix_nrows(&p, B->M));
-    CHECKD(GrB_Matrix_ncols(&q, B->M));
+    CHECKD(GrB_Matrix_nrows(&m, A->M), A->M);
+    CHECKD(GrB_Matrix_ncols(&n, A->M), A->M);
+    CHECKD(GrB_Matrix_nrows(&p, B->M), B->M);
+    CHECKD(GrB_Matrix_ncols(&q, B->M), B->M);
     C = FN(construct_empty_expanded_matrix)(m*p, n*q, CurrentMemoryContext);
   }
-  CHECKD(GxB_kron(C->M, mask ? mask->M : NULL, accum, mulop, A->M, B->M, desc));
+  CHECKD(GxB_kron(C->M, mask ? mask->M : NULL, accum, mulop, A->M, B->M, desc), A->M);
   PGGRB_RETURN_MATRIX(C);
 }
 
@@ -744,9 +744,9 @@ FN(matrix_random)(PG_FUNCTION_ARGS) {
                         make_skew_symmetric,
                         make_hermitian,
                         no_diagonal,
-                        &seed));
+                        &seed), A->M);
 
-  CHECKD(GrB_free(&A->M));
+  CHECKD(GrB_free(&A->M), A->M);
   A->M = M;
   PGGRB_RETURN_MATRIX(A);
 }
@@ -763,7 +763,7 @@ FN(matrix_set_element)(PG_FUNCTION_ARGS) {
   col = PG_GETARG_INT64(2);
   val = PG_GET(3);
 
-  CHECKD(GrB_Matrix_setElement(A->M, val, row, col));
+  CHECKD(GrB_Matrix_setElement(A->M, val, row, col), A->M);
   PGGRB_RETURN_MATRIX(A);
 }
 

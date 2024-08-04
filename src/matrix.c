@@ -1,5 +1,5 @@
 
-/* The same "header template" vector.h is used to generate the various
+/* The same "header template" matrix.h is used to generate the various
    type specific functions. */
 
 #define SUFFIX _bool
@@ -172,7 +172,7 @@ matrix_nrows(PG_FUNCTION_ARGS) {
   pgGrB_Matrix *mat;
   GrB_Index count;
   mat = PGGRB_GETARG_MATRIX(0);
-  CHECKD(GrB_Matrix_nrows(&count, mat->M));
+  CHECKD(GrB_Matrix_nrows(&count, mat->M), mat->M);
   return Int64GetDatum(count);
 }
 
@@ -182,7 +182,7 @@ matrix_ncols(PG_FUNCTION_ARGS) {
   pgGrB_Matrix *mat;
   GrB_Index count;
   mat = PGGRB_GETARG_MATRIX(0);
-  CHECKD(GrB_Matrix_ncols(&count, mat->M));
+  CHECKD(GrB_Matrix_ncols(&count, mat->M), mat->M);
   return Int64GetDatum(count);
 }
 
@@ -192,7 +192,7 @@ matrix_nvals(PG_FUNCTION_ARGS) {
   pgGrB_Matrix *mat;
   GrB_Index count;
   mat = PGGRB_GETARG_MATRIX(0);
-  CHECKD(GrB_Matrix_nvals(&count, mat->M));
+  CHECKD(GrB_Matrix_nvals(&count, mat->M), mat->M);
   return Int64GetDatum(count);
 }
 
@@ -205,7 +205,7 @@ matrix_eq(PG_FUNCTION_ARGS) {
   A = PGGRB_GETARG_MATRIX(0);
   B = PGGRB_GETARG_MATRIX(1);
 
-  CHECKD(LAGraph_isequal(&result, A->M, B->M, NULL));
+  CHECKD(LAGraph_isequal(&result, A->M, B->M, NULL), A->M);
   PG_RETURN_BOOL(result);
 }
 
@@ -218,7 +218,7 @@ matrix_ne(PG_FUNCTION_ARGS) {
   A = PGGRB_GETARG_MATRIX(0);
   B = PGGRB_GETARG_MATRIX(1);
 
-  CHECKD(LAGraph_isequal(&result, A->M, B->M, NULL));
+  CHECKD(LAGraph_isequal(&result, A->M, B->M, NULL), A->M);
   PG_RETURN_BOOL(!result);
 }
 
@@ -448,17 +448,17 @@ matrix_reduce_vector(PG_FUNCTION_ARGS) {
     text_to_cstring(PG_GETARG_TEXT_PP(1));
 
   if (semiring_name == NULL) {
-    CHECKD(GxB_Matrix_type(&type, A->M));
+      CHECKD(GxB_Matrix_type(&type, A->M), A->M);
     semiring_name = DEFAULT_SEMIRING(type);
   }
 
   semiring = lookup_semiring(semiring_name);
-  CHECKD(GxB_Semiring_add(&monoid, semiring));
+  CHECKD(GxB_Semiring_add(&monoid, semiring), semiring);
 
-  CHECKD(GrB_Matrix_ncols(&size, A->M));
+  CHECKD(GrB_Matrix_ncols(&size, A->M), A->M);
   TYPE_APPLY(val, A->type, construct_empty_expanded_vector, size, CurrentMemoryContext);
 
-  CHECKD(GrB_reduce(val->V, NULL, monoid, A->M, NULL));
+  CHECKD(GrB_reduce(val->V, NULL, monoid, A->M, NULL), A->M);
   PGGRB_RETURN_VECTOR(val);
 }
 
@@ -480,12 +480,12 @@ matrix_transpose(PG_FUNCTION_ARGS) {
   }
 
   if (C == NULL) {
-    CHECKD(GrB_Matrix_nrows(&m, A->M));
-    CHECKD(GrB_Matrix_ncols(&n, A->M));
-    TYPE_APPLY(C, A->type, construct_empty_expanded_matrix, m, n, CurrentMemoryContext);
+      CHECKD(GrB_Matrix_nrows(&m, A->M), A->M);
+      CHECKD(GrB_Matrix_ncols(&n, A->M), A->M);
+      TYPE_APPLY(C, A->type, construct_empty_expanded_matrix, m, n, CurrentMemoryContext);
   }
 
-  CHECKD(GrB_transpose(C->M, mask? mask->M:NULL, NULL, A->M, desc));
+  CHECKD(GrB_transpose(C->M, mask? mask->M:NULL, NULL, A->M, desc), A->M);
   PGGRB_RETURN_MATRIX(C);
 }
 
@@ -499,7 +499,7 @@ matrix_assign_matrix(PG_FUNCTION_ARGS) {
   B = PGGRB_GETARG_MATRIX(1);
   mask = PG_ARGISNULL(2)? NULL : PGGRB_GETARG_MATRIX(2);
 
-  CHECKD(GrB_Matrix_nvals(&nvals, B->M));
+  CHECKD(GrB_Matrix_nvals(&nvals, B->M), B->M);
 
   if (B != NULL) {
     TYPE_APPLY(nvals, B->type, extract_rowscols, B, &rows, &cols, nvals);
@@ -513,7 +513,7 @@ matrix_assign_matrix(PG_FUNCTION_ARGS) {
                     nvals,
                     cols? cols : GrB_ALL,
                     nvals,
-                    NULL));
+                    NULL), A->M);
   PGGRB_RETURN_MATRIX(A);
 }
 
@@ -573,17 +573,17 @@ matrix_xtract(PG_FUNCTION_ARGS) {
   C = PG_ARGISNULL(2) ? NULL : PGGRB_GETARG_MATRIX(2);
   GET_DESCRIPTOR(3, desc);
 
-  CHECKD(GrB_Matrix_nrows(&nrows, A->M));
-  CHECKD(GrB_Matrix_ncols(&ncols, A->M));
+  CHECKD(GrB_Matrix_nrows(&nrows, A->M), A->M);
+  CHECKD(GrB_Matrix_ncols(&ncols, A->M), A->M);
 
   if (C == NULL) {
     TYPE_APPLY(C, A->type, construct_empty_expanded_matrix, nrows, ncols, CurrentMemoryContext);
   }
 
-  CHECKD(GrB_Matrix_nvals(&nvals, A->M));
+  CHECKD(GrB_Matrix_nvals(&nvals, A->M), A->M);
   TYPE_APPLY(nvals, A->type, extract_rowscols, B, &rows, &cols, nvals);
 
-  CHECKD(GrB_Matrix_extract(C->M, NULL, NULL, A->M, rows, nrows, cols, ncols, NULL));
+  CHECKD(GrB_Matrix_extract(C->M, NULL, NULL, A->M, rows, nrows, cols, ncols, NULL), A->M);
   PGGRB_RETURN_MATRIX(C);
 }
 
@@ -646,169 +646,12 @@ matrix_mmread(PG_FUNCTION_ARGS) {
     elog(ERROR, "unable to open memstream for matrix_mmread");
   
   LAGraph_mmread(&M, fp);
-  CHECKD(GrB_Matrix_nrows(&nrows, M));
-  CHECKD(GrB_Matrix_ncols(&ncols, M));
-  CHECKD(GxB_Matrix_type(&type, M));
+  CHECKD(GrB_Matrix_nrows(&nrows, M), M);
+  CHECKD(GrB_Matrix_ncols(&ncols, M), M);
+  CHECKD(GxB_Matrix_type(&type, M), M);
   
   TYPE_APPLY(A, type, construct_empty_expanded_matrix, nrows, ncols, CurrentMemoryContext);
-  CHECKD(GrB_free(&A->M));
+  CHECKD(GrB_free(&A->M), A->M);
   A->M = M;
   PGGRB_RETURN_MATRIX(A);
 }
-
-Datum
-matrix_bfs(PG_FUNCTION_ARGS) {
-  pgGrB_Matrix *A, *AT;
-  pgGrB_Vector *R;
-  GrB_Vector V, P;
-  GrB_Index size, start;
-  GrB_Info info;
-  
-  A = PGGRB_GETARG_MATRIX(0);
-  start = PG_GETARG_INT64(1);
-  AT = PG_ARGISNULL(2)? NULL : PGGRB_GETARG_MATRIX(2);
-  
-  CHECKD(LAGraph_bfs_pushpull(&V, &P, A->M, AT? AT->M : NULL, start, 0, true));
-  CHECKD(GrB_Matrix_nrows(&size, A->M));
-  TYPE_APPLY(R, GrB_INT32, construct_empty_expanded_vector, size, CurrentMemoryContext);
-  CHECKD(GrB_free(&R->V));
-  R->V = V;
-  PGGRB_RETURN_VECTOR(R);
-}
-
-Datum
-matrix_pagerank(PG_FUNCTION_ARGS) {
-  GrB_Info info;
-  FuncCallContext  *funcctx;
-  TupleDesc tupdesc;
-  Datum result;
-
-  Datum values[2];
-  bool nulls[2] = {false, false};
-  HeapTuple tuple;
-  GrB_Index nrows = 0;
-  pgGrB_Matrix *mat;
-  pgGrB_Matrix_PageRankState *state;
-  int iters;
-  LAGraph_PageRank *ranks = NULL;
-
-  if (SRF_IS_FIRSTCALL()) {
-    MemoryContext oldcontext;
-
-    funcctx = SRF_FIRSTCALL_INIT();
-    oldcontext = MemoryContextSwitchTo(funcctx->multi_call_memory_ctx);
-    mat = PGGRB_GETARG_MATRIX(0);
-
-    state = (pgGrB_Matrix_PageRankState*)palloc(sizeof(pgGrB_Matrix_PageRankState));
-    CHECKD(GrB_Matrix_nrows(&nrows, mat->M));
-    CHECKD(LAGraph_pagerank(&ranks, mat->M, 100, 0.0001, &iters));
-
-    state->ranks = ranks;
-    funcctx->max_calls = nrows;
-    funcctx->user_fctx = (void*)state;
-
-    if (get_call_result_type(fcinfo, NULL, &tupdesc) != TYPEFUNC_COMPOSITE)
-      ereport(ERROR,
-              (errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
-               errmsg("function returning record called in context "
-                      "that cannot accept type record")));
-    BlessTupleDesc(tupdesc);
-    funcctx->tuple_desc = tupdesc;
-
-    MemoryContextSwitchTo(oldcontext);
-  }
-
-  funcctx = SRF_PERCALL_SETUP();
-  state = (pgGrB_Matrix_PageRankState*)funcctx->user_fctx;
-
-  if (funcctx->call_cntr < funcctx->max_calls) {
-    values[0] = Int64GetDatum(state->ranks[funcctx->call_cntr].page);
-    values[1] = Float8GetDatum(state->ranks[funcctx->call_cntr].pagerank);
-
-    tuple = heap_form_tuple(funcctx->tuple_desc, values, nulls);
-    result = HeapTupleGetDatum(tuple);
-    SRF_RETURN_NEXT(funcctx, result);
-  } else {
-    SRF_RETURN_DONE(funcctx);
-  }
-}
-
-/* Datum sssp_bf(PG_FUNCTION_ARGS) { */
-/*   pgGrB_Matrix *A; */
-/*   GrB_Vector pd, ppi, ph; */
-/*   GrB_Index start, n; */
-/*   GrB_Info info; */
-/*   FuncCallContext  *funcctx; */
-/*   GrB_Index cnt, nrows; */
-/*   TupleDesc tupdesc; */
-/*   Datum result; */
-/*   pgGrB_Matrix_SSSPState *state; */
-/*   float8 distance; */
-/*   int64 parent; */
-/*   int64 hops; */
-
-/*   Datum values[4]; */
-/*   bool nulls[4] = {false, false, false, false}; */
-/*   HeapTuple tuple; */
-
-
-/*   if (SRF_IS_FIRSTCALL()) { */
-/*     MemoryContext oldcontext; */
-
-/*     funcctx = SRF_FIRSTCALL_INIT(); */
-/*     oldcontext = MemoryContextSwitchTo(funcctx->multi_call_memory_ctx); */
-/*     A = PGGRB_GETARG_MATRIX(0); */
-/*     start = PG_GETARG_INT64(1); */
-    
-/*     state = (pgGrB_Matrix_SSSPState*)palloc(sizeof(pgGrB_Matrix_SSSPState)); */
-
-/*     CHECKD(GrB_Matrix_nrows(&n, A->M)); */
-/*     for (GrB_Index i = 0; i < n; i++) { */
-/*       CHECKD(GrB_Matrix_setElement_FP64 (A->M, 0, i, i)); */
-/*     } */
-
-/*     CHECKD(LAGraph_BF_full(&pd, &ppi, &ph, A->M, start)); */
-
-/*     state->pd = pd; */
-/*     state->ppi = ppi; */
-/*     state->ph = ph; */
-
-/*     funcctx->max_calls = n; */
-/*     funcctx->user_fctx = (void*)state; */
-
-/*     if (get_call_result_type(fcinfo, NULL, &tupdesc) != TYPEFUNC_COMPOSITE) */
-/*       ereport(ERROR, */
-/*               (errcode(ERRCODE_FEATURE_NOT_SUPPORTED), */
-/*                errmsg("function returning record called in context " */
-/*                       "that cannot accept type record"))); */
-/*     BlessTupleDesc(tupdesc); */
-/*     funcctx->tuple_desc = tupdesc; */
-
-/*     MemoryContextSwitchTo(oldcontext); */
-/*   } */
-
-/*   funcctx = SRF_PERCALL_SETUP(); */
-/*   state = (pgGrB_Matrix_SSSPState*)funcctx->user_fctx; */
-
-/*   cnt = funcctx->call_cntr; */
-/*   if (cnt < funcctx->max_calls) { */
-
-/*     CHECKD(GrB_Vector_extractElement(&distance, state->pd, cnt)); */
-/*     CHECKD(GrB_Vector_extractElement(&parent, state->ppi, cnt)); */
-/*     CHECKD(GrB_Vector_extractElement(&hops, state->ph, cnt)); */
-    
-/*     values[0] = Int64GetDatum(cnt); */
-
-/*     values[1] = distance == INFINITY? get_float8_infinity() : Float8GetDatum(distance); */
-    
-/*     values[2] = Int64GetDatum(parent); */
-/*     values[3] = Int64GetDatum(hops); */
-
-/*     tuple = heap_form_tuple(funcctx->tuple_desc, values, nulls); */
-/*     result = HeapTupleGetDatum(tuple); */
-/*     SRF_RETURN_NEXT(funcctx, result); */
-/*   } else { */
-/*     SRF_RETURN_DONE(funcctx); */
-/*   } */
-  
-/* } */

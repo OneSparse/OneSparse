@@ -1,8 +1,7 @@
 #ifndef PGGRAPHBLAS_H
 #define PGGRAPHBLAS_H
 
-#include "GraphBLAS.h"
-#include "LAGraph.h"
+#include "suitesparse/GraphBLAS.h"
 #include "postgres.h"
 #include "utils/builtins.h"
 #include "libpq/pqformat.h"
@@ -96,22 +95,26 @@
 
 /* GraphBLAS API checking macros */
 
-#define CHECKD(method)                                      \
+#define CHECKD(method, obj)                                 \
   {                                                         \
     info = method ;                                         \
     if (! (info == GrB_SUCCESS || info == GrB_NO_VALUE))    \
     {                                                       \
-      elog(ERROR, "%s", GrB_error());                       \
-      return (Datum) 0;                                     \
+        const char *emsg;                                   \
+        GrB_error(&emsg, obj);                              \
+        elog(ERROR, "%s", emsg);                            \
+        return (Datum) 0;                                   \
     }                                                       \
-}
+  }                                                         \
 
-#define CHECKV(method)                                      \
+#define CHECKV(method, obj)                                 \
 {                                                           \
     info = method ;                                         \
     if (! (info == GrB_SUCCESS || info == GrB_NO_VALUE))    \
     {                                                       \
-      elog(ERROR, "%s", GrB_error());                       \
+        const char *emsg;                                   \
+        GrB_error(&emsg, obj);                              \
+        elog(ERROR, "%s", emsg);                            \
       return;                                               \
     }                                                       \
 }                                                           \
@@ -176,9 +179,9 @@ typedef struct pgGrB_Matrix  {
   Size flat_size;
 } pgGrB_Matrix;
 
-typedef struct pgGrB_Matrix_PageRankState {
-  LAGraph_PageRank *ranks;
-} pgGrB_Matrix_PageRankState;
+/* typedef struct pgGrB_Matrix_PageRankState { */
+/*   LAGraph_PageRank *ranks; */
+/* } pgGrB_Matrix_PageRankState; */
 
 typedef struct pgGrB_Matrix_SSSPState {
   GrB_Vector pd;
@@ -244,7 +247,7 @@ PG_FUNCTION_INFO_V1(matrix_reduce_vector);
 PG_FUNCTION_INFO_V1(matrix_transpose);
 PG_FUNCTION_INFO_V1(matrix_assign_matrix);
 PG_FUNCTION_INFO_V1(matrix_bfs);
-PG_FUNCTION_INFO_V1(matrix_pagerank);
+//PG_FUNCTION_INFO_V1(matrix_pagerank);
 /* PG_FUNCTION_INFO_V1(sssp_bf); */
 
 /* Vectors */
@@ -452,20 +455,20 @@ typedef struct pgGrB_UnaryOp  {
     if (!PG_ARGISNULL(ARG)) {                                           \
       (desc_val) = text_to_cstring(PG_GETARG_TEXT_PP(ARG));             \
       if (strcmp((desc_val), "default") == 0) {                         \
-        CHECKD(GrB_Descriptor_set((DESC), GrB_##FIELD, GxB_DEFAULT));   \
+          CHECKD(GrB_Descriptor_set((DESC), GrB_##FIELD, GxB_DEFAULT), DESC); \
       } else if (strcmp((desc_val), "replace") == 0) {                  \
-        CHECKD(GrB_Descriptor_set((DESC), GrB_##FIELD, GrB_##VAL));     \
+          CHECKD(GrB_Descriptor_set((DESC), GrB_##FIELD, GrB_##VAL), DESC);  \
       } else if (strcmp((desc_val), "scmp") == 0) {                     \
-        CHECKD(GrB_Descriptor_set((DESC), GrB_##FIELD, GrB_##VAL));     \
+          CHECKD(GrB_Descriptor_set((DESC), GrB_##FIELD, GrB_##VAL), DESC);  \
       } else if (strcmp((desc_val), "tran") == 0) {                     \
-        CHECKD(GrB_Descriptor_set((DESC), GrB_##FIELD, GrB_##VAL));     \
+          CHECKD(GrB_Descriptor_set((DESC), GrB_##FIELD, GrB_##VAL), DESC);  \
       } else                                                            \
         elog(ERROR, "unknown outp descriptor value %s", desc_val);      \
     }                                                                   \
   } while(0)
 
 #define GET_DESCRIPTOR(N, D) do {                               \
-    CHECKD(GrB_Descriptor_new(&D));                             \
+    CHECKD(GrB_Descriptor_new(&D), D);                        \
     GETARG_DESCRIPTOR_VAL(N, D, OUTP, REPLACE);                 \
     GETARG_DESCRIPTOR_VAL(N+1, D, MASK, SCMP);                  \
     GETARG_DESCRIPTOR_VAL(N+2, D, INP0, TRAN);                  \

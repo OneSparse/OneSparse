@@ -70,8 +70,8 @@ FN(vector_get_flat_size)(ExpandedObjectHeader *eohptr) {
   if (A->flat_size)
     return A->flat_size;
 
-  CHECKD(GrB_Vector_size(&size, A->V));
-  CHECKD(GrB_Vector_nvals(&nvals, A->V));
+  CHECKD(GrB_Vector_size(&size, A->V), A->V);
+  CHECKD(GrB_Vector_nvals(&nvals, A->V), A->V);
 
   nbytes = PGGRB_VECTOR_OVERHEAD();
   nbytes += size * sizeof(GrB_Index);
@@ -89,27 +89,24 @@ FN(vector_flatten_into)(ExpandedObjectHeader *eohptr,
   GrB_Index *start, size, nvals;
   pgGrB_Vector *A = (pgGrB_Vector *) eohptr;
   pgGrB_FlatVector *flat = (pgGrB_FlatVector *) result;
-#ifdef IMPORT_EXPORT
   void *values;
   GrB_Type type;
-#endif
 
   Assert(A->ev_magic == vector_MAGIC);
   Assert(allocated_size == A->flat_size);
 
   memset(flat, 0, allocated_size);
 
-  CHECKV(GrB_Vector_nvals(&nvals, A->V));
-  CHECKV(GrB_Vector_size(&size, A->V));
+  CHECKV(GrB_Vector_nvals(&nvals, A->V), A->V);
+  CHECKV(GrB_Vector_size(&size, A->V), A->V);
 
-#ifdef IMPORT_EXPORT
-  CHECKV(GxB_Vector_export(&A->V,
+  CHECKV(GxB_Vector_export_CSC(&A->V,
                            &type,
                            &size,
                            &nvals,
                            &start,
                            &values,
-                           NULL));
+                           NULL), A->V);
 
   if (nvals > 0) {
     memcpy(PGGRB_VECTOR_DATA(flat), start, nvals*sizeof(GrB_Index));
@@ -117,13 +114,6 @@ FN(vector_flatten_into)(ExpandedObjectHeader *eohptr,
     pfree(start);
     pfree(values);
   }
-#else
-  start = PGGRB_VECTOR_DATA(flat);
-  CHECKV(GrB_Vector_extractTuples(start,
-                                  start + size,
-                                  &nvals,
-                                  A->V));
-#endif
 
   flat->size = size;
   flat->nvals = nvals;
@@ -182,7 +172,7 @@ FN(expand_flat_vector)(pgGrB_FlatVector *flat,
   /* Initialize the new vector */
   CHECKD(GrB_Vector_new(&A->V,
                         type,
-                        size));
+                        size), A->V);
 
   /* Create a context callback to free vector when context is cleared */
   ctxcb = (MemoryContextCallback*)MemoryContextAlloc(
@@ -199,7 +189,7 @@ FN(expand_flat_vector)(pgGrB_FlatVector *flat,
                             indices,
                             vals,
                             nvals,
-                            GB_DUP));
+                            GB_DUP), A->V);
   }
 
   A->type = type;
@@ -301,7 +291,7 @@ FN(vector)(PG_FUNCTION_ARGS) {
                          row_indices,
                          values,
                          vcount,
-                         GB_DUP));
+                          GB_DUP), retval->V);
 
   PGGRB_RETURN_VECTOR(retval);
 }
@@ -328,7 +318,7 @@ FN(vector_elements)(PG_FUNCTION_ARGS) {
     vec = (pgGrB_Vector *) PGGRB_GETARG_VECTOR(0);
 
     state = (FN(pgGrB_Vector_ExtractState)*)palloc(sizeof(FN(pgGrB_Vector_ExtractState)));
-    CHECKD(GrB_Vector_size(&size, vec->V));
+    CHECKD(GrB_Vector_size(&size, vec->V), vec->V);
 
     state->indices = (GrB_Index*) palloc0(sizeof(GrB_Index) * size);
     state->vals = (PG_TYPE*) palloc0(sizeof(PG_TYPE) * size);
@@ -336,7 +326,7 @@ FN(vector_elements)(PG_FUNCTION_ARGS) {
     CHECKD(GrB_Vector_extractTuples(state->indices,
                                    state->vals,
                                    &size,
-                                   vec->V));
+                                    vec->V), vec->V);
     state->vec = vec;
     funcctx->max_calls = size;
     funcctx->user_fctx = (void*)state;
@@ -381,10 +371,10 @@ FN(vector_ewise_mult)(pgGrB_Vector *A,
   GrB_Index size;
 
   if (C == NULL) {
-    CHECKD(GrB_Vector_size(&size, A->V));
+      CHECKD(GrB_Vector_size(&size, A->V), A->V);
     C = FN(construct_empty_expanded_vector)(size, CurrentMemoryContext);
   }
-  CHECKD(GrB_eWiseMult(C->V, mask ? mask->V : NULL, accum, binop, A->V, B->V, desc));
+  CHECKD(GrB_eWiseMult(C->V, mask ? mask->V : NULL, accum, binop, A->V, B->V, desc), C->V);
   PGGRB_RETURN_VECTOR(C);
 }
 
@@ -400,10 +390,10 @@ FN(vector_ewise_add)(pgGrB_Vector *A,
   GrB_Index size;
 
   if (C == NULL) {
-    CHECKD(GrB_Vector_size(&size, A->V));
+      CHECKD(GrB_Vector_size(&size, A->V), A->V);
     C = FN(construct_empty_expanded_vector)(size, CurrentMemoryContext);
   }
-  CHECKD(GrB_eWiseAdd(C->V, mask ? mask->V : NULL, accum, GB_ADD, A->V, B->V, desc));
+  CHECKD(GrB_eWiseAdd(C->V, mask ? mask->V : NULL, accum, GB_ADD, A->V, B->V, desc), C->V);
   PGGRB_RETURN_VECTOR(C);
 }
 
@@ -419,7 +409,7 @@ GrB_Index *FN(extract_indexes)(pgGrB_Vector *A,
   CHECKD(GrB_Vector_extractTuples(row_indices,
                                  values,
                                  &size,
-                                 A->V));
+                                  A->V), A->V);
   return row_indices;
 }
 
@@ -436,8 +426,8 @@ FN(vector_reduce)(PG_FUNCTION_ARGS) {
   semiring_name = PG_ARGISNULL(1) ? NULL : text_to_cstring(PG_GETARG_TEXT_PP(1));
 
   semiring = semiring_name ? lookup_semiring(semiring_name) : GB_RNG;
-  CHECKD(GxB_Semiring_add(&monoid, semiring));
-  CHECKD(GrB_reduce(&val, NULL, monoid, A->V, NULL));
+  CHECKD(GxB_Semiring_add(&monoid, semiring), semiring);
+  CHECKD(GrB_reduce(&val, NULL, monoid, A->V, NULL), A->V);
   PG_RET(val);
 }
 
@@ -453,12 +443,12 @@ FN(vector_assign)(PG_FUNCTION_ARGS) {
   B = PG_ARGISNULL(2) ? NULL : PGGRB_GETARG_VECTOR(2);
   mask = PG_ARGISNULL(3)? NULL : PGGRB_GETARG_VECTOR(3);
 
-  CHECKD(GrB_Vector_size(&size, A->V));
+  CHECKD(GrB_Vector_size(&size, A->V), A->V);
 
   if (B != NULL)
     indexes = FN(extract_indexes)(B, size);
 
-  CHECKD(GrB_assign(A->V, mask? mask->V: NULL, NULL, val, indexes ? indexes : GrB_ALL, size, NULL));
+  CHECKD(GrB_assign(A->V, mask? mask->V: NULL, NULL, val, indexes ? indexes : GrB_ALL, size, NULL), A->V);
   PGGRB_RETURN_VECTOR(A);
 }
 
@@ -473,7 +463,7 @@ FN(vector_set_element)(PG_FUNCTION_ARGS) {
   index = PG_GETARG_INT64(1);
   val = PG_GET(2);
 
-  CHECKD(GrB_Vector_setElement(A->V, val, index));
+  CHECKD(GrB_Vector_setElement(A->V, val, index), A->V);
   PGGRB_RETURN_VECTOR(A);
 }
 

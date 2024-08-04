@@ -269,7 +269,7 @@ vector_nvals(PG_FUNCTION_ARGS) {
   pgGrB_Vector *vec;
   GrB_Index nvals;
   vec = PGGRB_GETARG_VECTOR(0);
-  CHECKD(GrB_Vector_nvals(&nvals, vec->V));
+  CHECKD(GrB_Vector_nvals(&nvals, vec->V), vec->V);
   return Int64GetDatum(nvals);
 }
 
@@ -279,7 +279,7 @@ vector_size(PG_FUNCTION_ARGS) {
   pgGrB_Vector *vec;
   GrB_Index size;
   vec = PGGRB_GETARG_VECTOR(0);
-  CHECKD(GrB_Vector_size(&size, vec->V));
+  CHECKD(GrB_Vector_size(&size, vec->V), vec->V);
   return Int64GetDatum(size);
 }
 
@@ -293,7 +293,7 @@ vector_eq(PG_FUNCTION_ARGS) {
   A = PGGRB_GETARG_VECTOR(0);
   B = PGGRB_GETARG_VECTOR(1);
 
-  CHECKD(LAGraph_Vector_isequal(&result, A->V, B->V, NULL));
+  CHECKD(LAGraph_Vector_isequal(&result, A->V, B->V, NULL), A->V);
   PG_RETURN_BOOL(result);
 }
 
@@ -306,7 +306,7 @@ vector_ne(PG_FUNCTION_ARGS) {
   A = PGGRB_GETARG_VECTOR(0);
   B = PGGRB_GETARG_VECTOR(1);
 
-  CHECKD(LAGraph_Vector_isequal(&result, A->V, B->V, NULL));
+  CHECKD(LAGraph_Vector_isequal(&result, A->V, B->V, NULL), A->V);
   PG_RETURN_BOOL(!result);
 }
 
@@ -320,14 +320,14 @@ vector_xtract(PG_FUNCTION_ARGS) {
   B = PGGRB_GETARG_VECTOR(1);
   C = PG_ARGISNULL(2) ? NULL : PGGRB_GETARG_VECTOR(2);
 
-  CHECKD(GrB_Vector_size(&size, A->V));
+  CHECKD(GrB_Vector_size(&size, A->V), A->V);
   if (C == NULL) {
     TYPE_APPLY(C, A->type, construct_empty_expanded_vector, size, CurrentMemoryContext);
   }
 
   TYPE_APPLY(indexes, A->type, extract_indexes, B, size);
 
-  CHECKD(GrB_Vector_extract(C->V, NULL, NULL, A->V, indexes, size, NULL));
+  CHECKD(GrB_Vector_extract(C->V, NULL, NULL, A->V, indexes, size, NULL), A->V);
   PGGRB_RETURN_VECTOR(C);
 }
 

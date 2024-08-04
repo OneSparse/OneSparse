@@ -18,8 +18,8 @@ GrB_BinaryOp lookup_binop(char *name) {
 GrB_Type mxm_type(pgGrB_Matrix *left, pgGrB_Matrix *right) {
   GrB_Info info;
   GrB_Type atype, btype;
-  CHECKD(GxB_Matrix_type(&atype, left->M));
-  CHECKD(GxB_Matrix_type(&btype, right->M));
+  CHECKD(GxB_Matrix_type(&atype, left->M), left->M);
+  CHECKD(GxB_Matrix_type(&btype, right->M), right->M);
   RETURN_TYPECHCK2(atype, btype, FP64);
   RETURN_TYPECHCK2(atype, btype, FP32);
   RETURN_TYPECHCK2(atype, btype, INT64);
@@ -32,8 +32,8 @@ GrB_Type mxm_type(pgGrB_Matrix *left, pgGrB_Matrix *right) {
 GrB_Type mxv_type(pgGrB_Matrix *left, pgGrB_Vector *right) {
   GrB_Info info;
   GrB_Type atype, btype;
-  CHECKD(GxB_Matrix_type(&atype, left->M));
-  CHECKD(GxB_Vector_type(&btype, right->V));
+  CHECKD(GxB_Matrix_type(&atype, left->M), left->M);
+  CHECKD(GxB_Vector_type(&btype, right->V), right->V);
   RETURN_TYPECHCK2(atype, btype, FP64);
   RETURN_TYPECHCK2(atype, btype, FP32);
   RETURN_TYPECHCK2(atype, btype, INT64);
@@ -46,8 +46,8 @@ GrB_Type mxv_type(pgGrB_Matrix *left, pgGrB_Vector *right) {
 GrB_Type vxm_type(pgGrB_Vector *left, pgGrB_Matrix *right) {
   GrB_Info info;
   GrB_Type atype, btype;
-  CHECKD(GxB_Vector_type(&atype, left->V));
-  CHECKD(GxB_Matrix_type(&btype, right->M));
+  CHECKD(GxB_Vector_type(&atype, left->V), left->V);
+  CHECKD(GxB_Matrix_type(&btype, right->M), right->M);
   RETURN_TYPECHCK2(atype, btype, FP64);
   RETURN_TYPECHCK2(atype, btype, FP32);
   RETURN_TYPECHCK2(atype, btype, INT64);
@@ -60,8 +60,8 @@ GrB_Type vxm_type(pgGrB_Vector *left, pgGrB_Matrix *right) {
 char* mxm_semiring(pgGrB_Matrix *left, pgGrB_Matrix *right) {
   GrB_Info info;
   GrB_Type atype, btype;
-  CHECKD(GxB_Matrix_type(&atype, left->M));
-  CHECKD(GxB_Matrix_type(&btype, right->M));
+  CHECKD(GxB_Matrix_type(&atype, left->M), left->M);
+  CHECKD(GxB_Matrix_type(&btype, right->M), right->M);
   RETURN_TYPECHCK1(atype, btype, PLUS_TIMES, FP64);
   RETURN_TYPECHCK1(atype, btype, PLUS_TIMES, FP32);
   RETURN_TYPECHCK1(atype, btype, PLUS_TIMES, INT64);
@@ -74,8 +74,8 @@ char* mxm_semiring(pgGrB_Matrix *left, pgGrB_Matrix *right) {
 char* mxv_semiring(pgGrB_Matrix *left, pgGrB_Vector *right) {
   GrB_Info info;
   GrB_Type atype, btype;
-  CHECKD(GxB_Matrix_type(&atype, left->M));
-  CHECKD(GxB_Vector_type(&btype, right->V));
+  CHECKD(GxB_Matrix_type(&atype, left->M), left->M);
+  CHECKD(GxB_Vector_type(&btype, right->V), right->V);
   RETURN_TYPECHCK1(atype, btype, PLUS_TIMES, FP64);
   RETURN_TYPECHCK1(atype, btype, PLUS_TIMES, FP32);
   RETURN_TYPECHCK1(atype, btype, PLUS_TIMES, INT64);
@@ -88,8 +88,8 @@ char* mxv_semiring(pgGrB_Matrix *left, pgGrB_Vector *right) {
 char* vxm_semiring(pgGrB_Vector *left, pgGrB_Matrix *right) {
   GrB_Info info;
   GrB_Type atype, btype;
-  CHECKD(GxB_Vector_type(&atype, left->V));
-  CHECKD(GxB_Matrix_type(&btype, right->M));
+  CHECKD(GxB_Vector_type(&atype, left->V), left->V);
+  CHECKD(GxB_Matrix_type(&btype, right->M), right->M);
   RETURN_TYPECHCK1(atype, btype, PLUS_TIMES, FP64);
   RETURN_TYPECHCK1(atype, btype, PLUS_TIMES, FP32);
   RETURN_TYPECHCK1(atype, btype, PLUS_TIMES, INT64);
@@ -103,14 +103,14 @@ char* vxm_semiring(pgGrB_Vector *left, pgGrB_Matrix *right) {
 char* matrix_times_binop(pgGrB_Matrix *left, pgGrB_Matrix *right) {
   GrB_Info info;
   GrB_Type type;
-  CHECKD(GxB_Matrix_type(&type, left->M));
+  CHECKD(GxB_Matrix_type(&type, left->M), left->M);
   return DEFAULT_TIMES_BINOP(type);
 }
 
 char* matrix_plus_binop(pgGrB_Matrix *left, pgGrB_Matrix *right) {
   GrB_Info info;
   GrB_Type type;
-  CHECKD(GxB_Matrix_type(&type, left->M));
+  CHECKD(GxB_Matrix_type(&type, left->M), left->M);
   return DEFAULT_PLUS_BINOP(type);
 }
 
@@ -118,14 +118,14 @@ char* matrix_plus_binop(pgGrB_Matrix *left, pgGrB_Matrix *right) {
 char* vector_times_binop(pgGrB_Vector *left, pgGrB_Vector *right) {
   GrB_Info info;
   GrB_Type type;
-  CHECKD(GxB_Vector_type(&type, left->V));
+  CHECKD(GxB_Vector_type(&type, left->V), left->V);
   return DEFAULT_TIMES_BINOP(type);
 }
 
 char* vector_plus_binop(pgGrB_Vector *left, pgGrB_Vector *right) {
   GrB_Info info;
   GrB_Type type;
-  CHECKD(GxB_Vector_type(&type, left->V));
+  CHECKD(GxB_Vector_type(&type, left->V), left->V);
   return DEFAULT_PLUS_BINOP(type);
 }
 

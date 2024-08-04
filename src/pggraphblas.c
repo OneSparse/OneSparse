@@ -76,10 +76,12 @@ _PG_init(void)
 #endif
 
   if (! (info == GrB_SUCCESS || info == GrB_NO_VALUE))  {
-    elog(ERROR, "%s", GrB_error());
+      const char *emsg;
+      GrB_error(&emsg, NULL);
+      elog(ERROR, "%s", emsg);
     return;
   }
-  
+
   SEMIRING_GROUP(0, FIRST_);
   SEMIRING_GROUP(40, SECOND_);
   SEMIRING_GROUP(80, MIN_);

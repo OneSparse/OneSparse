@@ -624,19 +624,19 @@ RETURNS SETOF matrix_element_bool
 AS '$libdir/pggraphblas', 'matrix_elements_bool'
 LANGUAGE C STABLE STRICT;
 
-CREATE FUNCTION bfs(A matrix, size bigint, AT matrix default null)
-RETURNS vector
-AS '$libdir/pggraphblas', 'matrix_bfs'
-LANGUAGE C STABLE;
-    
-CREATE TYPE pageranking AS (page bigint, rank float);
+-- CREATE FUNCTION bfs(A matrix, size bigint, AT matrix default null)
+-- RETURNS vector
+-- AS '$libdir/pggraphblas', 'matrix_bfs'
+-- LANGUAGE C STABLE;
 
-CREATE FUNCTION pagerank(A matrix)
-RETURNS pageranking
-AS '$libdir/pggraphblas', 'matrix_pagerank'
-LANGUAGE C STABLE;
+-- CREATE TYPE pageranking AS (page bigint, rank float);
 
-CREATE TYPE ssspath AS (source bigint, distance float, parent bigint, hops bigint);
+-- CREATE FUNCTION pagerank(A matrix)
+-- RETURNS pageranking
+-- AS '$libdir/pggraphblas', 'matrix_pagerank'
+-- LANGUAGE C STABLE;
+
+-- CREATE TYPE ssspath AS (source bigint, distance float, parent bigint, hops bigint);
 
 -- CREATE FUNCTION sssp_bf(A matrix, start bigint)
 -- RETURNS ssspath
