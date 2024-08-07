@@ -100,21 +100,6 @@ FN(vector_flatten_into)(ExpandedObjectHeader *eohptr,
   CHECKV(GrB_Vector_nvals(&nvals, A->V), A->V);
   CHECKV(GrB_Vector_size(&size, A->V), A->V);
 
-  CHECKV(GxB_Vector_export_CSC(&A->V,
-                           &type,
-                           &size,
-                           &nvals,
-                           &start,
-                           &values,
-                           NULL), A->V);
-
-  if (nvals > 0) {
-    memcpy(PGGRB_VECTOR_DATA(flat), start, nvals*sizeof(GrB_Index));
-    memcpy((PGGRB_VECTOR_DATA(flat) + nvals), values, nvals*sizeof(PG_TYPE));
-    pfree(start);
-    pfree(values);
-  }
-
   flat->size = size;
   flat->nvals = nvals;
   flat->type = GB_TYPE;

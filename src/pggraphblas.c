@@ -1,8 +1,6 @@
 #include "pggraphblas.h"
 PG_MODULE_MAGIC;
 
-#define HUGE_ALLOC
-
 pgGrB_Semiring semirings[960];
 pgGrB_BinaryOp binops[256];
 pgGrB_UnaryOp uops[67];
@@ -18,11 +16,7 @@ void *calloc_function(size_t num, size_t size) {
   size_t total;
   total = num * size;
   oldcxt = MemoryContextSwitchTo(TopMemoryContext);
-#ifdef HUGE_ALLOC
   p = palloc_extended(total, MCXT_ALLOC_HUGE | MCXT_ALLOC_ZERO);
-#else
-  p = palloc0(total);
-#endif
   MemoryContextSwitchTo(oldcxt);
   return p;
 }
@@ -32,11 +26,7 @@ void *malloc_function(size_t size) {
   void *p;
   oldcxt = MemoryContextSwitchTo(TopMemoryContext);
 
-#ifdef HUGE_ALLOC
   p = palloc_extended(size, MCXT_ALLOC_HUGE);
-#else
-  p = palloc(size);
-#endif
   MemoryContextSwitchTo(oldcxt);
   return p;
 }
@@ -44,11 +34,7 @@ void *malloc_function(size_t size) {
 void *realloc_function(void *p, size_t size) {
   MemoryContext oldcxt;
   oldcxt = MemoryContextSwitchTo(TopMemoryContext);
-#ifdef HUGE_ALLOC
   p = repalloc_huge(p, size);
-#else
-  p = repalloc(p, size);
-#endif
   MemoryContextSwitchTo(oldcxt);
   return p;
 }
@@ -65,20 +51,14 @@ _PG_init(void)
 {
   GrB_Info info;
 
-#ifdef IMPORT_EXPORT
-  info = LAGraph_xinit (malloc_function,
-                        calloc_function,
-                        realloc_function,
-                        free_function,
-                        false);
-#else
-  info = LAGraph_init (GrB_BLOCKING);
-#endif
+  info = GxB_init (GrB_NONBLOCKING,
+                   malloc_function,
+                   calloc_function,
+                   realloc_function,
+                   free_function);
 
   if (! (info == GrB_SUCCESS || info == GrB_NO_VALUE))  {
-      const char *emsg;
-      GrB_error(&emsg, NULL);
-      elog(ERROR, "%s", emsg);
+      elog(ERROR, "%s", "cannot initialize SuiteSparse");
     return;
   }
 

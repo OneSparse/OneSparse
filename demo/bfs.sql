@@ -2,43 +2,7 @@
 
 \ir fixtures.sql
 
-drop function if exists bfs2;
-        
-create function bfs2(tablename text, source bigint) returns vector as $$
-declare
-    A matrix;
-    n bigint;
-    v vector;
-    q vector;
-    level integer := 0;                            -- Start at level 1.
-    not_done bool := true;                         -- Flag to indicate still work to do.
-    
-begin
-    execute format('select matrix(array_agg(i), array_agg(j), array_agg(true)) from %I', tablename) into A;
-    n := nrows(A);                          -- The number of result rows.
-    v := vector_integer(n);                 -- int32 result vector of vertex levels.
-    q := assign(vector_bool(n), false);     -- bool mask of completed vertices.
-
-    q := set_element(q, source, true);             -- Set the source element to done.
-    
-    while not_done and level <= n loop             -- While still work to do.
-        v := assign(v, level, mask=>q);            -- Assign the current level to all
-
-        q := mxv(transpose(A), q, q,               -- Multiply q<mask> = Aq,
-            semiring=>'LOR_LAND_BOOL',             -- using LOR_LAND_BOOL semiring
-            mask=>v,                               -- only those *not* masked
-            dmask=>'scmp',                         -- by complementing the mask
-            doutp=>'replace');                     -- clearing results in q first
-
-        not_done := reduce_bool(q);                -- are there more neighbors?
-
-        level := level + 1;                        -- increment the level
-    end loop;
-    return v;
-end;
-$$ language plpgsql;
-
-drop function if exists bfs;
+drop function if exists bfs3;
         
 create function bfs3(A matrix, source bigint) returns vector as $$
 declare

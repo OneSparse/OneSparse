@@ -6,8 +6,8 @@ DATA = $(wildcard *--*.sql)
 PGXS := $(shell $(PG_CONFIG) --pgxs)
 MODULE_big = pggraphblas
 OBJS = $(patsubst %.c,%.o,$(wildcard src/pggraphblas.c))
-SHLIB_LINK = -lgraphblas -llagraph
-PG_CPPFLAGS = -O0
+SHLIB_LINK = -lgraphblas
+PG_CPPFLAGS = -O0 -Wfatal-errors
 
 TESTS        = $(wildcard test/sql/*.sql)
 REGRESS      = $(patsubst test/sql/%.sql,%,$(TESTS))

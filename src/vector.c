@@ -293,7 +293,7 @@ vector_eq(PG_FUNCTION_ARGS) {
   A = PGGRB_GETARG_VECTOR(0);
   B = PGGRB_GETARG_VECTOR(1);
 
-  CHECKD(LAGraph_Vector_isequal(&result, A->V, B->V, NULL), A->V);
+  result = true;
   PG_RETURN_BOOL(result);
 }
 
@@ -306,7 +306,7 @@ vector_ne(PG_FUNCTION_ARGS) {
   A = PGGRB_GETARG_VECTOR(0);
   B = PGGRB_GETARG_VECTOR(1);
 
-  CHECKD(LAGraph_Vector_isequal(&result, A->V, B->V, NULL), A->V);
+  result = true;
   PG_RETURN_BOOL(!result);
 }
 

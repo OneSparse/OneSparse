@@ -58,16 +58,6 @@ RETURNS bool
 AS '$libdir/pggraphblas', 'matrix_ne'
 LANGUAGE C STABLE;
 
-CREATE FUNCTION to_mm(A matrix)
-RETURNS text
-AS '$libdir/pggraphblas', 'matrix_mmwrite'
-LANGUAGE C STABLE;
-
-CREATE FUNCTION from_mm(A text)
-RETURNS matrix
-AS '$libdir/pggraphblas', 'matrix_mmread'
-LANGUAGE C STABLE;
-
 CREATE FUNCTION print(
     A matrix,
     level integer default 2)
@@ -205,98 +195,6 @@ RETURNS matrix
 AS '$libdir/pggraphblas', 'matrix_kron'
 LANGUAGE C STABLE;
 
-CREATE FUNCTION matrix_random_bigint(
-    nrows bigint,
-    ncols bigint,
-    nvals bigint,
-    make_pattern bool default false,
-    make_symmetric bool default false,
-    make_skew_symmetric bool default false,
-    make_hermitian bool default false,
-    no_diagonal bool default false,
-    seed bigint default null
-    )
-RETURNS matrix
-AS '$libdir/pggraphblas', 'matrix_random_int64'
-LANGUAGE C STABLE;
-
-CREATE FUNCTION matrix_random_integer(
-    nrows bigint,
-    ncols bigint,
-    nvals bigint,
-    make_pattern bool default false,
-    make_symmetric bool default false,
-    make_skew_symmetric bool default false,
-    make_hermitian bool default false,
-    no_diagonal bool default false,
-    seed bigint default null
-    )
-RETURNS matrix
-AS '$libdir/pggraphblas', 'matrix_random_int32'
-LANGUAGE C STABLE;
-
-CREATE FUNCTION matrix_random_smallint(
-    nrows bigint,
-    ncols bigint,
-    nvals bigint,
-    make_pattern bool default false,
-    make_symmetric bool default false,
-    make_skew_symmetric bool default false,
-    make_hermitian bool default false,
-    no_diagonal bool default false,
-    seed bigint default null
-    )
-RETURNS matrix
-AS '$libdir/pggraphblas', 'matrix_random_int16'
-LANGUAGE C STABLE;
-
-CREATE FUNCTION matrix_random_real(
-    nrows bigint,
-    ncols bigint,
-    nvals bigint,
-    make_pattern bool default false,
-    make_symmetric bool default false,
-    make_skew_symmetric bool default false,
-    make_hermitian bool default false,
-    no_diagonal bool default false,
-    seed bigint default null
-    )
-RETURNS matrix
-AS '$libdir/pggraphblas', 'matrix_random_float4'
-LANGUAGE C STABLE;
-
-CREATE FUNCTION matrix_random_float(
-    nrows bigint,
-    ncols bigint,
-    nvals bigint,
-    make_pattern bool default false,
-    make_symmetric bool default false,
-    make_skew_symmetric bool default false,
-    make_hermitian bool default false,
-    no_diagonal bool default false,
-    seed bigint default null
-    )
-RETURNS matrix
-AS '$libdir/pggraphblas', 'matrix_random_float8'
-LANGUAGE C STABLE;
-
-CREATE FUNCTION matrix_random_bool(
-    nrows bigint,
-    ncols bigint,
-    nvals bigint,
-    make_pattern bool default false,
-    make_symmetric bool default false,
-    make_skew_symmetric bool default false,
-    make_hermitian bool default false,
-    no_diagonal bool default false,
-    seed bigint default null
-    )
-RETURNS matrix
-AS '$libdir/pggraphblas', 'matrix_random_bool'
-LANGUAGE C STABLE;
-
-    
-        
 CREATE FUNCTION transpose(
     A matrix,
     inout C matrix default null,
@@ -624,25 +522,6 @@ RETURNS SETOF matrix_element_bool
 AS '$libdir/pggraphblas', 'matrix_elements_bool'
 LANGUAGE C STABLE STRICT;
 
--- CREATE FUNCTION bfs(A matrix, size bigint, AT matrix default null)
--- RETURNS vector
--- AS '$libdir/pggraphblas', 'matrix_bfs'
--- LANGUAGE C STABLE;
-
--- CREATE TYPE pageranking AS (page bigint, rank float);
-
--- CREATE FUNCTION pagerank(A matrix)
--- RETURNS pageranking
--- AS '$libdir/pggraphblas', 'matrix_pagerank'
--- LANGUAGE C STABLE;
-
--- CREATE TYPE ssspath AS (source bigint, distance float, parent bigint, hops bigint);
-
--- CREATE FUNCTION sssp_bf(A matrix, start bigint)
--- RETURNS ssspath
--- AS '$libdir/pggraphblas', 'sssp_bf'
--- LANGUAGE C STABLE;
-    
 -- vectors
 
 CREATE FUNCTION ewise_mult(

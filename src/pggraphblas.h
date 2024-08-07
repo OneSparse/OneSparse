@@ -152,7 +152,6 @@ GrB_Info visequal
  );
 /* Flattened representation of matrix, used to store to disk.
 
-Actual array data is appended and for the moment cannot exceed 1GB.
 */
 typedef struct pgGrB_FlatMatrix {
   int32 vl_len_;
@@ -160,7 +159,6 @@ typedef struct pgGrB_FlatMatrix {
   GrB_Index ncols;
   GrB_Index nvals;
   GrB_Type type;
-  int64_t nonempty;
 } pgGrB_FlatMatrix;
 
 /* ID for debugging crosschecks */
@@ -179,16 +177,6 @@ typedef struct pgGrB_Matrix  {
   Size flat_size;
 } pgGrB_Matrix;
 
-/* typedef struct pgGrB_Matrix_PageRankState { */
-/*   LAGraph_PageRank *ranks; */
-/* } pgGrB_Matrix_PageRankState; */
-
-typedef struct pgGrB_Matrix_SSSPState {
-  GrB_Vector pd;
-  GrB_Vector ppi;
-  GrB_Vector ph;
-} pgGrB_Matrix_SSSPState;
-
 /* helper to turn types into names. */
 char* grb_type_to_name(GrB_Type t);
 GrB_Type grb_name_to_type(char* n);
@@ -198,8 +186,7 @@ static void
 context_callback_matrix_free(void*);
 
 /* Helper function that either detoasts or expands matrices. */
-pgGrB_Matrix *
-DatumGetMatrix(Datum d);
+pgGrB_Matrix* DatumGetMatrix(Datum d);
 
 /* Helper function to create an empty flattened matrix. */
 pgGrB_FlatMatrix *
@@ -207,7 +194,7 @@ construct_empty_flat_matrix(GrB_Index nrows,
                             GrB_Index ncols,
                             GrB_Type type);
 
-/* Helper to detoast and expand matrixs arguments */
+/* Helper to detoast and expand matrix arguments */
 #define PGGRB_GETARG_MATRIX(n)  DatumGetMatrix(PG_GETARG_DATUM(n))
 
 /* Helper to return Expanded Object Header Pointer from matrix. */
@@ -247,8 +234,6 @@ PG_FUNCTION_INFO_V1(matrix_reduce_vector);
 PG_FUNCTION_INFO_V1(matrix_transpose);
 PG_FUNCTION_INFO_V1(matrix_assign_matrix);
 PG_FUNCTION_INFO_V1(matrix_bfs);
-//PG_FUNCTION_INFO_V1(matrix_pagerank);
-/* PG_FUNCTION_INFO_V1(sssp_bf); */
 
 /* Vectors */
 
@@ -282,13 +267,10 @@ typedef struct pgGrB_Vector  {
 static void context_callback_vector_free(void*);
 
 /* Helper function that either detoasts or expands vectors. */
-pgGrB_Vector *
-DatumGetVector(Datum d);
+pgGrB_Vector* DatumGetVector(Datum d);
 
 /* Helper function to create an empty flattened vector. */
-pgGrB_FlatVector *
-construct_empty_flat_vector(GrB_Index size,
-                            GrB_Type type);
+pgGrB_FlatVector* construct_empty_flat_vector(GrB_Index size, GrB_Type type);
 
 GrB_Type mxm_type(pgGrB_Matrix *left, pgGrB_Matrix *right);
 GrB_Type mxv_type(pgGrB_Matrix *left, pgGrB_Vector *right);
@@ -311,7 +293,7 @@ GrB_BinaryOp lookup_binop(char *name);
 #define VectorGetEOHP(d) (pgGrB_Vector *) DatumGetEOHP(d)
 #define MatrixGetEOHP(d) (pgGrB_Matrix *) DatumGetEOHP(d);
 
-/* Helper to detoast and expand vectors arguments */
+/* Helper to detoast and expand vector arguments */
 #define PGGRB_GETARG_VECTOR(n)  DatumGetVector(PG_GETARG_DATUM(n))
 
 /* Helper to return Expanded Object Header Pointer from vector. */
@@ -470,7 +452,7 @@ typedef struct pgGrB_UnaryOp  {
 #define GET_DESCRIPTOR(N, D) do {                               \
     CHECKD(GrB_Descriptor_new(&D), D);                        \
     GETARG_DESCRIPTOR_VAL(N, D, OUTP, REPLACE);                 \
-    GETARG_DESCRIPTOR_VAL(N+1, D, MASK, SCMP);                  \
+    GETARG_DESCRIPTOR_VAL(N+1, D, MASK, COMP_STRUCTURE);        \
     GETARG_DESCRIPTOR_VAL(N+2, D, INP0, TRAN);                  \
     GETARG_DESCRIPTOR_VAL(N+3, D, INP1, TRAN);                  \
   } while (0)

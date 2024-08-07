@@ -114,7 +114,6 @@ char* matrix_plus_binop(pgGrB_Matrix *left, pgGrB_Matrix *right) {
   return DEFAULT_PLUS_BINOP(type);
 }
 
-
 char* vector_times_binop(pgGrB_Vector *left, pgGrB_Vector *right) {
   GrB_Info info;
   GrB_Type type;
