@@ -1,4 +1,4 @@
-#include "pggraphblas.h"
+#include "onesparse.h"
 PG_MODULE_MAGIC;
 
 pgGrB_Semiring semirings[960];

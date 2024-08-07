@@ -1,1 +1,1 @@
-docker run -it pggraphblas/test psql -U postgres
+docker run -it onesparse/test psql -U postgres

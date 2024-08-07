@@ -44,8 +44,8 @@ RUN curl -s -L https://github.com/theory/pgtap/archive/v0.99.0.tar.gz | tar zxvf
 RUN chown -R postgres:postgres /home/postgres
     
 # put test stuff into pg home        
-RUN mkdir "/home/postgres/pggraphblas"
-WORKDIR "/home/postgres/pggraphblas"
+RUN mkdir "/home/postgres/onesparse"
+WORKDIR "/home/postgres/onesparse"
 COPY . .
     
 # RUN mkdir "/home/postgres/LAGraph"
@@ -60,8 +60,8 @@ COPY . .
 RUN make && make install && make clean
 RUN ldconfig
 
-# chown just pggraphblas
-RUN chown -R postgres:postgres /home/postgres/pggraphblas
+# chown just onesparse
+RUN chown -R postgres:postgres /home/postgres/onesparse
     
 # make postgres a sudoer        
 RUN echo "postgres ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/user && \

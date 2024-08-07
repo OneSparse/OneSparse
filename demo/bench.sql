@@ -1,6 +1,6 @@
 \timing on
     
-create extension if not exists pggraphblas;
+create extension if not exists onesparse;
     
 create table a (m matrix);
 

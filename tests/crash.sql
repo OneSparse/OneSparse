@@ -1,4 +1,4 @@
-create extension if not exists pggraphblas;
+create extension if not exists onesparse;
     
 \ir gdb.sql
 \i /demo/fixtures.sql

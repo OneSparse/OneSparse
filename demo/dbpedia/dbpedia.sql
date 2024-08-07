@@ -1,6 +1,6 @@
 \timing on
 begin;
-create extension if not exists pggraphblas;
+create extension if not exists onesparse;
 
 drop table if exists article;    
 create table article (

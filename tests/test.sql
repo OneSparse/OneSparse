@@ -9,6 +9,6 @@
 -- \set QUIET 1
 
 create extension if not exists pgtap;
-create extension if not exists pggraphblas;
+create extension if not exists onesparse;
 
 \ir init.sql
