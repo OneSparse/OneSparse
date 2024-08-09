@@ -215,9 +215,7 @@ vector_ewise_mult(PG_FUNCTION_ARGS)
 		accum_name = PG_ARGISNULL(5) ?
 			accum_name : text_to_cstring(PG_GETARG_TEXT_PP(5));
 		if (PG_NARGS() > 6)
-		{
 			GET_DESCRIPTOR(6, desc);
-		}
 	}
 
 	binop = lookup_binop(binop_name);
@@ -257,9 +255,7 @@ vector_ewise_add(PG_FUNCTION_ARGS)
 		accum_name = PG_ARGISNULL(5) ?
 			accum_name : text_to_cstring(PG_GETARG_TEXT_PP(5));
 		if (PG_NARGS() > 6)
-		{
 			GET_DESCRIPTOR(6, desc);
-		}
 	}
 
 	binop = lookup_binop(binop_name);
@@ -337,9 +333,7 @@ vector_xtract(PG_FUNCTION_ARGS)
 
 	CHECKD(GrB_Vector_size(&size, A->V), A->V);
 	if (C == NULL)
-	{
 		TYPE_APPLY(C, A->type, construct_empty_expanded_vector, size, CurrentMemoryContext);
-	}
 
 	TYPE_APPLY(indexes, A->type, extract_indexes, B, size);
 

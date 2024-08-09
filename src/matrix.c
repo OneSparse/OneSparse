@@ -248,16 +248,16 @@ matrix_ewise_mult(PG_FUNCTION_ARGS)
 	binop_name = matrix_times_binop(A, B);
 	accum_name = NULL;
 
-	if (PG_NARGS() > 2) {
+	if (PG_NARGS() > 2)
+	{
 		C = PG_ARGISNULL(2) ? NULL : OS_GETARG_MATRIX(2);
 		mask = PG_ARGISNULL(3) ? NULL : OS_GETARG_MATRIX(3);
 		binop_name = PG_ARGISNULL(4) ?
 			binop_name : text_to_cstring(PG_GETARG_TEXT_PP(4));
 		accum_name = PG_ARGISNULL(5) ?
 			accum_name : text_to_cstring(PG_GETARG_TEXT_PP(5));
-		if (PG_NARGS() > 6) {
+		if (PG_NARGS() > 6)
 			GET_DESCRIPTOR(6, desc);
-		}
 	}
 	binop = lookup_binop(binop_name);
 	if (binop == NULL)
@@ -294,9 +294,7 @@ matrix_ewise_add(PG_FUNCTION_ARGS)
 		accum_name = PG_ARGISNULL(5) ?
 			accum_name : text_to_cstring(PG_GETARG_TEXT_PP(5));
 		if (PG_NARGS() > 6)
-		{
 			GET_DESCRIPTOR(6, desc);
-		}
 	}
 
 	binop = lookup_binop(binop_name);
@@ -339,9 +337,7 @@ mxm(PG_FUNCTION_ARGS)
 			text_to_cstring(PG_GETARG_TEXT_PP(5));
 
 		if (PG_NARGS() > 6)
-		{
 			GET_DESCRIPTOR(6, desc);
-		}
 	}
 
 	semiring = lookup_semiring(semiring_name);
@@ -389,9 +385,8 @@ mxv(PG_FUNCTION_ARGS)
 		binop_name = PG_ARGISNULL(5) ?
 			NULL :
 			text_to_cstring(PG_GETARG_TEXT_PP(5));
-		if (PG_NARGS() > 6) {
+		if (PG_NARGS() > 6)
 			GET_DESCRIPTOR(6, desc);
-		}
 	}
 
 	if (binop_name != NULL)
@@ -435,9 +430,7 @@ vxm(PG_FUNCTION_ARGS)
 			NULL :
 			text_to_cstring(PG_GETARG_TEXT_PP(5));
 		if (PG_NARGS() > 6)
-		{
 			GET_DESCRIPTOR(6, desc);
-		}
 	}
 
 	if (binop_name != NULL)
@@ -495,15 +488,16 @@ matrix_transpose(PG_FUNCTION_ARGS) {
 
 	A = OS_GETARG_MATRIX(0);
 
-	if (PG_NARGS() > 0) {
+	if (PG_NARGS() > 0)
+	{
 		C = PG_ARGISNULL(1) ? NULL : OS_GETARG_MATRIX(2);
 		mask = PG_ARGISNULL(2) ? NULL : OS_GETARG_MATRIX(3);
-		if (PG_NARGS() > 3) {
+		if (PG_NARGS() > 3)
 			GET_DESCRIPTOR(3, desc);
-		}
 	}
 
-	if (C == NULL) {
+	if (C == NULL)
+	{
 		CHECKD(GrB_Matrix_nrows(&m, A->M), A->M);
 		CHECKD(GrB_Matrix_ncols(&n, A->M), A->M);
 		TYPE_APPLY(C, A->type, construct_empty_expanded_matrix, m, n, CurrentMemoryContext);
@@ -514,7 +508,8 @@ matrix_transpose(PG_FUNCTION_ARGS) {
 }
 
 Datum
-matrix_assign_matrix(PG_FUNCTION_ARGS) {
+matrix_assign_matrix(PG_FUNCTION_ARGS)
+{
 	GrB_Info info;
 	OS_Matrix *A, *B, *mask;
 	GrB_Index nvals, *rows = NULL, *cols = NULL;
@@ -525,9 +520,8 @@ matrix_assign_matrix(PG_FUNCTION_ARGS) {
 
 	CHECKD(GrB_Matrix_nvals(&nvals, B->M), B->M);
 
-	if (B != NULL) {
+	if (B != NULL)
 		TYPE_APPLY(nvals, B->type, extract_rowscols, B, &rows, &cols, nvals);
-	}
 
 	CHECKD(GrB_assign(A->M,
 					  mask? mask->M: NULL,
@@ -566,9 +560,8 @@ matrix_kron(PG_FUNCTION_ARGS) {
 			NULL :
 			text_to_cstring(PG_GETARG_TEXT_PP(5));
 
-		if (PG_NARGS() > 6) {
+		if (PG_NARGS() > 6)
 			GET_DESCRIPTOR(6, desc);
-		}
 	}
 
 	if (accum_name != NULL)
@@ -600,9 +593,8 @@ matrix_xtract(PG_FUNCTION_ARGS) {
 	CHECKD(GrB_Matrix_nrows(&nrows, A->M), A->M);
 	CHECKD(GrB_Matrix_ncols(&ncols, A->M), A->M);
 
-	if (C == NULL) {
+	if (C == NULL)
 		TYPE_APPLY(C, A->type, construct_empty_expanded_matrix, nrows, ncols, CurrentMemoryContext);
-	}
 
 	CHECKD(GrB_Matrix_nvals(&nvals, A->M), A->M);
 	TYPE_APPLY(nvals, A->type, extract_rowscols, B, &rows, &cols, nvals);
