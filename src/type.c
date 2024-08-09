@@ -15,7 +15,7 @@ GrB_BinaryOp lookup_binop(char *name) {
   return NULL;
 }
 
-GrB_Type mxm_type(pgGrB_Matrix *left, pgGrB_Matrix *right) {
+GrB_Type mxm_type(OS_Matrix *left, OS_Matrix *right) {
   GrB_Info info;
   GrB_Type atype, btype;
   CHECKD(GxB_Matrix_type(&atype, left->M), left->M);
@@ -29,7 +29,7 @@ GrB_Type mxm_type(pgGrB_Matrix *left, pgGrB_Matrix *right) {
   return NULL;
 }
 
-GrB_Type mxv_type(pgGrB_Matrix *left, pgGrB_Vector *right) {
+GrB_Type mxv_type(OS_Matrix *left, OS_Vector *right) {
   GrB_Info info;
   GrB_Type atype, btype;
   CHECKD(GxB_Matrix_type(&atype, left->M), left->M);
@@ -43,7 +43,7 @@ GrB_Type mxv_type(pgGrB_Matrix *left, pgGrB_Vector *right) {
   return NULL;
 }
 
-GrB_Type vxm_type(pgGrB_Vector *left, pgGrB_Matrix *right) {
+GrB_Type vxm_type(OS_Vector *left, OS_Matrix *right) {
   GrB_Info info;
   GrB_Type atype, btype;
   CHECKD(GxB_Vector_type(&atype, left->V), left->V);
@@ -57,7 +57,7 @@ GrB_Type vxm_type(pgGrB_Vector *left, pgGrB_Matrix *right) {
   return NULL;
 }
 
-char* mxm_semiring(pgGrB_Matrix *left, pgGrB_Matrix *right) {
+char* mxm_semiring(OS_Matrix *left, OS_Matrix *right) {
   GrB_Info info;
   GrB_Type atype, btype;
   CHECKD(GxB_Matrix_type(&atype, left->M), left->M);
@@ -71,7 +71,7 @@ char* mxm_semiring(pgGrB_Matrix *left, pgGrB_Matrix *right) {
   return "";
 }
 
-char* mxv_semiring(pgGrB_Matrix *left, pgGrB_Vector *right) {
+char* mxv_semiring(OS_Matrix *left, OS_Vector *right) {
   GrB_Info info;
   GrB_Type atype, btype;
   CHECKD(GxB_Matrix_type(&atype, left->M), left->M);
@@ -85,7 +85,7 @@ char* mxv_semiring(pgGrB_Matrix *left, pgGrB_Vector *right) {
   return "";
 }
 
-char* vxm_semiring(pgGrB_Vector *left, pgGrB_Matrix *right) {
+char* vxm_semiring(OS_Vector *left, OS_Matrix *right) {
   GrB_Info info;
   GrB_Type atype, btype;
   CHECKD(GxB_Vector_type(&atype, left->V), left->V);
@@ -100,28 +100,28 @@ char* vxm_semiring(pgGrB_Vector *left, pgGrB_Matrix *right) {
 
 }
 
-char* matrix_times_binop(pgGrB_Matrix *left, pgGrB_Matrix *right) {
+char* matrix_times_binop(OS_Matrix *left, OS_Matrix *right) {
   GrB_Info info;
   GrB_Type type;
   CHECKD(GxB_Matrix_type(&type, left->M), left->M);
   return DEFAULT_TIMES_BINOP(type);
 }
 
-char* matrix_plus_binop(pgGrB_Matrix *left, pgGrB_Matrix *right) {
+char* matrix_plus_binop(OS_Matrix *left, OS_Matrix *right) {
   GrB_Info info;
   GrB_Type type;
   CHECKD(GxB_Matrix_type(&type, left->M), left->M);
   return DEFAULT_PLUS_BINOP(type);
 }
 
-char* vector_times_binop(pgGrB_Vector *left, pgGrB_Vector *right) {
+char* vector_times_binop(OS_Vector *left, OS_Vector *right) {
   GrB_Info info;
   GrB_Type type;
   CHECKD(GxB_Vector_type(&type, left->V), left->V);
   return DEFAULT_TIMES_BINOP(type);
 }
 
-char* vector_plus_binop(pgGrB_Vector *left, pgGrB_Vector *right) {
+char* vector_plus_binop(OS_Vector *left, OS_Vector *right) {
   GrB_Info info;
   GrB_Type type;
   CHECKD(GxB_Vector_type(&type, left->V), left->V);
@@ -160,12 +160,12 @@ char* grb_type_to_name(GrB_Type t) {
 /*   {"GxB_" #add #mul "INT32", GxB_ ## add ## mul ## INT32},              \ */
 /*   {"GxB_" #add #mul "INT64", GxB_ ## add ## mul ## INT64},              \ */
 
-/* struct pgGrB_Semiring */
+/* struct OS_Semiring */
 /* { */
 /*     const char* name; */
 /*     GrB_Semiring semiring; */
 /* } */
-/* pgGrB_Semiring[] =  */
+/* OS_Semiring[] =  */
 /* { */
 /* SEMIRING(PLUS_, TIMES_); */
 /* {"setinel", NULL} */

@@ -1,9 +1,9 @@
 #include "onesparse.h"
 PG_MODULE_MAGIC;
 
-pgGrB_Semiring semirings[960];
-pgGrB_BinaryOp binops[256];
-pgGrB_UnaryOp uops[67];
+OS_Semiring semirings[960];
+OS_BinaryOp binops[256];
+OS_UnaryOp uops[67];
 MemoryContext gb_context;
 
 #include "type.c"

@@ -14,6 +14,7 @@
 #include "utils/lsyscache.h"
 #include "nodes/pg_list.h"
 #include "utils/varlena.h"
+#include "libpq/libpq-fs.h"
 
 #define CCAT2(x, y) x ## y
 #define CCAT(x, y) CCAT2(x, y)
@@ -153,13 +154,13 @@ GrB_Info visequal
 /* Flattened representation of matrix, used to store to disk.
 
 */
-typedef struct pgGrB_FlatMatrix {
+typedef struct OS_FlatMatrix {
   int32 vl_len_;
   GrB_Index nrows;
   GrB_Index ncols;
   GrB_Index nvals;
   GrB_Type type;
-} pgGrB_FlatMatrix;
+} OS_FlatMatrix;
 
 /* ID for debugging crosschecks */
 #define matrix_MAGIC 689276813
@@ -169,13 +170,13 @@ typedef struct pgGrB_FlatMatrix {
 When loaded from storage, the flattened representation is used to
 build the matrix with GrB_Matrix_build.
 */
-typedef struct pgGrB_Matrix  {
+typedef struct OS_Matrix  {
   ExpandedObjectHeader hdr;
   int em_magic;
   GrB_Type type;
   GrB_Matrix M;
   Size flat_size;
-} pgGrB_Matrix;
+} OS_Matrix;
 
 /* helper to turn types into names. */
 char* grb_type_to_name(GrB_Type t);
@@ -186,25 +187,22 @@ static void
 context_callback_matrix_free(void*);
 
 /* Helper function that either detoasts or expands matrices. */
-pgGrB_Matrix* DatumGetMatrix(Datum d);
+OS_Matrix* DatumGetMatrix(Datum d);
 
 /* Helper function to create an empty flattened matrix. */
-pgGrB_FlatMatrix *
+OS_FlatMatrix *
 construct_empty_flat_matrix(GrB_Index nrows,
                             GrB_Index ncols,
                             GrB_Type type);
 
 /* Helper to detoast and expand matrix arguments */
-#define PGGRB_GETARG_MATRIX(n)  DatumGetMatrix(PG_GETARG_DATUM(n))
+#define OS_GETARG_MATRIX(n)  DatumGetMatrix(PG_GETARG_DATUM(n))
 
 /* Helper to return Expanded Object Header Pointer from matrix. */
-#define PGGRB_RETURN_MATRIX(A) return EOHPGetRWDatum(&(A)->hdr)
+#define OS_RETURN_MATRIX(A) return EOHPGetRWDatum(&(A)->hdr)
 
 /* Helper to compute flat matrix header size */
-#define PGGRB_MATRIX_OVERHEAD() MAXALIGN(sizeof(pgGrB_FlatMatrix))
-
-/* pointer to beginning of matrix data. */
-#define PGGRB_MATRIX_DATA(a) ((GrB_Index *)(((char *) (a)) + PGGRB_MATRIX_OVERHEAD()))
+#define OS_MATRIX_OVERHEAD() MAXALIGN(sizeof(OS_FlatMatrix))
 
 /* Public API functions */
 
@@ -241,12 +239,12 @@ PG_FUNCTION_INFO_V1(matrix_bfs);
 
 Actual array data is appended and for the moment cannot exceed 1GB.
 */
-typedef struct pgGrB_FlatVector {
+typedef struct OS_FlatVector {
   int32 vl_len_;
   GrB_Index size;
   GrB_Index nvals;
   GrB_Type type;
-} pgGrB_FlatVector;
+} OS_FlatVector;
 
 /* ID for debugging crosschecks */
 #define vector_MAGIC 681276813
@@ -256,53 +254,52 @@ typedef struct pgGrB_FlatVector {
 When loaded from storage, the flattened representation is used to
 build the vector with GrB_Vector_build.
 */
-typedef struct pgGrB_Vector  {
+typedef struct OS_Vector  {
   ExpandedObjectHeader hdr;
   int ev_magic;
   GrB_Type type;
   GrB_Vector V;
   Size flat_size;
-} pgGrB_Vector;
+} OS_Vector;
 
 static void context_callback_vector_free(void*);
 
 /* Helper function that either detoasts or expands vectors. */
-pgGrB_Vector* DatumGetVector(Datum d);
+OS_Vector* DatumGetVector(Datum d);
 
 /* Helper function to create an empty flattened vector. */
-pgGrB_FlatVector* construct_empty_flat_vector(GrB_Index size, GrB_Type type);
+OS_FlatVector* construct_empty_flat_vector(GrB_Index size, GrB_Type type);
 
-GrB_Type mxm_type(pgGrB_Matrix *left, pgGrB_Matrix *right);
-GrB_Type mxv_type(pgGrB_Matrix *left, pgGrB_Vector *right);
-GrB_Type vxm_type(pgGrB_Vector *left, pgGrB_Matrix *right);
+GrB_Type mxm_type(OS_Matrix *left, OS_Matrix *right);
+GrB_Type mxv_type(OS_Matrix *left, OS_Vector *right);
+GrB_Type vxm_type(OS_Vector *left, OS_Matrix *right);
 
 /* function to choose implicit semirings for overloaded operators */
-char* mxm_semiring(pgGrB_Matrix *left, pgGrB_Matrix *right);
-char* mxv_semiring(pgGrB_Matrix *left, pgGrB_Vector *right);
-char* vxm_semiring(pgGrB_Vector *left, pgGrB_Matrix *right);
+char* mxm_semiring(OS_Matrix *left, OS_Matrix *right);
+char* mxv_semiring(OS_Matrix *left, OS_Vector *right);
+char* vxm_semiring(OS_Vector *left, OS_Matrix *right);
 
-char* matrix_times_binop(pgGrB_Matrix *left, pgGrB_Matrix *right);
-char* matrix_plus_binop(pgGrB_Matrix *left, pgGrB_Matrix *right);
+char* matrix_times_binop(OS_Matrix *left, OS_Matrix *right);
+char* matrix_plus_binop(OS_Matrix *left, OS_Matrix *right);
 
-char* vector_times_binop(pgGrB_Vector *left, pgGrB_Vector *right);
-char* vector_plus_binop(pgGrB_Vector *left, pgGrB_Vector *right);
+char* vector_times_binop(OS_Vector *left, OS_Vector *right);
+char* vector_plus_binop(OS_Vector *left, OS_Vector *right);
 
 GrB_Semiring lookup_semiring(char *name);
 GrB_BinaryOp lookup_binop(char *name);
 
-#define VectorGetEOHP(d) (pgGrB_Vector *) DatumGetEOHP(d)
-#define MatrixGetEOHP(d) (pgGrB_Matrix *) DatumGetEOHP(d);
+#define VectorGetEOHP(d) (OS_Vector *) DatumGetEOHP(d)
+#define MatrixGetEOHP(d) (OS_Matrix *) DatumGetEOHP(d);
 
 /* Helper to detoast and expand vector arguments */
-#define PGGRB_GETARG_VECTOR(n)  DatumGetVector(PG_GETARG_DATUM(n))
+#define OS_GETARG_VECTOR(n)  DatumGetVector(PG_GETARG_DATUM(n))
 
 /* Helper to return Expanded Object Header Pointer from vector. */
-#define PGGRB_RETURN_VECTOR(A) return EOHPGetRWDatum(&(A)->hdr)
+#define OS_RETURN_VECTOR(A) return EOHPGetRWDatum(&(A)->hdr)
 
 /* Helper to compute flat vector header size */
-#define PGGRB_VECTOR_OVERHEAD() MAXALIGN(sizeof(pgGrB_FlatVector))
+#define OS_VECTOR_OVERHEAD() MAXALIGN(sizeof(OS_FlatVector))
 
-#define PGGRB_VECTOR_DATA(a) ((GrB_Index *)(((char *) (a)) + PGGRB_VECTOR_OVERHEAD()))
 
 PG_FUNCTION_INFO_V1(vector_in);
 PG_FUNCTION_INFO_V1(vector_out);
@@ -319,20 +316,20 @@ PG_FUNCTION_INFO_V1(vector_size);
 PG_FUNCTION_INFO_V1(vector_xtract);
 PG_FUNCTION_INFO_V1(vector_print);
 
-typedef struct pgGrB_Semiring  {
+typedef struct OS_Semiring  {
   char name[255];
   GrB_Semiring R;
-} pgGrB_Semiring;
+} OS_Semiring;
 
-typedef struct pgGrB_BinaryOp  {
+typedef struct OS_BinaryOp  {
   char name[255];
   GrB_BinaryOp B;
-} pgGrB_BinaryOp;
+} OS_BinaryOp;
 
-typedef struct pgGrB_UnaryOp  {
+typedef struct OS_UnaryOp  {
   char name[255];
   GrB_UnaryOp U;
-} pgGrB_UnaryOp;
+} OS_UnaryOp;
 
 #define SEMIRING(N, PLS, TMS, TYP) do {                             \
     strlcpy(semirings[(N)].name, #PLS #TMS #TYP, 255);              \

@@ -117,17 +117,17 @@
 /* MemoryContextCallback function to free matrices */
 static void
 context_callback_vector_free(void* a) {
-  pgGrB_Vector *A = (pgGrB_Vector *) a;
+  OS_Vector *A = (OS_Vector *) a;
   GrB_Vector_free(&A->V);
 }
 
 /* Construct an empty flat vector. */
-pgGrB_FlatVector *
+OS_FlatVector *
 construct_empty_flat_vector(GrB_Index size, GrB_Type type) {
-  pgGrB_FlatVector *result;
+  OS_FlatVector *result;
 
-  result = (pgGrB_FlatVector *) palloc0(sizeof(pgGrB_FlatVector));
-  SET_VARSIZE(result, sizeof(pgGrB_FlatVector));
+  result = (OS_FlatVector *) palloc0(sizeof(OS_FlatVector));
+  SET_VARSIZE(result, sizeof(OS_FlatVector));
   result->size = size;
   result->nvals = 0;
   result->type = type;
@@ -136,18 +136,18 @@ construct_empty_flat_vector(GrB_Index size, GrB_Type type) {
 
 /* Helper function to always expanded datum
 
-This is used by PGGRB_GETARG_VECTOR */
-pgGrB_Vector *
+This is used by OS_GETARG_VECTOR */
+OS_Vector *
 DatumGetVector(Datum d) {
-  pgGrB_Vector *A;
-  pgGrB_FlatVector *flat;
+  OS_Vector *A;
+  OS_FlatVector *flat;
 
   if (VARATT_IS_EXTERNAL_EXPANDED(DatumGetPointer(d))) {
     A = VectorGetEOHP(d);
     Assert(A->ev_magic == vector_MAGIC);
     return A;
   }
-  flat = (pgGrB_FlatVector*)PG_DETOAST_DATUM(d);
+  flat = (OS_FlatVector*)PG_DETOAST_DATUM(d);
   TYPE_APPLY(d, flat->type, expand_flat_vector, flat, CurrentMemoryContext);
   return VectorGetEOHP(d);
 }
@@ -155,7 +155,7 @@ DatumGetVector(Datum d) {
 Datum
 vector_in(PG_FUNCTION_ARGS)
 {
-  pgGrB_FlatVector *flat;
+  OS_FlatVector *flat;
   char *input;
   size_t len;
   int bc;
@@ -175,7 +175,7 @@ vector_out(PG_FUNCTION_ARGS)
 {
   Size size;
   char *rp, *result, *buf;
-  pgGrB_Vector *A = PGGRB_GETARG_VECTOR(0);
+  OS_Vector *A = OS_GETARG_VECTOR(0);
   size = EOH_get_flat_size(&A->hdr);
   buf = palloc(size);
   EOH_flatten_into(&A->hdr, buf, size);
@@ -187,23 +187,23 @@ vector_out(PG_FUNCTION_ARGS)
 
 Datum
 vector_ewise_mult(PG_FUNCTION_ARGS) {
-  pgGrB_Vector *A, *B;
-  pgGrB_Vector *C = NULL, *mask = NULL;
+  OS_Vector *A, *B;
+  OS_Vector *C = NULL, *mask = NULL;
   Datum d;
   char *binop_name, *accum_name;
   GrB_BinaryOp binop = NULL, accum = NULL;
   GrB_Descriptor desc = NULL;
   GrB_Info info;
 
-  A = PGGRB_GETARG_VECTOR(0);
-  B = PGGRB_GETARG_VECTOR(1);
+  A = OS_GETARG_VECTOR(0);
+  B = OS_GETARG_VECTOR(1);
 
   accum_name = NULL;
   binop_name = vector_times_binop(A, B);
 
   if (PG_NARGS() > 2) {
-    C = PG_ARGISNULL(2) ? NULL : PGGRB_GETARG_VECTOR(2);
-   mask = PG_ARGISNULL(3) ? NULL : PGGRB_GETARG_VECTOR(3);
+    C = PG_ARGISNULL(2) ? NULL : OS_GETARG_VECTOR(2);
+   mask = PG_ARGISNULL(3) ? NULL : OS_GETARG_VECTOR(3);
     binop_name = PG_ARGISNULL(4) ?
       binop_name : text_to_cstring(PG_GETARG_TEXT_PP(4));
     accum_name = PG_ARGISNULL(5) ?
@@ -226,23 +226,23 @@ vector_ewise_mult(PG_FUNCTION_ARGS) {
 
 Datum
 vector_ewise_add(PG_FUNCTION_ARGS) {
-  pgGrB_Vector *A, *B;
-  pgGrB_Vector *C = NULL, *mask = NULL;
+  OS_Vector *A, *B;
+  OS_Vector *C = NULL, *mask = NULL;
   Datum d;
   char *binop_name, *accum_name;
   GrB_BinaryOp binop = NULL, accum = NULL;
   GrB_Descriptor desc = NULL;
   GrB_Info info;
 
-  A = PGGRB_GETARG_VECTOR(0);
-  B = PGGRB_GETARG_VECTOR(1);
+  A = OS_GETARG_VECTOR(0);
+  B = OS_GETARG_VECTOR(1);
 
   accum_name = NULL;
   binop_name = vector_times_binop(A, B);
 
   if (PG_NARGS() > 2) {
-    C = PG_ARGISNULL(2) ? NULL : PGGRB_GETARG_VECTOR(2);
-    mask = PG_ARGISNULL(3) ? NULL : PGGRB_GETARG_VECTOR(3);
+    C = PG_ARGISNULL(2) ? NULL : OS_GETARG_VECTOR(2);
+    mask = PG_ARGISNULL(3) ? NULL : OS_GETARG_VECTOR(3);
     binop_name = PG_ARGISNULL(4) ?
       binop_name : text_to_cstring(PG_GETARG_TEXT_PP(4));
     accum_name = PG_ARGISNULL(5) ?
@@ -266,9 +266,9 @@ vector_ewise_add(PG_FUNCTION_ARGS) {
 Datum
 vector_nvals(PG_FUNCTION_ARGS) {
   GrB_Info info;
-  pgGrB_Vector *vec;
+  OS_Vector *vec;
   GrB_Index nvals;
-  vec = PGGRB_GETARG_VECTOR(0);
+  vec = OS_GETARG_VECTOR(0);
   CHECKD(GrB_Vector_nvals(&nvals, vec->V), vec->V);
   return Int64GetDatum(nvals);
 }
@@ -276,9 +276,9 @@ vector_nvals(PG_FUNCTION_ARGS) {
 Datum
 vector_size(PG_FUNCTION_ARGS) {
   GrB_Info info;
-  pgGrB_Vector *vec;
+  OS_Vector *vec;
   GrB_Index size;
-  vec = PGGRB_GETARG_VECTOR(0);
+  vec = OS_GETARG_VECTOR(0);
   CHECKD(GrB_Vector_size(&size, vec->V), vec->V);
   return Int64GetDatum(size);
 }
@@ -287,11 +287,11 @@ vector_size(PG_FUNCTION_ARGS) {
 Datum
 vector_eq(PG_FUNCTION_ARGS) {
   GrB_Info info;
-  pgGrB_Vector *A, *B;
+  OS_Vector *A, *B;
   bool result;
 
-  A = PGGRB_GETARG_VECTOR(0);
-  B = PGGRB_GETARG_VECTOR(1);
+  A = OS_GETARG_VECTOR(0);
+  B = OS_GETARG_VECTOR(1);
 
   result = true;
   PG_RETURN_BOOL(result);
@@ -300,11 +300,11 @@ vector_eq(PG_FUNCTION_ARGS) {
 Datum
 vector_ne(PG_FUNCTION_ARGS) {
   GrB_Info info;
-  pgGrB_Vector *A, *B;
+  OS_Vector *A, *B;
   bool result;
 
-  A = PGGRB_GETARG_VECTOR(0);
-  B = PGGRB_GETARG_VECTOR(1);
+  A = OS_GETARG_VECTOR(0);
+  B = OS_GETARG_VECTOR(1);
 
   result = true;
   PG_RETURN_BOOL(!result);
@@ -313,12 +313,12 @@ vector_ne(PG_FUNCTION_ARGS) {
 Datum
 vector_xtract(PG_FUNCTION_ARGS) {
   GrB_Info info;
-  pgGrB_Vector *A, *B, *C = NULL;
+  OS_Vector *A, *B, *C = NULL;
   GrB_Index size, *indexes;
 
-  A = PGGRB_GETARG_VECTOR(0);
-  B = PGGRB_GETARG_VECTOR(1);
-  C = PG_ARGISNULL(2) ? NULL : PGGRB_GETARG_VECTOR(2);
+  A = OS_GETARG_VECTOR(0);
+  B = OS_GETARG_VECTOR(1);
+  C = PG_ARGISNULL(2) ? NULL : OS_GETARG_VECTOR(2);
 
   CHECKD(GrB_Vector_size(&size, A->V), A->V);
   if (C == NULL) {
@@ -328,17 +328,17 @@ vector_xtract(PG_FUNCTION_ARGS) {
   TYPE_APPLY(indexes, A->type, extract_indexes, B, size);
 
   CHECKD(GrB_Vector_extract(C->V, NULL, NULL, A->V, indexes, size, NULL), A->V);
-  PGGRB_RETURN_VECTOR(C);
+  OS_RETURN_VECTOR(C);
 }
 
 Datum
 vector_print(PG_FUNCTION_ARGS) {
-  pgGrB_Vector *A;
+  OS_Vector *A;
   char *result, *buf;
   size_t size;
   FILE *fp;
   int level;
-  A = PGGRB_GETARG_VECTOR(0);
+  A = OS_GETARG_VECTOR(0);
   level = PG_GETARG_INT32(1);
   
   fp = open_memstream(&buf, &size);

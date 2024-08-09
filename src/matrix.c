@@ -96,19 +96,19 @@
 /* MemoryContextCallback function to free matrices */
 static void
 context_callback_matrix_free(void* m) {
-  pgGrB_Matrix *mat = (pgGrB_Matrix *) m;
+  OS_Matrix *mat = (OS_Matrix *) m;
   GrB_Matrix_free(&mat->M);
 }
 
 /* Construct an empty flat matrix. */
-pgGrB_FlatMatrix *
+OS_FlatMatrix *
 construct_empty_flat_matrix(GrB_Index nrows,
                             GrB_Index ncols,
                             GrB_Type type) {
-  pgGrB_FlatMatrix *result;
+  OS_FlatMatrix *result;
 
-  result = (pgGrB_FlatMatrix *) palloc0(sizeof(pgGrB_FlatMatrix));
-  SET_VARSIZE(result, sizeof(pgGrB_FlatMatrix));
+  result = (OS_FlatMatrix *) palloc0(sizeof(OS_FlatMatrix));
+  SET_VARSIZE(result, sizeof(OS_FlatMatrix));
   result->nrows = ncols;
   result->ncols = nrows;
   result->nvals = 0;
@@ -118,25 +118,25 @@ construct_empty_flat_matrix(GrB_Index nrows,
 
 /* Helper function to always expanded datum
 
-This is used by PGGRB_GETARG_MATRIX */
-pgGrB_Matrix *
+This is used by OS_GETARG_MATRIX */
+OS_Matrix *
 DatumGetMatrix(Datum d) {
-  pgGrB_Matrix *A;
-  pgGrB_FlatMatrix *flat;
+  OS_Matrix *A;
+  OS_FlatMatrix *flat;
 
   if (VARATT_IS_EXTERNAL_EXPANDED(DatumGetPointer(d))) {
     A = MatrixGetEOHP(d);
     Assert(A->em_magic == matrix_MAGIC);
     return A;
   }
-  flat = (pgGrB_FlatMatrix*)PG_DETOAST_DATUM(d);
+  flat = (OS_FlatMatrix*)PG_DETOAST_DATUM(d);
   TYPE_APPLY(d, flat->type, expand_flat_matrix, flat, CurrentMemoryContext);
   return MatrixGetEOHP(d);
 }
 
 Datum
 matrix_in(PG_FUNCTION_ARGS) {
-  pgGrB_FlatMatrix *flat;
+  OS_FlatMatrix *flat;
   char *input;
   size_t len;
   int bc;
@@ -156,7 +156,7 @@ matrix_out(PG_FUNCTION_ARGS)
 {
   Size size;
   char *rp, *result, *buf;
-  pgGrB_Matrix *A = PGGRB_GETARG_MATRIX(0);
+  OS_Matrix *A = OS_GETARG_MATRIX(0);
   size = EOH_get_flat_size(&A->hdr);
   buf = palloc(size);
   EOH_flatten_into(&A->hdr, buf, size);
@@ -169,9 +169,9 @@ matrix_out(PG_FUNCTION_ARGS)
 Datum
 matrix_nrows(PG_FUNCTION_ARGS) {
   GrB_Info info;
-  pgGrB_Matrix *mat;
+  OS_Matrix *mat;
   GrB_Index count;
-  mat = PGGRB_GETARG_MATRIX(0);
+  mat = OS_GETARG_MATRIX(0);
   CHECKD(GrB_Matrix_nrows(&count, mat->M), mat->M);
   return Int64GetDatum(count);
 }
@@ -179,9 +179,9 @@ matrix_nrows(PG_FUNCTION_ARGS) {
 Datum
 matrix_ncols(PG_FUNCTION_ARGS) {
   GrB_Info info;
-  pgGrB_Matrix *mat;
+  OS_Matrix *mat;
   GrB_Index count;
-  mat = PGGRB_GETARG_MATRIX(0);
+  mat = OS_GETARG_MATRIX(0);
   CHECKD(GrB_Matrix_ncols(&count, mat->M), mat->M);
   return Int64GetDatum(count);
 }
@@ -189,9 +189,9 @@ matrix_ncols(PG_FUNCTION_ARGS) {
 Datum
 matrix_nvals(PG_FUNCTION_ARGS) {
   GrB_Info info;
-  pgGrB_Matrix *mat;
+  OS_Matrix *mat;
   GrB_Index count;
-  mat = PGGRB_GETARG_MATRIX(0);
+  mat = OS_GETARG_MATRIX(0);
   CHECKD(GrB_Matrix_nvals(&count, mat->M), mat->M);
   return Int64GetDatum(count);
 }
@@ -199,11 +199,11 @@ matrix_nvals(PG_FUNCTION_ARGS) {
 Datum
 matrix_eq(PG_FUNCTION_ARGS) {
   GrB_Info info;
-  pgGrB_Matrix *A, *B;
+  OS_Matrix *A, *B;
   bool result;
 
-  A = PGGRB_GETARG_MATRIX(0);
-  B = PGGRB_GETARG_MATRIX(1);
+  A = OS_GETARG_MATRIX(0);
+  B = OS_GETARG_MATRIX(1);
 
   result = true;
   PG_RETURN_BOOL(result);
@@ -212,11 +212,11 @@ matrix_eq(PG_FUNCTION_ARGS) {
 Datum
 matrix_ne(PG_FUNCTION_ARGS) {
   GrB_Info info;
-  pgGrB_Matrix *A, *B;
+  OS_Matrix *A, *B;
   bool result;
 
-  A = PGGRB_GETARG_MATRIX(0);
-  B = PGGRB_GETARG_MATRIX(1);
+  A = OS_GETARG_MATRIX(0);
+  B = OS_GETARG_MATRIX(1);
 
   result = true;
   PG_RETURN_BOOL(!result);
@@ -224,22 +224,22 @@ matrix_ne(PG_FUNCTION_ARGS) {
 
 Datum
 matrix_ewise_mult(PG_FUNCTION_ARGS) {
-  pgGrB_Matrix *A, *B, *C = NULL, *mask = NULL;
+  OS_Matrix *A, *B, *C = NULL, *mask = NULL;
   Datum d;
   char *binop_name, *accum_name;
   GrB_BinaryOp binop = NULL, accum = NULL;
   GrB_Descriptor desc = NULL;
   GrB_Info info;
 
-  A = PGGRB_GETARG_MATRIX(0);
-  B = PGGRB_GETARG_MATRIX(1);
+  A = OS_GETARG_MATRIX(0);
+  B = OS_GETARG_MATRIX(1);
 
   binop_name = matrix_times_binop(A, B);
   accum_name = NULL;
 
   if (PG_NARGS() > 2) {
-    C = PG_ARGISNULL(2) ? NULL : PGGRB_GETARG_MATRIX(2);
-    mask = PG_ARGISNULL(3) ? NULL : PGGRB_GETARG_MATRIX(3);
+    C = PG_ARGISNULL(2) ? NULL : OS_GETARG_MATRIX(2);
+    mask = PG_ARGISNULL(3) ? NULL : OS_GETARG_MATRIX(3);
     binop_name = PG_ARGISNULL(4) ?
       binop_name : text_to_cstring(PG_GETARG_TEXT_PP(4));
     accum_name = PG_ARGISNULL(5) ?
@@ -260,22 +260,22 @@ matrix_ewise_mult(PG_FUNCTION_ARGS) {
 
 Datum
 matrix_ewise_add(PG_FUNCTION_ARGS) {
-  pgGrB_Matrix *A, *B, *C = NULL, *mask = NULL;
+  OS_Matrix *A, *B, *C = NULL, *mask = NULL;
   Datum d;
   char *binop_name, *accum_name;
   GrB_BinaryOp binop = NULL, accum = NULL;
   GrB_Descriptor desc = NULL;
   GrB_Info info;
 
-  A = PGGRB_GETARG_MATRIX(0);
-  B = PGGRB_GETARG_MATRIX(1);
+  A = OS_GETARG_MATRIX(0);
+  B = OS_GETARG_MATRIX(1);
 
   accum_name = NULL;
   binop_name = matrix_plus_binop(A, B);
 
   if (PG_NARGS() > 2) {
-    C = PG_ARGISNULL(2) ? NULL : PGGRB_GETARG_MATRIX(2);
-    mask = PG_ARGISNULL(3) ? NULL : PGGRB_GETARG_MATRIX(3);
+    C = PG_ARGISNULL(2) ? NULL : OS_GETARG_MATRIX(2);
+    mask = PG_ARGISNULL(3) ? NULL : OS_GETARG_MATRIX(3);
     binop_name = PG_ARGISNULL(4) ?
       binop_name : text_to_cstring(PG_GETARG_TEXT_PP(4));
     accum_name = PG_ARGISNULL(5) ?
@@ -297,7 +297,7 @@ matrix_ewise_add(PG_FUNCTION_ARGS) {
 
 Datum
 mxm(PG_FUNCTION_ARGS) {
-  pgGrB_Matrix *A, *B, *C = NULL, *mask = NULL;
+  OS_Matrix *A, *B, *C = NULL, *mask = NULL;
   GrB_Info info;
   GrB_Type type;
   Datum d;
@@ -306,15 +306,15 @@ mxm(PG_FUNCTION_ARGS) {
   GrB_BinaryOp binop = NULL;
   GrB_Descriptor desc = NULL;
 
-  A = PGGRB_GETARG_MATRIX(0);
-  B = PGGRB_GETARG_MATRIX(1);
+  A = OS_GETARG_MATRIX(0);
+  B = OS_GETARG_MATRIX(1);
 
   semiring_name = mxm_semiring(A, B);
   binop_name = NULL;
 
   if (PG_NARGS() > 2) {
-    C = PG_ARGISNULL(2) ? NULL : PGGRB_GETARG_MATRIX(2);
-    mask = PG_ARGISNULL(3) ? NULL : PGGRB_GETARG_MATRIX(3);
+    C = PG_ARGISNULL(2) ? NULL : OS_GETARG_MATRIX(2);
+    mask = PG_ARGISNULL(3) ? NULL : OS_GETARG_MATRIX(3);
     semiring_name = PG_ARGISNULL(4) ?
       semiring_name :
       text_to_cstring(PG_GETARG_TEXT_PP(4));
@@ -346,8 +346,8 @@ mxm(PG_FUNCTION_ARGS) {
 Datum
 mxv(PG_FUNCTION_ARGS) {
   GrB_Info info;
-  pgGrB_Matrix *A;
-  pgGrB_Vector *B, *C = NULL, *mask = NULL;
+  OS_Matrix *A;
+  OS_Vector *B, *C = NULL, *mask = NULL;
   GrB_Type type;
   Datum d;
   char *semiring_name, *binop_name;
@@ -355,15 +355,15 @@ mxv(PG_FUNCTION_ARGS) {
   GrB_BinaryOp binop = NULL;
   GrB_Descriptor desc = NULL;
 
-  A = PGGRB_GETARG_MATRIX(0);
-  B = PGGRB_GETARG_VECTOR(1);
+  A = OS_GETARG_MATRIX(0);
+  B = OS_GETARG_VECTOR(1);
 
   semiring_name = mxv_semiring(A, B);
   binop_name = NULL;
 
   if (PG_NARGS() > 2) {
-    C = PG_ARGISNULL(2) ? NULL : PGGRB_GETARG_VECTOR(2);
-    mask = PG_ARGISNULL(3) ? NULL : PGGRB_GETARG_VECTOR(3);
+    C = PG_ARGISNULL(2) ? NULL : OS_GETARG_VECTOR(2);
+    mask = PG_ARGISNULL(3) ? NULL : OS_GETARG_VECTOR(3);
     semiring_name = PG_ARGISNULL(4) ?
       semiring_name :
       text_to_cstring(PG_GETARG_TEXT_PP(4));
@@ -390,8 +390,8 @@ mxv(PG_FUNCTION_ARGS) {
 
 Datum
 vxm(PG_FUNCTION_ARGS) {
-  pgGrB_Matrix *B;
-  pgGrB_Vector *A, *C = NULL, *mask = NULL;
+  OS_Matrix *B;
+  OS_Vector *A, *C = NULL, *mask = NULL;
   GrB_Type type;
   GrB_Info info;
   Datum d;
@@ -400,15 +400,15 @@ vxm(PG_FUNCTION_ARGS) {
   GrB_BinaryOp binop = NULL;
   GrB_Descriptor desc = NULL;
 
-  A = PGGRB_GETARG_VECTOR(0);
-  B = PGGRB_GETARG_MATRIX(1);
+  A = OS_GETARG_VECTOR(0);
+  B = OS_GETARG_MATRIX(1);
 
   semiring_name = vxm_semiring(A, B);
   binop_name = NULL;
 
   if (PG_NARGS() > 2) {
-    C = PG_ARGISNULL(2) ? NULL : PGGRB_GETARG_VECTOR(2);
-    mask = PG_ARGISNULL(3) ? NULL : PGGRB_GETARG_VECTOR(3);
+    C = PG_ARGISNULL(2) ? NULL : OS_GETARG_VECTOR(2);
+    mask = PG_ARGISNULL(3) ? NULL : OS_GETARG_VECTOR(3);
     semiring_name = PG_ARGISNULL(4) ? semiring_name : PG_GETARG_CSTRING(4);
     binop_name = PG_ARGISNULL(5) ?
       NULL :
@@ -434,15 +434,15 @@ vxm(PG_FUNCTION_ARGS) {
 Datum
 matrix_reduce_vector(PG_FUNCTION_ARGS) {
   GrB_Info info;
-  pgGrB_Matrix *A;
+  OS_Matrix *A;
   GrB_Semiring semiring;
   GrB_Monoid monoid;
   char *semiring_name;
-  pgGrB_Vector *val;
+  OS_Vector *val;
   GrB_Index size;
   GrB_Type type;
 
-  A = PGGRB_GETARG_MATRIX(0);
+  A = OS_GETARG_MATRIX(0);
   semiring_name = PG_ARGISNULL(1)?
     NULL:
     text_to_cstring(PG_GETARG_TEXT_PP(1));
@@ -459,21 +459,21 @@ matrix_reduce_vector(PG_FUNCTION_ARGS) {
   TYPE_APPLY(val, A->type, construct_empty_expanded_vector, size, CurrentMemoryContext);
 
   CHECKD(GrB_reduce(val->V, NULL, monoid, A->M, NULL), A->M);
-  PGGRB_RETURN_VECTOR(val);
+  OS_RETURN_VECTOR(val);
 }
 
 Datum
 matrix_transpose(PG_FUNCTION_ARGS) {
   GrB_Info info;
-  pgGrB_Matrix *A, *C = NULL, *mask;
+  OS_Matrix *A, *C = NULL, *mask;
   GrB_Index m, n;
   GrB_Descriptor desc = NULL;
 
-  A = PGGRB_GETARG_MATRIX(0);
+  A = OS_GETARG_MATRIX(0);
 
   if (PG_NARGS() > 0) {
-    C = PG_ARGISNULL(1) ? NULL : PGGRB_GETARG_MATRIX(2);
-    mask = PG_ARGISNULL(2) ? NULL : PGGRB_GETARG_MATRIX(3);
+    C = PG_ARGISNULL(1) ? NULL : OS_GETARG_MATRIX(2);
+    mask = PG_ARGISNULL(2) ? NULL : OS_GETARG_MATRIX(3);
     if (PG_NARGS() > 3) {
       GET_DESCRIPTOR(3, desc);
     }
@@ -486,18 +486,18 @@ matrix_transpose(PG_FUNCTION_ARGS) {
   }
 
   CHECKD(GrB_transpose(C->M, mask? mask->M:NULL, NULL, A->M, desc), A->M);
-  PGGRB_RETURN_MATRIX(C);
+  OS_RETURN_MATRIX(C);
 }
 
 Datum
 matrix_assign_matrix(PG_FUNCTION_ARGS) {
   GrB_Info info;
-  pgGrB_Matrix *A, *B, *mask;
+  OS_Matrix *A, *B, *mask;
   GrB_Index nvals, *rows = NULL, *cols = NULL;
 
-  A = PGGRB_GETARG_MATRIX(0);
-  B = PGGRB_GETARG_MATRIX(1);
-  mask = PG_ARGISNULL(2)? NULL : PGGRB_GETARG_MATRIX(2);
+  A = OS_GETARG_MATRIX(0);
+  B = OS_GETARG_MATRIX(1);
+  mask = PG_ARGISNULL(2)? NULL : OS_GETARG_MATRIX(2);
 
   CHECKD(GrB_Matrix_nvals(&nvals, B->M), B->M);
 
@@ -514,12 +514,12 @@ matrix_assign_matrix(PG_FUNCTION_ARGS) {
                     cols? cols : GrB_ALL,
                     nvals,
                     NULL), A->M);
-  PGGRB_RETURN_MATRIX(A);
+  OS_RETURN_MATRIX(A);
 }
 
 Datum
 matrix_kron(PG_FUNCTION_ARGS) {
-  pgGrB_Matrix *A, *B, *C = NULL, *mask = NULL;
+  OS_Matrix *A, *B, *C = NULL, *mask = NULL;
   GrB_Info info;
   GrB_Type type;
   Datum d;
@@ -527,14 +527,14 @@ matrix_kron(PG_FUNCTION_ARGS) {
   GrB_BinaryOp accum = NULL, mulop = NULL;
   GrB_Descriptor desc = NULL;
 
-  A = PGGRB_GETARG_MATRIX(0);
-  B = PGGRB_GETARG_MATRIX(1);
+  A = OS_GETARG_MATRIX(0);
+  B = OS_GETARG_MATRIX(1);
   accum_name = NULL;
   mulop_name = NULL;
 
   if (PG_NARGS() > 2) {
-    C = PG_ARGISNULL(2) ? NULL : PGGRB_GETARG_MATRIX(2);
-    mask = PG_ARGISNULL(3) ? NULL : PGGRB_GETARG_MATRIX(3);
+    C = PG_ARGISNULL(2) ? NULL : OS_GETARG_MATRIX(2);
+    mask = PG_ARGISNULL(3) ? NULL : OS_GETARG_MATRIX(3);
     accum_name = PG_ARGISNULL(4) ?
       NULL :
       text_to_cstring(PG_GETARG_TEXT_PP(4));
@@ -564,13 +564,13 @@ matrix_kron(PG_FUNCTION_ARGS) {
 Datum
 matrix_xtract(PG_FUNCTION_ARGS) {
   GrB_Info info;
-  pgGrB_Matrix *A, *B, *C = NULL;
+  OS_Matrix *A, *B, *C = NULL;
   GrB_Index nrows, ncols, nvals, *rows, *cols;
   GrB_Descriptor desc = NULL;
 
-  A = PGGRB_GETARG_MATRIX(0);
-  B = PGGRB_GETARG_MATRIX(1);
-  C = PG_ARGISNULL(2) ? NULL : PGGRB_GETARG_MATRIX(2);
+  A = OS_GETARG_MATRIX(0);
+  B = OS_GETARG_MATRIX(1);
+  C = PG_ARGISNULL(2) ? NULL : OS_GETARG_MATRIX(2);
   GET_DESCRIPTOR(3, desc);
 
   CHECKD(GrB_Matrix_nrows(&nrows, A->M), A->M);
@@ -584,17 +584,17 @@ matrix_xtract(PG_FUNCTION_ARGS) {
   TYPE_APPLY(nvals, A->type, extract_rowscols, B, &rows, &cols, nvals);
 
   CHECKD(GrB_Matrix_extract(C->M, NULL, NULL, A->M, rows, nrows, cols, ncols, NULL), A->M);
-  PGGRB_RETURN_MATRIX(C);
+  OS_RETURN_MATRIX(C);
 }
 
 Datum
 matrix_print(PG_FUNCTION_ARGS) {
-  pgGrB_Matrix *A;
+  OS_Matrix *A;
   char *result, *buf;
   size_t size;
   FILE *fp;
   int level;
-  A = PGGRB_GETARG_MATRIX(0);
+  A = OS_GETARG_MATRIX(0);
   level = PG_GETARG_INT32(1);
 
   fp = open_memstream(&buf, &size);
