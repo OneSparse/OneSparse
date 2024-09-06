@@ -1,5 +1,0 @@
-# pggraphblas extension
-comment = 'Postgres extension for SuiteSparse::GraphBLAS'
-default_version = '0.0.1'
-relocatable = true
-requires = ''
