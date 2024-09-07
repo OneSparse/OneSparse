@@ -33,6 +33,18 @@ static Size scalar_get_flat_size(ExpandedObjectHeader *eohptr) {
 		{
 			data_size = sizeof(int32_t);
 		}
+		else if (type_code == GrB_INT16_CODE)
+		{
+			data_size = sizeof(int16_t);
+		}
+		else if (type_code == GrB_FP64_CODE)
+		{
+			data_size = sizeof(double);
+		}
+		else if (type_code == GrB_FP32_CODE)
+		{
+			data_size = sizeof(float);
+		}
 		else
 			elog(ERROR, "Unknown Type Code");
 	}
@@ -82,6 +94,21 @@ static void flatten_scalar(
 		else if (flat->type_code == GrB_INT32_CODE)
 		{
 			ERRORIF(GrB_Scalar_extractElement((int32_t*)data, scalar->scalar) != GrB_SUCCESS,
+					"Cannot extract Scalar element.");
+		}
+		else if (flat->type_code == GrB_INT16_CODE)
+		{
+			ERRORIF(GrB_Scalar_extractElement((int16_t*)data, scalar->scalar) != GrB_SUCCESS,
+					"Cannot extract Scalar element.");
+		}
+		else if (flat->type_code == GrB_FP64_CODE)
+		{
+			ERRORIF(GrB_Scalar_extractElement((double*)data, scalar->scalar) != GrB_SUCCESS,
+					"Cannot extract Scalar element.");
+		}
+		else if (flat->type_code == GrB_FP32_CODE)
+		{
+			ERRORIF(GrB_Scalar_extractElement((double*)data, scalar->scalar) != GrB_SUCCESS,
 					"Cannot extract Scalar element.");
 		}
 		else
@@ -153,6 +180,18 @@ Datum expand_scalar(onesparse_FlatScalar *flat, MemoryContext parentcontext)
 	{
 		type = GrB_INT32;
 	}
+	else if (flat->type_code == GrB_INT16_CODE)
+	{
+		type = GrB_INT16;
+	}
+	else if (flat->type_code == GrB_FP64_CODE)
+	{
+		type = GrB_FP64;
+	}
+	else if (flat->type_code == GrB_FP32_CODE)
+	{
+		type = GrB_FP32;
+	}
 	else
 		elog(ERROR, "Unknown type code.");
 
@@ -168,6 +207,21 @@ Datum expand_scalar(onesparse_FlatScalar *flat, MemoryContext parentcontext)
 		else if (type == GrB_INT32)
 		{
 			ERRORIF(GrB_Scalar_setElement(scalar->scalar, *(int32_t*)data) != GrB_SUCCESS,
+					"Cannot set scalar element in expand.");
+		}
+		else if (type == GrB_INT16)
+		{
+			ERRORIF(GrB_Scalar_setElement(scalar->scalar, *(int16_t*)data) != GrB_SUCCESS,
+					"Cannot set scalar element in expand.");
+		}
+		else if (type == GrB_FP64)
+		{
+			ERRORIF(GrB_Scalar_setElement(scalar->scalar, *(double*)data) != GrB_SUCCESS,
+					"Cannot set scalar element in expand.");
+		}
+		else if (type == GrB_FP32)
+		{
+			ERRORIF(GrB_Scalar_setElement(scalar->scalar, *(float*)data) != GrB_SUCCESS,
 					"Cannot set scalar element in expand.");
 		}
 		else
@@ -248,7 +302,7 @@ Datum scalar_out(PG_FUNCTION_ARGS)
 			result = palloc(20);
 			snprintf(result, 20, "%" PRIi64, value);
 		}
-		if (type_code == GrB_INT32_CODE)
+		else if (type_code == GrB_INT32_CODE)
 		{
 			int32_t value;
 			ERRORIF(GrB_Scalar_extractElement(&value, scalar->scalar) != GrB_SUCCESS,
@@ -256,8 +310,32 @@ Datum scalar_out(PG_FUNCTION_ARGS)
 			result = palloc(10);
 			snprintf(result, 10, "%" PRIi32, value);
 		}
+		else if (type_code == GrB_INT16_CODE)
+		{
+			int16_t value;
+			ERRORIF(GrB_Scalar_extractElement(&value, scalar->scalar) != GrB_SUCCESS,
+					"Error extracting scalar element.");
+			result = palloc(5);
+			snprintf(result,5, "%" PRIi16, value);
+		}
+		else if (type_code == GrB_FP64_CODE)
+		{
+			double value;
+			ERRORIF(GrB_Scalar_extractElement(&value, scalar->scalar) != GrB_SUCCESS,
+					"Error extracting scalar element.");
+			result = palloc(16);
+			snprintf(result, 16, "%f", value);
+		}
+		else if (type_code == GrB_FP32_CODE)
+		{
+			float value;
+			ERRORIF(GrB_Scalar_extractElement(&value, scalar->scalar) != GrB_SUCCESS,
+					"Error extracting scalar element.");
+			result = palloc(7);
+			snprintf(result, 7, "%f", value);
+		}
 		else
-			elog(ERROR, "Unsupported type code.");
+			elog(ERROR, "Unsupported type code %i.", type_code);
 	}
 	else
 	{
@@ -294,6 +372,27 @@ Datum scalar_nvals(PG_FUNCTION_ARGS)
 #define GB_TYPE GrB_INT32            // graphblas vector type
 #define PG_GETARG PG_GETARG_INT32       // how to get value args
 #define PG_RETURN PG_RETURN_INT32
+#include "scalar_ops.h"
+
+#define SUFFIX _int16                // suffix for names
+#define PG_TYPE int16                // postgres type
+#define GB_TYPE GrB_INT16            // graphblas vector type
+#define PG_GETARG PG_GETARG_INT16       // how to get value args
+#define PG_RETURN PG_RETURN_INT16
+#include "scalar_ops.h"
+
+#define SUFFIX _fp64                // suffix for names
+#define PG_TYPE float8                // postgres type
+#define GB_TYPE GrB_FP64            // graphblas vector type
+#define PG_GETARG PG_GETARG_FLOAT8       // how to get value args
+#define PG_RETURN PG_RETURN_FLOAT8
+#include "scalar_ops.h"
+
+#define SUFFIX _fp32                // suffix for names
+#define PG_TYPE float4                // postgres type
+#define GB_TYPE GrB_FP32            // graphblas vector type
+#define PG_GETARG PG_GETARG_FLOAT4       // how to get value args
+#define PG_RETURN PG_RETURN_FLOAT4
 #include "scalar_ops.h"
 
 /* Local Variables: */

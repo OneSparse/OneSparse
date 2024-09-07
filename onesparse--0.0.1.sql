@@ -26,8 +26,6 @@ RETURNS int2
 AS '$libdir/onesparse', 'scalar_nvals'
 LANGUAGE C;
 
--- int64 functions
-
 CREATE FUNCTION scalar(bigint)
 RETURNS scalar
 AS '$libdir/onesparse', 'scalar_int64'
@@ -77,7 +75,6 @@ CREATE FUNCTION div_scalar(bigint, scalar)
 RETURNS bigint
 AS '$libdir/onesparse', 'div_scalar_int64'
 LANGUAGE C;
-
 CREATE OPERATOR + (
     LEFTARG = scalar,
     RIGHTARG = bigint,
@@ -134,8 +131,6 @@ CREATE CAST (onesparse.scalar AS bigint)
     WITH FUNCTION onesparse.bigint_scalar(scalar)
     AS ASSIGNMENT;
 
--- int32 functions
-
 CREATE FUNCTION scalar(integer)
 RETURNS scalar
 AS '$libdir/onesparse', 'scalar_int32'
@@ -185,7 +180,6 @@ CREATE FUNCTION div_scalar(integer, scalar)
 RETURNS integer
 AS '$libdir/onesparse', 'div_scalar_int32'
 LANGUAGE C;
-
 CREATE OPERATOR + (
     LEFTARG = scalar,
     RIGHTARG = integer,
@@ -234,8 +228,6 @@ CREATE OPERATOR / (
     FUNCTION = div_scalar
     );
 
--- Casts
-
 CREATE CAST (integer AS onesparse.scalar)
     WITH FUNCTION onesparse.scalar(integer)
     AS IMPLICIT;
@@ -244,7 +236,320 @@ CREATE CAST (onesparse.scalar AS integer)
     WITH FUNCTION onesparse.integer_scalar(scalar)
     AS ASSIGNMENT;
 
--- type tables TODO
+CREATE FUNCTION scalar(smallint)
+RETURNS scalar
+AS '$libdir/onesparse', 'scalar_int16'
+LANGUAGE C;
+
+CREATE FUNCTION smallint_scalar(scalar)
+RETURNS smallint
+AS '$libdir/onesparse', 'cast_scalar_int16'
+LANGUAGE C;
+
+CREATE FUNCTION scalar_plus(scalar, smallint)
+RETURNS scalar
+AS '$libdir/onesparse', 'scalar_plus_int16'
+LANGUAGE C;
+
+CREATE FUNCTION plus_scalar(smallint, scalar)
+RETURNS smallint
+AS '$libdir/onesparse', 'plus_scalar_int16'
+LANGUAGE C;
+
+CREATE FUNCTION scalar_minus(scalar, smallint)
+RETURNS scalar
+AS '$libdir/onesparse', 'scalar_minus_int16'
+LANGUAGE C;
+
+CREATE FUNCTION minus_scalar(smallint, scalar)
+RETURNS smallint
+AS '$libdir/onesparse', 'minus_scalar_int16'
+LANGUAGE C;
+
+CREATE FUNCTION scalar_mult(scalar, smallint)
+RETURNS scalar
+AS '$libdir/onesparse', 'scalar_mult_int16'
+LANGUAGE C;
+
+CREATE FUNCTION mult_scalar(smallint, scalar)
+RETURNS smallint
+AS '$libdir/onesparse', 'mult_scalar_int16'
+LANGUAGE C;
+
+CREATE FUNCTION scalar_div(scalar, smallint)
+RETURNS scalar
+AS '$libdir/onesparse', 'scalar_div_int16'
+LANGUAGE C;
+
+CREATE FUNCTION div_scalar(smallint, scalar)
+RETURNS smallint
+AS '$libdir/onesparse', 'div_scalar_int16'
+LANGUAGE C;
+CREATE OPERATOR + (
+    LEFTARG = scalar,
+    RIGHTARG = smallint,
+    FUNCTION = scalar_plus
+    );
+
+CREATE OPERATOR + (
+    LEFTARG = smallint,
+    RIGHTARG = scalar,
+    FUNCTION = plus_scalar
+    );
+
+CREATE OPERATOR - (
+    LEFTARG = scalar,
+    RIGHTARG = smallint,
+    FUNCTION = scalar_minus
+    );
+
+CREATE OPERATOR - (
+    LEFTARG = smallint,
+    RIGHTARG = scalar,
+    FUNCTION = minus_scalar
+    );
+
+CREATE OPERATOR * (
+    LEFTARG = scalar,
+    RIGHTARG = smallint,
+    FUNCTION = scalar_mult
+    );
+
+CREATE OPERATOR * (
+    LEFTARG = smallint,
+    RIGHTARG = scalar,
+    FUNCTION = mult_scalar
+    );
+
+CREATE OPERATOR / (
+    LEFTARG = scalar,
+    RIGHTARG = smallint,
+    FUNCTION = scalar_div
+    );
+
+CREATE OPERATOR / (
+    LEFTARG = smallint,
+    RIGHTARG = scalar,
+    FUNCTION = div_scalar
+    );
+
+CREATE CAST (smallint AS onesparse.scalar)
+    WITH FUNCTION onesparse.scalar(smallint)
+    AS IMPLICIT;
+
+CREATE CAST (onesparse.scalar AS smallint)
+    WITH FUNCTION onesparse.smallint_scalar(scalar)
+    AS ASSIGNMENT;
+
+CREATE FUNCTION scalar(float4)
+RETURNS scalar
+AS '$libdir/onesparse', 'scalar_fp32'
+LANGUAGE C;
+
+CREATE FUNCTION float4_scalar(scalar)
+RETURNS float4
+AS '$libdir/onesparse', 'cast_scalar_fp32'
+LANGUAGE C;
+
+CREATE FUNCTION scalar_plus(scalar, float4)
+RETURNS scalar
+AS '$libdir/onesparse', 'scalar_plus_fp32'
+LANGUAGE C;
+
+CREATE FUNCTION plus_scalar(float4, scalar)
+RETURNS float4
+AS '$libdir/onesparse', 'plus_scalar_fp32'
+LANGUAGE C;
+
+CREATE FUNCTION scalar_minus(scalar, float4)
+RETURNS scalar
+AS '$libdir/onesparse', 'scalar_minus_fp32'
+LANGUAGE C;
+
+CREATE FUNCTION minus_scalar(float4, scalar)
+RETURNS float4
+AS '$libdir/onesparse', 'minus_scalar_fp32'
+LANGUAGE C;
+
+CREATE FUNCTION scalar_mult(scalar, float4)
+RETURNS scalar
+AS '$libdir/onesparse', 'scalar_mult_fp32'
+LANGUAGE C;
+
+CREATE FUNCTION mult_scalar(float4, scalar)
+RETURNS float4
+AS '$libdir/onesparse', 'mult_scalar_fp32'
+LANGUAGE C;
+
+CREATE FUNCTION scalar_div(scalar, float4)
+RETURNS scalar
+AS '$libdir/onesparse', 'scalar_div_fp32'
+LANGUAGE C;
+
+CREATE FUNCTION div_scalar(float4, scalar)
+RETURNS float4
+AS '$libdir/onesparse', 'div_scalar_fp32'
+LANGUAGE C;
+CREATE OPERATOR + (
+    LEFTARG = scalar,
+    RIGHTARG = float4,
+    FUNCTION = scalar_plus
+    );
+
+CREATE OPERATOR + (
+    LEFTARG = float4,
+    RIGHTARG = scalar,
+    FUNCTION = plus_scalar
+    );
+
+CREATE OPERATOR - (
+    LEFTARG = scalar,
+    RIGHTARG = float4,
+    FUNCTION = scalar_minus
+    );
+
+CREATE OPERATOR - (
+    LEFTARG = float4,
+    RIGHTARG = scalar,
+    FUNCTION = minus_scalar
+    );
+
+CREATE OPERATOR * (
+    LEFTARG = scalar,
+    RIGHTARG = float4,
+    FUNCTION = scalar_mult
+    );
+
+CREATE OPERATOR * (
+    LEFTARG = float4,
+    RIGHTARG = scalar,
+    FUNCTION = mult_scalar
+    );
+
+CREATE OPERATOR / (
+    LEFTARG = scalar,
+    RIGHTARG = float4,
+    FUNCTION = scalar_div
+    );
+
+CREATE OPERATOR / (
+    LEFTARG = float4,
+    RIGHTARG = scalar,
+    FUNCTION = div_scalar
+    );
+
+CREATE CAST (float4 AS onesparse.scalar)
+    WITH FUNCTION onesparse.scalar(float4)
+    AS IMPLICIT;
+
+CREATE CAST (onesparse.scalar AS float4)
+    WITH FUNCTION onesparse.float4_scalar(scalar)
+    AS ASSIGNMENT;
+
+CREATE FUNCTION scalar(float8)
+RETURNS scalar
+AS '$libdir/onesparse', 'scalar_fp64'
+LANGUAGE C;
+
+CREATE FUNCTION float8_scalar(scalar)
+RETURNS float8
+AS '$libdir/onesparse', 'cast_scalar_fp64'
+LANGUAGE C;
+
+CREATE FUNCTION scalar_plus(scalar, float8)
+RETURNS scalar
+AS '$libdir/onesparse', 'scalar_plus_fp64'
+LANGUAGE C;
+
+CREATE FUNCTION plus_scalar(float8, scalar)
+RETURNS float8
+AS '$libdir/onesparse', 'plus_scalar_fp64'
+LANGUAGE C;
+
+CREATE FUNCTION scalar_minus(scalar, float8)
+RETURNS scalar
+AS '$libdir/onesparse', 'scalar_minus_fp64'
+LANGUAGE C;
+
+CREATE FUNCTION minus_scalar(float8, scalar)
+RETURNS float8
+AS '$libdir/onesparse', 'minus_scalar_fp64'
+LANGUAGE C;
+
+CREATE FUNCTION scalar_mult(scalar, float8)
+RETURNS scalar
+AS '$libdir/onesparse', 'scalar_mult_fp64'
+LANGUAGE C;
+
+CREATE FUNCTION mult_scalar(float8, scalar)
+RETURNS float8
+AS '$libdir/onesparse', 'mult_scalar_fp64'
+LANGUAGE C;
+
+CREATE FUNCTION scalar_div(scalar, float8)
+RETURNS scalar
+AS '$libdir/onesparse', 'scalar_div_fp64'
+LANGUAGE C;
+
+CREATE FUNCTION div_scalar(float8, scalar)
+RETURNS float8
+AS '$libdir/onesparse', 'div_scalar_fp64'
+LANGUAGE C;
+CREATE OPERATOR + (
+    LEFTARG = scalar,
+    RIGHTARG = float8,
+    FUNCTION = scalar_plus
+    );
+
+CREATE OPERATOR + (
+    LEFTARG = float8,
+    RIGHTARG = scalar,
+    FUNCTION = plus_scalar
+    );
+
+CREATE OPERATOR - (
+    LEFTARG = scalar,
+    RIGHTARG = float8,
+    FUNCTION = scalar_minus
+    );
+
+CREATE OPERATOR - (
+    LEFTARG = float8,
+    RIGHTARG = scalar,
+    FUNCTION = minus_scalar
+    );
+
+CREATE OPERATOR * (
+    LEFTARG = scalar,
+    RIGHTARG = float8,
+    FUNCTION = scalar_mult
+    );
+
+CREATE OPERATOR * (
+    LEFTARG = float8,
+    RIGHTARG = scalar,
+    FUNCTION = mult_scalar
+    );
+
+CREATE OPERATOR / (
+    LEFTARG = scalar,
+    RIGHTARG = float8,
+    FUNCTION = scalar_div
+    );
+
+CREATE OPERATOR / (
+    LEFTARG = float8,
+    RIGHTARG = scalar,
+    FUNCTION = div_scalar
+    );
+
+CREATE CAST (float8 AS onesparse.scalar)
+    WITH FUNCTION onesparse.scalar(float8)
+    AS IMPLICIT;
+
+CREATE CAST (onesparse.scalar AS float8)
+    WITH FUNCTION onesparse.float8_scalar(scalar)
+    AS ASSIGNMENT;
 
 CREATE TABLE grb_type (
     name text PRIMARY KEY,

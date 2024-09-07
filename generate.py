@@ -19,11 +19,11 @@ class TypeSpec:
     div: str = '/'
 
 types = [
-    TypeSpec('int64', 'bigint',           'GrB_INT64'),
-    TypeSpec('int32', 'integer',          'GrB_INT32'),
-#    TypeSpec('int16', 'smallint',         'GrB_INT16'),
-#    TypeSpec('fp32',  'real',             'GrB_INT32'),
-#    TypeSpec('fp64',  'double precision', 'GrB_INT64'),
+    TypeSpec('int64', 'bigint',   'GrB_INT64'),
+    TypeSpec('int32', 'integer',  'GrB_INT32'),
+    TypeSpec('int16', 'smallint', 'GrB_INT16'),
+    TypeSpec('fp32',  'float4',   'GrB_INT32'),
+    TypeSpec('fp64',  'float8',   'GrB_INT64'),
 #    TypeSpec('bool',  'bool',             'GrB_BOOL', None, None, None, None),
 ]
 

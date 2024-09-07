@@ -20,3 +20,8 @@ CREATE TYPE scalar (
     storage = 'extended',
     internallength = VARIABLE
     );
+
+CREATE FUNCTION nvals(scalar)
+RETURNS int2
+AS '$libdir/onesparse', 'scalar_nvals'
+LANGUAGE C;
