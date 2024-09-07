@@ -36,6 +36,14 @@ RETURNS bigint
 AS '$libdir/onesparse', 'cast_scalar_int64'
 LANGUAGE C;
 
+CREATE CAST (bigint AS onesparse.scalar)
+    WITH FUNCTION onesparse.scalar(bigint)
+    AS IMPLICIT;
+
+CREATE CAST (onesparse.scalar AS bigint)
+    WITH FUNCTION onesparse.bigint_scalar(scalar)
+    AS ASSIGNMENT;
+
 CREATE FUNCTION scalar_plus(scalar, bigint)
 RETURNS scalar
 AS '$libdir/onesparse', 'scalar_plus_int64'
@@ -123,14 +131,6 @@ CREATE OPERATOR / (
     FUNCTION = div_scalar
     );
 
-CREATE CAST (bigint AS onesparse.scalar)
-    WITH FUNCTION onesparse.scalar(bigint)
-    AS IMPLICIT;
-
-CREATE CAST (onesparse.scalar AS bigint)
-    WITH FUNCTION onesparse.bigint_scalar(scalar)
-    AS ASSIGNMENT;
-
 CREATE FUNCTION scalar(integer)
 RETURNS scalar
 AS '$libdir/onesparse', 'scalar_int32'
@@ -140,6 +140,14 @@ CREATE FUNCTION integer_scalar(scalar)
 RETURNS integer
 AS '$libdir/onesparse', 'cast_scalar_int32'
 LANGUAGE C;
+
+CREATE CAST (integer AS onesparse.scalar)
+    WITH FUNCTION onesparse.scalar(integer)
+    AS IMPLICIT;
+
+CREATE CAST (onesparse.scalar AS integer)
+    WITH FUNCTION onesparse.integer_scalar(scalar)
+    AS ASSIGNMENT;
 
 CREATE FUNCTION scalar_plus(scalar, integer)
 RETURNS scalar
@@ -228,14 +236,6 @@ CREATE OPERATOR / (
     FUNCTION = div_scalar
     );
 
-CREATE CAST (integer AS onesparse.scalar)
-    WITH FUNCTION onesparse.scalar(integer)
-    AS IMPLICIT;
-
-CREATE CAST (onesparse.scalar AS integer)
-    WITH FUNCTION onesparse.integer_scalar(scalar)
-    AS ASSIGNMENT;
-
 CREATE FUNCTION scalar(smallint)
 RETURNS scalar
 AS '$libdir/onesparse', 'scalar_int16'
@@ -245,6 +245,14 @@ CREATE FUNCTION smallint_scalar(scalar)
 RETURNS smallint
 AS '$libdir/onesparse', 'cast_scalar_int16'
 LANGUAGE C;
+
+CREATE CAST (smallint AS onesparse.scalar)
+    WITH FUNCTION onesparse.scalar(smallint)
+    AS IMPLICIT;
+
+CREATE CAST (onesparse.scalar AS smallint)
+    WITH FUNCTION onesparse.smallint_scalar(scalar)
+    AS ASSIGNMENT;
 
 CREATE FUNCTION scalar_plus(scalar, smallint)
 RETURNS scalar
@@ -333,14 +341,6 @@ CREATE OPERATOR / (
     FUNCTION = div_scalar
     );
 
-CREATE CAST (smallint AS onesparse.scalar)
-    WITH FUNCTION onesparse.scalar(smallint)
-    AS IMPLICIT;
-
-CREATE CAST (onesparse.scalar AS smallint)
-    WITH FUNCTION onesparse.smallint_scalar(scalar)
-    AS ASSIGNMENT;
-
 CREATE FUNCTION scalar(float4)
 RETURNS scalar
 AS '$libdir/onesparse', 'scalar_fp32'
@@ -350,6 +350,14 @@ CREATE FUNCTION float4_scalar(scalar)
 RETURNS float4
 AS '$libdir/onesparse', 'cast_scalar_fp32'
 LANGUAGE C;
+
+CREATE CAST (float4 AS onesparse.scalar)
+    WITH FUNCTION onesparse.scalar(float4)
+    AS IMPLICIT;
+
+CREATE CAST (onesparse.scalar AS float4)
+    WITH FUNCTION onesparse.float4_scalar(scalar)
+    AS ASSIGNMENT;
 
 CREATE FUNCTION scalar_plus(scalar, float4)
 RETURNS scalar
@@ -438,14 +446,6 @@ CREATE OPERATOR / (
     FUNCTION = div_scalar
     );
 
-CREATE CAST (float4 AS onesparse.scalar)
-    WITH FUNCTION onesparse.scalar(float4)
-    AS IMPLICIT;
-
-CREATE CAST (onesparse.scalar AS float4)
-    WITH FUNCTION onesparse.float4_scalar(scalar)
-    AS ASSIGNMENT;
-
 CREATE FUNCTION scalar(float8)
 RETURNS scalar
 AS '$libdir/onesparse', 'scalar_fp64'
@@ -455,6 +455,14 @@ CREATE FUNCTION float8_scalar(scalar)
 RETURNS float8
 AS '$libdir/onesparse', 'cast_scalar_fp64'
 LANGUAGE C;
+
+CREATE CAST (float8 AS onesparse.scalar)
+    WITH FUNCTION onesparse.scalar(float8)
+    AS IMPLICIT;
+
+CREATE CAST (onesparse.scalar AS float8)
+    WITH FUNCTION onesparse.float8_scalar(scalar)
+    AS ASSIGNMENT;
 
 CREATE FUNCTION scalar_plus(scalar, float8)
 RETURNS scalar
@@ -543,12 +551,22 @@ CREATE OPERATOR / (
     FUNCTION = div_scalar
     );
 
-CREATE CAST (float8 AS onesparse.scalar)
-    WITH FUNCTION onesparse.scalar(float8)
+CREATE FUNCTION scalar(bool)
+RETURNS scalar
+AS '$libdir/onesparse', 'scalar_bool'
+LANGUAGE C;
+
+CREATE FUNCTION bool_scalar(scalar)
+RETURNS bool
+AS '$libdir/onesparse', 'cast_scalar_bool'
+LANGUAGE C;
+
+CREATE CAST (bool AS onesparse.scalar)
+    WITH FUNCTION onesparse.scalar(bool)
     AS IMPLICIT;
 
-CREATE CAST (onesparse.scalar AS float8)
-    WITH FUNCTION onesparse.float8_scalar(scalar)
+CREATE CAST (onesparse.scalar AS bool)
+    WITH FUNCTION onesparse.bool_scalar(scalar)
     AS ASSIGNMENT;
 
 CREATE TABLE grb_type (

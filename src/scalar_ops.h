@@ -45,6 +45,7 @@ Datum FN(cast_scalar)(PG_FUNCTION_ARGS)
 	PG_RETURN(value);
 }
 
+#ifndef NO_SCALAR_MATH
 Datum FN(scalar_plus)(PG_FUNCTION_ARGS)
 {
 	onesparse_Scalar *scalar, *result;
@@ -228,9 +229,11 @@ Datum FN(div_scalar)(PG_FUNCTION_ARGS)
 
 	PG_RETURN(left / right);
 }
+#endif
 
 #undef SUFFIX
 #undef PG_TYPE
 #undef GB_TYPE
 #undef PG_GETARG
 #undef PG_RETURN
+#undef NO_SCALAR_MATH
