@@ -15,8 +15,24 @@
 #include "utils/varlena.h"
 #include "suitesparse/GraphBLAS.h"
 
+#define ONESPARSE_DEBUG
+
+#define CCAT2(x, y) x ## y
+#define CCAT(x, y) CCAT2(x, y)
+#define FN(x) CCAT(x, SUFFIX)
+
 #define ERRORIF(cond, msg) if (cond) ereport(ERROR, (errmsg(msg)))
+
+#define ERRORNULL(_arg) \
+	do { \
+	if (PG_ARGISNULL(_arg)) elog(ERROR, "Cannot pass NULL to %s", __func__); \
+	} while (0) \
+
+#ifdef ONESPARSE_DEBUG
 #define LOGF() elog(INFO, __func__)
+#else
+#define LOGF()
+#endif
 
 void *malloc_function(size_t);
 void *calloc_function(size_t, size_t);

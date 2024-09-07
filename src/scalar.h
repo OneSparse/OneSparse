@@ -9,7 +9,6 @@ typedef struct onesparse_FlatScalar {
     int32 vl_len_;
 	int32_t type_code;
 	int16_t nvals;
-	int64_t value;
 } onesparse_FlatScalar;
 
 typedef struct onesparse_Scalar  {
@@ -53,7 +52,6 @@ onesparse_Scalar* DatumGetScalar(Datum d);
 PG_FUNCTION_INFO_V1(scalar_in);
 PG_FUNCTION_INFO_V1(scalar_out);
 
-PG_FUNCTION_INFO_V1(scalar_bigint);
 PG_FUNCTION_INFO_V1(scalar_nvals);
 
 #endif /* ONESPARSE_SCALAR_H */

@@ -2,15 +2,42 @@
 PG_MODULE_MAGIC;
 
 static Size scalar_get_flat_size(ExpandedObjectHeader *eohptr) {
-	onesparse_Scalar *scalar = (onesparse_Scalar*) eohptr;
+	onesparse_Scalar *scalar;
+	int32_t type_code;
+	GrB_Index nvals;
+	Size data_size;
 
 	LOGF();
+
+	scalar = (onesparse_Scalar*) eohptr;
 	Assert(scalar->em_magic == scalar_MAGIC);
 
 	if (scalar->flat_size)
 		return scalar->flat_size;
 
-	scalar->flat_size = ONESPARSE_SCALAR_FLATSIZE();
+	data_size = 0;
+
+	ERRORIF(GrB_get(scalar->scalar, &type_code, GrB_EL_TYPE_CODE) != GrB_SUCCESS,
+			"Cannot get Scalar Type code.");
+
+	ERRORIF(GrB_Scalar_nvals(&nvals, scalar->scalar) != GrB_SUCCESS,
+			"Error extracting scalar nvals.");
+
+	if (nvals)
+	{
+		if (type_code == GrB_INT64_CODE)
+		{
+			data_size = sizeof(int64_t);
+		}
+		else if (type_code == GrB_INT32_CODE)
+		{
+			data_size = sizeof(int32_t);
+		}
+		else
+			elog(ERROR, "Unknown Type Code");
+	}
+
+	scalar->flat_size = ONESPARSE_SCALAR_FLATSIZE() + data_size;
 	elog(INFO, "flat size %zu", scalar->flat_size);
 
 	return scalar->flat_size;
@@ -26,6 +53,8 @@ static void flatten_scalar(
 	GrB_Index nvals;
 	onesparse_Scalar *scalar;
 	onesparse_FlatScalar *flat;
+	void* data;
+
 	LOGF();
 
 	scalar = (onesparse_Scalar *) eohptr;
@@ -44,9 +73,15 @@ static void flatten_scalar(
 	flat->nvals = nvals ? 1 : 0;
 	if (flat->nvals)
 	{
+		data = ONESPARSE_SCALAR_DATA(flat);
 		if (flat->type_code == GrB_INT64_CODE)
 		{
-			ERRORIF(GrB_Scalar_extractElement(&flat->value, scalar->scalar) != GrB_SUCCESS,
+			ERRORIF(GrB_Scalar_extractElement((int64_t*)data, scalar->scalar) != GrB_SUCCESS,
+					"Cannot extract Scalar element.");
+		}
+		else if (flat->type_code == GrB_INT32_CODE)
+		{
+			ERRORIF(GrB_Scalar_extractElement((int32_t*)data, scalar->scalar) != GrB_SUCCESS,
 					"Cannot extract Scalar element.");
 		}
 		else
@@ -106,11 +141,17 @@ Datum expand_scalar(onesparse_FlatScalar *flat, MemoryContext parentcontext)
 {
 	GrB_Type type;
 	onesparse_Scalar *scalar;
+	void* data;
+
 	LOGF();
 
 	if (flat->type_code == GrB_INT64_CODE)
 	{
 		type = GrB_INT64;
+	}
+	else if (flat->type_code == GrB_INT32_CODE)
+	{
+		type = GrB_INT32;
 	}
 	else
 		elog(ERROR, "Unknown type code.");
@@ -118,8 +159,15 @@ Datum expand_scalar(onesparse_FlatScalar *flat, MemoryContext parentcontext)
 	scalar = new_scalar(type, parentcontext, NULL);
 	if (flat->nvals)
 	{
+		data = ONESPARSE_SCALAR_DATA(flat);
 		if (type == GrB_INT64)
-		{			ERRORIF(GrB_Scalar_setElement(scalar->scalar, flat->value) != GrB_SUCCESS,
+		{
+			ERRORIF(GrB_Scalar_setElement(scalar->scalar, *(int64_t*)data) != GrB_SUCCESS,
+					"Cannot set scalar element in expand.");
+		}
+		else if (type == GrB_INT32)
+		{
+			ERRORIF(GrB_Scalar_setElement(scalar->scalar, *(int32_t*)data) != GrB_SUCCESS,
 					"Cannot set scalar element in expand.");
 		}
 		else
@@ -200,6 +248,14 @@ Datum scalar_out(PG_FUNCTION_ARGS)
 			result = palloc(20);
 			snprintf(result, 20, "%" PRIi64, value);
 		}
+		if (type_code == GrB_INT32_CODE)
+		{
+			int32_t value;
+			ERRORIF(GrB_Scalar_extractElement(&value, scalar->scalar) != GrB_SUCCESS,
+					"Error extracting scalar element.");
+			result = palloc(10);
+			snprintf(result, 10, "%" PRIi32, value);
+		}
 		else
 			elog(ERROR, "Unsupported type code.");
 	}
@@ -211,31 +267,13 @@ Datum scalar_out(PG_FUNCTION_ARGS)
 	PG_RETURN_CSTRING(result);
 }
 
-Datum scalar_bigint(PG_FUNCTION_ARGS)
-{
-	onesparse_Scalar* scalar;
-	int64_t val;
-	LOGF();
-	scalar = new_scalar(GrB_INT64, CurrentMemoryContext, NULL);
-	if (!PG_ARGISNULL(0))
-	{
-		val = PG_GETARG_INT64(0);
-		ERRORIF(GrB_Scalar_setElement(
-					scalar->scalar,
-					val),
-				"Error setting Scalar element");
-	}
-	ONESPARSE_RETURN_SCALAR(scalar);
-}
-
 Datum scalar_nvals(PG_FUNCTION_ARGS)
 {
 	GrB_Index result;
 	onesparse_Scalar *scalar;
 
 	LOGF();
-	if (PG_ARGISNULL(0))
-		elog(ERROR, "Cannot pass NULL to %s", __func__);
+	ERRORNULL(0);
 
 	scalar = ONESPARSE_GETARG_SCALAR(0);
 
@@ -243,6 +281,20 @@ Datum scalar_nvals(PG_FUNCTION_ARGS)
 			"Error extracting scalar nvals.");
 	PG_RETURN_INT16(result ? 1 : 0);
 }
+
+#define SUFFIX _int64                // suffix for names
+#define PG_TYPE int64                // postgres type
+#define GB_TYPE GrB_INT64            // graphblas vector type
+#define PG_GETARG PG_GETARG_INT64       // how to get value args
+#define PG_RETURN PG_RETURN_INT64
+#include "scalar_ops.h"
+
+#define SUFFIX _int32                // suffix for names
+#define PG_TYPE int32                // postgres type
+#define GB_TYPE GrB_INT32            // graphblas vector type
+#define PG_GETARG PG_GETARG_INT32       // how to get value args
+#define PG_RETURN PG_RETURN_INT32
+#include "scalar_ops.h"
 
 /* Local Variables: */
 /* mode: c */
