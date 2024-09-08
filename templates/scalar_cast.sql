@@ -1,6 +1,6 @@
 
 CREATE CAST ({type.pgtype} AS onesparse.scalar)
-    WITH FUNCTION onesparse.scalar({type.pgtype})
+    WITH FUNCTION onesparse.scalar_{type.pgtype}({type.pgtype})
     AS IMPLICIT;
 
 CREATE CAST (onesparse.scalar AS {type.pgtype})

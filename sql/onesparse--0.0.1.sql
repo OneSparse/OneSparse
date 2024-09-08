@@ -16,6 +16,8 @@ LANGUAGE C IMMUTABLE STRICT;
 CREATE TYPE scalar (
     input = scalar_in,
     output = scalar_out,
+    -- typmod_in = scalar_typmod_in,
+    -- typmod_out = scalar_typmod_out,
     alignment = int4,
     storage = 'extended',
     internallength = VARIABLE
@@ -569,22 +571,26 @@ CREATE CAST (onesparse.scalar AS bool)
     WITH FUNCTION onesparse.bool_scalar(scalar)
     AS ASSIGNMENT;
 
-CREATE TABLE grb_type (
+CREATE TABLE grb_type2 (
     name text PRIMARY KEY,
+    type_code integer DEFAULT 0,
     struct text
     );
 
-INSERT INTO grb_type (name) VALUES
-    ('BOOL'),
-    ('INT8'),
-    ('INT16'),
-    ('INT32'),
-    ('INT64'),
-    ('UINT8'),
-    ('UINT16'),
-    ('UINT32'),
-    ('UINT64'),
-    ('FP32'),
-    ('FP64'),
-    ('FC32'),
-    ('FC64');
+CREATE INDEX ON grb_type2 (type_code);
+
+INSERT INTO grb_type2 (name, type_code) VALUES
+    ('bool',    1),
+    ('int8',    2),
+    ('uint8',   3),
+    ('int16',   4),
+    ('uint16',  5),
+    ('int32',   6),
+    ('uint32',  7),
+    ('int64',   8),
+    ('uint64',  9),
+    ('fp32',    10),
+    ('fp64',    11),
+    ('fc32',    7070),
+    ('fc64',    7071)
+;

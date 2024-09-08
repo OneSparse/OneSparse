@@ -1,5 +1,5 @@
 
-CREATE FUNCTION scalar({type.pgtype})
+CREATE FUNCTION scalar_{type.pgtype}({type.pgtype})
 RETURNS scalar
 AS '$libdir/onesparse', 'scalar_{type.name}'
 LANGUAGE C;

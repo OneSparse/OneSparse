@@ -19,7 +19,6 @@ typedef struct onesparse_Scalar  {
 } onesparse_Scalar;
 
 static void context_callback_scalar_free(void*);
-
 static Size scalar_get_flat_size(ExpandedObjectHeader *eohptr);
 
 static void flatten_scalar(

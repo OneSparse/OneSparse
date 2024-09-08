@@ -2,7 +2,7 @@
 
 EXTENSION = onesparse
 PG_CONFIG ?= pg_config
-DATA = $(wildcard *--*.sql)
+DATA = $(wildcard sql/*--*.sql)
 PGXS := $(shell $(PG_CONFIG) --pgxs)
 MODULE_big = onesparse
 OBJS = $(patsubst %.c,%.o,$(wildcard src/*.c))
@@ -13,6 +13,3 @@ TESTS        = $(wildcard test/sql/*.sql)
 REGRESS      = $(patsubst test/sql/%.sql,%,$(TESTS))
 REGRESS_OPTS = --inputdir=test --load-language=plpgsql
 include $(PGXS)
-
-sql: onesparse--0.0.1.sql
-	bash onesparse--0.0.1-gen.sql.sh
