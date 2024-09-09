@@ -60,5 +60,4 @@ RUN initdb -D "$PGDATA"
 EXPOSE 5432
 # wait forever
 
-# RUN sleep 5; make installcheck
 CMD tail -f /dev/null

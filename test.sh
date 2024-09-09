@@ -40,9 +40,7 @@ then
     $EXEC tmux new-session -d -s onesparse
     $EXECIT tmux attach-session -t onesparse
 else
-    echo running repl
-    $EXEC tmux new-session -d -s onesparse $*
-    $EXECIT tmux attach-session -t onesparse
+    $EXEC make installcheck
 fi
 
 echo destroying test container and image
