@@ -109,7 +109,7 @@ static void flatten_scalar(
 		}
 		else if (flat->type_code == GrB_FP32_CODE)
 		{
-			ERRORIF(GrB_Scalar_extractElement((double*)data, scalar->scalar) != GrB_SUCCESS,
+			ERRORIF(GrB_Scalar_extractElement((float*)data, scalar->scalar) != GrB_SUCCESS,
 					"Cannot extract Scalar element.");
 		}
 		else if (flat->type_code == GrB_BOOL_CODE)
@@ -434,48 +434,48 @@ Datum scalar_out(PG_FUNCTION_ARGS)
 			int64_t value;
 			ERRORIF(GrB_Scalar_extractElement(&value, scalar->scalar) != GrB_SUCCESS,
 					"Error extracting scalar element.");
-			result = palloc(23);
-			snprintf(result, 23, "%s:" "%" PRIi64, sname, value);
+			result = palloc(GxB_MAX_NAME_LEN);
+			snprintf(result, GxB_MAX_NAME_LEN, "%s:" "%" PRIi64, sname, value);
 		}
 		else if (type_code == GrB_INT32_CODE)
 		{
 			int32_t value;
 			ERRORIF(GrB_Scalar_extractElement(&value, scalar->scalar) != GrB_SUCCESS,
 					"Error extracting scalar element.");
-			result = palloc(13);
-			snprintf(result, 13, "%s:" "%" PRIi32, sname, value);
+			result = palloc(GxB_MAX_NAME_LEN);
+			snprintf(result, GxB_MAX_NAME_LEN, "%s:" "%" PRIi32, sname, value);
 		}
 		else if (type_code == GrB_INT16_CODE)
 		{
 			int16_t value;
 			ERRORIF(GrB_Scalar_extractElement(&value, scalar->scalar) != GrB_SUCCESS,
 					"Error extracting scalar element.");
-			result = palloc(8);
-			snprintf(result, 8, "%s:" "%" PRIi16, sname, value);
+			result = palloc(GxB_MAX_NAME_LEN);
+			snprintf(result, GxB_MAX_NAME_LEN, "%s:" "%" PRIi16, sname, value);
 		}
 		else if (type_code == GrB_FP64_CODE)
 		{
 			double value;
 			ERRORIF(GrB_Scalar_extractElement(&value, scalar->scalar) != GrB_SUCCESS,
 					"Error extracting scalar element.");
-			result = palloc(21);
-			snprintf(result, 21, "%s:%f", sname, value);
+			result = palloc(GxB_MAX_NAME_LEN);
+			snprintf(result, GxB_MAX_NAME_LEN, "%s:%f", sname, value);
 		}
 		else if (type_code == GrB_FP32_CODE)
 		{
 			float value;
 			ERRORIF(GrB_Scalar_extractElement(&value, scalar->scalar) != GrB_SUCCESS,
 					"Error extracting scalar element.");
-			result = palloc(12);
-			snprintf(result, 12, "%s:%f", sname, value);
+			result = palloc(GxB_MAX_NAME_LEN);
+			snprintf(result, GxB_MAX_NAME_LEN, "%s:%f", sname, value);
 		}
 		else if (type_code == GrB_BOOL_CODE)
 		{
 			bool value;
 			ERRORIF(GrB_Scalar_extractElement(&value, scalar->scalar) != GrB_SUCCESS,
 					"Error extracting scalar element.");
-			result = palloc(7);
-			snprintf(result, 7, "%s:%s", sname, value ? "t" : "f");
+			result = palloc(GxB_MAX_NAME_LEN);
+			snprintf(result, GxB_MAX_NAME_LEN, "%s:%s", sname, value ? "t" : "f");
 		}
 		else
 			elog(ERROR, "Unsupported type code %i.", type_code);

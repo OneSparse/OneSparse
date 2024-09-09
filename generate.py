@@ -8,18 +8,39 @@ VERSION = '0.1.0'
 class Template:
     name: str
     outfile: object = None
-    version: str = VERSION
+    test_dir: str = 'sql/'
     debug: bool = False
+    version: str = VERSION
+
     def path(self, part):
         return str(Path('templates', f'{self.name}_{part}.sql'))
-    def test_path(self, part):
-        return str(Path('sql', f'{self.name}_{part}.sql'))
+
     def file(self, part):
         return open(self.path(part), 'r')
+
     def read(self, part):
         return self.file(part).read()
-    def write_part(self, part, **fmt):
+
+    def write(self, part, **fmt):
         self.outfile.write(self.read(part).format(**fmt))
+
+    def test_path(self, part):
+        return str(Path('templates', f'test_{self.name}_{part}.sql'))
+
+    def test_file(self, part):
+        return open(self.test_path(part), 'r')
+
+    def test_read(self, part):
+        return self.test_file(part).read()
+
+    def test_write(self, part, **fmt):
+        print(part, fmt)
+        typ = fmt.get('type')
+        if typ is not None:
+            outfile = open(Path(self.test_dir, f'test_{self.name}_{part}_{typ}.sql'), 'w+')
+        else:
+            outfile = open(Path(self.test_dir, f'test_{self.name}_{part}.sql'), 'w+')
+        outfile.write(self.test_read(part).format(**fmt))
 
 @dataclass
 class Type:
@@ -45,18 +66,19 @@ def write_source(outfile):
     ]
 
     objects = [
-        Template('scalar', outfile=open(outfile, 'w+')),
+        Template('scalar', outfile),
         ]
 
     for o in objects:
-        o.write_part('header')
+        o.write('header')
+        o.test_write('header')
         for t in types:
-            o.write_part('func', type=t)
-            o.write_part('cast', type=t)
+            o.write('func', type=t)
+            o.write('cast', type=t)
             if t.plus is not None:
-                o.write_part('math', type=t)
-                o.write_part('op', type=t)
-        o.write_part('footer')
+                o.write('math', type=t)
+                o.write('op', type=t)
+        o.write('footer')
 
 if __name__ == '__main__':
-    write_source(outfile=sys.stdout if sys.argv[1] == '-' else sys.argv[1])
+    write_source(outfile=sys.stdout if sys.argv[1] == '-' else open(sys.argv[1], 'w+'))
