@@ -20,6 +20,7 @@ typedef struct onesparse_Scalar  {
 
 static void context_callback_scalar_free(void*);
 static Size scalar_get_flat_size(ExpandedObjectHeader *eohptr);
+Datum _scalar_in(char *input);
 
 static void flatten_scalar(
 	ExpandedObjectHeader *eohptr,

@@ -1,5 +1,4 @@
 #include "scalar.h"
-PG_MODULE_MAGIC;
 
 static Size scalar_get_flat_size(ExpandedObjectHeader *eohptr) {
 	onesparse_Scalar *scalar;
@@ -54,8 +53,6 @@ static Size scalar_get_flat_size(ExpandedObjectHeader *eohptr) {
 	}
 
 	scalar->flat_size = ONESPARSE_SCALAR_FLATSIZE() + data_size;
-	elog(INFO, "flat size %zu", scalar->flat_size);
-
 	return scalar->flat_size;
 }
 
@@ -277,20 +274,19 @@ onesparse_Scalar* DatumGetScalar(Datum datum)
 	return ScalarGetEOHP(datum);
 }
 
-Datum scalar_in(PG_FUNCTION_ARGS)
+Datum _scalar_in(char *input)
 {
 	onesparse_Scalar *scalar;
-	char *input;
 	size_t len;
 	GrB_Type typ;
-	char *str_val = "";
-	char *str_type = "";
+	char str_val[GxB_MAX_NAME_LEN];
+	char str_type[GxB_MAX_NAME_LEN];
 	char *fmt = "";
 
-	input = PG_GETARG_CSTRING(0);
 	len = strlen(input);
 
-	sscanf(input, "%[^:]:%s", str_val, str_type);
+	sscanf(input, "%[^:]:%s", str_type, str_val);
+
 	if (strcmp(str_type, "i8") == 0)
 	{
 		int64_t value;
@@ -299,13 +295,13 @@ Datum scalar_in(PG_FUNCTION_ARGS)
 		scalar = new_scalar(typ, CurrentMemoryContext, NULL);
 		if (len)
 		{
-			if (sscanf(input, fmt, &value) == 1)
+			if (sscanf(str_val, fmt, &value) == 1)
 			{
 				ERRORIF(GrB_Scalar_setElement(scalar->scalar, value) != GrB_SUCCESS,
 						"Cannot set scalar element in expand.");
 			}
 			else
-				elog(ERROR, "Invalid format for %s %s", fmt, input);
+				elog(ERROR, "Invalid format for %s %s", fmt, str_val);
 		}
 	}
 	else if (strcmp(str_type, "i4") == 0)
@@ -316,13 +312,13 @@ Datum scalar_in(PG_FUNCTION_ARGS)
 		scalar = new_scalar(typ, CurrentMemoryContext, NULL);
 		if (len)
 		{
-			if (sscanf(input, fmt, &value) == 1)
+			if (sscanf(str_val, fmt, &value) == 1)
 			{
 				ERRORIF(GrB_Scalar_setElement(scalar->scalar, value) != GrB_SUCCESS,
 						"Cannot set scalar element in expand.");
 			}
 			else
-				elog(ERROR, "Invalid format for %s %s", fmt, input);
+				elog(ERROR, "Invalid format for %s %s", fmt, str_val);
 		}
 	}
 	else if (strcmp(str_type, "i2") == 0)
@@ -333,13 +329,13 @@ Datum scalar_in(PG_FUNCTION_ARGS)
 		scalar = new_scalar(typ, CurrentMemoryContext, NULL);
 		if (len)
 		{
-			if (sscanf(input, fmt, &value) == 1)
+			if (sscanf(str_val, fmt, &value) == 1)
 			{
 				ERRORIF(GrB_Scalar_setElement(scalar->scalar, value) != GrB_SUCCESS,
 						"Cannot set scalar element in expand.");
 			}
 			else
-				elog(ERROR, "Invalid format for %s %s", fmt, input);
+				elog(ERROR, "Invalid format for %s %s", fmt, str_val);
 		}
 	}
 	else if (strcmp(str_type, "f8") == 0)
@@ -350,13 +346,13 @@ Datum scalar_in(PG_FUNCTION_ARGS)
 		scalar = new_scalar(typ, CurrentMemoryContext, NULL);
 		if (len)
 		{
-			if (sscanf(input, fmt, &value) == 1)
+			if (sscanf(str_val, fmt, &value) == 1)
 			{
 				ERRORIF(GrB_Scalar_setElement(scalar->scalar, value) != GrB_SUCCESS,
 						"Cannot set scalar element in expand.");
 			}
 			else
-				elog(ERROR, "Invalid format for %s %s", fmt, input);
+				elog(ERROR, "Invalid format for %s %s", fmt, str_val);
 		}
 	}
 	else if (strcmp(str_type, "f4") == 0)
@@ -367,13 +363,13 @@ Datum scalar_in(PG_FUNCTION_ARGS)
 		scalar = new_scalar(typ, CurrentMemoryContext, NULL);
 		if (len)
 		{
-			if (sscanf(input, fmt, &value) == 1)
+			if (sscanf(str_val, fmt, &value) == 1)
 			{
 				ERRORIF(GrB_Scalar_setElement(scalar->scalar, value) != GrB_SUCCESS,
 						"Cannot set scalar element in expand.");
 			}
 			else
-				elog(ERROR, "Invalid format for %s %s", fmt, input);
+				elog(ERROR, "Invalid format for %s %s", fmt, str_val);
 		}
 	}
 	else if (strcmp(str_type, "b") == 0)
@@ -384,7 +380,7 @@ Datum scalar_in(PG_FUNCTION_ARGS)
 		scalar = new_scalar(typ, CurrentMemoryContext, NULL);
 		if (len)
 		{
-			if (sscanf(input, fmt, &value) == 1)
+			if (sscanf(str_val, fmt, &value) == 1)
 			{
 				bool _value;
 				if (value == 't')
@@ -397,7 +393,7 @@ Datum scalar_in(PG_FUNCTION_ARGS)
 						"Cannot set scalar element in expand.");
 			}
 			else
-				elog(ERROR, "Invalid format for %s %s", fmt, input);
+				elog(ERROR, "Invalid format for %s %s", fmt, str_val);
 		}
 	}
 	else
@@ -405,9 +401,16 @@ Datum scalar_in(PG_FUNCTION_ARGS)
 	ONESPARSE_RETURN_SCALAR(scalar);
 }
 
+Datum scalar_in(PG_FUNCTION_ARGS)
+{
+	char *input;
+	input = PG_GETARG_CSTRING(0);
+	return _scalar_in(input);
+}
+
 Datum scalar_out(PG_FUNCTION_ARGS)
 {
-	char *result;
+	char *result, *sname;
 	int32_t type_code;
 	onesparse_Scalar *scalar;
 	GrB_Index nvals;
@@ -419,18 +422,20 @@ Datum scalar_out(PG_FUNCTION_ARGS)
 	ERRORIF(GrB_Scalar_nvals(&nvals, scalar->scalar) != GrB_SUCCESS,
 			"Error extracting scalar nvals.");
 
+	ERRORIF(GrB_get(scalar->scalar, &type_code, GrB_EL_TYPE_CODE) != GrB_SUCCESS,
+			"Cannot get Scalar Type code.");
+
+	sname = short_name(type_code);
+
 	if (nvals)
 	{
-		ERRORIF(GrB_get(scalar->scalar, &type_code, GrB_EL_TYPE_CODE) != GrB_SUCCESS,
-				"Cannot get Scalar Type code.");
-
 		if (type_code == GrB_INT64_CODE)
 		{
 			int64_t value;
 			ERRORIF(GrB_Scalar_extractElement(&value, scalar->scalar) != GrB_SUCCESS,
 					"Error extracting scalar element.");
 			result = palloc(23);
-			snprintf(result, 23, "%s:" "%" PRIi64, "i8", value);
+			snprintf(result, 23, "%s:" "%" PRIi64, sname, value);
 		}
 		else if (type_code == GrB_INT32_CODE)
 		{
@@ -438,7 +443,7 @@ Datum scalar_out(PG_FUNCTION_ARGS)
 			ERRORIF(GrB_Scalar_extractElement(&value, scalar->scalar) != GrB_SUCCESS,
 					"Error extracting scalar element.");
 			result = palloc(13);
-			snprintf(result, 13, "%s:" "%" PRIi32, "i4", value);
+			snprintf(result, 13, "%s:" "%" PRIi32, sname, value);
 		}
 		else if (type_code == GrB_INT16_CODE)
 		{
@@ -446,7 +451,7 @@ Datum scalar_out(PG_FUNCTION_ARGS)
 			ERRORIF(GrB_Scalar_extractElement(&value, scalar->scalar) != GrB_SUCCESS,
 					"Error extracting scalar element.");
 			result = palloc(8);
-			snprintf(result, 8, "%s:" "%" PRIi16, "i2", value);
+			snprintf(result, 8, "%s:" "%" PRIi16, sname, value);
 		}
 		else if (type_code == GrB_FP64_CODE)
 		{
@@ -454,7 +459,7 @@ Datum scalar_out(PG_FUNCTION_ARGS)
 			ERRORIF(GrB_Scalar_extractElement(&value, scalar->scalar) != GrB_SUCCESS,
 					"Error extracting scalar element.");
 			result = palloc(21);
-			snprintf(result, 21, "%s:%f", "fp64", value);
+			snprintf(result, 21, "%s:%f", sname, value);
 		}
 		else if (type_code == GrB_FP32_CODE)
 		{
@@ -462,7 +467,7 @@ Datum scalar_out(PG_FUNCTION_ARGS)
 			ERRORIF(GrB_Scalar_extractElement(&value, scalar->scalar) != GrB_SUCCESS,
 					"Error extracting scalar element.");
 			result = palloc(12);
-			snprintf(result, 12, "%s:%f", "fp32", value);
+			snprintf(result, 12, "%s:%f", sname, value);
 		}
 		else if (type_code == GrB_BOOL_CODE)
 		{
@@ -470,15 +475,15 @@ Datum scalar_out(PG_FUNCTION_ARGS)
 			ERRORIF(GrB_Scalar_extractElement(&value, scalar->scalar) != GrB_SUCCESS,
 					"Error extracting scalar element.");
 			result = palloc(7);
-			snprintf(result, 7, "%s:%s", "bool", value ? "t" : "f");
+			snprintf(result, 7, "%s:%s", sname, value ? "t" : "f");
 		}
 		else
 			elog(ERROR, "Unsupported type code %i.", type_code);
 	}
 	else
 	{
-		result = palloc(1);
-		snprintf(result, 1, "");
+		result = palloc(4);
+		snprintf(result, 4, "%s:", sname);
 	}
 	PG_RETURN_CSTRING(result);
 }

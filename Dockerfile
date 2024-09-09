@@ -43,7 +43,7 @@ WORKDIR "/home/postgres/onesparse"
 COPY . .
     
 # make the extension
-RUN python3 generate.py sql/onesparse--0.1.0.sql    
+RUN python3 generate.py onesparse/onesparse--0.1.0.sql    
 RUN make && make install && make clean
 RUN ldconfig
 
@@ -59,4 +59,6 @@ USER postgres
 RUN initdb -D "$PGDATA"
 EXPOSE 5432
 # wait forever
+
+# RUN sleep 5; make installcheck
 CMD tail -f /dev/null

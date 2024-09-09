@@ -15,7 +15,7 @@
 #include "utils/varlena.h"
 #include "suitesparse/GraphBLAS.h"
 
-#define ONESPARSE_DEBUG
+#undef ONESPARSE_DEBUG
 
 #define CCAT2(x, y) x ## y
 #define CCAT(x, y) CCAT2(x, y)
@@ -33,6 +33,8 @@
 #else
 #define LOGF()
 #endif
+
+char* short_name(GrB_Type_Code code);
 
 void *malloc_function(size_t);
 void *calloc_function(size_t, size_t);

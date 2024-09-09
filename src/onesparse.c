@@ -1,4 +1,26 @@
 #include "onesparse.h"
+PG_MODULE_MAGIC;
+
+char* short_name(GrB_Type_Code code)
+{
+	switch(code)
+	{
+		case GrB_INT64_CODE:
+			return "i8";
+		case GrB_INT32_CODE:
+			return "i4";
+		case GrB_INT16_CODE:
+			return "i2";
+		case GrB_FP64_CODE:
+			return "f8";
+		case GrB_FP32_CODE:
+			return "f4";
+		case GrB_BOOL_CODE:
+			return "b";
+	}
+	return "?";
+}
+
 
 void *calloc_function(size_t num, size_t size) {
   MemoryContext oldcxt;

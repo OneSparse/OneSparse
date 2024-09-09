@@ -16,7 +16,9 @@ echo building test image
 docker build . -t onesparse/test
 
 echo running test container
-docker run -v $(pwd)/tests/:/tests -v $(pwd)/demo/:/demo -v --cap-add=SYS_PTRACE --security-opt seccomp=unconfined -d --name "$DB_HOST" onesparse/test
+docker run -v $(pwd)/sql/:/home/postgres/onesparse/sql -v $(pwd)/expected/:/home/postgres/onesparse/expected -v $(pwd)/results/:/home/postgres/onesparse/results -v $(pwd)/onesparse/:/home/postgres/onesparse/onesparse -v $(pwd)/demo/:/demo -v --cap-add=SYS_PTRACE --security-opt seccomp=unconfined -d --name "$DB_HOST" onesparse/test
+
+$EXECIT chown postgres:postgres sql expected results
 
 $EXECIT pg_ctl start
 # $EXEC make clean
