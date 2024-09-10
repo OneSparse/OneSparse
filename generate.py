@@ -46,9 +46,9 @@ class Type:
     short: str
     pgtype: str
     gbtype: str
-    min: int = -1
-    zero: int = 0
-    max: int = 1
+    min: str = "-1"
+    zero: str = "0"
+    max: str = "1"
     plus: str = '+'
     mult: str = '*'
     sub: str = '-'
