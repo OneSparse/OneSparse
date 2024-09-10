@@ -34,7 +34,6 @@ class Template:
         return self.test_file(part).read()
 
     def test_write(self, part, **fmt):
-        print(part, fmt)
         typ = fmt.get('type')
         if typ is not None:
             outfile = open(Path(self.test_dir, f'test_{self.name}_{part}_{typ}.sql'), 'w+')

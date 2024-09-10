@@ -13,6 +13,16 @@ RETURNS cstring
 AS '$libdir/onesparse', 'scalar_out'
 LANGUAGE C IMMUTABLE STRICT;
 
+CREATE FUNCTION scalar_typmod_in(cstring[])
+RETURNS integer
+AS '$libdir/onesparse', 'scalar_typmod_in'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION scalar_typmod_out(integer)
+RETURNS cstring
+AS '$libdir/onesparse', 'scalar_typmod_out'
+LANGUAGE C IMMUTABLE STRICT;
+
 CREATE TYPE scalar (
     input = scalar_in,
     output = scalar_out,
@@ -28,7 +38,7 @@ RETURNS int2
 AS '$libdir/onesparse', 'scalar_nvals'
 LANGUAGE C;
 
-CREATE FUNCTION scalar(bigint)
+CREATE FUNCTION scalar_bigint(bigint)
 RETURNS scalar
 AS '$libdir/onesparse', 'scalar_int64'
 LANGUAGE C;
@@ -39,7 +49,7 @@ AS '$libdir/onesparse', 'cast_scalar_int64'
 LANGUAGE C;
 
 CREATE CAST (bigint AS onesparse.scalar)
-    WITH FUNCTION onesparse.scalar(bigint)
+    WITH FUNCTION onesparse.scalar_bigint(bigint)
     AS IMPLICIT;
 
 CREATE CAST (onesparse.scalar AS bigint)
@@ -133,7 +143,7 @@ CREATE OPERATOR / (
     FUNCTION = div_scalar
     );
 
-CREATE FUNCTION scalar(integer)
+CREATE FUNCTION scalar_integer(integer)
 RETURNS scalar
 AS '$libdir/onesparse', 'scalar_int32'
 LANGUAGE C;
@@ -144,7 +154,7 @@ AS '$libdir/onesparse', 'cast_scalar_int32'
 LANGUAGE C;
 
 CREATE CAST (integer AS onesparse.scalar)
-    WITH FUNCTION onesparse.scalar(integer)
+    WITH FUNCTION onesparse.scalar_integer(integer)
     AS IMPLICIT;
 
 CREATE CAST (onesparse.scalar AS integer)
@@ -238,7 +248,7 @@ CREATE OPERATOR / (
     FUNCTION = div_scalar
     );
 
-CREATE FUNCTION scalar(smallint)
+CREATE FUNCTION scalar_smallint(smallint)
 RETURNS scalar
 AS '$libdir/onesparse', 'scalar_int16'
 LANGUAGE C;
@@ -249,7 +259,7 @@ AS '$libdir/onesparse', 'cast_scalar_int16'
 LANGUAGE C;
 
 CREATE CAST (smallint AS onesparse.scalar)
-    WITH FUNCTION onesparse.scalar(smallint)
+    WITH FUNCTION onesparse.scalar_smallint(smallint)
     AS IMPLICIT;
 
 CREATE CAST (onesparse.scalar AS smallint)
@@ -343,7 +353,7 @@ CREATE OPERATOR / (
     FUNCTION = div_scalar
     );
 
-CREATE FUNCTION scalar(float4)
+CREATE FUNCTION scalar_float4(float4)
 RETURNS scalar
 AS '$libdir/onesparse', 'scalar_fp32'
 LANGUAGE C;
@@ -354,7 +364,7 @@ AS '$libdir/onesparse', 'cast_scalar_fp32'
 LANGUAGE C;
 
 CREATE CAST (float4 AS onesparse.scalar)
-    WITH FUNCTION onesparse.scalar(float4)
+    WITH FUNCTION onesparse.scalar_float4(float4)
     AS IMPLICIT;
 
 CREATE CAST (onesparse.scalar AS float4)
@@ -448,7 +458,7 @@ CREATE OPERATOR / (
     FUNCTION = div_scalar
     );
 
-CREATE FUNCTION scalar(float8)
+CREATE FUNCTION scalar_float8(float8)
 RETURNS scalar
 AS '$libdir/onesparse', 'scalar_fp64'
 LANGUAGE C;
@@ -459,7 +469,7 @@ AS '$libdir/onesparse', 'cast_scalar_fp64'
 LANGUAGE C;
 
 CREATE CAST (float8 AS onesparse.scalar)
-    WITH FUNCTION onesparse.scalar(float8)
+    WITH FUNCTION onesparse.scalar_float8(float8)
     AS IMPLICIT;
 
 CREATE CAST (onesparse.scalar AS float8)
@@ -553,7 +563,7 @@ CREATE OPERATOR / (
     FUNCTION = div_scalar
     );
 
-CREATE FUNCTION scalar(bool)
+CREATE FUNCTION scalar_bool(bool)
 RETURNS scalar
 AS '$libdir/onesparse', 'scalar_bool'
 LANGUAGE C;
@@ -564,7 +574,7 @@ AS '$libdir/onesparse', 'cast_scalar_bool'
 LANGUAGE C;
 
 CREATE CAST (bool AS onesparse.scalar)
-    WITH FUNCTION onesparse.scalar(bool)
+    WITH FUNCTION onesparse.scalar_bool(bool)
     AS IMPLICIT;
 
 CREATE CAST (onesparse.scalar AS bool)
@@ -573,24 +583,25 @@ CREATE CAST (onesparse.scalar AS bool)
 
 CREATE TABLE grb_type2 (
     name text PRIMARY KEY,
+    short_name text UNIQUE,
     type_code integer DEFAULT 0,
     struct text
     );
 
 CREATE INDEX ON grb_type2 (type_code);
 
-INSERT INTO grb_type2 (name, type_code) VALUES
-    ('bool',    1),
-    ('int8',    2),
-    ('uint8',   3),
-    ('int16',   4),
-    ('uint16',  5),
-    ('int32',   6),
-    ('uint32',  7),
-    ('int64',   8),
-    ('uint64',  9),
-    ('fp32',    10),
-    ('fp64',    11),
-    ('fc32',    7070),
-    ('fc64',    7071)
+INSERT INTO grb_type2 (name, short_name, type_code) VALUES
+    ('bool',   'b',  1),
+    ('int8',   'i',  2),
+    ('uint8',  'u',  3),
+    ('int16',  'i2', 4),
+    ('uint16', 'u2', 5),
+    ('int32',  'i4', 6),
+    ('uint32', 'u4', 7),
+    ('int64',  'i8', 8),
+    ('uint64', 'u8', 9),
+    ('fp32',   'f4', 10),
+    ('fp64',   'f8', 11),
+    ('fc32',   'c4', 7070),
+    ('fc64',   'c8', 7071)
 ;
