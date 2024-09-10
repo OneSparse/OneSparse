@@ -9,7 +9,6 @@ class Template:
     name: str
     outfile: object = None
     test_dir: str = 'sql/'
-    debug: bool = False
     version: str = VERSION
 
     def path(self, part):
@@ -36,7 +35,7 @@ class Template:
     def test_write(self, part, **fmt):
         typ = fmt.get('type')
         if typ is not None:
-            outfile = open(Path(self.test_dir, f'test_{self.name}_{part}_{typ}.sql'), 'w+')
+            outfile = open(Path(self.test_dir, f'test_{self.name}_{part}_{typ.short}.sql'), 'w+')
         else:
             outfile = open(Path(self.test_dir, f'test_{self.name}_{part}.sql'), 'w+')
         outfile.write(self.test_read(part).format(**fmt))
@@ -47,6 +46,9 @@ class Type:
     short: str
     pgtype: str
     gbtype: str
+    min: int = -1
+    zero: int = 0
+    max: int = 1
     plus: str = '+'
     mult: str = '*'
     sub: str = '-'
@@ -61,7 +63,7 @@ def write_source(outfile):
         Type('int16', 'i2', 'smallint', 'GrB_INT16'),
         Type('fp32',  'f4', 'float4',   'GrB_INT32'),
         Type('fp64',  'f8', 'float8',   'GrB_INT64'),
-        Type('bool',  'b', 'bool',      'GrB_BOOL', None, None, None, None),
+        Type('bool',  'b', 'bool',      'GrB_BOOL', 0, 0, 1, None, None, None, None),
     ]
 
     objects = [
@@ -73,6 +75,7 @@ def write_source(outfile):
         o.test_write('header')
         for t in types:
             o.write('func', type=t)
+            o.test_write('func', type=t)
             o.write('cast', type=t)
             if t.plus is not None:
                 o.write('math', type=t)
