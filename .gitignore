@@ -53,3 +53,5 @@ dkms.conf
 
 /results
 regression.*
+/expected/*.diff
+*~

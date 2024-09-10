@@ -80,7 +80,9 @@ def write_source(outfile):
             o.test_write('cast', type=t)
             if t.plus is not None:
                 o.write('math', type=t)
+                o.test_write('math', type=t)
                 o.write('op', type=t)
+                o.test_write('op', type=t)
         o.write('footer')
 
 if __name__ == '__main__':
