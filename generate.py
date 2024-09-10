@@ -77,6 +77,7 @@ def write_source(outfile):
             o.write('func', type=t)
             o.test_write('func', type=t)
             o.write('cast', type=t)
+            o.test_write('cast', type=t)
             if t.plus is not None:
                 o.write('math', type=t)
                 o.write('op', type=t)
