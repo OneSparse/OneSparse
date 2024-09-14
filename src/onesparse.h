@@ -1,7 +1,9 @@
 #ifndef ONESPARSE_H
 #define ONESPARSE_H
 
+#include <string.h>
 #include "postgres.h"
+#include "common/fe_memutils.h"
 #include "utils/builtins.h"
 #include "libpq/pqformat.h"
 #include "funcapi.h"
@@ -13,6 +15,7 @@
 #include "utils/lsyscache.h"
 #include "nodes/pg_list.h"
 #include "utils/varlena.h"
+#include "common/hashfn.h"
 #include "suitesparse/GraphBLAS.h"
 
 #undef ONESPARSE_DEBUG

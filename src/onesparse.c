@@ -1,3 +1,6 @@
+
+void initialize_semirings();
+
 #include "onesparse.h"
 PG_MODULE_MAGIC;
 
@@ -66,6 +69,9 @@ void _PG_init(void)
 					 &realloc_function,
 					 &free_function) != GrB_SUCCESS,
 			"Cannot initialize GraphBLAS");
+
+	initialize_semirings();
+
 	/* ERRORIF(GrB_init(GrB_NONBLOCKING) != GrB_SUCCESS, */
 	/* 		"Cannot initialize GraphBLAS"); */
 }

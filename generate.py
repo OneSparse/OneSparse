@@ -1,6 +1,12 @@
 import sys
-from dataclasses import dataclass
+from collections import defaultdict
+from dataclasses import dataclass, field
 from pathlib import Path
+
+from pyclibrary import CLibrary, CParser
+
+parser = CParser(['/usr/local/include/suitesparse/GraphBLAS.h'])
+suitesparse = CLibrary('/usr/local/lib/libgraphblas.so', parser)
 
 VERSION = '0.1.0'
 
@@ -8,23 +14,46 @@ VERSION = '0.1.0'
 class Template:
     name: str
     outfile: object = None
+    context: defaultdict[dict] = field(default_factory=lambda: defaultdict(dict))
     test_dir: str = 'sql/'
+    source_dir: str = 'src/'
     version: str = VERSION
 
-    def path(self, part):
-        return str(Path('templates', f'{self.name}_{part}.sql'))
+    def sql_path(self, part):
+        return Path('templates', f'{self.name}_{part}.sql')
 
-    def file(self, part):
-        return open(self.path(part), 'r')
+    def sql_file(self, part):
+        return open(self.sql_path(part), 'r')
 
-    def read(self, part):
-        return self.file(part).read()
+    def sql_read(self, part):
+        return self.sql_file(part).read()
 
-    def write(self, part, **fmt):
-        self.outfile.write(self.read(part).format(**fmt))
+    def sql_write(self, part):
+        if self.sql_path(part).exists():
+            self.outfile.write(self.sql_read(part).format(**self.context))
+
+    def source_path(self, part):
+        return Path('templates', f'{self.name}_{part}.h')
+
+    def source_file(self, part):
+        return open(self.source_path(part), 'r')
+
+    def source_read(self, part):
+        return self.source_file(part).read()
+
+    def source_write(self, part):
+        typ = self.context.get('type')
+        if typ is not None:
+            path = Path(self.source_dir, f'{self.name}_{part}_{typ.short}.h')
+        else:
+            path = Path(self.source_dir, f'{self.name}_{part}.h')
+
+        if self.source_path(part).exists():
+            outfile = open(path, 'w+')
+            outfile.write(self.source_read(part).format(**self.context))
 
     def test_path(self, part):
-        return str(Path('templates', f'test_{self.name}_{part}.sql'))
+        return Path('templates', f'test_{self.name}_{part}.sql')
 
     def test_file(self, part):
         return open(self.test_path(part), 'r')
@@ -32,13 +61,21 @@ class Template:
     def test_read(self, part):
         return self.test_file(part).read()
 
-    def test_write(self, part, **fmt):
-        typ = fmt.get('type')
+    def test_write(self, part):
+        typ = self.context.get('type')
         if typ is not None:
-            outfile = open(Path(self.test_dir, f'test_{self.name}_{part}_{typ.short}.sql'), 'w+')
+            path = Path(self.test_dir, f'test_{self.name}_{part}_{typ.short}.sql')
         else:
-            outfile = open(Path(self.test_dir, f'test_{self.name}_{part}.sql'), 'w+')
-        outfile.write(self.test_read(part).format(**fmt))
+            path = Path(self.test_dir, f'test_{self.name}_{part}.sql')
+
+        if self.test_path(part).exists():
+            outfile = open(path, 'w+')
+            outfile.write(self.test_read(part).format(**self.context))
+
+    def write(self, part):
+        self.sql_write(part)
+        self.source_write(part)
+        self.test_write(part)
 
 @dataclass
 class Type:
@@ -54,6 +91,21 @@ class Type:
     sub: str = '-'
     div: str = '/'
 
+variables = suitesparse['variables'].items()
+semirings = [i for i, j in variables if j[1].type_spec == 'GrB_Semiring']
+binops = [i for i, j in variables if j[1].type_spec == 'GrB_BinaryOp']
+monoids = [i for i, j in variables if j[1].type_spec == 'GrB_Monoid']
+unaries = [i for i, j in variables if j[1].type_spec == 'GrB_UnaryOp']
+indexunaries = [i for i, j in variables if j[1].type_spec == 'GrB_IndexUnaryOp']
+descriptors = [i for i, j in variables if j[1].type_spec == 'GrB_Descriptor']
+selectop = [i for i, j in variables if j[1].type_spec == 'GxB_SelectOp']
+
+
+semiring_decls = '\n'.join([
+    f'\n    entry = semiringhash_insert(semiringhash, "{s.lower()[4:]}", &found);\n'
+    f'    entry->name = strdup("{s.lower()[4:]}");\n'
+    f'    entry->semiring = {s};'
+    for s in semirings])
 
 def write_source(outfile):
 
@@ -68,21 +120,18 @@ def write_source(outfile):
 
     objects = [
         Template('scalar', outfile),
+        Template('semiring', outfile, dict(decls=semiring_decls)),
         ]
 
     for o in objects:
         o.write('header')
-        o.test_write('header')
         for t in types:
-            o.write('func', type=t)
-            o.test_write('func', type=t)
-            o.write('cast', type=t)
-            o.test_write('cast', type=t)
+            o.context['type'] = t
+            o.write('func')
+            o.write('cast')
             if t.plus is not None:
-                o.write('math', type=t)
-                o.test_write('math', type=t)
-                o.write('op', type=t)
-                o.test_write('op', type=t)
+                o.write('math')
+                o.write('op')
         o.write('footer')
 
 if __name__ == '__main__':
