@@ -107,6 +107,24 @@ semiring_decls = '\n'.join([
     f'    entry->semiring = {s};'
     for s in semirings])
 
+binop_decls = '\n'.join([
+    f'\n    entry = binaryophash_insert(binaryophash, "{s.lower()[4:]}", &found);\n'
+    f'    entry->name = strdup("{s.lower()[4:]}");\n'
+    f'    entry->binaryop = {s};'
+    for s in binops])
+
+monoid_decls = '\n'.join([
+    f'\n    entry = monoidhash_insert(monoidhash, "{s.lower()[4:]}", &found);\n'
+    f'    entry->name = strdup("{s.lower()[4:]}");\n'
+    f'    entry->monoid = {s};'
+    for s in monoids])
+
+unaryop_decls = '\n'.join([
+    f'\n    entry = unaryophash_insert(unaryophash, "{s.lower()[4:]}", &found);\n'
+    f'    entry->name = strdup("{s.lower()[4:]}");\n'
+    f'    entry->unaryop = {s};'
+    for s in unaries])
+
 def write_source(outfile):
 
     types = [
@@ -121,6 +139,9 @@ def write_source(outfile):
     objects = [
         Template('scalar', outfile),
         Template('semiring', outfile, dict(decls=semiring_decls)),
+        Template('binaryop', outfile, dict(decls=binop_decls)),
+        Template('monoid', outfile, dict(decls=monoid_decls)),
+        Template('unaryop', outfile, dict(decls=unaryop_decls)),
         ]
 
     for o in objects:

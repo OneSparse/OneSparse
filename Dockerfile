@@ -38,6 +38,8 @@ RUN curl -s -L -J https://github.com/DrTimothyAldenDavis/GraphBLAS/archive/refs/
     CMAKE_OPTIONS='-DCMAKE_BUILD_TYPE=Debug' \
     && sudo make install
 
+RUN pip3 install pyclibrary
+
 RUN sudo ldconfig
 
 # put test stuff into pg home        
@@ -45,8 +47,6 @@ RUN mkdir "/home/postgres/onesparse"
 WORKDIR "/home/postgres/onesparse"
 COPY . .
     
-RUN pip3 install pyclibrary
-
 RUN sudo chown -R postgres:postgres /home/postgres/onesparse
 
 # make the extension

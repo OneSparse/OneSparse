@@ -627,3 +627,69 @@ CREATE TYPE semiring (
     storage = 'extended',
     internallength = VARIABLE
     );
+-- complain if script is sourced in psql, rather than via CREATE EXTENSION
+\echo Use "CREATE EXTENSION onesparse" to load this file. \quit
+
+CREATE TYPE binaryop;
+
+CREATE FUNCTION binaryop_in(cstring)
+RETURNS binaryop
+AS '$libdir/onesparse', 'binaryop_in'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION binaryop_out(binaryop)
+RETURNS cstring
+AS '$libdir/onesparse', 'binaryop_out'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE TYPE binaryop (
+    input = binaryop_in,
+    output = binaryop_out,
+    alignment = int4,
+    storage = 'extended',
+    internallength = VARIABLE
+    );
+-- complain if script is sourced in psql, rather than via CREATE EXTENSION
+\echo Use "CREATE EXTENSION onesparse" to load this file. \quit
+
+CREATE TYPE monoid;
+
+CREATE FUNCTION monoid_in(cstring)
+RETURNS monoid
+AS '$libdir/onesparse', 'monoid_in'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION monoid_out(monoid)
+RETURNS cstring
+AS '$libdir/onesparse', 'monoid_out'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE TYPE monoid (
+    input = monoid_in,
+    output = monoid_out,
+    alignment = int4,
+    storage = 'extended',
+    internallength = VARIABLE
+    );
+-- complain if script is sourced in psql, rather than via CREATE EXTENSION
+\echo Use "CREATE EXTENSION onesparse" to load this file. \quit
+
+CREATE TYPE unaryop;
+
+CREATE FUNCTION unaryop_in(cstring)
+RETURNS unaryop
+AS '$libdir/onesparse', 'unaryop_in'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION unaryop_out(unaryop)
+RETURNS cstring
+AS '$libdir/onesparse', 'unaryop_out'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE TYPE unaryop (
+    input = unaryop_in,
+    output = unaryop_out,
+    alignment = int4,
+    storage = 'extended',
+    internallength = VARIABLE
+    );
