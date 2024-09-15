@@ -3,6 +3,8 @@ void initialize_semirings();
 void initialize_binaryops();
 void initialize_monoids();
 void initialize_unaryops();
+void initialize_indexunaryops();
+void initialize_descriptors();
 
 #include "onesparse.h"
 PG_MODULE_MAGIC;
@@ -77,6 +79,8 @@ void _PG_init(void)
 	initialize_binaryops();
 	initialize_monoids();
 	initialize_unaryops();
+	initialize_indexunaryops();
+	initialize_descriptors();
 
 	/* ERRORIF(GrB_init(GrB_NONBLOCKING) != GrB_SUCCESS, */
 	/* 		"Cannot initialize GraphBLAS"); */

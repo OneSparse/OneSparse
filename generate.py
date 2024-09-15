@@ -98,8 +98,6 @@ monoids = [i for i, j in variables if j[1].type_spec == 'GrB_Monoid']
 unaries = [i for i, j in variables if j[1].type_spec == 'GrB_UnaryOp']
 indexunaries = [i for i, j in variables if j[1].type_spec == 'GrB_IndexUnaryOp']
 descriptors = [i for i, j in variables if j[1].type_spec == 'GrB_Descriptor']
-selectop = [i for i, j in variables if j[1].type_spec == 'GxB_SelectOp']
-
 
 semiring_decls = '\n'.join([
     f'\n    entry = semiringhash_insert(semiringhash, "{s.lower()[4:]}", &found);\n'
@@ -125,6 +123,18 @@ unaryop_decls = '\n'.join([
     f'    entry->unaryop = {s};'
     for s in unaries])
 
+indexunaryop_decls = '\n'.join([
+    f'\n    entry = indexunaryophash_insert(indexunaryophash, "{s.lower()[4:]}", &found);\n'
+    f'    entry->name = strdup("{s.lower()[4:]}");\n'
+    f'    entry->indexunaryop = {s};'
+    for s in indexunaries])
+
+descriptor_decls = '\n'.join([
+    f'\n    entry = descriptorhash_insert(descriptorhash, "{s.lower()[4:]}", &found);\n'
+    f'    entry->name = strdup("{s.lower()[4:]}");\n'
+    f'    entry->descriptor = {s};'
+    for s in descriptors])
+
 def write_source(outfile):
 
     types = [
@@ -142,6 +152,7 @@ def write_source(outfile):
         Template('binaryop', outfile, dict(decls=binop_decls)),
         Template('monoid', outfile, dict(decls=monoid_decls)),
         Template('unaryop', outfile, dict(decls=unaryop_decls)),
+        Template('descriptor', outfile, dict(decls=descriptor_decls)),
         ]
 
     for o in objects:
