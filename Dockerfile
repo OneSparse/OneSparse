@@ -54,7 +54,7 @@ RUN python3 generate.py onesparse/onesparse--0.1.0.sql
 RUN make && sudo make install && make clean
 
 # start the database            
-RUN initdb -D "$PGDATA" -c shared_preload_libraries='onesparse'
+RUN initdb -D "$PGDATA" -c shared_preload_libraries='onesparse' -c search_path='onesparse'
 EXPOSE 5432
 # wait forever
 

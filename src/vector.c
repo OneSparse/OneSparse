@@ -19,6 +19,7 @@ static Size vector_get_flat_size(ExpandedObjectHeader *eohptr) {
 
 	ERRORIF(GxB_Vector_serialize(&serialized_data, &serialized_size, vector->vector, NULL) != GrB_SUCCESS,
 			"Error serializing vector");
+
 	vector->serialized_data = serialized_data;
 	vector->serialized_size = serialized_size;
 	vector->flat_size = ONESPARSE_VECTOR_FLATSIZE() + serialized_size;

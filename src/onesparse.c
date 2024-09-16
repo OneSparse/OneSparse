@@ -68,12 +68,15 @@ void free_function(void *p) {
 
 void _PG_init(void)
 {
-	ERRORIF(GxB_init(GrB_NONBLOCKING,
-					 &malloc_function,
-					 &calloc_function,
-					 &realloc_function,
-					 &free_function) != GrB_SUCCESS,
+	ERRORIF(GrB_init(GrB_NONBLOCKING) != GrB_SUCCESS,
 			"Cannot initialize GraphBLAS");
+
+	/* ERRORIF(GxB_init(GrB_NONBLOCKING, */
+	/* 				 &malloc_function, */
+	/* 				 &calloc_function, */
+	/* 				 &realloc_function, */
+	/* 				 &free_function) != GrB_SUCCESS, */
+	/* 		"Cannot initialize GraphBLAS"); */
 
 	initialize_semirings();
 	initialize_binaryops();
@@ -81,10 +84,8 @@ void _PG_init(void)
 	initialize_unaryops();
 	initialize_indexunaryops();
 	initialize_descriptors();
-
-	/* ERRORIF(GrB_init(GrB_NONBLOCKING) != GrB_SUCCESS, */
-	/* 		"Cannot initialize GraphBLAS"); */
 }
+
 
 /* Local Variables: */
 /* mode: c */
