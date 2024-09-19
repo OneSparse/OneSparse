@@ -4,6 +4,7 @@ set search_path = 'onesparse';
 select '0'::bool::scalar;
 select '0'::bool::scalar;
 select '1'::bool::scalar;
+select set('1'::bool::scalar, 2);
 select scalar_bool((0)::bool);
 select scalar_bool((0)::bool);
 select scalar_bool((1)::bool);

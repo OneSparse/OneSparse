@@ -1,5 +1,6 @@
 
 PG_FUNCTION_INFO_V1(FN(scalar));
+PG_FUNCTION_INFO_V1(FN(set_scalar));
 PG_FUNCTION_INFO_V1(FN(cast_scalar));
 
 PG_FUNCTION_INFO_V1(FN(scalar_plus));
@@ -25,6 +26,20 @@ Datum FN(scalar)(PG_FUNCTION_ARGS)
 					val),
 				"Error setting Scalar element");
 	}
+	ONESPARSE_RETURN_SCALAR(scalar);
+}
+
+Datum FN(set_scalar)(PG_FUNCTION_ARGS)
+{
+	onesparse_Scalar* scalar;
+	PG_TYPE val;
+	LOGF();
+	ERRORNULL(0);
+	ERRORNULL(1);
+	scalar = ONESPARSE_GETARG_SCALAR(0);
+    val = PG_GETARG(1);
+    ERRORIF(GrB_Scalar_setElement(scalar->scalar, val),
+            "Error setting Scalar element");
 	ONESPARSE_RETURN_SCALAR(scalar);
 }
 

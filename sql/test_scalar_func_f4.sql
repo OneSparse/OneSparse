@@ -4,6 +4,7 @@ set search_path = 'onesparse';
 select '-1'::float4::scalar;
 select '0'::float4::scalar;
 select '1'::float4::scalar;
+select set('1'::float4::scalar, 2);
 select scalar_float4((-1)::float4);
 select scalar_float4((0)::float4);
 select scalar_float4((1)::float4);

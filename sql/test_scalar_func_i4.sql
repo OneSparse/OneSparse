@@ -4,6 +4,7 @@ set search_path = 'onesparse';
 select '-1'::integer::scalar;
 select '0'::integer::scalar;
 select '1'::integer::scalar;
+select set('1'::integer::scalar, 2);
 select scalar_integer((-1)::integer);
 select scalar_integer((0)::integer);
 select scalar_integer((1)::integer);

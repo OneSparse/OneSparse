@@ -4,6 +4,7 @@ set search_path = 'onesparse';
 select '-1'::smallint::scalar;
 select '0'::smallint::scalar;
 select '1'::smallint::scalar;
+select set('1'::smallint::scalar, 2);
 select scalar_smallint((-1)::smallint);
 select scalar_smallint((0)::smallint);
 select scalar_smallint((1)::smallint);

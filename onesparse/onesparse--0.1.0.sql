@@ -136,7 +136,7 @@ RETURNS int2
 AS '$libdir/onesparse', 'scalar_nvals'
 LANGUAGE C;
 
-CREATE FUNCTION wait(scalar)
+CREATE FUNCTION wait(scalar, waitmode integer default 0)
 RETURNS void
 AS '$libdir/onesparse', 'scalar_wait'
 LANGUAGE C;
@@ -159,6 +159,11 @@ LANGUAGE C;
 CREATE FUNCTION bigint_scalar(scalar)
 RETURNS bigint
 AS '$libdir/onesparse', 'cast_scalar_int64'
+LANGUAGE C;
+
+CREATE FUNCTION set(scalar, bigint)
+RETURNS scalar
+AS '$libdir/onesparse', 'set_scalar_int64'
 LANGUAGE C;
 
 CREATE CAST (bigint AS onesparse.scalar)
@@ -266,6 +271,11 @@ RETURNS integer
 AS '$libdir/onesparse', 'cast_scalar_int32'
 LANGUAGE C;
 
+CREATE FUNCTION set(scalar, integer)
+RETURNS scalar
+AS '$libdir/onesparse', 'set_scalar_int32'
+LANGUAGE C;
+
 CREATE CAST (integer AS onesparse.scalar)
     WITH FUNCTION onesparse.scalar_integer(integer)
     AS IMPLICIT;
@@ -369,6 +379,11 @@ LANGUAGE C;
 CREATE FUNCTION smallint_scalar(scalar)
 RETURNS smallint
 AS '$libdir/onesparse', 'cast_scalar_int16'
+LANGUAGE C;
+
+CREATE FUNCTION set(scalar, smallint)
+RETURNS scalar
+AS '$libdir/onesparse', 'set_scalar_int16'
 LANGUAGE C;
 
 CREATE CAST (smallint AS onesparse.scalar)
@@ -476,6 +491,11 @@ RETURNS float4
 AS '$libdir/onesparse', 'cast_scalar_fp32'
 LANGUAGE C;
 
+CREATE FUNCTION set(scalar, float4)
+RETURNS scalar
+AS '$libdir/onesparse', 'set_scalar_fp32'
+LANGUAGE C;
+
 CREATE CAST (float4 AS onesparse.scalar)
     WITH FUNCTION onesparse.scalar_float4(float4)
     AS IMPLICIT;
@@ -581,6 +601,11 @@ RETURNS float8
 AS '$libdir/onesparse', 'cast_scalar_fp64'
 LANGUAGE C;
 
+CREATE FUNCTION set(scalar, float8)
+RETURNS scalar
+AS '$libdir/onesparse', 'set_scalar_fp64'
+LANGUAGE C;
+
 CREATE CAST (float8 AS onesparse.scalar)
     WITH FUNCTION onesparse.scalar_float8(float8)
     AS IMPLICIT;
@@ -684,6 +709,11 @@ LANGUAGE C;
 CREATE FUNCTION bool_scalar(scalar)
 RETURNS bool
 AS '$libdir/onesparse', 'cast_scalar_bool'
+LANGUAGE C;
+
+CREATE FUNCTION set(scalar, bool)
+RETURNS scalar
+AS '$libdir/onesparse', 'set_scalar_bool'
 LANGUAGE C;
 
 CREATE CAST (bool AS onesparse.scalar)
