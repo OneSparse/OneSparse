@@ -123,21 +123,9 @@ RETURNS cstring
 AS '$libdir/onesparse', 'scalar_out'
 LANGUAGE C IMMUTABLE STRICT;
 
-CREATE FUNCTION scalar_typmod_in(cstring[])
-RETURNS integer
-AS '$libdir/onesparse', 'scalar_typmod_in'
-LANGUAGE C IMMUTABLE STRICT;
-
-CREATE FUNCTION scalar_typmod_out(integer)
-RETURNS cstring
-AS '$libdir/onesparse', 'scalar_typmod_out'
-LANGUAGE C IMMUTABLE STRICT;
-
 CREATE TYPE scalar (
     input = scalar_in,
     output = scalar_out,
-    -- typmod_in = scalar_typmod_in,
-    -- typmod_out = scalar_typmod_out,
     alignment = int4,
     storage = 'extended',
     internallength = VARIABLE
@@ -730,21 +718,9 @@ RETURNS cstring
 AS '$libdir/onesparse', 'vector_out'
 LANGUAGE C IMMUTABLE STRICT;
 
--- CREATE FUNCTION vector_typmod_in(cstring[])
--- RETURNS integer
--- AS '$libdir/onesparse', 'vector_typmod_in'
--- LANGUAGE C IMMUTABLE STRICT;
-
--- CREATE FUNCTION vector_typmod_out(integer)
--- RETURNS cstring
--- AS '$libdir/onesparse', 'vector_typmod_out'
--- LANGUAGE C IMMUTABLE STRICT;
-
 CREATE TYPE vector (
     input = vector_in,
     output = vector_out,
-    -- typmod_in = vector_typmod_in,
-    -- typmod_out = vector_typmod_out,
     alignment = int4,
     storage = 'extended',
     internallength = VARIABLE
@@ -765,10 +741,37 @@ CREATE FUNCTION ewise_add(
     v vector,
     op binaryop,
     mask vector default null,
+    accum binaryop default null,
     descriptor text default null
     )
 RETURNS vector
 AS '$libdir/onesparse', 'vector_ewise_add'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION ewise_mult(
+    u vector,
+    v vector,
+    op binaryop,
+    mask vector default null,
+    accum binaryop default null,
+    descriptor text default null
+    )
+RETURNS vector
+AS '$libdir/onesparse', 'vector_ewise_mult'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION ewise_union(
+    u vector,
+    a scalar,
+    v vector,
+    b scalar,
+    op binaryop,
+    mask vector default null,
+    accum binaryop default null,
+    descriptor text default null
+    )
+RETURNS vector
+AS '$libdir/onesparse', 'vector_ewise_union'
 LANGUAGE C STABLE;
 
 
