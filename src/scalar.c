@@ -17,6 +17,9 @@ static const ExpandedObjectMethods scalar_methods = {
 PG_FUNCTION_INFO_V1(scalar_in);
 PG_FUNCTION_INFO_V1(scalar_out);
 PG_FUNCTION_INFO_V1(scalar_nvals);
+PG_FUNCTION_INFO_V1(scalar_wait);
+PG_FUNCTION_INFO_V1(scalar_dup);
+PG_FUNCTION_INFO_V1(scalar_clear);
 
 static Size scalar_get_flat_size(ExpandedObjectHeader *eohptr) {
 	onesparse_Scalar *scalar;
@@ -519,6 +522,56 @@ Datum scalar_nvals(PG_FUNCTION_ARGS)
 	ERRORIF(GrB_Scalar_nvals(&result, scalar->scalar) != GrB_SUCCESS,
 			"Error extracting scalar nvals.");
 	PG_RETURN_INT16(result ? 1 : 0);
+}
+
+Datum scalar_wait(PG_FUNCTION_ARGS)
+{
+	onesparse_Scalar *scalar;
+	int waitmode;
+
+	LOGF();
+	ERRORNULL(0);
+
+	scalar = ONESPARSE_GETARG_SCALAR(0);
+	waitmode = PG_GETARG_INT32(1);
+
+	ERRORIF(GrB_Scalar_wait(scalar->scalar, waitmode) != GrB_SUCCESS,
+			"Error waiting for scalar.");
+	PG_RETURN_VOID();
+}
+
+Datum scalar_dup(PG_FUNCTION_ARGS)
+{
+	GrB_Type type;
+	onesparse_Scalar *scalar;
+	onesparse_Scalar *result;
+
+	LOGF();
+	ERRORNULL(0);
+
+	scalar = ONESPARSE_GETARG_SCALAR(0);
+	ERRORIF(GxB_Scalar_type(&type, scalar->scalar) != GrB_SUCCESS,
+			"Cannot get scalar type");
+
+	result = new_scalar(type, CurrentMemoryContext, NULL);
+
+	ERRORIF(GrB_Scalar_dup(&result->scalar, scalar->scalar) != GrB_SUCCESS,
+			"Error duping scalar.");
+	ONESPARSE_RETURN_SCALAR(result);
+}
+
+Datum scalar_clear(PG_FUNCTION_ARGS)
+{
+	onesparse_Scalar *scalar;
+
+	LOGF();
+	ERRORNULL(0);
+
+	scalar = ONESPARSE_GETARG_SCALAR(0);
+
+	ERRORIF(GrB_Scalar_clear(scalar->scalar) != GrB_SUCCESS,
+			"Error clearing scalar.");
+	PG_RETURN_VOID();
 }
 
 #define SUFFIX _int64                // suffix for names

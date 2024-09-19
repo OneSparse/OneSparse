@@ -136,6 +136,21 @@ RETURNS int2
 AS '$libdir/onesparse', 'scalar_nvals'
 LANGUAGE C;
 
+CREATE FUNCTION wait(scalar)
+RETURNS void
+AS '$libdir/onesparse', 'scalar_wait'
+LANGUAGE C;
+
+CREATE FUNCTION dup(scalar)
+RETURNS scalar
+AS '$libdir/onesparse', 'scalar_dup'
+LANGUAGE C;
+
+CREATE FUNCTION clear(scalar)
+RETURNS void
+AS '$libdir/onesparse', 'scalar_clear'
+LANGUAGE C;
+
 CREATE FUNCTION scalar_bigint(bigint)
 RETURNS scalar
 AS '$libdir/onesparse', 'scalar_int64'
