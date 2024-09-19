@@ -130,8 +130,8 @@ indexunaryop_decls = '\n'.join([
     for s in indexunaries])
 
 descriptor_decls = '\n'.join([
-    f'\n    entry = descriptorhash_insert(descriptorhash, "{s.lower()[4:]}", &found);\n'
-    f'    entry->name = strdup("{s.lower()[4:]}");\n'
+    f'\n    entry = descriptorhash_insert(descriptorhash, "{s.lower()[9:]}", &found);\n'
+    f'    entry->name = strdup("{s.lower()[9:]}");\n'
     f'    entry->descriptor = {s};'
     for s in descriptors])
 
@@ -147,12 +147,13 @@ def write_source(outfile):
     ]
 
     objects = [
-        Template('scalar', outfile),
-        Template('semiring', outfile, dict(decls=semiring_decls)),
+        Template('descriptor', outfile, dict(decls=descriptor_decls)),
+        Template('unaryop', outfile, dict(decls=unaryop_decls)),
         Template('binaryop', outfile, dict(decls=binop_decls)),
         Template('monoid', outfile, dict(decls=monoid_decls)),
-        Template('unaryop', outfile, dict(decls=unaryop_decls)),
-        Template('descriptor', outfile, dict(decls=descriptor_decls)),
+        Template('semiring', outfile, dict(decls=semiring_decls)),
+        Template('scalar', outfile),
+        Template('vector', outfile),
         ]
 
     for o in objects:

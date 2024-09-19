@@ -1,4 +1,26 @@
-#include "vector.h"
+#include "onesparse.h"
+
+static void context_callback_vector_free(void*);
+static Size vector_get_flat_size(ExpandedObjectHeader *eohptr);
+
+static void flatten_vector(
+	ExpandedObjectHeader *eohptr,
+	void *result,
+	Size allocated_size);
+
+static const ExpandedObjectMethods vector_methods = {
+	vector_get_flat_size,
+	flatten_vector
+};
+
+PG_FUNCTION_INFO_V1(vector_in);
+PG_FUNCTION_INFO_V1(vector_out);
+
+PG_FUNCTION_INFO_V1(vector_nvals);
+PG_FUNCTION_INFO_V1(vector_size);
+PG_FUNCTION_INFO_V1(vector_ewise_add);
+PG_FUNCTION_INFO_V1(vector_ewise_mult);
+PG_FUNCTION_INFO_V1(vector_ewise_union);
 
 static Size vector_get_flat_size(ExpandedObjectHeader *eohptr) {
 	onesparse_Vector *vector;
@@ -23,7 +45,6 @@ static Size vector_get_flat_size(ExpandedObjectHeader *eohptr) {
 	vector->serialized_data = serialized_data;
 	vector->serialized_size = serialized_size;
 	vector->flat_size = ONESPARSE_VECTOR_FLATSIZE() + serialized_size;
-	elog(INFO, "flat size %zu", vector->flat_size);
 	return vector->flat_size;
 }
 
@@ -37,6 +58,7 @@ static void flatten_vector(
 	onesparse_Vector *vector;
 	onesparse_FlatVector *flat;
 	void* data;
+//	void (*free_function)(void *p);
 
 	LOGF();
 
@@ -60,6 +82,12 @@ static void flatten_vector(
 
 	memcpy(data, vector->serialized_data, vector->serialized_size);
 	flat->serialized_size = vector->serialized_size;
+
+	/* free_function = NULL; */
+	/* ERRORIF(GrB_get(GrB_Global, (void*)free_function, GxB_FREE_FUNCTION) != GrB_SUCCESS, */
+	/* 		"Cannot get SuiteSparse free function."); */
+
+	/* free_function(vector->serialized_data); */
 	SET_VARSIZE(flat, allocated_size);
 }
 
@@ -188,208 +216,152 @@ Datum vector_in(PG_FUNCTION_ARGS)
 {
 	onesparse_Vector *vector;
 	char *input;
-	size_t len;
 	GrB_Type typ;
-	char *str_val = "";
-	char *str_type = "";
-	char *fmt = "";
+	char *short_name;
+    char *input_copy;
+	char *token;
+    char *saveptr;
+    char *endptr;
+    char *number_token;
+    char *number_saveptr;
+    int index = 0;
 
 	input = PG_GETARG_CSTRING(0);
-	len = strlen(input);
+	input_copy = strdup(input);
+    token = strtok_r(input_copy, "[", &saveptr);
 
-	vector = new_vector(GrB_INT64, GrB_INDEX_MAX+1, CurrentMemoryContext, NULL);
-	/* sscanf(input, "%[^:]:%s", str_val, str_type); */
-	/* if (strcmp(str_type, "i8") == 0) */
-	/* { */
-	/* 	int64_t value; */
-	/* 	typ = GrB_INT64; */
-	/* 	fmt = "%ld"; */
-	/* 	vector = new_vector(typ, CurrentMemoryContext, NULL); */
-	/* 	if (len) */
-	/* 	{ */
-	/* 		if (sscanf(input, fmt, &value) == 1) */
-	/* 		{ */
-	/* 			ERRORIF(GrB_Vector_setElement(vector->vector, value) != GrB_SUCCESS, */
-	/* 					"Cannot set vector element in expand."); */
-	/* 		} */
-	/* 		else */
-	/* 			elog(ERROR, "Invalid format for %s %s", fmt, input); */
-	/* 	} */
-	/* } */
-	/* else if (strcmp(str_type, "i4") == 0) */
-	/* { */
-	/* 	int32_t value; */
-	/* 	typ = GrB_INT32; */
-	/* 	fmt = "%i"; */
-	/* 	vector = new_vector(typ, CurrentMemoryContext, NULL); */
-	/* 	if (len) */
-	/* 	{ */
-	/* 		if (sscanf(input, fmt, &value) == 1) */
-	/* 		{ */
-	/* 			ERRORIF(GrB_Vector_setElement(vector->vector, value) != GrB_SUCCESS, */
-	/* 					"Cannot set vector element in expand."); */
-	/* 		} */
-	/* 		else */
-	/* 			elog(ERROR, "Invalid format for %s %s", fmt, input); */
-	/* 	} */
-	/* } */
-	/* else if (strcmp(str_type, "i2") == 0) */
-	/* { */
-	/* 	int16_t value; */
-	/* 	typ = GrB_INT16; */
-	/* 	fmt = "%i"; */
-	/* 	vector = new_vector(typ, CurrentMemoryContext, NULL); */
-	/* 	if (len) */
-	/* 	{ */
-	/* 		if (sscanf(input, fmt, &value) == 1) */
-	/* 		{ */
-	/* 			ERRORIF(GrB_Vector_setElement(vector->vector, value) != GrB_SUCCESS, */
-	/* 					"Cannot set vector element in expand."); */
-	/* 		} */
-	/* 		else */
-	/* 			elog(ERROR, "Invalid format for %s %s", fmt, input); */
-	/* 	} */
-	/* } */
-	/* else if (strcmp(str_type, "f8") == 0) */
-	/* { */
-	/* 	double value; */
-	/* 	typ = GrB_FP64; */
-	/* 	fmt = "%lf"; */
-	/* 	vector = new_vector(typ, CurrentMemoryContext, NULL); */
-	/* 	if (len) */
-	/* 	{ */
-	/* 		if (sscanf(input, fmt, &value) == 1) */
-	/* 		{ */
-	/* 			ERRORIF(GrB_Vector_setElement(vector->vector, value) != GrB_SUCCESS, */
-	/* 					"Cannot set vector element in expand."); */
-	/* 		} */
-	/* 		else */
-	/* 			elog(ERROR, "Invalid format for %s %s", fmt, input); */
-	/* 	} */
-	/* } */
-	/* else if (strcmp(str_type, "f4") == 0) */
-	/* { */
-	/* 	float value; */
-	/* 	typ = GrB_FP32; */
-	/* 	fmt = "%f"; */
-	/* 	vector = new_vector(typ, CurrentMemoryContext, NULL); */
-	/* 	if (len) */
-	/* 	{ */
-	/* 		if (sscanf(input, fmt, &value) == 1) */
-	/* 		{ */
-	/* 			ERRORIF(GrB_Vector_setElement(vector->vector, value) != GrB_SUCCESS, */
-	/* 					"Cannot set vector element in expand."); */
-	/* 		} */
-	/* 		else */
-	/* 			elog(ERROR, "Invalid format for %s %s", fmt, input); */
-	/* 	} */
-	/* } */
-	/* else if (strcmp(str_type, "b") == 0) */
-	/* { */
-	/* 	char value; */
-	/* 	typ = GrB_BOOL; */
-	/* 	fmt = "%c"; */
-	/* 	vector = new_vector(typ, CurrentMemoryContext, NULL); */
-	/* 	if (len) */
-	/* 	{ */
-	/* 		if (sscanf(input, fmt, &value) == 1) */
-	/* 		{ */
-	/* 			bool _value; */
-	/* 			if (value == 't') */
-	/* 				_value = true; */
-	/* 			else if (value == 'f') */
-	/* 				_value = false; */
-	/* 			else */
-	/* 				elog(ERROR, "Invalid value for bool %c", value); */
-	/* 			ERRORIF(GrB_Vector_setElement(vector->vector, _value) != GrB_SUCCESS, */
-	/* 					"Cannot set vector element in expand."); */
-	/* 		} */
-	/* 		else */
-	/* 			elog(ERROR, "Invalid format for %s %s", fmt, input); */
-	/* 	} */
-	/* } */
-	/* else */
-	/* 	elog(ERROR, "Unknown type code %s", str_type); */
+    if (token != NULL)
+	{
+		short_name = palloc(strlen(token)+1);
+        strcpy(short_name, token);
+		typ = short_type(short_name);
+    }
+	else
+		elog(ERROR, "Vector parse error, no short type code prefix.");
+
+	vector = new_vector(typ, GrB_INDEX_MAX+1, CurrentMemoryContext, NULL);
+
+    strcpy(input_copy, input);
+    strtok_r(input_copy, "[", &saveptr);
+    token = strtok_r(NULL, "]", &saveptr);
+
+    for (number_token = strtok_r(token, " ", &number_saveptr); number_token != NULL;
+         number_token = strtok_r(NULL, " ", &number_saveptr))
+	{
+        errno = 0;
+
+        if (typ == GrB_INT64) {
+            int64_t num = strtoll(number_token, &endptr, 10);
+            if (errno != 0 || *endptr != '\0')
+				elog(ERROR, "Invalid INT64 %s", number_token);
+			ERRORIF(GrB_Vector_setElement(vector->vector, num, index) != GrB_SUCCESS,
+				"Error setting Vector Element");
+        }
+        else if (typ == GrB_INT32) {
+            long num = strtol(number_token, &endptr, 10);
+            if (errno != 0 || *endptr != '\0')
+				elog(ERROR, "Invalid INT32 %s", number_token);
+			ERRORIF(GrB_Vector_setElement(vector->vector, num, index) != GrB_SUCCESS,
+					"Error setting Vector Element");
+        }
+        else if (typ == GrB_INT16) {
+            int num = (int)strtol(number_token, &endptr, 10);
+            if (errno != 0 || *endptr != '\0')
+				elog(ERROR, "Invalid INT16 %s", number_token);
+			ERRORIF(GrB_Vector_setElement(vector->vector, num, index) != GrB_SUCCESS,
+					"Error setting Vector Element");
+        }
+		else if (typ == GrB_FP64)
+		{
+            double num = strtod(number_token, &endptr);
+            if (errno != 0 || *endptr != '\0')
+				elog(ERROR, "Invalid FP64 %s", number_token);
+			ERRORIF(GrB_Vector_setElement(vector->vector, num, index) != GrB_SUCCESS,
+					"Error setting Vector Element");
+        }
+		else if (typ == GrB_FP32)
+		{
+            float num = strtof(number_token, &endptr);
+            if (errno != 0 || *endptr != '\0')
+				elog(ERROR, "Invalid FP32 %s", number_token);
+			ERRORIF(GrB_Vector_setElement(vector->vector, num, index) != GrB_SUCCESS,
+					"Error setting Vector Element");
+        }
+		else if (typ == GrB_BOOL)
+		{
+			bool num;
+            if (strcmp(number_token, "t") == 0)
+				num = true;
+			else if  (strcmp(number_token, "f") == 0)
+				num = false;
+			else
+				elog(ERROR, "Invalid BOOL %s", number_token);
+			ERRORIF(GrB_Vector_setElement(vector->vector, num, index) != GrB_SUCCESS,
+					"Error setting Vector Element");
+        }
+		index++;
+    }
 	ONESPARSE_RETURN_VECTOR(vector);
 }
 
 Datum vector_out(PG_FUNCTION_ARGS)
 {
-	char *result;
-	int32_t type_code;
+	GrB_Info info;
+	GrB_Index i;
+    GxB_Iterator iterator;
 	onesparse_Vector *vector;
-	GrB_Index nvals;
+    StringInfoData buf;
+	int32_t type_code;
 
 	LOGF();
 	vector = ONESPARSE_GETARG_VECTOR(0);
 
-	nvals = 0;
-	ERRORIF(GrB_Vector_nvals(&nvals, vector->vector) != GrB_SUCCESS,
-			"Error extracting vector nvals.");
+    GxB_Iterator_new(&iterator);
+	ERRORIF(GxB_Vector_Iterator_attach(iterator, vector->vector, NULL) != GrB_SUCCESS,
+			"Cannot attach vector iterator.");
 
-	/* if (nvals) */
-	/* { */
-	/* 	ERRORIF(GrB_get(vector->vector, &type_code, GrB_EL_TYPE_CODE) != GrB_SUCCESS, */
-	/* 			"Cannot get Vector Type code."); */
+    initStringInfo(&buf);
+	ERRORIF(GrB_get(vector->vector, &type_code, GrB_EL_TYPE_CODE) != GrB_SUCCESS,
+			"Cannot get Vector Type code.");
 
-	/* 	if (type_code == GrB_INT64_CODE) */
-	/* 	{ */
-	/* 		int64_t value; */
-	/* 		ERRORIF(GrB_Vector_extractElement(&value, vector->vector) != GrB_SUCCESS, */
-	/* 				"Error extracting vector element."); */
-	/* 		result = palloc(23); */
-	/* 		snprintf(result, 23, "%s:" "%" PRIi64, "i8", value); */
-	/* 	} */
-	/* 	else if (type_code == GrB_INT32_CODE) */
-	/* 	{ */
-	/* 		int32_t value; */
-	/* 		ERRORIF(GrB_Vector_extractElement(&value, vector->vector) != GrB_SUCCESS, */
-	/* 				"Error extracting vector element."); */
-	/* 		result = palloc(13); */
-	/* 		snprintf(result, 13, "%s:" "%" PRIi32, "i4", value); */
-	/* 	} */
-	/* 	else if (type_code == GrB_INT16_CODE) */
-	/* 	{ */
-	/* 		int16_t value; */
-	/* 		ERRORIF(GrB_Vector_extractElement(&value, vector->vector) != GrB_SUCCESS, */
-	/* 				"Error extracting vector element."); */
-	/* 		result = palloc(8); */
-	/* 		snprintf(result, 8, "%s:" "%" PRIi16, "i2", value); */
-	/* 	} */
-	/* 	else if (type_code == GrB_FP64_CODE) */
-	/* 	{ */
-	/* 		double value; */
-	/* 		ERRORIF(GrB_Vector_extractElement(&value, vector->vector) != GrB_SUCCESS, */
-	/* 				"Error extracting vector element."); */
-	/* 		result = palloc(21); */
-	/* 		snprintf(result, 21, "%s:%f", "fp64", value); */
-	/* 	} */
-	/* 	else if (type_code == GrB_FP32_CODE) */
-	/* 	{ */
-	/* 		float value; */
-	/* 		ERRORIF(GrB_Vector_extractElement(&value, vector->vector) != GrB_SUCCESS, */
-	/* 				"Error extracting vector element."); */
-	/* 		result = palloc(12); */
-	/* 		snprintf(result, 12, "%s:%f", "fp32", value); */
-	/* 	} */
-	/* 	else if (type_code == GrB_BOOL_CODE) */
-	/* 	{ */
-	/* 		bool value; */
-	/* 		ERRORIF(GrB_Vector_extractElement(&value, vector->vector) != GrB_SUCCESS, */
-	/* 				"Error extracting vector element."); */
-	/* 		result = palloc(7); */
-	/* 		snprintf(result, 7, "%s:%s", "bool", value ? "t" : "f"); */
-	/* 	} */
-	/* 	else */
-	/* 		elog(ERROR, "Unsupported type code %i.", type_code); */
-	/* } */
-	/* else */
-	/* { */
-		result = palloc(1);
-		/* snprintf(result, 1, ""); */
-//	}
-	PG_RETURN_CSTRING(result);
-}
+	appendStringInfo(&buf, "%s[", short_code(type_code));
+
+    info = GxB_Vector_Iterator_seek(iterator, 0);
+    while (info != GxB_EXHAUSTED)
+    {
+        i = GxB_Vector_Iterator_getIndex(iterator);
+		switch(type_code)
+		{
+			case GrB_INT64_CODE:
+				int64_t vi64 = GxB_Iterator_get_INT64(iterator);
+				appendStringInfo(&buf, "%lu:%ld", i, vi64);
+				break;
+			case GrB_INT32_CODE:
+				int32_t vi32 = GxB_Iterator_get_INT32(iterator);
+				appendStringInfo(&buf, "%lu:%d", i, vi32);
+				break;
+			case GrB_INT16_CODE:
+				int16_t vi16 = GxB_Iterator_get_INT16(iterator);
+				appendStringInfo(&buf, "%lu:%d", i, vi16);
+				break;
+			case GrB_FP64_CODE:
+				double vf64 = GxB_Iterator_get_FP64(iterator);
+				appendStringInfo(&buf, "%lu:%f", i, vf64);
+				break;
+			case GrB_FP32_CODE:
+				float vf32 = GxB_Iterator_get_FP32(iterator);
+				appendStringInfo(&buf, "%lu:%f", i, vf32);
+				break;
+		}
+        info = GxB_Vector_Iterator_next(iterator);
+		if (info != GxB_EXHAUSTED)
+			appendStringInfo(&buf, " ");
+    }
+    GrB_free(&iterator);
+
+	appendStringInfo(&buf, "]");
+	PG_RETURN_CSTRING(buf.data);}
+
 
 Datum vector_nvals(PG_FUNCTION_ARGS)
 {
@@ -406,48 +378,154 @@ Datum vector_nvals(PG_FUNCTION_ARGS)
 	PG_RETURN_INT64(result);
 }
 
-/* #define SUFFIX _int64                // suffix for names */
-/* #define PG_TYPE int64                // postgres type */
-/* #define GB_TYPE GrB_INT64            // graphblas vector type */
-/* #define PG_GETARG PG_GETARG_INT64       // how to get value args */
-/* #define PG_RETURN PG_RETURN_INT64 */
-/* #include "vector_ops.h" */
+Datum vector_size(PG_FUNCTION_ARGS)
+{
+	GrB_Index result;
+	onesparse_Vector *vector;
 
-/* #define SUFFIX _int32                // suffix for names */
-/* #define PG_TYPE int32                // postgres type */
-/* #define GB_TYPE GrB_INT32            // graphblas vector type */
-/* #define PG_GETARG PG_GETARG_INT32       // how to get value args */
-/* #define PG_RETURN PG_RETURN_INT32 */
-/* #include "vector_ops.h" */
+	LOGF();
+	ERRORNULL(0);
 
-/* #define SUFFIX _int16                // suffix for names */
-/* #define PG_TYPE int16                // postgres type */
-/* #define GB_TYPE GrB_INT16            // graphblas vector type */
-/* #define PG_GETARG PG_GETARG_INT16       // how to get value args */
-/* #define PG_RETURN PG_RETURN_INT16 */
-/* #include "vector_ops.h" */
+	vector = ONESPARSE_GETARG_VECTOR(0);
 
-/* #define SUFFIX _fp64                // suffix for names */
-/* #define PG_TYPE float8                // postgres type */
-/* #define GB_TYPE GrB_FP64            // graphblas vector type */
-/* #define PG_GETARG PG_GETARG_FLOAT8       // how to get value args */
-/* #define PG_RETURN PG_RETURN_FLOAT8 */
-/* #include "vector_ops.h" */
+	ERRORIF(GrB_Vector_size(&result, vector->vector) != GrB_SUCCESS,
+			"Error extracting vector size.");
+	PG_RETURN_INT64(result);
+}
 
-/* #define SUFFIX _fp32                // suffix for names */
-/* #define PG_TYPE float4                // postgres type */
-/* #define GB_TYPE GrB_FP32            // graphblas vector type */
-/* #define PG_GETARG PG_GETARG_FLOAT4       // how to get value args */
-/* #define PG_RETURN PG_RETURN_FLOAT4 */
-/* #include "vector_ops.h" */
+Datum vector_ewise_add(PG_FUNCTION_ARGS)
+{
+	GrB_Type type;
+	onesparse_Vector *u, *v, *w, *mask;
+	onesparse_Descriptor *descriptor;
+	onesparse_BinaryOp *op, *accum;
+	LOGF();
+	ERRORNULL(0);
+	ERRORNULL(1);
+	ERRORNULL(2);
 
-/* #define SUFFIX _bool                // suffix for names */
-/* #define PG_TYPE bool                // postgres type */
-/* #define GB_TYPE GrB_BOOL            // graphblas vector type */
-/* #define PG_GETARG PG_GETARG_BOOL       // how to get value args */
-/* #define PG_RETURN PG_RETURN_BOOL */
-/* #define NO_VECTOR_MATH */
-/* #include "vector_ops.h" */
+	u = ONESPARSE_GETARG_VECTOR(0);
+	v = ONESPARSE_GETARG_VECTOR(1);
+	op = ONESPARSE_GETARG_BINARYOP(2);
+
+	mask = NULL;
+	accum = NULL;
+	descriptor = NULL;
+
+	if (PG_NARGS() > 3)
+		mask = PG_ARGISNULL(3) ? NULL : ONESPARSE_GETARG_VECTOR(3);
+	if (PG_NARGS() > 4)
+		 accum = PG_ARGISNULL(4) ? NULL : ONESPARSE_GETARG_BINARYOP(4);
+	if (PG_NARGS() > 5)
+		 descriptor = PG_ARGISNULL(4) ? NULL : ONESPARSE_GETARG_DESCRIPTOR(5);
+
+	ERRORIF(GxB_Vector_type(&type, u->vector) != GrB_SUCCESS,
+			"Cannot get vector type");
+
+	w = new_vector(type, GrB_INDEX_MAX+1, CurrentMemoryContext, NULL);
+
+	ERRORIF(GrB_eWiseAdd(w->vector,
+						 mask->vector,
+						 accum->binaryop,
+						 op->binaryop,
+						 u->vector,
+						 v->vector,
+						 descriptor->descriptor) != GrB_SUCCESS,
+			"Error vector eWiseAdd.");
+
+	ONESPARSE_RETURN_VECTOR(w);
+}
+
+Datum vector_ewise_mult(PG_FUNCTION_ARGS)
+{
+	GrB_Type type;
+	onesparse_Vector *u, *v, *w, *mask;
+	onesparse_Descriptor *descriptor;
+	onesparse_BinaryOp *op, *accum;
+	LOGF();
+	ERRORNULL(0);
+	ERRORNULL(1);
+	ERRORNULL(2);
+
+	u = ONESPARSE_GETARG_VECTOR(0);
+	v = ONESPARSE_GETARG_VECTOR(1);
+	op = ONESPARSE_GETARG_BINARYOP(2);
+
+	mask = NULL;
+	accum = NULL;
+	descriptor = NULL;
+
+	if (PG_NARGS() > 3)
+		mask = PG_ARGISNULL(3) ? NULL : ONESPARSE_GETARG_VECTOR(3);
+	if (PG_NARGS() > 4)
+		 accum = PG_ARGISNULL(4) ? NULL : ONESPARSE_GETARG_BINARYOP(4);
+	if (PG_NARGS() > 5)
+		 descriptor = PG_ARGISNULL(4) ? NULL : ONESPARSE_GETARG_DESCRIPTOR(5);
+
+	ERRORIF(GxB_Vector_type(&type, u->vector) != GrB_SUCCESS,
+			"Cannot get vector type");
+
+	w = new_vector(type, GrB_INDEX_MAX+1, CurrentMemoryContext, NULL);
+
+	ERRORIF(GrB_eWiseMult(w->vector,
+						  mask->vector,
+						  accum->binaryop,
+						  op->binaryop,
+						  u->vector,
+						  v->vector,
+						  descriptor->descriptor) != GrB_SUCCESS,
+			"Error vector eWiseMult.");
+
+	ONESPARSE_RETURN_VECTOR(w);
+}
+
+Datum vector_ewise_union(PG_FUNCTION_ARGS)
+{
+	GrB_Type type;
+	onesparse_Vector *u, *v, *w, *mask;
+	onesparse_Scalar *a, *b;
+	onesparse_Descriptor *descriptor;
+	onesparse_BinaryOp *op, *accum;
+	LOGF();
+	ERRORNULL(0);
+	ERRORNULL(1);
+	ERRORNULL(2);
+
+	u = ONESPARSE_GETARG_VECTOR(0);
+	a = ONESPARSE_GETARG_SCALAR(1);
+	v = ONESPARSE_GETARG_VECTOR(2);
+	b = ONESPARSE_GETARG_SCALAR(3);
+	op = ONESPARSE_GETARG_BINARYOP(4);
+
+	mask = NULL;
+	accum = NULL;
+	descriptor = NULL;
+
+	if (PG_NARGS() > 5)
+		mask = PG_ARGISNULL(3) ? NULL : ONESPARSE_GETARG_VECTOR(5);
+	if (PG_NARGS() > 6)
+		 accum = PG_ARGISNULL(4) ? NULL : ONESPARSE_GETARG_BINARYOP(6);
+	if (PG_NARGS() > 7)
+		 descriptor = PG_ARGISNULL(4) ? NULL : ONESPARSE_GETARG_DESCRIPTOR(7);
+
+	ERRORIF(GxB_Vector_type(&type, u->vector) != GrB_SUCCESS,
+			"Cannot get vector type");
+
+	w = new_vector(type, GrB_INDEX_MAX+1, CurrentMemoryContext, NULL);
+
+	ERRORIF(GxB_eWiseUnion(w->vector,
+						   mask->vector,
+						   accum->binaryop,
+						   op->binaryop,
+						   u->vector,
+						   a->scalar,
+						   v->vector,
+						   b->scalar,
+						   descriptor->descriptor) != GrB_SUCCESS,
+			"Error vector eWiseUnion.");
+
+	ONESPARSE_RETURN_VECTOR(w);
+}
 
 /* Local Variables: */
 /* mode: c */

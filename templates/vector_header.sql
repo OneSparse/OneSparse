@@ -13,27 +13,58 @@ RETURNS cstring
 AS '$libdir/onesparse', 'vector_out'
 LANGUAGE C IMMUTABLE STRICT;
 
--- CREATE FUNCTION vector_typmod_in(cstring[])
--- RETURNS integer
--- AS '$libdir/onesparse', 'vector_typmod_in'
--- LANGUAGE C IMMUTABLE STRICT;
-
--- CREATE FUNCTION vector_typmod_out(integer)
--- RETURNS cstring
--- AS '$libdir/onesparse', 'vector_typmod_out'
--- LANGUAGE C IMMUTABLE STRICT;
-
 CREATE TYPE vector (
     input = vector_in,
     output = vector_out,
-    -- typmod_in = vector_typmod_in,
-    -- typmod_out = vector_typmod_out,
     alignment = int4,
     storage = 'extended',
     internallength = VARIABLE
     );
 
 CREATE FUNCTION nvals(vector)
-RETURNS int2
+RETURNS int8
 AS '$libdir/onesparse', 'vector_nvals'
 LANGUAGE C;
+
+CREATE FUNCTION size(vector)
+RETURNS int8
+AS '$libdir/onesparse', 'vector_size'
+LANGUAGE C;
+
+CREATE FUNCTION ewise_add(
+    u vector,
+    v vector,
+    op binaryop,
+    mask vector default null,
+    accum binaryop default null,
+    descriptor text default null
+    )
+RETURNS vector
+AS '$libdir/onesparse', 'vector_ewise_add'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION ewise_mult(
+    u vector,
+    v vector,
+    op binaryop,
+    mask vector default null,
+    accum binaryop default null,
+    descriptor text default null
+    )
+RETURNS vector
+AS '$libdir/onesparse', 'vector_ewise_mult'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION ewise_union(
+    u vector,
+    a scalar,
+    v vector,
+    b scalar,
+    op binaryop,
+    mask vector default null,
+    accum binaryop default null,
+    descriptor text default null
+    )
+RETURNS vector
+AS '$libdir/onesparse', 'vector_ewise_union'
+LANGUAGE C STABLE;

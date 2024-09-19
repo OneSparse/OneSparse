@@ -2,6 +2,7 @@
 #define ONESPARSE_H
 
 #include <string.h>
+#include <errno.h>
 #include "postgres.h"
 #include "common/fe_memutils.h"
 #include "utils/builtins.h"
@@ -37,7 +38,8 @@
 #define LOGF()
 #endif
 
-char* short_name(GrB_Type_Code code);
+char* short_code(GrB_Type_Code code);
+GrB_Type short_type(char *name);
 
 void *malloc_function(size_t);
 void *calloc_function(size_t, size_t);
@@ -45,6 +47,15 @@ void *realloc_function(void*, size_t);
 void free_function(void*);
 
 void _PG_init(void);
+
+#include "scalar.h"
+#include "vector.h"
+#include "semiring.h"
+#include "monoid.h"
+#include "binaryop.h"
+#include "unaryop.h"
+#include "indexunaryop.h"
+#include "descriptor.h"
 
 #endif /* ONESPARSE_H */
 

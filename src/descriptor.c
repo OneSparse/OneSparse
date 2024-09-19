@@ -1,4 +1,20 @@
-#include "descriptor.h"
+#include "onesparse.h"
+
+static void context_callback_descriptor_free(void*);
+static Size descriptor_get_flat_size(ExpandedObjectHeader *eohptr);
+
+static void flatten_descriptor(
+	ExpandedObjectHeader *eohptr,
+	void *result,
+	Size allocated_size);
+
+static const ExpandedObjectMethods descriptor_methods = {
+	descriptor_get_flat_size,
+	flatten_descriptor
+};
+
+PG_FUNCTION_INFO_V1(descriptor_in);
+PG_FUNCTION_INFO_V1(descriptor_out);
 
 void initialize_descriptors(void);
 GrB_Descriptor lookup_descriptor(char *name);

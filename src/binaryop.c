@@ -1,4 +1,20 @@
-#include "binaryop.h"
+#include "onesparse.h"
+
+static void context_callback_binaryop_free(void*);
+static Size binaryop_get_flat_size(ExpandedObjectHeader *eohptr);
+
+static void flatten_binaryop(
+	ExpandedObjectHeader *eohptr,
+	void *result,
+	Size allocated_size);
+
+static const ExpandedObjectMethods binaryop_methods = {
+	binaryop_get_flat_size,
+	flatten_binaryop
+};
+
+PG_FUNCTION_INFO_V1(binaryop_in);
+PG_FUNCTION_INFO_V1(binaryop_out);
 
 void initialize_binaryops(void);
 GrB_BinaryOp lookup_binaryop(char *name);

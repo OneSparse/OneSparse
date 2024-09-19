@@ -1,8 +1,6 @@
 #ifndef ONESPARSE_DESCRIPTOR_H
 #define ONESPARSE_DESCRIPTOR_H
 
-#include "onesparse.h"
-
 #define descriptor_MAGIC 689276813
 
 typedef struct onesparse_FlatDescriptor {
@@ -17,19 +15,6 @@ typedef struct onesparse_Descriptor  {
     GrB_Descriptor descriptor;
 	char* name;
 } onesparse_Descriptor;
-
-static void context_callback_descriptor_free(void*);
-static Size descriptor_get_flat_size(ExpandedObjectHeader *eohptr);
-
-static void flatten_descriptor(
-	ExpandedObjectHeader *eohptr,
-	void *result,
-	Size allocated_size);
-
-static const ExpandedObjectMethods descriptor_methods = {
-	descriptor_get_flat_size,
-	flatten_descriptor
-};
 
 Datum expand_descriptor(onesparse_FlatDescriptor *flat,	MemoryContext parentcontext);
 
@@ -46,9 +31,6 @@ onesparse_Descriptor* DatumGetDescriptor(Datum d);
 
 #define ONESPARSE_DESCRIPTOR_DATA(_flat) ((char*)(_flat) + ONESPARSE_DESCRIPTOR_FLATSIZE())
 #define DescriptorGetEOHP(_datum) (onesparse_Descriptor *) DatumGetEOHP(_datum)
-
-PG_FUNCTION_INFO_V1(descriptor_in);
-PG_FUNCTION_INFO_V1(descriptor_out);
 
 #endif /* ONESPARSE_DESCRIPTOR_H */
 

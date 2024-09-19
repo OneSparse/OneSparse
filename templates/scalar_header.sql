@@ -13,21 +13,9 @@ RETURNS cstring
 AS '$libdir/onesparse', 'scalar_out'
 LANGUAGE C IMMUTABLE STRICT;
 
-CREATE FUNCTION scalar_typmod_in(cstring[])
-RETURNS integer
-AS '$libdir/onesparse', 'scalar_typmod_in'
-LANGUAGE C IMMUTABLE STRICT;
-
-CREATE FUNCTION scalar_typmod_out(integer)
-RETURNS cstring
-AS '$libdir/onesparse', 'scalar_typmod_out'
-LANGUAGE C IMMUTABLE STRICT;
-
 CREATE TYPE scalar (
     input = scalar_in,
     output = scalar_out,
-    -- typmod_in = scalar_typmod_in,
-    -- typmod_out = scalar_typmod_out,
     alignment = int4,
     storage = 'extended',
     internallength = VARIABLE

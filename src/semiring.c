@@ -1,4 +1,20 @@
-#include "semiring.h"
+#include "onesparse.h"
+
+static void context_callback_semiring_free(void*);
+static Size semiring_get_flat_size(ExpandedObjectHeader *eohptr);
+
+static void flatten_semiring(
+	ExpandedObjectHeader *eohptr,
+	void *result,
+	Size allocated_size);
+
+static const ExpandedObjectMethods semiring_methods = {
+	semiring_get_flat_size,
+	flatten_semiring
+};
+
+PG_FUNCTION_INFO_V1(semiring_in);
+PG_FUNCTION_INFO_V1(semiring_out);
 
 void initialize_semirings(void);
 GrB_Semiring lookup_semiring(char *name);

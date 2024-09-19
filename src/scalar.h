@@ -1,8 +1,6 @@
 #ifndef ONESPARSE_SCALAR_H
 #define ONESPARSE_SCALAR_H
 
-#include "onesparse.h"
-
 #define scalar_MAGIC 689276813
 
 typedef struct onesparse_FlatScalar {
@@ -17,20 +15,6 @@ typedef struct onesparse_Scalar  {
     GrB_Scalar scalar;
     Size flat_size;
 } onesparse_Scalar;
-
-static void context_callback_scalar_free(void*);
-static Size scalar_get_flat_size(ExpandedObjectHeader *eohptr);
-Datum _scalar_in(char *input);
-
-static void flatten_scalar(
-	ExpandedObjectHeader *eohptr,
-	void *result,
-	Size allocated_size);
-
-static const ExpandedObjectMethods scalar_methods = {
-	scalar_get_flat_size,
-	flatten_scalar
-};
 
 Datum expand_scalar(onesparse_FlatScalar *flat,	MemoryContext parentcontext);
 
@@ -48,11 +32,6 @@ onesparse_Scalar* DatumGetScalar(Datum d);
 
 #define ONESPARSE_SCALAR_DATA(_flat) ((char*)(_flat) + ONESPARSE_SCALAR_FLATSIZE())
 #define ScalarGetEOHP(_datum) (onesparse_Scalar *) DatumGetEOHP(_datum)
-
-PG_FUNCTION_INFO_V1(scalar_in);
-PG_FUNCTION_INFO_V1(scalar_out);
-
-PG_FUNCTION_INFO_V1(scalar_nvals);
 
 #endif /* ONESPARSE_SCALAR_H */
 

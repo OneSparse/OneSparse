@@ -1,4 +1,22 @@
-#include "scalar.h"
+#include "onesparse.h"
+
+static void context_callback_scalar_free(void*);
+static Size scalar_get_flat_size(ExpandedObjectHeader *eohptr);
+Datum _scalar_in(char *input);
+
+static void flatten_scalar(
+	ExpandedObjectHeader *eohptr,
+	void *result,
+	Size allocated_size);
+
+static const ExpandedObjectMethods scalar_methods = {
+	scalar_get_flat_size,
+	flatten_scalar
+};
+
+PG_FUNCTION_INFO_V1(scalar_in);
+PG_FUNCTION_INFO_V1(scalar_out);
+PG_FUNCTION_INFO_V1(scalar_nvals);
 
 static Size scalar_get_flat_size(ExpandedObjectHeader *eohptr) {
 	onesparse_Scalar *scalar;
@@ -425,7 +443,7 @@ Datum scalar_out(PG_FUNCTION_ARGS)
 	ERRORIF(GrB_get(scalar->scalar, &type_code, GrB_EL_TYPE_CODE) != GrB_SUCCESS,
 			"Cannot get Scalar Type code.");
 
-	sname = short_name(type_code);
+	sname = short_code(type_code);
 
 	if (nvals)
 	{

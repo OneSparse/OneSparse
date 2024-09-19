@@ -1,8 +1,6 @@
 #ifndef ONESPARSE_VECTOR_H
 #define ONESPARSE_VECTOR_H
 
-#include "onesparse.h"
-
 #define vector_MAGIC 689276813
 
 typedef struct onesparse_FlatVector {
@@ -21,19 +19,6 @@ typedef struct onesparse_Vector  {
     GrB_Index serialized_size;
 } onesparse_Vector;
 
-static void context_callback_vector_free(void*);
-static Size vector_get_flat_size(ExpandedObjectHeader *eohptr);
-
-static void flatten_vector(
-	ExpandedObjectHeader *eohptr,
-	void *result,
-	Size allocated_size);
-
-static const ExpandedObjectMethods vector_methods = {
-	vector_get_flat_size,
-	flatten_vector
-};
-
 Datum expand_vector(onesparse_FlatVector *flat,	MemoryContext parentcontext);
 
 onesparse_Vector* new_vector(
@@ -51,11 +36,6 @@ onesparse_Vector* DatumGetVector(Datum d);
 
 #define ONESPARSE_VECTOR_DATA(_flat) ((char*)(_flat) + ONESPARSE_VECTOR_FLATSIZE())
 #define VectorGetEOHP(_datum) (onesparse_Vector *) DatumGetEOHP(_datum)
-
-PG_FUNCTION_INFO_V1(vector_in);
-PG_FUNCTION_INFO_V1(vector_out);
-
-PG_FUNCTION_INFO_V1(vector_nvals);
 
 #endif /* ONESPARSE_VECTOR_H */
 

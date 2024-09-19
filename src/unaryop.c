@@ -1,4 +1,20 @@
-#include "unaryop.h"
+#include "onesparse.h"
+
+static void context_callback_unaryop_free(void*);
+static Size unaryop_get_flat_size(ExpandedObjectHeader *eohptr);
+
+static void flatten_unaryop(
+	ExpandedObjectHeader *eohptr,
+	void *result,
+	Size allocated_size);
+
+static const ExpandedObjectMethods unaryop_methods = {
+	unaryop_get_flat_size,
+	flatten_unaryop
+};
+
+PG_FUNCTION_INFO_V1(unaryop_in);
+PG_FUNCTION_INFO_V1(unaryop_out);
 
 void initialize_unaryops(void);
 GrB_UnaryOp lookup_unaryop(char *name);

@@ -37,128 +37,128 @@ void initialize_descriptors()
 
     descriptorhash = descriptorhash_create(TopMemoryContext, DESCRIPTORHASH_INITIAL_SIZE, NULL);
     
-    entry = descriptorhash_insert(descriptorhash, "desc_t1", &found);
-    entry->name = strdup("desc_t1");
+    entry = descriptorhash_insert(descriptorhash, "t1", &found);
+    entry->name = strdup("t1");
     entry->descriptor = GrB_DESC_T1;
 
-    entry = descriptorhash_insert(descriptorhash, "desc_t0", &found);
-    entry->name = strdup("desc_t0");
+    entry = descriptorhash_insert(descriptorhash, "t0", &found);
+    entry->name = strdup("t0");
     entry->descriptor = GrB_DESC_T0;
 
-    entry = descriptorhash_insert(descriptorhash, "desc_t0t1", &found);
-    entry->name = strdup("desc_t0t1");
+    entry = descriptorhash_insert(descriptorhash, "t0t1", &found);
+    entry->name = strdup("t0t1");
     entry->descriptor = GrB_DESC_T0T1;
 
-    entry = descriptorhash_insert(descriptorhash, "desc_c", &found);
-    entry->name = strdup("desc_c");
+    entry = descriptorhash_insert(descriptorhash, "c", &found);
+    entry->name = strdup("c");
     entry->descriptor = GrB_DESC_C;
 
-    entry = descriptorhash_insert(descriptorhash, "desc_ct1", &found);
-    entry->name = strdup("desc_ct1");
+    entry = descriptorhash_insert(descriptorhash, "ct1", &found);
+    entry->name = strdup("ct1");
     entry->descriptor = GrB_DESC_CT1;
 
-    entry = descriptorhash_insert(descriptorhash, "desc_ct0", &found);
-    entry->name = strdup("desc_ct0");
+    entry = descriptorhash_insert(descriptorhash, "ct0", &found);
+    entry->name = strdup("ct0");
     entry->descriptor = GrB_DESC_CT0;
 
-    entry = descriptorhash_insert(descriptorhash, "desc_ct0t1", &found);
-    entry->name = strdup("desc_ct0t1");
+    entry = descriptorhash_insert(descriptorhash, "ct0t1", &found);
+    entry->name = strdup("ct0t1");
     entry->descriptor = GrB_DESC_CT0T1;
 
-    entry = descriptorhash_insert(descriptorhash, "desc_s", &found);
-    entry->name = strdup("desc_s");
+    entry = descriptorhash_insert(descriptorhash, "s", &found);
+    entry->name = strdup("s");
     entry->descriptor = GrB_DESC_S;
 
-    entry = descriptorhash_insert(descriptorhash, "desc_st1", &found);
-    entry->name = strdup("desc_st1");
+    entry = descriptorhash_insert(descriptorhash, "st1", &found);
+    entry->name = strdup("st1");
     entry->descriptor = GrB_DESC_ST1;
 
-    entry = descriptorhash_insert(descriptorhash, "desc_st0", &found);
-    entry->name = strdup("desc_st0");
+    entry = descriptorhash_insert(descriptorhash, "st0", &found);
+    entry->name = strdup("st0");
     entry->descriptor = GrB_DESC_ST0;
 
-    entry = descriptorhash_insert(descriptorhash, "desc_st0t1", &found);
-    entry->name = strdup("desc_st0t1");
+    entry = descriptorhash_insert(descriptorhash, "st0t1", &found);
+    entry->name = strdup("st0t1");
     entry->descriptor = GrB_DESC_ST0T1;
 
-    entry = descriptorhash_insert(descriptorhash, "desc_sc", &found);
-    entry->name = strdup("desc_sc");
+    entry = descriptorhash_insert(descriptorhash, "sc", &found);
+    entry->name = strdup("sc");
     entry->descriptor = GrB_DESC_SC;
 
-    entry = descriptorhash_insert(descriptorhash, "desc_sct1", &found);
-    entry->name = strdup("desc_sct1");
+    entry = descriptorhash_insert(descriptorhash, "sct1", &found);
+    entry->name = strdup("sct1");
     entry->descriptor = GrB_DESC_SCT1;
 
-    entry = descriptorhash_insert(descriptorhash, "desc_sct0", &found);
-    entry->name = strdup("desc_sct0");
+    entry = descriptorhash_insert(descriptorhash, "sct0", &found);
+    entry->name = strdup("sct0");
     entry->descriptor = GrB_DESC_SCT0;
 
-    entry = descriptorhash_insert(descriptorhash, "desc_sct0t1", &found);
-    entry->name = strdup("desc_sct0t1");
+    entry = descriptorhash_insert(descriptorhash, "sct0t1", &found);
+    entry->name = strdup("sct0t1");
     entry->descriptor = GrB_DESC_SCT0T1;
 
-    entry = descriptorhash_insert(descriptorhash, "desc_r", &found);
-    entry->name = strdup("desc_r");
+    entry = descriptorhash_insert(descriptorhash, "r", &found);
+    entry->name = strdup("r");
     entry->descriptor = GrB_DESC_R;
 
-    entry = descriptorhash_insert(descriptorhash, "desc_rt1", &found);
-    entry->name = strdup("desc_rt1");
+    entry = descriptorhash_insert(descriptorhash, "rt1", &found);
+    entry->name = strdup("rt1");
     entry->descriptor = GrB_DESC_RT1;
 
-    entry = descriptorhash_insert(descriptorhash, "desc_rt0", &found);
-    entry->name = strdup("desc_rt0");
+    entry = descriptorhash_insert(descriptorhash, "rt0", &found);
+    entry->name = strdup("rt0");
     entry->descriptor = GrB_DESC_RT0;
 
-    entry = descriptorhash_insert(descriptorhash, "desc_rt0t1", &found);
-    entry->name = strdup("desc_rt0t1");
+    entry = descriptorhash_insert(descriptorhash, "rt0t1", &found);
+    entry->name = strdup("rt0t1");
     entry->descriptor = GrB_DESC_RT0T1;
 
-    entry = descriptorhash_insert(descriptorhash, "desc_rc", &found);
-    entry->name = strdup("desc_rc");
+    entry = descriptorhash_insert(descriptorhash, "rc", &found);
+    entry->name = strdup("rc");
     entry->descriptor = GrB_DESC_RC;
 
-    entry = descriptorhash_insert(descriptorhash, "desc_rct1", &found);
-    entry->name = strdup("desc_rct1");
+    entry = descriptorhash_insert(descriptorhash, "rct1", &found);
+    entry->name = strdup("rct1");
     entry->descriptor = GrB_DESC_RCT1;
 
-    entry = descriptorhash_insert(descriptorhash, "desc_rct0", &found);
-    entry->name = strdup("desc_rct0");
+    entry = descriptorhash_insert(descriptorhash, "rct0", &found);
+    entry->name = strdup("rct0");
     entry->descriptor = GrB_DESC_RCT0;
 
-    entry = descriptorhash_insert(descriptorhash, "desc_rct0t1", &found);
-    entry->name = strdup("desc_rct0t1");
+    entry = descriptorhash_insert(descriptorhash, "rct0t1", &found);
+    entry->name = strdup("rct0t1");
     entry->descriptor = GrB_DESC_RCT0T1;
 
-    entry = descriptorhash_insert(descriptorhash, "desc_rs", &found);
-    entry->name = strdup("desc_rs");
+    entry = descriptorhash_insert(descriptorhash, "rs", &found);
+    entry->name = strdup("rs");
     entry->descriptor = GrB_DESC_RS;
 
-    entry = descriptorhash_insert(descriptorhash, "desc_rst1", &found);
-    entry->name = strdup("desc_rst1");
+    entry = descriptorhash_insert(descriptorhash, "rst1", &found);
+    entry->name = strdup("rst1");
     entry->descriptor = GrB_DESC_RST1;
 
-    entry = descriptorhash_insert(descriptorhash, "desc_rst0", &found);
-    entry->name = strdup("desc_rst0");
+    entry = descriptorhash_insert(descriptorhash, "rst0", &found);
+    entry->name = strdup("rst0");
     entry->descriptor = GrB_DESC_RST0;
 
-    entry = descriptorhash_insert(descriptorhash, "desc_rst0t1", &found);
-    entry->name = strdup("desc_rst0t1");
+    entry = descriptorhash_insert(descriptorhash, "rst0t1", &found);
+    entry->name = strdup("rst0t1");
     entry->descriptor = GrB_DESC_RST0T1;
 
-    entry = descriptorhash_insert(descriptorhash, "desc_rsc", &found);
-    entry->name = strdup("desc_rsc");
+    entry = descriptorhash_insert(descriptorhash, "rsc", &found);
+    entry->name = strdup("rsc");
     entry->descriptor = GrB_DESC_RSC;
 
-    entry = descriptorhash_insert(descriptorhash, "desc_rsct1", &found);
-    entry->name = strdup("desc_rsct1");
+    entry = descriptorhash_insert(descriptorhash, "rsct1", &found);
+    entry->name = strdup("rsct1");
     entry->descriptor = GrB_DESC_RSCT1;
 
-    entry = descriptorhash_insert(descriptorhash, "desc_rsct0", &found);
-    entry->name = strdup("desc_rsct0");
+    entry = descriptorhash_insert(descriptorhash, "rsct0", &found);
+    entry->name = strdup("rsct0");
     entry->descriptor = GrB_DESC_RSCT0;
 
-    entry = descriptorhash_insert(descriptorhash, "desc_rsct0t1", &found);
-    entry->name = strdup("desc_rsct0t1");
+    entry = descriptorhash_insert(descriptorhash, "rsct0t1", &found);
+    entry->name = strdup("rsct0t1");
     entry->descriptor = GrB_DESC_RSCT0T1;
     }
 

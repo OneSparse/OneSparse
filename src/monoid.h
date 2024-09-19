@@ -1,8 +1,6 @@
 #ifndef ONESPARSE_MONOID_H
 #define ONESPARSE_MONOID_H
 
-#include "onesparse.h"
-
 #define monoid_MAGIC 689276813
 
 typedef struct onesparse_FlatMonoid {
@@ -17,19 +15,6 @@ typedef struct onesparse_Monoid  {
     GrB_Monoid monoid;
 	char* name;
 } onesparse_Monoid;
-
-static void context_callback_monoid_free(void*);
-static Size monoid_get_flat_size(ExpandedObjectHeader *eohptr);
-
-static void flatten_monoid(
-	ExpandedObjectHeader *eohptr,
-	void *result,
-	Size allocated_size);
-
-static const ExpandedObjectMethods monoid_methods = {
-	monoid_get_flat_size,
-	flatten_monoid
-};
 
 Datum expand_monoid(onesparse_FlatMonoid *flat,	MemoryContext parentcontext);
 
@@ -46,9 +31,6 @@ onesparse_Monoid* DatumGetMonoid(Datum d);
 
 #define ONESPARSE_MONOID_DATA(_flat) ((char*)(_flat) + ONESPARSE_MONOID_FLATSIZE())
 #define MonoidGetEOHP(_datum) (onesparse_Monoid *) DatumGetEOHP(_datum)
-
-PG_FUNCTION_INFO_V1(monoid_in);
-PG_FUNCTION_INFO_V1(monoid_out);
 
 #endif /* ONESPARSE_MONOID_H */
 

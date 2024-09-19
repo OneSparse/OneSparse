@@ -1,8 +1,6 @@
 #ifndef ONESPARSE_SEMIRING_H
 #define ONESPARSE_SEMIRING_H
 
-#include "onesparse.h"
-
 #define semiring_MAGIC 689276813
 
 typedef struct onesparse_FlatSemiring {
@@ -17,19 +15,6 @@ typedef struct onesparse_Semiring  {
     GrB_Semiring semiring;
 	char* name;
 } onesparse_Semiring;
-
-static void context_callback_semiring_free(void*);
-static Size semiring_get_flat_size(ExpandedObjectHeader *eohptr);
-
-static void flatten_semiring(
-	ExpandedObjectHeader *eohptr,
-	void *result,
-	Size allocated_size);
-
-static const ExpandedObjectMethods semiring_methods = {
-	semiring_get_flat_size,
-	flatten_semiring
-};
 
 Datum expand_semiring(onesparse_FlatSemiring *flat,	MemoryContext parentcontext);
 
@@ -46,9 +31,6 @@ onesparse_Semiring* DatumGetSemiring(Datum d);
 
 #define ONESPARSE_SEMIRING_DATA(_flat) ((char*)(_flat) + ONESPARSE_SEMIRING_FLATSIZE())
 #define SemiringGetEOHP(_datum) (onesparse_Semiring *) DatumGetEOHP(_datum)
-
-PG_FUNCTION_INFO_V1(semiring_in);
-PG_FUNCTION_INFO_V1(semiring_out);
 
 #endif /* ONESPARSE_SEMIRING_H */
 

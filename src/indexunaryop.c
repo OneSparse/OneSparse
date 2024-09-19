@@ -1,4 +1,20 @@
-#include "indexunaryop.h"
+#include "onesparse.h"
+
+static void context_callback_indexunaryop_free(void*);
+static Size indexunaryop_get_flat_size(ExpandedObjectHeader *eohptr);
+
+static void flatten_indexunaryop(
+	ExpandedObjectHeader *eohptr,
+	void *result,
+	Size allocated_size);
+
+static const ExpandedObjectMethods indexunaryop_methods = {
+	indexunaryop_get_flat_size,
+	flatten_indexunaryop
+};
+
+PG_FUNCTION_INFO_V1(indexunaryop_in);
+PG_FUNCTION_INFO_V1(indexunaryop_out);
 
 void initialize_indexunaryops(void);
 GrB_IndexUnaryOp lookup_indexunaryop(char *name);

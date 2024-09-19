@@ -1,4 +1,20 @@
-#include "monoid.h"
+#include "onesparse.h"
+
+static void context_callback_monoid_free(void*);
+static Size monoid_get_flat_size(ExpandedObjectHeader *eohptr);
+
+static void flatten_monoid(
+	ExpandedObjectHeader *eohptr,
+	void *result,
+	Size allocated_size);
+
+static const ExpandedObjectMethods monoid_methods = {
+	monoid_get_flat_size,
+	flatten_monoid
+};
+
+PG_FUNCTION_INFO_V1(monoid_in);
+PG_FUNCTION_INFO_V1(monoid_out);
 
 void initialize_monoids(void);
 GrB_Monoid lookup_monoid(char *name);

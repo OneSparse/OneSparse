@@ -9,7 +9,7 @@ void initialize_descriptors();
 #include "onesparse.h"
 PG_MODULE_MAGIC;
 
-char* short_name(GrB_Type_Code code)
+char* short_code(GrB_Type_Code code)
 {
 	switch(code)
 	{
@@ -29,6 +29,22 @@ char* short_name(GrB_Type_Code code)
 	return "?";
 }
 
+GrB_Type short_type(char *name)
+{
+	if (strcmp(name, "i8") == 0)
+		return GrB_INT64;
+	if (strcmp(name, "i4") == 0)
+		return GrB_INT32;
+	if (strcmp(name, "i2") == 0)
+		return GrB_INT16;
+	if (strcmp(name, "f8") == 0)
+		return GrB_FP64;
+	if (strcmp(name, "f4") == 0)
+		return GrB_FP32;
+	if (strcmp(name, "b") == 0)
+		return GrB_BOOL;
+	elog(ERROR, "Unknown short name %s", name);
+}
 
 void *calloc_function(size_t num, size_t size) {
   MemoryContext oldcxt;

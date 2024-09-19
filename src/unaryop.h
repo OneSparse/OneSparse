@@ -1,8 +1,6 @@
 #ifndef ONESPARSE_UNARYOP_H
 #define ONESPARSE_UNARYOP_H
 
-#include "onesparse.h"
-
 #define unaryop_MAGIC 689276813
 
 typedef struct onesparse_FlatUnaryOp {
@@ -17,19 +15,6 @@ typedef struct onesparse_UnaryOp  {
     GrB_UnaryOp unaryop;
 	char* name;
 } onesparse_UnaryOp;
-
-static void context_callback_unaryop_free(void*);
-static Size unaryop_get_flat_size(ExpandedObjectHeader *eohptr);
-
-static void flatten_unaryop(
-	ExpandedObjectHeader *eohptr,
-	void *result,
-	Size allocated_size);
-
-static const ExpandedObjectMethods unaryop_methods = {
-	unaryop_get_flat_size,
-	flatten_unaryop
-};
 
 Datum expand_unaryop(onesparse_FlatUnaryOp *flat,	MemoryContext parentcontext);
 
@@ -46,9 +31,6 @@ onesparse_UnaryOp* DatumGetUnaryOp(Datum d);
 
 #define ONESPARSE_UNARYOP_DATA(_flat) ((char*)(_flat) + ONESPARSE_UNARYOP_FLATSIZE())
 #define UnaryOpGetEOHP(_datum) (onesparse_UnaryOp *) DatumGetEOHP(_datum)
-
-PG_FUNCTION_INFO_V1(unaryop_in);
-PG_FUNCTION_INFO_V1(unaryop_out);
 
 #endif /* ONESPARSE_UNARYOP_H */
 
