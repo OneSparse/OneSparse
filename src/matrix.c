@@ -19,6 +19,9 @@ PG_FUNCTION_INFO_V1(matrix_out);
 PG_FUNCTION_INFO_V1(matrix_nvals);
 PG_FUNCTION_INFO_V1(matrix_nrows);
 PG_FUNCTION_INFO_V1(matrix_ncols);
+PG_FUNCTION_INFO_V1(matrix_wait);
+PG_FUNCTION_INFO_V1(matrix_dup);
+PG_FUNCTION_INFO_V1(matrix_clear);
 PG_FUNCTION_INFO_V1(matrix_ewise_add);
 PG_FUNCTION_INFO_V1(matrix_ewise_mult);
 PG_FUNCTION_INFO_V1(matrix_ewise_union);
@@ -551,6 +554,63 @@ Datum matrix_ewise_union(PG_FUNCTION_ARGS)
 			"Error matrix eWiseUnion.");
 
 	ONESPARSE_RETURN_MATRIX(w);
+}
+
+Datum matrix_wait(PG_FUNCTION_ARGS)
+{
+	onesparse_Matrix *matrix;
+	int waitmode;
+
+	LOGF();
+	ERRORNULL(0);
+
+	matrix = ONESPARSE_GETARG_MATRIX(0);
+	waitmode = PG_GETARG_INT32(1);
+
+	ERRORIF(GrB_Matrix_wait(matrix->matrix, waitmode) != GrB_SUCCESS,
+			"Error waiting for matrix.");
+	PG_RETURN_VOID();
+}
+
+Datum matrix_dup(PG_FUNCTION_ARGS)
+{
+	GrB_Type type;
+	onesparse_Matrix *matrix;
+	onesparse_Matrix *result;
+	GrB_Index nrows, ncols;
+
+	LOGF();
+	ERRORNULL(0);
+
+	matrix = ONESPARSE_GETARG_MATRIX(0);
+	ERRORIF(GxB_Matrix_type(&type, matrix->matrix) != GrB_SUCCESS,
+			"Cannot get matrix type");
+
+	ERRORIF(GrB_Matrix_nrows(&nrows, matrix->matrix) != GrB_SUCCESS,
+			"Error extracting matrix nrows.");
+
+	ERRORIF(GrB_Matrix_ncols(&ncols, matrix->matrix) != GrB_SUCCESS,
+			"Error extracting matrix ncols.");
+
+	result = new_matrix(type, nrows, ncols, CurrentMemoryContext, NULL);
+
+	ERRORIF(GrB_Matrix_dup(&result->matrix, matrix->matrix) != GrB_SUCCESS,
+			"Error duping matrix.");
+	ONESPARSE_RETURN_MATRIX(result);
+}
+
+Datum matrix_clear(PG_FUNCTION_ARGS)
+{
+	onesparse_Matrix *matrix;
+
+	LOGF();
+	ERRORNULL(0);
+
+	matrix = ONESPARSE_GETARG_MATRIX(0);
+
+	ERRORIF(GrB_Matrix_clear(matrix->matrix) != GrB_SUCCESS,
+			"Error clearing matrix.");
+	PG_RETURN_VOID();
 }
 
 /* Local Variables: */

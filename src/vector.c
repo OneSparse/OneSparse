@@ -18,6 +18,9 @@ PG_FUNCTION_INFO_V1(vector_out);
 
 PG_FUNCTION_INFO_V1(vector_nvals);
 PG_FUNCTION_INFO_V1(vector_size);
+PG_FUNCTION_INFO_V1(vector_wait);
+PG_FUNCTION_INFO_V1(vector_dup);
+PG_FUNCTION_INFO_V1(vector_clear);
 PG_FUNCTION_INFO_V1(vector_ewise_add);
 PG_FUNCTION_INFO_V1(vector_ewise_mult);
 PG_FUNCTION_INFO_V1(vector_ewise_union);
@@ -532,6 +535,59 @@ Datum vector_ewise_union(PG_FUNCTION_ARGS)
 	ONESPARSE_RETURN_VECTOR(w);
 }
 
+Datum vector_wait(PG_FUNCTION_ARGS)
+{
+	onesparse_Vector *vector;
+	int waitmode;
+
+	LOGF();
+	ERRORNULL(0);
+
+	vector = ONESPARSE_GETARG_VECTOR(0);
+	waitmode = PG_GETARG_INT32(1);
+
+	ERRORIF(GrB_Vector_wait(vector->vector, waitmode) != GrB_SUCCESS,
+			"Error waiting for vector.");
+	PG_RETURN_VOID();
+}
+
+Datum vector_dup(PG_FUNCTION_ARGS)
+{
+	GrB_Type type;
+	onesparse_Vector *vector;
+	onesparse_Vector *result;
+	GrB_Index size;
+
+	LOGF();
+	ERRORNULL(0);
+
+	vector = ONESPARSE_GETARG_VECTOR(0);
+	ERRORIF(GxB_Vector_type(&type, vector->vector) != GrB_SUCCESS,
+			"Cannot get vector type");
+
+	ERRORIF(GrB_Vector_size(&size, vector->vector) != GrB_SUCCESS,
+			"Error extracting vector size.");
+
+	result = new_vector(type, size, CurrentMemoryContext, NULL);
+
+	ERRORIF(GrB_Vector_dup(&result->vector, vector->vector) != GrB_SUCCESS,
+			"Error duping vector.");
+	ONESPARSE_RETURN_VECTOR(result);
+}
+
+Datum vector_clear(PG_FUNCTION_ARGS)
+{
+	onesparse_Vector *vector;
+
+	LOGF();
+	ERRORNULL(0);
+
+	vector = ONESPARSE_GETARG_VECTOR(0);
+
+	ERRORIF(GrB_Vector_clear(vector->vector) != GrB_SUCCESS,
+			"Error clearing vector.");
+	PG_RETURN_VOID();
+}
 /* Local Variables: */
 /* mode: c */
 /* c-file-style: "postgresql" */

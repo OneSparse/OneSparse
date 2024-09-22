@@ -819,6 +819,21 @@ RETURNS vector
 AS '$libdir/onesparse', 'vector_ewise_union'
 LANGUAGE C STABLE;
 
+CREATE FUNCTION wait(vector, waitmode integer default 0)
+RETURNS void
+AS '$libdir/onesparse', 'vector_wait'
+LANGUAGE C;
+
+CREATE FUNCTION dup(vector)
+RETURNS vector
+AS '$libdir/onesparse', 'vector_dup'
+LANGUAGE C;
+
+CREATE FUNCTION clear(vector)
+RETURNS void
+AS '$libdir/onesparse', 'vector_clear'
+LANGUAGE C;
+
 
 
 
