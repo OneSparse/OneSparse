@@ -1,6 +1,6 @@
 # summary
 
-pgGraphBLAS is a postgres extension that bridges [The GraphBLAS
+OneSparse is a postgres extension that bridges [The GraphBLAS
 API](http://graphblas.org) with the
 [PostgreSQL](https://postgresql.org) object relational database.
 
@@ -10,7 +10,7 @@ real/integer matrix algebra operations, GraphBLAS supports up to 960
 different "semiring" algebra operations, that can be used as basic
 building blocks to implement a wide variety of graph algorithms.
 
-pgGraphBLAS leverages the expertise in the field of sparse matrix
+OneSparse leverages the expertise in the field of sparse matrix
 programming by [The GraphBLAS Forum](http://graphblas.org) and uses
 the
 [SuiteSparse:GraphBLAS](http://faculty.cse.tamu.edu/davis/GraphBLAS.html)
@@ -80,7 +80,7 @@ the matrix.  The math used with sparse matrices is exactly the same as
 dense, the sparsity of the data doesn't matter to the math, but it
 does matter to how efficiently the matrix is implemented internally.
 
-pgGraphBLAS is a postgres extension that provides access to two new
+OneSparse is a postgres extension that provides access to two new
 types: `matrix` and `vector`, as well as the GraphBLAS api to
 manipulate these types.  Aggregate functions are provided to build
 matrices from SQL queries, and set-returning functions are also
@@ -141,7 +141,7 @@ search](https://en.wikipedia.org/wiki/Breadth-first_search).
     $$ language plpgsql;
 
  The above code is written in `plpgsql` which is postgres' procedural
- query language.  This language works well with pgGraphBLAS
+ query language.  This language works well with OneSparse
  algorithmic approach.
 
     postgres=# create table t (m matrix);
@@ -233,7 +233,7 @@ data types, the following types map from GraphBLAS to PostgreSQL:
 Postgres does not support unsigned integers like GraphBLAS (is there a
 workaround?  support the uint extension?)
 
-pgGraphBLAS matrix and vector objects have an intrinsic type of data
+OneSparse matrix and vector objects have an intrinsic type of data
 that they store.  So, a matrix can store booleans, and various sized
 integers and floats.  Once a matrix is created with a specific type it
 cannot be changed.
@@ -245,7 +245,7 @@ supported type.  Put example here of {R,min,+,0,+inf}.
 
 # API
 
-PgGraphBLAS tries to adhere closely to the spirit of the [GraphBLAS C
+OneSparse tries to adhere closely to the spirit of the [GraphBLAS C
 API](https://github.com/sergiud/SuiteSparse/blob/master/GraphBLAS/Doc/GraphBLAS_API_C.pdf).
 This documentation focused on the specific of interfacing with
 postgres.  For a more complete introduction see [the
@@ -257,7 +257,7 @@ Guide](https://github.com/sergiud/SuiteSparse/blob/master/GraphBLAS/Doc/GraphBLA
 GraphBLAS operations all take an optional `mask` argument.  Check the
 GraphBLAS Users Guide for more information on masking operations.
 GraphBLAS operations can also take a descriptor argument, which in
-pgGraphBLAS is broken out into four optional arguments supported by
+OneSparse is broken out into four optional arguments supported by
 every function:
 
   - doutp text default null
@@ -272,7 +272,7 @@ See the GraphBLAS Users Guide for more info.
 ## printing
 
 At the moment, there is no human parsable text
-representation for vectors or matrices, so pgGraphBLAS provides a
+representation for vectors or matrices, so OneSparse provides a
 `print` function that can give a text description of vectors or
 matrices:
 

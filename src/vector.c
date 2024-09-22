@@ -418,16 +418,22 @@ Datum vector_ewise_add(PG_FUNCTION_ARGS)
 	descriptor = NULL;
 
 	if (PG_NARGS() > 3)
-		mask = PG_ARGISNULL(3) ? NULL : ONESPARSE_GETARG_VECTOR(3);
+	{
+		if (PG_ARGISNULL(3))
+		{
+			ERRORIF(GxB_Vector_type(&type, u->vector) != GrB_SUCCESS,
+					"Cannot get vector type");
+			w = new_vector(type, GrB_INDEX_MAX+1, CurrentMemoryContext, NULL);
+		}
+		else
+			w = ONESPARSE_GETARG_VECTOR(3);
+	}
 	if (PG_NARGS() > 4)
-		 accum = PG_ARGISNULL(4) ? NULL : ONESPARSE_GETARG_BINARYOP(4);
+		mask = PG_ARGISNULL(4) ? NULL : ONESPARSE_GETARG_VECTOR(4);
 	if (PG_NARGS() > 5)
-		 descriptor = PG_ARGISNULL(5) ? NULL : ONESPARSE_GETARG_DESCRIPTOR(5);
-
-	ERRORIF(GxB_Vector_type(&type, u->vector) != GrB_SUCCESS,
-			"Cannot get vector type");
-
-	w = new_vector(type, GrB_INDEX_MAX+1, CurrentMemoryContext, NULL);
+		 accum = PG_ARGISNULL(5) ? NULL : ONESPARSE_GETARG_BINARYOP(5);
+	if (PG_NARGS() > 6)
+		 descriptor = PG_ARGISNULL(6) ? NULL : ONESPARSE_GETARG_DESCRIPTOR(6);
 
 	ERRORIF(GrB_eWiseAdd(w->vector,
 						 mask ? mask->vector : NULL,
@@ -462,16 +468,22 @@ Datum vector_ewise_mult(PG_FUNCTION_ARGS)
 	descriptor = NULL;
 
 	if (PG_NARGS() > 3)
-		mask = PG_ARGISNULL(3) ? NULL : ONESPARSE_GETARG_VECTOR(3);
+	{
+		if (PG_ARGISNULL(3))
+		{
+			ERRORIF(GxB_Vector_type(&type, u->vector) != GrB_SUCCESS,
+					"Cannot get vector type");
+			w = new_vector(type, GrB_INDEX_MAX+1, CurrentMemoryContext, NULL);
+		}
+		else
+			w = ONESPARSE_GETARG_VECTOR(3);
+	}
 	if (PG_NARGS() > 4)
-		 accum = PG_ARGISNULL(4) ? NULL : ONESPARSE_GETARG_BINARYOP(4);
+		mask = PG_ARGISNULL(4) ? NULL : ONESPARSE_GETARG_VECTOR(4);
 	if (PG_NARGS() > 5)
-		 descriptor = PG_ARGISNULL(5) ? NULL : ONESPARSE_GETARG_DESCRIPTOR(5);
-
-	ERRORIF(GxB_Vector_type(&type, u->vector) != GrB_SUCCESS,
-			"Cannot get vector type");
-
-	w = new_vector(type, GrB_INDEX_MAX+1, CurrentMemoryContext, NULL);
+		 accum = PG_ARGISNULL(5) ? NULL : ONESPARSE_GETARG_BINARYOP(5);
+	if (PG_NARGS() > 6)
+		 descriptor = PG_ARGISNULL(6) ? NULL : ONESPARSE_GETARG_DESCRIPTOR(6);
 
 	ERRORIF(GrB_eWiseMult(w->vector,
 						  mask ? mask->vector : NULL,
@@ -510,16 +522,22 @@ Datum vector_ewise_union(PG_FUNCTION_ARGS)
 	descriptor = NULL;
 
 	if (PG_NARGS() > 5)
-		mask = PG_ARGISNULL(5) ? NULL : ONESPARSE_GETARG_VECTOR(5);
+	{
+		if (PG_ARGISNULL(5))
+		{
+			ERRORIF(GxB_Vector_type(&type, u->vector) != GrB_SUCCESS,
+					"Cannot get vector type");
+			w = new_vector(type, GrB_INDEX_MAX+1, CurrentMemoryContext, NULL);
+		}
+		else
+			w = ONESPARSE_GETARG_VECTOR(5);
+	}
 	if (PG_NARGS() > 6)
-		 accum = PG_ARGISNULL(6) ? NULL : ONESPARSE_GETARG_BINARYOP(6);
+		mask = PG_ARGISNULL(6) ? NULL : ONESPARSE_GETARG_VECTOR(6);
 	if (PG_NARGS() > 7)
-		 descriptor = PG_ARGISNULL(7) ? NULL : ONESPARSE_GETARG_DESCRIPTOR(7);
-
-	ERRORIF(GxB_Vector_type(&type, u->vector) != GrB_SUCCESS,
-			"Cannot get vector type");
-
-	w = new_vector(type, GrB_INDEX_MAX+1, CurrentMemoryContext, NULL);
+		 accum = PG_ARGISNULL(7) ? NULL : ONESPARSE_GETARG_BINARYOP(7);
+	if (PG_NARGS() > 8)
+		 descriptor = PG_ARGISNULL(8) ? NULL : ONESPARSE_GETARG_DESCRIPTOR(8);
 
 	ERRORIF(GxB_eWiseUnion(w->vector,
 						   mask ? mask->vector : NULL,

@@ -53,7 +53,7 @@ class Template:
             outfile.write(self.source_read(part).format(**self.context))
 
     def test_path(self, part):
-        return Path('templates', f'test_{self.name}_{part}.sql')
+        return Path('templates/tests', f'test_{self.name}_{part}.sql')
 
     def test_file(self, part):
         return open(self.test_path(part), 'r')

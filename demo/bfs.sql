@@ -2,9 +2,7 @@
 
 \ir fixtures.sql
 
-drop function if exists bfs2;
-        
-create function bfs2(tablename text, source bigint) returns vector as $$
+create or replace function bfs2(tablename text, source bigint) returns vector as $$
 declare
     A matrix;
     n bigint;
@@ -16,59 +14,26 @@ declare
 begin
     execute format('select matrix(array_agg(i), array_agg(j), array_agg(true)) from %I', tablename) into A;
     n := nrows(A);                          -- The number of result rows.
-    v := vector_integer(n);                 -- int32 result vector of vertex levels.
-    q := assign(vector_bool(n), false);     -- bool mask of completed vertices.
+    v := vector('int32', n);                -- int32 result vector of vertex levels.
+    q := assign(vector('bool', n), false);  -- bool mask of completed vertices.
 
     q := set_element(q, source, true);             -- Set the source element to done.
     
     while not_done and level <= n loop             -- While still work to do.
         v := assign(v, level, mask=>q);            -- Assign the current level to all
 
-        q := mxv(transpose(A), q, q,               -- Multiply q<mask> = Aq,
-            semiring=>'LOR_LAND_BOOL',             -- using LOR_LAND_BOOL semiring
+        q := mxv(A, q, q,                          -- Multiply q<mask> = Aq,
+            semiring=>'any_pair_int32',            -- using ANY_PAIR semiring
             mask=>v,                               -- only those *not* masked
-            dmask=>'scmp',                         -- by complementing the mask
-            doutp=>'replace');                     -- clearing results in q first
+            descriptor=>'rsct0')                   -- Replace Structured Compliment Transpose A
 
-        not_done := reduce_bool(q);                -- are there more neighbors?
-
+        not_done := reduce(q);                     -- are there more neighbors?
         level := level + 1;                        -- increment the level
     end loop;
     return v;
 end;
 $$ language plpgsql;
 
-drop function if exists bfs;
-        
-create function bfs3(A matrix, source bigint) returns vector as $$
-declare
-    n bigint := nrows(A);                          -- The number of result rows.
-    v vector := vector_integer(n);                 -- int32 result vector of vertex levels.
-    q vector := assign(vector_bool(n), false);     -- bool mask of completed vertices.
-    level integer := 0;                            -- Start at level 1.
-    not_done bool := true;                         -- Flag to indicate still work to do.
-    t timestamptz;
-    
-begin
-    q := set_element(q, source, true);             -- Set the source element to done.
-    
-    while not_done and level <= n loop             -- While still work to do.
-        v := assign(v, level, mask=>q);            -- Assign the current level to all
-
-        q := mxv(transpose(A), q, q,               -- Multiply q<mask> = T(A)q,
-            semiring=>'LOR_LAND_BOOL',             -- using LOR_LAND_BOOL semiring
-            mask=>v,                               -- only those *not* masked
-            dmask=>'scmp',                         -- by complementing the mask
-            doutp=>'replace');                     -- clearing results in q first
-
-        not_done := reduce_bool(q);                -- are there more neighbors?
-    
-        level := level + 1;                        -- increment the level
-    end loop;
-    return v;
-end;
-$$ language plpgsql;
-    
 drop function if exists bfscte;
             
 create function bfscte(tablename text, source integer)

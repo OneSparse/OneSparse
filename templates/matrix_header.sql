@@ -37,8 +37,8 @@ AS '$libdir/onesparse', 'matrix_ncols'
 LANGUAGE C;
 
 CREATE FUNCTION ewise_add(
-    u matrix,
-    v matrix,
+    a matrix,
+    b matrix,
     op binaryop,
     mask matrix default null,
     accum binaryop default null,
@@ -49,8 +49,8 @@ AS '$libdir/onesparse', 'matrix_ewise_add'
 LANGUAGE C STABLE;
 
 CREATE FUNCTION ewise_mult(
-    u matrix,
-    v matrix,
+    a matrix,
+    b matrix,
     op binaryop,
     mask matrix default null,
     accum binaryop default null,
@@ -61,10 +61,10 @@ AS '$libdir/onesparse', 'matrix_ewise_mult'
 LANGUAGE C STABLE;
 
 CREATE FUNCTION ewise_union(
-    u matrix,
-    a scalar,
-    v matrix,
-    b scalar,
+    a matrix,
+    alpha scalar,
+    b matrix,
+    beta scalar,
     op binaryop,
     mask matrix default null,
     accum binaryop default null,
@@ -72,4 +72,43 @@ CREATE FUNCTION ewise_union(
     )
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_ewise_union'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION mxm(
+    a matrix,
+    b matrix,
+    op semiring,
+    inout c matrix default null,
+    mask matrix default null,
+    accum binaryop default null,
+    descriptor text default null
+    )
+RETURNS matrix
+AS '$libdir/onesparse', 'matrix_mxm'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION mxv(
+    a matrix,
+    v vector,
+    op semiring,
+    inout w vector default null,
+    mask matrix default null,
+    accum binaryop default null,
+    descriptor text default null
+    )
+RETURNS vector
+AS '$libdir/onesparse', 'matrix_mxv'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION vxm(
+    u vector,
+    b matrix,
+    op semiring,
+    inout w vector default null,
+    mask matrix default null,
+    accum binaryop default null,
+    descriptor text default null
+    )
+RETURNS vector
+AS '$libdir/onesparse', 'matrix_vxm'
 LANGUAGE C STABLE;

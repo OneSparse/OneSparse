@@ -35,6 +35,7 @@ CREATE FUNCTION ewise_add(
     u vector,
     v vector,
     op binaryop,
+    inout w vector default null,
     mask vector default null,
     accum binaryop default null,
     descriptor text default null
@@ -47,6 +48,7 @@ CREATE FUNCTION ewise_mult(
     u vector,
     v vector,
     op binaryop,
+    inout w vector default null,
     mask vector default null,
     accum binaryop default null,
     descriptor text default null
@@ -57,10 +59,11 @@ LANGUAGE C STABLE;
 
 CREATE FUNCTION ewise_union(
     u vector,
-    a scalar,
+    alpha scalar,
     v vector,
-    b scalar,
+    beta scalar,
     op binaryop,
+    inout w vector default null,
     mask vector default null,
     accum binaryop default null,
     descriptor text default null
