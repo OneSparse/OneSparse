@@ -48,14 +48,15 @@ void free_function(void*);
 
 void _PG_init(void);
 
-#include "scalar.h"
-#include "vector.h"
-#include "semiring.h"
-#include "monoid.h"
-#include "binaryop.h"
+#include "descriptor.h"
 #include "unaryop.h"
 #include "indexunaryop.h"
-#include "descriptor.h"
+#include "binaryop.h"
+#include "monoid.h"
+#include "semiring.h"
+#include "scalar.h"
+#include "vector.h"
+#include "matrix.h"
 
 #endif /* ONESPARSE_H */
 

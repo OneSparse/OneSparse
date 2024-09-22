@@ -17,7 +17,7 @@ CREATE TYPE vector (
     input = vector_in,
     output = vector_out,
     alignment = int4,
-    storage = 'extended',
+    storage = 'external',
     internallength = VARIABLE
     );
 

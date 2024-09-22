@@ -17,6 +17,6 @@ CREATE TYPE unaryop (
     input = unaryop_in,
     output = unaryop_out,
     alignment = int4,
-    storage = 'extended',
+    storage = 'main',
     internallength = VARIABLE
     );

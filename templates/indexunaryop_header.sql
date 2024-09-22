@@ -17,6 +17,6 @@ CREATE TYPE indexunaryop (
     input = indexunaryop_in,
     output = indexunaryop_out,
     alignment = int4,
-    storage = 'extended',
+    storage = 'main',
     internallength = VARIABLE
     );

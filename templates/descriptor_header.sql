@@ -17,6 +17,6 @@ CREATE TYPE descriptor (
     input = descriptor_in,
     output = descriptor_out,
     alignment = int4,
-    storage = 'extended',
+    storage = 'main',
     internallength = VARIABLE
     );

@@ -154,6 +154,7 @@ def write_source(outfile):
         Template('semiring', outfile, dict(decls=semiring_decls)),
         Template('scalar', outfile),
         Template('vector', outfile),
+        Template('matrix', outfile),
         ]
 
     for o in objects:

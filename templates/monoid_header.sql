@@ -17,6 +17,6 @@ CREATE TYPE monoid (
     input = monoid_in,
     output = monoid_out,
     alignment = int4,
-    storage = 'extended',
+    storage = 'main',
     internallength = VARIABLE
     );

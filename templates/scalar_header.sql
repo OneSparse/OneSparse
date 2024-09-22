@@ -17,7 +17,7 @@ CREATE TYPE scalar (
     input = scalar_in,
     output = scalar_out,
     alignment = int4,
-    storage = 'extended',
+    storage = 'main',
     internallength = VARIABLE
     );
 

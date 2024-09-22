@@ -17,6 +17,6 @@ CREATE TYPE binaryop (
     input = binaryop_in,
     output = binaryop_out,
     alignment = int4,
-    storage = 'extended',
+    storage = 'main',
     internallength = VARIABLE
     );

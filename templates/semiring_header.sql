@@ -17,6 +17,6 @@ CREATE TYPE semiring (
     input = semiring_in,
     output = semiring_out,
     alignment = int4,
-    storage = 'extended',
+    storage = 'main',
     internallength = VARIABLE
     );
