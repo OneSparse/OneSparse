@@ -42,7 +42,7 @@ CREATE FUNCTION ewise_add(
     op binaryop,
     mask matrix default null,
     accum binaryop default null,
-    descriptor text default null
+    descriptor descriptor default null
     )
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_ewise_add'
@@ -54,7 +54,7 @@ CREATE FUNCTION ewise_mult(
     op binaryop,
     mask matrix default null,
     accum binaryop default null,
-    descriptor text default null
+    descriptor descriptor default null
     )
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_ewise_mult'
@@ -67,11 +67,32 @@ CREATE FUNCTION ewise_union(
     beta scalar,
     op binaryop,
     mask matrix default null,
-    accum binaryop default null,
-    descriptor text default null
+    descriptor descriptor default null
     )
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_ewise_union'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION reduce_vector(
+    a matrix,
+    op monoid,
+    w vector default null,
+    mask vector default null,
+    accum binaryop default null,
+    descriptor descriptor default null
+    )
+RETURNS vector
+AS '$libdir/onesparse', 'matrix_reduce_vector'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION reduce_scalar(
+    a matrix,
+    op monoid,
+    accum binaryop default null,
+    descriptor descriptor default null
+    )
+RETURNS scalar
+AS '$libdir/onesparse', 'matrix_reduce_scalar'
 LANGUAGE C STABLE;
 
 CREATE FUNCTION mxm(
@@ -81,7 +102,7 @@ CREATE FUNCTION mxm(
     inout c matrix default null,
     mask matrix default null,
     accum binaryop default null,
-    descriptor text default null
+    descriptor descriptor default null
     )
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_mxm'
@@ -94,7 +115,7 @@ CREATE FUNCTION mxv(
     inout w vector default null,
     mask matrix default null,
     accum binaryop default null,
-    descriptor text default null
+    descriptor descriptor default null
     )
 RETURNS vector
 AS '$libdir/onesparse', 'matrix_mxv'
@@ -107,8 +128,23 @@ CREATE FUNCTION vxm(
     inout w vector default null,
     mask matrix default null,
     accum binaryop default null,
-    descriptor text default null
+    descriptor descriptor default null
     )
 RETURNS vector
 AS '$libdir/onesparse', 'matrix_vxm'
 LANGUAGE C STABLE;
+
+CREATE FUNCTION wait(matrix, waitmode integer default 0)
+RETURNS void
+AS '$libdir/onesparse', 'matrix_wait'
+LANGUAGE C;
+
+CREATE FUNCTION dup(matrix)
+RETURNS matrix
+AS '$libdir/onesparse', 'matrix_dup'
+LANGUAGE C;
+
+CREATE FUNCTION clear(matrix)
+RETURNS void
+AS '$libdir/onesparse', 'matrix_clear'
+LANGUAGE C;

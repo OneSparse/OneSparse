@@ -38,7 +38,7 @@ CREATE FUNCTION ewise_add(
     inout w vector default null,
     mask vector default null,
     accum binaryop default null,
-    descriptor text default null
+    descriptor descriptor default null
     )
 RETURNS vector
 AS '$libdir/onesparse', 'vector_ewise_add'
@@ -51,7 +51,7 @@ CREATE FUNCTION ewise_mult(
     inout w vector default null,
     mask vector default null,
     accum binaryop default null,
-    descriptor text default null
+    descriptor descriptor default null
     )
 RETURNS vector
 AS '$libdir/onesparse', 'vector_ewise_mult'
@@ -66,11 +66,22 @@ CREATE FUNCTION ewise_union(
     inout w vector default null,
     mask vector default null,
     accum binaryop default null,
-    descriptor text default null
+    descriptor descriptor default null
     )
 RETURNS vector
 AS '$libdir/onesparse', 'vector_ewise_union'
 LANGUAGE C STABLE;
+
+CREATE FUNCTION reduce_scalar(
+    a vector,
+    op monoid,
+    accum binaryop default null,
+    descriptor descriptor default null
+    )
+RETURNS scalar
+AS '$libdir/onesparse', 'vector_reduce_scalar'
+LANGUAGE C STABLE;
+
 
 CREATE FUNCTION wait(vector, waitmode integer default 0)
 RETURNS void

@@ -25,6 +25,8 @@ PG_FUNCTION_INFO_V1(matrix_clear);
 PG_FUNCTION_INFO_V1(matrix_ewise_add);
 PG_FUNCTION_INFO_V1(matrix_ewise_mult);
 PG_FUNCTION_INFO_V1(matrix_ewise_union);
+PG_FUNCTION_INFO_V1(matrix_reduce_vector);
+PG_FUNCTION_INFO_V1(matrix_reduce_scalar);
 PG_FUNCTION_INFO_V1(matrix_mxm);
 PG_FUNCTION_INFO_V1(matrix_mxv);
 PG_FUNCTION_INFO_V1(matrix_vxm);
@@ -727,6 +729,87 @@ Datum matrix_vxm(PG_FUNCTION_ARGS)
 			"Error matrix mxm.");
 
 	ONESPARSE_RETURN_VECTOR(w);
+}
+
+Datum matrix_reduce_vector(PG_FUNCTION_ARGS)
+{
+	GrB_Type type;
+	onesparse_Matrix *u;
+	onesparse_Vector *w, *mask;
+	onesparse_Descriptor *descriptor;
+	onesparse_Monoid *op;
+	onesparse_BinaryOp *accum;
+	LOGF();
+	ERRORNULL(0);
+	ERRORNULL(1);
+
+	u = ONESPARSE_GETARG_MATRIX(0);
+	op = ONESPARSE_GETARG_MONOID(1);
+
+	descriptor = NULL;
+
+	if (PG_NARGS() > 2)
+	{
+		if (PG_ARGISNULL(2))
+		{
+			ERRORIF(GxB_Matrix_type(&type, u->matrix) != GrB_SUCCESS,
+					"Cannot get matrix type");
+			w = new_vector(type, GrB_INDEX_MAX+1, CurrentMemoryContext, NULL);
+		}
+		else
+			w = ONESPARSE_GETARG_VECTOR(2);
+	}
+	if (PG_NARGS() > 3)
+		mask = PG_ARGISNULL(3) ? NULL : ONESPARSE_GETARG_VECTOR(3);
+	if (PG_NARGS() > 4)
+		 accum = PG_ARGISNULL(4) ? NULL : ONESPARSE_GETARG_BINARYOP(4);
+	if (PG_NARGS() > 5)
+		 descriptor = PG_ARGISNULL(5) ? NULL : ONESPARSE_GETARG_DESCRIPTOR(5);
+
+	ERRORIF(GrB_Matrix_reduce_Monoid(
+				w->vector,
+				mask ? mask->vector : NULL,
+				accum ? accum->binaryop : NULL,
+				op->monoid,
+				u->matrix,
+				descriptor ? descriptor->descriptor : NULL) != GrB_SUCCESS,
+			"Error matrix vector reduce.");
+
+	ONESPARSE_RETURN_VECTOR(w);
+}
+
+Datum
+matrix_reduce_scalar(PG_FUNCTION_ARGS)
+{
+	onesparse_Matrix *A;
+	onesparse_Monoid *monoid;
+	onesparse_BinaryOp *accum;
+	onesparse_Descriptor *descriptor;
+	onesparse_Scalar *result;
+	GrB_Type type;
+
+	A = ONESPARSE_GETARG_MATRIX(0);
+	monoid = ONESPARSE_GETARG_MONOID(1);
+
+	if (PG_NARGS() > 2)
+		 accum = PG_ARGISNULL(2) ? NULL : ONESPARSE_GETARG_BINARYOP(2);
+	if (PG_NARGS() > 3)
+		 descriptor = PG_ARGISNULL(3) ? NULL : ONESPARSE_GETARG_DESCRIPTOR(3);
+
+	ERRORIF(GxB_Matrix_type(&type, A->matrix) != GrB_SUCCESS,
+			"Cannot get Matrix type");
+
+	result = new_scalar(type, CurrentMemoryContext, NULL);
+
+	ERRORIF(GrB_Matrix_reduce_Monoid_Scalar(
+				result->scalar,
+				accum ? accum->binaryop : NULL,
+				monoid->monoid,
+				A->matrix,
+				descriptor ? descriptor->descriptor : NULL) != GrB_SUCCESS,
+			"Cannot reduce matrix to scalar");
+
+	ONESPARSE_RETURN_SCALAR(result);
 }
 
 Datum matrix_wait(PG_FUNCTION_ARGS)

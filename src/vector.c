@@ -24,6 +24,7 @@ PG_FUNCTION_INFO_V1(vector_clear);
 PG_FUNCTION_INFO_V1(vector_ewise_add);
 PG_FUNCTION_INFO_V1(vector_ewise_mult);
 PG_FUNCTION_INFO_V1(vector_ewise_union);
+PG_FUNCTION_INFO_V1(vector_reduce_scalar);
 
 static Size vector_get_flat_size(ExpandedObjectHeader *eohptr) {
 	onesparse_Vector *vector;
@@ -551,6 +552,40 @@ Datum vector_ewise_union(PG_FUNCTION_ARGS)
 			"Error vector eWiseUnion.");
 
 	ONESPARSE_RETURN_VECTOR(w);
+}
+
+Datum
+vector_reduce_scalar(PG_FUNCTION_ARGS)
+{
+	onesparse_Vector *A;
+	onesparse_Monoid *monoid;
+	onesparse_BinaryOp *accum;
+	onesparse_Descriptor *descriptor;
+	onesparse_Scalar *result;
+	GrB_Type type;
+
+	A = ONESPARSE_GETARG_VECTOR(0);
+	monoid = ONESPARSE_GETARG_MONOID(1);
+
+	if (PG_NARGS() > 2)
+		 accum = PG_ARGISNULL(2) ? NULL : ONESPARSE_GETARG_BINARYOP(2);
+	if (PG_NARGS() > 3)
+		 descriptor = PG_ARGISNULL(3) ? NULL : ONESPARSE_GETARG_DESCRIPTOR(3);
+
+	ERRORIF(GxB_Vector_type(&type, A->vector) != GrB_SUCCESS,
+			"Cannot get Vector type");
+
+	result = new_scalar(type, CurrentMemoryContext, NULL);
+
+	ERRORIF(GrB_Vector_reduce_Monoid_Scalar(
+				result->scalar,
+				accum ? accum->binaryop : NULL,
+				monoid->monoid,
+				A->vector,
+				descriptor ? descriptor->descriptor : NULL) != GrB_SUCCESS,
+			"Cannot reduce vector to scalar");
+
+	ONESPARSE_RETURN_SCALAR(result);
 }
 
 Datum vector_wait(PG_FUNCTION_ARGS)
