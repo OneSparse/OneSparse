@@ -158,18 +158,8 @@ operations (semiring) different graph algorithms can step and
 accumulate different results, interpreting the data in unique ways,
 even over the same graphs.
 
-![Alt text](./docs/AdjacencyMatrixBFS.svg)
-
-(Image Credit: [Dr. Jeremy Kepner](http://www.mit.edu/~kepner/))
-
-Above is the same graph and matrix from before, shown here as `A`.
-Next to it we see a *vector* `v`.  When you multiply the transpose of
-A and v, the result vector contains all of the neighboring nodes for
-the nodes specified in `v`.  In this case, `v` contains a value for
-node 4, shown in red.  By multiplying the matrix by the input vector,
-the result is the output vector with the 4's two neighboring nodes, 1
-and 3.  Interating this multiplication process produces the most
-common graph operation: [breadth-first
+Iterating this multiplication process produces the most common graph
+operation: [breadth-first
 search](https://en.wikipedia.org/wiki/Breadth-first_search).
 
     create function bfs(A matrix, source bigint) returns vector as $$
