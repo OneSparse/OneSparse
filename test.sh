@@ -1,21 +1,22 @@
 #!/bin/bash
 
-DB_HOST="pggraphblas-test-db"
+DB_HOST="onesparse-test-db"
 DB_NAME="postgres"
 SU="postgres"
 EXEC="docker exec $DB_HOST"
 EXECIT="docker exec -it $DB_HOST"
+export BUILDKIT_PROGRESS=plain
 
 echo force rm previous container
-docker rm -f pggraphblas-test
+docker rm -f onesparse-test
 
 set -e
 
 echo building test image
-docker build . -t pggraphblas/test
+docker build --build-arg UID=$(id -u) --build-arg GID=$(id -g) . -t onesparse/test
 
 echo running test container
-docker run -v $(pwd)/tests/:/tests -v $(pwd)/demo/:/demo -v --cap-add=SYS_PTRACE --security-opt seccomp=unconfined -d --name "$DB_HOST" pggraphblas/test
+docker run --user $(id -u):$(id -g) --mount type=bind,source=$(pwd),target=/home/postgres/onesparse,bind-propagation=rshared --cap-add=SYS_PTRACE --security-opt seccomp=unconfined -d --name "$DB_HOST" onesparse/test
 
 $EXECIT pg_ctl start
 # $EXEC make clean
@@ -34,12 +35,10 @@ done
 if [ $# -eq 0 ]
 then
     echo running tests
-    $EXEC tmux new-session -d -s pggraphblas 
-    $EXECIT tmux attach-session -t pggraphblas
+    $EXEC tmux new-session -d -s onesparse
+    $EXECIT tmux attach-session -t onesparse
 else
-    echo running repl
-    $EXEC tmux new-session -d -s pggraphblas $*
-    $EXECIT tmux attach-session -t pggraphblas
+    $EXEC make installcheck
 fi
 
 echo destroying test container and image

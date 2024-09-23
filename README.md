@@ -1,16 +1,18 @@
-# summary
+# Summary
 
-pgGraphBLAS is a postgres extension that bridges [The GraphBLAS
+OneSparse is a postgres extension that bridges [The SuiteSparse GraphBLAS
 API](http://graphblas.org) with the
 [PostgreSQL](https://postgresql.org) object relational database.
 
 GraphBLAS is a sparse linear algebra API optimized for processing
-graphs encoded as sparse matrices and vectors.  In addition to common
-real/integer matrix algebra operations, GraphBLAS supports up to 960
+dense and sparse matrices and in particular graphs encoded as sparse
+matrices and vectors.  In addition to common real/integer matrix
+algebra operations "plus" and "times", GraphBLAS supports many
 different "semiring" algebra operations, that can be used as basic
-building blocks to implement a wide variety of graph algorithms.
+building blocks to implement a wide variety of algebraic and graph
+algorithms.
 
-pgGraphBLAS leverages the expertise in the field of sparse matrix
+OneSparse leverages the expertise in the field of sparse matrix
 programming by [The GraphBLAS Forum](http://graphblas.org) and uses
 the
 [SuiteSparse:GraphBLAS](http://faculty.cse.tamu.edu/davis/GraphBLAS.html)
@@ -22,7 +24,15 @@ information](http://faculty.cse.tamu.edu/davis/news.html) can provide
 you with a lot more background information, in addition to the
 references below.
 
-# intro
+# Intro
+
+Linear algebra is the foundational language of many areas of science,
+mathematics, information theory, quantum mechanics, and computer
+science.  Other programming environments like Python and Julia have
+powerful libraries and other tools to work in the language of linear
+algebra, but until now Postgres has lacked access to these powerful
+constructs, other than those provided by external store procedural
+languages like pl/python.
 
 For a long time, mathematicians have known that matrices are powerful
 representations of graphs, as described [in this mathmatical
@@ -80,7 +90,7 @@ the matrix.  The math used with sparse matrices is exactly the same as
 dense, the sparsity of the data doesn't matter to the math, but it
 does matter to how efficiently the matrix is implemented internally.
 
-pgGraphBLAS is a postgres extension that provides access to two new
+OneSparse is a postgres extension that provides access to two new
 types: `matrix` and `vector`, as well as the GraphBLAS api to
 manipulate these types.  Aggregate functions are provided to build
 matrices from SQL queries, and set-returning functions are also
@@ -88,7 +98,7 @@ provided to turn graphs back into relational sets.  From a PostgreSQL
 point of view, matrices look a little bit like arrays, being stored as
 variable length column values.
 
-# matrix multplication
+# Matrix Multplication
 
 They key operation of GraphBLAS is the matrix multiply as provided by
 the `mxm` (matrix times matrix), `mxv` (matrix times vector), and
@@ -125,15 +135,11 @@ search](https://en.wikipedia.org/wiki/Breadth-first_search).
 
         while not_done and level <= n loop             -- While still work to do.
             v := assign(v, level, mask=>q);            -- Assign the current level to all
-
-            q := mxv(transpose(A), q, q,               -- Multiply q<mask> = T(A)q,
-                semiring=>'lor_land_bool',             -- using LOR_LAND_BOOL semiring
+            q := mxv(A, q, q,                          -- Multiply q<mask> = T(A)q,
+                semiring=>'any_pair_bool',             -- using LOR_LAND_BOOL semiring
                 mask=>v,                               -- only those *not* masked
-                dmask=>'scmp',                         -- by complementing the mask
-                doutp=>'replace');                     -- clearing results in q first
-
+                descriptor=>'rsct0');                  -- by complementing the mask and clearing q first
             not_done := reduce_bool(q);                -- are there more neighbors?
-
             level := level + 1;                        -- increment the level
         end loop;
         return v;
@@ -141,7 +147,7 @@ search](https://en.wikipedia.org/wiki/Breadth-first_search).
     $$ language plpgsql;
 
  The above code is written in `plpgsql` which is postgres' procedural
- query language.  This language works well with pgGraphBLAS
+ query language.  This language works well with OneSparse's
  algorithmic approach.
 
     postgres=# create table t (m matrix);
@@ -233,7 +239,7 @@ data types, the following types map from GraphBLAS to PostgreSQL:
 Postgres does not support unsigned integers like GraphBLAS (is there a
 workaround?  support the uint extension?)
 
-pgGraphBLAS matrix and vector objects have an intrinsic type of data
+OneSparse matrix and vector objects have an intrinsic type of data
 that they store.  So, a matrix can store booleans, and various sized
 integers and floats.  Once a matrix is created with a specific type it
 cannot be changed.
@@ -245,7 +251,7 @@ supported type.  Put example here of {R,min,+,0,+inf}.
 
 # API
 
-PgGraphBLAS tries to adhere closely to the spirit of the [GraphBLAS C
+OneSparse tries to adhere closely to the spirit of the [GraphBLAS C
 API](https://github.com/sergiud/SuiteSparse/blob/master/GraphBLAS/Doc/GraphBLAS_API_C.pdf).
 This documentation focused on the specific of interfacing with
 postgres.  For a more complete introduction see [the
@@ -257,7 +263,7 @@ Guide](https://github.com/sergiud/SuiteSparse/blob/master/GraphBLAS/Doc/GraphBLA
 GraphBLAS operations all take an optional `mask` argument.  Check the
 GraphBLAS Users Guide for more information on masking operations.
 GraphBLAS operations can also take a descriptor argument, which in
-pgGraphBLAS is broken out into four optional arguments supported by
+OneSparse is broken out into four optional arguments supported by
 every function:
 
   - doutp text default null
@@ -272,7 +278,7 @@ See the GraphBLAS Users Guide for more info.
 ## printing
 
 At the moment, there is no human parsable text
-representation for vectors or matrices, so pgGraphBLAS provides a
+representation for vectors or matrices, so OneSparse provides a
 `print` function that can give a text description of vectors or
 matrices:
 

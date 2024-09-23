@@ -1,74 +1,61 @@
 FROM ubuntu:latest
+ARG UID    
+ARG GID
 
 # install base dependences    
 RUN apt-get update && \
-    apt-get install -y make cmake git curl build-essential m4 sudo gdbserver \
-    gdb libreadline-dev bison flex zlib1g-dev tmux emacs25-nox zile zip vim gawk wget
+    apt-get install -y make cmake git curl build-essential m4 sudo gdbserver python3-pip \
+    gdb libreadline-dev bison flex zlib1g-dev libicu-dev icu-devtools tmux zile zip vim gawk wget python3
 
 # add postgres user and make data dir        
-RUN groupadd -r postgres && useradd --no-log-init -r -m -s /bin/bash -g postgres -G sudo postgres
+RUN groupadd --gid ${GID} -r postgres && useradd --uid ${UID} --gid ${GID} --no-log-init -r -m -s /bin/bash -g postgres -G sudo postgres
+
+# make postgres a sudoer
+RUN echo "postgres ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/user && \
+    chmod 0440 /etc/sudoers.d/user
+
+USER postgres
+    
 ENV PGDATA /home/postgres/data
 RUN /bin/rm -Rf "$PGDATA" && mkdir "$PGDATA"
 WORKDIR "/home/postgres"
 
 # get postgres source and compile with debug and no optimization
-RUN git clone --branch REL_12_STABLE https://github.com/postgres/postgres.git --depth=1 && \
+RUN git clone --branch REL_16_STABLE https://github.com/postgres/postgres.git --depth=1 && \
     cd postgres && ./configure \
     --prefix=/usr/ \
-#    --enable-debug \
-#    --enable-depend --enable-cassert --enable-profiling \
-#    CFLAGS="-ggdb -Og -g3 -fno-omit-frame-pointer" \
+    --without-icu \
+    --enable-debug \
+    --enable-depend --enable-cassert --enable-profiling \
+    CFLAGS="-ggdb -Og -g3 -fno-omit-frame-pointer" \
 #    CFLAGS="-O3" \
-    && make -j 4 && make install
+    && make -j 4 && sudo make install
 
 # get GraphBLAS, compile with debug symbols    
-RUN curl -s -L http://faculty.cse.tamu.edu/davis/GraphBLAS/GraphBLAS-3.1.1.tar.gz | \
-    tar zxvf - && cd GraphBLAS-3.1.1 && \
-#    sed -i 's/^\/\/ #undef NDEBUG/#undef NDEBUG/g' Source/GB.h && \
-#    sed -i 's/^\/\/ #define GB_PRINT_MALLOC 1/#define GB_PRINT_MALLOC 1/g' Source/GB.h && \
+RUN curl -s -L -J https://github.com/DrTimothyAldenDavis/GraphBLAS/archive/refs/tags/v9.2.0.tar.gz | \
+    tar zxvf - && cd GraphBLAS-9.2.0 && \
     make library \
     CMAKE_OPTIONS='-DCMAKE_BUILD_TYPE=Debug' \
-    && make install
+    && sudo make install
 
-RUN git clone --branch 22July2019 https://github.com/GraphBLAS/LAGraph.git && \
-    cd LAGraph && \
-    make library \
-#    CMAKE_OPTIONS='-DCMAKE_BUILD_TYPE=Debug' \
-    && make install
+RUN pip3 install pyclibrary
 
-RUN curl -s -L https://github.com/theory/pgtap/archive/v0.99.0.tar.gz | tar zxvf - && \   
-    cd pgtap-0.99.0 && make && make install
+RUN sudo ldconfig
 
-# chown dependencies    
-RUN chown -R postgres:postgres /home/postgres
-    
 # put test stuff into pg home        
-RUN mkdir "/home/postgres/pggraphblas"
-WORKDIR "/home/postgres/pggraphblas"
+RUN mkdir "/home/postgres/onesparse"
+WORKDIR "/home/postgres/onesparse"
 COPY . .
     
-# RUN mkdir "/home/postgres/LAGraph"
-# COPY LAGraph /home/postgres/LAGraph
+RUN sudo chown -R postgres:postgres /home/postgres/onesparse
 
-# RUN cd /home/postgres/LAGraph && \
-#     make library \
-#     CMAKE_OPTIONS='-DCMAKE_BUILD_TYPE=Debug' \
-#     && make install
-    
-# make the extension    
-RUN make && make install && make clean
-RUN ldconfig
-
-# chown just pggraphblas
-RUN chown -R postgres:postgres /home/postgres/pggraphblas
-    
-# make postgres a sudoer        
-RUN echo "postgres ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/user && \
-    chmod 0440 /etc/sudoers.d/user
+# make the extension
+RUN python3 generate.py onesparse/onesparse--0.1.0.sql
+RUN make && sudo make install && make clean
 
 # start the database            
-USER postgres
-RUN initdb -D "$PGDATA"
+RUN initdb -D "$PGDATA" -c shared_preload_libraries='onesparse' -c search_path='onesparse'
 EXPOSE 5432
 # wait forever
+
 CMD tail -f /dev/null

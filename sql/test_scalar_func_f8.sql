@@ -1,0 +1,13 @@
+set client_min_messages = 'WARNING';
+create extension if not exists onesparse;
+set search_path = 'onesparse';
+select '-1'::float8::scalar;
+select '0'::float8::scalar;
+select '1'::float8::scalar;
+select set('1'::float8::scalar, 2);
+select scalar_float8((-1)::float8);
+select scalar_float8((0)::float8);
+select scalar_float8((1)::float8);
+select float8_scalar((-1)::float8::scalar);
+select float8_scalar((0)::float8::scalar);
+select float8_scalar((1)::float8::scalar);
