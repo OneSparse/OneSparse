@@ -28,14 +28,17 @@ architecture can be targeted with no code changes to the algorithm.
 This cannot be said for the common procedural approach taken by most
 graph libraries and frameworks.
 
+![The GraphBLAS can be run anywhere](./docs/run_anywhere.png)
+
 OneSparse's goal is to enable and encourage the multi-architecture
 future, where the right hardware is used for the right phase of any
 particularly complex algorithm or data pipeine. By abstracting away
 the specific and highly optimzation sensitive hardware details,
 problem solvers can focus on the problems, and allow hardware
-specialists to optimize for any given architecture:n
+specialists to optimize for any given architecture:
 
 ![The GraphBLAS abstracts away the hardware](./docs/algebra_ven.png)
+
 
 # Why Linear Algebra?
 
