@@ -815,7 +815,6 @@ matrix_reduce_scalar(PG_FUNCTION_ARGS)
 Datum
 matrix_assign_matrix(PG_FUNCTION_ARGS)
 {
-	GrB_Info info;
 	onesparse_Matrix *A, *B, *mask;
 	onesparse_BinaryOp *accum;
 	onesparse_Descriptor *descriptor;
@@ -831,11 +830,11 @@ matrix_assign_matrix(PG_FUNCTION_ARGS)
 	if (PG_NARGS() > 4)
 		descriptor = PG_ARGISNULL(4) ? NULL : ONESPARSE_GETARG_DESCRIPTOR(4);
 
-	ERRORIF(GrB_Matrix_nvals(&nvals, B->matrix) != GrB_SUCCESS,
-			"Error getting nvals.");
-
 	if (B != NULL)
 	{
+		ERRORIF(GrB_Matrix_nvals(&nvals, B->matrix) != GrB_SUCCESS,
+				"Error getting nvals.");
+
 		rows = (GrB_Index*) palloc0(sizeof(GrB_Index) * nvals);
 		cols = (GrB_Index*) palloc0(sizeof(GrB_Index) * nvals);
 

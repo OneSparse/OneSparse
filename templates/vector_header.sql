@@ -82,6 +82,17 @@ RETURNS scalar
 AS '$libdir/onesparse', 'vector_reduce_scalar'
 LANGUAGE C STABLE;
 
+CREATE FUNCTION assign(
+    a vector,
+    b vector,
+    op monoid,
+    mask vector default null,
+    accum binaryop default null,
+    descriptor descriptor default null
+    )
+RETURNS vector
+AS '$libdir/onesparse', 'vector_assign'
+LANGUAGE C STABLE;
 
 CREATE FUNCTION wait(vector, waitmode integer default 0)
 RETURNS void

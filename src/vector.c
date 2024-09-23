@@ -25,6 +25,7 @@ PG_FUNCTION_INFO_V1(vector_ewise_add);
 PG_FUNCTION_INFO_V1(vector_ewise_mult);
 PG_FUNCTION_INFO_V1(vector_ewise_union);
 PG_FUNCTION_INFO_V1(vector_reduce_scalar);
+PG_FUNCTION_INFO_V1(vector_assign);
 
 static Size vector_get_flat_size(ExpandedObjectHeader *eohptr) {
 	onesparse_Vector *vector;
@@ -586,6 +587,50 @@ vector_reduce_scalar(PG_FUNCTION_ARGS)
 			"Cannot reduce vector to scalar");
 
 	ONESPARSE_RETURN_SCALAR(result);
+}
+
+Datum
+vector_assign(PG_FUNCTION_ARGS)
+{
+	onesparse_Vector *A, *B, *mask;
+	onesparse_BinaryOp *accum;
+	onesparse_Descriptor *descriptor;
+	GrB_Index nvals, *Ilist = NULL;
+
+	A = ONESPARSE_GETARG_VECTOR(0);
+	B = ONESPARSE_GETARG_VECTOR(1);
+
+	if (PG_NARGS() > 2)
+		mask = PG_ARGISNULL(2) ? NULL : ONESPARSE_GETARG_VECTOR(2);
+	if (PG_NARGS() > 3)
+		accum = PG_ARGISNULL(3) ? NULL : ONESPARSE_GETARG_BINARYOP(3);
+	if (PG_NARGS() > 4)
+		descriptor = PG_ARGISNULL(4) ? NULL : ONESPARSE_GETARG_DESCRIPTOR(4);
+
+	if (B != NULL)
+	{
+		ERRORIF(GrB_Vector_nvals(&nvals, B->vector) != GrB_SUCCESS,
+				"Error getting nvals.");
+
+		Ilist = (GrB_Index*) palloc0(sizeof(GrB_Index) * nvals);
+
+		ERRORIF(GrB_Vector_extractTuples(Ilist,
+										 NULL,
+										 &nvals,
+										 A->vector) != GrB_SUCCESS,
+				"Error extracting tuples.");
+	}
+
+	ERRORIF(GrB_assign(A->vector,
+					   mask ? mask->vector : NULL,
+					   accum ? accum->binaryop : NULL,
+					   B->vector,
+					   Ilist ? Ilist : GrB_ALL,
+					   nvals,
+					   descriptor ? descriptor->descriptor : NULL) != GrB_SUCCESS,
+			"Error in assign vector.");
+
+	ONESPARSE_RETURN_VECTOR(A);
 }
 
 Datum vector_wait(PG_FUNCTION_ARGS)

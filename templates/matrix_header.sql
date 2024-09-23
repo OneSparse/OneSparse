@@ -95,6 +95,18 @@ RETURNS scalar
 AS '$libdir/onesparse', 'matrix_reduce_scalar'
 LANGUAGE C STABLE;
 
+CREATE FUNCTION assign(
+    a matrix,
+    b matrix,
+    op monoid,
+    mask matrix default null,
+    accum binaryop default null,
+    descriptor descriptor default null
+    )
+RETURNS matrix
+AS '$libdir/onesparse', 'matrix_assign_matrix'
+LANGUAGE C STABLE;
+
 CREATE FUNCTION mxm(
     a matrix,
     b matrix,

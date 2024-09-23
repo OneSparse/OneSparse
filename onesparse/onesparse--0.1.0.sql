@@ -832,6 +832,17 @@ RETURNS scalar
 AS '$libdir/onesparse', 'vector_reduce_scalar'
 LANGUAGE C STABLE;
 
+CREATE FUNCTION assign(
+    a vector,
+    b vector,
+    op monoid,
+    mask vector default null,
+    accum binaryop default null,
+    descriptor descriptor default null
+    )
+RETURNS vector
+AS '$libdir/onesparse', 'vector_assign'
+LANGUAGE C STABLE;
 
 CREATE FUNCTION wait(vector, waitmode integer default 0)
 RETURNS void
@@ -965,6 +976,18 @@ CREATE FUNCTION reduce_scalar(
     )
 RETURNS scalar
 AS '$libdir/onesparse', 'matrix_reduce_scalar'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION assign(
+    a matrix,
+    b matrix,
+    op monoid,
+    mask matrix default null,
+    accum binaryop default null,
+    descriptor descriptor default null
+    )
+RETURNS matrix
+AS '$libdir/onesparse', 'matrix_assign_matrix'
 LANGUAGE C STABLE;
 
 CREATE FUNCTION mxm(
