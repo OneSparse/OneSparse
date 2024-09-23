@@ -12,6 +12,36 @@ different "semiring" algebra operations, that can be used as basic
 building blocks to implement a wide variety of algebraic and graph
 algorithms.
 
+# Why Linear Algebra?
+
+OneSparse brings the power of [Linear
+Algebra](https://en.wikipedia.org/wiki/Linear_algebra) to Postgres.
+In languages like Python, similar roles are fulfilled with packages
+like numpy and scipy.  OneSparse goes beyond dense matrix
+multiplication and is highly optimized not only for dense and sparse
+matrices, but also optimizes for an unlimited number of powerful and
+and useful algebras by supporting JIT compilation of both built-in and
+user defined [Semirings](https://en.wikipedia.org/wiki/Semiring).
+
+Semirings can be thought of as an abstraction of the "additive" and
+"multiplicative" operations typically used in [Matrix
+Multiplication](https://en.wikipedia.org/wiki/Matrix_multiplication).
+
+For example, to compute the shortest path between rows and columns of
+a sparse matrix, instead of multiplying elements they are added, and
+instead of adding to reduce to the final value, the minimum is taken.
+This form of [Tropical
+Algebra](https://en.wikipedia.org/wiki/Tropical_geometry) is a very
+powerful mathematical technique used in solving optimization and other
+minimization and maximization problems.
+
+Another exotic form of Semiring is the [Log
+Semiring](https://en.wikipedia.org/wiki/Log_semiring) which is a
+powerful tool for traversing graphs whose edges represent
+probabilities by leveraging [Log
+probability](https://en.wikipedia.org/wiki/Log_probability) algebra
+for speed and better numeric stability.
+
 OneSparse leverages the expertise in the field of sparse matrix
 programming by [The GraphBLAS Forum](http://graphblas.org) and uses
 the
@@ -50,7 +80,7 @@ For this introduction we will focus on the adjacency type as they are
 simpler, but the same ideas apply to both, and it is easy to switch
 back and forth between them.
 
-![Alt text](./docs/AdjacencyMatrix.svg)
+![Alt text](./docs/AdjacencyMatrixBFS.svg)
 
 (Image Credit: [Dr. Jeremy Kepner](http://www.mit.edu/~kepner/))
 
@@ -149,50 +179,6 @@ search](https://en.wikipedia.org/wiki/Breadth-first_search).
  The above code is written in `plpgsql` which is postgres' procedural
  query language.  This language works well with OneSparse's
  algorithmic approach.
-
-    postgres=# create table t (m matrix);
-    CREATE TABLE
-
-    postgres=# create table f (i bigint, j bigint);
-    CREATE TABLE
-
-    postgres=# create index on f (i) include (j);
-    CREATE INDEX
-
-    postgres=# insert into t (m) values (matrix_random_bool(10000,10000,1000000));
-    INSERT 0 1
-    Time: 1464.482 ms (00:01.464)
-
-    postgres=# insert into f select row, col from matrix_elements_bool((select m from t));
-    INSERT 0 994944
-    Time: 11110.765 ms (00:11.111)
-
-    postgres=# select count(*) from plbfs(100);
-     count
-    -------
-      9999
-    (1 row)
-
-    Time: 4329.555 ms (00:04.330)
-
-    postgres=# select print(bfs(m, 100), 1) from t;
-                                       print
-    ---------------------------------------------------------------------------
-                                                                              +
-     GraphBLAS vector: A->V                                                   +
-     nrows: 10000 ncols: 1 max # entries: 15000                               +
-     format: standard CSC vlen: 10000 nvec_nonempty: 1 nvec: 1 plen: 1 vdim: 1+
-     hyper_ratio 0.0625                                                       +
-     GraphBLAS type:  int32_t size: 4                                         +
-     number of entries: 9999                                                  +
-
-    (1 row)
-
-    Time: 364.490 ms
-
-In the above simple benchmark, the GraphBLAS version of BFS can be
-seen to be almost 12x faster than the [plpgsql procedural
-version](https://github.com/michelp/pggraphblas/blob/master/demo/bfs.sql#L97).
 
 # references
 
