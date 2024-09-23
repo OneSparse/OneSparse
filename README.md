@@ -21,6 +21,22 @@ form shows the algebraic approach.
 
 ![Tables, Graphs, and Matrices](./docs/table_graph_matrix.png)
 
+The algebraic approach offers a powerful abstraction over the
+underlying compute architecture used to do the actual work.  Using
+SuiteSparse's powerful built-in JIT compiler, any hardware
+architecture can be targeted with no code changes to the algorithm.
+This cannot be said for the common procedural approach taken by most
+graph libraries and frameworks.
+
+OneSparse's goal is to enable and encourage the multi-architecture
+future, where the right hardware is used for the right phase of any
+particularly complex algorithm or data pipeine. By abstracting away
+the specific and highly optimzation sensitive hardware details,
+problem solvers can focus on the problems, and allow hardware
+specialists to optimize for any given architecture:n
+
+![The GraphBLAS abstracts away the hardware](./docs/algebra_ven.png)
+
 # Why Linear Algebra?
 
 OneSparse brings the power of [Linear
@@ -54,8 +70,8 @@ for speed and better numeric stability.
 Other GraphBLAS Semirings are used to optimize algebraic operations to
 minimize data movement.  For example, the "any_pair" semiring is used
 instead of "plus_times" in many Breadth-First Search Algorithms to
-avoid any mathematical operations and avoid unnecessary data movement,
-instead of adding results, "any" value is used, thus allowing the JIT
+avoid any mathematical operations and unnecessary data movement
+Instead of adding results, "any" value is used, thus allowing the JIT
 compiler to optimize as it sees fit.  Instead of loading element
 values and multiplying them, the "pair" operator is used to simply
 proceed only if both edges in a multiplication are present, without
@@ -486,7 +502,7 @@ inputs and outputs.
     postgres=# \e
     select print(matrix(array[0,1,2], array[1,2,0], array[1,2,3]) *
                  matrix(array[0,1,2], array[1,2,0], array[2,3,4]));
-                                     print                                 
+                                     print
     -----------------------------------------------------------------------
                                                                           +
      GraphBLAS matrix: A->M                                               +
@@ -504,7 +520,7 @@ inputs and outputs.
          column 1: int32 6                                                +
 
     (1 row)
-    
+
 
 ## mxv
 
@@ -537,7 +553,7 @@ Extracting subgraphs.
 Assigning subgraphs.
 
     postgres=# select print(assign(matrix_real(3,3), 3.14));
-                                      print                                   
+                                      print
     --------------------------------------------------------------------------
                                                                              +
      GraphBLAS matrix: A->M                                                  +
@@ -573,9 +589,9 @@ TODO. Selecting elements of a matrix.
 ## reduce
 
 Matrix reduce to scalar:
-    
+
     postgres=# select reduce_integer(assign(matrix_integer(10,10), 1));
-     reduce_integer 
+     reduce_integer
     ----------------
                 100
     (1 row)
@@ -587,7 +603,7 @@ Matrix transpose.
 ## kron
 
     postgres=# select print(kron(matrix_random_integer(3,3,3), matrix_random_integer(3,3,3)));
-                                     print                                 
+                                     print
     -----------------------------------------------------------------------
                                                                           +
      GraphBLAS matrix: A->M                                               +
@@ -615,7 +631,7 @@ Matrix transpose.
  the specified number of rows, columns, and values.
 
     postgres=# select print(matrix_random_smallint(10,10,10));
-                                       print                                    
+                                       print
     ----------------------------------------------------------------------------
                                                                                +
      GraphBLAS matrix: A->M                                                    +
@@ -657,5 +673,3 @@ Matrix transpose.
     - apply/select
 
     - more tests!
-
-    
