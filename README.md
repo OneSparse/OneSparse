@@ -12,6 +12,15 @@ different "semiring" algebra operations, that can be used as basic
 building blocks to implement a wide variety of algebraic and graph
 algorithms.
 
+OneSparse aims to unify the three algebraic paradigms of relational,
+procedural, and algebraic style approaches.  In the image below, all
+three visualization are presenting the same information: the tabular
+form shows rows a relational indicating edge relationships, the
+graphical form shows the procedural approach, and the sparse matrix
+form shows the algebraic approach.
+
+![Tables, Graphs, and Matrices](./docs/table_graph_matrix.png)
+
 # Why Linear Algebra?
 
 OneSparse brings the power of [Linear
@@ -41,6 +50,16 @@ powerful tool for traversing graphs whose edges represent
 probabilities by leveraging [Log
 probability](https://en.wikipedia.org/wiki/Log_probability) algebra
 for speed and better numeric stability.
+
+Other GraphBLAS Semirings are used to optimize algebraic operations to
+minimize data movement.  For example, the "any_pair" semiring is used
+instead of "plus_times" in many Breadth-First Search Algorithms to
+avoid any mathematical operations and avoid unnecessary data movement,
+instead of adding results, "any" value is used, thus allowing the JIT
+compiler to optimize as it sees fit.  Instead of loading element
+values and multiplying them, the "pair" operator is used to simply
+proceed only if both edges in a multiplication are present, without
+ever loading or multiplying their values.
 
 OneSparse leverages the expertise in the field of sparse matrix
 programming by [The GraphBLAS Forum](http://graphblas.org) and uses
