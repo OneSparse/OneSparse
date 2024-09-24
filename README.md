@@ -24,6 +24,13 @@ the tabular form shows rows a relational indicating edge
 relationships, the graphical form shows the procedural approach, and
 the sparse matrix form shows the algebraic approach.
 
+The diagram below shows the three paradigms of sparse graph
+computation, relational, procedural and algebraic.  Each approach
+contains the exact same information, each edge is represented as an
+element of a table, graph, or matrix.  With OneSparse, programmers can
+choose which approach best fits their needs, and move seamlessly
+between them:
+
 ![Tables, Graphs, and Matrices](./docs/table_graph_matrix.png)
 
 The algebraic approach offers a powerful abstraction over the
