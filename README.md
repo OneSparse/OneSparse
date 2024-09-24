@@ -1,8 +1,13 @@
 # Summary
 
-OneSparse is a postgres extension that bridges [The SuiteSparse GraphBLAS
-API](http://graphblas.org) with the
-[PostgreSQL](https://postgresql.org) object relational database.
+OneSparse Postgres extends the [PostgreSQL](https://postgresql.org)
+object relational database with the state-of-the-art
+[SuiteSparse:GraphBLAS](http://faculty.cse.tamu.edu/davis/GraphBLAS.html)
+high performance dense/sparse linear algebra library.  SuiteSparse
+contains thousands of algorithms optimizing tasks for algebraic graph
+traversal, machine learning, AI, science, and engineering.
+SuiteSparse's powerful built-in JIT compiler can target multiple
+hardware architectures, including GPUs, with no changes to your code.
 
 GraphBLAS is a sparse linear algebra API optimized for processing
 dense and sparse matrices and in particular graphs encoded as sparse
@@ -10,14 +15,14 @@ matrices and vectors.  In addition to common real/integer matrix
 algebra operations "plus" and "times", GraphBLAS supports many
 different "semiring" algebra operations, that can be used as basic
 building blocks to implement a wide variety of algebraic and graph
-algorithms.
+solutions.
 
-OneSparse aims to unify the three algebraic paradigms of relational,
-procedural, and algebraic style approaches.  In the image below, all
-three visualization are presenting the same information: the tabular
-form shows rows a relational indicating edge relationships, the
-graphical form shows the procedural approach, and the sparse matrix
-form shows the algebraic approach.
+OneSparse Postgres aims to unify the three algebraic paradigms of
+relational, procedural, and algebraic style approaches.  In the image
+below, all three visualization are presenting the same information:
+the tabular form shows rows a relational indicating edge
+relationships, the graphical form shows the procedural approach, and
+the sparse matrix form shows the algebraic approach.
 
 ![Tables, Graphs, and Matrices](./docs/table_graph_matrix.png)
 
