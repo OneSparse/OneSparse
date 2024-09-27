@@ -27,7 +27,7 @@ AS '$libdir/onesparse', 'scalar_nvals'
 LANGUAGE C;
 
 CREATE FUNCTION wait(scalar, waitmode integer default 0)
-RETURNS void
+RETURNS scalar
 AS '$libdir/onesparse', 'scalar_wait'
 LANGUAGE C;
 
@@ -37,6 +37,6 @@ AS '$libdir/onesparse', 'scalar_dup'
 LANGUAGE C;
 
 CREATE FUNCTION clear(scalar)
-RETURNS void
+RETURNS scalar
 AS '$libdir/onesparse', 'scalar_clear'
 LANGUAGE C;

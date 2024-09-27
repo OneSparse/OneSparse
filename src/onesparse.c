@@ -46,6 +46,50 @@ GrB_Type short_type(char *name)
 	elog(ERROR, "Unknown short name %s", name);
 }
 
+const char* error_name(GrB_Info info)
+{
+	switch(info)
+	{
+		case GrB_SUCCESS:
+			return "SUCCESS";
+		case GrB_NO_VALUE:
+			return "NO_VALUE";
+		case GxB_EXHAUSTED:
+			return "EXHAUSTED";
+		case GrB_UNINITIALIZED_OBJECT:
+			return "UNINITIALIZED_OBJECT";
+		case GrB_NULL_POINTER:
+			return "NULL_POINTER";
+		case GrB_INVALID_VALUE:
+			return "INVALID_VALUE";
+		case GrB_INVALID_INDEX:
+			return "INVALID_INDEX";
+		case GrB_DOMAIN_MISMATCH:
+			return "DOMAIN_MISMATCH";
+		case GrB_DIMENSION_MISMATCH:
+			return "DIMENSION_MISMATCH";
+		case GrB_OUTPUT_NOT_EMPTY:
+			return "OUTPUT_NOT_EMPTY";
+		case GrB_NOT_IMPLEMENTED:
+			return "NOT_IMPLEMENTED";
+		case GrB_ALREADY_SET:
+			return "ALREADY_SET";
+		case GrB_PANIC:
+			return "PANIC";
+		case GrB_OUT_OF_MEMORY:
+			return "OUT_OF_MEMORY";
+		case GrB_INSUFFICIENT_SPACE:
+			return "INSUFFICIENT_SPACE";
+		case GrB_INVALID_OBJECT:
+			return "INVALID_OBJECT";
+		case GrB_INDEX_OUT_OF_BOUNDS:
+			return "INDEX_OUT_OF_BOUNDS";
+		case GrB_EMPTY_OBJECT:
+			return "EMPTY_OBJECT";
+	}
+	return "Unknown Info enum value";
+}
+
 void *calloc_function(size_t num, size_t size) {
   MemoryContext oldcxt;
   void *p;
@@ -84,15 +128,8 @@ void free_function(void *p) {
 
 void _PG_init(void)
 {
-	ERRORIF(GrB_init(GrB_NONBLOCKING) != GrB_SUCCESS,
-			"Cannot initialize GraphBLAS");
-
-	/* ERRORIF(GxB_init(GrB_NONBLOCKING, */
-	/* 				 &malloc_function, */
-	/* 				 &calloc_function, */
-	/* 				 &realloc_function, */
-	/* 				 &free_function) != GrB_SUCCESS, */
-	/* 		"Cannot initialize GraphBLAS"); */
+	if (GrB_init(GrB_NONBLOCKING) != GrB_SUCCESS)
+		elog(ERROR, "Cannot initialize GraphBLAS");
 
 	initialize_semirings();
 	initialize_binaryops();

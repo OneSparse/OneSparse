@@ -119,8 +119,9 @@ context_callback_indexunaryop_free(void* ptr)
 	onesparse_IndexUnaryOp *indexunaryop = (onesparse_IndexUnaryOp *) ptr;
 	LOGF();
 
-	ERRORIF(GrB_IndexUnaryOp_free(&indexunaryop->indexunaryop) != GrB_SUCCESS,
-			"Cannot GrB_Free IndexUnaryOp");
+	CHECK(GrB_IndexUnaryOp_free(&indexunaryop->indexunaryop),
+		  indexunaryop->indexunaryop,
+		  "Cannot GrB_Free IndexUnaryOp");
 }
 
 /* Helper function to always expand datum

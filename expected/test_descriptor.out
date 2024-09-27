@@ -1,0 +1,189 @@
+set client_min_messages = 'WARNING';
+create extension if not exists onesparse;
+set search_path = 'onesparse';
+select 't0'::descriptor;
+ descriptor 
+------------
+ t0
+(1 row)
+
+select 't1'::descriptor;
+ descriptor 
+------------
+ t1
+(1 row)
+
+select 't0t1'::descriptor;
+ descriptor 
+------------
+ t0t1
+(1 row)
+
+select 'c'::descriptor;
+ descriptor 
+------------
+ c
+(1 row)
+
+select 'ct0'::descriptor;
+ descriptor 
+------------
+ ct0
+(1 row)
+
+select 'ct1'::descriptor;
+ descriptor 
+------------
+ ct1
+(1 row)
+
+select 'ct0t1'::descriptor;
+ descriptor 
+------------
+ ct0t1
+(1 row)
+
+select 's'::descriptor;
+ descriptor 
+------------
+ s
+(1 row)
+
+select 'st0'::descriptor;
+ descriptor 
+------------
+ st0
+(1 row)
+
+select 'st1'::descriptor;
+ descriptor 
+------------
+ st1
+(1 row)
+
+select 'st0t1'::descriptor;
+ descriptor 
+------------
+ st0t1
+(1 row)
+
+select 'sc'::descriptor;
+ descriptor 
+------------
+ sc
+(1 row)
+
+select 'sct0'::descriptor;
+ descriptor 
+------------
+ sct0
+(1 row)
+
+select 'sct1'::descriptor;
+ descriptor 
+------------
+ sct1
+(1 row)
+
+select 'sct0t1'::descriptor;
+ descriptor 
+------------
+ sct0t1
+(1 row)
+
+select 'r'::descriptor;
+ descriptor 
+------------
+ r
+(1 row)
+
+select 'rt0'::descriptor;
+ descriptor 
+------------
+ rt0
+(1 row)
+
+select 'rt1'::descriptor;
+ descriptor 
+------------
+ rt1
+(1 row)
+
+select 'rt0t1'::descriptor;
+ descriptor 
+------------
+ rt0t1
+(1 row)
+
+select 'rc'::descriptor;
+ descriptor 
+------------
+ rc
+(1 row)
+
+select 'rct0'::descriptor;
+ descriptor 
+------------
+ rct0
+(1 row)
+
+select 'rct1'::descriptor;
+ descriptor 
+------------
+ rct1
+(1 row)
+
+select 'rct0t1'::descriptor;
+ descriptor 
+------------
+ rct0t1
+(1 row)
+
+select 'rs'::descriptor;
+ descriptor 
+------------
+ rs
+(1 row)
+
+select 'rst0'::descriptor;
+ descriptor 
+------------
+ rst0
+(1 row)
+
+select 'rst1'::descriptor;
+ descriptor 
+------------
+ rst1
+(1 row)
+
+select 'rst0t1'::descriptor;
+ descriptor 
+------------
+ rst0t1
+(1 row)
+
+select 'rsc'::descriptor;
+ descriptor 
+------------
+ rsc
+(1 row)
+
+select 'rsct0'::descriptor;
+ descriptor 
+------------
+ rsct0
+(1 row)
+
+select 'rsct1'::descriptor;
+ descriptor 
+------------
+ rsct1
+(1 row)
+
+select 'rsct0t1'::descriptor;
+ descriptor 
+------------
+ rsct0t1
+(1 row)
+

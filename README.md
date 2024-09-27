@@ -51,7 +51,6 @@ specialists to optimize for any given architecture:
 
 ![The GraphBLAS abstracts away the hardware](./docs/algebra_ven.png)
 
-
 # Why Linear Algebra?
 
 OneSparse brings the power of [Linear

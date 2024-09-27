@@ -25,12 +25,23 @@
 #define CCAT(x, y) CCAT2(x, y)
 #define FN(x) CCAT(x, SUFFIX)
 
-#define ERRORIF(cond, msg) if (cond) ereport(ERROR, (errmsg(msg)))
-
 #define ERRORNULL(_arg) \
 	do { \
 	if (PG_ARGISNULL(_arg)) elog(ERROR, "Cannot pass NULL to %s", __func__); \
 	} while (0) \
+
+#define CHECK(method, obj, msg)                               \
+    do {                                                      \
+        GrB_Info __info = method ;                            \
+        if (! (__info == GrB_SUCCESS || __info == GrB_NO_VALUE))  \
+            {                                                 \
+				const char *ename = error_name(__info);         \
+                const char *emsg;                             \
+                GrB_error(&emsg, obj);                        \
+                elog(ERROR, "%s %s: %s", ename, emsg, msg);   \
+            }                                                 \
+    } while (0)                                               \
+
 
 #ifdef ONESPARSE_DEBUG
 #define LOGF() elog(INFO, __func__)
@@ -40,6 +51,7 @@
 
 char* short_code(GrB_Type_Code code);
 GrB_Type short_type(char *name);
+const char* error_name(GrB_Info info);
 
 void *malloc_function(size_t);
 void *calloc_function(size_t, size_t);
