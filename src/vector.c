@@ -233,27 +233,36 @@ Datum vector_in(PG_FUNCTION_ARGS)
 	char *token;
     char *saveptr;
     char *endptr;
+	char *prefix;
     char *number_token;
     char *number_saveptr;
     int index = 0;
 	bool is_short = false;
-	GrB_Index dimesion;
 	GrB_Index wsize;
+	int matched;
 
 	input = PG_GETARG_CSTRING(0);
 	input_copy = strdup(input);
     token = strtok_r(input_copy, "[", &saveptr);
 
+	wsize = GrB_INDEX_MAX+1;
     if (token != NULL)
 	{
 		short_name = palloc(strlen(token)+1);
-        strcpy(short_name, token);
+		matched = sscanf(token, "%99[^()](%lu)", short_name, &wsize);
+		if (matched == 1)
+		{
+			wsize = GrB_INDEX_MAX+1;
+		}
+		else if (matched != 2)
+		{
+			elog(ERROR, "Invalid prefix %s", token);
+		}
 		typ = short_type(short_name);
     }
 	else
 		elog(ERROR, "Vector parse error, no short type code prefix.");
 
-	wsize = GrB_INDEX_MAX+1;
 	vector = new_vector(typ, wsize, CurrentMemoryContext, NULL);
 
     strcpy(input_copy, input);

@@ -4,6 +4,14 @@ create extension if not exists onesparse;
 
 select 'i4[1 2 3]'::vector;
 
+select nvals('i4[1 2 3]'::vector);
+
+select 'i4(10)[1 2 3]'::vector;
+
+select size('i4(10)[1 2 3]'::vector);
+
+select size('i4(2)[1 2 3]'::vector);
+
 select ewise_add('i4[1 2 3]'::vector, 'i4[1 2 3]'::vector, 'plus_int32');
 
 select ewise_mult('i4[1 2 3]'::vector, 'i4[1 2 3]'::vector, 'times_int32');
