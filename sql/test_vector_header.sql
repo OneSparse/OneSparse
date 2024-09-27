@@ -2,6 +2,30 @@ set client_min_messages = 'WARNING';
 create extension if not exists onesparse;
 \dT+ vector
 
+select 'i4'::vector;
+
+select nvals('i4'::vector);
+
+select size('i4'::vector);
+
+select 'i4[]'::vector;
+
+select nvals('i4[]'::vector);
+
+select size('i4[]'::vector);
+
+select 'i4(10)'::vector;
+
+select nvals('i4(10)'::vector);
+
+select size('i4(10)'::vector);
+
+select 'i4(10)[]'::vector;
+
+select nvals('i4(10)[]'::vector);
+
+select size('i4(10)[]'::vector);
+
 select 'i4[1 2 3]'::vector;
 
 select nvals('i4[1 2 3]'::vector);

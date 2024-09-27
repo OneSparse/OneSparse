@@ -4,6 +4,22 @@ create extension if not exists onesparse;
 
 select 'i4[1:1:1 2:2:2 3:3:3]'::matrix;
 
+select 'i4(10:)[1:1:1 2:2:2 3:3:3]'::matrix;
+
+select 'i4(:10)[1:1:1 2:2:2 3:3:3]'::matrix;
+
+select nrows('i4(10:)[1:1:1 2:2:2 3:3:3]'::matrix);
+
+select ncols('i4(10:)[1:1:1 2:2:2 3:3:3]'::matrix);
+
+select nrows('i4(:10)[1:1:1 2:2:2 3:3:3]'::matrix);
+
+select ncols('i4(:10)[1:1:1 2:2:2 3:3:3]'::matrix);
+
+select nrows('i4(10:10)[1:1:1 2:2:2 3:3:3]'::matrix);
+
+select ncols('i4(10:10)[1:1:1 2:2:2 3:3:3]'::matrix);
+
 select ewise_add('i4[1:1:1 2:2:2 3:3:3]'::matrix, 'i4[1:1:1 2:2:2 3:3:3]'::matrix, 'plus_int32');
 
 select ewise_mult('i4[1:1:1 2:2:2 3:3:3]'::matrix, 'i4[1:1:1 2:2:2 3:3:3]'::matrix, 'times_int32');
