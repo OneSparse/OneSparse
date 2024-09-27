@@ -119,8 +119,9 @@ context_callback_monoid_free(void* ptr)
 	onesparse_Monoid *monoid = (onesparse_Monoid *) ptr;
 	LOGF();
 
-	ERRORIF(GrB_Monoid_free(&monoid->monoid) != GrB_SUCCESS,
-			"Cannot GrB_Free Monoid");
+	CHECK(GrB_Monoid_free(&monoid->monoid),
+		  monoid->monoid,
+		  "Cannot GrB_Free Monoid");
 }
 
 /* Helper function to always expand datum

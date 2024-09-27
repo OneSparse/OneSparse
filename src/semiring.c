@@ -119,8 +119,9 @@ context_callback_semiring_free(void* ptr)
 	onesparse_Semiring *semiring = (onesparse_Semiring *) ptr;
 	LOGF();
 
-	ERRORIF(GrB_Semiring_free(&semiring->semiring) != GrB_SUCCESS,
-			"Cannot GrB_Free Semiring");
+	CHECK(GrB_Semiring_free(&semiring->semiring),
+		  semiring->semiring,
+		  "Cannot GrB_Free Semiring");
 }
 
 /* Helper function to always expand datum

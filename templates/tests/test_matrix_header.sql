@@ -14,8 +14,14 @@ select reduce_scalar('i4[1:1:1 2:2:2 3:3:3]'::matrix, 'plus_monoid_int32');
 
 select reduce_vector('i4[1:1:1 1:2:3 2:2:2]'::matrix, 'plus_monoid_int32');
 
+select mxm('i4[0:0:1 0:1:2]'::matrix, 'i4[0:0:1 0:1:3]'::matrix, 'plus_times_int32');
+
+select mxv('i4[0:0:1 0:1:2]'::matrix, 'i4[0 1]'::vector, 'plus_times_int32');
+
+select vxm('i4[0 1]'::vector, 'i4[0:0:1 0:1:2]'::matrix, 'plus_times_int32');
+
 select dup('i4[1:1:1 2:2:2 3:3:3]'::matrix);
 
-select wait('i4[1:1:1 2:2:2 3:3:3]'::matrix);
+select wait('i4[2:2:2 3:3:3 1:1:1]'::matrix);
 
 select clear('i4[1:1:1 2:2:2 3:3:3]'::matrix);

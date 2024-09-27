@@ -28,10 +28,11 @@ Datum FN(cast_vector)(PG_FUNCTION_ARGS)
 	ERRORNULL(0);
 
 	vector = ONESPARSE_GETARG_VECTOR(0);
-	ERRORIF(GrB_Vector_extractElement(
+	CHECK(GrB_Vector_extractElement(
 				&value,
 				vector->vector),
-			"Error extracting Vector element");
+          vector->vector,
+          "Error extracting Vector element");
 
 	PG_RETURN(value);
 }

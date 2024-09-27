@@ -119,8 +119,9 @@ context_callback_descriptor_free(void* ptr)
 	onesparse_Descriptor *descriptor = (onesparse_Descriptor *) ptr;
 	LOGF();
 
-	ERRORIF(GrB_Descriptor_free(&descriptor->descriptor) != GrB_SUCCESS,
-			"Cannot GrB_Free Descriptor");
+	CHECK(GrB_Descriptor_free(&descriptor->descriptor),
+		  descriptor->descriptor,
+		  "Cannot GrB_Free Descriptor");
 }
 
 /* Helper function to always expand datum

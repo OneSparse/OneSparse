@@ -21,10 +21,11 @@ Datum FN(scalar)(PG_FUNCTION_ARGS)
 	if (!PG_ARGISNULL(0))
 	{
 		val = PG_GETARG(0);
-		ERRORIF(GrB_Scalar_setElement(
+		CHECK(GrB_Scalar_setElement(
 					scalar->scalar,
 					val),
-				"Error setting Scalar element");
+              scalar->scalar,
+              "Error setting Scalar element");
 	}
 	ONESPARSE_RETURN_SCALAR(scalar);
 }
@@ -38,8 +39,9 @@ Datum FN(set_scalar)(PG_FUNCTION_ARGS)
 	ERRORNULL(1);
 	scalar = ONESPARSE_GETARG_SCALAR(0);
     val = PG_GETARG(1);
-    ERRORIF(GrB_Scalar_setElement(scalar->scalar, val),
-            "Error setting Scalar element");
+    CHECK(GrB_Scalar_setElement(scalar->scalar, val),
+          scalar->scalar,
+          "Error setting Scalar element");
 	ONESPARSE_RETURN_SCALAR(scalar);
 }
 
@@ -52,10 +54,11 @@ Datum FN(cast_scalar)(PG_FUNCTION_ARGS)
 	ERRORNULL(0);
 
 	scalar = ONESPARSE_GETARG_SCALAR(0);
-	ERRORIF(GrB_Scalar_extractElement(
+	CHECK(GrB_Scalar_extractElement(
 				&value,
 				scalar->scalar),
-			"Error extracting Scalar element");
+          scalar->scalar,
+          "Error extracting Scalar element");
 
 	PG_RETURN(value);
 }
@@ -73,16 +76,18 @@ Datum FN(scalar_plus)(PG_FUNCTION_ARGS)
 	scalar = ONESPARSE_GETARG_SCALAR(0);
 	right = PG_GETARG(1);
 
-	ERRORIF(GrB_Scalar_extractElement(
+	CHECK(GrB_Scalar_extractElement(
 				&left,
 				scalar->scalar),
-			"Error extracting Scalar element");
+          scalar->scalar,
+          "Error extracting Scalar element");
 
 	result = new_scalar(GB_TYPE, CurrentMemoryContext, NULL);
-	ERRORIF(GrB_Scalar_setElement(
+	CHECK(GrB_Scalar_setElement(
 				result->scalar,
 				left + right),
-			"Error setting Scalar element");
+          result->scalar,
+          "Error setting Scalar element");
 
 	ONESPARSE_RETURN_SCALAR(result);
 }
@@ -99,10 +104,11 @@ Datum FN(plus_scalar)(PG_FUNCTION_ARGS)
 	left = PG_GETARG(0);
 	scalar = ONESPARSE_GETARG_SCALAR(1);
 
-	ERRORIF(GrB_Scalar_extractElement(
+	CHECK(GrB_Scalar_extractElement(
 				&right,
 				scalar->scalar),
-			"Error extracting Scalar element");
+          scalar->scalar,
+          "Error extracting Scalar element");
 
 	PG_RETURN(left + right);
 }
@@ -119,16 +125,18 @@ Datum FN(scalar_minus)(PG_FUNCTION_ARGS)
 	scalar = ONESPARSE_GETARG_SCALAR(0);
 	right = PG_GETARG(1);
 
-	ERRORIF(GrB_Scalar_extractElement(
+	CHECK(GrB_Scalar_extractElement(
 				&left,
 				scalar->scalar),
-			"Error extracting Scalar element");
+          scalar->scalar,
+          "Error extracting Scalar element");
 
 	result = new_scalar(GB_TYPE, CurrentMemoryContext, NULL);
-	ERRORIF(GrB_Scalar_setElement(
+	CHECK(GrB_Scalar_setElement(
 				result->scalar,
 				left - right),
-			"Error setting Scalar element");
+          result->scalar,
+          "Error setting Scalar element");
 
 	ONESPARSE_RETURN_SCALAR(result);
 }
@@ -145,10 +153,11 @@ Datum FN(minus_scalar)(PG_FUNCTION_ARGS)
 	left = PG_GETARG(0);
 	scalar = ONESPARSE_GETARG_SCALAR(1);
 
-	ERRORIF(GrB_Scalar_extractElement(
+	CHECK(GrB_Scalar_extractElement(
 				&right,
 				scalar->scalar),
-			"Error extracting Scalar element");
+          scalar->scalar,
+          "Error extracting Scalar element");
 
 	PG_RETURN(left - right);
 }
@@ -165,16 +174,18 @@ Datum FN(scalar_mult)(PG_FUNCTION_ARGS)
 	scalar = ONESPARSE_GETARG_SCALAR(0);
 	right = PG_GETARG(1);
 
-	ERRORIF(GrB_Scalar_extractElement(
+	CHECK(GrB_Scalar_extractElement(
 				&left,
 				scalar->scalar),
-			"Error extracting Scalar element");
+          scalar->scalar,
+          "Error extracting Scalar element");
 
 	result = new_scalar(GB_TYPE, CurrentMemoryContext, NULL);
-	ERRORIF(GrB_Scalar_setElement(
+	CHECK(GrB_Scalar_setElement(
 				result->scalar,
 				left * right),
-			"Error setting Scalar element");
+          result->scalar,
+          "Error setting Scalar element");
 
 	ONESPARSE_RETURN_SCALAR(result);
 }
@@ -191,10 +202,11 @@ Datum FN(mult_scalar)(PG_FUNCTION_ARGS)
 	left = PG_GETARG(0);
 	scalar = ONESPARSE_GETARG_SCALAR(1);
 
-	ERRORIF(GrB_Scalar_extractElement(
+	CHECK(GrB_Scalar_extractElement(
 				&right,
 				scalar->scalar),
-			"Error extracting Scalar element");
+          scalar->scalar,
+          "Error extracting Scalar element");
 
 	PG_RETURN(left * right);
 }
@@ -211,16 +223,18 @@ Datum FN(scalar_div)(PG_FUNCTION_ARGS)
 	scalar = ONESPARSE_GETARG_SCALAR(0);
 	right = PG_GETARG(1);
 
-	ERRORIF(GrB_Scalar_extractElement(
+	CHECK(GrB_Scalar_extractElement(
 				&left,
 				scalar->scalar),
-			"Error extracting Scalar element");
+          scalar->scalar,
+          "Error extracting Scalar element");
 
 	result = new_scalar(GB_TYPE, CurrentMemoryContext, NULL);
-	ERRORIF(GrB_Scalar_setElement(
+	CHECK(GrB_Scalar_setElement(
 				result->scalar,
 				left / right),
-			"Error setting Scalar element");
+          result->scalar,
+          "Error setting Scalar element");
 
 	ONESPARSE_RETURN_SCALAR(result);
 }
@@ -237,10 +251,11 @@ Datum FN(div_scalar)(PG_FUNCTION_ARGS)
 	left = PG_GETARG(0);
 	scalar = ONESPARSE_GETARG_SCALAR(1);
 
-	ERRORIF(GrB_Scalar_extractElement(
+	CHECK(GrB_Scalar_extractElement(
 				&right,
 				scalar->scalar),
-			"Error extracting Scalar element");
+          scalar->scalar,
+          "Error extracting Scalar element");
 
 	PG_RETURN(left / right);
 }

@@ -95,16 +95,28 @@ RETURNS scalar
 AS '$libdir/onesparse', 'matrix_reduce_scalar'
 LANGUAGE C STABLE;
 
-CREATE FUNCTION assign(
+CREATE FUNCTION matrix_assign(
     a matrix,
     b matrix,
-    op monoid,
+    op binaryop,
     mask matrix default null,
     accum binaryop default null,
     descriptor descriptor default null
     )
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_assign_matrix'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION matrix_extract(
+    a matrix,
+    b matrix,
+    op binaryop,
+    mask matrix default null,
+    accum binaryop default null,
+    descriptor descriptor default null
+    )
+RETURNS matrix
+AS '$libdir/onesparse', 'matrix_extract_matrix'
 LANGUAGE C STABLE;
 
 CREATE FUNCTION mxm(
@@ -147,7 +159,7 @@ AS '$libdir/onesparse', 'matrix_vxm'
 LANGUAGE C STABLE;
 
 CREATE FUNCTION wait(matrix, waitmode integer default 0)
-RETURNS void
+RETURNS matrix
 AS '$libdir/onesparse', 'matrix_wait'
 LANGUAGE C;
 
@@ -157,6 +169,6 @@ AS '$libdir/onesparse', 'matrix_dup'
 LANGUAGE C;
 
 CREATE FUNCTION clear(matrix)
-RETURNS void
+RETURNS matrix
 AS '$libdir/onesparse', 'matrix_clear'
 LANGUAGE C;

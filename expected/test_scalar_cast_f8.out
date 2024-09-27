@@ -1,0 +1,38 @@
+set client_min_messages = 'WARNING';
+create extension if not exists onesparse;
+set search_path = 'onesparse';
+select cast(-1::float8 as scalar);
+    scalar    
+--------------
+ f8:-1.000000
+(1 row)
+
+select cast(0::float8 as scalar);
+   scalar    
+-------------
+ f8:0.000000
+(1 row)
+
+select cast(1::float8 as scalar);
+   scalar    
+-------------
+ f8:1.000000
+(1 row)
+
+select cast(-1::float8::scalar as float8);
+ERROR:  operator does not exist: - scalar
+LINE 1: select cast(-1::float8::scalar as float8);
+                    ^
+HINT:  No operator matches the given name and argument type. You might need to add an explicit type cast.
+select cast(0::float8::scalar as  float8);
+ float8 
+--------
+      0
+(1 row)
+
+select cast(1::float8::scalar as scalar);
+   scalar    
+-------------
+ f8:1.000000
+(1 row)
+

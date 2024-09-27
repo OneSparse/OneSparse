@@ -1,0 +1,63 @@
+set client_min_messages = 'WARNING';
+create extension if not exists onesparse;
+set search_path = 'onesparse';
+select '0'::bool::scalar;
+ scalar 
+--------
+ b:f
+(1 row)
+
+select '0'::bool::scalar;
+ scalar 
+--------
+ b:f
+(1 row)
+
+select '1'::bool::scalar;
+ scalar 
+--------
+ b:t
+(1 row)
+
+select set('1'::bool::scalar, 2);
+ set 
+-----
+ b:t
+(1 row)
+
+select scalar_bool((0)::bool);
+ scalar_bool 
+-------------
+ b:f
+(1 row)
+
+select scalar_bool((0)::bool);
+ scalar_bool 
+-------------
+ b:f
+(1 row)
+
+select scalar_bool((1)::bool);
+ scalar_bool 
+-------------
+ b:t
+(1 row)
+
+select bool_scalar((0)::bool::scalar);
+ bool_scalar 
+-------------
+ f
+(1 row)
+
+select bool_scalar((0)::bool::scalar);
+ bool_scalar 
+-------------
+ f
+(1 row)
+
+select bool_scalar((1)::bool::scalar);
+ bool_scalar 
+-------------
+ t
+(1 row)
+

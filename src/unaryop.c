@@ -119,8 +119,9 @@ context_callback_unaryop_free(void* ptr)
 	onesparse_UnaryOp *unaryop = (onesparse_UnaryOp *) ptr;
 	LOGF();
 
-	ERRORIF(GrB_UnaryOp_free(&unaryop->unaryop) != GrB_SUCCESS,
-			"Cannot GrB_Free UnaryOp");
+	CHECK(GrB_UnaryOp_free(&unaryop->unaryop),
+		  unaryop->unaryop,
+		  "Cannot GrB_Free UnaryOp");
 }
 
 /* Helper function to always expand datum

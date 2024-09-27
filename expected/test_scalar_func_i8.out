@@ -1,0 +1,63 @@
+set client_min_messages = 'WARNING';
+create extension if not exists onesparse;
+set search_path = 'onesparse';
+select '-1'::bigint::scalar;
+ scalar 
+--------
+ i8:-1
+(1 row)
+
+select '0'::bigint::scalar;
+ scalar 
+--------
+ i8:0
+(1 row)
+
+select '1'::bigint::scalar;
+ scalar 
+--------
+ i8:1
+(1 row)
+
+select set('1'::bigint::scalar, 2);
+ set  
+------
+ i8:2
+(1 row)
+
+select scalar_bigint((-1)::bigint);
+ scalar_bigint 
+---------------
+ i8:-1
+(1 row)
+
+select scalar_bigint((0)::bigint);
+ scalar_bigint 
+---------------
+ i8:0
+(1 row)
+
+select scalar_bigint((1)::bigint);
+ scalar_bigint 
+---------------
+ i8:1
+(1 row)
+
+select bigint_scalar((-1)::bigint::scalar);
+ bigint_scalar 
+---------------
+            -1
+(1 row)
+
+select bigint_scalar((0)::bigint::scalar);
+ bigint_scalar 
+---------------
+             0
+(1 row)
+
+select bigint_scalar((1)::bigint::scalar);
+ bigint_scalar 
+---------------
+             1
+(1 row)
+

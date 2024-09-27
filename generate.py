@@ -92,6 +92,7 @@ class Type:
     div: str = '/'
 
 variables = suitesparse['variables'].items()
+info = [i for i, j in variables if j[1].type_spec == 'GrB_Info']
 semirings = [i for i, j in variables if j[1].type_spec == 'GrB_Semiring']
 binops = [i for i, j in variables if j[1].type_spec == 'GrB_BinaryOp']
 monoids = [i for i, j in variables if j[1].type_spec == 'GrB_Monoid']

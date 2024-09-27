@@ -119,8 +119,9 @@ context_callback_binaryop_free(void* ptr)
 	onesparse_BinaryOp *binaryop = (onesparse_BinaryOp *) ptr;
 	LOGF();
 
-	ERRORIF(GrB_BinaryOp_free(&binaryop->binaryop) != GrB_SUCCESS,
-			"Cannot GrB_Free BinaryOp");
+	CHECK(GrB_BinaryOp_free(&binaryop->binaryop),
+		  binaryop->binaryop,
+		  "Cannot GrB_Free BinaryOp");
 }
 
 /* Helper function to always expand datum

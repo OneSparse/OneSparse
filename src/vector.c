@@ -44,8 +44,9 @@ static Size vector_get_flat_size(ExpandedObjectHeader *eohptr) {
 		return vector->flat_size;
 	}
 
-	ERRORIF(GxB_Vector_serialize(&serialized_data, &serialized_size, vector->vector, NULL) != GrB_SUCCESS,
-			"Error serializing vector");
+	CHECK(GxB_Vector_serialize(&serialized_data, &serialized_size, vector->vector, NULL),
+		  vector->vector,
+		  "Error serializing vector");
 
 	vector->serialized_data = serialized_data;
 	vector->serialized_size = serialized_size;
@@ -77,11 +78,13 @@ static void flatten_vector(
 
 	memset(flat, 0, allocated_size);
 
-	ERRORIF(GrB_get(vector->vector, &flat->type_code, GrB_EL_TYPE_CODE) != GrB_SUCCESS,
-			"Cannot get Vector Type code.");
+	CHECK(GrB_get(vector->vector, &flat->type_code, GrB_EL_TYPE_CODE),
+		  vector->vector,
+		  "Cannot get Vector Type code.");
 
-	ERRORIF(GrB_Vector_size(&flat->size, vector->vector) != GrB_SUCCESS,
-			"Error extracting vector size.");
+	CHECK(GrB_Vector_size(&flat->size, vector->vector),
+		  vector->vector,
+		  "Error extracting vector size.");
 
 	data = ONESPARSE_VECTOR_DATA(flat);
 
@@ -126,8 +129,9 @@ onesparse_Vector* new_vector(
 
 	if (_vector == NULL)
 	{
-		ERRORIF(GrB_Vector_new(&vector->vector, type, size) != GrB_SUCCESS,
-				"Cannot create new Vector.");
+		CHECK(GrB_Vector_new(&vector->vector, type, size),
+			  vector->vector,
+			  "Cannot create new Vector.");
 	}
 	else
 	{
@@ -183,8 +187,9 @@ Datum expand_vector(onesparse_FlatVector *flat, MemoryContext parentcontext)
 
 	vector = new_vector(type, flat->size, parentcontext, NULL);
 	data = ONESPARSE_VECTOR_DATA(flat);
-	ERRORIF(GxB_Vector_deserialize(&vector->vector, type, data, flat->serialized_size, NULL) != GrB_SUCCESS,
-			"Error deserializing vector");
+	CHECK(GxB_Vector_deserialize(&vector->vector, type, data, flat->serialized_size, NULL),
+		  vector->vector,
+		  "Error deserializing vector");
 	ONESPARSE_RETURN_VECTOR(vector);
 }
 
@@ -194,8 +199,9 @@ context_callback_vector_free(void* ptr)
 	onesparse_Vector *vector = (onesparse_Vector *) ptr;
 	LOGF();
 
-	ERRORIF(GrB_Vector_free(&vector->vector) != GrB_SUCCESS,
-			"Cannot GrB_Free Vector");
+	CHECK(GrB_Vector_free(&vector->vector),
+		  vector->vector,
+		  "Cannot GrB_Free Vector");
 }
 
 /* Helper function to always expand datum
@@ -232,6 +238,7 @@ Datum vector_in(PG_FUNCTION_ARGS)
     int index = 0;
 	bool is_short = false;
 	GrB_Index dimesion;
+	GrB_Index wsize;
 
 	input = PG_GETARG_CSTRING(0);
 	input_copy = strdup(input);
@@ -246,11 +253,16 @@ Datum vector_in(PG_FUNCTION_ARGS)
 	else
 		elog(ERROR, "Vector parse error, no short type code prefix.");
 
-	vector = new_vector(typ, GrB_INDEX_MAX+1, CurrentMemoryContext, NULL);
+	wsize = GrB_INDEX_MAX+1;
+	vector = new_vector(typ, wsize, CurrentMemoryContext, NULL);
 
     strcpy(input_copy, input);
     strtok_r(input_copy, "[", &saveptr);
     token = strtok_r(NULL, "]", &saveptr);
+	if (token == NULL)
+	{
+		ONESPARSE_RETURN_VECTOR(vector);
+	}
 
     for (number_token = strtok_r(token, " ", &number_saveptr); number_token != NULL;
          number_token = strtok_r(NULL, " ", &number_saveptr))
@@ -261,38 +273,43 @@ Datum vector_in(PG_FUNCTION_ARGS)
             int64_t num = strtoll(number_token, &endptr, 10);
             if (errno != 0 || *endptr != '\0')
 				elog(ERROR, "Invalid INT64 %s", number_token);
-			ERRORIF(GrB_Vector_setElement(vector->vector, num, index) != GrB_SUCCESS,
-				"Error setting Vector Element");
+			CHECK(GrB_Vector_setElement(vector->vector, num, index),
+				  vector->vector,
+				  "Error setting Vector Element");
         }
         else if (typ == GrB_INT32) {
             long num = strtol(number_token, &endptr, 10);
             if (errno != 0 || *endptr != '\0')
 				elog(ERROR, "Invalid INT32 %s", number_token);
-			ERRORIF(GrB_Vector_setElement(vector->vector, num, index) != GrB_SUCCESS,
-					"Error setting Vector Element");
+			CHECK(GrB_Vector_setElement(vector->vector, num, index),
+				  vector->vector,
+				  "Error setting Vector Element");
         }
         else if (typ == GrB_INT16) {
             int num = (int)strtol(number_token, &endptr, 10);
             if (errno != 0 || *endptr != '\0')
 				elog(ERROR, "Invalid INT16 %s", number_token);
-			ERRORIF(GrB_Vector_setElement(vector->vector, num, index) != GrB_SUCCESS,
-					"Error setting Vector Element");
+			CHECK(GrB_Vector_setElement(vector->vector, num, index),
+				  vector->vector,
+				  "Error setting Vector Element");
         }
 		else if (typ == GrB_FP64)
 		{
             double num = strtod(number_token, &endptr);
             if (errno != 0 || *endptr != '\0')
 				elog(ERROR, "Invalid FP64 %s", number_token);
-			ERRORIF(GrB_Vector_setElement(vector->vector, num, index) != GrB_SUCCESS,
-					"Error setting Vector Element");
+			CHECK(GrB_Vector_setElement(vector->vector, num, index),
+				  vector->vector,
+				  "Error setting Vector Element");
         }
 		else if (typ == GrB_FP32)
 		{
             float num = strtof(number_token, &endptr);
             if (errno != 0 || *endptr != '\0')
 				elog(ERROR, "Invalid FP32 %s", number_token);
-			ERRORIF(GrB_Vector_setElement(vector->vector, num, index) != GrB_SUCCESS,
-					"Error setting Vector Element");
+			CHECK(GrB_Vector_setElement(vector->vector, num, index),
+				  vector->vector,
+				  "Error setting Vector Element");
         }
 		else if (typ == GrB_BOOL)
 		{
@@ -303,8 +320,9 @@ Datum vector_in(PG_FUNCTION_ARGS)
 				num = false;
 			else
 				elog(ERROR, "Invalid BOOL %s", number_token);
-			ERRORIF(GrB_Vector_setElement(vector->vector, num, index) != GrB_SUCCESS,
-					"Error setting Vector Element");
+			CHECK(GrB_Vector_setElement(vector->vector, num, index),
+				  vector->vector,
+				  "Error setting Vector Element");
         }
 		index++;
     }
@@ -324,12 +342,14 @@ Datum vector_out(PG_FUNCTION_ARGS)
 	vector = ONESPARSE_GETARG_VECTOR(0);
 
     GxB_Iterator_new(&iterator);
-	ERRORIF(GxB_Vector_Iterator_attach(iterator, vector->vector, NULL) != GrB_SUCCESS,
-			"Cannot attach vector iterator.");
+	CHECK(GxB_Vector_Iterator_attach(iterator, vector->vector, NULL),
+		  vector->vector,
+		  "Cannot attach vector iterator.");
 
     initStringInfo(&buf);
-	ERRORIF(GrB_get(vector->vector, &type_code, GrB_EL_TYPE_CODE) != GrB_SUCCESS,
-			"Cannot get Vector Type code.");
+	CHECK(GrB_get(vector->vector, &type_code, GrB_EL_TYPE_CODE),
+		  vector->vector,
+		  "Cannot get Vector Type code.");
 
 	appendStringInfo(&buf, "%s[", short_code(type_code));
 
@@ -380,8 +400,9 @@ Datum vector_nvals(PG_FUNCTION_ARGS)
 
 	vector = ONESPARSE_GETARG_VECTOR(0);
 
-	ERRORIF(GrB_Vector_nvals(&result, vector->vector) != GrB_SUCCESS,
-			"Error extracting vector nvals.");
+	CHECK(GrB_Vector_nvals(&result, vector->vector),
+		  vector->vector,
+		  "Error extracting vector nvals.");
 	PG_RETURN_INT64(result);
 }
 
@@ -395,8 +416,9 @@ Datum vector_size(PG_FUNCTION_ARGS)
 
 	vector = ONESPARSE_GETARG_VECTOR(0);
 
-	ERRORIF(GrB_Vector_size(&result, vector->vector) != GrB_SUCCESS,
-			"Error extracting vector size.");
+	CHECK(GrB_Vector_size(&result, vector->vector),
+		  vector->vector,
+		  "Error extracting vector size.");
 	PG_RETURN_INT64(result);
 }
 
@@ -406,6 +428,8 @@ Datum vector_ewise_add(PG_FUNCTION_ARGS)
 	onesparse_Vector *u, *v, *w, *mask;
 	onesparse_Descriptor *descriptor;
 	onesparse_BinaryOp *op, *accum;
+	GrB_Index wsize;
+
 	LOGF();
 	ERRORNULL(0);
 	ERRORNULL(1);
@@ -423,9 +447,15 @@ Datum vector_ewise_add(PG_FUNCTION_ARGS)
 	{
 		if (PG_ARGISNULL(3))
 		{
-			ERRORIF(GxB_Vector_type(&type, u->vector) != GrB_SUCCESS,
-					"Cannot get vector type");
-			w = new_vector(type, GrB_INDEX_MAX+1, CurrentMemoryContext, NULL);
+			CHECK(GxB_Vector_type(&type, u->vector),
+				  u->vector,
+				  "Cannot get vector type");
+
+			CHECK(GrB_Vector_size(&wsize, u->vector),
+				  u->vector,
+				  "Cannot get vector size");
+
+			w = new_vector(type, wsize, CurrentMemoryContext, NULL);
 		}
 		else
 			w = ONESPARSE_GETARG_VECTOR(3);
@@ -437,14 +467,15 @@ Datum vector_ewise_add(PG_FUNCTION_ARGS)
 	if (PG_NARGS() > 6)
 		 descriptor = PG_ARGISNULL(6) ? NULL : ONESPARSE_GETARG_DESCRIPTOR(6);
 
-	ERRORIF(GrB_eWiseAdd(w->vector,
-						 mask ? mask->vector : NULL,
-						 accum ? accum->binaryop : NULL,
-						 op->binaryop,
+	CHECK(GrB_eWiseAdd(w->vector,
+					   mask ? mask->vector : NULL,
+					   accum ? accum->binaryop : NULL,
+					   op->binaryop,
 						 u->vector,
-						 v->vector,
-						 descriptor ? descriptor->descriptor : NULL) != GrB_SUCCESS,
-			"Error vector eWiseAdd.");
+					   v->vector,
+					   descriptor ? descriptor->descriptor : NULL),
+		  w->vector,
+		  "Error vector eWiseAdd.");
 
 	ONESPARSE_RETURN_VECTOR(w);
 }
@@ -455,6 +486,8 @@ Datum vector_ewise_mult(PG_FUNCTION_ARGS)
 	onesparse_Vector *u, *v, *w, *mask;
 	onesparse_Descriptor *descriptor;
 	onesparse_BinaryOp *op, *accum;
+	GrB_Index wsize;
+
 	LOGF();
 
 	ERRORNULL(0);
@@ -473,9 +506,15 @@ Datum vector_ewise_mult(PG_FUNCTION_ARGS)
 	{
 		if (PG_ARGISNULL(3))
 		{
-			ERRORIF(GxB_Vector_type(&type, u->vector) != GrB_SUCCESS,
-					"Cannot get vector type");
-			w = new_vector(type, GrB_INDEX_MAX+1, CurrentMemoryContext, NULL);
+			CHECK(GxB_Vector_type(&type, u->vector),
+				  u->vector,
+				  "Cannot get vector type");
+
+			CHECK(GrB_Vector_size(&wsize, u->vector),
+				  u->vector,
+				  "Cannot get vector size");
+
+			w = new_vector(type, wsize, CurrentMemoryContext, NULL);
 		}
 		else
 			w = ONESPARSE_GETARG_VECTOR(3);
@@ -487,14 +526,15 @@ Datum vector_ewise_mult(PG_FUNCTION_ARGS)
 	if (PG_NARGS() > 6)
 		 descriptor = PG_ARGISNULL(6) ? NULL : ONESPARSE_GETARG_DESCRIPTOR(6);
 
-	ERRORIF(GrB_eWiseMult(w->vector,
-						  mask ? mask->vector : NULL,
-						  accum ? accum->binaryop : NULL,
-						  op->binaryop,
-						  u->vector,
-						  v->vector,
-						  descriptor ? descriptor->descriptor : NULL) != GrB_SUCCESS,
-			"Error vector eWiseMult.");
+	CHECK(GrB_eWiseMult(w->vector,
+						mask ? mask->vector : NULL,
+						accum ? accum->binaryop : NULL,
+						op->binaryop,
+						u->vector,
+						v->vector,
+						descriptor ? descriptor->descriptor : NULL),
+		  w->vector,
+		  "Error vector eWiseMult.");
 
 	ONESPARSE_RETURN_VECTOR(w);
 }
@@ -506,6 +546,8 @@ Datum vector_ewise_union(PG_FUNCTION_ARGS)
 	onesparse_Scalar *a, *b;
 	onesparse_Descriptor *descriptor;
 	onesparse_BinaryOp *op, *accum;
+	GrB_Index wsize;
+
 	LOGF();
 	ERRORNULL(0);
 	ERRORNULL(1);
@@ -527,9 +569,15 @@ Datum vector_ewise_union(PG_FUNCTION_ARGS)
 	{
 		if (PG_ARGISNULL(5))
 		{
-			ERRORIF(GxB_Vector_type(&type, u->vector) != GrB_SUCCESS,
-					"Cannot get vector type");
-			w = new_vector(type, GrB_INDEX_MAX+1, CurrentMemoryContext, NULL);
+			CHECK(GxB_Vector_type(&type, u->vector),
+				  u->vector,
+				  "Cannot get vector type");
+
+			CHECK(GrB_Vector_size(&wsize, u->vector),
+				  u->vector,
+				  "Cannot get vector size");
+
+			w = new_vector(type, wsize, CurrentMemoryContext, NULL);
 		}
 		else
 			w = ONESPARSE_GETARG_VECTOR(5);
@@ -541,16 +589,17 @@ Datum vector_ewise_union(PG_FUNCTION_ARGS)
 	if (PG_NARGS() > 8)
 		 descriptor = PG_ARGISNULL(8) ? NULL : ONESPARSE_GETARG_DESCRIPTOR(8);
 
-	ERRORIF(GxB_eWiseUnion(w->vector,
-						   mask ? mask->vector : NULL,
-						   accum ? accum->binaryop : NULL,
-						   op->binaryop,
-						   u->vector,
-						   a->scalar,
-						   v->vector,
+	CHECK(GxB_eWiseUnion(w->vector,
+						 mask ? mask->vector : NULL,
+						 accum ? accum->binaryop : NULL,
+						 op->binaryop,
+						 u->vector,
+						 a->scalar,
+						 v->vector,
 						   b->scalar,
-						   descriptor ? descriptor->descriptor : NULL) != GrB_SUCCESS,
-			"Error vector eWiseUnion.");
+						 descriptor ? descriptor->descriptor : NULL),
+		  w->vector,
+		  "Error vector eWiseUnion.");
 
 	ONESPARSE_RETURN_VECTOR(w);
 }
@@ -573,18 +622,20 @@ vector_reduce_scalar(PG_FUNCTION_ARGS)
 	if (PG_NARGS() > 3)
 		 descriptor = PG_ARGISNULL(3) ? NULL : ONESPARSE_GETARG_DESCRIPTOR(3);
 
-	ERRORIF(GxB_Vector_type(&type, A->vector) != GrB_SUCCESS,
-			"Cannot get Vector type");
+	CHECK(GxB_Vector_type(&type, A->vector),
+		  A->vector,
+		  "Cannot get Vector type");
 
 	result = new_scalar(type, CurrentMemoryContext, NULL);
 
-	ERRORIF(GrB_Vector_reduce_Monoid_Scalar(
-				result->scalar,
-				accum ? accum->binaryop : NULL,
-				monoid->monoid,
-				A->vector,
-				descriptor ? descriptor->descriptor : NULL) != GrB_SUCCESS,
-			"Cannot reduce vector to scalar");
+	CHECK(GrB_Vector_reduce_Monoid_Scalar(
+			  result->scalar,
+			  accum ? accum->binaryop : NULL,
+			  monoid->monoid,
+			  A->vector,
+			  descriptor ? descriptor->descriptor : NULL),
+		  result->scalar,
+		  "Cannot reduce vector to scalar");
 
 	ONESPARSE_RETURN_SCALAR(result);
 }
@@ -609,26 +660,29 @@ vector_assign(PG_FUNCTION_ARGS)
 
 	if (B != NULL)
 	{
-		ERRORIF(GrB_Vector_nvals(&nvals, B->vector) != GrB_SUCCESS,
-				"Error getting nvals.");
+		CHECK(GrB_Vector_nvals(&nvals, B->vector),
+			  B->vector,
+			  "Error getting nvals.");
 
 		Ilist = (GrB_Index*) palloc0(sizeof(GrB_Index) * nvals);
 
-		ERRORIF(GrB_Vector_extractTuples(Ilist,
-										 NULL,
-										 &nvals,
-										 A->vector) != GrB_SUCCESS,
-				"Error extracting tuples.");
+		CHECK(GrB_Vector_extractTuples(Ilist,
+									   NULL,
+									   &nvals,
+									   A->vector),
+			  A->vector,
+			  "Error extracting tuples.");
 	}
 
-	ERRORIF(GrB_assign(A->vector,
-					   mask ? mask->vector : NULL,
-					   accum ? accum->binaryop : NULL,
-					   B->vector,
-					   Ilist ? Ilist : GrB_ALL,
-					   nvals,
-					   descriptor ? descriptor->descriptor : NULL) != GrB_SUCCESS,
-			"Error in assign vector.");
+	CHECK(GrB_assign(A->vector,
+					 mask ? mask->vector : NULL,
+					 accum ? accum->binaryop : NULL,
+					 B->vector,
+					 Ilist ? Ilist : GrB_ALL,
+					 nvals,
+					 descriptor ? descriptor->descriptor : NULL),
+		  A->vector,
+		  "Error in assign vector.");
 
 	ONESPARSE_RETURN_VECTOR(A);
 }
@@ -644,8 +698,9 @@ Datum vector_wait(PG_FUNCTION_ARGS)
 	vector = ONESPARSE_GETARG_VECTOR(0);
 	waitmode = PG_GETARG_INT32(1);
 
-	ERRORIF(GrB_Vector_wait(vector->vector, waitmode) != GrB_SUCCESS,
-			"Error waiting for vector.");
+	CHECK(GrB_Vector_wait(vector->vector, waitmode),
+		  vector->vector,
+		  "Error waiting for vector.");
 	PG_RETURN_VOID();
 }
 
@@ -660,16 +715,19 @@ Datum vector_dup(PG_FUNCTION_ARGS)
 	ERRORNULL(0);
 
 	vector = ONESPARSE_GETARG_VECTOR(0);
-	ERRORIF(GxB_Vector_type(&type, vector->vector) != GrB_SUCCESS,
-			"Cannot get vector type");
+	CHECK(GxB_Vector_type(&type, vector->vector),
+		  vector->vector,
+		  "Cannot get vector type");
 
-	ERRORIF(GrB_Vector_size(&size, vector->vector) != GrB_SUCCESS,
-			"Error extracting vector size.");
+	CHECK(GrB_Vector_size(&size, vector->vector),
+		  vector->vector,
+		  "Error extracting vector size.");
 
 	result = new_vector(type, size, CurrentMemoryContext, NULL);
 
-	ERRORIF(GrB_Vector_dup(&result->vector, vector->vector) != GrB_SUCCESS,
-			"Error duping vector.");
+	CHECK(GrB_Vector_dup(&result->vector, vector->vector),
+		  vector->vector,
+		  "Error duping vector.");
 	ONESPARSE_RETURN_VECTOR(result);
 }
 
@@ -682,8 +740,9 @@ Datum vector_clear(PG_FUNCTION_ARGS)
 
 	vector = ONESPARSE_GETARG_VECTOR(0);
 
-	ERRORIF(GrB_Vector_clear(vector->vector) != GrB_SUCCESS,
-			"Error clearing vector.");
+	CHECK(GrB_Vector_clear(vector->vector),
+		  vector->vector,
+		  "Error clearing vector.");
 	PG_RETURN_VOID();
 }
 /* Local Variables: */
