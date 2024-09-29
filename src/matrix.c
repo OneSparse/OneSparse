@@ -266,13 +266,9 @@ Datum matrix_in(PG_FUNCTION_ARGS)
 	if (token != NULL)
 	{
 		short_name = palloc(strlen(token)+1);
+		nrows = ncols = GrB_INDEX_MAX+1;
 		matched = sscanf(token, "%99[^()](%lu:%lu)", short_name, &nrows, &ncols);
 		if (matched == 1)
-		{
-			nrows = GrB_INDEX_MAX+1;
-			ncols = GrB_INDEX_MAX+1;
-		}
-		else if (matched == 2)
 		{
 			if (input[strcspn(input, "(") + 1] == ':')
 			{
@@ -282,6 +278,10 @@ Datum matrix_in(PG_FUNCTION_ARGS)
 			{
 				ncols = GrB_INDEX_MAX+1;
 			}
+		}
+		else if (matched == 2)
+		{
+			ncols = GrB_INDEX_MAX+1;
 		}
 		else if (matched != 3)
 			elog(ERROR, "Invalid prefix %s", token);

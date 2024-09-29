@@ -1055,3 +1055,33 @@ CREATE FUNCTION clear(matrix)
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_clear'
 LANGUAGE C;
+
+CREATE FUNCTION mxm_op(a matrix, b matrix)
+RETURNS matrix
+RETURN onesparse.mxm(a, b, 'any_secondi_int64'::semiring);
+
+CREATE FUNCTION mxv_op(a matrix, b vector)
+RETURNS vector
+RETURN onesparse.mxv(a, b, 'any_secondi_int64'::semiring);
+
+CREATE FUNCTION vxm_op(a vector, b matrix)
+RETURNS vector
+RETURN onesparse.vxm(a, b, 'any_secondi_int64'::semiring);
+
+CREATE OPERATOR @ (
+    LEFTARG = matrix,
+    RIGHTARG = matrix,
+    FUNCTION = mxm_op
+    );
+
+CREATE OPERATOR @ (
+    LEFTARG = matrix,
+    RIGHTARG = vector,
+    FUNCTION = mxv_op
+    );
+
+CREATE OPERATOR @ (
+    LEFTARG = vector,
+    RIGHTARG = matrix,
+    FUNCTION = vxm_op
+    );
