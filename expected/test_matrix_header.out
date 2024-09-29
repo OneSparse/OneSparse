@@ -193,16 +193,22 @@ select 'i4[0:0 1:1]'::vector @ 'i4[0:0:1 0:1:2]'::matrix;
  i4[0:0 1:0]
 (1 row)
 
-select matrix_select('i4[1:1:1 2:2:2 3:3:3]'::matrix, 'valuegt_int32'::indexunaryop, 1::scalar);
-  matrix_select  
+select selection('i4[1:1:1 2:2:2 3:3:3]'::matrix, 'valuegt_int32'::indexunaryop, 1::scalar);
+    selection    
 -----------------
  i4[2:2:2 3:3:3]
 (1 row)
 
-select matrix_select('i4[1:1:1 2:2:2 3:3:3]'::matrix, 'valueeq_int32'::indexunaryop, 2::scalar);
- matrix_select 
----------------
+select selection('i4[1:1:1 2:2:2 3:3:3]'::matrix, 'valueeq_int32'::indexunaryop, 2::scalar);
+ selection 
+-----------
  i4[2:2:2]
+(1 row)
+
+select apply('i4[1:1:1 2:2:2 3:3:3]'::matrix, 'ainv_int32'::unaryop);
+          apply           
+--------------------------
+ i4[1:1:-1 2:2:-2 3:3:-3]
 (1 row)
 
 select dup('i4[1:1:1 2:2:2 3:3:3]'::matrix);

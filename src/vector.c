@@ -27,6 +27,7 @@ PG_FUNCTION_INFO_V1(vector_ewise_union);
 PG_FUNCTION_INFO_V1(vector_reduce_scalar);
 PG_FUNCTION_INFO_V1(vector_assign);
 PG_FUNCTION_INFO_V1(vector_select);
+PG_FUNCTION_INFO_V1(vector_apply);
 
 static Size vector_get_flat_size(ExpandedObjectHeader *eohptr) {
 	os_Vector *vector;
@@ -754,6 +755,62 @@ Datum vector_select(PG_FUNCTION_ARGS)
 					 descriptor ? descriptor->descriptor : NULL),
 		  w->vector,
 		  "Error in GrB_select");
+
+	OS_RETURN_VECTOR(w);
+}
+
+Datum vector_apply(PG_FUNCTION_ARGS)
+{
+	GrB_Type type;
+	os_Vector *u, *w, *mask;
+	os_Descriptor *descriptor;
+	os_BinaryOp *accum;
+	os_UnaryOp *op;
+	GrB_Index wsize;
+
+	LOGF();
+	ERRORNULL(0);
+	ERRORNULL(1);
+
+	u = OS_GETARG_VECTOR(0);
+	op = OS_GETARG_UNARYOP(1);
+
+	mask = NULL;
+	accum = NULL;
+	descriptor = NULL;
+
+	if (PG_NARGS() > 2)
+	{
+		if (PG_ARGISNULL(2))
+		{
+			CHECK(GxB_Vector_type(&type, u->vector),
+				  u->vector,
+				  "Cannot get vector type");
+
+			CHECK(GrB_Vector_size(&wsize, u->vector),
+				  u->vector,
+				  "Cannot get vector size");
+
+			w = new_vector(type, wsize, CurrentMemoryContext, NULL);
+		}
+		else
+			w = OS_GETARG_VECTOR(2);
+	}
+	if (PG_NARGS() > 3)
+		mask = PG_ARGISNULL(3) ? NULL : OS_GETARG_VECTOR(3);
+	if (PG_NARGS() > 4)
+		accum = PG_ARGISNULL(4) ? NULL : OS_GETARG_BINARYOP(4);
+	if (PG_NARGS() > 5)
+		descriptor = PG_ARGISNULL(5) ? NULL : OS_GETARG_DESCRIPTOR(5);
+
+	CHECK(GrB_apply(w->vector,
+					mask ? mask->vector : NULL,
+					accum ? accum->binaryop : NULL,
+					op->unaryop,
+					u->vector,
+					descriptor ? descriptor->descriptor : NULL),
+		  w->vector,
+		  "Error in GrB_Vector_apply");
 
 	OS_RETURN_VECTOR(w);
 }

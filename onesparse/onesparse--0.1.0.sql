@@ -866,17 +866,29 @@ RETURNS vector
 AS '$libdir/onesparse', 'vector_assign'
 LANGUAGE C STABLE;
 
-CREATE FUNCTION vector_select(
-    a vector,
+CREATE FUNCTION selection(
+    u vector,
     op indexunaryop,
     y scalar,
-    inout c vector default null,
+    inout w vector default null,
     mask vector default null,
     accum binaryop default null,
     descriptor descriptor default null
     )
 RETURNS vector
 AS '$libdir/onesparse', 'vector_select'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION apply(
+    u vector,
+    op unaryop,
+    inout w vector default null,
+    mask vector default null,
+    accum binaryop default null,
+    descriptor descriptor default null
+    )
+RETURNS vector
+AS '$libdir/onesparse', 'vector_apply'
 LANGUAGE C STABLE;
 
 CREATE FUNCTION wait(vector, waitmode integer default 0)
@@ -1076,7 +1088,7 @@ RETURNS vector
 AS '$libdir/onesparse', 'matrix_vxm'
 LANGUAGE C STABLE;
 
-CREATE FUNCTION matrix_select(
+CREATE FUNCTION selection(
     a matrix,
     op indexunaryop,
     y scalar,
@@ -1087,6 +1099,18 @@ CREATE FUNCTION matrix_select(
     )
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_select'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION apply(
+    a matrix,
+    op unaryop,
+    inout c matrix default null,
+    mask matrix default null,
+    accum binaryop default null,
+    descriptor descriptor default null
+    )
+RETURNS matrix
+AS '$libdir/onesparse', 'matrix_apply'
 LANGUAGE C STABLE;
 
 CREATE FUNCTION wait(matrix, waitmode integer default 0)
