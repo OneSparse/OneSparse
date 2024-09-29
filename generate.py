@@ -150,6 +150,7 @@ def write_source(outfile):
     objects = [
         Template('descriptor', outfile, dict(decls=descriptor_decls)),
         Template('unaryop', outfile, dict(decls=unaryop_decls)),
+        Template('indexunaryop', outfile, dict(decls=indexunaryop_decls)),
         Template('binaryop', outfile, dict(decls=binop_decls)),
         Template('monoid', outfile, dict(decls=monoid_decls)),
         Template('semiring', outfile, dict(decls=semiring_decls)),

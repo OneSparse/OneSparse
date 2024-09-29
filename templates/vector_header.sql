@@ -94,6 +94,19 @@ RETURNS vector
 AS '$libdir/onesparse', 'vector_assign'
 LANGUAGE C STABLE;
 
+CREATE FUNCTION vector_select(
+    a vector,
+    op indexunaryop,
+    y scalar,
+    inout c vector default null,
+    mask vector default null,
+    accum binaryop default null,
+    descriptor descriptor default null
+    )
+RETURNS vector
+AS '$libdir/onesparse', 'vector_select'
+LANGUAGE C STABLE;
+
 CREATE FUNCTION wait(vector, waitmode integer default 0)
 RETURNS void
 AS '$libdir/onesparse', 'vector_wait'

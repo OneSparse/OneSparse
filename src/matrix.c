@@ -31,6 +31,7 @@ PG_FUNCTION_INFO_V1(matrix_extract_matrix);
 PG_FUNCTION_INFO_V1(matrix_mxm);
 PG_FUNCTION_INFO_V1(matrix_mxv);
 PG_FUNCTION_INFO_V1(matrix_vxm);
+PG_FUNCTION_INFO_V1(matrix_select);
 
 static Size matrix_get_flat_size(ExpandedObjectHeader *eohptr) {
 	os_Matrix *matrix;
@@ -1055,6 +1056,70 @@ matrix_extract_matrix(PG_FUNCTION_ARGS)
 		  "Error in assign matrix.");
 
 	OS_RETURN_MATRIX(A);
+}
+
+Datum matrix_select(PG_FUNCTION_ARGS)
+{
+	GrB_Type type;
+	os_Matrix *A, *C, *mask;
+	os_Scalar *y;
+	os_Descriptor *descriptor;
+	os_BinaryOp *accum;
+	os_IndexUnaryOp *op;
+	GrB_Index nrows, ncols;
+
+	LOGF();
+	ERRORNULL(0);
+	ERRORNULL(1);
+	ERRORNULL(2);
+
+	A = OS_GETARG_MATRIX(0);
+	op = OS_GETARG_INDEXUNARYOP(1);
+	y = OS_GETARG_SCALAR(2);
+
+	mask = NULL;
+	accum = NULL;
+	descriptor = NULL;
+
+	if (PG_NARGS() > 3)
+	{
+		if (PG_ARGISNULL(3))
+		{
+			CHECK(GxB_Matrix_type(&type, A->matrix),
+				  A->matrix,
+				  "Cannot get matrix type");
+
+			CHECK(GrB_Matrix_nrows(&nrows, A->matrix),
+				  A->matrix,
+				  "Cannot get matrix nrows");
+
+			CHECK(GrB_Matrix_ncols(&ncols, A->matrix),
+				  A->matrix,
+				  "Cannot get matrix ncols");
+
+			C = new_matrix(type, nrows, ncols, CurrentMemoryContext, NULL);
+		}
+		else
+			C = OS_GETARG_MATRIX(3);
+	}
+	if (PG_NARGS() > 4)
+		mask = PG_ARGISNULL(4) ? NULL : OS_GETARG_MATRIX(4);
+	if (PG_NARGS() > 5)
+		accum = PG_ARGISNULL(5) ? NULL : OS_GETARG_BINARYOP(5);
+	if (PG_NARGS() > 6)
+		descriptor = PG_ARGISNULL(6) ? NULL : OS_GETARG_DESCRIPTOR(6);
+
+	CHECK(GrB_select(C->matrix,
+					 mask ? mask->matrix : NULL,
+					 accum ? accum->binaryop : NULL,
+					 op->indexunaryop,
+					 A->matrix,
+					 y ? y->scalar : NULL,
+					 descriptor ? descriptor->descriptor : NULL),
+		  C->matrix,
+		  "Error in GrB_select");
+
+	OS_RETURN_MATRIX(C);
 }
 
 Datum matrix_wait(PG_FUNCTION_ARGS)

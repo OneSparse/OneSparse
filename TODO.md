@@ -1,5 +1,5 @@
 
-# A few missing ops, concat/split
+# A few missing ops, concat/split/kron
 
 # Large Object support up to 4TB
 
@@ -9,9 +9,11 @@
 
 # add type[] operators for extract, containment, etc.
 
-# add type[] constructors
+# add type[] constructors and tuple iterators
 
 # select
+
+# apply
 
 # select ops: A < 42
 

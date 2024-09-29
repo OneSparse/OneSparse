@@ -64,6 +64,10 @@ select vxm('i4[0:0 1:1]'::vector, 'i4[0:0:1 0:1:2]'::matrix, 'plus_times_int32')
 
 select 'i4[0:0 1:1]'::vector @ 'i4[0:0:1 0:1:2]'::matrix;
 
+select matrix_select('i4[1:1:1 2:2:2 3:3:3]'::matrix, 'valuegt_int32'::indexunaryop, 1::scalar);
+
+select matrix_select('i4[1:1:1 2:2:2 3:3:3]'::matrix, 'valueeq_int32'::indexunaryop, 2::scalar);
+
 select dup('i4[1:1:1 2:2:2 3:3:3]'::matrix);
 
 select wait('i4[2:2:2 3:3:3 1:1:1]'::matrix);

@@ -45,6 +45,28 @@ CREATE TYPE unaryop (
 -- complain if script is sourced in psql, rather than via CREATE EXTENSION
 \echo Use "CREATE EXTENSION onesparse" to load this file. \quit
 
+CREATE TYPE indexunaryop;
+
+CREATE FUNCTION indexunaryop_in(cstring)
+RETURNS indexunaryop
+AS '$libdir/onesparse', 'indexunaryop_in'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION indexunaryop_out(indexunaryop)
+RETURNS cstring
+AS '$libdir/onesparse', 'indexunaryop_out'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE TYPE indexunaryop (
+    input = indexunaryop_in,
+    output = indexunaryop_out,
+    alignment = int4,
+    storage = 'main',
+    internallength = VARIABLE
+    );
+-- complain if script is sourced in psql, rather than via CREATE EXTENSION
+\echo Use "CREATE EXTENSION onesparse" to load this file. \quit
+
 CREATE TYPE binaryop;
 
 CREATE FUNCTION binaryop_in(cstring)
@@ -844,6 +866,19 @@ RETURNS vector
 AS '$libdir/onesparse', 'vector_assign'
 LANGUAGE C STABLE;
 
+CREATE FUNCTION vector_select(
+    a vector,
+    op indexunaryop,
+    y scalar,
+    inout c vector default null,
+    mask vector default null,
+    accum binaryop default null,
+    descriptor descriptor default null
+    )
+RETURNS vector
+AS '$libdir/onesparse', 'vector_select'
+LANGUAGE C STABLE;
+
 CREATE FUNCTION wait(vector, waitmode integer default 0)
 RETURNS void
 AS '$libdir/onesparse', 'vector_wait'
@@ -1039,6 +1074,19 @@ CREATE FUNCTION vxm(
     )
 RETURNS vector
 AS '$libdir/onesparse', 'matrix_vxm'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION matrix_select(
+    a matrix,
+    op indexunaryop,
+    y scalar,
+    inout c matrix default null,
+    mask matrix default null,
+    accum binaryop default null,
+    descriptor descriptor default null
+    )
+RETURNS matrix
+AS '$libdir/onesparse', 'matrix_select'
 LANGUAGE C STABLE;
 
 CREATE FUNCTION wait(matrix, waitmode integer default 0)

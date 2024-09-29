@@ -44,6 +44,8 @@ select ewise_union('i4[0:1 1:2 2:3]'::vector, 42, 'i4[0:1 1:2 2:3]'::vector, 84,
 
 select reduce_scalar('i4[0:1 1:2 2:3]'::vector, 'plus_monoid_int32');
 
+select vector_select('i4[0:1 1:2 2:3]'::vector, 'valuegt_int32', 1);
+
 select wait('i4[0:1 1:2 2:3]'::vector);
 
 select dup('i4[0:1 1:2 2:3]'::vector);

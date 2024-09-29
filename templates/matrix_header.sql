@@ -158,6 +158,19 @@ RETURNS vector
 AS '$libdir/onesparse', 'matrix_vxm'
 LANGUAGE C STABLE;
 
+CREATE FUNCTION matrix_select(
+    a matrix,
+    op indexunaryop,
+    y scalar,
+    inout c matrix default null,
+    mask matrix default null,
+    accum binaryop default null,
+    descriptor descriptor default null
+    )
+RETURNS matrix
+AS '$libdir/onesparse', 'matrix_select'
+LANGUAGE C STABLE;
+
 CREATE FUNCTION wait(matrix, waitmode integer default 0)
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_wait'
