@@ -15,8 +15,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Run a multi-line script
+      - name: Run tests
         run: |
-          pip3 install pyclibrary
-          python3 generate.py onesparse/onesparse--0.1.0.sql
           ./test.sh make installcheck
