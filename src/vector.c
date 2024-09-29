@@ -233,11 +233,9 @@ Datum vector_in(PG_FUNCTION_ARGS)
 	char *token;
     char *saveptr;
     char *endptr;
-	char *prefix;
     char *number_token;
     char *number_saveptr;
     int index = 0;
-	bool is_short = false;
 	GrB_Index wsize;
 	int matched;
 

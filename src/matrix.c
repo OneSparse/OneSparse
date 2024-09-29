@@ -263,33 +263,45 @@ Datum matrix_in(PG_FUNCTION_ARGS)
 	input_copy = strdup(input);
 	token = strtok_r(input_copy, "[", &saveptr);
 
-	if (token != NULL)
+	if (token == NULL)
+		elog(ERROR, "Matrix parse error, no short type code prefix.");
+
+	short_name = palloc(strlen(token)+1);
+
+	nrows = ncols = GrB_INDEX_MAX+1;
+
+	if (strstr(input, "(:)"))
 	{
-		short_name = palloc(strlen(token)+1);
 		nrows = ncols = GrB_INDEX_MAX+1;
+	}
+	else if (strstr(input, "(:"))
+	{
+		matched = sscanf(token, "%99[^()](:%lu)", short_name, &ncols);
+		if (matched != 2)
+			elog(ERROR, "Invalid short name %s", token);
+		nrows = GrB_INDEX_MAX+1;
+	}
+	else if (strstr(input, ")"))
+	{
 		matched = sscanf(token, "%99[^()](%lu:%lu)", short_name, &nrows, &ncols);
-		if (matched == 1)
-		{
-			if (input[strcspn(input, "(") + 1] == ':')
-			{
-				nrows = GrB_INDEX_MAX+1;
-			}
-			else
-			{
-				ncols = GrB_INDEX_MAX+1;
-			}
-		}
-		else if (matched == 2)
+		if (matched == 2)
 		{
 			ncols = GrB_INDEX_MAX+1;
 		}
 		else if (matched != 3)
+		{
 			elog(ERROR, "Invalid prefix %s", token);
-		typ = short_type(short_name);
+		}
 	}
 	else
-		elog(ERROR, "Matrix parse error, no short type code prefix.");
+	{
+		matched = sscanf(token, "%s", short_name);
+		if (matched != 1)
+			elog(ERROR, "Invalid short name %s", token);
+	}
 
+
+	typ = short_type(short_name);
 	matrix = new_matrix(typ, nrows, ncols, CurrentMemoryContext, NULL);
 
 	strcpy(input_copy, input);
