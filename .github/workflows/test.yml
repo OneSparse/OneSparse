@@ -17,5 +17,6 @@ jobs:
 
       - name: Run a multi-line script
         run: |
+          pip3 install pyclibrary
           python3 generate.py onesparse/onesparse--0.1.0.sql
           ./test.sh make installcheck
