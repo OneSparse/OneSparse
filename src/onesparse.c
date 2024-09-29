@@ -13,36 +13,58 @@ char* short_code(GrB_Type_Code code)
 {
 	switch(code)
 	{
+		case GrB_BOOL_CODE:
+			return "b";
 		case GrB_INT64_CODE:
 			return "i8";
+		case GrB_UINT64_CODE:
+			return "u8";
 		case GrB_INT32_CODE:
 			return "i4";
+		case GrB_UINT32_CODE:
+			return "u4";
 		case GrB_INT16_CODE:
 			return "i2";
+		case GrB_UINT16_CODE:
+			return "u2";
 		case GrB_FP64_CODE:
 			return "f8";
 		case GrB_FP32_CODE:
 			return "f4";
-		case GrB_BOOL_CODE:
-			return "b";
+		case GxB_FC32_CODE:
+			return "c4";
+		case GxB_FC64_CODE:
+			return "c8";
+		case GrB_UDT_CODE:
+			return "ut";
 	}
-	return "?";
+	elog(ERROR, "Unknown type code");
 }
 
 GrB_Type short_type(char *name)
 {
+	if (strcmp(name, "b") == 0)
+		return GrB_BOOL;
 	if (strcmp(name, "i8") == 0)
 		return GrB_INT64;
+	if (strcmp(name, "u8") == 0)
+		return GrB_UINT64;
 	if (strcmp(name, "i4") == 0)
 		return GrB_INT32;
+	if (strcmp(name, "u4") == 0)
+		return GrB_UINT32;
 	if (strcmp(name, "i2") == 0)
 		return GrB_INT16;
+	if (strcmp(name, "u2") == 0)
+		return GrB_UINT16;
 	if (strcmp(name, "f8") == 0)
 		return GrB_FP64;
 	if (strcmp(name, "f4") == 0)
 		return GrB_FP32;
-	if (strcmp(name, "b") == 0)
-		return GrB_BOOL;
+	if (strcmp(name, "c8") == 0)
+		return GxB_FC64;
+	if (strcmp(name, "c4") == 0)
+		return GxB_FC32;
 	elog(ERROR, "Unknown short name %s", name);
 }
 
