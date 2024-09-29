@@ -1,38 +1,38 @@
-#ifndef ONESPARSE_SEMIRING_H
-#define ONESPARSE_SEMIRING_H
+#ifndef OS_SEMIRING_H
+#define OS_SEMIRING_H
 
 #define semiring_MAGIC 689276813
 
-typedef struct onesparse_FlatSemiring {
+typedef struct os_FlatSemiring {
     int32 vl_len_;
 	char name[GxB_MAX_NAME_LEN];
-} onesparse_FlatSemiring;
+} os_FlatSemiring;
 
-typedef struct onesparse_Semiring  {
+typedef struct os_Semiring  {
     ExpandedObjectHeader hdr;
     int em_magic;
     Size flat_size;
     GrB_Semiring semiring;
 	char* name;
-} onesparse_Semiring;
+} os_Semiring;
 
-Datum expand_semiring(onesparse_FlatSemiring *flat,	MemoryContext parentcontext);
+Datum expand_semiring(os_FlatSemiring *flat,	MemoryContext parentcontext);
 
-onesparse_Semiring* new_semiring(
+os_Semiring* new_semiring(
 	char* name,
 	MemoryContext parentcontext);
 
-onesparse_Semiring* DatumGetSemiring(Datum d);
+os_Semiring* DatumGetSemiring(Datum d);
 
-#define ONESPARSE_DETOAST_SEMIRING(_datum) (onesparse_FlatSemiring*)PG_DETOAST_DATUM(datum)
-#define ONESPARSE_GETARG_SEMIRING(_arg_num)  DatumGetSemiring(PG_GETARG_DATUM(_arg_num))
-#define ONESPARSE_RETURN_SEMIRING(_semiring) return EOHPGetRWDatum(&(_semiring)->hdr)
-#define ONESPARSE_SEMIRING_FLATSIZE() MAXALIGN(sizeof(onesparse_FlatSemiring))
+#define OS_DETOAST_SEMIRING(_datum) (os_FlatSemiring*)PG_DETOAST_DATUM(datum)
+#define OS_GETARG_SEMIRING(_arg_num)  DatumGetSemiring(PG_GETARG_DATUM(_arg_num))
+#define OS_RETURN_SEMIRING(_semiring) return EOHPGetRWDatum(&(_semiring)->hdr)
+#define OS_SEMIRING_FLATSIZE() MAXALIGN(sizeof(os_FlatSemiring))
 
-#define ONESPARSE_SEMIRING_DATA(_flat) ((char*)(_flat) + ONESPARSE_SEMIRING_FLATSIZE())
-#define SemiringGetEOHP(_datum) (onesparse_Semiring *) DatumGetEOHP(_datum)
+#define OS_SEMIRING_DATA(_flat) ((char*)(_flat) + OS_SEMIRING_FLATSIZE())
+#define SemiringGetEOHP(_datum) (os_Semiring *) DatumGetEOHP(_datum)
 
-#endif /* ONESPARSE_SEMIRING_H */
+#endif /* OS_SEMIRING_H */
 
 /* Local Variables: */
 /* mode: c */

@@ -22,17 +22,17 @@ GrB_Monoid lookup_monoid(char *name);
 #include "monoid_header.h"
 
 static Size monoid_get_flat_size(ExpandedObjectHeader *eohptr) {
-	onesparse_Monoid *monoid;
+	os_Monoid *monoid;
 
 	LOGF();
 
-	monoid = (onesparse_Monoid*) eohptr;
+	monoid = (os_Monoid*) eohptr;
 	Assert(monoid->em_magic == monoid_MAGIC);
 
 	if (monoid->flat_size)
 		return monoid->flat_size;
 
-	monoid->flat_size = ONESPARSE_MONOID_FLATSIZE();
+	monoid->flat_size = OS_MONOID_FLATSIZE();
 	return monoid->flat_size;
 }
 
@@ -43,13 +43,13 @@ static void flatten_monoid(
 	void *result,
 	Size allocated_size)
 {
-	onesparse_Monoid *monoid;
-	onesparse_FlatMonoid *flat;
+	os_Monoid *monoid;
+	os_FlatMonoid *flat;
 
 	LOGF();
 
-	monoid = (onesparse_Monoid *) eohptr;
-	flat = (onesparse_FlatMonoid *) result;
+	monoid = (os_Monoid *) eohptr;
+	flat = (os_FlatMonoid *) result;
 
 	Assert(monoid->em_magic == monoid_MAGIC);
 	Assert(allocated_size == monoid->flat_size);
@@ -59,12 +59,12 @@ static void flatten_monoid(
 }
 
 /* Construct an empty expanded monoid. */
-onesparse_Monoid* new_monoid(
+os_Monoid* new_monoid(
 	char* name,
 	MemoryContext parentcontext)
 {
 	GrB_Monoid binop;
-	onesparse_Monoid *monoid;
+	os_Monoid *monoid;
 
 	MemoryContext objcxt, oldcxt;
 	MemoryContextCallback *ctxcb;
@@ -79,7 +79,7 @@ onesparse_Monoid* new_monoid(
 								   "expanded monoid",
 								   ALLOCSET_DEFAULT_SIZES);
 
-	monoid = MemoryContextAlloc(objcxt, sizeof(onesparse_Monoid));
+	monoid = MemoryContextAlloc(objcxt, sizeof(os_Monoid));
 
 	EOH_init_header(&monoid->hdr, &monoid_methods, objcxt);
 
@@ -103,20 +103,20 @@ onesparse_Monoid* new_monoid(
 }
 
 /* Expand a flat monoid in to an Expanded one, return as Postgres Datum. */
-Datum expand_monoid(onesparse_FlatMonoid *flat, MemoryContext parentcontext)
+Datum expand_monoid(os_FlatMonoid *flat, MemoryContext parentcontext)
 {
-	onesparse_Monoid *monoid;
+	os_Monoid *monoid;
 
 	LOGF();
 
 	monoid = new_monoid(flat->name, parentcontext);
-	ONESPARSE_RETURN_MONOID(monoid);
+	OS_RETURN_MONOID(monoid);
 }
 
 static void
 context_callback_monoid_free(void* ptr)
 {
-	onesparse_Monoid *monoid = (onesparse_Monoid *) ptr;
+	os_Monoid *monoid = (os_Monoid *) ptr;
 	LOGF();
 
 	CHECK(GrB_Monoid_free(&monoid->monoid),
@@ -127,10 +127,10 @@ context_callback_monoid_free(void* ptr)
 /* Helper function to always expand datum
 
    This is used by PG_GETARG_MONOID */
-onesparse_Monoid* DatumGetMonoid(Datum datum)
+os_Monoid* DatumGetMonoid(Datum datum)
 {
-	onesparse_Monoid *monoid;
-	onesparse_FlatMonoid *flat;
+	os_Monoid *monoid;
+	os_FlatMonoid *flat;
 
 	LOGF();
 	if (VARATT_IS_EXTERNAL_EXPANDED_RW(DatumGetPointer(datum))) {
@@ -138,28 +138,28 @@ onesparse_Monoid* DatumGetMonoid(Datum datum)
 		Assert(monoid->em_magic == monoid_MAGIC);
 		return monoid;
 	}
-	flat = ONESPARSE_DETOAST_MONOID(datum);
+	flat = OS_DETOAST_MONOID(datum);
 	datum = expand_monoid(flat, CurrentMemoryContext);
 	return MonoidGetEOHP(datum);
 }
 
 Datum monoid_in(PG_FUNCTION_ARGS)
 {
-	onesparse_Monoid *monoid;
+	os_Monoid *monoid;
 	char* input;
 
 	input = PG_GETARG_CSTRING(0);
 	monoid = new_monoid(input, CurrentMemoryContext);
-	ONESPARSE_RETURN_MONOID(monoid);
+	OS_RETURN_MONOID(monoid);
 }
 
 Datum monoid_out(PG_FUNCTION_ARGS)
 {
 	char *result;
-	onesparse_Monoid *monoid;
+	os_Monoid *monoid;
 
 	LOGF();
-	monoid = ONESPARSE_GETARG_MONOID(0);
+	monoid = OS_GETARG_MONOID(0);
 
 	result = palloc(strlen(monoid->name)+1);
 	snprintf(result, strlen(monoid->name)+1, "%s", monoid->name);

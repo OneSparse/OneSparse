@@ -1,38 +1,38 @@
-#ifndef ONESPARSE_INDEXUNARYOP_H
-#define ONESPARSE_INDEXUNARYOP_H
+#ifndef OS_INDEXUNARYOP_H
+#define OS_INDEXUNARYOP_H
 
 #define indexunaryop_MAGIC 689276813
 
-typedef struct onesparse_FlatIndexUnaryOp {
+typedef struct os_FlatIndexUnaryOp {
     int32 vl_len_;
 	char name[GxB_MAX_NAME_LEN];
-} onesparse_FlatIndexUnaryOp;
+} os_FlatIndexUnaryOp;
 
-typedef struct onesparse_IndexUnaryOp  {
+typedef struct os_IndexUnaryOp  {
     ExpandedObjectHeader hdr;
     int em_magic;
     Size flat_size;
     GrB_IndexUnaryOp indexunaryop;
 	char* name;
-} onesparse_IndexUnaryOp;
+} os_IndexUnaryOp;
 
-Datum expand_indexunaryop(onesparse_FlatIndexUnaryOp *flat,	MemoryContext parentcontext);
+Datum expand_indexunaryop(os_FlatIndexUnaryOp *flat,	MemoryContext parentcontext);
 
-onesparse_IndexUnaryOp* new_indexunaryop(
+os_IndexUnaryOp* new_indexunaryop(
 	char* name,
 	MemoryContext parentcontext);
 
-onesparse_IndexUnaryOp* DatumGetIndexUnaryOp(Datum d);
+os_IndexUnaryOp* DatumGetIndexUnaryOp(Datum d);
 
-#define ONESPARSE_DETOAST_INDEXUNARYOP(_datum) (onesparse_FlatIndexUnaryOp*)PG_DETOAST_DATUM(datum)
-#define ONESPARSE_GETARG_INDEXUNARYOP(_arg_num)  DatumGetIndexUnaryOp(PG_GETARG_DATUM(_arg_num))
-#define ONESPARSE_RETURN_INDEXUNARYOP(_indexunaryop) return EOHPGetRWDatum(&(_indexunaryop)->hdr)
-#define ONESPARSE_INDEXUNARYOP_FLATSIZE() MAXALIGN(sizeof(onesparse_FlatIndexUnaryOp))
+#define OS_DETOAST_INDEXUNARYOP(_datum) (os_FlatIndexUnaryOp*)PG_DETOAST_DATUM(datum)
+#define OS_GETARG_INDEXUNARYOP(_arg_num)  DatumGetIndexUnaryOp(PG_GETARG_DATUM(_arg_num))
+#define OS_RETURN_INDEXUNARYOP(_indexunaryop) return EOHPGetRWDatum(&(_indexunaryop)->hdr)
+#define OS_INDEXUNARYOP_FLATSIZE() MAXALIGN(sizeof(os_FlatIndexUnaryOp))
 
-#define ONESPARSE_INDEXUNARYOP_DATA(_flat) ((char*)(_flat) + ONESPARSE_INDEXUNARYOP_FLATSIZE())
-#define IndexUnaryOpGetEOHP(_datum) (onesparse_IndexUnaryOp *) DatumGetEOHP(_datum)
+#define OS_INDEXUNARYOP_DATA(_flat) ((char*)(_flat) + OS_INDEXUNARYOP_FLATSIZE())
+#define IndexUnaryOpGetEOHP(_datum) (os_IndexUnaryOp *) DatumGetEOHP(_datum)
 
-#endif /* ONESPARSE_INDEXUNARYOP_H */
+#endif /* OS_INDEXUNARYOP_H */
 
 /* Local Variables: */
 /* mode: c */

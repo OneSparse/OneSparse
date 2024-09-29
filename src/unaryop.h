@@ -1,38 +1,38 @@
-#ifndef ONESPARSE_UNARYOP_H
-#define ONESPARSE_UNARYOP_H
+#ifndef OS_UNARYOP_H
+#define OS_UNARYOP_H
 
 #define unaryop_MAGIC 689276813
 
-typedef struct onesparse_FlatUnaryOp {
+typedef struct os_FlatUnaryOp {
     int32 vl_len_;
 	char name[GxB_MAX_NAME_LEN];
-} onesparse_FlatUnaryOp;
+} os_FlatUnaryOp;
 
-typedef struct onesparse_UnaryOp  {
+typedef struct os_UnaryOp  {
     ExpandedObjectHeader hdr;
     int em_magic;
     Size flat_size;
     GrB_UnaryOp unaryop;
 	char* name;
-} onesparse_UnaryOp;
+} os_UnaryOp;
 
-Datum expand_unaryop(onesparse_FlatUnaryOp *flat,	MemoryContext parentcontext);
+Datum expand_unaryop(os_FlatUnaryOp *flat,	MemoryContext parentcontext);
 
-onesparse_UnaryOp* new_unaryop(
+os_UnaryOp* new_unaryop(
 	char* name,
 	MemoryContext parentcontext);
 
-onesparse_UnaryOp* DatumGetUnaryOp(Datum d);
+os_UnaryOp* DatumGetUnaryOp(Datum d);
 
-#define ONESPARSE_DETOAST_UNARYOP(_datum) (onesparse_FlatUnaryOp*)PG_DETOAST_DATUM(datum)
-#define ONESPARSE_GETARG_UNARYOP(_arg_num)  DatumGetUnaryOp(PG_GETARG_DATUM(_arg_num))
-#define ONESPARSE_RETURN_UNARYOP(_unaryop) return EOHPGetRWDatum(&(_unaryop)->hdr)
-#define ONESPARSE_UNARYOP_FLATSIZE() MAXALIGN(sizeof(onesparse_FlatUnaryOp))
+#define OS_DETOAST_UNARYOP(_datum) (os_FlatUnaryOp*)PG_DETOAST_DATUM(datum)
+#define OS_GETARG_UNARYOP(_arg_num)  DatumGetUnaryOp(PG_GETARG_DATUM(_arg_num))
+#define OS_RETURN_UNARYOP(_unaryop) return EOHPGetRWDatum(&(_unaryop)->hdr)
+#define OS_UNARYOP_FLATSIZE() MAXALIGN(sizeof(os_FlatUnaryOp))
 
-#define ONESPARSE_UNARYOP_DATA(_flat) ((char*)(_flat) + ONESPARSE_UNARYOP_FLATSIZE())
-#define UnaryOpGetEOHP(_datum) (onesparse_UnaryOp *) DatumGetEOHP(_datum)
+#define OS_UNARYOP_DATA(_flat) ((char*)(_flat) + OS_UNARYOP_FLATSIZE())
+#define UnaryOpGetEOHP(_datum) (os_UnaryOp *) DatumGetEOHP(_datum)
 
-#endif /* ONESPARSE_UNARYOP_H */
+#endif /* OS_UNARYOP_H */
 
 /* Local Variables: */
 /* mode: c */

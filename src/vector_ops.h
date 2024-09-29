@@ -4,7 +4,7 @@ PG_FUNCTION_INFO_V1(FN(cast_vector));
 
 Datum FN(vector)(PG_FUNCTION_ARGS)
 {
-	onesparse_Vector* vector;
+	os_Vector* vector;
 	PG_TYPE val;
 	LOGF();
 	vector = new_vector(GB_TYPE, CurrentMemoryContext, NULL);
@@ -16,18 +16,18 @@ Datum FN(vector)(PG_FUNCTION_ARGS)
 	/* 				val), */
 	/* 			"Error setting Vector element"); */
 	/* } */
-	ONESPARSE_RETURN_VECTOR(vector);
+	OS_RETURN_VECTOR(vector);
 }
 
 Datum FN(cast_vector)(PG_FUNCTION_ARGS)
 {
-	onesparse_Vector* vector;
+	os_Vector* vector;
 	PG_TYPE value;
 
 	LOGF();
 	ERRORNULL(0);
 
-	vector = ONESPARSE_GETARG_VECTOR(0);
+	vector = OS_GETARG_VECTOR(0);
 	CHECK(GrB_Vector_extractElement(
 				&value,
 				vector->vector),

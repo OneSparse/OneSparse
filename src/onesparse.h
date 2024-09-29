@@ -1,5 +1,5 @@
-#ifndef ONESPARSE_H
-#define ONESPARSE_H
+#ifndef OS_H
+#define OS_H
 
 #include <string.h>
 #include <errno.h>
@@ -19,7 +19,7 @@
 #include "common/hashfn.h"
 #include "suitesparse/GraphBLAS.h"
 
-#undef ONESPARSE_DEBUG
+#undef OS_DEBUG
 
 #define CCAT2(x, y) x ## y
 #define CCAT(x, y) CCAT2(x, y)
@@ -43,7 +43,7 @@
     } while (0)                                               \
 
 
-#ifdef ONESPARSE_DEBUG
+#ifdef OS_DEBUG
 #define LOGF() elog(INFO, __func__)
 #else
 #define LOGF()
@@ -70,7 +70,7 @@ void _PG_init(void);
 #include "vector.h"
 #include "matrix.h"
 
-#endif /* ONESPARSE_H */
+#endif /* OS_H */
 
 /* Local Variables: */
 /* mode: c */

@@ -33,13 +33,13 @@ PG_FUNCTION_INFO_V1(matrix_mxv);
 PG_FUNCTION_INFO_V1(matrix_vxm);
 
 static Size matrix_get_flat_size(ExpandedObjectHeader *eohptr) {
-	onesparse_Matrix *matrix;
+	os_Matrix *matrix;
 	void *serialized_data;
 	GrB_Index serialized_size;
 
 	LOGF();
 
-	matrix = (onesparse_Matrix*) eohptr;
+	matrix = (os_Matrix*) eohptr;
 	Assert(matrix->em_magic == matrix_MAGIC);
 
 	if (matrix->flat_size)
@@ -58,7 +58,7 @@ static Size matrix_get_flat_size(ExpandedObjectHeader *eohptr) {
 
 	matrix->serialized_data = serialized_data;
 	matrix->serialized_size = serialized_size;
-	matrix->flat_size = ONESPARSE_MATRIX_FLATSIZE() + serialized_size;
+	matrix->flat_size = OS_MATRIX_FLATSIZE() + serialized_size;
 	return matrix->flat_size;
 }
 
@@ -69,15 +69,15 @@ static void flatten_matrix(
 	void *result,
 	Size allocated_size)
 {
-	onesparse_Matrix *matrix;
-	onesparse_FlatMatrix *flat;
+	os_Matrix *matrix;
+	os_FlatMatrix *flat;
 	void* data;
 //	void (*free_function)(void *p);
 
 	LOGF();
 
-	matrix = (onesparse_Matrix *) eohptr;
-	flat = (onesparse_FlatMatrix *) result;
+	matrix = (os_Matrix *) eohptr;
+	flat = (os_FlatMatrix *) result;
 
 	Assert(matrix->em_magic == matrix_MAGIC);
 	Assert(allocated_size == matrix->flat_size);
@@ -101,7 +101,7 @@ static void flatten_matrix(
 		  matrix->matrix,
 		  "Error extracting matrix ncols.");
 
-	data = ONESPARSE_MATRIX_DATA(flat);
+	data = OS_MATRIX_DATA(flat);
 
 	memcpy(data, matrix->serialized_data, matrix->serialized_size);
 	flat->serialized_size = matrix->serialized_size;
@@ -115,14 +115,14 @@ static void flatten_matrix(
 }
 
 /* Construct an empty expanded matrix. */
-onesparse_Matrix* new_matrix(
+os_Matrix* new_matrix(
 	GrB_Type type,
 	GrB_Index nrows,
 	GrB_Index ncols,
 	MemoryContext parentcontext,
 	GrB_Matrix _matrix)
 {
-	onesparse_Matrix *matrix;
+	os_Matrix *matrix;
 
 	MemoryContext objcxt, oldcxt;
 	MemoryContextCallback *ctxcb;
@@ -132,7 +132,7 @@ onesparse_Matrix* new_matrix(
 								   "expanded matrix",
 								   ALLOCSET_DEFAULT_SIZES);
 
-	matrix = MemoryContextAlloc(objcxt,	sizeof(onesparse_Matrix));
+	matrix = MemoryContextAlloc(objcxt,	sizeof(os_Matrix));
 
 	EOH_init_header(&matrix->hdr, &matrix_methods, objcxt);
 
@@ -166,10 +166,10 @@ onesparse_Matrix* new_matrix(
 }
 
 /* Expand a flat matrix in to an Expanded one, return as Postgres Datum. */
-Datum expand_matrix(onesparse_FlatMatrix *flat, MemoryContext parentcontext)
+Datum expand_matrix(os_FlatMatrix *flat, MemoryContext parentcontext)
 {
 	GrB_Type type;
-	onesparse_Matrix *matrix;
+	os_Matrix *matrix;
 	void* data;
 
 	LOGF();
@@ -202,7 +202,7 @@ Datum expand_matrix(onesparse_FlatMatrix *flat, MemoryContext parentcontext)
 		elog(ERROR, "Unknown type code.");
 
 	matrix = new_matrix(type, flat->nrows, flat->ncols, parentcontext, NULL);
-	data = ONESPARSE_MATRIX_DATA(flat);
+	data = OS_MATRIX_DATA(flat);
 	CHECK(GxB_Matrix_deserialize(
 			  &matrix->matrix,
 			  type,
@@ -210,13 +210,13 @@ Datum expand_matrix(onesparse_FlatMatrix *flat, MemoryContext parentcontext)
 			  flat->serialized_size, NULL),
 		  matrix->matrix,
 		  "Error deserializing matrix");
-	ONESPARSE_RETURN_MATRIX(matrix);
+	OS_RETURN_MATRIX(matrix);
 }
 
 static void
 context_callback_matrix_free(void* ptr)
 {
-	onesparse_Matrix *matrix = (onesparse_Matrix *) ptr;
+	os_Matrix *matrix = (os_Matrix *) ptr;
 	LOGF();
 
 	CHECK(GrB_Matrix_free(&matrix->matrix),
@@ -227,10 +227,10 @@ context_callback_matrix_free(void* ptr)
 /* Helper function to always expand datum
 
    This is used by PG_GETARG_MATRIX */
-onesparse_Matrix* DatumGetMatrix(Datum datum)
+os_Matrix* DatumGetMatrix(Datum datum)
 {
-	onesparse_Matrix *matrix;
-	onesparse_FlatMatrix *flat;
+	os_Matrix *matrix;
+	os_FlatMatrix *flat;
 
 	LOGF();
 	if (VARATT_IS_EXTERNAL_EXPANDED_RW(DatumGetPointer(datum))) {
@@ -238,14 +238,14 @@ onesparse_Matrix* DatumGetMatrix(Datum datum)
 		Assert(matrix->em_magic == matrix_MAGIC);
 		return matrix;
 	}
-	flat = ONESPARSE_DETOAST_MATRIX(datum);
+	flat = OS_DETOAST_MATRIX(datum);
 	datum = expand_matrix(flat, CurrentMemoryContext);
 	return MatrixGetEOHP(datum);
 }
 
 Datum matrix_in(PG_FUNCTION_ARGS)
 {
-	onesparse_Matrix *matrix;
+	os_Matrix *matrix;
 	char *input;
 	GrB_Type typ;
 	char *short_name;
@@ -309,7 +309,7 @@ Datum matrix_in(PG_FUNCTION_ARGS)
 	token = strtok_r(NULL, "]", &saveptr);
 	if (token == NULL)
 	{
-		ONESPARSE_RETURN_MATRIX(matrix);
+		OS_RETURN_MATRIX(matrix);
 	}
 
 	row = 0;
@@ -379,7 +379,7 @@ Datum matrix_in(PG_FUNCTION_ARGS)
 				  "Error setting Matrix Element");
 		}
 	}
-	ONESPARSE_RETURN_MATRIX(matrix);
+	OS_RETURN_MATRIX(matrix);
 }
 
 Datum matrix_out(PG_FUNCTION_ARGS)
@@ -387,12 +387,12 @@ Datum matrix_out(PG_FUNCTION_ARGS)
 	GrB_Info info;
 	GrB_Index row, col;
 	GxB_Iterator iterator;
-	onesparse_Matrix *matrix;
+	os_Matrix *matrix;
 	StringInfoData buf;
 	int32_t type_code;
 
 	LOGF();
-	matrix = ONESPARSE_GETARG_MATRIX(0);
+	matrix = OS_GETARG_MATRIX(0);
 
 	GxB_Iterator_new(&iterator);
 	CHECK(GxB_Matrix_Iterator_attach(iterator, matrix->matrix, NULL),
@@ -446,12 +446,12 @@ Datum matrix_out(PG_FUNCTION_ARGS)
 Datum matrix_nvals(PG_FUNCTION_ARGS)
 {
 	GrB_Index result;
-	onesparse_Matrix *matrix;
+	os_Matrix *matrix;
 
 	LOGF();
 	ERRORNULL(0);
 
-	matrix = ONESPARSE_GETARG_MATRIX(0);
+	matrix = OS_GETARG_MATRIX(0);
 
 	CHECK(GrB_Matrix_nvals(&result, matrix->matrix),
 		  matrix->matrix,
@@ -462,12 +462,12 @@ Datum matrix_nvals(PG_FUNCTION_ARGS)
 Datum matrix_nrows(PG_FUNCTION_ARGS)
 {
 	GrB_Index result;
-	onesparse_Matrix *matrix;
+	os_Matrix *matrix;
 
 	LOGF();
 	ERRORNULL(0);
 
-	matrix = ONESPARSE_GETARG_MATRIX(0);
+	matrix = OS_GETARG_MATRIX(0);
 
 	CHECK(GrB_Matrix_nrows(&result, matrix->matrix),
 		  matrix->matrix,
@@ -478,12 +478,12 @@ Datum matrix_nrows(PG_FUNCTION_ARGS)
 Datum matrix_ncols(PG_FUNCTION_ARGS)
 {
 	GrB_Index result;
-	onesparse_Matrix *matrix;
+	os_Matrix *matrix;
 
 	LOGF();
 	ERRORNULL(0);
 
-	matrix = ONESPARSE_GETARG_MATRIX(0);
+	matrix = OS_GETARG_MATRIX(0);
 
 	CHECK(GrB_Matrix_ncols(&result, matrix->matrix),
 		  matrix->matrix,
@@ -494,9 +494,9 @@ Datum matrix_ncols(PG_FUNCTION_ARGS)
 Datum matrix_ewise_add(PG_FUNCTION_ARGS)
 {
 	GrB_Type type;
-	onesparse_Matrix *u, *v, *w, *mask;
-	onesparse_Descriptor *descriptor;
-	onesparse_BinaryOp *op, *accum;
+	os_Matrix *u, *v, *w, *mask;
+	os_Descriptor *descriptor;
+	os_BinaryOp *op, *accum;
 	GrB_Index nrows, ncols;
 
 	LOGF();
@@ -504,9 +504,9 @@ Datum matrix_ewise_add(PG_FUNCTION_ARGS)
 	ERRORNULL(1);
 	ERRORNULL(2);
 
-	u = ONESPARSE_GETARG_MATRIX(0);
-	v = ONESPARSE_GETARG_MATRIX(1);
-	op = ONESPARSE_GETARG_BINARYOP(2);
+	u = OS_GETARG_MATRIX(0);
+	v = OS_GETARG_MATRIX(1);
+	op = OS_GETARG_BINARYOP(2);
 
 	mask = NULL;
 	accum = NULL;
@@ -531,14 +531,14 @@ Datum matrix_ewise_add(PG_FUNCTION_ARGS)
 			w = new_matrix(type, nrows, ncols, CurrentMemoryContext, NULL);
 		}
 		else
-			w = ONESPARSE_GETARG_MATRIX(3);
+			w = OS_GETARG_MATRIX(3);
 	}
 	if (PG_NARGS() > 4)
-		mask = PG_ARGISNULL(4) ? NULL : ONESPARSE_GETARG_MATRIX(4);
+		mask = PG_ARGISNULL(4) ? NULL : OS_GETARG_MATRIX(4);
 	if (PG_NARGS() > 5)
-		accum = PG_ARGISNULL(5) ? NULL : ONESPARSE_GETARG_BINARYOP(5);
+		accum = PG_ARGISNULL(5) ? NULL : OS_GETARG_BINARYOP(5);
 	if (PG_NARGS() >6)
-		descriptor = PG_ARGISNULL(6) ? NULL : ONESPARSE_GETARG_DESCRIPTOR(6);
+		descriptor = PG_ARGISNULL(6) ? NULL : OS_GETARG_DESCRIPTOR(6);
 
 	CHECK(GrB_eWiseAdd(w->matrix,
 					   mask ? mask->matrix : NULL,
@@ -550,15 +550,15 @@ Datum matrix_ewise_add(PG_FUNCTION_ARGS)
 		  w->matrix,
 		  "Error matrix eWiseAdd.");
 
-	ONESPARSE_RETURN_MATRIX(w);
+	OS_RETURN_MATRIX(w);
 }
 
 Datum matrix_ewise_mult(PG_FUNCTION_ARGS)
 {
 	GrB_Type type;
-	onesparse_Matrix *u, *v, *w, *mask;
-	onesparse_Descriptor *descriptor;
-	onesparse_BinaryOp *op, *accum;
+	os_Matrix *u, *v, *w, *mask;
+	os_Descriptor *descriptor;
+	os_BinaryOp *op, *accum;
 	GrB_Index nrows, ncols;
 
 	LOGF();
@@ -566,9 +566,9 @@ Datum matrix_ewise_mult(PG_FUNCTION_ARGS)
 	ERRORNULL(1);
 	ERRORNULL(2);
 
-	u = ONESPARSE_GETARG_MATRIX(0);
-	v = ONESPARSE_GETARG_MATRIX(1);
-	op = ONESPARSE_GETARG_BINARYOP(2);
+	u = OS_GETARG_MATRIX(0);
+	v = OS_GETARG_MATRIX(1);
+	op = OS_GETARG_BINARYOP(2);
 
 	mask = NULL;
 	accum = NULL;
@@ -593,14 +593,14 @@ Datum matrix_ewise_mult(PG_FUNCTION_ARGS)
 			w = new_matrix(type, nrows, ncols, CurrentMemoryContext, NULL);
 		}
 		else
-			w = ONESPARSE_GETARG_MATRIX(3);
+			w = OS_GETARG_MATRIX(3);
 	}
 	if (PG_NARGS() > 4)
-		mask = PG_ARGISNULL(4) ? NULL : ONESPARSE_GETARG_MATRIX(4);
+		mask = PG_ARGISNULL(4) ? NULL : OS_GETARG_MATRIX(4);
 	if (PG_NARGS() > 5)
-		accum = PG_ARGISNULL(5) ? NULL : ONESPARSE_GETARG_BINARYOP(5);
+		accum = PG_ARGISNULL(5) ? NULL : OS_GETARG_BINARYOP(5);
 	if (PG_NARGS() > 6)
-		descriptor = PG_ARGISNULL(6) ? NULL : ONESPARSE_GETARG_DESCRIPTOR(6);
+		descriptor = PG_ARGISNULL(6) ? NULL : OS_GETARG_DESCRIPTOR(6);
 
 	CHECK(GrB_eWiseMult(w->matrix,
 						mask ? mask->matrix : NULL,
@@ -612,16 +612,16 @@ Datum matrix_ewise_mult(PG_FUNCTION_ARGS)
 		  w->matrix,
 		  "Error matrix eWiseMult.");
 
-	ONESPARSE_RETURN_MATRIX(w);
+	OS_RETURN_MATRIX(w);
 }
 
 Datum matrix_ewise_union(PG_FUNCTION_ARGS)
 {
 	GrB_Type type;
-	onesparse_Matrix *u, *v, *w, *mask;
-	onesparse_Scalar *a, *b;
-	onesparse_Descriptor *descriptor;
-	onesparse_BinaryOp *op, *accum;
+	os_Matrix *u, *v, *w, *mask;
+	os_Scalar *a, *b;
+	os_Descriptor *descriptor;
+	os_BinaryOp *op, *accum;
 	GrB_Index nrows, ncols;
 
 	LOGF();
@@ -631,11 +631,11 @@ Datum matrix_ewise_union(PG_FUNCTION_ARGS)
 	ERRORNULL(3);
 	ERRORNULL(4);
 
-	u = ONESPARSE_GETARG_MATRIX(0);
-	a = ONESPARSE_GETARG_SCALAR(1);
-	v = ONESPARSE_GETARG_MATRIX(2);
-	b = ONESPARSE_GETARG_SCALAR(3);
-	op = ONESPARSE_GETARG_BINARYOP(4);
+	u = OS_GETARG_MATRIX(0);
+	a = OS_GETARG_SCALAR(1);
+	v = OS_GETARG_MATRIX(2);
+	b = OS_GETARG_SCALAR(3);
+	op = OS_GETARG_BINARYOP(4);
 
 	mask = NULL;
 	accum = NULL;
@@ -660,14 +660,14 @@ Datum matrix_ewise_union(PG_FUNCTION_ARGS)
 			w = new_matrix(type, nrows, ncols, CurrentMemoryContext, NULL);
 		}
 		else
-			w = ONESPARSE_GETARG_MATRIX(5);
+			w = OS_GETARG_MATRIX(5);
 	}
 	if (PG_NARGS() > 6)
-		mask = PG_ARGISNULL(6) ? NULL : ONESPARSE_GETARG_MATRIX(6);
+		mask = PG_ARGISNULL(6) ? NULL : OS_GETARG_MATRIX(6);
 	if (PG_NARGS() > 7)
-		accum = PG_ARGISNULL(7) ? NULL : ONESPARSE_GETARG_BINARYOP(7);
+		accum = PG_ARGISNULL(7) ? NULL : OS_GETARG_BINARYOP(7);
 	if (PG_NARGS() > 8)
-		descriptor = PG_ARGISNULL(8) ? NULL : ONESPARSE_GETARG_DESCRIPTOR(8);
+		descriptor = PG_ARGISNULL(8) ? NULL : OS_GETARG_DESCRIPTOR(8);
 
 	CHECK(GxB_eWiseUnion(w->matrix,
 						 mask ? mask->matrix : NULL,
@@ -680,16 +680,16 @@ Datum matrix_ewise_union(PG_FUNCTION_ARGS)
 						 descriptor ? descriptor->descriptor : NULL),
 		  w->matrix,
 		  "Error matrix eWiseUnion.");
-	ONESPARSE_RETURN_MATRIX(w);
+	OS_RETURN_MATRIX(w);
 }
 
 Datum matrix_mxm(PG_FUNCTION_ARGS)
 {
 	GrB_Type type;
-	onesparse_Matrix *u, *v, *w, *mask;
-	onesparse_Descriptor *descriptor;
-	onesparse_BinaryOp *accum;
-	onesparse_Semiring *op;
+	os_Matrix *u, *v, *w, *mask;
+	os_Descriptor *descriptor;
+	os_BinaryOp *accum;
+	os_Semiring *op;
 	GrB_Index nrows, ncols;
 
 	LOGF();
@@ -697,9 +697,9 @@ Datum matrix_mxm(PG_FUNCTION_ARGS)
 	ERRORNULL(1);
 	ERRORNULL(2);
 
-	u = ONESPARSE_GETARG_MATRIX(0);
-	v = ONESPARSE_GETARG_MATRIX(1);
-	op = ONESPARSE_GETARG_SEMIRING(2);
+	u = OS_GETARG_MATRIX(0);
+	v = OS_GETARG_MATRIX(1);
+	op = OS_GETARG_SEMIRING(2);
 
 	mask = NULL;
 	accum = NULL;
@@ -724,14 +724,14 @@ Datum matrix_mxm(PG_FUNCTION_ARGS)
 			w = new_matrix(type, nrows, ncols, CurrentMemoryContext, NULL);
 		}
 		else
-			w = ONESPARSE_GETARG_MATRIX(3);
+			w = OS_GETARG_MATRIX(3);
 	}
 	if (PG_NARGS() > 4)
-		mask = PG_ARGISNULL(4) ? NULL : ONESPARSE_GETARG_MATRIX(4);
+		mask = PG_ARGISNULL(4) ? NULL : OS_GETARG_MATRIX(4);
 	if (PG_NARGS() > 5)
-		accum = PG_ARGISNULL(5) ? NULL : ONESPARSE_GETARG_BINARYOP(5);
+		accum = PG_ARGISNULL(5) ? NULL : OS_GETARG_BINARYOP(5);
 	if (PG_NARGS() > 6)
-		descriptor = PG_ARGISNULL(6) ? NULL : ONESPARSE_GETARG_DESCRIPTOR(6);
+		descriptor = PG_ARGISNULL(6) ? NULL : OS_GETARG_DESCRIPTOR(6);
 
 	CHECK(GrB_mxm(w->matrix,
 				  mask ? mask->matrix : NULL,
@@ -743,17 +743,17 @@ Datum matrix_mxm(PG_FUNCTION_ARGS)
 		  w->matrix,
 		  "Error matrix mxm.");
 
-	ONESPARSE_RETURN_MATRIX(w);
+	OS_RETURN_MATRIX(w);
 }
 
 Datum matrix_mxv(PG_FUNCTION_ARGS)
 {
 	GrB_Type type;
-	onesparse_Matrix *u;
-	onesparse_Vector *v, *w, *mask;
-	onesparse_Descriptor *descriptor;
-	onesparse_BinaryOp *accum;
-	onesparse_Semiring *op;
+	os_Matrix *u;
+	os_Vector *v, *w, *mask;
+	os_Descriptor *descriptor;
+	os_BinaryOp *accum;
+	os_Semiring *op;
 	GrB_Index wsize;
 
 	LOGF();
@@ -761,9 +761,9 @@ Datum matrix_mxv(PG_FUNCTION_ARGS)
 	ERRORNULL(1);
 	ERRORNULL(2);
 
-	u = ONESPARSE_GETARG_MATRIX(0);
-	v = ONESPARSE_GETARG_VECTOR(1);
-	op = ONESPARSE_GETARG_SEMIRING(2);
+	u = OS_GETARG_MATRIX(0);
+	v = OS_GETARG_VECTOR(1);
+	op = OS_GETARG_SEMIRING(2);
 
 	mask = NULL;
 	accum = NULL;
@@ -784,14 +784,14 @@ Datum matrix_mxv(PG_FUNCTION_ARGS)
 			w = new_vector(type, wsize, CurrentMemoryContext, NULL);
 		}
 		else
-			w = ONESPARSE_GETARG_VECTOR(3);
+			w = OS_GETARG_VECTOR(3);
 	}
 	if (PG_NARGS() > 4)
-		mask = PG_ARGISNULL(4) ? NULL : ONESPARSE_GETARG_VECTOR(4);
+		mask = PG_ARGISNULL(4) ? NULL : OS_GETARG_VECTOR(4);
 	if (PG_NARGS() > 5)
-		accum = PG_ARGISNULL(5) ? NULL : ONESPARSE_GETARG_BINARYOP(5);
+		accum = PG_ARGISNULL(5) ? NULL : OS_GETARG_BINARYOP(5);
 	if (PG_NARGS() > 6)
-		descriptor = PG_ARGISNULL(6) ? NULL : ONESPARSE_GETARG_DESCRIPTOR(6);
+		descriptor = PG_ARGISNULL(6) ? NULL : OS_GETARG_DESCRIPTOR(6);
 
 	CHECK(GrB_mxv(w->vector,
 				  mask ? mask->vector : NULL,
@@ -803,17 +803,17 @@ Datum matrix_mxv(PG_FUNCTION_ARGS)
 		  w->vector,
 		  "Error matrix mxm.");
 
-	ONESPARSE_RETURN_VECTOR(w);
+	OS_RETURN_VECTOR(w);
 }
 
 Datum matrix_vxm(PG_FUNCTION_ARGS)
 {
 	GrB_Type type;
-	onesparse_Vector *u, *w, *mask;
-	onesparse_Matrix *v;
-	onesparse_Descriptor *descriptor;
-	onesparse_BinaryOp *accum;
-	onesparse_Semiring *op;
+	os_Vector *u, *w, *mask;
+	os_Matrix *v;
+	os_Descriptor *descriptor;
+	os_BinaryOp *accum;
+	os_Semiring *op;
 	GrB_Index wsize;
 
 	LOGF();
@@ -821,9 +821,9 @@ Datum matrix_vxm(PG_FUNCTION_ARGS)
 	ERRORNULL(1);
 	ERRORNULL(2);
 
-	u = ONESPARSE_GETARG_VECTOR(0);
-	v = ONESPARSE_GETARG_MATRIX(1);
-	op = ONESPARSE_GETARG_SEMIRING(2);
+	u = OS_GETARG_VECTOR(0);
+	v = OS_GETARG_MATRIX(1);
+	op = OS_GETARG_SEMIRING(2);
 
 	mask = NULL;
 	accum = NULL;
@@ -844,14 +844,14 @@ Datum matrix_vxm(PG_FUNCTION_ARGS)
 			w = new_vector(type, wsize, CurrentMemoryContext, NULL);
 		}
 		else
-			w = ONESPARSE_GETARG_VECTOR(3);
+			w = OS_GETARG_VECTOR(3);
 	}
 	if (PG_NARGS() > 4)
-		mask = PG_ARGISNULL(4) ? NULL : ONESPARSE_GETARG_VECTOR(4);
+		mask = PG_ARGISNULL(4) ? NULL : OS_GETARG_VECTOR(4);
 	if (PG_NARGS() > 5)
-		accum = PG_ARGISNULL(5) ? NULL : ONESPARSE_GETARG_BINARYOP(5);
+		accum = PG_ARGISNULL(5) ? NULL : OS_GETARG_BINARYOP(5);
 	if (PG_NARGS() > 6)
-		descriptor = PG_ARGISNULL(6) ? NULL : ONESPARSE_GETARG_DESCRIPTOR(6);
+		descriptor = PG_ARGISNULL(6) ? NULL : OS_GETARG_DESCRIPTOR(6);
 
 	CHECK(GrB_vxm(w->vector,
 				  mask ? mask->vector : NULL,
@@ -863,25 +863,25 @@ Datum matrix_vxm(PG_FUNCTION_ARGS)
 		  w->vector,
 		  "Error matrix mxm.");
 
-	ONESPARSE_RETURN_VECTOR(w);
+	OS_RETURN_VECTOR(w);
 }
 
 Datum matrix_reduce_vector(PG_FUNCTION_ARGS)
 {
 	GrB_Type type;
-	onesparse_Matrix *u;
-	onesparse_Vector *w, *mask;
-	onesparse_Descriptor *descriptor;
-	onesparse_Monoid *op;
-	onesparse_BinaryOp *accum;
+	os_Matrix *u;
+	os_Vector *w, *mask;
+	os_Descriptor *descriptor;
+	os_Monoid *op;
+	os_BinaryOp *accum;
 	GrB_Index wsize;
 
 	LOGF();
 	ERRORNULL(0);
 	ERRORNULL(1);
 
-	u = ONESPARSE_GETARG_MATRIX(0);
-	op = ONESPARSE_GETARG_MONOID(1);
+	u = OS_GETARG_MATRIX(0);
+	op = OS_GETARG_MONOID(1);
 
 	descriptor = NULL;
 
@@ -900,14 +900,14 @@ Datum matrix_reduce_vector(PG_FUNCTION_ARGS)
 			w = new_vector(type, wsize, CurrentMemoryContext, NULL);
 		}
 		else
-			w = ONESPARSE_GETARG_VECTOR(2);
+			w = OS_GETARG_VECTOR(2);
 	}
 	if (PG_NARGS() > 3)
-		mask = PG_ARGISNULL(3) ? NULL : ONESPARSE_GETARG_VECTOR(3);
+		mask = PG_ARGISNULL(3) ? NULL : OS_GETARG_VECTOR(3);
 	if (PG_NARGS() > 4)
-		accum = PG_ARGISNULL(4) ? NULL : ONESPARSE_GETARG_BINARYOP(4);
+		accum = PG_ARGISNULL(4) ? NULL : OS_GETARG_BINARYOP(4);
 	if (PG_NARGS() > 5)
-		descriptor = PG_ARGISNULL(5) ? NULL : ONESPARSE_GETARG_DESCRIPTOR(5);
+		descriptor = PG_ARGISNULL(5) ? NULL : OS_GETARG_DESCRIPTOR(5);
 
 	CHECK(GrB_Matrix_reduce_Monoid(
 			  w->vector,
@@ -919,26 +919,26 @@ Datum matrix_reduce_vector(PG_FUNCTION_ARGS)
 		  w->vector,
 		  "Error matrix vector reduce.");
 
-	ONESPARSE_RETURN_VECTOR(w);
+	OS_RETURN_VECTOR(w);
 }
 
 Datum
 matrix_reduce_scalar(PG_FUNCTION_ARGS)
 {
-	onesparse_Matrix *A;
-	onesparse_Monoid *monoid;
-	onesparse_BinaryOp *accum;
-	onesparse_Descriptor *descriptor;
-	onesparse_Scalar *result;
+	os_Matrix *A;
+	os_Monoid *monoid;
+	os_BinaryOp *accum;
+	os_Descriptor *descriptor;
+	os_Scalar *result;
 	GrB_Type type;
 
-	A = ONESPARSE_GETARG_MATRIX(0);
-	monoid = ONESPARSE_GETARG_MONOID(1);
+	A = OS_GETARG_MATRIX(0);
+	monoid = OS_GETARG_MONOID(1);
 
 	if (PG_NARGS() > 2)
-		accum = PG_ARGISNULL(2) ? NULL : ONESPARSE_GETARG_BINARYOP(2);
+		accum = PG_ARGISNULL(2) ? NULL : OS_GETARG_BINARYOP(2);
 	if (PG_NARGS() > 3)
-		descriptor = PG_ARGISNULL(3) ? NULL : ONESPARSE_GETARG_DESCRIPTOR(3);
+		descriptor = PG_ARGISNULL(3) ? NULL : OS_GETARG_DESCRIPTOR(3);
 
 	CHECK(GxB_Matrix_type(&type, A->matrix),
 		  A->matrix,
@@ -955,26 +955,26 @@ matrix_reduce_scalar(PG_FUNCTION_ARGS)
 		  result->scalar,
 		  "Cannot reduce matrix to scalar");
 
-	ONESPARSE_RETURN_SCALAR(result);
+	OS_RETURN_SCALAR(result);
 }
 
 Datum
 matrix_assign_matrix(PG_FUNCTION_ARGS)
 {
-	onesparse_Matrix *A, *B, *mask;
-	onesparse_BinaryOp *accum;
-	onesparse_Descriptor *descriptor;
+	os_Matrix *A, *B, *mask;
+	os_BinaryOp *accum;
+	os_Descriptor *descriptor;
 	GrB_Index nvals, *rows = NULL, *cols = NULL;
 
-	A = ONESPARSE_GETARG_MATRIX(0);
-	B = ONESPARSE_GETARG_MATRIX(1);
+	A = OS_GETARG_MATRIX(0);
+	B = OS_GETARG_MATRIX(1);
 
 	if (PG_NARGS() > 2)
-		accum = PG_ARGISNULL(2) ? NULL : ONESPARSE_GETARG_BINARYOP(2);
+		accum = PG_ARGISNULL(2) ? NULL : OS_GETARG_BINARYOP(2);
 	if (PG_NARGS() > 3)
-		mask = PG_ARGISNULL(3) ? NULL : ONESPARSE_GETARG_MATRIX(3);
+		mask = PG_ARGISNULL(3) ? NULL : OS_GETARG_MATRIX(3);
 	if (PG_NARGS() > 4)
-		descriptor = PG_ARGISNULL(4) ? NULL : ONESPARSE_GETARG_DESCRIPTOR(4);
+		descriptor = PG_ARGISNULL(4) ? NULL : OS_GETARG_DESCRIPTOR(4);
 
 	CHECK(GrB_Matrix_nvals(&nvals, B->matrix),
 		  B->matrix,
@@ -1003,26 +1003,26 @@ matrix_assign_matrix(PG_FUNCTION_ARGS)
 		  A->matrix,
 		  "Error in assign matrix.");
 
-	ONESPARSE_RETURN_MATRIX(A);
+	OS_RETURN_MATRIX(A);
 }
 
 Datum
 matrix_extract_matrix(PG_FUNCTION_ARGS)
 {
-	onesparse_Matrix *A, *B, *mask;
-	onesparse_BinaryOp *accum;
-	onesparse_Descriptor *descriptor;
+	os_Matrix *A, *B, *mask;
+	os_BinaryOp *accum;
+	os_Descriptor *descriptor;
 	GrB_Index nvals, *rows = NULL, *cols = NULL;
 
-	A = ONESPARSE_GETARG_MATRIX(0);
-	B = ONESPARSE_GETARG_MATRIX(1);
+	A = OS_GETARG_MATRIX(0);
+	B = OS_GETARG_MATRIX(1);
 
 	if (PG_NARGS() > 2)
-		accum = PG_ARGISNULL(2) ? NULL : ONESPARSE_GETARG_BINARYOP(2);
+		accum = PG_ARGISNULL(2) ? NULL : OS_GETARG_BINARYOP(2);
 	if (PG_NARGS() > 3)
-		mask = PG_ARGISNULL(3) ? NULL : ONESPARSE_GETARG_MATRIX(3);
+		mask = PG_ARGISNULL(3) ? NULL : OS_GETARG_MATRIX(3);
 	if (PG_NARGS() > 4)
-		descriptor = PG_ARGISNULL(4) ? NULL : ONESPARSE_GETARG_DESCRIPTOR(4);
+		descriptor = PG_ARGISNULL(4) ? NULL : OS_GETARG_DESCRIPTOR(4);
 
 	if (B != NULL)
 	{
@@ -1054,37 +1054,37 @@ matrix_extract_matrix(PG_FUNCTION_ARGS)
 		  A->matrix,
 		  "Error in assign matrix.");
 
-	ONESPARSE_RETURN_MATRIX(A);
+	OS_RETURN_MATRIX(A);
 }
 
 Datum matrix_wait(PG_FUNCTION_ARGS)
 {
-	onesparse_Matrix *A;
+	os_Matrix *A;
 	int waitmode;
 
 	LOGF();
 	ERRORNULL(0);
 
-	A = ONESPARSE_GETARG_MATRIX(0);
+	A = OS_GETARG_MATRIX(0);
 	waitmode = PG_GETARG_INT32(1);
 
 	CHECK(GrB_Matrix_wait(A->matrix, waitmode),
 		  A->matrix,
 		  "Error waiting for matrix.");
-	ONESPARSE_RETURN_MATRIX(A);
+	OS_RETURN_MATRIX(A);
 }
 
 Datum matrix_dup(PG_FUNCTION_ARGS)
 {
 	GrB_Type type;
-	onesparse_Matrix *matrix;
-	onesparse_Matrix *result;
+	os_Matrix *matrix;
+	os_Matrix *result;
 	GrB_Index nrows, ncols;
 
 	LOGF();
 	ERRORNULL(0);
 
-	matrix = ONESPARSE_GETARG_MATRIX(0);
+	matrix = OS_GETARG_MATRIX(0);
 	CHECK(GxB_Matrix_type(&type, matrix->matrix),
 		  matrix->matrix,
 		  "Cannot get matrix type");
@@ -1102,22 +1102,22 @@ Datum matrix_dup(PG_FUNCTION_ARGS)
 	CHECK(GrB_Matrix_dup(&result->matrix, matrix->matrix),
 		  result->matrix,
 		  "Error duping matrix.");
-	ONESPARSE_RETURN_MATRIX(result);
+	OS_RETURN_MATRIX(result);
 }
 
 Datum matrix_clear(PG_FUNCTION_ARGS)
 {
-	onesparse_Matrix *A;
+	os_Matrix *A;
 
 	LOGF();
 	ERRORNULL(0);
 
-	A = ONESPARSE_GETARG_MATRIX(0);
+	A = OS_GETARG_MATRIX(0);
 
 	CHECK(GrB_Matrix_clear(A->matrix),
 		  A->matrix,
 		  "Error clearing matrix.");
-	ONESPARSE_RETURN_MATRIX(A);
+	OS_RETURN_MATRIX(A);
 }
 
 /* Local Variables: */

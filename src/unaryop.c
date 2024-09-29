@@ -22,17 +22,17 @@ GrB_UnaryOp lookup_unaryop(char *name);
 #include "unaryop_header.h"
 
 static Size unaryop_get_flat_size(ExpandedObjectHeader *eohptr) {
-	onesparse_UnaryOp *unaryop;
+	os_UnaryOp *unaryop;
 
 	LOGF();
 
-	unaryop = (onesparse_UnaryOp*) eohptr;
+	unaryop = (os_UnaryOp*) eohptr;
 	Assert(unaryop->em_magic == unaryop_MAGIC);
 
 	if (unaryop->flat_size)
 		return unaryop->flat_size;
 
-	unaryop->flat_size = ONESPARSE_UNARYOP_FLATSIZE();
+	unaryop->flat_size = OS_UNARYOP_FLATSIZE();
 	return unaryop->flat_size;
 }
 
@@ -43,13 +43,13 @@ static void flatten_unaryop(
 	void *result,
 	Size allocated_size)
 {
-	onesparse_UnaryOp *unaryop;
-	onesparse_FlatUnaryOp *flat;
+	os_UnaryOp *unaryop;
+	os_FlatUnaryOp *flat;
 
 	LOGF();
 
-	unaryop = (onesparse_UnaryOp *) eohptr;
-	flat = (onesparse_FlatUnaryOp *) result;
+	unaryop = (os_UnaryOp *) eohptr;
+	flat = (os_FlatUnaryOp *) result;
 
 	Assert(unaryop->em_magic == unaryop_MAGIC);
 	Assert(allocated_size == unaryop->flat_size);
@@ -59,12 +59,12 @@ static void flatten_unaryop(
 }
 
 /* Construct an empty expanded unaryop. */
-onesparse_UnaryOp* new_unaryop(
+os_UnaryOp* new_unaryop(
 	char* name,
 	MemoryContext parentcontext)
 {
 	GrB_UnaryOp binop;
-	onesparse_UnaryOp *unaryop;
+	os_UnaryOp *unaryop;
 
 	MemoryContext objcxt, oldcxt;
 	MemoryContextCallback *ctxcb;
@@ -79,7 +79,7 @@ onesparse_UnaryOp* new_unaryop(
 								   "expanded unaryop",
 								   ALLOCSET_DEFAULT_SIZES);
 
-	unaryop = MemoryContextAlloc(objcxt, sizeof(onesparse_UnaryOp));
+	unaryop = MemoryContextAlloc(objcxt, sizeof(os_UnaryOp));
 
 	EOH_init_header(&unaryop->hdr, &unaryop_methods, objcxt);
 
@@ -103,20 +103,20 @@ onesparse_UnaryOp* new_unaryop(
 }
 
 /* Expand a flat unaryop in to an Expanded one, return as Postgres Datum. */
-Datum expand_unaryop(onesparse_FlatUnaryOp *flat, MemoryContext parentcontext)
+Datum expand_unaryop(os_FlatUnaryOp *flat, MemoryContext parentcontext)
 {
-	onesparse_UnaryOp *unaryop;
+	os_UnaryOp *unaryop;
 
 	LOGF();
 
 	unaryop = new_unaryop(flat->name, parentcontext);
-	ONESPARSE_RETURN_UNARYOP(unaryop);
+	OS_RETURN_UNARYOP(unaryop);
 }
 
 static void
 context_callback_unaryop_free(void* ptr)
 {
-	onesparse_UnaryOp *unaryop = (onesparse_UnaryOp *) ptr;
+	os_UnaryOp *unaryop = (os_UnaryOp *) ptr;
 	LOGF();
 
 	CHECK(GrB_UnaryOp_free(&unaryop->unaryop),
@@ -127,10 +127,10 @@ context_callback_unaryop_free(void* ptr)
 /* Helper function to always expand datum
 
    This is used by PG_GETARG_UNARYOP */
-onesparse_UnaryOp* DatumGetUnaryOp(Datum datum)
+os_UnaryOp* DatumGetUnaryOp(Datum datum)
 {
-	onesparse_UnaryOp *unaryop;
-	onesparse_FlatUnaryOp *flat;
+	os_UnaryOp *unaryop;
+	os_FlatUnaryOp *flat;
 
 	LOGF();
 	if (VARATT_IS_EXTERNAL_EXPANDED_RW(DatumGetPointer(datum))) {
@@ -138,28 +138,28 @@ onesparse_UnaryOp* DatumGetUnaryOp(Datum datum)
 		Assert(unaryop->em_magic == unaryop_MAGIC);
 		return unaryop;
 	}
-	flat = ONESPARSE_DETOAST_UNARYOP(datum);
+	flat = OS_DETOAST_UNARYOP(datum);
 	datum = expand_unaryop(flat, CurrentMemoryContext);
 	return UnaryOpGetEOHP(datum);
 }
 
 Datum unaryop_in(PG_FUNCTION_ARGS)
 {
-	onesparse_UnaryOp *unaryop;
+	os_UnaryOp *unaryop;
 	char* input;
 
 	input = PG_GETARG_CSTRING(0);
 	unaryop = new_unaryop(input, CurrentMemoryContext);
-	ONESPARSE_RETURN_UNARYOP(unaryop);
+	OS_RETURN_UNARYOP(unaryop);
 }
 
 Datum unaryop_out(PG_FUNCTION_ARGS)
 {
 	char *result;
-	onesparse_UnaryOp *unaryop;
+	os_UnaryOp *unaryop;
 
 	LOGF();
-	unaryop = ONESPARSE_GETARG_UNARYOP(0);
+	unaryop = OS_GETARG_UNARYOP(0);
 
 	result = palloc(strlen(unaryop->name)+1);
 	snprintf(result, strlen(unaryop->name)+1, "%s", unaryop->name);

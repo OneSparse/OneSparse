@@ -22,14 +22,14 @@ PG_FUNCTION_INFO_V1(scalar_dup);
 PG_FUNCTION_INFO_V1(scalar_clear);
 
 static Size scalar_get_flat_size(ExpandedObjectHeader *eohptr) {
-	onesparse_Scalar *scalar;
+	os_Scalar *scalar;
 	int32_t type_code;
 	GrB_Index nvals;
 	Size data_size;
 
 	LOGF();
 
-	scalar = (onesparse_Scalar*) eohptr;
+	scalar = (os_Scalar*) eohptr;
 	Assert(scalar->em_magic == scalar_MAGIC);
 
 	if (scalar->flat_size)
@@ -75,7 +75,7 @@ static Size scalar_get_flat_size(ExpandedObjectHeader *eohptr) {
 			elog(ERROR, "Unknown Type Code");
 	}
 
-	scalar->flat_size = ONESPARSE_SCALAR_FLATSIZE() + data_size;
+	scalar->flat_size = OS_SCALAR_FLATSIZE() + data_size;
 	return scalar->flat_size;
 }
 
@@ -87,14 +87,14 @@ static void flatten_scalar(
 	Size allocated_size)
 {
 	GrB_Index nvals;
-	onesparse_Scalar *scalar;
-	onesparse_FlatScalar *flat;
+	os_Scalar *scalar;
+	os_FlatScalar *flat;
 	void* data;
 
 	LOGF();
 
-	scalar = (onesparse_Scalar *) eohptr;
-	flat = (onesparse_FlatScalar *) result;
+	scalar = (os_Scalar *) eohptr;
+	flat = (os_FlatScalar *) result;
 
 	Assert(scalar->em_magic == scalar_MAGIC);
 	Assert(allocated_size == scalar->flat_size);
@@ -111,7 +111,7 @@ static void flatten_scalar(
 	flat->nvals = nvals ? 1 : 0;
 	if (flat->nvals)
 	{
-		data = ONESPARSE_SCALAR_DATA(flat);
+		data = OS_SCALAR_DATA(flat);
 		if (flat->type_code == GrB_INT64_CODE)
 		{
 			CHECK(GrB_Scalar_extractElement((int64_t*)data, scalar->scalar),
@@ -155,12 +155,12 @@ static void flatten_scalar(
 }
 
 /* Construct an empty expanded scalar. */
-onesparse_Scalar* new_scalar(
+os_Scalar* new_scalar(
 	GrB_Type type,
 	MemoryContext parentcontext,
 	GrB_Scalar _scalar)
 {
-	onesparse_Scalar *scalar;
+	os_Scalar *scalar;
 
 	MemoryContext objcxt, oldcxt;
 	MemoryContextCallback *ctxcb;
@@ -170,7 +170,7 @@ onesparse_Scalar* new_scalar(
 								   "expanded scalar",
 								   ALLOCSET_DEFAULT_SIZES);
 
-	scalar = MemoryContextAlloc(objcxt,	sizeof(onesparse_Scalar));
+	scalar = MemoryContextAlloc(objcxt,	sizeof(os_Scalar));
 
 	EOH_init_header(&scalar->hdr, &scalar_methods, objcxt);
 
@@ -202,10 +202,10 @@ onesparse_Scalar* new_scalar(
 }
 
 /* Expand a flat scalar in to an Expanded one, return as Postgres Datum. */
-Datum expand_scalar(onesparse_FlatScalar *flat, MemoryContext parentcontext)
+Datum expand_scalar(os_FlatScalar *flat, MemoryContext parentcontext)
 {
 	GrB_Type type;
-	onesparse_Scalar *scalar;
+	os_Scalar *scalar;
 	void* data;
 
 	LOGF();
@@ -240,7 +240,7 @@ Datum expand_scalar(onesparse_FlatScalar *flat, MemoryContext parentcontext)
 	scalar = new_scalar(type, parentcontext, NULL);
 	if (flat->nvals)
 	{
-		data = ONESPARSE_SCALAR_DATA(flat);
+		data = OS_SCALAR_DATA(flat);
 		if (type == GrB_INT64)
 		{
 			CHECK(GrB_Scalar_setElement(scalar->scalar, *(int64_t*)data),
@@ -280,13 +280,13 @@ Datum expand_scalar(onesparse_FlatScalar *flat, MemoryContext parentcontext)
 		else
 			elog(ERROR, "Unknown type code.");
 	}
-	ONESPARSE_RETURN_SCALAR(scalar);
+	OS_RETURN_SCALAR(scalar);
 }
 
 static void
 context_callback_scalar_free(void* ptr)
 {
-	onesparse_Scalar *scalar = (onesparse_Scalar *) ptr;
+	os_Scalar *scalar = (os_Scalar *) ptr;
 	LOGF();
 
 	CHECK(GrB_Scalar_free(&scalar->scalar),
@@ -297,10 +297,10 @@ context_callback_scalar_free(void* ptr)
 /* Helper function to always expand datum
 
    This is used by PG_GETARG_SCALAR */
-onesparse_Scalar* DatumGetScalar(Datum datum)
+os_Scalar* DatumGetScalar(Datum datum)
 {
-	onesparse_Scalar *scalar;
-	onesparse_FlatScalar *flat;
+	os_Scalar *scalar;
+	os_FlatScalar *flat;
 
 	LOGF();
 	if (VARATT_IS_EXTERNAL_EXPANDED_RW(DatumGetPointer(datum))) {
@@ -308,14 +308,14 @@ onesparse_Scalar* DatumGetScalar(Datum datum)
 		Assert(scalar->em_magic == scalar_MAGIC);
 		return scalar;
 	}
-	flat = ONESPARSE_DETOAST_SCALAR(datum);
+	flat = OS_DETOAST_SCALAR(datum);
 	datum = expand_scalar(flat, CurrentMemoryContext);
 	return ScalarGetEOHP(datum);
 }
 
 Datum _scalar_in(char *input)
 {
-	onesparse_Scalar *scalar;
+	os_Scalar *scalar;
 	size_t len;
 	GrB_Type typ;
 	char str_val[GxB_MAX_NAME_LEN];
@@ -443,7 +443,7 @@ Datum _scalar_in(char *input)
 	}
 	else
 		elog(ERROR, "Unknown type code %s", str_type);
-	ONESPARSE_RETURN_SCALAR(scalar);
+	OS_RETURN_SCALAR(scalar);
 }
 
 Datum scalar_in(PG_FUNCTION_ARGS)
@@ -457,11 +457,11 @@ Datum scalar_out(PG_FUNCTION_ARGS)
 {
 	char *result, *sname;
 	int32_t type_code;
-	onesparse_Scalar *scalar;
+	os_Scalar *scalar;
 	GrB_Index nvals;
 
 	LOGF();
-	scalar = ONESPARSE_GETARG_SCALAR(0);
+	scalar = OS_GETARG_SCALAR(0);
 
 	nvals = 0;
 	CHECK(GrB_Scalar_nvals(&nvals, scalar->scalar),
@@ -544,12 +544,12 @@ Datum scalar_out(PG_FUNCTION_ARGS)
 Datum scalar_nvals(PG_FUNCTION_ARGS)
 {
 	GrB_Index result;
-	onesparse_Scalar *scalar;
+	os_Scalar *scalar;
 
 	LOGF();
 	ERRORNULL(0);
 
-	scalar = ONESPARSE_GETARG_SCALAR(0);
+	scalar = OS_GETARG_SCALAR(0);
 
 	CHECK(GrB_Scalar_nvals(&result, scalar->scalar),
 		  scalar->scalar,
@@ -559,31 +559,31 @@ Datum scalar_nvals(PG_FUNCTION_ARGS)
 
 Datum scalar_wait(PG_FUNCTION_ARGS)
 {
-	onesparse_Scalar *scalar;
+	os_Scalar *scalar;
 	int waitmode;
 
 	LOGF();
 	ERRORNULL(0);
 
-	scalar = ONESPARSE_GETARG_SCALAR(0);
+	scalar = OS_GETARG_SCALAR(0);
 	waitmode = PG_GETARG_INT32(1);
 
 	CHECK(GrB_Scalar_wait(scalar->scalar, waitmode),
 		  scalar->scalar,
 		  "Error waiting for scalar.");
-	ONESPARSE_RETURN_SCALAR(scalar);
+	OS_RETURN_SCALAR(scalar);
 }
 
 Datum scalar_dup(PG_FUNCTION_ARGS)
 {
 	GrB_Type type;
-	onesparse_Scalar *scalar;
-	onesparse_Scalar *result;
+	os_Scalar *scalar;
+	os_Scalar *result;
 
 	LOGF();
 	ERRORNULL(0);
 
-	scalar = ONESPARSE_GETARG_SCALAR(0);
+	scalar = OS_GETARG_SCALAR(0);
 	CHECK(GxB_Scalar_type(&type, scalar->scalar),
 		  scalar->scalar,
 		  "Cannot get scalar type");
@@ -593,22 +593,22 @@ Datum scalar_dup(PG_FUNCTION_ARGS)
 	CHECK(GrB_Scalar_dup(&result->scalar, scalar->scalar),
 		  scalar->scalar,
 		  "Error duping scalar.");
-	ONESPARSE_RETURN_SCALAR(result);
+	OS_RETURN_SCALAR(result);
 }
 
 Datum scalar_clear(PG_FUNCTION_ARGS)
 {
-	onesparse_Scalar *scalar;
+	os_Scalar *scalar;
 
 	LOGF();
 	ERRORNULL(0);
 
-	scalar = ONESPARSE_GETARG_SCALAR(0);
+	scalar = OS_GETARG_SCALAR(0);
 
 	CHECK(GrB_Scalar_clear(scalar->scalar),
 		  scalar->scalar,
 		  "Error clearing scalar.");
-	ONESPARSE_RETURN_SCALAR(scalar);
+	OS_RETURN_SCALAR(scalar);
 }
 
 #define SUFFIX _int64                // suffix for names

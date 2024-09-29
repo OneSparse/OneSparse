@@ -56,13 +56,13 @@ select mxm('i4[0:0:1 0:1:2]'::matrix, 'i4[0:0:1 0:1:3]'::matrix, 'plus_times_int
 
 select 'i4[0:0:1 0:1:2]'::matrix @ 'i4[0:0:1 0:1:3]'::matrix;
 
-select mxv('i4[0:0:1 0:1:2]'::matrix, 'i4[0 1]'::vector, 'plus_times_int32');
+select mxv('i4[0:0:1 0:1:2]'::matrix, 'i4[0:0 1:1]'::vector, 'plus_times_int32');
 
-select 'i4[0:0:1 0:1:2]'::matrix @ 'i4[0 1]'::vector;
+select 'i4[0:0:1 0:1:2]'::matrix @ 'i4[0:0 1:1]'::vector;
 
-select vxm('i4[0 1]'::vector, 'i4[0:0:1 0:1:2]'::matrix, 'plus_times_int32');
+select vxm('i4[0:0 1:1]'::vector, 'i4[0:0:1 0:1:2]'::matrix, 'plus_times_int32');
 
-select 'i4[0 1]'::vector @ 'i4[0:0:1 0:1:2]'::matrix;
+select 'i4[0:0 1:1]'::vector @ 'i4[0:0:1 0:1:2]'::matrix;
 
 select dup('i4[1:1:1 2:2:2 3:3:3]'::matrix);
 

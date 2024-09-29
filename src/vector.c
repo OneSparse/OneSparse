@@ -28,13 +28,13 @@ PG_FUNCTION_INFO_V1(vector_reduce_scalar);
 PG_FUNCTION_INFO_V1(vector_assign);
 
 static Size vector_get_flat_size(ExpandedObjectHeader *eohptr) {
-	onesparse_Vector *vector;
+	os_Vector *vector;
 	void *serialized_data;
 	GrB_Index serialized_size;
 
 	LOGF();
 
-	vector = (onesparse_Vector*) eohptr;
+	vector = (os_Vector*) eohptr;
 	Assert(vector->em_magic == vector_MAGIC);
 
 	if (vector->flat_size)
@@ -50,7 +50,7 @@ static Size vector_get_flat_size(ExpandedObjectHeader *eohptr) {
 
 	vector->serialized_data = serialized_data;
 	vector->serialized_size = serialized_size;
-	vector->flat_size = ONESPARSE_VECTOR_FLATSIZE() + serialized_size;
+	vector->flat_size = OS_VECTOR_FLATSIZE() + serialized_size;
 	return vector->flat_size;
 }
 
@@ -61,15 +61,15 @@ static void flatten_vector(
 	void *result,
 	Size allocated_size)
 {
-	onesparse_Vector *vector;
-	onesparse_FlatVector *flat;
+	os_Vector *vector;
+	os_FlatVector *flat;
 	void* data;
 //	void (*free_function)(void *p);
 
 	LOGF();
 
-	vector = (onesparse_Vector *) eohptr;
-	flat = (onesparse_FlatVector *) result;
+	vector = (os_Vector *) eohptr;
+	flat = (os_FlatVector *) result;
 
 	Assert(vector->em_magic == vector_MAGIC);
 	Assert(allocated_size == vector->flat_size);
@@ -86,7 +86,7 @@ static void flatten_vector(
 		  vector->vector,
 		  "Error extracting vector size.");
 
-	data = ONESPARSE_VECTOR_DATA(flat);
+	data = OS_VECTOR_DATA(flat);
 
 	memcpy(data, vector->serialized_data, vector->serialized_size);
 	flat->serialized_size = vector->serialized_size;
@@ -100,13 +100,13 @@ static void flatten_vector(
 }
 
 /* Construct an empty expanded vector. */
-onesparse_Vector* new_vector(
+os_Vector* new_vector(
 	GrB_Type type,
 	GrB_Index size,
 	MemoryContext parentcontext,
 	GrB_Vector _vector)
 {
-	onesparse_Vector *vector;
+	os_Vector *vector;
 
 	MemoryContext objcxt, oldcxt;
 	MemoryContextCallback *ctxcb;
@@ -116,7 +116,7 @@ onesparse_Vector* new_vector(
 								   "expanded vector",
 								   ALLOCSET_DEFAULT_SIZES);
 
-	vector = MemoryContextAlloc(objcxt,	sizeof(onesparse_Vector));
+	vector = MemoryContextAlloc(objcxt,	sizeof(os_Vector));
 
 	EOH_init_header(&vector->hdr, &vector_methods, objcxt);
 
@@ -150,10 +150,10 @@ onesparse_Vector* new_vector(
 }
 
 /* Expand a flat vector in to an Expanded one, return as Postgres Datum. */
-Datum expand_vector(onesparse_FlatVector *flat, MemoryContext parentcontext)
+Datum expand_vector(os_FlatVector *flat, MemoryContext parentcontext)
 {
 	GrB_Type type;
-	onesparse_Vector *vector;
+	os_Vector *vector;
 	void* data;
 
 	LOGF();
@@ -186,17 +186,17 @@ Datum expand_vector(onesparse_FlatVector *flat, MemoryContext parentcontext)
 		elog(ERROR, "Unknown type code.");
 
 	vector = new_vector(type, flat->size, parentcontext, NULL);
-	data = ONESPARSE_VECTOR_DATA(flat);
+	data = OS_VECTOR_DATA(flat);
 	CHECK(GxB_Vector_deserialize(&vector->vector, type, data, flat->serialized_size, NULL),
 		  vector->vector,
 		  "Error deserializing vector");
-	ONESPARSE_RETURN_VECTOR(vector);
+	OS_RETURN_VECTOR(vector);
 }
 
 static void
 context_callback_vector_free(void* ptr)
 {
-	onesparse_Vector *vector = (onesparse_Vector *) ptr;
+	os_Vector *vector = (os_Vector *) ptr;
 	LOGF();
 
 	CHECK(GrB_Vector_free(&vector->vector),
@@ -207,10 +207,10 @@ context_callback_vector_free(void* ptr)
 /* Helper function to always expand datum
 
    This is used by PG_GETARG_VECTOR */
-onesparse_Vector* DatumGetVector(Datum datum)
+os_Vector* DatumGetVector(Datum datum)
 {
-	onesparse_Vector *vector;
-	onesparse_FlatVector *flat;
+	os_Vector *vector;
+	os_FlatVector *flat;
 
 	LOGF();
 	if (VARATT_IS_EXTERNAL_EXPANDED_RW(DatumGetPointer(datum))) {
@@ -218,14 +218,14 @@ onesparse_Vector* DatumGetVector(Datum datum)
 		Assert(vector->em_magic == vector_MAGIC);
 		return vector;
 	}
-	flat = ONESPARSE_DETOAST_VECTOR(datum);
+	flat = OS_DETOAST_VECTOR(datum);
 	datum = expand_vector(flat, CurrentMemoryContext);
 	return VectorGetEOHP(datum);
 }
 
 Datum vector_in(PG_FUNCTION_ARGS)
 {
-	onesparse_Vector *vector;
+	os_Vector *vector;
 	char *input;
 	GrB_Type typ;
 	char *short_name;
@@ -268,7 +268,7 @@ Datum vector_in(PG_FUNCTION_ARGS)
     token = strtok_r(NULL, "]", &saveptr);
 	if (token == NULL)
 	{
-		ONESPARSE_RETURN_VECTOR(vector);
+		OS_RETURN_VECTOR(vector);
 	}
 
     for (number_token = strtok_r(token, " ", &number_saveptr); number_token != NULL;
@@ -276,8 +276,12 @@ Datum vector_in(PG_FUNCTION_ARGS)
 	{
         errno = 0;
 
+		if (sscanf(number_token, "%d:%s", &index, number_token) != 2)
+			elog(ERROR, "Invalid vector entry %s", number_token);
+
         if (typ == GrB_INT64) {
-            int64_t num = strtoll(number_token, &endptr, 10);
+            int64_t num;
+			matched = strtoll(number_token, &endptr, 10);
             if (errno != 0 || *endptr != '\0')
 				elog(ERROR, "Invalid INT64 %s", number_token);
 			CHECK(GrB_Vector_setElement(vector->vector, num, index),
@@ -331,9 +335,8 @@ Datum vector_in(PG_FUNCTION_ARGS)
 				  vector->vector,
 				  "Error setting Vector Element");
         }
-		index++;
     }
-	ONESPARSE_RETURN_VECTOR(vector);
+	OS_RETURN_VECTOR(vector);
 }
 
 Datum vector_out(PG_FUNCTION_ARGS)
@@ -341,12 +344,12 @@ Datum vector_out(PG_FUNCTION_ARGS)
 	GrB_Info info;
 	GrB_Index i;
     GxB_Iterator iterator;
-	onesparse_Vector *vector;
+	os_Vector *vector;
     StringInfoData buf;
 	int32_t type_code;
 
 	LOGF();
-	vector = ONESPARSE_GETARG_VECTOR(0);
+	vector = OS_GETARG_VECTOR(0);
 
     GxB_Iterator_new(&iterator);
 	CHECK(GxB_Vector_Iterator_attach(iterator, vector->vector, NULL),
@@ -400,12 +403,12 @@ Datum vector_out(PG_FUNCTION_ARGS)
 Datum vector_nvals(PG_FUNCTION_ARGS)
 {
 	GrB_Index result;
-	onesparse_Vector *vector;
+	os_Vector *vector;
 
 	LOGF();
 	ERRORNULL(0);
 
-	vector = ONESPARSE_GETARG_VECTOR(0);
+	vector = OS_GETARG_VECTOR(0);
 
 	CHECK(GrB_Vector_nvals(&result, vector->vector),
 		  vector->vector,
@@ -416,12 +419,12 @@ Datum vector_nvals(PG_FUNCTION_ARGS)
 Datum vector_size(PG_FUNCTION_ARGS)
 {
 	GrB_Index result;
-	onesparse_Vector *vector;
+	os_Vector *vector;
 
 	LOGF();
 	ERRORNULL(0);
 
-	vector = ONESPARSE_GETARG_VECTOR(0);
+	vector = OS_GETARG_VECTOR(0);
 
 	CHECK(GrB_Vector_size(&result, vector->vector),
 		  vector->vector,
@@ -432,9 +435,9 @@ Datum vector_size(PG_FUNCTION_ARGS)
 Datum vector_ewise_add(PG_FUNCTION_ARGS)
 {
 	GrB_Type type;
-	onesparse_Vector *u, *v, *w, *mask;
-	onesparse_Descriptor *descriptor;
-	onesparse_BinaryOp *op, *accum;
+	os_Vector *u, *v, *w, *mask;
+	os_Descriptor *descriptor;
+	os_BinaryOp *op, *accum;
 	GrB_Index wsize;
 
 	LOGF();
@@ -442,9 +445,9 @@ Datum vector_ewise_add(PG_FUNCTION_ARGS)
 	ERRORNULL(1);
 	ERRORNULL(2);
 
-	u = ONESPARSE_GETARG_VECTOR(0);
-	v = ONESPARSE_GETARG_VECTOR(1);
-	op = ONESPARSE_GETARG_BINARYOP(2);
+	u = OS_GETARG_VECTOR(0);
+	v = OS_GETARG_VECTOR(1);
+	op = OS_GETARG_BINARYOP(2);
 
 	mask = NULL;
 	accum = NULL;
@@ -465,14 +468,14 @@ Datum vector_ewise_add(PG_FUNCTION_ARGS)
 			w = new_vector(type, wsize, CurrentMemoryContext, NULL);
 		}
 		else
-			w = ONESPARSE_GETARG_VECTOR(3);
+			w = OS_GETARG_VECTOR(3);
 	}
 	if (PG_NARGS() > 4)
-		mask = PG_ARGISNULL(4) ? NULL : ONESPARSE_GETARG_VECTOR(4);
+		mask = PG_ARGISNULL(4) ? NULL : OS_GETARG_VECTOR(4);
 	if (PG_NARGS() > 5)
-		 accum = PG_ARGISNULL(5) ? NULL : ONESPARSE_GETARG_BINARYOP(5);
+		 accum = PG_ARGISNULL(5) ? NULL : OS_GETARG_BINARYOP(5);
 	if (PG_NARGS() > 6)
-		 descriptor = PG_ARGISNULL(6) ? NULL : ONESPARSE_GETARG_DESCRIPTOR(6);
+		 descriptor = PG_ARGISNULL(6) ? NULL : OS_GETARG_DESCRIPTOR(6);
 
 	CHECK(GrB_eWiseAdd(w->vector,
 					   mask ? mask->vector : NULL,
@@ -484,15 +487,15 @@ Datum vector_ewise_add(PG_FUNCTION_ARGS)
 		  w->vector,
 		  "Error vector eWiseAdd.");
 
-	ONESPARSE_RETURN_VECTOR(w);
+	OS_RETURN_VECTOR(w);
 }
 
 Datum vector_ewise_mult(PG_FUNCTION_ARGS)
 {
 	GrB_Type type;
-	onesparse_Vector *u, *v, *w, *mask;
-	onesparse_Descriptor *descriptor;
-	onesparse_BinaryOp *op, *accum;
+	os_Vector *u, *v, *w, *mask;
+	os_Descriptor *descriptor;
+	os_BinaryOp *op, *accum;
 	GrB_Index wsize;
 
 	LOGF();
@@ -501,9 +504,9 @@ Datum vector_ewise_mult(PG_FUNCTION_ARGS)
 	ERRORNULL(1);
 	ERRORNULL(2);
 
-	u = ONESPARSE_GETARG_VECTOR(0);
-	v = ONESPARSE_GETARG_VECTOR(1);
-	op = ONESPARSE_GETARG_BINARYOP(2);
+	u = OS_GETARG_VECTOR(0);
+	v = OS_GETARG_VECTOR(1);
+	op = OS_GETARG_BINARYOP(2);
 
 	mask = NULL;
 	accum = NULL;
@@ -524,14 +527,14 @@ Datum vector_ewise_mult(PG_FUNCTION_ARGS)
 			w = new_vector(type, wsize, CurrentMemoryContext, NULL);
 		}
 		else
-			w = ONESPARSE_GETARG_VECTOR(3);
+			w = OS_GETARG_VECTOR(3);
 	}
 	if (PG_NARGS() > 4)
-		mask = PG_ARGISNULL(4) ? NULL : ONESPARSE_GETARG_VECTOR(4);
+		mask = PG_ARGISNULL(4) ? NULL : OS_GETARG_VECTOR(4);
 	if (PG_NARGS() > 5)
-		 accum = PG_ARGISNULL(5) ? NULL : ONESPARSE_GETARG_BINARYOP(5);
+		 accum = PG_ARGISNULL(5) ? NULL : OS_GETARG_BINARYOP(5);
 	if (PG_NARGS() > 6)
-		 descriptor = PG_ARGISNULL(6) ? NULL : ONESPARSE_GETARG_DESCRIPTOR(6);
+		 descriptor = PG_ARGISNULL(6) ? NULL : OS_GETARG_DESCRIPTOR(6);
 
 	CHECK(GrB_eWiseMult(w->vector,
 						mask ? mask->vector : NULL,
@@ -543,16 +546,16 @@ Datum vector_ewise_mult(PG_FUNCTION_ARGS)
 		  w->vector,
 		  "Error vector eWiseMult.");
 
-	ONESPARSE_RETURN_VECTOR(w);
+	OS_RETURN_VECTOR(w);
 }
 
 Datum vector_ewise_union(PG_FUNCTION_ARGS)
 {
 	GrB_Type type;
-	onesparse_Vector *u, *v, *w, *mask;
-	onesparse_Scalar *a, *b;
-	onesparse_Descriptor *descriptor;
-	onesparse_BinaryOp *op, *accum;
+	os_Vector *u, *v, *w, *mask;
+	os_Scalar *a, *b;
+	os_Descriptor *descriptor;
+	os_BinaryOp *op, *accum;
 	GrB_Index wsize;
 
 	LOGF();
@@ -562,11 +565,11 @@ Datum vector_ewise_union(PG_FUNCTION_ARGS)
 	ERRORNULL(3);
 	ERRORNULL(4);
 
-	u = ONESPARSE_GETARG_VECTOR(0);
-	a = ONESPARSE_GETARG_SCALAR(1);
-	v = ONESPARSE_GETARG_VECTOR(2);
-	b = ONESPARSE_GETARG_SCALAR(3);
-	op = ONESPARSE_GETARG_BINARYOP(4);
+	u = OS_GETARG_VECTOR(0);
+	a = OS_GETARG_SCALAR(1);
+	v = OS_GETARG_VECTOR(2);
+	b = OS_GETARG_SCALAR(3);
+	op = OS_GETARG_BINARYOP(4);
 
 	mask = NULL;
 	accum = NULL;
@@ -587,14 +590,14 @@ Datum vector_ewise_union(PG_FUNCTION_ARGS)
 			w = new_vector(type, wsize, CurrentMemoryContext, NULL);
 		}
 		else
-			w = ONESPARSE_GETARG_VECTOR(5);
+			w = OS_GETARG_VECTOR(5);
 	}
 	if (PG_NARGS() > 6)
-		mask = PG_ARGISNULL(6) ? NULL : ONESPARSE_GETARG_VECTOR(6);
+		mask = PG_ARGISNULL(6) ? NULL : OS_GETARG_VECTOR(6);
 	if (PG_NARGS() > 7)
-		 accum = PG_ARGISNULL(7) ? NULL : ONESPARSE_GETARG_BINARYOP(7);
+		 accum = PG_ARGISNULL(7) ? NULL : OS_GETARG_BINARYOP(7);
 	if (PG_NARGS() > 8)
-		 descriptor = PG_ARGISNULL(8) ? NULL : ONESPARSE_GETARG_DESCRIPTOR(8);
+		 descriptor = PG_ARGISNULL(8) ? NULL : OS_GETARG_DESCRIPTOR(8);
 
 	CHECK(GxB_eWiseUnion(w->vector,
 						 mask ? mask->vector : NULL,
@@ -608,26 +611,26 @@ Datum vector_ewise_union(PG_FUNCTION_ARGS)
 		  w->vector,
 		  "Error vector eWiseUnion.");
 
-	ONESPARSE_RETURN_VECTOR(w);
+	OS_RETURN_VECTOR(w);
 }
 
 Datum
 vector_reduce_scalar(PG_FUNCTION_ARGS)
 {
-	onesparse_Vector *A;
-	onesparse_Monoid *monoid;
-	onesparse_BinaryOp *accum;
-	onesparse_Descriptor *descriptor;
-	onesparse_Scalar *result;
+	os_Vector *A;
+	os_Monoid *monoid;
+	os_BinaryOp *accum;
+	os_Descriptor *descriptor;
+	os_Scalar *result;
 	GrB_Type type;
 
-	A = ONESPARSE_GETARG_VECTOR(0);
-	monoid = ONESPARSE_GETARG_MONOID(1);
+	A = OS_GETARG_VECTOR(0);
+	monoid = OS_GETARG_MONOID(1);
 
 	if (PG_NARGS() > 2)
-		 accum = PG_ARGISNULL(2) ? NULL : ONESPARSE_GETARG_BINARYOP(2);
+		 accum = PG_ARGISNULL(2) ? NULL : OS_GETARG_BINARYOP(2);
 	if (PG_NARGS() > 3)
-		 descriptor = PG_ARGISNULL(3) ? NULL : ONESPARSE_GETARG_DESCRIPTOR(3);
+		 descriptor = PG_ARGISNULL(3) ? NULL : OS_GETARG_DESCRIPTOR(3);
 
 	CHECK(GxB_Vector_type(&type, A->vector),
 		  A->vector,
@@ -644,26 +647,26 @@ vector_reduce_scalar(PG_FUNCTION_ARGS)
 		  result->scalar,
 		  "Cannot reduce vector to scalar");
 
-	ONESPARSE_RETURN_SCALAR(result);
+	OS_RETURN_SCALAR(result);
 }
 
 Datum
 vector_assign(PG_FUNCTION_ARGS)
 {
-	onesparse_Vector *A, *B, *mask;
-	onesparse_BinaryOp *accum;
-	onesparse_Descriptor *descriptor;
+	os_Vector *A, *B, *mask;
+	os_BinaryOp *accum;
+	os_Descriptor *descriptor;
 	GrB_Index nvals, *Ilist = NULL;
 
-	A = ONESPARSE_GETARG_VECTOR(0);
-	B = ONESPARSE_GETARG_VECTOR(1);
+	A = OS_GETARG_VECTOR(0);
+	B = OS_GETARG_VECTOR(1);
 
 	if (PG_NARGS() > 2)
-		mask = PG_ARGISNULL(2) ? NULL : ONESPARSE_GETARG_VECTOR(2);
+		mask = PG_ARGISNULL(2) ? NULL : OS_GETARG_VECTOR(2);
 	if (PG_NARGS() > 3)
-		accum = PG_ARGISNULL(3) ? NULL : ONESPARSE_GETARG_BINARYOP(3);
+		accum = PG_ARGISNULL(3) ? NULL : OS_GETARG_BINARYOP(3);
 	if (PG_NARGS() > 4)
-		descriptor = PG_ARGISNULL(4) ? NULL : ONESPARSE_GETARG_DESCRIPTOR(4);
+		descriptor = PG_ARGISNULL(4) ? NULL : OS_GETARG_DESCRIPTOR(4);
 
 	if (B != NULL)
 	{
@@ -691,18 +694,18 @@ vector_assign(PG_FUNCTION_ARGS)
 		  A->vector,
 		  "Error in assign vector.");
 
-	ONESPARSE_RETURN_VECTOR(A);
+	OS_RETURN_VECTOR(A);
 }
 
 Datum vector_wait(PG_FUNCTION_ARGS)
 {
-	onesparse_Vector *vector;
+	os_Vector *vector;
 	int waitmode;
 
 	LOGF();
 	ERRORNULL(0);
 
-	vector = ONESPARSE_GETARG_VECTOR(0);
+	vector = OS_GETARG_VECTOR(0);
 	waitmode = PG_GETARG_INT32(1);
 
 	CHECK(GrB_Vector_wait(vector->vector, waitmode),
@@ -714,14 +717,14 @@ Datum vector_wait(PG_FUNCTION_ARGS)
 Datum vector_dup(PG_FUNCTION_ARGS)
 {
 	GrB_Type type;
-	onesparse_Vector *vector;
-	onesparse_Vector *result;
+	os_Vector *vector;
+	os_Vector *result;
 	GrB_Index size;
 
 	LOGF();
 	ERRORNULL(0);
 
-	vector = ONESPARSE_GETARG_VECTOR(0);
+	vector = OS_GETARG_VECTOR(0);
 	CHECK(GxB_Vector_type(&type, vector->vector),
 		  vector->vector,
 		  "Cannot get vector type");
@@ -735,17 +738,17 @@ Datum vector_dup(PG_FUNCTION_ARGS)
 	CHECK(GrB_Vector_dup(&result->vector, vector->vector),
 		  vector->vector,
 		  "Error duping vector.");
-	ONESPARSE_RETURN_VECTOR(result);
+	OS_RETURN_VECTOR(result);
 }
 
 Datum vector_clear(PG_FUNCTION_ARGS)
 {
-	onesparse_Vector *vector;
+	os_Vector *vector;
 
 	LOGF();
 	ERRORNULL(0);
 
-	vector = ONESPARSE_GETARG_VECTOR(0);
+	vector = OS_GETARG_VECTOR(0);
 
 	CHECK(GrB_Vector_clear(vector->vector),
 		  vector->vector,
