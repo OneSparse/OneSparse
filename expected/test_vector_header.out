@@ -133,6 +133,12 @@ select reduce_scalar('i4[0:1 1:2 2:3]'::vector, 'plus_monoid_int32');
  i4:6
 (1 row)
 
+select vector_select('i4[0:1 1:2 2:3]'::vector, 'valuegt_int32', 1);
+ vector_select 
+---------------
+ i4[1:2 2:3]
+(1 row)
+
 select wait('i4[0:1 1:2 2:3]'::vector);
  wait 
 ------
