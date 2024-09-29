@@ -21,7 +21,7 @@ RUN /bin/rm -Rf "$PGDATA" && mkdir "$PGDATA"
 WORKDIR "/home/postgres"
 
 # get postgres source and compile with debug and no optimization
-RUN git clone --branch REL_16_STABLE https://github.com/postgres/postgres.git --depth=1 && \
+RUN git clone --branch REL_17_STABLE https://github.com/postgres/postgres.git --depth=1 && \
     cd postgres && ./configure \
     --prefix=/usr/ \
     --without-icu \
@@ -35,7 +35,7 @@ RUN git clone --branch REL_16_STABLE https://github.com/postgres/postgres.git --
 RUN curl -s -L -J https://github.com/DrTimothyAldenDavis/GraphBLAS/archive/refs/tags/v9.2.0.tar.gz | \
     tar zxvf - && cd GraphBLAS-9.2.0 && \
     make library \
-    CMAKE_OPTIONS='-DCMAKE_BUILD_TYPE=Debug' \
+    CMAKE_OPTIONS='-DCMAKE_BUILD_TYPE=Debug -DGRAPHBLAS_COMPACT=1' \
     && sudo make install
 
 RUN pip3 install pyclibrary
