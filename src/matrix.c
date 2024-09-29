@@ -257,6 +257,7 @@ Datum matrix_in(PG_FUNCTION_ARGS)
 	char *number_saveptr;
 	int row, col;
 	GrB_Index nrows, ncols;
+	int matched;
 
 	input = PG_GETARG_CSTRING(0);
 	input_copy = strdup(input);
@@ -265,13 +266,30 @@ Datum matrix_in(PG_FUNCTION_ARGS)
 	if (token != NULL)
 	{
 		short_name = palloc(strlen(token)+1);
-		strcpy(short_name, token);
+		nrows = ncols = GrB_INDEX_MAX+1;
+		matched = sscanf(token, "%99[^()](%lu:%lu)", short_name, &nrows, &ncols);
+		if (matched == 1)
+		{
+			if (input[strcspn(input, "(") + 1] == ':')
+			{
+				nrows = GrB_INDEX_MAX+1;
+			}
+			else
+			{
+				ncols = GrB_INDEX_MAX+1;
+			}
+		}
+		else if (matched == 2)
+		{
+			ncols = GrB_INDEX_MAX+1;
+		}
+		else if (matched != 3)
+			elog(ERROR, "Invalid prefix %s", token);
 		typ = short_type(short_name);
 	}
 	else
 		elog(ERROR, "Matrix parse error, no short type code prefix.");
 
-	nrows = ncols = GrB_INDEX_MAX+1;
 	matrix = new_matrix(typ, nrows, ncols, CurrentMemoryContext, NULL);
 
 	strcpy(input_copy, input);

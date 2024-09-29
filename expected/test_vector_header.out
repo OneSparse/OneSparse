@@ -7,12 +7,108 @@ create extension if not exists onesparse;
  onesparse | vector | vector        | var  |          | postgres |                   | 
 (1 row)
 
+select 'i4'::vector;
+ vector 
+--------
+ i4[]
+(1 row)
+
+select nvals('i4'::vector);
+ nvals 
+-------
+     0
+(1 row)
+
+select size('i4'::vector);
+        size         
+---------------------
+ 1152921504606846976
+(1 row)
+
+select 'i4[]'::vector;
+ vector 
+--------
+ i4[]
+(1 row)
+
+select nvals('i4[]'::vector);
+ nvals 
+-------
+     0
+(1 row)
+
+select size('i4[]'::vector);
+        size         
+---------------------
+ 1152921504606846976
+(1 row)
+
+select 'i4(10)'::vector;
+ vector 
+--------
+ i4[]
+(1 row)
+
+select nvals('i4(10)'::vector);
+ nvals 
+-------
+     0
+(1 row)
+
+select size('i4(10)'::vector);
+ size 
+------
+   10
+(1 row)
+
+select 'i4(10)[]'::vector;
+ vector 
+--------
+ i4[]
+(1 row)
+
+select nvals('i4(10)[]'::vector);
+ nvals 
+-------
+     0
+(1 row)
+
+select size('i4(10)[]'::vector);
+ size 
+------
+   10
+(1 row)
+
 select 'i4[1 2 3]'::vector;
      vector      
 -----------------
  i4[0:1 1:2 2:3]
 (1 row)
 
+select nvals('i4[1 2 3]'::vector);
+ nvals 
+-------
+     3
+(1 row)
+
+select 'i4(10)[1 2 3]'::vector;
+     vector      
+-----------------
+ i4[0:1 1:2 2:3]
+(1 row)
+
+select size('i4(10)[1 2 3]'::vector);
+ size 
+------
+   10
+(1 row)
+
+select size('i4(2)[1 2 3]'::vector);
+ERROR:  INVALID_INDEX GraphBLAS error: GrB_INVALID_INDEX
+function: GrB_Vector_setElement_INT64 (w, x, row)
+Row index 2 out of range; must be < 2: Error setting Vector Element
+LINE 1: select size('i4(2)[1 2 3]'::vector);
+                    ^
 select ewise_add('i4[1 2 3]'::vector, 'i4[1 2 3]'::vector, 'plus_int32');
     ewise_add    
 -----------------
