@@ -13,11 +13,11 @@ hardware architectures, including GPUs, with no changes to your code.
 
 Like the JSON/JSONB types did for unstructured data, OneSparse makes
 dense and sparse matrices and vectors fully native Postgres
-types. OneSparse supports optimized, parallel matrix mulitplication
+types. OneSparse supports optimized, parallel matrix multiplication
 and other operations like reduction, selection, assignment,
 extraction, elementwise union, and intersection.  These methods can be
 used for both traditional numeric algebraic computing, or sparse graph
-analytics over adjecency and incidence matrices.
+analytics over adjacency and incidence matrices.
 
 Like numpy and scipy did for Python, OneSparse transforms Postgres
 into a powerful framework for linear algebra and its infinite industry
