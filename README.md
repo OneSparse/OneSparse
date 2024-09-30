@@ -152,7 +152,7 @@ For this introduction we will focus on the adjacency type as they are
 simpler, but the same ideas apply to both, and it is easy to switch
 back and forth between them.
 
-![Alt text](./BFS.png)
+![Alt text](./docs/BFS.png)
 
 (Image Credit: [Dr. Jeremy Kepner](http://www.mit.edu/~kepner/))
 
