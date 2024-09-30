@@ -11,6 +11,22 @@ traversal, machine learning, AI, science, and engineering.
 SuiteSparse's powerful built-in JIT compiler can target multiple
 hardware architectures, including GPUs, with no changes to your code.
 
+Like the JSON/JSONB types did for unstructured data, OneSparse makes
+dense and sparse matrices and vectors fully native Postgres
+types. OneSparse supports optimized, parallel matrix mulitplication
+and other operations like reduction, selection, assignment,
+extraction, elementwise union, and intersection.  These methods can be
+used for both traditional numeric algebraic computing, or sparse graph
+analytics over adjecency and incidence matrices.
+
+Like numpy and scipy did for Python, OneSparse transforms Postgres
+into a powerful framework for linear algebra and its infinite industry
+application: mathematics, engineering, economics, machine learning,
+bioinformatics and graph science.  Leverage SQL for it's power of
+filtering, viewing and aggregating, and use linear algebra for its
+power of abstract reasoning, numeric analytical power, and parallel
+graph analytics.
+
 GraphBLAS is a sparse linear algebra API optimized for processing
 dense and sparse matrices and in particular graphs encoded as sparse
 matrices and vectors.  In addition to common real/integer matrix
@@ -67,6 +83,10 @@ user defined [Semirings](https://en.wikipedia.org/wiki/Semiring).
 Semirings can be thought of as an abstraction of the "additive" and
 "multiplicative" operations typically used in [Matrix
 Multiplication](https://en.wikipedia.org/wiki/Matrix_multiplication).
+They are particularly useful when implementing graph algorithms across
+an adjacency matrix:
+
+![A Graph and An Adjacency](./docs/AisA.png)
 
 For example, to compute the shortest path between rows and columns of
 a sparse matrix, instead of multiplying elements they are added, and
@@ -132,7 +152,7 @@ For this introduction we will focus on the adjacency type as they are
 simpler, but the same ideas apply to both, and it is easy to switch
 back and forth between them.
 
-![Alt text](./docs/AdjacencyMatrixBFS.svg)
+![Alt text](./BFS.png)
 
 (Image Credit: [Dr. Jeremy Kepner](http://www.mit.edu/~kepner/))
 
