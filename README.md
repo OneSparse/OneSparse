@@ -1,3 +1,5 @@
+[![Tests](https://github.com/OneSparse/OneSparse/actions/workflows/test.yml/badge.svg)](https://github.com/OneSparse/OneSparse/actions/workflows/test.yml)
+
 # Summary
 
 OneSparse Postgres extends the [PostgreSQL](https://postgresql.org)

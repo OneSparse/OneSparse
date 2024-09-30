@@ -21,13 +21,7 @@ $EXECIT pg_ctl start
 # $EXEC make clean
 # $EXEC make install
 
-until
-    $EXEC \
-	    psql -o /dev/null -t -q -U "$SU" \
-        -c 'select pg_sleep(1)' \
-	    2>/dev/null;
-do sleep 1;
-done
+sleep 5
 
 $EXEC make installcheck
 
