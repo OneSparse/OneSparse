@@ -5,8 +5,9 @@ ARG GID
 # install base dependences    
 RUN apt-get update && \
     apt-get install -y make cmake git curl build-essential m4 sudo gdbserver python3-pip \
-    gdb libreadline-dev bison flex zlib1g-dev libicu-dev icu-devtools tmux zile zip vim gawk wget python3
+    gdb libreadline-dev bison flex zlib1g-dev libicu-dev icu-devtools tmux zile zip vim gawk wget python3-full python3-virtualenv
 
+RUN deluser --remove-home ubuntu
 # add postgres user and make data dir        
 RUN groupadd --gid ${GID} -r postgres && useradd --uid ${UID} --gid ${GID} --no-log-init -r -m -s /bin/bash -g postgres -G sudo postgres
 
@@ -38,8 +39,6 @@ RUN curl -s -L -J https://github.com/DrTimothyAldenDavis/GraphBLAS/archive/refs/
     CMAKE_OPTIONS='-DCMAKE_BUILD_TYPE=Debug -DGRAPHBLAS_COMPACT=1' \
     && sudo make install
 
-RUN pip3 install pyclibrary
-
 RUN sudo ldconfig
 
 # put test stuff into pg home        
@@ -47,10 +46,14 @@ RUN mkdir "/home/postgres/onesparse"
 WORKDIR "/home/postgres/onesparse"
 COPY . .
     
+RUN python3 -m venv .virt
+RUN . .virt/bin/activate    
+RUN .virt/bin/pip3 install pyclibrary
+
 RUN sudo chown -R postgres:postgres /home/postgres/onesparse
 
 # make the extension
-RUN python3 generate.py onesparse/onesparse--0.1.0.sql
+RUN .virt/bin/python3 generate.py onesparse/onesparse--0.1.0.sql
 RUN make && sudo make install && make clean
 
 # start the database            
