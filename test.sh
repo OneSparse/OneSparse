@@ -31,15 +31,7 @@ until
 do sleep 1;
 done
 
-
-if [ $# -eq 0 ]
-then
-    echo running tests
-    $EXEC tmux new-session -d -s onesparse
-    $EXECIT tmux attach-session -t onesparse
-else
-    $EXEC make installcheck
-fi
+$EXEC make installcheck
 
 echo destroying test container and image
 
