@@ -22,7 +22,8 @@ analytics over adjacency and incidence matrices.
 Like numpy and scipy did for Python, OneSparse transforms Postgres
 into a powerful framework for linear algebra and its infinite industry
 application: mathematics, engineering, economics, machine learning,
-bioinformatics and graph science.  Leverage SQL for it's power of
+bioinformatics and graph science. Matrix multiplication is as simple
+as 'A @ B', just as in Python.  Leverage SQL for it's power of
 filtering, viewing and aggregating, and use linear algebra for its
 power of abstract reasoning, numeric analytical power, and parallel
 graph analytics.
