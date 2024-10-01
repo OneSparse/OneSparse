@@ -18,7 +18,7 @@ $ docker exec -u postgres -it onesparse-demo-container psql
 psql (17.0 (Debian 17.0-1.pgdg120+1))
 Type "help" for help.
 
-postgres=# select 'i4'::onesparse.matrix;
+postgres=# select 'i4'::matrix;
  matrix 
 --------
  i4[]
