@@ -10,6 +10,28 @@ suitesparse = CLibrary('/usr/local/lib/libgraphblas.so', parser)
 
 VERSION = '0.1.0'
 
+def doctestify(test):
+    lines = test.splitlines()
+    markdown_lines = []
+    in_code_block = False
+
+    for line in lines:
+        if line.startswith("--"):
+            if in_code_block:
+                markdown_lines.append("```")
+                in_code_block = False
+            markdown_lines.append(line[3:])
+        else:
+            if not in_code_block:
+                markdown_lines.append("```")
+                in_code_block = True
+            markdown_lines.append(line)
+
+    if in_code_block:
+        markdown_lines.append("```")
+
+    return "\n".join(markdown_lines)
+
 @dataclass
 class Template:
     name: str
@@ -72,10 +94,23 @@ class Template:
             outfile = open(path, 'w+')
             outfile.write(self.test_read(part).format(**self.context))
 
+    def doc_write(self, part):
+        typ = self.context.get('type')
+        if typ is not None:
+            path = Path(self.test_dir, f'test_{self.name}_{part}_{typ.short}.sql')
+        else:
+            path = Path(self.test_dir, f'test_{self.name}_{part}.sql')
+
+        if self.test_path(part).exists():
+            doc = Path('docs', *path.with_suffix('.md').parts[1:])
+            outfile = open(doc, 'w+')
+            outfile.write(doctestify(self.test_read(part).format(**self.context)))
+
     def write(self, part):
         self.sql_write(part)
         self.source_write(part)
         self.test_write(part)
+        self.doc_write(part)
 
 @dataclass
 class Type:

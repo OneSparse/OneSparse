@@ -1,8 +1,8 @@
 -- # Matrix Objects
-
+--
 -- This documentation is also tests for the code, the examples below
 -- show the literal output of these statements from Postgres.
-
+--
 -- Some setup to make sure warnings are shown, and that the extension
 -- is installed.
 
@@ -51,7 +51,7 @@ select 'i4(10:)'::matrix;
 -- the "sparse" in sparse matrix.  This is how it's possible to create
 -- an unbounded row by unbounded column matrix without exhausting
 -- memory trying to allocate 2^120 entries.
-
+--
 -- All graphblas operations are exposed by a series of functions and
 -- operators.  Here we see three very common operations, returning the
 -- number of rows, the number of columns, and the number of store
