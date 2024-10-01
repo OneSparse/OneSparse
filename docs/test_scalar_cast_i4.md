@@ -1,4 +1,4 @@
-# Scalar Casting
+# Scalar 'integer' Casting
 
 This documentation is also tests for the code, the examples below
 show the literal output of these statements from Postgres.
