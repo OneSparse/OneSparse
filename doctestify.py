@@ -18,7 +18,7 @@ def doctestify(test):
             markdown_lines.append(line[3:])
         else:
             if not in_code_block:
-                markdown_lines.append("``` psql")
+                markdown_lines.append("``` postgres-console")
                 in_code_block = True
             markdown_lines.append(line)
 
