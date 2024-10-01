@@ -21,7 +21,7 @@ Describe the vector type:
 ```
 An empty vector can be constructed many ways, but one of the
 simplest is casting a type code to the matrix type.  In this case
-'i4' means GrB_INT32.  The type codes are intentionally compressed
+`i4` means GrB_INT32.  The type codes are intentionally compressed
 to be as short as possible for smaller pg_dumps.
 
 Much of these functions are basically vector versions of the same

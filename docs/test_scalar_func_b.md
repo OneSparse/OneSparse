@@ -1,4 +1,4 @@
-# Scalar 'bool' Functions
+# Scalar `bool` Functions
 
 This documentation is also tests for the code, the examples below
 show the literal output of these statements from Postgres.

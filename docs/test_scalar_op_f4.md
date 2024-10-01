@@ -1,4 +1,4 @@
-# Scalar 'float4' Operators
+# Scalar `float4` Operators
 
 This documentation is also tests for the code, the examples below
 show the literal output of these statements from Postgres.

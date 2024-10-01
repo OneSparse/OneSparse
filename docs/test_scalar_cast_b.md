@@ -1,4 +1,4 @@
-# Scalar 'bool' Casting
+# Scalar `bool` Casting
 
 This documentation is also tests for the code, the examples below
 show the literal output of these statements from Postgres.
@@ -9,8 +9,8 @@ is installed.
 set client_min_messages = 'WARNING';
 create extension if not exists onesparse;
 ```
-These casting functions cast the Postgres type bool to the
-GraphBLAS scalar type GrB_BOOL.
+These casting functions cast the Postgres type `bool` to the
+GraphBLAS scalar type `GrB_BOOL`.
 ``` postgres-console
 select cast(0::bool as scalar);
  scalar 
@@ -31,8 +31,8 @@ select cast(1::bool as scalar);
 (1 row)
 
 ```
-These tests cast back from the scalar type GrB_BOOL to the
-Postgres type bool
+These tests cast back from the scalar type `GrB_BOOL` to the
+Postgres type `bool`
 ``` postgres-console
 select cast(0::bool::scalar as bool);
  bool 
