@@ -175,43 +175,22 @@
 <p>This documentation is also tests for the code, the examples below
 show the literal output of these statements from Postgres.</p>
 <p>Some setup to make sure warnings are shown, and that the extension
-is installed.</p>
-<pre><code>set client_min_messages = 'WARNING';
-create extension if not exists onesparse;
-</code></pre>
-<p>Describe the scalar type</p>
-<pre><code>\dT+ scalar
-                                        List of data types
-  Schema   |  Name  | Internal name | Size | Elements |  Owner   | Access privileges | Description 
------------+--------+---------------+------+----------+----------+-------------------+-------------
- onesparse | scalar | scalar        | var  |          | postgres |                   | 
-(1 row)
-
-</code></pre>
-<p>Duplicate a scalar</p>
-<pre><code>select dup('i4:42'::scalar);
-  dup  
--------
- i4:42
-(1 row)
-
-</code></pre>
-<p>Wait for a scalar to complete in non-blocking mode</p>
-<pre><code>select wait('i4:42'::scalar);
- wait  
--------
- i4:42
-(1 row)
-
-</code></pre>
-<p>Clear a scalar, deleting its stored element.</p>
-<pre><code>select clear('i4:42'::scalar);
- clear 
--------
- i4:
-(1 row)
-
-</code></pre>
+is installed.
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>set client_min_messages = &#39;WARNING&#39;;
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>create extension if not exists onesparse;
+</span></code></pre></div>
+Describe the scalar type
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>\dT+ scalar
+</span></code></pre></div>
+Duplicate a scalar
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>select dup(&#39;i4:42&#39;::scalar);
+</span></code></pre></div>
+Wait for a scalar to complete in non-blocking mode
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>select wait(&#39;i4:42&#39;::scalar);
+</span></code></pre></div>
+Clear a scalar, deleting its stored element.
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>select clear(&#39;i4:42&#39;::scalar);
+</span></code></pre></div></p>
               
             </div>
           </div><footer>

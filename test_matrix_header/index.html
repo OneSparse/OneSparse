@@ -175,65 +175,39 @@
 <p>This documentation is also tests for the code, the examples below
 show the literal output of these statements from Postgres.</p>
 <p>Some setup to make sure warnings are shown, and that the extension
-is installed.</p>
-<pre><code>set client_min_messages = 'WARNING';
-create extension if not exists onesparse;
-</code></pre>
-<p>The 'matrix' data type wraps a SuiteSparse GrB_Matrix handle and
+is installed.
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>set client_min_messages = &#39;WARNING&#39;;
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>create extension if not exists onesparse;
+</span></code></pre></div>
+The 'matrix' data type wraps a SuiteSparse GrB_Matrix handle and
 delegates functions from SQL to the library through instances of
-this type.</p>
-<pre><code>\dT+ matrix
-                                        List of data types
-  Schema   |  Name  | Internal name | Size | Elements |  Owner   | Access privileges | Description 
------------+--------+---------------+------+----------+----------+-------------------+-------------
- onesparse | matrix | matrix        | var  |          | postgres |                   | 
-(1 row)
-
-</code></pre>
-<p>An empty matrix can be constructed many ways, but one of the
+this type.
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>\dT+ matrix
+</span></code></pre></div>
+An empty matrix can be constructed many ways, but one of the
 simplest is casting a type code to the matrix type.  In this case
 'i4' means GrB_INT32.  The type codes are intentionally compressed
-to be as short as possible for smaller pg_dumps.</p>
-<pre><code>select 'i4'::matrix;
- matrix 
---------
- i4[]
-(1 row)
-
-</code></pre>
-<p>A matrix can have a fixed number of rows and/or columns.  The
+to be as short as possible for smaller pg_dumps.
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>select &#39;i4&#39;::matrix;
+</span></code></pre></div>
+A matrix can have a fixed number of rows and/or columns.  The
 default possible number of rows and columns is defined by the
 SuiteSparse library to be <code>GrB_INDEX_MAX</code> which is '2^60' power
 indexes.  For the purposes of this documentation this will be
 referred to as "INDEX_MAX" and matrices and vector dimensions that
 are INDEX_MAX in size are reffered to as "unbounded".  For matrices
 with known dimensions, the dimensions can be provided in parentesis
-after the type code.  Here a 10 row by 10 column matrix is created:</p>
-<pre><code>select 'i4(10:10)'::matrix;
- matrix 
---------
- i4[]
-(1 row)
-
-</code></pre>
-<p>Either dimension can be ommited, this creates a 10 row by unbounded
-column matrix.</p>
-<pre><code>select 'i4(10:)'::matrix;
- matrix 
---------
- i4[]
-(1 row)
-
-</code></pre>
-<p>This creates a unbounded row by 10 column matrix.</p>
-<pre><code>select 'i4(10:)'::matrix;
- matrix 
---------
- i4[]
-(1 row)
-
-</code></pre>
-<p>Note that in all the above cases the matrices created are <em>empty</em>.
+after the type code.  Here a 10 row by 10 column matrix is created:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>select &#39;i4(10:10)&#39;::matrix;
+</span></code></pre></div>
+Either dimension can be ommited, this creates a 10 row by unbounded
+column matrix.
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>select &#39;i4(10:)&#39;::matrix;
+</span></code></pre></div>
+This creates a unbounded row by 10 column matrix.
+<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>select &#39;i4(10:)&#39;::matrix;
+</span></code></pre></div>
+Note that in all the above cases the matrices created are <em>empty</em>.
 They contain no stored elements.  The memory needed to hold the
 matrix contains only stored elements, if there isn't a value stored
 at a given row or column position, no memory is consumed.  This is
@@ -243,325 +217,149 @@ memory trying to allocate 2^120 entries.</p>
 <p>All graphblas operations are exposed by a series of functions and
 operators.  Here we see three very common operations, returning the
 number of rows, the number of columns, and the number of store
-values.</p>
-<pre><code>select nrows('i4'::matrix);
-        nrows        
----------------------
- 1152921504606846976
-(1 row)
-
-select ncols('i4'::matrix);
-        ncols        
----------------------
- 1152921504606846976
-(1 row)
-
-select nvals('i4'::matrix);
- nvals 
--------
-     0
-(1 row)
-
-</code></pre>
-<p>Above you can see the matrix has unbounded rows and columns (the
+values.
+<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>select nrows(&#39;i4&#39;::matrix);
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>select ncols(&#39;i4&#39;::matrix);
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>select nvals(&#39;i4&#39;::matrix);
+</span></code></pre></div>
+Above you can see the matrix has unbounded rows and columns (the
 very large number is the number of <em>possible</em> entries).  And the
 number of stored values is zero.
+<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>
+</span></code></pre></div>
 Values can be specified after the 'type(dimension)' prefix as an
 array of elements between square brackets.  Empty brackets imply no
-elements:</p>
-<pre><code>select nrows('i4[]'::matrix);
-        nrows        
----------------------
- 1152921504606846976
-(1 row)
-
-select ncols('i4[]'::matrix);
-        ncols        
----------------------
- 1152921504606846976
-(1 row)
-
-select nvals('i4[]'::matrix);
- nvals 
--------
-     0
-(1 row)
-
-</code></pre>
-<p>Elements are specified between square brackets are coordinates of
-'row_id:column_id:value' separated by spaces:</p>
-<pre><code>select 'i4[1:1:1 2:2:2 3:3:3]'::matrix;
-        matrix         
------------------------
- i4[1:1:1 2:2:2 3:3:3]
-(1 row)
-
-select 'i4(10:)[1:1:1 2:2:2 3:3:3]'::matrix;
-        matrix         
------------------------
- i4[1:1:1 2:2:2 3:3:3]
-(1 row)
-
-select 'i4(:10)[1:1:1 2:2:2 3:3:3]'::matrix;
-        matrix         
------------------------
- i4[1:1:1 2:2:2 3:3:3]
-(1 row)
-
-</code></pre>
-<p>Below you see the number of rows, columns and spaces for a variety
-of combinations:</p>
-<pre><code>select nrows('i4(10)[1:1:1 2:2:2 3:3:3]'::matrix);
- nrows 
--------
-    10
-(1 row)
-
-select ncols('i4(10)[1:1:1 2:2:2 3:3:3]'::matrix);
-        ncols        
----------------------
- 1152921504606846976
-(1 row)
-
-select nvals('i4(10)[1:1:1 2:2:2 3:3:3]'::matrix);
- nvals 
--------
-     3
-(1 row)
-
-select nrows('i4(10:)[1:1:1 2:2:2 3:3:3]'::matrix);
- nrows 
--------
-    10
-(1 row)
-
-select ncols('i4(10:)[1:1:1 2:2:2 3:3:3]'::matrix);
-        ncols        
----------------------
- 1152921504606846976
-(1 row)
-
-select nvals('i4(10:)[1:1:1 2:2:2 3:3:3]'::matrix);
- nvals 
--------
-     3
-(1 row)
-
-select nrows('i4(:10)[1:1:1 2:2:2 3:3:3]'::matrix);
-        nrows        
----------------------
- 1152921504606846976
-(1 row)
-
-select ncols('i4(:10)[1:1:1 2:2:2 3:3:3]'::matrix);
- ncols 
--------
-    10
-(1 row)
-
-select nvals('i4(:10)[1:1:1 2:2:2 3:3:3]'::matrix);
- nvals 
--------
-     3
-(1 row)
-
-select nrows('i4(10:10)[1:1:1 2:2:2 3:3:3]'::matrix);
- nrows 
--------
-    10
-(1 row)
-
-select ncols('i4(10:10)[1:1:1 2:2:2 3:3:3]'::matrix);
- ncols 
--------
-    10
-(1 row)
-
-select nvals('i4(10:10)[1:1:1 2:2:2 3:3:3]'::matrix);
- nvals 
--------
-     3
-(1 row)
-
-</code></pre>
+elements:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>select nrows(&#39;i4[]&#39;::matrix);
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>select ncols(&#39;i4[]&#39;::matrix);
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>select nvals(&#39;i4[]&#39;::matrix);
+</span></code></pre></div>
+Elements are specified between square brackets are coordinates of
+'row_id:column_id:value' separated by spaces:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>select &#39;i4[1:1:1 2:2:2 3:3:3]&#39;::matrix;
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>select &#39;i4(10:)[1:1:1 2:2:2 3:3:3]&#39;::matrix;
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>select &#39;i4(:10)[1:1:1 2:2:2 3:3:3]&#39;::matrix;
+</span></code></pre></div>
+Below you see the number of rows, columns and spaces for a variety
+of combinations:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>select nrows(&#39;i4(10)[1:1:1 2:2:2 3:3:3]&#39;::matrix);
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>select ncols(&#39;i4(10)[1:1:1 2:2:2 3:3:3]&#39;::matrix);
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>select nvals(&#39;i4(10)[1:1:1 2:2:2 3:3:3]&#39;::matrix);
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>select nrows(&#39;i4(10:)[1:1:1 2:2:2 3:3:3]&#39;::matrix);
+</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>
+</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>select ncols(&#39;i4(10:)[1:1:1 2:2:2 3:3:3]&#39;::matrix);
+</span><span id="__span-10-10"><a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a>
+</span><span id="__span-10-11"><a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a>select nvals(&#39;i4(10:)[1:1:1 2:2:2 3:3:3]&#39;::matrix);
+</span><span id="__span-10-12"><a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a>
+</span><span id="__span-10-13"><a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a>select nrows(&#39;i4(:10)[1:1:1 2:2:2 3:3:3]&#39;::matrix);
+</span><span id="__span-10-14"><a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a>
+</span><span id="__span-10-15"><a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a>select ncols(&#39;i4(:10)[1:1:1 2:2:2 3:3:3]&#39;::matrix);
+</span><span id="__span-10-16"><a id="__codelineno-10-16" name="__codelineno-10-16" href="#__codelineno-10-16"></a>
+</span><span id="__span-10-17"><a id="__codelineno-10-17" name="__codelineno-10-17" href="#__codelineno-10-17"></a>select nvals(&#39;i4(:10)[1:1:1 2:2:2 3:3:3]&#39;::matrix);
+</span><span id="__span-10-18"><a id="__codelineno-10-18" name="__codelineno-10-18" href="#__codelineno-10-18"></a>
+</span><span id="__span-10-19"><a id="__codelineno-10-19" name="__codelineno-10-19" href="#__codelineno-10-19"></a>select nrows(&#39;i4(10:10)[1:1:1 2:2:2 3:3:3]&#39;::matrix);
+</span><span id="__span-10-20"><a id="__codelineno-10-20" name="__codelineno-10-20" href="#__codelineno-10-20"></a>
+</span><span id="__span-10-21"><a id="__codelineno-10-21" name="__codelineno-10-21" href="#__codelineno-10-21"></a>select ncols(&#39;i4(10:10)[1:1:1 2:2:2 3:3:3]&#39;::matrix);
+</span><span id="__span-10-22"><a id="__codelineno-10-22" name="__codelineno-10-22" href="#__codelineno-10-22"></a>
+</span><span id="__span-10-23"><a id="__codelineno-10-23" name="__codelineno-10-23" href="#__codelineno-10-23"></a>select nvals(&#39;i4(10:10)[1:1:1 2:2:2 3:3:3]&#39;::matrix);
+</span></code></pre></div></p>
 <h1 id="element-wise-operations">Element-wise operations</h1>
 <p>The GraphBLAS API has elementwise operations on matrices that
 operate pairs of matrices.  'ewise_add' computes the element-wise
 “addition” of two matrices A and B, element-wise using any binary
 operator.  Elements present on both sides of the operation are
-included in the result.</p>
-<pre><code>select ewise_add('i4[1:1:1 2:2:2 3:3:3]'::matrix, 'i4[1:1:1 2:2:2 3:3:3]'::matrix, 'plus_int32');
-       ewise_add       
------------------------
- i4[1:1:2 2:2:4 3:3:6]
-(1 row)
-
-</code></pre>
-<p>'ewise_mult' multiplies elements of two matrices, taking only the
+included in the result.
+<div class="language-text highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>select ewise_add(&#39;i4[1:1:1 2:2:2 3:3:3]&#39;::matrix, &#39;i4[1:1:1 2:2:2 3:3:3]&#39;::matrix, &#39;plus_int32&#39;);
+</span></code></pre></div>
+'ewise_mult' multiplies elements of two matrices, taking only the
 intersection of common elements in both matrices, if an element is
 missing from either the left or right side, it is ommited from the
-result:</p>
-<pre><code>select ewise_mult('i4[1:1:1 2:2:2 3:3:3]'::matrix, 'i4[1:1:1 2:2:2 3:3:3]'::matrix, 'times_int32');
-      ewise_mult       
------------------------
- i4[1:1:1 2:2:4 3:3:9]
-(1 row)
-
-</code></pre>
-<p>'ewise_union' is like 'ewise_add' but differs in how the binary op
+result:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>select ewise_mult(&#39;i4[1:1:1 2:2:2 3:3:3]&#39;::matrix, &#39;i4[1:1:1 2:2:2 3:3:3]&#39;::matrix, &#39;times_int32&#39;);
+</span></code></pre></div>
+'ewise_union' is like 'ewise_add' but differs in how the binary op
 is applied. A pair of scalars, alpha and beta define the inputs to
 the operator when entries are present in one matrix but not the
-other.</p>
-<pre><code>select ewise_union('i4[1:1:1 2:2:2 3:3:3]'::matrix, 42, 'i4[1:1:1 2:2:2 3:3:3]'::matrix, 84, 'plus_int32');
-      ewise_union      
------------------------
- i4[1:1:2 2:2:4 3:3:6]
-(1 row)
-
-</code></pre>
-<p>The entire matrix can be reduced to a scalar value:</p>
-<pre><code>select reduce_scalar('i4[1:1:1 2:2:2 3:3:3]'::matrix, 'plus_monoid_int32');
- reduce_scalar 
----------------
- i4:6
-(1 row)
-
-</code></pre>
-<p>The matrix can also be reduced to a column vector:</p>
-<pre><code>select reduce_vector('i4[1:1:1 1:2:3 2:2:2]'::matrix, 'plus_monoid_int32');
- reduce_vector 
----------------
- i4[1:4 2:2]
-(1 row)
-
-</code></pre>
-<p>To reduce a row vector, specify that the input should be transposed
-with the descriptor 't0':</p>
-<pre><code>select reduce_vector('i4[1:1:1 1:2:3 2:2:2]'::matrix, 'plus_monoid_int32', descriptor=&gt;'t0');
- reduce_vector 
----------------
- i4[1:1 2:5]
-(1 row)
-
-</code></pre>
-<p>Matrix Multiplication (referred to here as A @ B) is the heart of
+other.
+<div class="language-text highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>select ewise_union(&#39;i4[1:1:1 2:2:2 3:3:3]&#39;::matrix, 42, &#39;i4[1:1:1 2:2:2 3:3:3]&#39;::matrix, 84, &#39;plus_int32&#39;);
+</span></code></pre></div>
+The entire matrix can be reduced to a scalar value:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>select reduce_scalar(&#39;i4[1:1:1 2:2:2 3:3:3]&#39;::matrix, &#39;plus_monoid_int32&#39;);
+</span></code></pre></div>
+The matrix can also be reduced to a column vector:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>select reduce_vector(&#39;i4[1:1:1 1:2:3 2:2:2]&#39;::matrix, &#39;plus_monoid_int32&#39;);
+</span></code></pre></div>
+To reduce a row vector, specify that the input should be transposed
+with the descriptor 't0':
+<div class="language-text highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>select reduce_vector(&#39;i4[1:1:1 1:2:3 2:2:2]&#39;::matrix, &#39;plus_monoid_int32&#39;, descriptor=&gt;&#39;t0&#39;);
+</span></code></pre></div>
+Matrix Multiplication (referred to here as A @ B) is the heart of
 linear algebra.  All matrix multiplication happens over a semiring.
 For the most common form of matrix multiplication, the outer
 opperation is to multiply coresponding elements with the "times"
 operator and then reduce those products with the "plus" operator.
-This is called the "plus_times" semiring:</p>
-<pre><code>select mxm('i4[0:0:1 0:1:2]'::matrix, 'i4[0:0:1 0:1:3]'::matrix, 'plus_times_int32');
-       mxm       
------------------
- i4[0:0:1 0:1:3]
-(1 row)
-
-</code></pre>
-<p>AxB can also be done with the '@' operator, mimicking the Python
-syntax:</p>
-<pre><code>select 'i4[0:0:1 0:1:2]'::matrix @ 'i4[0:0:1 0:1:3]'::matrix;
-    ?column?     
------------------
- i4[0:0:0 0:1:0]
-(1 row)
-
-</code></pre>
-<p>Matrices can be multipled by vectors on the right taking the linear
+This is called the "plus_times" semiring:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>select mxm(&#39;i4[0:0:1 0:1:2]&#39;::matrix, &#39;i4[0:0:1 0:1:3]&#39;::matrix, &#39;plus_times_int32&#39;);
+</span></code></pre></div>
+AxB can also be done with the '@' operator, mimicking the Python
+syntax:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>select &#39;i4[0:0:1 0:1:2]&#39;::matrix @ &#39;i4[0:0:1 0:1:3]&#39;::matrix;
+</span></code></pre></div>
+Matrices can be multipled by vectors on the right taking the linear
 combination of the matrices columns using the vectors elements as
-coefficients:</p>
-<pre><code>select mxv('i4[0:0:1 0:1:2]'::matrix, 'i4[0:0 1:1]'::vector, 'plus_times_int32');
-   mxv   
----------
- i4[0:2]
-(1 row)
-
-</code></pre>
-<p>'mxv' is also supported by the '@' operator:</p>
-<pre><code>select 'i4[0:0:1 0:1:2]'::matrix @ 'i4[0:0 1:1]'::vector;
- ?column? 
-----------
- i4[0:0]
-(1 row)
-
-</code></pre>
-<p>Matrices can be multipled by vectors on the right taking the linear
+coefficients:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>select mxv(&#39;i4[0:0:1 0:1:2]&#39;::matrix, &#39;i4[0:0 1:1]&#39;::vector, &#39;plus_times_int32&#39;);
+</span></code></pre></div>
+'mxv' is also supported by the '@' operator:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>select &#39;i4[0:0:1 0:1:2]&#39;::matrix @ &#39;i4[0:0 1:1]&#39;::vector;
+</span></code></pre></div>
+Matrices can be multipled by vectors on the right taking the linear
 combination of the matrices rows using the vectors elements as
-coefficients:</p>
-<pre><code>select vxm('i4[0:0 1:1]'::vector, 'i4[0:0:1 0:1:2]'::matrix, 'plus_times_int32');
-     vxm     
--------------
- i4[0:0 1:0]
-(1 row)
-
-</code></pre>
-<p>'vxm' is also supported by the '@' operator:</p>
-<pre><code>select 'i4[0:0 1:1]'::vector @ 'i4[0:0:1 0:1:2]'::matrix;
-  ?column?   
--------------
- i4[0:0 1:0]
-(1 row)
-
-</code></pre>
-<p>The 'selection' method calls the 'GrB_select()' API function.  The
+coefficients:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>select vxm(&#39;i4[0:0 1:1]&#39;::vector, &#39;i4[0:0:1 0:1:2]&#39;::matrix, &#39;plus_times_int32&#39;);
+</span></code></pre></div>
+'vxm' is also supported by the '@' operator:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>select &#39;i4[0:0 1:1]&#39;::vector @ &#39;i4[0:0:1 0:1:2]&#39;::matrix;
+</span></code></pre></div>
+The 'selection' method calls the 'GrB_select()' API function.  The
 name 'selection' was chosen not to conflict with the SQL keyword
 'select'.  Selection provides a conditional operator called an
 'indexunaryop' and a parameter for the operator to use to compare
 elements in the matrix.  Below, all elements with values greater
-than 1 are returned:</p>
-<pre><code>select selection('i4[1:1:1 2:2:2 3:3:3]'::matrix, 'valuegt_int32'::indexunaryop, 1::scalar);
-    selection    
------------------
- i4[2:2:2 3:3:3]
-(1 row)
-
-</code></pre>
-<p>Here are all values equal to 2:</p>
-<pre><code>select selection('i4[1:1:1 2:2:2 3:3:3]'::matrix, 'valueeq_int32'::indexunaryop, 2::scalar);
- selection 
------------
- i4[2:2:2]
-(1 row)
-
-</code></pre>
-<p>Apply takes an operator called a 'unaryop' and applies it to every
+than 1 are returned:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>select selection(&#39;i4[1:1:1 2:2:2 3:3:3]&#39;::matrix, &#39;valuegt_int32&#39;::indexunaryop, 1::scalar);
+</span></code></pre></div>
+Here are all values equal to 2:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>select selection(&#39;i4[1:1:1 2:2:2 3:3:3]&#39;::matrix, &#39;valueeq_int32&#39;::indexunaryop, 2::scalar);
+</span></code></pre></div>
+Apply takes an operator called a 'unaryop' and applies it to every
 element of the matrix.  The 'ainv_int32' returned the additive
-inverse (the negative value for integers) of every element:</p>
-<pre><code>select apply('i4[1:1:1 2:2:2 3:3:3]'::matrix, 'ainv_int32'::unaryop);
-          apply           
---------------------------
- i4[1:1:-1 2:2:-2 3:3:-3]
-(1 row)
-
-</code></pre>
-<p>The 'dup' function duplicates a matrix returning a new matrix
-object with the same values:</p>
-<pre><code>select dup('i4[1:1:1 2:2:2 3:3:3]'::matrix);
-          dup          
------------------------
- i4[1:1:1 2:2:2 3:3:3]
-(1 row)
-
-</code></pre>
-<p>The 'wait' method is used to "complete" a matrix, which may have
+inverse (the negative value for integers) of every element:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>select apply(&#39;i4[1:1:1 2:2:2 3:3:3]&#39;::matrix, &#39;ainv_int32&#39;::unaryop);
+</span></code></pre></div>
+The 'dup' function duplicates a matrix returning a new matrix
+object with the same values:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>select dup(&#39;i4[1:1:1 2:2:2 3:3:3]&#39;::matrix);
+</span></code></pre></div>
+The 'wait' method is used to "complete" a matrix, which may have
 pending operations waiting to be performed when using the default
 SuiteSparse non-blocking mode.  As a side effect, wait will sort
-the elements of the input:</p>
-<pre><code>select wait('i4[2:2:2 3:3:3 1:1:1]'::matrix);
-         wait          
------------------------
- i4[1:1:1 2:2:2 3:3:3]
-(1 row)
-
-</code></pre>
-<p>The 'clear' function clears the matrix of all elements and returns
-the same object, but empty.  The dimensions do not change:</p>
-<pre><code>select clear('i4[1:1:1 2:2:2 3:3:3]'::matrix);
- clear 
--------
- i4[]
-(1 row)
-
-</code></pre>
+the elements of the input:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>select wait(&#39;i4[2:2:2 3:3:3 1:1:1]&#39;::matrix);
+</span></code></pre></div>
+The 'clear' function clears the matrix of all elements and returns
+the same object, but empty.  The dimensions do not change:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>select clear(&#39;i4[1:1:1 2:2:2 3:3:3]&#39;::matrix);
+</span></code></pre></div></p>
               
             </div>
           </div><footer>

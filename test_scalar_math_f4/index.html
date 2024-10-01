@@ -175,24 +175,14 @@
 <p>This documentation is also tests for the code, the examples below
 show the literal output of these statements from Postgres.</p>
 <p>Some setup to make sure warnings are shown, and that the extension
-is installed.</p>
-<pre><code>set client_min_messages = 'WARNING';
-create extension if not exists onesparse;
-</code></pre>
-<p>Add mixed scalar objects and postgres scalar values</p>
-<pre><code>select (-1::float4)::scalar + 1::float4;
-  ?column?   
--------------
- f4:0.000000
-(1 row)
-
-select -1::float4 + (1::float4)::scalar;
- ?column? 
-----------
-        0
-(1 row)
-
-</code></pre>
+is installed.
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>set client_min_messages = &#39;WARNING&#39;;
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>create extension if not exists onesparse;
+</span></code></pre></div>
+Add mixed scalar objects and postgres scalar values
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>select (-1::float4)::scalar + 1::float4;
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>select -1::float4 + (1::float4)::scalar;
+</span></code></pre></div></p>
               
             </div>
           </div><footer>

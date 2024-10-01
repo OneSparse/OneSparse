@@ -175,182 +175,71 @@
 <p>This documentation is also tests for the code, the examples below
 show the literal output of these statements from Postgres.</p>
 <p>Some setup to make sure warnings are shown, and that the extension
-is installed.</p>
-<pre><code>set client_min_messages = 'WARNING';
-create extension if not exists onesparse;
-</code></pre>
-<p>Describe the vector type:</p>
-<pre><code>\dT+ vector
-                                        List of data types
-  Schema   |  Name  | Internal name | Size | Elements |  Owner   | Access privileges | Description 
------------+--------+---------------+------+----------+----------+-------------------+-------------
- onesparse | vector | vector        | var  |          | postgres |                   | 
-(1 row)
-
-</code></pre>
-<p>An empty vector can be constructed many ways, but one of the
+is installed.
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>set client_min_messages = &#39;WARNING&#39;;
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>create extension if not exists onesparse;
+</span></code></pre></div>
+Describe the vector type:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>\dT+ vector
+</span></code></pre></div>
+An empty vector can be constructed many ways, but one of the
 simplest is casting a type code to the matrix type.  In this case
 'i4' means GrB_INT32.  The type codes are intentionally compressed
 to be as short as possible for smaller pg_dumps.</p>
 <p>Much of these functions are basically vector versions of the same
-functions for matrix.  See those docs for details:</p>
-<pre><code>select 'i4'::vector;
- vector 
---------
- i4[]
-(1 row)
-
-select nvals('i4'::vector);
- nvals 
--------
-     0
-(1 row)
-
-select size('i4'::vector);
-        size         
----------------------
- 1152921504606846976
-(1 row)
-
-select 'i4[]'::vector;
- vector 
---------
- i4[]
-(1 row)
-
-select nvals('i4[]'::vector);
- nvals 
--------
-     0
-(1 row)
-
-select size('i4[]'::vector);
-        size         
----------------------
- 1152921504606846976
-(1 row)
-
-select 'i4(10)'::vector;
- vector 
---------
- i4[]
-(1 row)
-
-select nvals('i4(10)'::vector);
- nvals 
--------
-     0
-(1 row)
-
-select size('i4(10)'::vector);
- size 
-------
-   10
-(1 row)
-
-select 'i4(10)[]'::vector;
- vector 
---------
- i4[]
-(1 row)
-
-select nvals('i4(10)[]'::vector);
- nvals 
--------
-     0
-(1 row)
-
-select size('i4(10)[]'::vector);
- size 
-------
-   10
-(1 row)
-
-select 'i4[0:1 1:2 2:3]'::vector;
-     vector      
------------------
- i4[0:1 1:2 2:3]
-(1 row)
-
-select nvals('i4[0:1 1:2 2:3]'::vector);
- nvals 
--------
-     3
-(1 row)
-
-select 'i4(10)[0:1 1:2 2:3]'::vector;
-     vector      
------------------
- i4[0:1 1:2 2:3]
-(1 row)
-
-select size('i4(10)[0:1 1:2 2:3]'::vector);
- size 
-------
-   10
-(1 row)
-
-select size('i4(2)[0:1 1:2 2:3]'::vector);
-ERROR:  INVALID_INDEX GraphBLAS error: GrB_INVALID_INDEX
-function: GrB_Vector_setElement_INT64 (w, x, row)
-Row index 2 out of range; must be &lt; 2: Error setting Vector Element
-LINE 1: select size('i4(2)[0:1 1:2 2:3]'::vector);
-                    ^
-select ewise_add('i4[0:1 1:2 2:3]'::vector, 'i4[0:1 1:2 2:3]'::vector, 'plus_int32');
-    ewise_add    
------------------
- i4[0:2 1:4 2:6]
-(1 row)
-
-select ewise_mult('i4[0:1 1:2 2:3]'::vector, 'i4[0:1 1:2 2:3]'::vector, 'times_int32');
-   ewise_mult    
------------------
- i4[0:1 1:4 2:9]
-(1 row)
-
-select ewise_union('i4[0:1 1:2 2:3]'::vector, 42, 'i4[0:1 1:2 2:3]'::vector, 84, 'plus_int32');
-   ewise_union   
------------------
- i4[0:2 1:4 2:6]
-(1 row)
-
-select reduce_scalar('i4[0:1 1:2 2:3]'::vector, 'plus_monoid_int32');
- reduce_scalar 
----------------
- i4:6
-(1 row)
-
-select selection('i4[0:1 1:2 2:3]'::vector, 'valuegt_int32', 1);
-  selection  
--------------
- i4[1:2 2:3]
-(1 row)
-
-select apply('i4[1:1 2:2 3:3]'::vector, 'ainv_int32'::unaryop);
-       apply        
---------------------
- i4[1:-1 2:-2 3:-3]
-(1 row)
-
-select wait('i4[0:1 1:2 2:3]'::vector);
- wait 
-------
-
-(1 row)
-
-select dup('i4[0:1 1:2 2:3]'::vector);
-       dup       
------------------
- i4[0:1 1:2 2:3]
-(1 row)
-
-select clear('i4[0:1 1:2 2:3]'::vector);
- clear 
--------
-
-(1 row)
-
-</code></pre>
+functions for matrix.  See those docs for details:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>select &#39;i4&#39;::vector;
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>select nvals(&#39;i4&#39;::vector);
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>select size(&#39;i4&#39;::vector);
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>select &#39;i4[]&#39;::vector;
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>select nvals(&#39;i4[]&#39;::vector);
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>select size(&#39;i4[]&#39;::vector);
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>
+</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>select &#39;i4(10)&#39;::vector;
+</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>
+</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>select nvals(&#39;i4(10)&#39;::vector);
+</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a>
+</span><span id="__span-2-17"><a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a>select size(&#39;i4(10)&#39;::vector);
+</span><span id="__span-2-18"><a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a>
+</span><span id="__span-2-19"><a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a>select &#39;i4(10)[]&#39;::vector;
+</span><span id="__span-2-20"><a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a>
+</span><span id="__span-2-21"><a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a>select nvals(&#39;i4(10)[]&#39;::vector);
+</span><span id="__span-2-22"><a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a>
+</span><span id="__span-2-23"><a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a>select size(&#39;i4(10)[]&#39;::vector);
+</span><span id="__span-2-24"><a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a>
+</span><span id="__span-2-25"><a id="__codelineno-2-25" name="__codelineno-2-25" href="#__codelineno-2-25"></a>select &#39;i4[0:1 1:2 2:3]&#39;::vector;
+</span><span id="__span-2-26"><a id="__codelineno-2-26" name="__codelineno-2-26" href="#__codelineno-2-26"></a>
+</span><span id="__span-2-27"><a id="__codelineno-2-27" name="__codelineno-2-27" href="#__codelineno-2-27"></a>select nvals(&#39;i4[0:1 1:2 2:3]&#39;::vector);
+</span><span id="__span-2-28"><a id="__codelineno-2-28" name="__codelineno-2-28" href="#__codelineno-2-28"></a>
+</span><span id="__span-2-29"><a id="__codelineno-2-29" name="__codelineno-2-29" href="#__codelineno-2-29"></a>select &#39;i4(10)[0:1 1:2 2:3]&#39;::vector;
+</span><span id="__span-2-30"><a id="__codelineno-2-30" name="__codelineno-2-30" href="#__codelineno-2-30"></a>
+</span><span id="__span-2-31"><a id="__codelineno-2-31" name="__codelineno-2-31" href="#__codelineno-2-31"></a>select size(&#39;i4(10)[0:1 1:2 2:3]&#39;::vector);
+</span><span id="__span-2-32"><a id="__codelineno-2-32" name="__codelineno-2-32" href="#__codelineno-2-32"></a>
+</span><span id="__span-2-33"><a id="__codelineno-2-33" name="__codelineno-2-33" href="#__codelineno-2-33"></a>select size(&#39;i4(2)[0:1 1:2 2:3]&#39;::vector);
+</span><span id="__span-2-34"><a id="__codelineno-2-34" name="__codelineno-2-34" href="#__codelineno-2-34"></a>
+</span><span id="__span-2-35"><a id="__codelineno-2-35" name="__codelineno-2-35" href="#__codelineno-2-35"></a>select ewise_add(&#39;i4[0:1 1:2 2:3]&#39;::vector, &#39;i4[0:1 1:2 2:3]&#39;::vector, &#39;plus_int32&#39;);
+</span><span id="__span-2-36"><a id="__codelineno-2-36" name="__codelineno-2-36" href="#__codelineno-2-36"></a>
+</span><span id="__span-2-37"><a id="__codelineno-2-37" name="__codelineno-2-37" href="#__codelineno-2-37"></a>select ewise_mult(&#39;i4[0:1 1:2 2:3]&#39;::vector, &#39;i4[0:1 1:2 2:3]&#39;::vector, &#39;times_int32&#39;);
+</span><span id="__span-2-38"><a id="__codelineno-2-38" name="__codelineno-2-38" href="#__codelineno-2-38"></a>
+</span><span id="__span-2-39"><a id="__codelineno-2-39" name="__codelineno-2-39" href="#__codelineno-2-39"></a>select ewise_union(&#39;i4[0:1 1:2 2:3]&#39;::vector, 42, &#39;i4[0:1 1:2 2:3]&#39;::vector, 84, &#39;plus_int32&#39;);
+</span><span id="__span-2-40"><a id="__codelineno-2-40" name="__codelineno-2-40" href="#__codelineno-2-40"></a>
+</span><span id="__span-2-41"><a id="__codelineno-2-41" name="__codelineno-2-41" href="#__codelineno-2-41"></a>select reduce_scalar(&#39;i4[0:1 1:2 2:3]&#39;::vector, &#39;plus_monoid_int32&#39;);
+</span><span id="__span-2-42"><a id="__codelineno-2-42" name="__codelineno-2-42" href="#__codelineno-2-42"></a>
+</span><span id="__span-2-43"><a id="__codelineno-2-43" name="__codelineno-2-43" href="#__codelineno-2-43"></a>select selection(&#39;i4[0:1 1:2 2:3]&#39;::vector, &#39;valuegt_int32&#39;, 1);
+</span><span id="__span-2-44"><a id="__codelineno-2-44" name="__codelineno-2-44" href="#__codelineno-2-44"></a>
+</span><span id="__span-2-45"><a id="__codelineno-2-45" name="__codelineno-2-45" href="#__codelineno-2-45"></a>select apply(&#39;i4[1:1 2:2 3:3]&#39;::vector, &#39;ainv_int32&#39;::unaryop);
+</span><span id="__span-2-46"><a id="__codelineno-2-46" name="__codelineno-2-46" href="#__codelineno-2-46"></a>
+</span><span id="__span-2-47"><a id="__codelineno-2-47" name="__codelineno-2-47" href="#__codelineno-2-47"></a>select wait(&#39;i4[0:1 1:2 2:3]&#39;::vector);
+</span><span id="__span-2-48"><a id="__codelineno-2-48" name="__codelineno-2-48" href="#__codelineno-2-48"></a>
+</span><span id="__span-2-49"><a id="__codelineno-2-49" name="__codelineno-2-49" href="#__codelineno-2-49"></a>select dup(&#39;i4[0:1 1:2 2:3]&#39;::vector);
+</span><span id="__span-2-50"><a id="__codelineno-2-50" name="__codelineno-2-50" href="#__codelineno-2-50"></a>
+</span><span id="__span-2-51"><a id="__codelineno-2-51" name="__codelineno-2-51" href="#__codelineno-2-51"></a>select clear(&#39;i4[0:1 1:2 2:3]&#39;::vector);
+</span></code></pre></div></p>
               
             </div>
           </div><footer>

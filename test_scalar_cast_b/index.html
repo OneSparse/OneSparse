@@ -175,52 +175,22 @@
 <p>This documentation is also tests for the code, the examples below
 show the literal output of these statements from Postgres.</p>
 <p>Some setup to make sure warnings are shown, and that the extension
-is installed.</p>
-<pre><code>set client_min_messages = 'WARNING';
-create extension if not exists onesparse;
-</code></pre>
-<p>These casting functions cast the Postgres type bool to the
-GraphBLAS scalar type GrB_BOOL.</p>
-<pre><code>select cast(0::bool as scalar);
- scalar 
---------
- b:f
-(1 row)
-
-select cast(0::bool as scalar);
- scalar 
---------
- b:f
-(1 row)
-
-select cast(1::bool as scalar);
- scalar 
---------
- b:t
-(1 row)
-
-</code></pre>
-<p>These tests cast back from the scalar type GrB_BOOL to the
-Postgres type bool</p>
-<pre><code>select cast(0::bool::scalar as bool);
- bool 
-------
- f
-(1 row)
-
-select cast(0::bool::scalar as  bool);
- bool 
-------
- f
-(1 row)
-
-select cast(1::bool::scalar as scalar);
- scalar 
---------
- b:t
-(1 row)
-
-</code></pre>
+is installed.
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>set client_min_messages = &#39;WARNING&#39;;
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>create extension if not exists onesparse;
+</span></code></pre></div>
+These casting functions cast the Postgres type bool to the
+GraphBLAS scalar type GrB_BOOL.
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>select cast(0::bool as scalar);
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>select cast(0::bool as scalar);
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>select cast(1::bool as scalar);
+</span></code></pre></div>
+These tests cast back from the scalar type GrB_BOOL to the
+Postgres type bool
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>select cast(0::bool::scalar as bool);
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>select cast(0::bool::scalar as  bool);
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>select cast(1::bool::scalar as scalar);
+</span></code></pre></div></p>
               
             </div>
           </div><footer>
