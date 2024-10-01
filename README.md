@@ -45,6 +45,10 @@ traversal, machine learning, AI, science, and engineering.
 SuiteSparse's powerful built-in JIT compiler can target multiple
 hardware architectures, including GPUs, with no changes to your code.
 
+Join us in the [OneSparse Discussions
+Board](https://github.com/OneSparse/OneSparse/discussions) and say
+hi!.
+
 Like the JSON/JSONB types did for unstructured data, OneSparse makes
 dense and sparse matrices and vectors fully native Postgres
 types. OneSparse supports optimized, parallel matrix multiplication
