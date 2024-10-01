@@ -27,8 +27,9 @@ postgres=# select 'i4'::matrix;
 postgres=# 
 ```
 
-See the doctests for some examples for creating matrices and vectors.
-You can verify the doctests with docker using:
+See the [Documentation](https://onesparse.github.io/OneSparse/) for
+some examples for creating matrices and vectors.  You can verify the
+doctests with docker using:
 
 ```
 $ docker exec -u postgres -it onesparse-demo-container make installcheck
