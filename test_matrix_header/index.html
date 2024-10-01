@@ -1,190 +1,204 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="light">
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        
-        
-        
-        <link rel="shortcut icon" href="../img/favicon.ico">
-        <title>Matrix Objects - My Docs</title>
-        <link href="../css/bootstrap.min.css" rel="stylesheet">
-        <link href="../css/fontawesome.min.css" rel="stylesheet">
-        <link href="../css/brands.min.css" rel="stylesheet">
-        <link href="../css/solid.min.css" rel="stylesheet">
-        <link href="../css/v4-font-face.min.css" rel="stylesheet">
-        <link href="../css/base.css" rel="stylesheet">
-        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
-        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
-        <script>hljs.highlightAll();</script> 
-    </head>
-
-    <body>
-        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
-            <div class="container">
-                <a class="navbar-brand" href="..">My Docs</a>
-                <!-- Expander button -->
-                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-
-                <!-- Expanded navigation -->
-                <div id="navbar-collapse" class="navbar-collapse collapse">
-                        <!-- Main navigation -->
-                        <ul class="nav navbar-nav">
-                            <li class="nav-item">
-                                <a href=".." class="nav-link">Welcome to MkDocs</a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="./" class="nav-link active" aria-current="page">Matrix Objects</a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="../test_scalar_cast_b/" class="nav-link">Scalar Casting</a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="../test_scalar_cast_f4/" class="nav-link">Scalar Casting</a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="../test_scalar_cast_f8/" class="nav-link">Scalar Casting</a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="../test_scalar_cast_i2/" class="nav-link">Scalar Casting</a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="../test_scalar_cast_i4/" class="nav-link">Scalar Casting</a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="../test_scalar_cast_i8/" class="nav-link">Scalar Casting</a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="../test_scalar_func_b/" class="nav-link">Scalar Functions</a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="../test_scalar_func_f4/" class="nav-link">Scalar Functions</a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="../test_scalar_func_f8/" class="nav-link">Scalar Functions</a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="../test_scalar_func_i2/" class="nav-link">Scalar Functions</a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="../test_scalar_func_i4/" class="nav-link">Scalar Functions</a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="../test_scalar_func_i8/" class="nav-link">Scalar Functions</a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="../test_scalar_header/" class="nav-link">Scalar Functions</a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="../test_scalar_math_f4/" class="nav-link">Scalar Math</a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="../test_scalar_math_f8/" class="nav-link">Scalar Math</a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="../test_scalar_math_i2/" class="nav-link">Scalar Math</a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="../test_scalar_math_i4/" class="nav-link">Scalar Math</a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="../test_scalar_math_i8/" class="nav-link">Scalar Math</a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="../test_scalar_op_f4/" class="nav-link">Scalar Ops</a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="../test_scalar_op_f8/" class="nav-link">Scalar Ops</a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="../test_scalar_op_i2/" class="nav-link">Scalar Ops</a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="../test_scalar_op_i4/" class="nav-link">Scalar Ops</a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="../test_scalar_op_i8/" class="nav-link">Scalar Ops</a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="../test_vector_header/" class="nav-link">Vectors</a>
-                            </li>
-                        </ul>
-
-                    <ul class="nav navbar-nav ms-md-auto">
-                        <li class="nav-item">
-                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
-                                <i class="fa fa-search"></i> Search
-                            </a>
-                        </li>
-                            <li class="nav-item">
-                                <a rel="prev" href=".." class="nav-link">
-                                    <i class="fa fa-arrow-left"></i> Previous
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a rel="next" href="../test_scalar_cast_b/" class="nav-link">
-                                    Next <i class="fa fa-arrow-right"></i>
-                                </a>
-                            </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <div class="container">
-            <div class="row">
-                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
-    <div class="navbar-header">
-        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
-            <span class="fa fa-angle-down"></span>
-        </button>
-    </div>
-
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Matrix - OneSparse Postgres</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
     
-    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
-        <ul class="nav flex-column">
-            
-            <li class="nav-item" data-bs-level="1"><a href="#matrix-objects" class="nav-link">Matrix Objects</a>
-              <ul class="nav flex-column">
-              </ul>
-            </li>
-            
-            <li class="nav-item" data-bs-level="1"><a href="#element-wise-operations" class="nav-link">Element-wise operations</a>
-              <ul class="nav flex-column">
-              </ul>
-            </li>
-        </ul>
-    </div>
-</div></div>
-                    <div class="col-md-9" role="main">
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Matrix";
+        var mkdocs_page_input_path = "test_matrix_header.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/C.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/pgsql.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
 
-<h1 id="matrix-objects">Matrix Objects</h1>
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> OneSparse Postgres
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Welcome to MkDocs</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Matrix</a>
+    <ul class="current">
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../test_scalar_cast_b/">Scalar 'bool' Casting</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../test_scalar_cast_f4/">Scalar 'float4' Casting</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../test_scalar_cast_f8/">Scalar 'float8' Casting</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../test_scalar_cast_i2/">Scalar 'smallint' Casting</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../test_scalar_cast_i4/">Scalar 'integer' Casting</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../test_scalar_cast_i8/">Scalar 'bigint' Casting</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../test_scalar_func_b/">Scalar 'bool' Functions</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../test_scalar_func_f4/">Scalar 'float4' Functions</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../test_scalar_func_f8/">Scalar 'float8' Functions</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../test_scalar_func_i2/">Scalar 'smallint' Functions</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../test_scalar_func_i4/">Scalar 'integer' Functions</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../test_scalar_func_i8/">Scalar 'bigint' Functions</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../test_scalar_header/">Scalar</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../test_scalar_math_f4/">Scalar 'float4' Math</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../test_scalar_math_f8/">Scalar 'float8' Math</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../test_scalar_math_i2/">Scalar 'smallint' Math</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../test_scalar_math_i4/">Scalar 'integer' Math</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../test_scalar_math_i8/">Scalar 'bigint' Math</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../test_scalar_op_f4/">Scalar 'float4' Operators</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../test_scalar_op_f8/">Scalar 'float8' Operators</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../test_scalar_op_i2/">Scalar 'smallint' Operators</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../test_scalar_op_i4/">Scalar 'integer' Operators</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../test_scalar_op_i8/">Scalar 'bigint' Operators</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../test_vector_header/">Vectors</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">OneSparse Postgres</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Matrix</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="matrix">Matrix</h1>
 <p>This documentation is also tests for the code, the examples below
 show the literal output of these statements from Postgres.</p>
 <p>Some setup to make sure warnings are shown, and that the extension
 is installed.</p>
-<pre><code>
-set client_min_messages = 'WARNING';
+<pre><code>set client_min_messages = 'WARNING';
 create extension if not exists onesparse;
-
 </code></pre>
 <p>The 'matrix' data type wraps a SuiteSparse GrB_Matrix handle and
 delegates functions from SQL to the library through instances of
 this type.</p>
-<pre><code>
-\dT+ matrix
+<pre><code>\dT+ matrix
+                                        List of data types
+  Schema   |  Name  | Internal name | Size | Elements |  Owner   | Access privileges | Description 
+-----------+--------+---------------+------+----------+----------+-------------------+-------------
+ onesparse | matrix | matrix        | var  |          | postgres |                   | 
+(1 row)
 
 </code></pre>
 <p>An empty matrix can be constructed many ways, but one of the
 simplest is casting a type code to the matrix type.  In this case
 'i4' means GrB_INT32.  The type codes are intentionally compressed
 to be as short as possible for smaller pg_dumps.</p>
-<pre><code>
-select 'i4'::matrix;
+<pre><code>select 'i4'::matrix;
+ matrix 
+--------
+ i4[]
+(1 row)
 
 </code></pre>
 <p>A matrix can have a fixed number of rows and/or columns.  The
@@ -195,19 +209,28 @@ referred to as "INDEX_MAX" and matrices and vector dimensions that
 are INDEX_MAX in size are reffered to as "unbounded".  For matrices
 with known dimensions, the dimensions can be provided in parentesis
 after the type code.  Here a 10 row by 10 column matrix is created:</p>
-<pre><code>
-select 'i4(10:10)'::matrix;
+<pre><code>select 'i4(10:10)'::matrix;
+ matrix 
+--------
+ i4[]
+(1 row)
 
 </code></pre>
 <p>Either dimension can be ommited, this creates a 10 row by unbounded
 column matrix.</p>
-<pre><code>
-select 'i4(10:)'::matrix;
+<pre><code>select 'i4(10:)'::matrix;
+ matrix 
+--------
+ i4[]
+(1 row)
 
 </code></pre>
 <p>This creates a unbounded row by 10 column matrix.</p>
-<pre><code>
-select 'i4(10:)'::matrix;
+<pre><code>select 'i4(10:)'::matrix;
+ matrix 
+--------
+ i4[]
+(1 row)
 
 </code></pre>
 <p>Note that in all the above cases the matrices created are <em>empty</em>.
@@ -221,66 +244,144 @@ memory trying to allocate 2^120 entries.</p>
 operators.  Here we see three very common operations, returning the
 number of rows, the number of columns, and the number of store
 values.</p>
-<pre><code>
-select nrows('i4'::matrix);
+<pre><code>select nrows('i4'::matrix);
+        nrows        
+---------------------
+ 1152921504606846976
+(1 row)
 
 select ncols('i4'::matrix);
+        ncols        
+---------------------
+ 1152921504606846976
+(1 row)
 
 select nvals('i4'::matrix);
+ nvals 
+-------
+     0
+(1 row)
 
 </code></pre>
 <p>Above you can see the matrix has unbounded rows and columns (the
 very large number is the number of <em>possible</em> entries).  And the
-number of stored values is zero.</p>
-<pre><code>
-</code></pre>
-<p>Values can be specified after the 'type(dimension)' prefix as an
+number of stored values is zero.
+Values can be specified after the 'type(dimension)' prefix as an
 array of elements between square brackets.  Empty brackets imply no
 elements:</p>
-<pre><code>
-select nrows('i4[]'::matrix);
+<pre><code>select nrows('i4[]'::matrix);
+        nrows        
+---------------------
+ 1152921504606846976
+(1 row)
 
 select ncols('i4[]'::matrix);
+        ncols        
+---------------------
+ 1152921504606846976
+(1 row)
 
 select nvals('i4[]'::matrix);
+ nvals 
+-------
+     0
+(1 row)
 
 </code></pre>
 <p>Elements are specified between square brackets are coordinates of
 'row_id:column_id:value' separated by spaces:</p>
-<pre><code>
-select 'i4[1:1:1 2:2:2 3:3:3]'::matrix;
+<pre><code>select 'i4[1:1:1 2:2:2 3:3:3]'::matrix;
+        matrix         
+-----------------------
+ i4[1:1:1 2:2:2 3:3:3]
+(1 row)
 
 select 'i4(10:)[1:1:1 2:2:2 3:3:3]'::matrix;
+        matrix         
+-----------------------
+ i4[1:1:1 2:2:2 3:3:3]
+(1 row)
 
 select 'i4(:10)[1:1:1 2:2:2 3:3:3]'::matrix;
+        matrix         
+-----------------------
+ i4[1:1:1 2:2:2 3:3:3]
+(1 row)
 
 </code></pre>
 <p>Below you see the number of rows, columns and spaces for a variety
 of combinations:</p>
-<pre><code>
-select nrows('i4(10)[1:1:1 2:2:2 3:3:3]'::matrix);
+<pre><code>select nrows('i4(10)[1:1:1 2:2:2 3:3:3]'::matrix);
+ nrows 
+-------
+    10
+(1 row)
 
 select ncols('i4(10)[1:1:1 2:2:2 3:3:3]'::matrix);
+        ncols        
+---------------------
+ 1152921504606846976
+(1 row)
 
 select nvals('i4(10)[1:1:1 2:2:2 3:3:3]'::matrix);
+ nvals 
+-------
+     3
+(1 row)
 
 select nrows('i4(10:)[1:1:1 2:2:2 3:3:3]'::matrix);
+ nrows 
+-------
+    10
+(1 row)
 
 select ncols('i4(10:)[1:1:1 2:2:2 3:3:3]'::matrix);
+        ncols        
+---------------------
+ 1152921504606846976
+(1 row)
 
 select nvals('i4(10:)[1:1:1 2:2:2 3:3:3]'::matrix);
+ nvals 
+-------
+     3
+(1 row)
 
 select nrows('i4(:10)[1:1:1 2:2:2 3:3:3]'::matrix);
+        nrows        
+---------------------
+ 1152921504606846976
+(1 row)
 
 select ncols('i4(:10)[1:1:1 2:2:2 3:3:3]'::matrix);
+ ncols 
+-------
+    10
+(1 row)
 
 select nvals('i4(:10)[1:1:1 2:2:2 3:3:3]'::matrix);
+ nvals 
+-------
+     3
+(1 row)
 
 select nrows('i4(10:10)[1:1:1 2:2:2 3:3:3]'::matrix);
+ nrows 
+-------
+    10
+(1 row)
 
 select ncols('i4(10:10)[1:1:1 2:2:2 3:3:3]'::matrix);
+ ncols 
+-------
+    10
+(1 row)
 
 select nvals('i4(10:10)[1:1:1 2:2:2 3:3:3]'::matrix);
+ nvals 
+-------
+     3
+(1 row)
 
 </code></pre>
 <h1 id="element-wise-operations">Element-wise operations</h1>
@@ -289,41 +390,58 @@ operate pairs of matrices.  'ewise_add' computes the element-wise
 “addition” of two matrices A and B, element-wise using any binary
 operator.  Elements present on both sides of the operation are
 included in the result.</p>
-<pre><code>
-select ewise_add('i4[1:1:1 2:2:2 3:3:3]'::matrix, 'i4[1:1:1 2:2:2 3:3:3]'::matrix, 'plus_int32');
+<pre><code>select ewise_add('i4[1:1:1 2:2:2 3:3:3]'::matrix, 'i4[1:1:1 2:2:2 3:3:3]'::matrix, 'plus_int32');
+       ewise_add       
+-----------------------
+ i4[1:1:2 2:2:4 3:3:6]
+(1 row)
 
 </code></pre>
 <p>'ewise_mult' multiplies elements of two matrices, taking only the
 intersection of common elements in both matrices, if an element is
 missing from either the left or right side, it is ommited from the
 result:</p>
-<pre><code>
-select ewise_mult('i4[1:1:1 2:2:2 3:3:3]'::matrix, 'i4[1:1:1 2:2:2 3:3:3]'::matrix, 'times_int32');
-
+<pre><code>select ewise_mult('i4[1:1:1 2:2:2 3:3:3]'::matrix, 'i4[1:1:1 2:2:2 3:3:3]'::matrix, 'times_int32');
+      ewise_mult       
+-----------------------
+ i4[1:1:1 2:2:4 3:3:9]
+(1 row)
 
 </code></pre>
 <p>'ewise_union' is like 'ewise_add' but differs in how the binary op
 is applied. A pair of scalars, alpha and beta define the inputs to
 the operator when entries are present in one matrix but not the
 other.</p>
-<pre><code>
-select ewise_union('i4[1:1:1 2:2:2 3:3:3]'::matrix, 42, 'i4[1:1:1 2:2:2 3:3:3]'::matrix, 84, 'plus_int32');
+<pre><code>select ewise_union('i4[1:1:1 2:2:2 3:3:3]'::matrix, 42, 'i4[1:1:1 2:2:2 3:3:3]'::matrix, 84, 'plus_int32');
+      ewise_union      
+-----------------------
+ i4[1:1:2 2:2:4 3:3:6]
+(1 row)
 
 </code></pre>
 <p>The entire matrix can be reduced to a scalar value:</p>
-<pre><code>
-select reduce_scalar('i4[1:1:1 2:2:2 3:3:3]'::matrix, 'plus_monoid_int32');
+<pre><code>select reduce_scalar('i4[1:1:1 2:2:2 3:3:3]'::matrix, 'plus_monoid_int32');
+ reduce_scalar 
+---------------
+ i4:6
+(1 row)
 
 </code></pre>
 <p>The matrix can also be reduced to a column vector:</p>
-<pre><code>
-select reduce_vector('i4[1:1:1 1:2:3 2:2:2]'::matrix, 'plus_monoid_int32');
+<pre><code>select reduce_vector('i4[1:1:1 1:2:3 2:2:2]'::matrix, 'plus_monoid_int32');
+ reduce_vector 
+---------------
+ i4[1:4 2:2]
+(1 row)
 
 </code></pre>
 <p>To reduce a row vector, specify that the input should be transposed
 with the descriptor 't0':</p>
-<pre><code>
-select reduce_vector('i4[1:1:1 1:2:3 2:2:2]'::matrix, 'plus_monoid_int32', descriptor=&gt;'t0');
+<pre><code>select reduce_vector('i4[1:1:1 1:2:3 2:2:2]'::matrix, 'plus_monoid_int32', descriptor=&gt;'t0');
+ reduce_vector 
+---------------
+ i4[1:1 2:5]
+(1 row)
 
 </code></pre>
 <p>Matrix Multiplication (referred to here as A @ B) is the heart of
@@ -332,38 +450,56 @@ For the most common form of matrix multiplication, the outer
 opperation is to multiply coresponding elements with the "times"
 operator and then reduce those products with the "plus" operator.
 This is called the "plus_times" semiring:</p>
-<pre><code>
-select mxm('i4[0:0:1 0:1:2]'::matrix, 'i4[0:0:1 0:1:3]'::matrix, 'plus_times_int32');
+<pre><code>select mxm('i4[0:0:1 0:1:2]'::matrix, 'i4[0:0:1 0:1:3]'::matrix, 'plus_times_int32');
+       mxm       
+-----------------
+ i4[0:0:1 0:1:3]
+(1 row)
 
 </code></pre>
 <p>AxB can also be done with the '@' operator, mimicking the Python
 syntax:</p>
-<pre><code>
-select 'i4[0:0:1 0:1:2]'::matrix @ 'i4[0:0:1 0:1:3]'::matrix;
+<pre><code>select 'i4[0:0:1 0:1:2]'::matrix @ 'i4[0:0:1 0:1:3]'::matrix;
+    ?column?     
+-----------------
+ i4[0:0:0 0:1:0]
+(1 row)
 
 </code></pre>
 <p>Matrices can be multipled by vectors on the right taking the linear
 combination of the matrices columns using the vectors elements as
 coefficients:</p>
-<pre><code>
-select mxv('i4[0:0:1 0:1:2]'::matrix, 'i4[0:0 1:1]'::vector, 'plus_times_int32');
+<pre><code>select mxv('i4[0:0:1 0:1:2]'::matrix, 'i4[0:0 1:1]'::vector, 'plus_times_int32');
+   mxv   
+---------
+ i4[0:2]
+(1 row)
 
 </code></pre>
 <p>'mxv' is also supported by the '@' operator:</p>
-<pre><code>
-select 'i4[0:0:1 0:1:2]'::matrix @ 'i4[0:0 1:1]'::vector;
+<pre><code>select 'i4[0:0:1 0:1:2]'::matrix @ 'i4[0:0 1:1]'::vector;
+ ?column? 
+----------
+ i4[0:0]
+(1 row)
 
 </code></pre>
 <p>Matrices can be multipled by vectors on the right taking the linear
 combination of the matrices rows using the vectors elements as
 coefficients:</p>
-<pre><code>
-select vxm('i4[0:0 1:1]'::vector, 'i4[0:0:1 0:1:2]'::matrix, 'plus_times_int32');
+<pre><code>select vxm('i4[0:0 1:1]'::vector, 'i4[0:0:1 0:1:2]'::matrix, 'plus_times_int32');
+     vxm     
+-------------
+ i4[0:0 1:0]
+(1 row)
 
 </code></pre>
 <p>'vxm' is also supported by the '@' operator:</p>
-<pre><code>
-select 'i4[0:0 1:1]'::vector @ 'i4[0:0:1 0:1:2]'::matrix;
+<pre><code>select 'i4[0:0 1:1]'::vector @ 'i4[0:0:1 0:1:2]'::matrix;
+  ?column?   
+-------------
+ i4[0:0 1:0]
+(1 row)
 
 </code></pre>
 <p>The 'selection' method calls the 'GrB_select()' API function.  The
@@ -372,116 +508,105 @@ name 'selection' was chosen not to conflict with the SQL keyword
 'indexunaryop' and a parameter for the operator to use to compare
 elements in the matrix.  Below, all elements with values greater
 than 1 are returned:</p>
-<pre><code>
-select selection('i4[1:1:1 2:2:2 3:3:3]'::matrix, 'valuegt_int32'::indexunaryop, 1::scalar);
+<pre><code>select selection('i4[1:1:1 2:2:2 3:3:3]'::matrix, 'valuegt_int32'::indexunaryop, 1::scalar);
+    selection    
+-----------------
+ i4[2:2:2 3:3:3]
+(1 row)
 
 </code></pre>
 <p>Here are all values equal to 2:</p>
-<pre><code>
-select selection('i4[1:1:1 2:2:2 3:3:3]'::matrix, 'valueeq_int32'::indexunaryop, 2::scalar);
+<pre><code>select selection('i4[1:1:1 2:2:2 3:3:3]'::matrix, 'valueeq_int32'::indexunaryop, 2::scalar);
+ selection 
+-----------
+ i4[2:2:2]
+(1 row)
 
 </code></pre>
 <p>Apply takes an operator called a 'unaryop' and applies it to every
 element of the matrix.  The 'ainv_int32' returned the additive
 inverse (the negative value for integers) of every element:</p>
-<pre><code>
-select apply('i4[1:1:1 2:2:2 3:3:3]'::matrix, 'ainv_int32'::unaryop);
+<pre><code>select apply('i4[1:1:1 2:2:2 3:3:3]'::matrix, 'ainv_int32'::unaryop);
+          apply           
+--------------------------
+ i4[1:1:-1 2:2:-2 3:3:-3]
+(1 row)
 
 </code></pre>
 <p>The 'dup' function duplicates a matrix returning a new matrix
 object with the same values:</p>
-<pre><code>
-select dup('i4[1:1:1 2:2:2 3:3:3]'::matrix);
+<pre><code>select dup('i4[1:1:1 2:2:2 3:3:3]'::matrix);
+          dup          
+-----------------------
+ i4[1:1:1 2:2:2 3:3:3]
+(1 row)
 
 </code></pre>
 <p>The 'wait' method is used to "complete" a matrix, which may have
 pending operations waiting to be performed when using the default
 SuiteSparse non-blocking mode.  As a side effect, wait will sort
 the elements of the input:</p>
-<pre><code>
-select wait('i4[2:2:2 3:3:3 1:1:1]'::matrix);
+<pre><code>select wait('i4[2:2:2 3:3:3 1:1:1]'::matrix);
+         wait          
+-----------------------
+ i4[1:1:1 2:2:2 3:3:3]
+(1 row)
 
 </code></pre>
 <p>The 'clear' function clears the matrix of all elements and returns
 the same object, but empty.  The dimensions do not change:</p>
-<pre><code>
-select clear('i4[1:1:1 2:2:2 3:3:3]'::matrix);
-</code></pre></div>
-            </div>
-        </div>
+<pre><code>select clear('i4[1:1:1 2:2:2 3:3:3]'::matrix);
+ clear 
+-------
+ i4[]
+(1 row)
 
-        <footer class="col-md-12">
-            <hr>
-            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
-        </footer>
-        <script src="../js/bootstrap.bundle.min.js"></script>
-        <script>
-            var base_url = "..",
-                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
-        </script>
-        <script src="../js/base.js"></script>
-        <script src="../search/main.js"></script>
+</code></pre>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href=".." class="btn btn-neutral float-left" title="Welcome to MkDocs"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../test_scalar_cast_b/" class="btn btn-neutral float-right" title="Scalar 'bool' Casting">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
 
-        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title" id="searchModalLabel">Search</h4>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>From here you can search these documents. Enter your search terms below.</p>
-                <form>
-                    <div class="form-group">
-                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
-                    </div>
-                </form>
-                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
-            </div>
-            <div class="modal-footer">
-            </div>
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
         </div>
-    </div>
-</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th style="width: 20%;">Keys</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td class="help shortcut"><kbd>?</kbd></td>
-                    <td>Open this help</td>
-                  </tr>
-                  <tr>
-                    <td class="next shortcut"><kbd>n</kbd></td>
-                    <td>Next page</td>
-                  </tr>
-                  <tr>
-                    <td class="prev shortcut"><kbd>p</kbd></td>
-                    <td>Previous page</td>
-                  </tr>
-                  <tr>
-                    <td class="search shortcut"><kbd>s</kbd></td>
-                    <td>Search</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="modal-footer">
-            </div>
-        </div>
-    </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href=".." style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../test_scalar_cast_b/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
 
-    </body>
+</body>
 </html>
