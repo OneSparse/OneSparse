@@ -9,8 +9,6 @@
 set client_min_messages = 'WARNING';
 create extension if not exists onesparse;
 
--- # Matrix
---
 -- The 'matrix' data type wraps a SuiteSparse GrB_Matrix handle and
 -- delegates functions from SQL to the library through instances of
 -- this type.
@@ -149,7 +147,7 @@ select reduce_vector('i4[1:1:1 1:2:3 2:2:2]'::matrix, 'plus_monoid_int32');
 -- To reduce a row vector, specify that the input should be transposed
 -- with the descriptor 't0':
 
-select reduce_vector('i4[1:1:1 1:2:3 2:2:2]'::matrix, 'plus_monoid_int32', descriptor='t0');
+select reduce_vector('i4[1:1:1 1:2:3 2:2:2]'::matrix, 'plus_monoid_int32', descriptor=>'t0');
 
 -- Matrix Multiplication (referred to here as A @ B) is the heart of
 -- linear algebra.  All matrix multiplication happens over a semiring.

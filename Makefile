@@ -7,7 +7,7 @@ PGXS := $(shell $(PG_CONFIG) --pgxs)
 MODULE_big = onesparse
 OBJS = $(patsubst %.c,%.o,$(wildcard src/*.c))
 SHLIB_LINK = -lgraphblas -lpq
-PG_CPPFLAGS = -O0 -Wfatal-errors
+PG_CPPFLAGS = -O0 -Wfatal-errors -std=c11
 
 TESTS        = $(wildcard sql/*.sql)
 REGRESS      = $(patsubst sql/%.sql,%,$(TESTS))

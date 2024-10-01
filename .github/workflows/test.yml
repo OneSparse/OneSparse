@@ -17,4 +17,7 @@ jobs:
 
       - name: Run tests
         run: |
-          ./test.sh
+          docker run -d -e POSTGRES_PASSWORD=password -it --name onesparse-test onesparse/onesparse:0.1.0
+          sleep 5
+          docker exec -u postgres -it onesparse-test make installcheck
+

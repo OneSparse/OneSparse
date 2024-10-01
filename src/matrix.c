@@ -415,25 +415,35 @@ Datum matrix_out(PG_FUNCTION_ARGS)
 		switch(type_code)
 		{
 			case GrB_INT64_CODE:
+				{
 				int64_t vi64 = GxB_Iterator_get_INT64(iterator);
 				appendStringInfo(&buf, "%lu:%lu:%ld", row, col, vi64);
 				break;
+				}
 			case GrB_INT32_CODE:
+				{
 				int32_t vi32 = GxB_Iterator_get_INT32(iterator);
 				appendStringInfo(&buf, "%lu:%lu:%d", row, col, vi32);
 				break;
+				}
 			case GrB_INT16_CODE:
+				{
 				int16_t vi16 = GxB_Iterator_get_INT16(iterator);
 				appendStringInfo(&buf, "%lu:%lu:%d", row, col, vi16);
 				break;
+				}
 			case GrB_FP64_CODE:
+				{
 				double vf64 = GxB_Iterator_get_FP64(iterator);
 				appendStringInfo(&buf, "%lu:%lu:%f", row, col, vf64);
 				break;
+				}
 			case GrB_FP32_CODE:
+				{
 				float vf32 = GxB_Iterator_get_FP32(iterator);
 				appendStringInfo(&buf, "%lu:%lu:%f", row, col, vf32);
 				break;
+				}
 		}
 		info = GxB_Matrix_Iterator_next(iterator);
 		if (info != GxB_EXHAUSTED)

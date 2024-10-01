@@ -1,0 +1,43 @@
+FROM postgres:latest
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update -y && apt-get install -y \
+    gnupg2 \
+    wget \
+    ca-certificates \
+    build-essential \
+    libreadline-dev \
+    zlib1g-dev \
+    flex \
+    bison \
+    libxml2-dev \
+    libxslt1-dev \
+    libssl-dev \
+    libyaml-dev \
+    git \
+    curl \
+    cmake \
+    m4 \
+    zlib1g-dev \
+    postgresql-server-dev-17
+
+USER postgres
+WORKDIR /home/postgres
+
+RUN curl -s -L -J https://github.com/DrTimothyAldenDavis/GraphBLAS/archive/refs/tags/v9.2.0.tar.gz | \
+    tar zxvf - && cd GraphBLAS-9.2.0
+
+USER root
+WORKDIR /home/postgres/GraphBLAS-9.2.0
+RUN make library CMAKE_OPTIONS='-DGRAPHBLAS_COMPACT=1' && make install && ldconfig
+USER postgres    
+
+COPY . /home/postgres/OneSparse
+
+WORKDIR /home/postgres/OneSparse
+USER root    
+RUN make && make install
+
+RUN chown -R postgres:postgres /home/postgres
+RUN echo 'CREATE EXTENSION onesparse; ALTER SYSTEM SET search_path TO public,onesparse;' > /docker-entrypoint-initdb.d/init-onesparse.sql

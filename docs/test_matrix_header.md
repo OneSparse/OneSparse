@@ -6,21 +6,17 @@ show the literal output of these statements from Postgres.
 Some setup to make sure warnings are shown, and that the extension
 is installed.
 ```
+
 set client_min_messages = 'WARNING';
 create extension if not exists onesparse;
-```
-# Matrix
 
+```
 The 'matrix' data type wraps a SuiteSparse GrB_Matrix handle and
 delegates functions from SQL to the library through instances of
 this type.
 ```
+
 \dT+ matrix
-                                        List of data types
-  Schema   |  Name  | Internal name | Size | Elements |  Owner   | Access privileges | Description 
------------+--------+---------------+------+----------+----------+-------------------+-------------
- onesparse | matrix | matrix        | var  |          | postgres |                   | 
-(1 row)
 
 ```
 An empty matrix can be constructed many ways, but one of the
@@ -28,11 +24,8 @@ simplest is casting a type code to the matrix type.  In this case
 'i4' means GrB_INT32.  The type codes are intentionally compressed
 to be as short as possible for smaller pg_dumps.
 ```
+
 select 'i4'::matrix;
- matrix 
---------
- i4[]
-(1 row)
 
 ```
 A matrix can have a fixed number of rows and/or columns.  The
@@ -44,30 +37,21 @@ are INDEX_MAX in size are reffered to as "unbounded".  For matrices
 with known dimensions, the dimensions can be provided in parentesis
 after the type code.  Here a 10 row by 10 column matrix is created:
 ```
+
 select 'i4(10:10)'::matrix;
- matrix 
---------
- i4[]
-(1 row)
 
 ```
 Either dimension can be ommited, this creates a 10 row by unbounded
 column matrix.
 ```
+
 select 'i4(10:)'::matrix;
- matrix 
---------
- i4[]
-(1 row)
 
 ```
 This creates a unbounded row by 10 column matrix.
 ```
+
 select 'i4(10:)'::matrix;
- matrix 
---------
- i4[]
-(1 row)
 
 ```
 Note that in all the above cases the matrices created are *empty*.
@@ -83,147 +67,70 @@ operators.  Here we see three very common operations, returning the
 number of rows, the number of columns, and the number of store
 values.
 ```
+
 select nrows('i4'::matrix);
-        nrows        
----------------------
- 1152921504606846976
-(1 row)
 
 select ncols('i4'::matrix);
-        ncols        
----------------------
- 1152921504606846976
-(1 row)
 
 select nvals('i4'::matrix);
- nvals 
--------
-     0
-(1 row)
 
 ```
 Above you can see the matrix has unbounded rows and columns (the
 very large number is the number of *possible* entries).  And the
 number of stored values is zero.
+```
+
+```
 Values can be specified after the 'type(dimension)' prefix as an
 array of elements between square brackets.  Empty brackets imply no
 elements:
 ```
+
 select nrows('i4[]'::matrix);
-        nrows        
----------------------
- 1152921504606846976
-(1 row)
 
 select ncols('i4[]'::matrix);
-        ncols        
----------------------
- 1152921504606846976
-(1 row)
 
 select nvals('i4[]'::matrix);
- nvals 
--------
-     0
-(1 row)
 
 ```
 Elements are specified between square brackets are coordinates of
 'row_id:column_id:value' separated by spaces:
 ```
+
 select 'i4[1:1:1 2:2:2 3:3:3]'::matrix;
-        matrix         
------------------------
- i4[1:1:1 2:2:2 3:3:3]
-(1 row)
 
 select 'i4(10:)[1:1:1 2:2:2 3:3:3]'::matrix;
-        matrix         
------------------------
- i4[1:1:1 2:2:2 3:3:3]
-(1 row)
 
 select 'i4(:10)[1:1:1 2:2:2 3:3:3]'::matrix;
-        matrix         
------------------------
- i4[1:1:1 2:2:2 3:3:3]
-(1 row)
 
 ```
 Below you see the number of rows, columns and spaces for a variety
 of combinations:
 ```
+
 select nrows('i4(10)[1:1:1 2:2:2 3:3:3]'::matrix);
- nrows 
--------
-    10
-(1 row)
 
 select ncols('i4(10)[1:1:1 2:2:2 3:3:3]'::matrix);
-        ncols        
----------------------
- 1152921504606846976
-(1 row)
 
 select nvals('i4(10)[1:1:1 2:2:2 3:3:3]'::matrix);
- nvals 
--------
-     3
-(1 row)
 
 select nrows('i4(10:)[1:1:1 2:2:2 3:3:3]'::matrix);
- nrows 
--------
-    10
-(1 row)
 
 select ncols('i4(10:)[1:1:1 2:2:2 3:3:3]'::matrix);
-        ncols        
----------------------
- 1152921504606846976
-(1 row)
 
 select nvals('i4(10:)[1:1:1 2:2:2 3:3:3]'::matrix);
- nvals 
--------
-     3
-(1 row)
 
 select nrows('i4(:10)[1:1:1 2:2:2 3:3:3]'::matrix);
-        nrows        
----------------------
- 1152921504606846976
-(1 row)
 
 select ncols('i4(:10)[1:1:1 2:2:2 3:3:3]'::matrix);
- ncols 
--------
-    10
-(1 row)
 
 select nvals('i4(:10)[1:1:1 2:2:2 3:3:3]'::matrix);
- nvals 
--------
-     3
-(1 row)
 
 select nrows('i4(10:10)[1:1:1 2:2:2 3:3:3]'::matrix);
- nrows 
--------
-    10
-(1 row)
 
 select ncols('i4(10:10)[1:1:1 2:2:2 3:3:3]'::matrix);
- ncols 
--------
-    10
-(1 row)
 
 select nvals('i4(10:10)[1:1:1 2:2:2 3:3:3]'::matrix);
- nvals 
--------
-     3
-(1 row)
 
 ```
 # Element-wise operations
@@ -234,11 +141,8 @@ operate pairs of matrices.  'ewise_add' computes the element-wise
 operator.  Elements present on both sides of the operation are
 included in the result.
 ```
+
 select ewise_add('i4[1:1:1 2:2:2 3:3:3]'::matrix, 'i4[1:1:1 2:2:2 3:3:3]'::matrix, 'plus_int32');
-       ewise_add       
------------------------
- i4[1:1:2 2:2:4 3:3:6]
-(1 row)
 
 ```
 'ewise_mult' multiplies elements of two matrices, taking only the
@@ -246,11 +150,9 @@ intersection of common elements in both matrices, if an element is
 missing from either the left or right side, it is ommited from the
 result:
 ```
+
 select ewise_mult('i4[1:1:1 2:2:2 3:3:3]'::matrix, 'i4[1:1:1 2:2:2 3:3:3]'::matrix, 'times_int32');
-      ewise_mult       
------------------------
- i4[1:1:1 2:2:4 3:3:9]
-(1 row)
+
 
 ```
 'ewise_union' is like 'ewise_add' but differs in how the binary op
@@ -258,38 +160,28 @@ is applied. A pair of scalars, alpha and beta define the inputs to
 the operator when entries are present in one matrix but not the
 other.
 ```
+
 select ewise_union('i4[1:1:1 2:2:2 3:3:3]'::matrix, 42, 'i4[1:1:1 2:2:2 3:3:3]'::matrix, 84, 'plus_int32');
-      ewise_union      
------------------------
- i4[1:1:2 2:2:4 3:3:6]
-(1 row)
 
 ```
 The entire matrix can be reduced to a scalar value:
 ```
+
 select reduce_scalar('i4[1:1:1 2:2:2 3:3:3]'::matrix, 'plus_monoid_int32');
- reduce_scalar 
----------------
- i4:6
-(1 row)
 
 ```
 The matrix can also be reduced to a column vector:
 ```
+
 select reduce_vector('i4[1:1:1 1:2:3 2:2:2]'::matrix, 'plus_monoid_int32');
- reduce_vector 
----------------
- i4[1:4 2:2]
-(1 row)
 
 ```
 To reduce a row vector, specify that the input should be transposed
 with the descriptor 't0':
 ```
-select reduce_vector('i4[1:1:1 1:2:3 2:2:2]'::matrix, 'plus_monoid_int32', descriptor='t0');
-ERROR:  column "descriptor" does not exist
-LINE 1: ...1:1:1 1:2:3 2:2:2]'::matrix, 'plus_monoid_int32', descriptor...
-                                                             ^
+
+select reduce_vector('i4[1:1:1 1:2:3 2:2:2]'::matrix, 'plus_monoid_int32', descriptor=>'t0');
+
 ```
 Matrix Multiplication (referred to here as A @ B) is the heart of
 linear algebra.  All matrix multiplication happens over a semiring.
@@ -298,61 +190,43 @@ opperation is to multiply coresponding elements with the "times"
 operator and then reduce those products with the "plus" operator.
 This is called the "plus_times" semiring:
 ```
+
 select mxm('i4[0:0:1 0:1:2]'::matrix, 'i4[0:0:1 0:1:3]'::matrix, 'plus_times_int32');
-       mxm       
------------------
- i4[0:0:1 0:1:3]
-(1 row)
 
 ```
 AxB can also be done with the '@' operator, mimicking the Python
 syntax:
 ```
+
 select 'i4[0:0:1 0:1:2]'::matrix @ 'i4[0:0:1 0:1:3]'::matrix;
-    ?column?     
------------------
- i4[0:0:0 0:1:0]
-(1 row)
 
 ```
 Matrices can be multipled by vectors on the right taking the linear
 combination of the matrices columns using the vectors elements as
 coefficients:
 ```
+
 select mxv('i4[0:0:1 0:1:2]'::matrix, 'i4[0:0 1:1]'::vector, 'plus_times_int32');
-   mxv   
----------
- i4[0:2]
-(1 row)
 
 ```
 'mxv' is also supported by the '@' operator:
 ```
+
 select 'i4[0:0:1 0:1:2]'::matrix @ 'i4[0:0 1:1]'::vector;
- ?column? 
-----------
- i4[0:0]
-(1 row)
 
 ```
 Matrices can be multipled by vectors on the right taking the linear
 combination of the matrices rows using the vectors elements as
 coefficients:
 ```
+
 select vxm('i4[0:0 1:1]'::vector, 'i4[0:0:1 0:1:2]'::matrix, 'plus_times_int32');
-     vxm     
--------------
- i4[0:0 1:0]
-(1 row)
 
 ```
 'vxm' is also supported by the '@' operator:
 ```
+
 select 'i4[0:0 1:1]'::vector @ 'i4[0:0:1 0:1:2]'::matrix;
-  ?column?   
--------------
- i4[0:0 1:0]
-(1 row)
 
 ```
 The 'selection' method calls the 'GrB_select()' API function.  The
@@ -362,41 +236,29 @@ name 'selection' was chosen not to conflict with the SQL keyword
 elements in the matrix.  Below, all elements with values greater
 than 1 are returned:
 ```
+
 select selection('i4[1:1:1 2:2:2 3:3:3]'::matrix, 'valuegt_int32'::indexunaryop, 1::scalar);
-    selection    
------------------
- i4[2:2:2 3:3:3]
-(1 row)
 
 ```
 Here are all values equal to 2:
 ```
+
 select selection('i4[1:1:1 2:2:2 3:3:3]'::matrix, 'valueeq_int32'::indexunaryop, 2::scalar);
- selection 
------------
- i4[2:2:2]
-(1 row)
 
 ```
 Apply takes an operator called a 'unaryop' and applies it to every
 element of the matrix.  The 'ainv_int32' returned the additive
 inverse (the negative value for integers) of every element:
 ```
+
 select apply('i4[1:1:1 2:2:2 3:3:3]'::matrix, 'ainv_int32'::unaryop);
-          apply           
---------------------------
- i4[1:1:-1 2:2:-2 3:3:-3]
-(1 row)
 
 ```
 The 'dup' function duplicates a matrix returning a new matrix
 object with the same values:
 ```
+
 select dup('i4[1:1:1 2:2:2 3:3:3]'::matrix);
-          dup          
------------------------
- i4[1:1:1 2:2:2 3:3:3]
-(1 row)
 
 ```
 The 'wait' method is used to "complete" a matrix, which may have
@@ -404,20 +266,13 @@ pending operations waiting to be performed when using the default
 SuiteSparse non-blocking mode.  As a side effect, wait will sort
 the elements of the input:
 ```
+
 select wait('i4[2:2:2 3:3:3 1:1:1]'::matrix);
-         wait          
------------------------
- i4[1:1:1 2:2:2 3:3:3]
-(1 row)
 
 ```
 The 'clear' function clears the matrix of all elements and returns
 the same object, but empty.  The dimensions do not change:
 ```
-select clear('i4[1:1:1 2:2:2 3:3:3]'::matrix);
- clear 
--------
- i4[]
-(1 row)
 
+select clear('i4[1:1:1 2:2:2 3:3:3]'::matrix);
 ```
