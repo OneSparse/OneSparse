@@ -11,6 +11,12 @@ create extension if not exists onesparse;
 -- Describe the scalar type
 \dT+ scalar
 
+-- print a scalar
+select print('i4:42'::scalar);
+
+-- print a scalar
+select print('i4:42'::scalar, 5);
+
 -- Duplicate a scalar
 select dup('i4:42'::scalar);
 

@@ -891,6 +891,21 @@ RETURNS vector
 AS '$libdir/onesparse', 'vector_apply'
 LANGUAGE C STABLE;
 
+CREATE FUNCTION set_element(a vector, i bigint, s scalar)
+RETURNS vector
+AS '$libdir/onesparse', 'vector_set_element'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION get_element(a vector, i bigint)
+RETURNS scalar
+AS '$libdir/onesparse', 'vector_get_element'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION remove_element(a vector, i bigint)
+RETURNS vector
+AS '$libdir/onesparse', 'vector_remove_element'
+LANGUAGE C STABLE;
+
 CREATE FUNCTION wait(vector, waitmode integer default 0)
 RETURNS void
 AS '$libdir/onesparse', 'vector_wait'
@@ -1111,6 +1126,21 @@ CREATE FUNCTION apply(
     )
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_apply'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION set_element(a matrix, i bigint, j bigint, s scalar)
+RETURNS matrix
+AS '$libdir/onesparse', 'matrix_set_element'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION get_element(a matrix, i bigint, j bigint)
+RETURNS scalar
+AS '$libdir/onesparse', 'matrix_get_element'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION remove_element(a matrix, i bigint, j bigint)
+RETURNS matrix
+AS '$libdir/onesparse', 'matrix_remove_element'
 LANGUAGE C STABLE;
 
 CREATE FUNCTION wait(matrix, waitmode integer default 0)

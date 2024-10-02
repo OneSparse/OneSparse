@@ -390,6 +390,57 @@ select apply('i4[1:1:1 2:2:2 3:3:3]'::matrix, 'ainv_int32'::unaryop);
 (1 row)
 
 ```
+Elements can be set individually with `set_element`, the modified
+input is returned:
+``` postgres-console
+select set_element('i4[1:1:1 2:2:2 3:3:3]'::matrix, 4, 4, 4);
+         set_element         
+-----------------------------
+ i4[1:1:1 2:2:2 3:3:3 4:4:4]
+(1 row)
+
+```
+Scalar elements can be extracted individually with `get_element`
+``` postgres-console
+select get_element('i4[1:1:1 2:2:2 3:3:3]'::matrix, 3, 3);
+ get_element 
+-------------
+ i4:3
+(1 row)
+
+```
+The `print` function returns a descripton of the matrix from
+SuiteSparse.
+``` postgres-console
+select print('i4[1:1:1 2:2:2 3:3:3]'::matrix);
+                                         print                                          
+----------------------------------------------------------------------------------------
+                                                                                       +
+   1152921504606846976x1152921504606846976 GraphBLAS int32_t matrix, hypersparse by row+
+   A->matrix, 3 entries, memory: 324 bytes                                             +
+                                                                                       +
+ 
+(1 row)
+
+```
+The `print` function takes an optional "level" argument that
+defaults to `1` which is a short summary.
+``` postgres-console
+select print('i4[1:1:1 2:2:2 3:3:3]'::matrix, 5);
+                                         print                                          
+----------------------------------------------------------------------------------------
+                                                                                       +
+   1152921504606846976x1152921504606846976 GraphBLAS int32_t matrix, hypersparse by row+
+   A->matrix, 3 entries, memory: 324 bytes                                             +
+                                                                                       +
+     (1,1)   1                                                                         +
+     (2,2)   2                                                                         +
+     (3,3)   3                                                                         +
+                                                                                       +
+ 
+(1 row)
+
+```
 The `dup` function duplicates a matrix returning a new matrix
 object with the same values:
 ``` postgres-console

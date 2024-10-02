@@ -160,6 +160,45 @@ select apply('i4[1:1 2:2 3:3]'::vector, 'ainv_int32'::unaryop);
  i4[1:-1 2:-2 3:-3]
 (1 row)
 
+-- Elements can be set individually with `set_element`, the modified
+-- input is returned:
+select set_element('i4[1:1 2:2 3:3]'::vector, 4, 4);
+     set_element     
+---------------------
+ i4[1:1 2:2 3:3 4:4]
+(1 row)
+
+-- Scalar elements can be extracted individually with `get_element`
+select get_element('i4[1:1 2:2 3:3]'::vector, 3);
+ get_element 
+-------------
+ i4:3
+(1 row)
+
+select print('i4[1:1 2:2 3:3]'::vector);
+                              print                              
+-----------------------------------------------------------------
+                                                                +
+   1152921504606846976x1 GraphBLAS int32_t vector, sparse by col+
+   A->vector, 3 entries, memory: 284 bytes                      +
+                                                                +
+ 
+(1 row)
+
+select print('i4[1:1 2:2 3:3]'::vector, 5);
+                              print                              
+-----------------------------------------------------------------
+                                                                +
+   1152921504606846976x1 GraphBLAS int32_t vector, sparse by col+
+   A->vector, 3 entries, memory: 284 bytes                      +
+                                                                +
+     (1,0)   1                                                  +
+     (2,0)   2                                                  +
+     (3,0)   3                                                  +
+                                                                +
+ 
+(1 row)
+
 select wait('i4[0:1 1:2 2:3]'::vector);
  wait 
 ------

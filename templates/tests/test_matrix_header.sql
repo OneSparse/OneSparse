@@ -203,9 +203,27 @@ select selection('i4[1:1:1 2:2:2 3:3:3]'::matrix, 'valueeq_int32'::indexunaryop,
 
 select apply('i4[1:1:1 2:2:2 3:3:3]'::matrix, 'ainv_int32'::unaryop);
 
+-- Elements can be set individually with `set_element`, the modified
+-- input is returned:
+
+select set_element('i4[1:1:1 2:2:2 3:3:3]'::matrix, 4, 4, 4);
+
+-- Scalar elements can be extracted individually with `get_element`
+
+select get_element('i4[1:1:1 2:2:2 3:3:3]'::matrix, 3, 3);
+
+-- The `print` function returns a descripton of the matrix from
+-- SuiteSparse.
+
+select print('i4[1:1:1 2:2:2 3:3:3]'::matrix);
+
+-- The `print` function takes an optional "level" argument that
+-- defaults to `1` which is a short summary.
+
+select print('i4[1:1:1 2:2:2 3:3:3]'::matrix, 5);
+
 -- The `dup` function duplicates a matrix returning a new matrix
 -- object with the same values:
-
 select dup('i4[1:1:1 2:2:2 3:3:3]'::matrix);
 
 -- The `wait` method is used to "complete" a matrix, which may have

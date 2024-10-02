@@ -33,6 +33,10 @@ PG_FUNCTION_INFO_V1(matrix_mxv);
 PG_FUNCTION_INFO_V1(matrix_vxm);
 PG_FUNCTION_INFO_V1(matrix_select);
 PG_FUNCTION_INFO_V1(matrix_apply);
+PG_FUNCTION_INFO_V1(matrix_get_element);
+PG_FUNCTION_INFO_V1(matrix_set_element);
+PG_FUNCTION_INFO_V1(matrix_remove_element);
+PG_FUNCTION_INFO_V1(matrix_print);
 
 static Size matrix_get_flat_size(ExpandedObjectHeader *eohptr) {
 	os_Matrix *matrix;
@@ -47,9 +51,13 @@ static Size matrix_get_flat_size(ExpandedObjectHeader *eohptr) {
 	if (matrix->flat_size)
 	{
 		Assert(matrix->serialized_data != NULL);
-		Assert(matrix->serialized_size > 0);
+		Assert(OS_MATRIX_FLATSIZE() + matrix->serialized_size == matrix->flat_size);
 		return matrix->flat_size;
 	}
+
+    CHECK(GrB_wait(matrix->matrix, GrB_MATERIALIZE),
+		  matrix->matrix,
+		  "Error waiting to materialize matrix.");
 
 	CHECK(GxB_Matrix_serialize(
 			  &serialized_data,
@@ -74,7 +82,6 @@ static void flatten_matrix(
 	os_Matrix *matrix;
 	os_FlatMatrix *flat;
 	void* data;
-//	void (*free_function)(void *p);
 
 	LOGF();
 
@@ -205,6 +212,7 @@ Datum expand_matrix(os_FlatMatrix *flat, MemoryContext parentcontext)
 
 	matrix = new_matrix(type, flat->nrows, flat->ncols, parentcontext, NULL);
 	data = OS_MATRIX_DATA(flat);
+
 	CHECK(GxB_Matrix_deserialize(
 			  &matrix->matrix,
 			  type,
@@ -212,6 +220,7 @@ Datum expand_matrix(os_FlatMatrix *flat, MemoryContext parentcontext)
 			  flat->serialized_size, NULL),
 		  matrix->matrix,
 		  "Error deserializing matrix");
+
 	OS_RETURN_MATRIX(matrix);
 }
 
@@ -1193,6 +1202,84 @@ Datum matrix_apply(PG_FUNCTION_ARGS)
 	OS_RETURN_MATRIX(C);
 }
 
+Datum matrix_set_element(PG_FUNCTION_ARGS)
+{
+	os_Matrix *matrix;
+	os_Scalar *scalar;
+	GrB_Index i, j;
+
+	LOGF();
+	ERRORNULL(0);
+	ERRORNULL(1);
+	ERRORNULL(2);
+	ERRORNULL(3);
+
+	matrix = OS_GETARG_MATRIX(0);
+	i = PG_GETARG_INT64(1);
+	j = PG_GETARG_INT64(2);
+	scalar = OS_GETARG_SCALAR(3);
+
+	CHECK(GrB_Matrix_setElement(matrix->matrix, scalar->scalar, i, j),
+		  matrix->matrix,
+		  "Error setting matrix element.");
+
+	OS_RETURN_MATRIX(matrix);
+}
+
+Datum matrix_remove_element(PG_FUNCTION_ARGS)
+{
+	os_Matrix *matrix;
+	GrB_Index i, j;
+
+	LOGF();
+	ERRORNULL(0);
+	ERRORNULL(1);
+	ERRORNULL(2);
+
+	matrix = OS_GETARG_MATRIX(0);
+	i = PG_GETARG_INT64(1);
+	j = PG_GETARG_INT64(2);
+
+	CHECK(GrB_Matrix_removeElement(matrix->matrix, i, j),
+		  matrix->matrix,
+		  "Error setting matrix element.");
+
+    CHECK(GrB_wait(matrix->matrix, GrB_MATERIALIZE),
+		  matrix->matrix,
+		  "Error waiting to materialize matrix.");
+
+	OS_RETURN_MATRIX(matrix);
+}
+
+Datum matrix_get_element(PG_FUNCTION_ARGS)
+{
+	os_Matrix *matrix;
+	os_Scalar *scalar;
+	GrB_Index i, j;
+	GrB_Type type;
+
+
+	LOGF();
+	ERRORNULL(0);
+	ERRORNULL(1);
+	ERRORNULL(2);
+
+	matrix = OS_GETARG_MATRIX(0);
+	i = PG_GETARG_INT64(1);
+	j = PG_GETARG_INT64(2);
+
+	CHECK(GxB_Matrix_type(&type, matrix->matrix),
+		  matrix->matrix,
+		  "Cannot get matrix type");
+
+	scalar = new_scalar(type, CurrentMemoryContext, NULL);
+
+	CHECK(GrB_Matrix_extractElement(scalar->scalar, matrix->matrix, i, j),
+		  matrix->matrix,
+		  "Error extracting setting matrix element.");
+	OS_RETURN_SCALAR(scalar);
+}
+
 Datum matrix_wait(PG_FUNCTION_ARGS)
 {
 	os_Matrix *A;
@@ -1254,6 +1341,30 @@ Datum matrix_clear(PG_FUNCTION_ARGS)
 		  A->matrix,
 		  "Error clearing matrix.");
 	OS_RETURN_MATRIX(A);
+}
+
+Datum matrix_print(PG_FUNCTION_ARGS) {
+	os_Matrix *A;
+	char *result, *buf;
+	size_t size;
+	FILE *fp;
+	int level;
+	A = OS_GETARG_MATRIX(0);
+	level = PG_GETARG_INT32(1);
+	if (level > 5)
+	{
+		elog(ERROR, "Print level is from 0 to 5");
+	}
+
+	fp = open_memstream(&buf, &size);
+	if (fp == NULL)
+		elog(ERROR, "unable to open memstream for matrix_print");
+	GxB_fprint(A->matrix, level, fp);
+	fflush(fp);
+	result = palloc(size + 1);
+	memcpy(result, buf, size+1);
+	free(buf);
+	PG_RETURN_TEXT_P(cstring_to_text_with_len(result, size+1));
 }
 
 /* Local Variables: */

@@ -27,6 +27,10 @@ char* short_code(GrB_Type_Code code)
 			return "i2";
 		case GrB_UINT16_CODE:
 			return "u2";
+		case GrB_INT8_CODE:
+			return "i";
+		case GrB_UINT8_CODE:
+			return "u";
 		case GrB_FP64_CODE:
 			return "f8";
 		case GrB_FP32_CODE:
@@ -159,6 +163,7 @@ void _PG_init(void)
 	initialize_unaryops();
 	initialize_indexunaryops();
 	initialize_descriptors();
+    GrB_set (GrB_GLOBAL, true, GxB_BURBLE);
 }
 
 

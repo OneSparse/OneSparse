@@ -119,6 +119,26 @@ RETURNS vector
 AS '$libdir/onesparse', 'vector_apply'
 LANGUAGE C STABLE;
 
+CREATE FUNCTION set_element(a vector, i bigint, s scalar)
+RETURNS vector
+AS '$libdir/onesparse', 'vector_set_element'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION get_element(a vector, i bigint)
+RETURNS scalar
+AS '$libdir/onesparse', 'vector_get_element'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION remove_element(a vector, i bigint)
+RETURNS vector
+AS '$libdir/onesparse', 'vector_remove_element'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION print(a vector, level int default 1)
+RETURNS text
+AS '$libdir/onesparse', 'vector_print'
+LANGUAGE C STABLE;
+
 CREATE FUNCTION wait(vector, waitmode integer default 0)
 RETURNS void
 AS '$libdir/onesparse', 'vector_wait'
