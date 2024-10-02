@@ -19,6 +19,35 @@ Describe the scalar type
 (1 row)
 
 ```
+print a scalar
+``` postgres-console
+select print('i4:42'::scalar);
+                    print                    
+---------------------------------------------
+                                            +
+   1x1 GraphBLAS int32_t scalar, full by col+
+   A->scalar, 1 entry, memory: 240 bytes    +
+   iso value:   42                          +
+                                            +
+ 
+(1 row)
+
+```
+print a scalar
+``` postgres-console
+select print('i4:42'::scalar, 5);
+                    print                    
+---------------------------------------------
+                                            +
+   1x1 GraphBLAS int32_t scalar, full by col+
+   A->scalar, 1 entry, memory: 240 bytes    +
+   iso value:   42                          +
+                                            +
+     (0,0)   42                             +
+ 
+(1 row)
+
+```
 Duplicate a scalar
 ``` postgres-console
 select dup('i4:42'::scalar);

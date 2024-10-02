@@ -318,11 +318,12 @@ search](https://en.wikipedia.org/wiki/Breadth-first_search).
 
 - lookup semirings with base name and object "lookup('any_pair', A)" for type specific semiring
 
-- semiring functions "plus_times(A, B)"
+- semiring functions? "plus_times(A, B)"
 
 - Wrap LAGraph
 
 - Zero-copy into python-graphblas objects in plpythonu
 
-- psycopg2 adapters to python-graphblas
+- psycopg2 packed binary adapters to python-graphblas
+
 

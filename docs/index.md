@@ -1,3 +1,10 @@
+# Welcome to OneSparse Postgres
+
+OneSparse is a Postgres extension that bind the powerful
+[SuiteSparse:GraphBLAS](http://faculty.cse.tamu.edu/davis/GraphBLAS.html)
+Linear Algebra library, exposing it's functionality and new types,
+functions and operators in Postgres.
+
 # TLDR; Docker Demo
 
 Start the onesparse demo docker container, substitute suitable

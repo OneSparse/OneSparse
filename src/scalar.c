@@ -20,6 +20,7 @@ PG_FUNCTION_INFO_V1(scalar_nvals);
 PG_FUNCTION_INFO_V1(scalar_wait);
 PG_FUNCTION_INFO_V1(scalar_dup);
 PG_FUNCTION_INFO_V1(scalar_clear);
+PG_FUNCTION_INFO_V1(scalar_print);
 
 static Size scalar_get_flat_size(ExpandedObjectHeader *eohptr) {
 	os_Scalar *scalar;
@@ -611,44 +612,69 @@ Datum scalar_clear(PG_FUNCTION_ARGS)
 	OS_RETURN_SCALAR(scalar);
 }
 
+Datum scalar_print(PG_FUNCTION_ARGS) {
+	os_Scalar *A;
+	char *result, *buf;
+	size_t size;
+	FILE *fp;
+	int level;
+	A = OS_GETARG_SCALAR(0);
+	level = PG_GETARG_INT32(1);
+	if (level > 5)
+	{
+		elog(ERROR, "Print level is from 0 to 5");
+	}
+
+	fp = open_memstream(&buf, &size);
+	if (fp == NULL)
+		elog(ERROR, "unable to open memstream for scalar_print");
+	GxB_fprint(A->scalar, level, fp);
+	fflush(fp);
+	result = palloc(size + 1);
+	memcpy(result, buf, size+1);
+	free(buf);
+	PG_RETURN_TEXT_P(cstring_to_text_with_len(result, size+1));
+}
+
+
 #define SUFFIX _int64                // suffix for names
 #define PG_TYPE int64                // postgres type
-#define GB_TYPE GrB_INT64            // graphblas vector type
+#define GB_TYPE GrB_INT64            // graphblas scalar type
 #define PG_GETARG PG_GETARG_INT64       // how to get value args
 #define PG_RETURN PG_RETURN_INT64
 #include "scalar_ops.h"
 
 #define SUFFIX _int32                // suffix for names
 #define PG_TYPE int32                // postgres type
-#define GB_TYPE GrB_INT32            // graphblas vector type
+#define GB_TYPE GrB_INT32            // graphblas scalar type
 #define PG_GETARG PG_GETARG_INT32       // how to get value args
 #define PG_RETURN PG_RETURN_INT32
 #include "scalar_ops.h"
 
 #define SUFFIX _int16                // suffix for names
 #define PG_TYPE int16                // postgres type
-#define GB_TYPE GrB_INT16            // graphblas vector type
+#define GB_TYPE GrB_INT16            // graphblas scalar type
 #define PG_GETARG PG_GETARG_INT16       // how to get value args
 #define PG_RETURN PG_RETURN_INT16
 #include "scalar_ops.h"
 
 #define SUFFIX _fp64                // suffix for names
 #define PG_TYPE float8                // postgres type
-#define GB_TYPE GrB_FP64            // graphblas vector type
+#define GB_TYPE GrB_FP64            // graphblas scalar type
 #define PG_GETARG PG_GETARG_FLOAT8       // how to get value args
 #define PG_RETURN PG_RETURN_FLOAT8
 #include "scalar_ops.h"
 
 #define SUFFIX _fp32                // suffix for names
 #define PG_TYPE float4                // postgres type
-#define GB_TYPE GrB_FP32            // graphblas vector type
+#define GB_TYPE GrB_FP32            // graphblas scalar type
 #define PG_GETARG PG_GETARG_FLOAT4       // how to get value args
 #define PG_RETURN PG_RETURN_FLOAT4
 #include "scalar_ops.h"
 
 #define SUFFIX _bool                // suffix for names
 #define PG_TYPE bool                // postgres type
-#define GB_TYPE GrB_BOOL            // graphblas vector type
+#define GB_TYPE GrB_BOOL            // graphblas scalar type
 #define PG_GETARG PG_GETARG_BOOL       // how to get value args
 #define PG_RETURN PG_RETURN_BOOL
 #define NO_SCALAR_MATH

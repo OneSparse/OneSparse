@@ -39,5 +39,5 @@ WORKDIR /home/postgres/OneSparse
 USER root    
 RUN make && make install
 
-RUN chown -R postgres:postgres /home/postgres
+RUN chown -R postgres:postgres /home/postgres/OneSparse
 RUN echo 'CREATE EXTENSION onesparse; ALTER SYSTEM SET search_path TO public,onesparse;' > /docker-entrypoint-initdb.d/init-onesparse.sql

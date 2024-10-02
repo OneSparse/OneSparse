@@ -28,6 +28,10 @@ PG_FUNCTION_INFO_V1(vector_reduce_scalar);
 PG_FUNCTION_INFO_V1(vector_assign);
 PG_FUNCTION_INFO_V1(vector_select);
 PG_FUNCTION_INFO_V1(vector_apply);
+PG_FUNCTION_INFO_V1(vector_get_element);
+PG_FUNCTION_INFO_V1(vector_set_element);
+PG_FUNCTION_INFO_V1(vector_remove_element);
+PG_FUNCTION_INFO_V1(vector_print);
 
 static Size vector_get_flat_size(ExpandedObjectHeader *eohptr) {
 	os_Vector *vector;
@@ -45,6 +49,10 @@ static Size vector_get_flat_size(ExpandedObjectHeader *eohptr) {
 		Assert(vector->serialized_size > 0);
 		return vector->flat_size;
 	}
+
+    CHECK(GrB_wait(vector->vector, GrB_MATERIALIZE),
+		  vector->vector,
+		  "Error waiting to materialize vector.");
 
 	CHECK(GxB_Vector_serialize(&serialized_data, &serialized_size, vector->vector, NULL),
 		  vector->vector,
@@ -825,6 +833,78 @@ Datum vector_apply(PG_FUNCTION_ARGS)
 	OS_RETURN_VECTOR(w);
 }
 
+Datum vector_set_element(PG_FUNCTION_ARGS)
+{
+	os_Vector *vector;
+	os_Scalar *scalar;
+	GrB_Index i;
+
+	LOGF();
+	ERRORNULL(0);
+	ERRORNULL(1);
+	ERRORNULL(2);
+
+	vector = OS_GETARG_VECTOR(0);
+	i = PG_GETARG_INT64(1);
+	scalar = OS_GETARG_SCALAR(2);
+
+	CHECK(GrB_Vector_setElement(vector->vector, scalar->scalar, i),
+		  vector->vector,
+		  "Error setting vector element.");
+
+	OS_RETURN_VECTOR(vector);
+}
+
+Datum vector_remove_element(PG_FUNCTION_ARGS)
+{
+	os_Vector *vector;
+	GrB_Index i;
+
+	LOGF();
+	ERRORNULL(0);
+	ERRORNULL(1);
+
+	vector = OS_GETARG_VECTOR(0);
+	i = PG_GETARG_INT64(1);
+
+	CHECK(GrB_Vector_removeElement(vector->vector, i),
+		  vector->vector,
+		  "Error setting vector element.");
+
+    CHECK(GrB_wait(vector->vector, GrB_MATERIALIZE),
+		  vector->vector,
+		  "Error waiting to materialize vector.");
+
+	OS_RETURN_VECTOR(vector);
+}
+
+Datum vector_get_element(PG_FUNCTION_ARGS)
+{
+	os_Vector *vector;
+	os_Scalar *scalar;
+	GrB_Index i;
+	GrB_Type type;
+
+
+	LOGF();
+	ERRORNULL(0);
+	ERRORNULL(1);
+
+	vector = OS_GETARG_VECTOR(0);
+	i = PG_GETARG_INT64(1);
+
+	CHECK(GxB_Vector_type(&type, vector->vector),
+		  vector->vector,
+		  "Cannot get vector type");
+
+	scalar = new_scalar(type, CurrentMemoryContext, NULL);
+
+	CHECK(GrB_Vector_extractElement(scalar->scalar, vector->vector, i),
+		  vector->vector,
+		  "Error extracting setting vector element.");
+	OS_RETURN_SCALAR(scalar);
+}
+
 Datum vector_wait(PG_FUNCTION_ARGS)
 {
 	os_Vector *vector;
@@ -883,6 +963,31 @@ Datum vector_clear(PG_FUNCTION_ARGS)
 		  "Error clearing vector.");
 	PG_RETURN_VOID();
 }
+
+Datum vector_print(PG_FUNCTION_ARGS) {
+	os_Vector *A;
+	char *result, *buf;
+	size_t size;
+	FILE *fp;
+	int level;
+	A = OS_GETARG_VECTOR(0);
+	level = PG_GETARG_INT32(1);
+	if (level > 5)
+	{
+		elog(ERROR, "Print level is from 0 to 5");
+	}
+
+	fp = open_memstream(&buf, &size);
+	if (fp == NULL)
+		elog(ERROR, "unable to open memstream for vector_print");
+	GxB_fprint(A->vector, level, fp);
+	fflush(fp);
+	result = palloc(size + 1);
+	memcpy(result, buf, size+1);
+	free(buf);
+	PG_RETURN_TEXT_P(cstring_to_text_with_len(result, size+1));
+}
+
 /* Local Variables: */
 /* mode: c */
 /* c-file-style: "postgresql" */

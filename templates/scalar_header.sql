@@ -26,6 +26,11 @@ RETURNS int2
 AS '$libdir/onesparse', 'scalar_nvals'
 LANGUAGE C;
 
+CREATE FUNCTION print(a scalar, level int default 1)
+RETURNS text
+AS '$libdir/onesparse', 'scalar_print'
+LANGUAGE C STABLE;
+
 CREATE FUNCTION wait(scalar, waitmode integer default 0)
 RETURNS scalar
 AS '$libdir/onesparse', 'scalar_wait'

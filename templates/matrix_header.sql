@@ -183,6 +183,21 @@ RETURNS matrix
 AS '$libdir/onesparse', 'matrix_apply'
 LANGUAGE C STABLE;
 
+CREATE FUNCTION set_element(a matrix, i bigint, j bigint, s scalar)
+RETURNS matrix
+AS '$libdir/onesparse', 'matrix_set_element'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION get_element(a matrix, i bigint, j bigint)
+RETURNS scalar
+AS '$libdir/onesparse', 'matrix_get_element'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION remove_element(a matrix, i bigint, j bigint)
+RETURNS matrix
+AS '$libdir/onesparse', 'matrix_remove_element'
+LANGUAGE C STABLE;
+
 CREATE FUNCTION wait(matrix, waitmode integer default 0)
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_wait'
@@ -197,6 +212,11 @@ CREATE FUNCTION clear(matrix)
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_clear'
 LANGUAGE C;
+
+CREATE FUNCTION print(a matrix, level int default 1)
+RETURNS text
+AS '$libdir/onesparse', 'matrix_print'
+LANGUAGE C STABLE;
 
 CREATE FUNCTION mxm_op(a matrix, b matrix)
 RETURNS matrix

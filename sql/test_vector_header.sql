@@ -67,6 +67,19 @@ select selection('i4[0:1 1:2 2:3]'::vector, 'valuegt_int32', 1);
 
 select apply('i4[1:1 2:2 3:3]'::vector, 'ainv_int32'::unaryop);
 
+-- Elements can be set individually with `set_element`, the modified
+-- input is returned:
+
+select set_element('i4[1:1 2:2 3:3]'::vector, 4, 4);
+
+-- Scalar elements can be extracted individually with `get_element`
+
+select get_element('i4[1:1 2:2 3:3]'::vector, 3);
+
+select print('i4[1:1 2:2 3:3]'::vector);
+
+select print('i4[1:1 2:2 3:3]'::vector, 5);
+
 select wait('i4[0:1 1:2 2:3]'::vector);
 
 select dup('i4[0:1 1:2 2:3]'::vector);
