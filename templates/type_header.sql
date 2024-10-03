@@ -1,27 +1,27 @@
 -- complain if script is sourced in psql, rather than via CREATE EXTENSION
 \echo Use "CREATE EXTENSION onesparse" to load this file. \quit
 
-CREATE TYPE semiring;
+CREATE TYPE type;
 
-CREATE FUNCTION semiring_in(cstring)
-RETURNS semiring
-AS '$libdir/onesparse', 'semiring_in'
+CREATE FUNCTION type_in(cstring)
+RETURNS type
+AS '$libdir/onesparse', 'type_in'
 LANGUAGE C IMMUTABLE STRICT;
 
-CREATE FUNCTION semiring_out(semiring)
+CREATE FUNCTION type_out(type)
 RETURNS cstring
-AS '$libdir/onesparse', 'semiring_out'
+AS '$libdir/onesparse', 'type_out'
 LANGUAGE C IMMUTABLE STRICT;
 
-CREATE TYPE semiring (
-    input = semiring_in,
-    output = semiring_out,
+CREATE TYPE type (
+    input = type_in,
+    output = type_out,
     alignment = int4,
     storage = 'main',
     internallength = VARIABLE
     );
 
-CREATE FUNCTION name(semiring)
+CREATE FUNCTION name(type)
 RETURNS text
-AS '$libdir/onesparse', 'semiring_name'
+AS '$libdir/onesparse', 'type_name'
 LANGUAGE C IMMUTABLE STRICT;

@@ -1,6 +1,33 @@
 -- complain if script is sourced in psql, rather than via CREATE EXTENSION
 \echo Use "CREATE EXTENSION onesparse" to load this file. \quit
 
+CREATE TYPE type;
+
+CREATE FUNCTION type_in(cstring)
+RETURNS type
+AS '$libdir/onesparse', 'type_in'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION type_out(type)
+RETURNS cstring
+AS '$libdir/onesparse', 'type_out'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE TYPE type (
+    input = type_in,
+    output = type_out,
+    alignment = int4,
+    storage = 'main',
+    internallength = VARIABLE
+    );
+
+CREATE FUNCTION name(type)
+RETURNS text
+AS '$libdir/onesparse', 'type_name'
+LANGUAGE C IMMUTABLE STRICT;
+-- complain if script is sourced in psql, rather than via CREATE EXTENSION
+\echo Use "CREATE EXTENSION onesparse" to load this file. \quit
+
 CREATE TYPE descriptor;
 
 CREATE FUNCTION descriptor_in(cstring)
@@ -20,6 +47,11 @@ CREATE TYPE descriptor (
     storage = 'main',
     internallength = VARIABLE
     );
+
+CREATE FUNCTION name(descriptor)
+RETURNS text
+AS '$libdir/onesparse', 'descriptor_name'
+LANGUAGE C IMMUTABLE STRICT;
 -- complain if script is sourced in psql, rather than via CREATE EXTENSION
 \echo Use "CREATE EXTENSION onesparse" to load this file. \quit
 
@@ -42,6 +74,11 @@ CREATE TYPE unaryop (
     storage = 'main',
     internallength = VARIABLE
     );
+
+CREATE FUNCTION name(unaryop)
+RETURNS text
+AS '$libdir/onesparse', 'unaryop_name'
+LANGUAGE C IMMUTABLE STRICT;
 -- complain if script is sourced in psql, rather than via CREATE EXTENSION
 \echo Use "CREATE EXTENSION onesparse" to load this file. \quit
 
@@ -64,6 +101,11 @@ CREATE TYPE indexunaryop (
     storage = 'main',
     internallength = VARIABLE
     );
+
+CREATE FUNCTION name(indexunaryop)
+RETURNS text
+AS '$libdir/onesparse', 'indexunaryop_name'
+LANGUAGE C IMMUTABLE STRICT;
 -- complain if script is sourced in psql, rather than via CREATE EXTENSION
 \echo Use "CREATE EXTENSION onesparse" to load this file. \quit
 
@@ -86,6 +128,11 @@ CREATE TYPE binaryop (
     storage = 'main',
     internallength = VARIABLE
     );
+
+CREATE FUNCTION name(binaryop)
+RETURNS text
+AS '$libdir/onesparse', 'binaryop_name'
+LANGUAGE C IMMUTABLE STRICT;
 -- complain if script is sourced in psql, rather than via CREATE EXTENSION
 \echo Use "CREATE EXTENSION onesparse" to load this file. \quit
 
@@ -108,6 +155,11 @@ CREATE TYPE monoid (
     storage = 'main',
     internallength = VARIABLE
     );
+
+CREATE FUNCTION name(monoid)
+RETURNS text
+AS '$libdir/onesparse', 'monoid_name'
+LANGUAGE C IMMUTABLE STRICT;
 -- complain if script is sourced in psql, rather than via CREATE EXTENSION
 \echo Use "CREATE EXTENSION onesparse" to load this file. \quit
 
@@ -130,6 +182,11 @@ CREATE TYPE semiring (
     storage = 'main',
     internallength = VARIABLE
     );
+
+CREATE FUNCTION name(semiring)
+RETURNS text
+AS '$libdir/onesparse', 'semiring_name'
+LANGUAGE C IMMUTABLE STRICT;
 -- complain if script is sourced in psql, rather than via CREATE EXTENSION
 \echo Use "CREATE EXTENSION onesparse" to load this file. \quit
 
@@ -153,10 +210,20 @@ CREATE TYPE scalar (
     internallength = VARIABLE
     );
 
+CREATE FUNCTION type(scalar)
+RETURNS type
+AS '$libdir/onesparse', 'scalar_type'
+LANGUAGE C STABLE;
+
 CREATE FUNCTION nvals(scalar)
 RETURNS int2
 AS '$libdir/onesparse', 'scalar_nvals'
 LANGUAGE C;
+
+CREATE FUNCTION print(a scalar, level int default 1)
+RETURNS text
+AS '$libdir/onesparse', 'scalar_print'
+LANGUAGE C STABLE;
 
 CREATE FUNCTION wait(scalar, waitmode integer default 0)
 RETURNS scalar
@@ -793,6 +860,11 @@ CREATE TYPE vector (
     internallength = VARIABLE
     );
 
+CREATE FUNCTION type(vector)
+RETURNS type
+AS '$libdir/onesparse', 'vector_type'
+LANGUAGE C STABLE;
+
 CREATE FUNCTION nvals(vector)
 RETURNS int8
 AS '$libdir/onesparse', 'vector_nvals'
@@ -906,6 +978,11 @@ RETURNS vector
 AS '$libdir/onesparse', 'vector_remove_element'
 LANGUAGE C STABLE;
 
+CREATE FUNCTION print(a vector, level int default 1)
+RETURNS text
+AS '$libdir/onesparse', 'vector_print'
+LANGUAGE C STABLE;
+
 CREATE FUNCTION wait(vector, waitmode integer default 0)
 RETURNS void
 AS '$libdir/onesparse', 'vector_wait'
@@ -965,6 +1042,11 @@ CREATE TYPE matrix (
     storage = 'external',
     internallength = VARIABLE
     );
+
+CREATE FUNCTION type(matrix)
+RETURNS type
+AS '$libdir/onesparse', 'matrix_type'
+LANGUAGE C STABLE;
 
 CREATE FUNCTION nvals(matrix)
 RETURNS int8
@@ -1157,6 +1239,11 @@ CREATE FUNCTION clear(matrix)
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_clear'
 LANGUAGE C;
+
+CREATE FUNCTION print(a matrix, level int default 1)
+RETURNS text
+AS '$libdir/onesparse', 'matrix_print'
+LANGUAGE C STABLE;
 
 CREATE FUNCTION mxm_op(a matrix, b matrix)
 RETURNS matrix

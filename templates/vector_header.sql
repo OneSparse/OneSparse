@@ -21,6 +21,11 @@ CREATE TYPE vector (
     internallength = VARIABLE
     );
 
+CREATE FUNCTION type(vector)
+RETURNS type
+AS '$libdir/onesparse', 'vector_type'
+LANGUAGE C STABLE;
+
 CREATE FUNCTION nvals(vector)
 RETURNS int8
 AS '$libdir/onesparse', 'vector_nvals'

@@ -15,6 +15,7 @@ static const ExpandedObjectMethods monoid_methods = {
 
 PG_FUNCTION_INFO_V1(monoid_in);
 PG_FUNCTION_INFO_V1(monoid_out);
+PG_FUNCTION_INFO_V1(monoid_name);
 
 void initialize_monoids(void);
 GrB_Monoid lookup_monoid(char *name);
@@ -164,6 +165,13 @@ Datum monoid_out(PG_FUNCTION_ARGS)
 	result = palloc(strlen(monoid->name)+1);
 	snprintf(result, strlen(monoid->name)+1, "%s", monoid->name);
 	PG_RETURN_CSTRING(result);
+}
+
+Datum monoid_name(PG_FUNCTION_ARGS)
+{
+	os_Monoid *monoid;
+	monoid = OS_GETARG_MONOID(0);
+	PG_RETURN_TEXT_P(cstring_to_text(monoid->name));
 }
 
 /* Local Variables: */

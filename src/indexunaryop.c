@@ -15,6 +15,7 @@ static const ExpandedObjectMethods indexunaryop_methods = {
 
 PG_FUNCTION_INFO_V1(indexunaryop_in);
 PG_FUNCTION_INFO_V1(indexunaryop_out);
+PG_FUNCTION_INFO_V1(indexunaryop_name);
 
 void initialize_indexunaryops(void);
 GrB_IndexUnaryOp lookup_indexunaryop(char *name);
@@ -166,6 +167,12 @@ Datum indexunaryop_out(PG_FUNCTION_ARGS)
 	PG_RETURN_CSTRING(result);
 }
 
+Datum indexunaryop_name(PG_FUNCTION_ARGS)
+{
+	os_IndexUnaryOp *indexunaryop;
+	indexunaryop = OS_GETARG_INDEXUNARYOP(0);
+	PG_RETURN_TEXT_P(cstring_to_text(indexunaryop->name));
+}
 /* Local Variables: */
 /* mode: c */
 /* c-file-style: "postgresql" */

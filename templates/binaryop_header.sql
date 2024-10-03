@@ -20,3 +20,8 @@ CREATE TYPE binaryop (
     storage = 'main',
     internallength = VARIABLE
     );
+
+CREATE FUNCTION name(binaryop)
+RETURNS text
+AS '$libdir/onesparse', 'binaryop_name'
+LANGUAGE C IMMUTABLE STRICT;

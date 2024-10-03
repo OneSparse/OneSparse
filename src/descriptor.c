@@ -15,6 +15,7 @@ static const ExpandedObjectMethods descriptor_methods = {
 
 PG_FUNCTION_INFO_V1(descriptor_in);
 PG_FUNCTION_INFO_V1(descriptor_out);
+PG_FUNCTION_INFO_V1(descriptor_name);
 
 void initialize_descriptors(void);
 GrB_Descriptor lookup_descriptor(char *name);
@@ -166,6 +167,12 @@ Datum descriptor_out(PG_FUNCTION_ARGS)
 	PG_RETURN_CSTRING(result);
 }
 
+Datum descriptor_name(PG_FUNCTION_ARGS)
+{
+	os_Descriptor *descriptor;
+	descriptor = OS_GETARG_DESCRIPTOR(0);
+	PG_RETURN_TEXT_P(cstring_to_text(descriptor->name));
+}
 /* Local Variables: */
 /* mode: c */
 /* c-file-style: "postgresql" */
