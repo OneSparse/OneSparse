@@ -128,30 +128,25 @@ class Type:
 
 variables = suitesparse['variables'].items()
 info = [i for i, j in variables if j[1].type_spec == 'GrB_Info']
-semirings = [i for i, j in variables if j[1].type_spec == 'GrB_Semiring']
-binops = [i for i, j in variables if j[1].type_spec == 'GrB_BinaryOp']
-monoids = [i for i, j in variables if j[1].type_spec == 'GrB_Monoid']
+types = [i for i, j in variables if j[1].type_spec == 'GrB_Type']
+descriptors = [i for i, j in variables if j[1].type_spec == 'GrB_Descriptor']
 unaries = [i for i, j in variables if j[1].type_spec == 'GrB_UnaryOp']
 indexunaries = [i for i, j in variables if j[1].type_spec == 'GrB_IndexUnaryOp']
-descriptors = [i for i, j in variables if j[1].type_spec == 'GrB_Descriptor']
+binops = [i for i, j in variables if j[1].type_spec == 'GrB_BinaryOp']
+monoids = [i for i, j in variables if j[1].type_spec == 'GrB_Monoid']
+semirings = [i for i, j in variables if j[1].type_spec == 'GrB_Semiring']
 
-semiring_decls = '\n'.join([
-    f'\n    entry = semiringhash_insert(semiringhash, "{s.lower()[4:]}", &found);\n'
+types_decls = '\n'.join([
+    f'\n    entry = typehash_insert(typehash, "{s.lower()[4:]}", &found);\n'
     f'    entry->name = strdup("{s.lower()[4:]}");\n'
-    f'    entry->semiring = {s};'
-    for s in semirings])
+    f'    entry->type = {s};'
+    for s in types])
 
-binop_decls = '\n'.join([
-    f'\n    entry = binaryophash_insert(binaryophash, "{s.lower()[4:]}", &found);\n'
-    f'    entry->name = strdup("{s.lower()[4:]}");\n'
-    f'    entry->binaryop = {s};'
-    for s in binops])
-
-monoid_decls = '\n'.join([
-    f'\n    entry = monoidhash_insert(monoidhash, "{s.lower()[4:]}", &found);\n'
-    f'    entry->name = strdup("{s.lower()[4:]}");\n'
-    f'    entry->monoid = {s};'
-    for s in monoids])
+descriptor_decls = '\n'.join([
+    f'\n    entry = descriptorhash_insert(descriptorhash, "{s.lower()[9:]}", &found);\n'
+    f'    entry->name = strdup("{s.lower()[9:]}");\n'
+    f'    entry->descriptor = {s};'
+    for s in descriptors])
 
 unaryop_decls = '\n'.join([
     f'\n    entry = unaryophash_insert(unaryophash, "{s.lower()[4:]}", &found);\n'
@@ -165,11 +160,23 @@ indexunaryop_decls = '\n'.join([
     f'    entry->indexunaryop = {s};'
     for s in indexunaries])
 
-descriptor_decls = '\n'.join([
-    f'\n    entry = descriptorhash_insert(descriptorhash, "{s.lower()[9:]}", &found);\n'
-    f'    entry->name = strdup("{s.lower()[9:]}");\n'
-    f'    entry->descriptor = {s};'
-    for s in descriptors])
+binop_decls = '\n'.join([
+    f'\n    entry = binaryophash_insert(binaryophash, "{s.lower()[4:]}", &found);\n'
+    f'    entry->name = strdup("{s.lower()[4:]}");\n'
+    f'    entry->binaryop = {s};'
+    for s in binops])
+
+monoid_decls = '\n'.join([
+    f'\n    entry = monoidhash_insert(monoidhash, "{s.lower()[4:]}", &found);\n'
+    f'    entry->name = strdup("{s.lower()[4:]}");\n'
+    f'    entry->monoid = {s};'
+    for s in monoids])
+
+semiring_decls = '\n'.join([
+    f'\n    entry = semiringhash_insert(semiringhash, "{s.lower()[4:]}", &found);\n'
+    f'    entry->name = strdup("{s.lower()[4:]}");\n'
+    f'    entry->semiring = {s};'
+    for s in semirings])
 
 def write_source(outfile):
 
@@ -183,6 +190,7 @@ def write_source(outfile):
     ]
 
     objects = [
+        Template('type', outfile, dict(decls=types_decls)),
         Template('descriptor', outfile, dict(decls=descriptor_decls)),
         Template('unaryop', outfile, dict(decls=unaryop_decls)),
         Template('indexunaryop', outfile, dict(decls=indexunaryop_decls)),

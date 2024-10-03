@@ -15,6 +15,7 @@ static const ExpandedObjectMethods binaryop_methods = {
 
 PG_FUNCTION_INFO_V1(binaryop_in);
 PG_FUNCTION_INFO_V1(binaryop_out);
+PG_FUNCTION_INFO_V1(binaryop_name);
 
 void initialize_binaryops(void);
 GrB_BinaryOp lookup_binaryop(char *name);
@@ -166,6 +167,12 @@ Datum binaryop_out(PG_FUNCTION_ARGS)
 	PG_RETURN_CSTRING(result);
 }
 
+Datum binaryop_name(PG_FUNCTION_ARGS)
+{
+	os_BinaryOp *binaryop;
+	binaryop = OS_GETARG_BINARYOP(0);
+	PG_RETURN_TEXT_P(cstring_to_text(binaryop->name));
+}
 /* Local Variables: */
 /* mode: c */
 /* c-file-style: "postgresql" */

@@ -20,3 +20,8 @@ CREATE TYPE indexunaryop (
     storage = 'main',
     internallength = VARIABLE
     );
+
+CREATE FUNCTION name(indexunaryop)
+RETURNS text
+AS '$libdir/onesparse', 'indexunaryop_name'
+LANGUAGE C IMMUTABLE STRICT;

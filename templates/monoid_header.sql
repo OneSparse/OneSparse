@@ -20,3 +20,8 @@ CREATE TYPE monoid (
     storage = 'main',
     internallength = VARIABLE
     );
+
+CREATE FUNCTION name(monoid)
+RETURNS text
+AS '$libdir/onesparse', 'monoid_name'
+LANGUAGE C IMMUTABLE STRICT;

@@ -21,6 +21,11 @@ CREATE TYPE scalar (
     internallength = VARIABLE
     );
 
+CREATE FUNCTION type(scalar)
+RETURNS type
+AS '$libdir/onesparse', 'scalar_type'
+LANGUAGE C STABLE;
+
 CREATE FUNCTION nvals(scalar)
 RETURNS int2
 AS '$libdir/onesparse', 'scalar_nvals'

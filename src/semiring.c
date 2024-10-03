@@ -15,6 +15,7 @@ static const ExpandedObjectMethods semiring_methods = {
 
 PG_FUNCTION_INFO_V1(semiring_in);
 PG_FUNCTION_INFO_V1(semiring_out);
+PG_FUNCTION_INFO_V1(semiring_name);
 
 void initialize_semirings(void);
 GrB_Semiring lookup_semiring(char *name);
@@ -164,6 +165,13 @@ Datum semiring_out(PG_FUNCTION_ARGS)
 	result = palloc(strlen(semiring->name)+1);
 	snprintf(result, strlen(semiring->name)+1, "%s", semiring->name);
 	PG_RETURN_CSTRING(result);
+}
+
+Datum semiring_name(PG_FUNCTION_ARGS)
+{
+	os_Semiring *semiring;
+	semiring = OS_GETARG_SEMIRING(0);
+	PG_RETURN_TEXT_P(cstring_to_text(semiring->name));
 }
 
 /* Local Variables: */

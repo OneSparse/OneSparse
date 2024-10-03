@@ -21,6 +21,11 @@ CREATE TYPE matrix (
     internallength = VARIABLE
     );
 
+CREATE FUNCTION type(matrix)
+RETURNS type
+AS '$libdir/onesparse', 'matrix_type'
+LANGUAGE C STABLE;
+
 CREATE FUNCTION nvals(matrix)
 RETURNS int8
 AS '$libdir/onesparse', 'matrix_nvals'

@@ -15,6 +15,7 @@ static const ExpandedObjectMethods unaryop_methods = {
 
 PG_FUNCTION_INFO_V1(unaryop_in);
 PG_FUNCTION_INFO_V1(unaryop_out);
+PG_FUNCTION_INFO_V1(unaryop_name);
 
 void initialize_unaryops(void);
 GrB_UnaryOp lookup_unaryop(char *name);
@@ -164,6 +165,13 @@ Datum unaryop_out(PG_FUNCTION_ARGS)
 	result = palloc(strlen(unaryop->name)+1);
 	snprintf(result, strlen(unaryop->name)+1, "%s", unaryop->name);
 	PG_RETURN_CSTRING(result);
+}
+
+Datum unaryop_name(PG_FUNCTION_ARGS)
+{
+	os_UnaryOp *unaryop;
+	unaryop = OS_GETARG_UNARYOP(0);
+	PG_RETURN_TEXT_P(cstring_to_text(unaryop->name));
 }
 
 /* Local Variables: */

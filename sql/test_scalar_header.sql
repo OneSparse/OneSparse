@@ -25,3 +25,4 @@ select wait('i4:42'::scalar);
 
 -- Clear a scalar, deleting its stored element.
 select clear('i4:42'::scalar);
+

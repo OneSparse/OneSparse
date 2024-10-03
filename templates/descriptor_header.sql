@@ -20,3 +20,8 @@ CREATE TYPE descriptor (
     storage = 'main',
     internallength = VARIABLE
     );
+
+CREATE FUNCTION name(descriptor)
+RETURNS text
+AS '$libdir/onesparse', 'descriptor_name'
+LANGUAGE C IMMUTABLE STRICT;

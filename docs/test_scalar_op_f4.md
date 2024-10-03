@@ -1,14 +1,5 @@
-# Scalar `float4` Operators
+# Scalar `float4` Operations
 
-This documentation is also tests for the code, the examples below
-show the literal output of these statements from Postgres.
-
-Some setup to make sure warnings are shown, and that the extension
-is installed.
-``` postgres-console
-set client_min_messages = 'WARNING';
-create extension if not exists onesparse;
-```
 Test various scalar math operations with native Postgres types
 ``` postgres-console
 select (1::float4)::scalar + -1::float4;
@@ -57,6 +48,119 @@ select 1::float4 / (1::float4)::scalar;
  ?column? 
 ----------
         1
+(1 row)
+
+```
+Test construction of min, zero and max values:
+``` postgres-console
+select '-1'::float4::scalar;
+    scalar    
+--------------
+ f4:-1.000000
+(1 row)
+
+select '0'::float4::scalar;
+   scalar    
+-------------
+ f4:0.000000
+(1 row)
+
+select '1'::float4::scalar;
+   scalar    
+-------------
+ f4:1.000000
+(1 row)
+
+```
+Test setting a scalar value from max to 2
+``` postgres-console
+select set('1'::float4::scalar, 2);
+     set     
+-------------
+ f4:2.000000
+(1 row)
+
+```
+Test various casting functions used by the CREATE CAST machinery:
+``` postgres-console
+select scalar_float4((-1)::float4);
+ scalar_float4 
+---------------
+ f4:-1.000000
+(1 row)
+
+select scalar_float4((0)::float4);
+ scalar_float4 
+---------------
+ f4:0.000000
+(1 row)
+
+select scalar_float4((1)::float4);
+ scalar_float4 
+---------------
+ f4:1.000000
+(1 row)
+
+select float4_scalar((-1)::float4::scalar);
+ float4_scalar 
+---------------
+            -1
+(1 row)
+
+select float4_scalar((0)::float4::scalar);
+ float4_scalar 
+---------------
+             0
+(1 row)
+
+select float4_scalar((1)::float4::scalar);
+ float4_scalar 
+---------------
+             1
+(1 row)
+
+```
+These casting functions cast the Postgres type `float4` to the
+GraphBLAS scalar type `GrB_INT32`.
+``` postgres-console
+select cast(-1::float4 as scalar);
+    scalar    
+--------------
+ f4:-1.000000
+(1 row)
+
+select cast(0::float4 as scalar);
+   scalar    
+-------------
+ f4:0.000000
+(1 row)
+
+select cast(1::float4 as scalar);
+   scalar    
+-------------
+ f4:1.000000
+(1 row)
+
+```
+These tests cast back from the scalar type `GrB_INT32` to the
+Postgres type `float4`
+``` postgres-console
+select cast((-1::float4)::scalar as float4);
+ float4 
+--------
+     -1
+(1 row)
+
+select cast((0::float4)::scalar as  float4);
+ float4 
+--------
+      0
+(1 row)
+
+select cast((1::float4)::scalar as scalar);
+   scalar    
+-------------
+ f4:1.000000
 (1 row)
 
 ```

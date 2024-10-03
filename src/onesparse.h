@@ -59,8 +59,19 @@ void *calloc_function(size_t, size_t);
 void *realloc_function(void*, size_t);
 void free_function(void*);
 
+void initialize_types(void);
+void initialize_descriptors();
+void initialize_unaryops();
+void initialize_indexunaryops();
+void initialize_binaryops();
+void initialize_monoids();
+void initialize_semirings();
+
+GrB_Type lookup_type(char *name);
+
 void _PG_init(void);
 
+#include "type.h"
 #include "descriptor.h"
 #include "unaryop.h"
 #include "indexunaryop.h"
