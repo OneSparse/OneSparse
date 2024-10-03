@@ -123,12 +123,12 @@ this type.
 </span></code></pre></div>
 An empty matrix can be constructed many ways, but one of the
 simplest is casting a type code to the matrix type.  In this case
-<code>i4</code> means GrB_INT32.  The type codes are intentionally compressed
+<code>int32</code> means GrB_INT32.  The type codes are intentionally compressed
 to be as short as possible for smaller pg_dumps.
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">select</span><span class="w"> </span><span class="s1">&#39;i4&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">;</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="go"> matrix </span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="go">--------</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="go"> i4[]</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">select</span><span class="w"> </span><span class="s1">&#39;int32&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">;</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="go"> matrix  </span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="go">---------</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="go"> int32[]</span>
 </span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="go">(1 row)</span>
 </span></code></pre></div>
 A matrix can have a fixed number of rows and/or columns.  The
@@ -140,25 +140,25 @@ are <code>INDEX_MAX</code> in size are reffered to as "unbounded".  For
 matrices with known dimensions, the dimensions can be provided in
 parentesis after the type code.  Here a 10 row by 10 column matrix
 is created:
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">select</span><span class="w"> </span><span class="s1">&#39;i4(10:10)&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">;</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="go"> matrix </span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="go">--------</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="go"> i4[]</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">select</span><span class="w"> </span><span class="s1">&#39;int32(10:10)&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">;</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="go"> matrix  </span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="go">---------</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="go"> int32[]</span>
 </span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="go">(1 row)</span>
 </span></code></pre></div>
 Either dimension can be ommited, this creates a 10 row by unbounded
 column matrix.
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">select</span><span class="w"> </span><span class="s1">&#39;i4(10:)&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">;</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="go"> matrix </span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="go">--------</span>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="go"> i4[]</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">select</span><span class="w"> </span><span class="s1">&#39;int32(10:)&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">;</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="go"> matrix  </span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="go">---------</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="go"> int32[]</span>
 </span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="go">(1 row)</span>
 </span></code></pre></div>
 This creates a unbounded row by 10 column matrix.
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">select</span><span class="w"> </span><span class="s1">&#39;i4(10:)&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">;</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="go"> matrix </span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="go">--------</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="go"> i4[]</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">select</span><span class="w"> </span><span class="s1">&#39;int32(10:)&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">;</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="go"> matrix  </span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="go">---------</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="go"> int32[]</span>
 </span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="go">(1 row)</span>
 </span></code></pre></div>
 Note that in all the above cases the matrices created are <em>empty</em>.
@@ -172,19 +172,19 @@ memory trying to allocate <code>2^120</code> entries.</p>
 operators.  Here we see three very common operations, returning the
 number of rows, the number of columns, and the number of store
 values.
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">select</span><span class="w"> </span><span class="n">nrows</span><span class="p">(</span><span class="s1">&#39;i4&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">);</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">select</span><span class="w"> </span><span class="n">nrows</span><span class="p">(</span><span class="s1">&#39;int32&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">);</span>
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="go">        nrows        </span>
 </span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="go">---------------------</span>
 </span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="go"> 1152921504606846976</span>
 </span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="go">(1 row)</span>
 </span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>
-</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="go">select ncols(&#39;i4&#39;::matrix);</span>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="go">select ncols(&#39;int32&#39;::matrix);</span>
 </span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="go">        ncols        </span>
 </span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="go">---------------------</span>
 </span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="go"> 1152921504606846976</span>
 </span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="go">(1 row)</span>
 </span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>
-</span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="go">select nvals(&#39;i4&#39;::matrix);</span>
+</span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="go">select nvals(&#39;int32&#39;::matrix);</span>
 </span><span id="__span-6-14"><a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="go"> nvals </span>
 </span><span id="__span-6-15"><a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a><span class="go">-------</span>
 </span><span id="__span-6-16"><a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a><span class="go">     0</span>
@@ -196,19 +196,19 @@ number of stored values is zero.
 Values can be specified after the <code>type(dimension)</code> prefix as an
 array of elements between square brackets.  Empty brackets imply no
 elements:
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">select</span><span class="w"> </span><span class="n">nrows</span><span class="p">(</span><span class="s1">&#39;i4[]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">);</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">select</span><span class="w"> </span><span class="n">nrows</span><span class="p">(</span><span class="s1">&#39;int32[]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">);</span>
 </span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="go">        nrows        </span>
 </span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="go">---------------------</span>
 </span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="go"> 1152921504606846976</span>
 </span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="go">(1 row)</span>
 </span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>
-</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="go">select ncols(&#39;i4[]&#39;::matrix);</span>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="go">select ncols(&#39;int32[]&#39;::matrix);</span>
 </span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="go">        ncols        </span>
 </span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="go">---------------------</span>
 </span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="go"> 1152921504606846976</span>
 </span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="go">(1 row)</span>
 </span><span id="__span-7-12"><a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a>
-</span><span id="__span-7-13"><a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="go">select nvals(&#39;i4[]&#39;::matrix);</span>
+</span><span id="__span-7-13"><a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="go">select nvals(&#39;int32[]&#39;::matrix);</span>
 </span><span id="__span-7-14"><a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a><span class="go"> nvals </span>
 </span><span id="__span-7-15"><a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a><span class="go">-------</span>
 </span><span id="__span-7-16"><a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a><span class="go">     0</span>
@@ -216,93 +216,93 @@ elements:
 </span></code></pre></div>
 Elements are specified between square brackets are coordinates of
 'row_id:column_id:value' separated by spaces:
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">select</span><span class="w"> </span><span class="s1">&#39;i4[1:1:1 2:2:2 3:3:3]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">;</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="go">        matrix         </span>
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="go">-----------------------</span>
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="go"> i4[1:1:1 2:2:2 3:3:3]</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">select</span><span class="w"> </span><span class="s1">&#39;int32[1:1:1 2:2:2 3:3:3]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">;</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="go">          matrix          </span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="go">--------------------------</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="go"> int32[1:1:1 2:2:2 3:3:3]</span>
 </span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="go">(1 row)</span>
 </span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>
-</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="go">select &#39;i4(10:)[1:1:1 2:2:2 3:3:3]&#39;::matrix;</span>
-</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="go">        matrix         </span>
-</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="go">-----------------------</span>
-</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="go"> i4[1:1:1 2:2:2 3:3:3]</span>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="go">select &#39;int32(10:)[1:1:1 2:2:2 3:3:3]&#39;::matrix;</span>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="go">          matrix          </span>
+</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="go">--------------------------</span>
+</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="go"> int32[1:1:1 2:2:2 3:3:3]</span>
 </span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="go">(1 row)</span>
 </span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>
-</span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="go">select &#39;i4(:10)[1:1:1 2:2:2 3:3:3]&#39;::matrix;</span>
-</span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a><span class="go">        matrix         </span>
-</span><span id="__span-8-15"><a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a><span class="go">-----------------------</span>
-</span><span id="__span-8-16"><a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a><span class="go"> i4[1:1:1 2:2:2 3:3:3]</span>
+</span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="go">select &#39;int32(:10)[1:1:1 2:2:2 3:3:3]&#39;::matrix;</span>
+</span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a><span class="go">          matrix          </span>
+</span><span id="__span-8-15"><a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a><span class="go">--------------------------</span>
+</span><span id="__span-8-16"><a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a><span class="go"> int32[1:1:1 2:2:2 3:3:3]</span>
 </span><span id="__span-8-17"><a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a><span class="go">(1 row)</span>
 </span></code></pre></div>
 Below you see the number of rows, columns and spaces for a variety
 of combinations:
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="k">select</span><span class="w"> </span><span class="n">nrows</span><span class="p">(</span><span class="s1">&#39;i4(10)[1:1:1 2:2:2 3:3:3]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">);</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="k">select</span><span class="w"> </span><span class="n">nrows</span><span class="p">(</span><span class="s1">&#39;int32(10)[1:1:1 2:2:2 3:3:3]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">);</span>
 </span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="go"> nrows </span>
 </span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="go">-------</span>
 </span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="go">    10</span>
 </span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="go">(1 row)</span>
 </span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>
-</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="go">select ncols(&#39;i4(10)[1:1:1 2:2:2 3:3:3]&#39;::matrix);</span>
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="go">select ncols(&#39;int32(10)[1:1:1 2:2:2 3:3:3]&#39;::matrix);</span>
 </span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="go">        ncols        </span>
 </span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="go">---------------------</span>
 </span><span id="__span-9-10"><a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="go"> 1152921504606846976</span>
 </span><span id="__span-9-11"><a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a><span class="go">(1 row)</span>
 </span><span id="__span-9-12"><a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a>
-</span><span id="__span-9-13"><a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a><span class="go">select nvals(&#39;i4(10)[1:1:1 2:2:2 3:3:3]&#39;::matrix);</span>
+</span><span id="__span-9-13"><a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a><span class="go">select nvals(&#39;int32(10)[1:1:1 2:2:2 3:3:3]&#39;::matrix);</span>
 </span><span id="__span-9-14"><a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a><span class="go"> nvals </span>
 </span><span id="__span-9-15"><a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a><span class="go">-------</span>
 </span><span id="__span-9-16"><a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a><span class="go">     3</span>
 </span><span id="__span-9-17"><a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a><span class="go">(1 row)</span>
 </span><span id="__span-9-18"><a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a>
-</span><span id="__span-9-19"><a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a><span class="go">select nrows(&#39;i4(10:)[1:1:1 2:2:2 3:3:3]&#39;::matrix);</span>
+</span><span id="__span-9-19"><a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a><span class="go">select nrows(&#39;int32(10:)[1:1:1 2:2:2 3:3:3]&#39;::matrix);</span>
 </span><span id="__span-9-20"><a id="__codelineno-9-20" name="__codelineno-9-20" href="#__codelineno-9-20"></a><span class="go"> nrows </span>
 </span><span id="__span-9-21"><a id="__codelineno-9-21" name="__codelineno-9-21" href="#__codelineno-9-21"></a><span class="go">-------</span>
 </span><span id="__span-9-22"><a id="__codelineno-9-22" name="__codelineno-9-22" href="#__codelineno-9-22"></a><span class="go">    10</span>
 </span><span id="__span-9-23"><a id="__codelineno-9-23" name="__codelineno-9-23" href="#__codelineno-9-23"></a><span class="go">(1 row)</span>
 </span><span id="__span-9-24"><a id="__codelineno-9-24" name="__codelineno-9-24" href="#__codelineno-9-24"></a>
-</span><span id="__span-9-25"><a id="__codelineno-9-25" name="__codelineno-9-25" href="#__codelineno-9-25"></a><span class="go">select ncols(&#39;i4(10:)[1:1:1 2:2:2 3:3:3]&#39;::matrix);</span>
+</span><span id="__span-9-25"><a id="__codelineno-9-25" name="__codelineno-9-25" href="#__codelineno-9-25"></a><span class="go">select ncols(&#39;int32(10:)[1:1:1 2:2:2 3:3:3]&#39;::matrix);</span>
 </span><span id="__span-9-26"><a id="__codelineno-9-26" name="__codelineno-9-26" href="#__codelineno-9-26"></a><span class="go">        ncols        </span>
 </span><span id="__span-9-27"><a id="__codelineno-9-27" name="__codelineno-9-27" href="#__codelineno-9-27"></a><span class="go">---------------------</span>
 </span><span id="__span-9-28"><a id="__codelineno-9-28" name="__codelineno-9-28" href="#__codelineno-9-28"></a><span class="go"> 1152921504606846976</span>
 </span><span id="__span-9-29"><a id="__codelineno-9-29" name="__codelineno-9-29" href="#__codelineno-9-29"></a><span class="go">(1 row)</span>
 </span><span id="__span-9-30"><a id="__codelineno-9-30" name="__codelineno-9-30" href="#__codelineno-9-30"></a>
-</span><span id="__span-9-31"><a id="__codelineno-9-31" name="__codelineno-9-31" href="#__codelineno-9-31"></a><span class="go">select nvals(&#39;i4(10:)[1:1:1 2:2:2 3:3:3]&#39;::matrix);</span>
+</span><span id="__span-9-31"><a id="__codelineno-9-31" name="__codelineno-9-31" href="#__codelineno-9-31"></a><span class="go">select nvals(&#39;int32(10:)[1:1:1 2:2:2 3:3:3]&#39;::matrix);</span>
 </span><span id="__span-9-32"><a id="__codelineno-9-32" name="__codelineno-9-32" href="#__codelineno-9-32"></a><span class="go"> nvals </span>
 </span><span id="__span-9-33"><a id="__codelineno-9-33" name="__codelineno-9-33" href="#__codelineno-9-33"></a><span class="go">-------</span>
 </span><span id="__span-9-34"><a id="__codelineno-9-34" name="__codelineno-9-34" href="#__codelineno-9-34"></a><span class="go">     3</span>
 </span><span id="__span-9-35"><a id="__codelineno-9-35" name="__codelineno-9-35" href="#__codelineno-9-35"></a><span class="go">(1 row)</span>
 </span><span id="__span-9-36"><a id="__codelineno-9-36" name="__codelineno-9-36" href="#__codelineno-9-36"></a>
-</span><span id="__span-9-37"><a id="__codelineno-9-37" name="__codelineno-9-37" href="#__codelineno-9-37"></a><span class="go">select nrows(&#39;i4(:10)[1:1:1 2:2:2 3:3:3]&#39;::matrix);</span>
+</span><span id="__span-9-37"><a id="__codelineno-9-37" name="__codelineno-9-37" href="#__codelineno-9-37"></a><span class="go">select nrows(&#39;int32(:10)[1:1:1 2:2:2 3:3:3]&#39;::matrix);</span>
 </span><span id="__span-9-38"><a id="__codelineno-9-38" name="__codelineno-9-38" href="#__codelineno-9-38"></a><span class="go">        nrows        </span>
 </span><span id="__span-9-39"><a id="__codelineno-9-39" name="__codelineno-9-39" href="#__codelineno-9-39"></a><span class="go">---------------------</span>
 </span><span id="__span-9-40"><a id="__codelineno-9-40" name="__codelineno-9-40" href="#__codelineno-9-40"></a><span class="go"> 1152921504606846976</span>
 </span><span id="__span-9-41"><a id="__codelineno-9-41" name="__codelineno-9-41" href="#__codelineno-9-41"></a><span class="go">(1 row)</span>
 </span><span id="__span-9-42"><a id="__codelineno-9-42" name="__codelineno-9-42" href="#__codelineno-9-42"></a>
-</span><span id="__span-9-43"><a id="__codelineno-9-43" name="__codelineno-9-43" href="#__codelineno-9-43"></a><span class="go">select ncols(&#39;i4(:10)[1:1:1 2:2:2 3:3:3]&#39;::matrix);</span>
+</span><span id="__span-9-43"><a id="__codelineno-9-43" name="__codelineno-9-43" href="#__codelineno-9-43"></a><span class="go">select ncols(&#39;int32(:10)[1:1:1 2:2:2 3:3:3]&#39;::matrix);</span>
 </span><span id="__span-9-44"><a id="__codelineno-9-44" name="__codelineno-9-44" href="#__codelineno-9-44"></a><span class="go"> ncols </span>
 </span><span id="__span-9-45"><a id="__codelineno-9-45" name="__codelineno-9-45" href="#__codelineno-9-45"></a><span class="go">-------</span>
 </span><span id="__span-9-46"><a id="__codelineno-9-46" name="__codelineno-9-46" href="#__codelineno-9-46"></a><span class="go">    10</span>
 </span><span id="__span-9-47"><a id="__codelineno-9-47" name="__codelineno-9-47" href="#__codelineno-9-47"></a><span class="go">(1 row)</span>
 </span><span id="__span-9-48"><a id="__codelineno-9-48" name="__codelineno-9-48" href="#__codelineno-9-48"></a>
-</span><span id="__span-9-49"><a id="__codelineno-9-49" name="__codelineno-9-49" href="#__codelineno-9-49"></a><span class="go">select nvals(&#39;i4(:10)[1:1:1 2:2:2 3:3:3]&#39;::matrix);</span>
+</span><span id="__span-9-49"><a id="__codelineno-9-49" name="__codelineno-9-49" href="#__codelineno-9-49"></a><span class="go">select nvals(&#39;int32(:10)[1:1:1 2:2:2 3:3:3]&#39;::matrix);</span>
 </span><span id="__span-9-50"><a id="__codelineno-9-50" name="__codelineno-9-50" href="#__codelineno-9-50"></a><span class="go"> nvals </span>
 </span><span id="__span-9-51"><a id="__codelineno-9-51" name="__codelineno-9-51" href="#__codelineno-9-51"></a><span class="go">-------</span>
 </span><span id="__span-9-52"><a id="__codelineno-9-52" name="__codelineno-9-52" href="#__codelineno-9-52"></a><span class="go">     3</span>
 </span><span id="__span-9-53"><a id="__codelineno-9-53" name="__codelineno-9-53" href="#__codelineno-9-53"></a><span class="go">(1 row)</span>
 </span><span id="__span-9-54"><a id="__codelineno-9-54" name="__codelineno-9-54" href="#__codelineno-9-54"></a>
-</span><span id="__span-9-55"><a id="__codelineno-9-55" name="__codelineno-9-55" href="#__codelineno-9-55"></a><span class="go">select nrows(&#39;i4(10:10)[1:1:1 2:2:2 3:3:3]&#39;::matrix);</span>
+</span><span id="__span-9-55"><a id="__codelineno-9-55" name="__codelineno-9-55" href="#__codelineno-9-55"></a><span class="go">select nrows(&#39;int32(10:10)[1:1:1 2:2:2 3:3:3]&#39;::matrix);</span>
 </span><span id="__span-9-56"><a id="__codelineno-9-56" name="__codelineno-9-56" href="#__codelineno-9-56"></a><span class="go"> nrows </span>
 </span><span id="__span-9-57"><a id="__codelineno-9-57" name="__codelineno-9-57" href="#__codelineno-9-57"></a><span class="go">-------</span>
 </span><span id="__span-9-58"><a id="__codelineno-9-58" name="__codelineno-9-58" href="#__codelineno-9-58"></a><span class="go">    10</span>
 </span><span id="__span-9-59"><a id="__codelineno-9-59" name="__codelineno-9-59" href="#__codelineno-9-59"></a><span class="go">(1 row)</span>
 </span><span id="__span-9-60"><a id="__codelineno-9-60" name="__codelineno-9-60" href="#__codelineno-9-60"></a>
-</span><span id="__span-9-61"><a id="__codelineno-9-61" name="__codelineno-9-61" href="#__codelineno-9-61"></a><span class="go">select ncols(&#39;i4(10:10)[1:1:1 2:2:2 3:3:3]&#39;::matrix);</span>
+</span><span id="__span-9-61"><a id="__codelineno-9-61" name="__codelineno-9-61" href="#__codelineno-9-61"></a><span class="go">select ncols(&#39;int32(10:10)[1:1:1 2:2:2 3:3:3]&#39;::matrix);</span>
 </span><span id="__span-9-62"><a id="__codelineno-9-62" name="__codelineno-9-62" href="#__codelineno-9-62"></a><span class="go"> ncols </span>
 </span><span id="__span-9-63"><a id="__codelineno-9-63" name="__codelineno-9-63" href="#__codelineno-9-63"></a><span class="go">-------</span>
 </span><span id="__span-9-64"><a id="__codelineno-9-64" name="__codelineno-9-64" href="#__codelineno-9-64"></a><span class="go">    10</span>
 </span><span id="__span-9-65"><a id="__codelineno-9-65" name="__codelineno-9-65" href="#__codelineno-9-65"></a><span class="go">(1 row)</span>
 </span><span id="__span-9-66"><a id="__codelineno-9-66" name="__codelineno-9-66" href="#__codelineno-9-66"></a>
-</span><span id="__span-9-67"><a id="__codelineno-9-67" name="__codelineno-9-67" href="#__codelineno-9-67"></a><span class="go">select nvals(&#39;i4(10:10)[1:1:1 2:2:2 3:3:3]&#39;::matrix);</span>
+</span><span id="__span-9-67"><a id="__codelineno-9-67" name="__codelineno-9-67" href="#__codelineno-9-67"></a><span class="go">select nvals(&#39;int32(10:10)[1:1:1 2:2:2 3:3:3]&#39;::matrix);</span>
 </span><span id="__span-9-68"><a id="__codelineno-9-68" name="__codelineno-9-68" href="#__codelineno-9-68"></a><span class="go"> nvals </span>
 </span><span id="__span-9-69"><a id="__codelineno-9-69" name="__codelineno-9-69" href="#__codelineno-9-69"></a><span class="go">-------</span>
 </span><span id="__span-9-70"><a id="__codelineno-9-70" name="__codelineno-9-70" href="#__codelineno-9-70"></a><span class="go">     3</span>
@@ -314,52 +314,52 @@ operate pairs of matrices.  <code>ewise_add</code> computes the element-wise
 “addition” of two matrices A and B, element-wise using any binary
 operator.  Elements present on both sides of the operation are
 included in the result.
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="k">select</span><span class="w"> </span><span class="n">ewise_add</span><span class="p">(</span><span class="s1">&#39;i4[1:1:1 2:2:2 3:3:3]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;i4[1:1:1 2:2:2 3:3:3]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;plus_int32&#39;</span><span class="p">);</span>
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="go">       ewise_add       </span>
-</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="go">-----------------------</span>
-</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="go"> i4[1:1:2 2:2:4 3:3:6]</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="k">select</span><span class="w"> </span><span class="n">ewise_add</span><span class="p">(</span><span class="s1">&#39;int32[1:1:1 2:2:2 3:3:3]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;int32[1:1:1 2:2:2 3:3:3]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;plus_int32&#39;</span><span class="p">);</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="go">        ewise_add         </span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="go">--------------------------</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="go"> int32[1:1:2 2:2:4 3:3:6]</span>
 </span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="go">(1 row)</span>
 </span></code></pre></div>
 <code>ewise_mult</code> multiplies elements of two matrices, taking only the
 intersection of common elements in both matrices, if an element is
 missing from either the left or right side, it is ommited from the
 result:
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="k">select</span><span class="w"> </span><span class="n">ewise_mult</span><span class="p">(</span><span class="s1">&#39;i4[1:1:1 2:2:2 3:3:3]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;i4[1:1:1 2:2:2 3:3:3]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;times_int32&#39;</span><span class="p">);</span>
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="go">      ewise_mult       </span>
-</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="go">-----------------------</span>
-</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="go"> i4[1:1:1 2:2:4 3:3:9]</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="k">select</span><span class="w"> </span><span class="n">ewise_mult</span><span class="p">(</span><span class="s1">&#39;int32[1:1:1 2:2:2 3:3:3]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;int32[1:1:1 2:2:2 3:3:3]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;times_int32&#39;</span><span class="p">);</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="go">        ewise_mult        </span>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="go">--------------------------</span>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="go"> int32[1:1:1 2:2:4 3:3:9]</span>
 </span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="go">(1 row)</span>
 </span></code></pre></div>
 <code>ewise_union</code> is like <code>ewise_add</code> but differs in how the binary op
 is applied. A pair of scalars, <code>alpha</code> and <code>beta</code> define the inputs
 to the operator when entries are present in one matrix but not the
 other.
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="k">select</span><span class="w"> </span><span class="n">ewise_union</span><span class="p">(</span><span class="s1">&#39;i4[1:1:1 2:2:2 3:3:3]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">,</span><span class="w"> </span><span class="mf">42</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;i4[1:1:1 2:2:2 3:3:3]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">,</span><span class="w"> </span><span class="mf">84</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;plus_int32&#39;</span><span class="p">);</span>
-</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="go">      ewise_union      </span>
-</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="go">-----------------------</span>
-</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="go"> i4[1:1:2 2:2:4 3:3:6]</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="k">select</span><span class="w"> </span><span class="n">ewise_union</span><span class="p">(</span><span class="s1">&#39;int32[1:1:1 2:2:2 3:3:3]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">,</span><span class="w"> </span><span class="mf">42</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;int32[1:1:1 2:2:2 3:3:3]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">,</span><span class="w"> </span><span class="mf">84</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;plus_int32&#39;</span><span class="p">);</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="go">       ewise_union        </span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="go">--------------------------</span>
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="go"> int32[1:1:2 2:2:4 3:3:6]</span>
 </span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="go">(1 row)</span>
 </span></code></pre></div>
 The entire matrix can be reduced to a scalar value:
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="k">select</span><span class="w"> </span><span class="n">reduce_scalar</span><span class="p">(</span><span class="s1">&#39;i4[1:1:1 2:2:2 3:3:3]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;plus_monoid_int32&#39;</span><span class="p">);</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="k">select</span><span class="w"> </span><span class="n">reduce_scalar</span><span class="p">(</span><span class="s1">&#39;int32[1:1:1 2:2:2 3:3:3]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;plus_monoid_int32&#39;</span><span class="p">);</span>
 </span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="go"> reduce_scalar </span>
 </span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="go">---------------</span>
-</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="go"> i4:6</span>
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="go"> int32:6</span>
 </span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="go">(1 row)</span>
 </span></code></pre></div>
 The matrix can also be reduced to a column vector:
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="k">select</span><span class="w"> </span><span class="n">reduce_vector</span><span class="p">(</span><span class="s1">&#39;i4[1:1:1 1:2:3 2:2:2]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;plus_monoid_int32&#39;</span><span class="p">);</span>
-</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="go"> reduce_vector </span>
-</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="go">---------------</span>
-</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="go"> i4[1:4 2:2]</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="k">select</span><span class="w"> </span><span class="n">reduce_vector</span><span class="p">(</span><span class="s1">&#39;int32[1:1:1 1:2:3 2:2:2]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;plus_monoid_int32&#39;</span><span class="p">);</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="go"> reduce_vector  </span>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="go">----------------</span>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="go"> int32[1:4 2:2]</span>
 </span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="go">(1 row)</span>
 </span></code></pre></div>
 To reduce a row vector, specify that the input should be transposed
 with the descriptor <code>t0</code>:
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="gp">select reduce_vector(&#39;i4[1:1:1 1:2:3 2:2:2]&#39;::matrix, &#39;plus_monoid_int32&#39;, descriptor=&gt;</span><span class="s1">&#39;t0&#39;</span><span class="p">);</span>
-</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="go"> reduce_vector </span>
-</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="go">---------------</span>
-</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="go"> i4[1:1 2:5]</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="gp">select reduce_vector(&#39;int32[1:1:1 1:2:3 2:2:2]&#39;::matrix, &#39;plus_monoid_int32&#39;, descriptor=&gt;</span><span class="s1">&#39;t0&#39;</span><span class="p">);</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="go"> reduce_vector  </span>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="go">----------------</span>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="go"> int32[1:1 2:5]</span>
 </span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="go">(1 row)</span>
 </span></code></pre></div>
 Matrix Multiplication (referred to here as A @ B) is the heart of
@@ -368,50 +368,50 @@ For the most common form of matrix multiplication, the outer
 opperation is to multiply coresponding elements with the "times"
 operator and then reduce those products with the "plus" operator.
 This is called the <code>plus_times</code> semiring:
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="k">select</span><span class="w"> </span><span class="n">mxm</span><span class="p">(</span><span class="s1">&#39;i4[0:0:1 0:1:2]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;i4[0:0:1 0:1:3]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;plus_times_int32&#39;</span><span class="p">);</span>
-</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="go">       mxm       </span>
-</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="go">-----------------</span>
-</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="go"> i4[0:0:1 0:1:3]</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="k">select</span><span class="w"> </span><span class="n">mxm</span><span class="p">(</span><span class="s1">&#39;int32[0:0:1 0:1:2]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;int32[0:0:1 0:1:3]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;plus_times_int32&#39;</span><span class="p">);</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="go">        mxm         </span>
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="go">--------------------</span>
+</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="go"> int32[0:0:1 0:1:3]</span>
 </span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="go">(1 row)</span>
 </span></code></pre></div>
 AxB can also be done with the <code>@</code> operator, mimicking the Python
 syntax:
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="k">select</span><span class="w"> </span><span class="s1">&#39;i4[0:0:1 0:1:2]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="w"> </span><span class="o">@</span><span class="w"> </span><span class="s1">&#39;i4[0:0:1 0:1:3]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">;</span>
-</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="go">    ?column?     </span>
-</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="go">-----------------</span>
-</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="go"> i4[0:0:0 0:1:0]</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="k">select</span><span class="w"> </span><span class="s1">&#39;int32[0:0:1 0:1:2]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="w"> </span><span class="o">@</span><span class="w"> </span><span class="s1">&#39;int32[0:0:1 0:1:3]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">;</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="go">      ?column?      </span>
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="go">--------------------</span>
+</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="go"> int32[0:0:0 0:1:0]</span>
 </span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="go">(1 row)</span>
 </span></code></pre></div>
 Matrices can be multipled by vectors on the right taking the linear
 combination of the matrices columns using the vectors elements as
 coefficients:
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="k">select</span><span class="w"> </span><span class="n">mxv</span><span class="p">(</span><span class="s1">&#39;i4[0:0:1 0:1:2]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;i4[0:0 1:1]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;plus_times_int32&#39;</span><span class="p">);</span>
-</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="go">   mxv   </span>
-</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="go">---------</span>
-</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="go"> i4[0:2]</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="k">select</span><span class="w"> </span><span class="n">mxv</span><span class="p">(</span><span class="s1">&#39;int32[0:0:1 0:1:2]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;int32[0:0 1:1]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;plus_times_int32&#39;</span><span class="p">);</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="go">    mxv     </span>
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="go">------------</span>
+</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="go"> int32[0:2]</span>
 </span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="go">(1 row)</span>
 </span></code></pre></div>
 'mxv' is also supported by the <code>@</code> operator:
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="k">select</span><span class="w"> </span><span class="s1">&#39;i4[0:0:1 0:1:2]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="w"> </span><span class="o">@</span><span class="w"> </span><span class="s1">&#39;i4[0:0 1:1]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">;</span>
-</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="go"> ?column? </span>
-</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="go">----------</span>
-</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="go"> i4[0:0]</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="k">select</span><span class="w"> </span><span class="s1">&#39;int32[0:0:1 0:1:2]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="w"> </span><span class="o">@</span><span class="w"> </span><span class="s1">&#39;int32[0:0 1:1]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">;</span>
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="go">  ?column?  </span>
+</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="go">------------</span>
+</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="go"> int32[0:0]</span>
 </span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="go">(1 row)</span>
 </span></code></pre></div>
 Matrices can be multipled by vectors on the right taking the linear
 combination of the matrices rows using the vectors elements as
 coefficients:
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="k">select</span><span class="w"> </span><span class="n">vxm</span><span class="p">(</span><span class="s1">&#39;i4[0:0 1:1]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;i4[0:0:1 0:1:2]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;plus_times_int32&#39;</span><span class="p">);</span>
-</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="go">     vxm     </span>
-</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="go">-------------</span>
-</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="go"> i4[0:0 1:0]</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="k">select</span><span class="w"> </span><span class="n">vxm</span><span class="p">(</span><span class="s1">&#39;int32[0:0 1:1]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;int32[0:0:1 0:1:2]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;plus_times_int32&#39;</span><span class="p">);</span>
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="go">      vxm       </span>
+</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="go">----------------</span>
+</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="go"> int32[0:0 1:0]</span>
 </span><span id="__span-20-5"><a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="go">(1 row)</span>
 </span></code></pre></div>
 'vxm' is also supported by the <code>@</code> operator:
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="k">select</span><span class="w"> </span><span class="s1">&#39;i4[0:0 1:1]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="w"> </span><span class="o">@</span><span class="w"> </span><span class="s1">&#39;i4[0:0:1 0:1:2]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">;</span>
-</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="go">  ?column?   </span>
-</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="go">-------------</span>
-</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="go"> i4[0:0 1:0]</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="k">select</span><span class="w"> </span><span class="s1">&#39;int32[0:0 1:1]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="w"> </span><span class="o">@</span><span class="w"> </span><span class="s1">&#39;int32[0:0:1 0:1:2]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">;</span>
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="go">    ?column?    </span>
+</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="go">----------------</span>
+</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="go"> int32[0:0 1:0]</span>
 </span><span id="__span-21-5"><a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a><span class="go">(1 row)</span>
 </span></code></pre></div>
 The <code>selection</code> method calls the <code>GrB_select()</code> API function.  The
@@ -420,46 +420,46 @@ name <code>selection</code> was chosen not to conflict with the SQL keyword
 <code>indexunaryop</code> and a parameter for the operator to use to compare
 elements in the matrix.  Below, all elements with values greater
 than 1 are returned:
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="k">select</span><span class="w"> </span><span class="n">selection</span><span class="p">(</span><span class="s1">&#39;i4[1:1:1 2:2:2 3:3:3]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;valuegt_int32&#39;</span><span class="o">::</span><span class="n">indexunaryop</span><span class="p">,</span><span class="w"> </span><span class="mf">1</span><span class="o">::</span><span class="n">scalar</span><span class="p">);</span>
-</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="go">    selection    </span>
-</span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="go">-----------------</span>
-</span><span id="__span-22-4"><a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="go"> i4[2:2:2 3:3:3]</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="k">select</span><span class="w"> </span><span class="n">selection</span><span class="p">(</span><span class="s1">&#39;int32[1:1:1 2:2:2 3:3:3]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;valuegt_int32&#39;</span><span class="o">::</span><span class="n">indexunaryop</span><span class="p">,</span><span class="w"> </span><span class="mf">1</span><span class="o">::</span><span class="n">scalar</span><span class="p">);</span>
+</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="go">     selection      </span>
+</span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="go">--------------------</span>
+</span><span id="__span-22-4"><a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="go"> int32[2:2:2 3:3:3]</span>
 </span><span id="__span-22-5"><a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a><span class="go">(1 row)</span>
 </span></code></pre></div>
 Here are all values equal to 2:
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="k">select</span><span class="w"> </span><span class="n">selection</span><span class="p">(</span><span class="s1">&#39;i4[1:1:1 2:2:2 3:3:3]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;valueeq_int32&#39;</span><span class="o">::</span><span class="n">indexunaryop</span><span class="p">,</span><span class="w"> </span><span class="mf">2</span><span class="o">::</span><span class="n">scalar</span><span class="p">);</span>
-</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="go"> selection </span>
-</span><span id="__span-23-3"><a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="go">-----------</span>
-</span><span id="__span-23-4"><a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="go"> i4[2:2:2]</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="k">select</span><span class="w"> </span><span class="n">selection</span><span class="p">(</span><span class="s1">&#39;int32[1:1:1 2:2:2 3:3:3]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;valueeq_int32&#39;</span><span class="o">::</span><span class="n">indexunaryop</span><span class="p">,</span><span class="w"> </span><span class="mf">2</span><span class="o">::</span><span class="n">scalar</span><span class="p">);</span>
+</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="go">  selection   </span>
+</span><span id="__span-23-3"><a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="go">--------------</span>
+</span><span id="__span-23-4"><a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="go"> int32[2:2:2]</span>
 </span><span id="__span-23-5"><a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a><span class="go">(1 row)</span>
 </span></code></pre></div>
 <code>apply</code> takes an operator of type <code>unaryop</code> and applies it to every
 element of the matrix.  The 'ainv_int32' returned the additive
 inverse (the negative value for integers) of every element:
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="k">select</span><span class="w"> </span><span class="n">apply</span><span class="p">(</span><span class="s1">&#39;i4[1:1:1 2:2:2 3:3:3]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;ainv_int32&#39;</span><span class="o">::</span><span class="n">unaryop</span><span class="p">);</span>
-</span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="go">          apply           </span>
-</span><span id="__span-24-3"><a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="go">--------------------------</span>
-</span><span id="__span-24-4"><a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="go"> i4[1:1:-1 2:2:-2 3:3:-3]</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="k">select</span><span class="w"> </span><span class="n">apply</span><span class="p">(</span><span class="s1">&#39;int32[1:1:1 2:2:2 3:3:3]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;ainv_int32&#39;</span><span class="o">::</span><span class="n">unaryop</span><span class="p">);</span>
+</span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="go">            apply            </span>
+</span><span id="__span-24-3"><a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="go">-----------------------------</span>
+</span><span id="__span-24-4"><a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="go"> int32[1:1:-1 2:2:-2 3:3:-3]</span>
 </span><span id="__span-24-5"><a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a><span class="go">(1 row)</span>
 </span></code></pre></div>
 Elements can be set individually with <code>set_element</code>, the modified
 input is returned:
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="k">select</span><span class="w"> </span><span class="n">set_element</span><span class="p">(</span><span class="s1">&#39;i4[1:1:1 2:2:2 3:3:3]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">,</span><span class="w"> </span><span class="mf">4</span><span class="p">,</span><span class="w"> </span><span class="mf">4</span><span class="p">,</span><span class="w"> </span><span class="mf">4</span><span class="p">);</span>
-</span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="go">         set_element         </span>
-</span><span id="__span-25-3"><a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a><span class="go">-----------------------------</span>
-</span><span id="__span-25-4"><a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="go"> i4[1:1:1 2:2:2 3:3:3 4:4:4]</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="k">select</span><span class="w"> </span><span class="n">set_element</span><span class="p">(</span><span class="s1">&#39;int32[1:1:1 2:2:2 3:3:3]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">,</span><span class="w"> </span><span class="mf">4</span><span class="p">,</span><span class="w"> </span><span class="mf">4</span><span class="p">,</span><span class="w"> </span><span class="mf">4</span><span class="p">);</span>
+</span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="go">          set_element           </span>
+</span><span id="__span-25-3"><a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a><span class="go">--------------------------------</span>
+</span><span id="__span-25-4"><a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="go"> int32[1:1:1 2:2:2 3:3:3 4:4:4]</span>
 </span><span id="__span-25-5"><a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a><span class="go">(1 row)</span>
 </span></code></pre></div>
 Scalar elements can be extracted individually with <code>get_element</code>
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="k">select</span><span class="w"> </span><span class="n">get_element</span><span class="p">(</span><span class="s1">&#39;i4[1:1:1 2:2:2 3:3:3]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">,</span><span class="w"> </span><span class="mf">3</span><span class="p">,</span><span class="w"> </span><span class="mf">3</span><span class="p">);</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="k">select</span><span class="w"> </span><span class="n">get_element</span><span class="p">(</span><span class="s1">&#39;int32[1:1:1 2:2:2 3:3:3]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">,</span><span class="w"> </span><span class="mf">3</span><span class="p">,</span><span class="w"> </span><span class="mf">3</span><span class="p">);</span>
 </span><span id="__span-26-2"><a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="go"> get_element </span>
 </span><span id="__span-26-3"><a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="go">-------------</span>
-</span><span id="__span-26-4"><a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a><span class="go"> i4:3</span>
+</span><span id="__span-26-4"><a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a><span class="go"> int32:3</span>
 </span><span id="__span-26-5"><a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a><span class="go">(1 row)</span>
 </span></code></pre></div>
 The <code>print</code> function returns a descripton of the matrix from
 SuiteSparse.
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="k">select</span><span class="w"> </span><span class="n">print</span><span class="p">(</span><span class="s1">&#39;i4[1:1:1 2:2:2 3:3:3]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">);</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="k">select</span><span class="w"> </span><span class="n">print</span><span class="p">(</span><span class="s1">&#39;int32[1:1:1 2:2:2 3:3:3]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">);</span>
 </span><span id="__span-27-2"><a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="go">                                         print                                          </span>
 </span><span id="__span-27-3"><a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="go">----------------------------------------------------------------------------------------</span>
 </span><span id="__span-27-4"><a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a><span class="go">                                                                                       +</span>
@@ -471,7 +471,7 @@ SuiteSparse.
 </span></code></pre></div>
 The <code>print</code> function takes an optional "level" argument that
 defaults to <code>1</code> which is a short summary.
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="k">select</span><span class="w"> </span><span class="n">print</span><span class="p">(</span><span class="s1">&#39;i4[1:1:1 2:2:2 3:3:3]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">,</span><span class="w"> </span><span class="mf">5</span><span class="p">);</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="k">select</span><span class="w"> </span><span class="n">print</span><span class="p">(</span><span class="s1">&#39;int32[1:1:1 2:2:2 3:3:3]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">,</span><span class="w"> </span><span class="mf">5</span><span class="p">);</span>
 </span><span id="__span-28-2"><a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="go">                                         print                                          </span>
 </span><span id="__span-28-3"><a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a><span class="go">----------------------------------------------------------------------------------------</span>
 </span><span id="__span-28-4"><a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a><span class="go">                                                                                       +</span>
@@ -487,28 +487,28 @@ defaults to <code>1</code> which is a short summary.
 </span></code></pre></div>
 The <code>dup</code> function duplicates a matrix returning a new matrix
 object with the same values:
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="k">select</span><span class="w"> </span><span class="n">dup</span><span class="p">(</span><span class="s1">&#39;i4[1:1:1 2:2:2 3:3:3]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">);</span>
-</span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="go">          dup          </span>
-</span><span id="__span-29-3"><a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a><span class="go">-----------------------</span>
-</span><span id="__span-29-4"><a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a><span class="go"> i4[1:1:1 2:2:2 3:3:3]</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="k">select</span><span class="w"> </span><span class="n">dup</span><span class="p">(</span><span class="s1">&#39;int32[1:1:1 2:2:2 3:3:3]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">);</span>
+</span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="go">           dup            </span>
+</span><span id="__span-29-3"><a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a><span class="go">--------------------------</span>
+</span><span id="__span-29-4"><a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a><span class="go"> int32[1:1:1 2:2:2 3:3:3]</span>
 </span><span id="__span-29-5"><a id="__codelineno-29-5" name="__codelineno-29-5" href="#__codelineno-29-5"></a><span class="go">(1 row)</span>
 </span></code></pre></div>
 The <code>wait</code> method is used to "complete" a matrix, which may have
 pending operations waiting to be performed when using the default
 SuiteSparse non-blocking mode.  As a side effect, wait will sort
 the elements of the input:
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="k">select</span><span class="w"> </span><span class="n">wait</span><span class="p">(</span><span class="s1">&#39;i4[2:2:2 3:3:3 1:1:1]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">);</span>
-</span><span id="__span-30-2"><a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a><span class="go">         wait          </span>
-</span><span id="__span-30-3"><a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a><span class="go">-----------------------</span>
-</span><span id="__span-30-4"><a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a><span class="go"> i4[1:1:1 2:2:2 3:3:3]</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="k">select</span><span class="w"> </span><span class="n">wait</span><span class="p">(</span><span class="s1">&#39;int32[2:2:2 3:3:3 1:1:1]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">);</span>
+</span><span id="__span-30-2"><a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a><span class="go">           wait           </span>
+</span><span id="__span-30-3"><a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a><span class="go">--------------------------</span>
+</span><span id="__span-30-4"><a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a><span class="go"> int32[1:1:1 2:2:2 3:3:3]</span>
 </span><span id="__span-30-5"><a id="__codelineno-30-5" name="__codelineno-30-5" href="#__codelineno-30-5"></a><span class="go">(1 row)</span>
 </span></code></pre></div>
 The <code>clear</code> function clears the matrix of all elements and returns
 the same object, but empty.  The dimensions do not change:
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-31-1"><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="k">select</span><span class="w"> </span><span class="n">clear</span><span class="p">(</span><span class="s1">&#39;i4[1:1:1 2:2:2 3:3:3]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">);</span>
-</span><span id="__span-31-2"><a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a><span class="go"> clear </span>
-</span><span id="__span-31-3"><a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a><span class="go">-------</span>
-</span><span id="__span-31-4"><a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a><span class="go"> i4[]</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-31-1"><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="k">select</span><span class="w"> </span><span class="n">clear</span><span class="p">(</span><span class="s1">&#39;int32[1:1:1 2:2:2 3:3:3]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">);</span>
+</span><span id="__span-31-2"><a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a><span class="go">  clear  </span>
+</span><span id="__span-31-3"><a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a><span class="go">---------</span>
+</span><span id="__span-31-4"><a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a><span class="go"> int32[]</span>
 </span><span id="__span-31-5"><a id="__codelineno-31-5" name="__codelineno-31-5" href="#__codelineno-31-5"></a><span class="go">(1 row)</span>
 </span></code></pre></div></p>
               
