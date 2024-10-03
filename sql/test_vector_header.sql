@@ -15,73 +15,73 @@ create extension if not exists onesparse;
 
 -- An empty vector can be constructed many ways, but one of the
 -- simplest is casting a type code to the matrix type.  In this case
--- `i4` means GrB_INT32.  The type codes are intentionally compressed
+-- `int32` means GrB_INT32.  The type codes are intentionally compressed
 -- to be as short as possible for smaller pg_dumps.
 --
 -- Much of these functions are basically vector versions of the same
 -- functions for matrix.  See those docs for details:
 
-select 'i4'::vector;
+select 'int32'::vector;
 
-select nvals('i4'::vector);
+select nvals('int32'::vector);
 
-select size('i4'::vector);
+select size('int32'::vector);
 
-select 'i4[]'::vector;
+select 'int32[]'::vector;
 
-select nvals('i4[]'::vector);
+select nvals('int32[]'::vector);
 
-select size('i4[]'::vector);
+select size('int32[]'::vector);
 
-select 'i4(10)'::vector;
+select 'int32(10)'::vector;
 
-select nvals('i4(10)'::vector);
+select nvals('int32(10)'::vector);
 
-select size('i4(10)'::vector);
+select size('int32(10)'::vector);
 
-select 'i4(10)[]'::vector;
+select 'int32(10)[]'::vector;
 
-select nvals('i4(10)[]'::vector);
+select nvals('int32(10)[]'::vector);
 
-select size('i4(10)[]'::vector);
+select size('int32(10)[]'::vector);
 
-select 'i4[0:1 1:2 2:3]'::vector;
+select 'int32[0:1 1:2 2:3]'::vector;
 
-select nvals('i4[0:1 1:2 2:3]'::vector);
+select nvals('int32[0:1 1:2 2:3]'::vector);
 
-select 'i4(10)[0:1 1:2 2:3]'::vector;
+select 'int32(10)[0:1 1:2 2:3]'::vector;
 
-select size('i4(10)[0:1 1:2 2:3]'::vector);
+select size('int32(10)[0:1 1:2 2:3]'::vector);
 
-select size('i4(2)[0:1 1:2 2:3]'::vector);
+select size('int32(2)[0:1 1:2 2:3]'::vector);
 
-select ewise_add('i4[0:1 1:2 2:3]'::vector, 'i4[0:1 1:2 2:3]'::vector, 'plus_int32');
+select ewise_add('int32[0:1 1:2 2:3]'::vector, 'int32[0:1 1:2 2:3]'::vector, 'plus_int32');
 
-select ewise_mult('i4[0:1 1:2 2:3]'::vector, 'i4[0:1 1:2 2:3]'::vector, 'times_int32');
+select ewise_mult('int32[0:1 1:2 2:3]'::vector, 'int32[0:1 1:2 2:3]'::vector, 'times_int32');
 
-select ewise_union('i4[0:1 1:2 2:3]'::vector, 42, 'i4[0:1 1:2 2:3]'::vector, 84, 'plus_int32');
+select ewise_union('int32[0:1 1:2 2:3]'::vector, 42, 'int32[0:1 1:2 2:3]'::vector, 84, 'plus_int32');
 
-select reduce_scalar('i4[0:1 1:2 2:3]'::vector, 'plus_monoid_int32');
+select reduce_scalar('int32[0:1 1:2 2:3]'::vector, 'plus_monoid_int32');
 
-select selection('i4[0:1 1:2 2:3]'::vector, 'valuegt_int32', 1);
+select selection('int32[0:1 1:2 2:3]'::vector, 'valuegt_int32', 1);
 
-select apply('i4[1:1 2:2 3:3]'::vector, 'ainv_int32'::unaryop);
+select apply('int32[1:1 2:2 3:3]'::vector, 'ainv_int32'::unaryop);
 
 -- Elements can be set individually with `set_element`, the modified
 -- input is returned:
 
-select set_element('i4[1:1 2:2 3:3]'::vector, 4, 4);
+select set_element('int32[1:1 2:2 3:3]'::vector, 4, 4);
 
 -- Scalar elements can be extracted individually with `get_element`
 
-select get_element('i4[1:1 2:2 3:3]'::vector, 3);
+select get_element('int32[1:1 2:2 3:3]'::vector, 3);
 
-select print('i4[1:1 2:2 3:3]'::vector);
+select print('int32[1:1 2:2 3:3]'::vector);
 
-select print('i4[1:1 2:2 3:3]'::vector, 5);
+select print('int32[1:1 2:2 3:3]'::vector, 5);
 
-select wait('i4[0:1 1:2 2:3]'::vector);
+select wait('int32[0:1 1:2 2:3]'::vector);
 
-select dup('i4[0:1 1:2 2:3]'::vector);
+select dup('int32[0:1 1:2 2:3]'::vector);
 
-select clear('i4[0:1 1:2 2:3]'::vector);
+select clear('int32[0:1 1:2 2:3]'::vector);

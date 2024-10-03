@@ -17,10 +17,10 @@ create extension if not exists onesparse;
 
 -- An empty matrix can be constructed many ways, but one of the
 -- simplest is casting a type code to the matrix type.  In this case
--- `i4` means GrB_INT32.  The type codes are intentionally compressed
+-- `int32` means GrB_INT32.  The type codes are intentionally compressed
 -- to be as short as possible for smaller pg_dumps.
 
-select 'i4'::matrix;
+select 'int32'::matrix;
 
 -- A matrix can have a fixed number of rows and/or columns.  The
 -- default possible number of rows and columns is defined by the
@@ -32,16 +32,16 @@ select 'i4'::matrix;
 -- parentesis after the type code.  Here a 10 row by 10 column matrix
 -- is created:
 
-select 'i4(10:10)'::matrix;
+select 'int32(10:10)'::matrix;
 
 -- Either dimension can be ommited, this creates a 10 row by unbounded
 -- column matrix.
 
-select 'i4(10:)'::matrix;
+select 'int32(10:)'::matrix;
 
 -- This creates a unbounded row by 10 column matrix.
 
-select 'i4(10:)'::matrix;
+select 'int32(10:)'::matrix;
 
 -- Note that in all the above cases the matrices created are *empty*.
 -- They contain no stored elements.  The memory needed to hold the
@@ -56,11 +56,11 @@ select 'i4(10:)'::matrix;
 -- number of rows, the number of columns, and the number of store
 -- values.
 
-select nrows('i4'::matrix);
+select nrows('int32'::matrix);
 
-select ncols('i4'::matrix);
+select ncols('int32'::matrix);
 
-select nvals('i4'::matrix);
+select nvals('int32'::matrix);
 
 -- Above you can see the matrix has unbounded rows and columns (the
 -- very large number is the number of *possible* entries).  And the
@@ -70,47 +70,47 @@ select nvals('i4'::matrix);
 -- array of elements between square brackets.  Empty brackets imply no
 -- elements:
 
-select nrows('i4[]'::matrix);
+select nrows('int32[]'::matrix);
 
-select ncols('i4[]'::matrix);
+select ncols('int32[]'::matrix);
 
-select nvals('i4[]'::matrix);
+select nvals('int32[]'::matrix);
 
 -- Elements are specified between square brackets are coordinates of
 -- 'row_id:column_id:value' separated by spaces:
 
-select 'i4[1:1:1 2:2:2 3:3:3]'::matrix;
+select 'int32[1:1:1 2:2:2 3:3:3]'::matrix;
 
-select 'i4(10:)[1:1:1 2:2:2 3:3:3]'::matrix;
+select 'int32(10:)[1:1:1 2:2:2 3:3:3]'::matrix;
 
-select 'i4(:10)[1:1:1 2:2:2 3:3:3]'::matrix;
+select 'int32(:10)[1:1:1 2:2:2 3:3:3]'::matrix;
 
 -- Below you see the number of rows, columns and spaces for a variety
 -- of combinations:
 
-select nrows('i4(10)[1:1:1 2:2:2 3:3:3]'::matrix);
+select nrows('int32(10)[1:1:1 2:2:2 3:3:3]'::matrix);
 
-select ncols('i4(10)[1:1:1 2:2:2 3:3:3]'::matrix);
+select ncols('int32(10)[1:1:1 2:2:2 3:3:3]'::matrix);
 
-select nvals('i4(10)[1:1:1 2:2:2 3:3:3]'::matrix);
+select nvals('int32(10)[1:1:1 2:2:2 3:3:3]'::matrix);
 
-select nrows('i4(10:)[1:1:1 2:2:2 3:3:3]'::matrix);
+select nrows('int32(10:)[1:1:1 2:2:2 3:3:3]'::matrix);
 
-select ncols('i4(10:)[1:1:1 2:2:2 3:3:3]'::matrix);
+select ncols('int32(10:)[1:1:1 2:2:2 3:3:3]'::matrix);
 
-select nvals('i4(10:)[1:1:1 2:2:2 3:3:3]'::matrix);
+select nvals('int32(10:)[1:1:1 2:2:2 3:3:3]'::matrix);
 
-select nrows('i4(:10)[1:1:1 2:2:2 3:3:3]'::matrix);
+select nrows('int32(:10)[1:1:1 2:2:2 3:3:3]'::matrix);
 
-select ncols('i4(:10)[1:1:1 2:2:2 3:3:3]'::matrix);
+select ncols('int32(:10)[1:1:1 2:2:2 3:3:3]'::matrix);
 
-select nvals('i4(:10)[1:1:1 2:2:2 3:3:3]'::matrix);
+select nvals('int32(:10)[1:1:1 2:2:2 3:3:3]'::matrix);
 
-select nrows('i4(10:10)[1:1:1 2:2:2 3:3:3]'::matrix);
+select nrows('int32(10:10)[1:1:1 2:2:2 3:3:3]'::matrix);
 
-select ncols('i4(10:10)[1:1:1 2:2:2 3:3:3]'::matrix);
+select ncols('int32(10:10)[1:1:1 2:2:2 3:3:3]'::matrix);
 
-select nvals('i4(10:10)[1:1:1 2:2:2 3:3:3]'::matrix);
+select nvals('int32(10:10)[1:1:1 2:2:2 3:3:3]'::matrix);
 
 -- # Element-wise operations
 --
@@ -120,14 +120,14 @@ select nvals('i4(10:10)[1:1:1 2:2:2 3:3:3]'::matrix);
 -- operator.  Elements present on both sides of the operation are
 -- included in the result.
 
-select ewise_add('i4[1:1:1 2:2:2 3:3:3]'::matrix, 'i4[1:1:1 2:2:2 3:3:3]'::matrix, 'plus_int32');
+select ewise_add('int32[1:1:1 2:2:2 3:3:3]'::matrix, 'int32[1:1:1 2:2:2 3:3:3]'::matrix, 'plus_int32');
 
 -- `ewise_mult` multiplies elements of two matrices, taking only the
 -- intersection of common elements in both matrices, if an element is
 -- missing from either the left or right side, it is ommited from the
 -- result:
 
-select ewise_mult('i4[1:1:1 2:2:2 3:3:3]'::matrix, 'i4[1:1:1 2:2:2 3:3:3]'::matrix, 'times_int32');
+select ewise_mult('int32[1:1:1 2:2:2 3:3:3]'::matrix, 'int32[1:1:1 2:2:2 3:3:3]'::matrix, 'times_int32');
 
 
 -- `ewise_union` is like `ewise_add` but differs in how the binary op
@@ -135,20 +135,20 @@ select ewise_mult('i4[1:1:1 2:2:2 3:3:3]'::matrix, 'i4[1:1:1 2:2:2 3:3:3]'::matr
 -- to the operator when entries are present in one matrix but not the
 -- other.
 
-select ewise_union('i4[1:1:1 2:2:2 3:3:3]'::matrix, 42, 'i4[1:1:1 2:2:2 3:3:3]'::matrix, 84, 'plus_int32');
+select ewise_union('int32[1:1:1 2:2:2 3:3:3]'::matrix, 42, 'int32[1:1:1 2:2:2 3:3:3]'::matrix, 84, 'plus_int32');
 
 -- The entire matrix can be reduced to a scalar value:
 
-select reduce_scalar('i4[1:1:1 2:2:2 3:3:3]'::matrix, 'plus_monoid_int32');
+select reduce_scalar('int32[1:1:1 2:2:2 3:3:3]'::matrix, 'plus_monoid_int32');
 
 -- The matrix can also be reduced to a column vector:
 
-select reduce_vector('i4[1:1:1 1:2:3 2:2:2]'::matrix, 'plus_monoid_int32');
+select reduce_vector('int32[1:1:1 1:2:3 2:2:2]'::matrix, 'plus_monoid_int32');
 
 -- To reduce a row vector, specify that the input should be transposed
 -- with the descriptor `t0`:
 
-select reduce_vector('i4[1:1:1 1:2:3 2:2:2]'::matrix, 'plus_monoid_int32', descriptor=>'t0');
+select reduce_vector('int32[1:1:1 1:2:3 2:2:2]'::matrix, 'plus_monoid_int32', descriptor=>'t0');
 
 -- Matrix Multiplication (referred to here as A @ B) is the heart of
 -- linear algebra.  All matrix multiplication happens over a semiring.
@@ -157,32 +157,32 @@ select reduce_vector('i4[1:1:1 1:2:3 2:2:2]'::matrix, 'plus_monoid_int32', descr
 -- operator and then reduce those products with the "plus" operator.
 -- This is called the `plus_times` semiring:
 
-select mxm('i4[0:0:1 0:1:2]'::matrix, 'i4[0:0:1 0:1:3]'::matrix, 'plus_times_int32');
+select mxm('int32[0:0:1 0:1:2]'::matrix, 'int32[0:0:1 0:1:3]'::matrix, 'plus_times_int32');
 
 -- AxB can also be done with the `@` operator, mimicking the Python
 -- syntax:
 
-select 'i4[0:0:1 0:1:2]'::matrix @ 'i4[0:0:1 0:1:3]'::matrix;
+select 'int32[0:0:1 0:1:2]'::matrix @ 'int32[0:0:1 0:1:3]'::matrix;
 
 -- Matrices can be multipled by vectors on the right taking the linear
 -- combination of the matrices columns using the vectors elements as
 -- coefficients:
 
-select mxv('i4[0:0:1 0:1:2]'::matrix, 'i4[0:0 1:1]'::vector, 'plus_times_int32');
+select mxv('int32[0:0:1 0:1:2]'::matrix, 'int32[0:0 1:1]'::vector, 'plus_times_int32');
 
 -- 'mxv' is also supported by the `@` operator:
 
-select 'i4[0:0:1 0:1:2]'::matrix @ 'i4[0:0 1:1]'::vector;
+select 'int32[0:0:1 0:1:2]'::matrix @ 'int32[0:0 1:1]'::vector;
 
 -- Matrices can be multipled by vectors on the right taking the linear
 -- combination of the matrices rows using the vectors elements as
 -- coefficients:
 
-select vxm('i4[0:0 1:1]'::vector, 'i4[0:0:1 0:1:2]'::matrix, 'plus_times_int32');
+select vxm('int32[0:0 1:1]'::vector, 'int32[0:0:1 0:1:2]'::matrix, 'plus_times_int32');
 
 -- 'vxm' is also supported by the `@` operator:
 
-select 'i4[0:0 1:1]'::vector @ 'i4[0:0:1 0:1:2]'::matrix;
+select 'int32[0:0 1:1]'::vector @ 'int32[0:0:1 0:1:2]'::matrix;
 
 -- The `selection` method calls the `GrB_select()` API function.  The
 -- name `selection` was chosen not to conflict with the SQL keyword
@@ -191,49 +191,49 @@ select 'i4[0:0 1:1]'::vector @ 'i4[0:0:1 0:1:2]'::matrix;
 -- elements in the matrix.  Below, all elements with values greater
 -- than 1 are returned:
 
-select selection('i4[1:1:1 2:2:2 3:3:3]'::matrix, 'valuegt_int32'::indexunaryop, 1::scalar);
+select selection('int32[1:1:1 2:2:2 3:3:3]'::matrix, 'valuegt_int32'::indexunaryop, 1::scalar);
 
 -- Here are all values equal to 2:
 
-select selection('i4[1:1:1 2:2:2 3:3:3]'::matrix, 'valueeq_int32'::indexunaryop, 2::scalar);
+select selection('int32[1:1:1 2:2:2 3:3:3]'::matrix, 'valueeq_int32'::indexunaryop, 2::scalar);
 
 -- `apply` takes an operator of type `unaryop` and applies it to every
 -- element of the matrix.  The 'ainv_int32' returned the additive
 -- inverse (the negative value for integers) of every element:
 
-select apply('i4[1:1:1 2:2:2 3:3:3]'::matrix, 'ainv_int32'::unaryop);
+select apply('int32[1:1:1 2:2:2 3:3:3]'::matrix, 'ainv_int32'::unaryop);
 
 -- Elements can be set individually with `set_element`, the modified
 -- input is returned:
 
-select set_element('i4[1:1:1 2:2:2 3:3:3]'::matrix, 4, 4, 4);
+select set_element('int32[1:1:1 2:2:2 3:3:3]'::matrix, 4, 4, 4);
 
 -- Scalar elements can be extracted individually with `get_element`
 
-select get_element('i4[1:1:1 2:2:2 3:3:3]'::matrix, 3, 3);
+select get_element('int32[1:1:1 2:2:2 3:3:3]'::matrix, 3, 3);
 
 -- The `print` function returns a descripton of the matrix from
 -- SuiteSparse.
 
-select print('i4[1:1:1 2:2:2 3:3:3]'::matrix);
+select print('int32[1:1:1 2:2:2 3:3:3]'::matrix);
 
 -- The `print` function takes an optional "level" argument that
 -- defaults to `1` which is a short summary.
 
-select print('i4[1:1:1 2:2:2 3:3:3]'::matrix, 5);
+select print('int32[1:1:1 2:2:2 3:3:3]'::matrix, 5);
 
 -- The `dup` function duplicates a matrix returning a new matrix
 -- object with the same values:
-select dup('i4[1:1:1 2:2:2 3:3:3]'::matrix);
+select dup('int32[1:1:1 2:2:2 3:3:3]'::matrix);
 
 -- The `wait` method is used to "complete" a matrix, which may have
 -- pending operations waiting to be performed when using the default
 -- SuiteSparse non-blocking mode.  As a side effect, wait will sort
 -- the elements of the input:
 
-select wait('i4[2:2:2 3:3:3 1:1:1]'::matrix);
+select wait('int32[2:2:2 3:3:3 1:1:1]'::matrix);
 
 -- The `clear` function clears the matrix of all elements and returns
 -- the same object, but empty.  The dimensions do not change:
 
-select clear('i4[1:1:1 2:2:2 3:3:3]'::matrix);
+select clear('int32[1:1:1 2:2:2 3:3:3]'::matrix);

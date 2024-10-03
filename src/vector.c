@@ -353,7 +353,7 @@ Datum vector_in(PG_FUNCTION_ARGS)
 Datum vector_out(PG_FUNCTION_ARGS)
 {
 	GrB_Info info;
-	GrB_Index i;
+	GrB_Index i, wsize, nvals;
     GxB_Iterator iterator;
 	os_Vector *vector;
     StringInfoData buf;
@@ -362,17 +362,35 @@ Datum vector_out(PG_FUNCTION_ARGS)
 	LOGF();
 	vector = OS_GETARG_VECTOR(0);
 
-    GxB_Iterator_new(&iterator);
-	CHECK(GxB_Vector_Iterator_attach(iterator, vector->vector, NULL),
-		  vector->vector,
-		  "Cannot attach vector iterator.");
-
     initStringInfo(&buf);
 	CHECK(GrB_get(vector->vector, &type_code, GrB_EL_TYPE_CODE),
 		  vector->vector,
 		  "Cannot get Vector Type code.");
 
-	appendStringInfo(&buf, "%s[", short_code(type_code));
+	CHECK(GrB_Vector_size(&wsize, vector->vector),
+		  vector->vector,
+		  "Error extracting vector size.");
+
+	appendStringInfo(&buf, "%s", short_code(type_code));
+	if (wsize < GrB_INDEX_MAX+1)
+	{
+		appendStringInfo(&buf, "(%lu)", wsize);
+	}
+	CHECK(GrB_Vector_nvals(&nvals, vector->vector),
+		  vector->vector,
+		  "Error extracting vector nvals.");
+
+	if (nvals == 0)
+	{
+		PG_RETURN_CSTRING(buf.data);
+	}
+
+	appendStringInfo(&buf, "[");
+
+    GxB_Iterator_new(&iterator);
+	CHECK(GxB_Vector_Iterator_attach(iterator, vector->vector, NULL),
+		  vector->vector,
+		  "Cannot attach vector iterator.");
 
     info = GxB_Vector_Iterator_seek(iterator, 0);
     while (info != GxB_EXHAUSTED)

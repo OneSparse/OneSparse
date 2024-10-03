@@ -21,7 +21,7 @@ Describe the scalar type
 ```
 print a scalar
 ``` postgres-console
-select print('i4:42'::scalar);
+select print('int32:42'::scalar);
                     print                    
 ---------------------------------------------
                                             +
@@ -35,7 +35,7 @@ select print('i4:42'::scalar);
 ```
 print a scalar
 ``` postgres-console
-select print('i4:42'::scalar, 5);
+select print('int32:42'::scalar, 5);
                     print                    
 ---------------------------------------------
                                             +
@@ -50,28 +50,28 @@ select print('i4:42'::scalar, 5);
 ```
 Duplicate a scalar
 ``` postgres-console
-select dup('i4:42'::scalar);
-  dup  
--------
- i4:42
+select dup('int32:42'::scalar);
+   dup    
+----------
+ int32:42
 (1 row)
 
 ```
 Wait for a scalar to complete in non-blocking mode
 ``` postgres-console
-select wait('i4:42'::scalar);
- wait  
--------
- i4:42
+select wait('int32:42'::scalar);
+   wait   
+----------
+ int32:42
 (1 row)
 
 ```
 Clear a scalar, deleting its stored element.
 ``` postgres-console
-select clear('i4:42'::scalar);
+select clear('int32:42'::scalar);
  clear 
 -------
- i4:
+ int
 (1 row)
 
 ```

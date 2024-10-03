@@ -23,13 +23,13 @@ this type.
 ```
 An empty matrix can be constructed many ways, but one of the
 simplest is casting a type code to the matrix type.  In this case
-`i4` means GrB_INT32.  The type codes are intentionally compressed
+`int32` means GrB_INT32.  The type codes are intentionally compressed
 to be as short as possible for smaller pg_dumps.
 ``` postgres-console
-select 'i4'::matrix;
- matrix 
---------
- i4[]
+select 'int32'::matrix;
+ matrix  
+---------
+ int32[]
 (1 row)
 
 ```
@@ -43,29 +43,29 @@ matrices with known dimensions, the dimensions can be provided in
 parentesis after the type code.  Here a 10 row by 10 column matrix
 is created:
 ``` postgres-console
-select 'i4(10:10)'::matrix;
- matrix 
---------
- i4[]
+select 'int32(10:10)'::matrix;
+ matrix  
+---------
+ int32[]
 (1 row)
 
 ```
 Either dimension can be ommited, this creates a 10 row by unbounded
 column matrix.
 ``` postgres-console
-select 'i4(10:)'::matrix;
- matrix 
---------
- i4[]
+select 'int32(10:)'::matrix;
+ matrix  
+---------
+ int32[]
 (1 row)
 
 ```
 This creates a unbounded row by 10 column matrix.
 ``` postgres-console
-select 'i4(10:)'::matrix;
- matrix 
---------
- i4[]
+select 'int32(10:)'::matrix;
+ matrix  
+---------
+ int32[]
 (1 row)
 
 ```
@@ -82,19 +82,19 @@ operators.  Here we see three very common operations, returning the
 number of rows, the number of columns, and the number of store
 values.
 ``` postgres-console
-select nrows('i4'::matrix);
+select nrows('int32'::matrix);
         nrows        
 ---------------------
  1152921504606846976
 (1 row)
 
-select ncols('i4'::matrix);
+select ncols('int32'::matrix);
         ncols        
 ---------------------
  1152921504606846976
 (1 row)
 
-select nvals('i4'::matrix);
+select nvals('int32'::matrix);
  nvals 
 -------
      0
@@ -108,19 +108,19 @@ Values can be specified after the `type(dimension)` prefix as an
 array of elements between square brackets.  Empty brackets imply no
 elements:
 ``` postgres-console
-select nrows('i4[]'::matrix);
+select nrows('int32[]'::matrix);
         nrows        
 ---------------------
  1152921504606846976
 (1 row)
 
-select ncols('i4[]'::matrix);
+select ncols('int32[]'::matrix);
         ncols        
 ---------------------
  1152921504606846976
 (1 row)
 
-select nvals('i4[]'::matrix);
+select nvals('int32[]'::matrix);
  nvals 
 -------
      0
@@ -130,95 +130,95 @@ select nvals('i4[]'::matrix);
 Elements are specified between square brackets are coordinates of
 'row_id:column_id:value' separated by spaces:
 ``` postgres-console
-select 'i4[1:1:1 2:2:2 3:3:3]'::matrix;
-        matrix         
------------------------
- i4[1:1:1 2:2:2 3:3:3]
+select 'int32[1:1:1 2:2:2 3:3:3]'::matrix;
+          matrix          
+--------------------------
+ int32[1:1:1 2:2:2 3:3:3]
 (1 row)
 
-select 'i4(10:)[1:1:1 2:2:2 3:3:3]'::matrix;
-        matrix         
------------------------
- i4[1:1:1 2:2:2 3:3:3]
+select 'int32(10:)[1:1:1 2:2:2 3:3:3]'::matrix;
+          matrix          
+--------------------------
+ int32[1:1:1 2:2:2 3:3:3]
 (1 row)
 
-select 'i4(:10)[1:1:1 2:2:2 3:3:3]'::matrix;
-        matrix         
------------------------
- i4[1:1:1 2:2:2 3:3:3]
+select 'int32(:10)[1:1:1 2:2:2 3:3:3]'::matrix;
+          matrix          
+--------------------------
+ int32[1:1:1 2:2:2 3:3:3]
 (1 row)
 
 ```
 Below you see the number of rows, columns and spaces for a variety
 of combinations:
 ``` postgres-console
-select nrows('i4(10)[1:1:1 2:2:2 3:3:3]'::matrix);
+select nrows('int32(10)[1:1:1 2:2:2 3:3:3]'::matrix);
  nrows 
 -------
     10
 (1 row)
 
-select ncols('i4(10)[1:1:1 2:2:2 3:3:3]'::matrix);
+select ncols('int32(10)[1:1:1 2:2:2 3:3:3]'::matrix);
         ncols        
 ---------------------
  1152921504606846976
 (1 row)
 
-select nvals('i4(10)[1:1:1 2:2:2 3:3:3]'::matrix);
+select nvals('int32(10)[1:1:1 2:2:2 3:3:3]'::matrix);
  nvals 
 -------
      3
 (1 row)
 
-select nrows('i4(10:)[1:1:1 2:2:2 3:3:3]'::matrix);
+select nrows('int32(10:)[1:1:1 2:2:2 3:3:3]'::matrix);
  nrows 
 -------
     10
 (1 row)
 
-select ncols('i4(10:)[1:1:1 2:2:2 3:3:3]'::matrix);
+select ncols('int32(10:)[1:1:1 2:2:2 3:3:3]'::matrix);
         ncols        
 ---------------------
  1152921504606846976
 (1 row)
 
-select nvals('i4(10:)[1:1:1 2:2:2 3:3:3]'::matrix);
+select nvals('int32(10:)[1:1:1 2:2:2 3:3:3]'::matrix);
  nvals 
 -------
      3
 (1 row)
 
-select nrows('i4(:10)[1:1:1 2:2:2 3:3:3]'::matrix);
+select nrows('int32(:10)[1:1:1 2:2:2 3:3:3]'::matrix);
         nrows        
 ---------------------
  1152921504606846976
 (1 row)
 
-select ncols('i4(:10)[1:1:1 2:2:2 3:3:3]'::matrix);
+select ncols('int32(:10)[1:1:1 2:2:2 3:3:3]'::matrix);
  ncols 
 -------
     10
 (1 row)
 
-select nvals('i4(:10)[1:1:1 2:2:2 3:3:3]'::matrix);
+select nvals('int32(:10)[1:1:1 2:2:2 3:3:3]'::matrix);
  nvals 
 -------
      3
 (1 row)
 
-select nrows('i4(10:10)[1:1:1 2:2:2 3:3:3]'::matrix);
+select nrows('int32(10:10)[1:1:1 2:2:2 3:3:3]'::matrix);
  nrows 
 -------
     10
 (1 row)
 
-select ncols('i4(10:10)[1:1:1 2:2:2 3:3:3]'::matrix);
+select ncols('int32(10:10)[1:1:1 2:2:2 3:3:3]'::matrix);
  ncols 
 -------
     10
 (1 row)
 
-select nvals('i4(10:10)[1:1:1 2:2:2 3:3:3]'::matrix);
+select nvals('int32(10:10)[1:1:1 2:2:2 3:3:3]'::matrix);
  nvals 
 -------
      3
@@ -233,10 +233,10 @@ operate pairs of matrices.  `ewise_add` computes the element-wise
 operator.  Elements present on both sides of the operation are
 included in the result.
 ``` postgres-console
-select ewise_add('i4[1:1:1 2:2:2 3:3:3]'::matrix, 'i4[1:1:1 2:2:2 3:3:3]'::matrix, 'plus_int32');
-       ewise_add       
------------------------
- i4[1:1:2 2:2:4 3:3:6]
+select ewise_add('int32[1:1:1 2:2:2 3:3:3]'::matrix, 'int32[1:1:1 2:2:2 3:3:3]'::matrix, 'plus_int32');
+        ewise_add         
+--------------------------
+ int32[1:1:2 2:2:4 3:3:6]
 (1 row)
 
 ```
@@ -245,10 +245,10 @@ intersection of common elements in both matrices, if an element is
 missing from either the left or right side, it is ommited from the
 result:
 ``` postgres-console
-select ewise_mult('i4[1:1:1 2:2:2 3:3:3]'::matrix, 'i4[1:1:1 2:2:2 3:3:3]'::matrix, 'times_int32');
-      ewise_mult       
------------------------
- i4[1:1:1 2:2:4 3:3:9]
+select ewise_mult('int32[1:1:1 2:2:2 3:3:3]'::matrix, 'int32[1:1:1 2:2:2 3:3:3]'::matrix, 'times_int32');
+        ewise_mult        
+--------------------------
+ int32[1:1:1 2:2:4 3:3:9]
 (1 row)
 
 ```
@@ -257,38 +257,38 @@ is applied. A pair of scalars, `alpha` and `beta` define the inputs
 to the operator when entries are present in one matrix but not the
 other.
 ``` postgres-console
-select ewise_union('i4[1:1:1 2:2:2 3:3:3]'::matrix, 42, 'i4[1:1:1 2:2:2 3:3:3]'::matrix, 84, 'plus_int32');
-      ewise_union      
------------------------
- i4[1:1:2 2:2:4 3:3:6]
+select ewise_union('int32[1:1:1 2:2:2 3:3:3]'::matrix, 42, 'int32[1:1:1 2:2:2 3:3:3]'::matrix, 84, 'plus_int32');
+       ewise_union        
+--------------------------
+ int32[1:1:2 2:2:4 3:3:6]
 (1 row)
 
 ```
 The entire matrix can be reduced to a scalar value:
 ``` postgres-console
-select reduce_scalar('i4[1:1:1 2:2:2 3:3:3]'::matrix, 'plus_monoid_int32');
+select reduce_scalar('int32[1:1:1 2:2:2 3:3:3]'::matrix, 'plus_monoid_int32');
  reduce_scalar 
 ---------------
- i4:6
+ int32:6
 (1 row)
 
 ```
 The matrix can also be reduced to a column vector:
 ``` postgres-console
-select reduce_vector('i4[1:1:1 1:2:3 2:2:2]'::matrix, 'plus_monoid_int32');
- reduce_vector 
----------------
- i4[1:4 2:2]
+select reduce_vector('int32[1:1:1 1:2:3 2:2:2]'::matrix, 'plus_monoid_int32');
+ reduce_vector  
+----------------
+ int32[1:4 2:2]
 (1 row)
 
 ```
 To reduce a row vector, specify that the input should be transposed
 with the descriptor `t0`:
 ``` postgres-console
-select reduce_vector('i4[1:1:1 1:2:3 2:2:2]'::matrix, 'plus_monoid_int32', descriptor=>'t0');
- reduce_vector 
----------------
- i4[1:1 2:5]
+select reduce_vector('int32[1:1:1 1:2:3 2:2:2]'::matrix, 'plus_monoid_int32', descriptor=>'t0');
+ reduce_vector  
+----------------
+ int32[1:1 2:5]
 (1 row)
 
 ```
@@ -299,20 +299,20 @@ opperation is to multiply coresponding elements with the "times"
 operator and then reduce those products with the "plus" operator.
 This is called the `plus_times` semiring:
 ``` postgres-console
-select mxm('i4[0:0:1 0:1:2]'::matrix, 'i4[0:0:1 0:1:3]'::matrix, 'plus_times_int32');
-       mxm       
------------------
- i4[0:0:1 0:1:3]
+select mxm('int32[0:0:1 0:1:2]'::matrix, 'int32[0:0:1 0:1:3]'::matrix, 'plus_times_int32');
+        mxm         
+--------------------
+ int32[0:0:1 0:1:3]
 (1 row)
 
 ```
 AxB can also be done with the `@` operator, mimicking the Python
 syntax:
 ``` postgres-console
-select 'i4[0:0:1 0:1:2]'::matrix @ 'i4[0:0:1 0:1:3]'::matrix;
-    ?column?     
------------------
- i4[0:0:0 0:1:0]
+select 'int32[0:0:1 0:1:2]'::matrix @ 'int32[0:0:1 0:1:3]'::matrix;
+      ?column?      
+--------------------
+ int32[0:0:0 0:1:0]
 (1 row)
 
 ```
@@ -320,19 +320,19 @@ Matrices can be multipled by vectors on the right taking the linear
 combination of the matrices columns using the vectors elements as
 coefficients:
 ``` postgres-console
-select mxv('i4[0:0:1 0:1:2]'::matrix, 'i4[0:0 1:1]'::vector, 'plus_times_int32');
-   mxv   
----------
- i4[0:2]
+select mxv('int32[0:0:1 0:1:2]'::matrix, 'int32[0:0 1:1]'::vector, 'plus_times_int32');
+    mxv     
+------------
+ int32[0:2]
 (1 row)
 
 ```
 'mxv' is also supported by the `@` operator:
 ``` postgres-console
-select 'i4[0:0:1 0:1:2]'::matrix @ 'i4[0:0 1:1]'::vector;
- ?column? 
-----------
- i4[0:0]
+select 'int32[0:0:1 0:1:2]'::matrix @ 'int32[0:0 1:1]'::vector;
+  ?column?  
+------------
+ int32[0:0]
 (1 row)
 
 ```
@@ -340,19 +340,19 @@ Matrices can be multipled by vectors on the right taking the linear
 combination of the matrices rows using the vectors elements as
 coefficients:
 ``` postgres-console
-select vxm('i4[0:0 1:1]'::vector, 'i4[0:0:1 0:1:2]'::matrix, 'plus_times_int32');
-     vxm     
--------------
- i4[0:0 1:0]
+select vxm('int32[0:0 1:1]'::vector, 'int32[0:0:1 0:1:2]'::matrix, 'plus_times_int32');
+      vxm       
+----------------
+ int32[0:0 1:0]
 (1 row)
 
 ```
 'vxm' is also supported by the `@` operator:
 ``` postgres-console
-select 'i4[0:0 1:1]'::vector @ 'i4[0:0:1 0:1:2]'::matrix;
-  ?column?   
--------------
- i4[0:0 1:0]
+select 'int32[0:0 1:1]'::vector @ 'int32[0:0:1 0:1:2]'::matrix;
+    ?column?    
+----------------
+ int32[0:0 1:0]
 (1 row)
 
 ```
@@ -363,19 +363,19 @@ name `selection` was chosen not to conflict with the SQL keyword
 elements in the matrix.  Below, all elements with values greater
 than 1 are returned:
 ``` postgres-console
-select selection('i4[1:1:1 2:2:2 3:3:3]'::matrix, 'valuegt_int32'::indexunaryop, 1::scalar);
-    selection    
------------------
- i4[2:2:2 3:3:3]
+select selection('int32[1:1:1 2:2:2 3:3:3]'::matrix, 'valuegt_int32'::indexunaryop, 1::scalar);
+     selection      
+--------------------
+ int32[2:2:2 3:3:3]
 (1 row)
 
 ```
 Here are all values equal to 2:
 ``` postgres-console
-select selection('i4[1:1:1 2:2:2 3:3:3]'::matrix, 'valueeq_int32'::indexunaryop, 2::scalar);
- selection 
------------
- i4[2:2:2]
+select selection('int32[1:1:1 2:2:2 3:3:3]'::matrix, 'valueeq_int32'::indexunaryop, 2::scalar);
+  selection   
+--------------
+ int32[2:2:2]
 (1 row)
 
 ```
@@ -383,36 +383,36 @@ select selection('i4[1:1:1 2:2:2 3:3:3]'::matrix, 'valueeq_int32'::indexunaryop,
 element of the matrix.  The 'ainv_int32' returned the additive
 inverse (the negative value for integers) of every element:
 ``` postgres-console
-select apply('i4[1:1:1 2:2:2 3:3:3]'::matrix, 'ainv_int32'::unaryop);
-          apply           
---------------------------
- i4[1:1:-1 2:2:-2 3:3:-3]
+select apply('int32[1:1:1 2:2:2 3:3:3]'::matrix, 'ainv_int32'::unaryop);
+            apply            
+-----------------------------
+ int32[1:1:-1 2:2:-2 3:3:-3]
 (1 row)
 
 ```
 Elements can be set individually with `set_element`, the modified
 input is returned:
 ``` postgres-console
-select set_element('i4[1:1:1 2:2:2 3:3:3]'::matrix, 4, 4, 4);
-         set_element         
------------------------------
- i4[1:1:1 2:2:2 3:3:3 4:4:4]
+select set_element('int32[1:1:1 2:2:2 3:3:3]'::matrix, 4, 4, 4);
+          set_element           
+--------------------------------
+ int32[1:1:1 2:2:2 3:3:3 4:4:4]
 (1 row)
 
 ```
 Scalar elements can be extracted individually with `get_element`
 ``` postgres-console
-select get_element('i4[1:1:1 2:2:2 3:3:3]'::matrix, 3, 3);
+select get_element('int32[1:1:1 2:2:2 3:3:3]'::matrix, 3, 3);
  get_element 
 -------------
- i4:3
+ int32:3
 (1 row)
 
 ```
 The `print` function returns a descripton of the matrix from
 SuiteSparse.
 ``` postgres-console
-select print('i4[1:1:1 2:2:2 3:3:3]'::matrix);
+select print('int32[1:1:1 2:2:2 3:3:3]'::matrix);
                                          print                                          
 ----------------------------------------------------------------------------------------
                                                                                        +
@@ -426,7 +426,7 @@ select print('i4[1:1:1 2:2:2 3:3:3]'::matrix);
 The `print` function takes an optional "level" argument that
 defaults to `1` which is a short summary.
 ``` postgres-console
-select print('i4[1:1:1 2:2:2 3:3:3]'::matrix, 5);
+select print('int32[1:1:1 2:2:2 3:3:3]'::matrix, 5);
                                          print                                          
 ----------------------------------------------------------------------------------------
                                                                                        +
@@ -444,10 +444,10 @@ select print('i4[1:1:1 2:2:2 3:3:3]'::matrix, 5);
 The `dup` function duplicates a matrix returning a new matrix
 object with the same values:
 ``` postgres-console
-select dup('i4[1:1:1 2:2:2 3:3:3]'::matrix);
-          dup          
------------------------
- i4[1:1:1 2:2:2 3:3:3]
+select dup('int32[1:1:1 2:2:2 3:3:3]'::matrix);
+           dup            
+--------------------------
+ int32[1:1:1 2:2:2 3:3:3]
 (1 row)
 
 ```
@@ -456,20 +456,20 @@ pending operations waiting to be performed when using the default
 SuiteSparse non-blocking mode.  As a side effect, wait will sort
 the elements of the input:
 ``` postgres-console
-select wait('i4[2:2:2 3:3:3 1:1:1]'::matrix);
-         wait          
------------------------
- i4[1:1:1 2:2:2 3:3:3]
+select wait('int32[2:2:2 3:3:3 1:1:1]'::matrix);
+           wait           
+--------------------------
+ int32[1:1:1 2:2:2 3:3:3]
 (1 row)
 
 ```
 The `clear` function clears the matrix of all elements and returns
 the same object, but empty.  The dimensions do not change:
 ``` postgres-console
-select clear('i4[1:1:1 2:2:2 3:3:3]'::matrix);
- clear 
--------
- i4[]
+select clear('int32[1:1:1 2:2:2 3:3:3]'::matrix);
+  clear  
+---------
+ int32[]
 (1 row)
 
 ```

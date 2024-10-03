@@ -16,7 +16,7 @@ create extension if not exists onesparse;
 (1 row)
 
 -- print a scalar
-select print('i4:42'::scalar);
+select print('int32:42'::scalar);
                     print                    
 ---------------------------------------------
                                             +
@@ -28,7 +28,7 @@ select print('i4:42'::scalar);
 (1 row)
 
 -- print a scalar
-select print('i4:42'::scalar, 5);
+select print('int32:42'::scalar, 5);
                     print                    
 ---------------------------------------------
                                             +
@@ -41,23 +41,23 @@ select print('i4:42'::scalar, 5);
 (1 row)
 
 -- Duplicate a scalar
-select dup('i4:42'::scalar);
-  dup  
--------
- i4:42
+select dup('int32:42'::scalar);
+   dup    
+----------
+ int32:42
 (1 row)
 
 -- Wait for a scalar to complete in non-blocking mode
-select wait('i4:42'::scalar);
- wait  
--------
- i4:42
+select wait('int32:42'::scalar);
+   wait   
+----------
+ int32:42
 (1 row)
 
 -- Clear a scalar, deleting its stored element.
-select clear('i4:42'::scalar);
+select clear('int32:42'::scalar);
  clear 
 -------
- i4:
+ int
 (1 row)
 

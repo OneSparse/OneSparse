@@ -328,7 +328,7 @@ Datum _scalar_in(char *input)
 
 	sscanf(input, "%[^:]:%s", str_type, str_val);
 
-	if (strcmp(str_type, "i8") == 0)
+	if (strcmp(str_type, "int64") == 0)
 	{
 		int64_t value;
 		typ = GrB_INT64;
@@ -346,7 +346,7 @@ Datum _scalar_in(char *input)
 				elog(ERROR, "Invalid format for %s %s", fmt, str_val);
 		}
 	}
-	else if (strcmp(str_type, "i4") == 0)
+	else if (strcmp(str_type, "int32") == 0)
 	{
 		int32_t value;
 		typ = GrB_INT32;
@@ -364,7 +364,7 @@ Datum _scalar_in(char *input)
 				elog(ERROR, "Invalid format for %s %s", fmt, str_val);
 		}
 	}
-	else if (strcmp(str_type, "i2") == 0)
+	else if (strcmp(str_type, "int16") == 0)
 	{
 		int16_t value;
 		typ = GrB_INT16;
@@ -382,7 +382,7 @@ Datum _scalar_in(char *input)
 				elog(ERROR, "Invalid format for %s %s", fmt, str_val);
 		}
 	}
-	else if (strcmp(str_type, "f8") == 0)
+	else if (strcmp(str_type, "fp64") == 0)
 	{
 		double value;
 		typ = GrB_FP64;
@@ -400,7 +400,7 @@ Datum _scalar_in(char *input)
 				elog(ERROR, "Invalid format for %s %s", fmt, str_val);
 		}
 	}
-	else if (strcmp(str_type, "f4") == 0)
+	else if (strcmp(str_type, "fp32") == 0)
 	{
 		float value;
 		typ = GrB_FP32;
@@ -418,7 +418,7 @@ Datum _scalar_in(char *input)
 				elog(ERROR, "Invalid format for %s %s", fmt, str_val);
 		}
 	}
-	else if (strcmp(str_type, "b") == 0)
+	else if (strcmp(str_type, "bool") == 0)
 	{
 		char value;
 		typ = GrB_BOOL;

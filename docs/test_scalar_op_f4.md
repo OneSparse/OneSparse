@@ -3,9 +3,9 @@
 Test various scalar math operations with native Postgres types
 ``` postgres-console
 select (1::float4)::scalar + -1::float4;
-  ?column?   
--------------
- f4:0.000000
+   ?column?    
+---------------
+ fp32:0.000000
 (1 row)
 
 select 1::float4 + (-1::float4)::scalar;
@@ -15,9 +15,9 @@ select 1::float4 + (-1::float4)::scalar;
 (1 row)
 
 select (1::float4)::scalar - 1::float4;
-  ?column?   
--------------
- f4:0.000000
+   ?column?    
+---------------
+ fp32:0.000000
 (1 row)
 
 select 1::float4 - (1::float4)::scalar;
@@ -27,9 +27,9 @@ select 1::float4 - (1::float4)::scalar;
 (1 row)
 
 select (1::float4)::scalar * -1::float4;
-   ?column?   
---------------
- f4:-1.000000
+    ?column?    
+----------------
+ fp32:-1.000000
 (1 row)
 
 select 1::float4 * (-1::float4)::scalar;
@@ -39,9 +39,9 @@ select 1::float4 * (-1::float4)::scalar;
 (1 row)
 
 select (1::float4)::scalar / 1::float4;
-  ?column?   
--------------
- f4:1.000000
+   ?column?    
+---------------
+ fp32:1.000000
 (1 row)
 
 select 1::float4 / (1::float4)::scalar;
@@ -54,51 +54,51 @@ select 1::float4 / (1::float4)::scalar;
 Test construction of min, zero and max values:
 ``` postgres-console
 select '-1'::float4::scalar;
-    scalar    
---------------
- f4:-1.000000
+     scalar     
+----------------
+ fp32:-1.000000
 (1 row)
 
 select '0'::float4::scalar;
-   scalar    
--------------
- f4:0.000000
+    scalar     
+---------------
+ fp32:0.000000
 (1 row)
 
 select '1'::float4::scalar;
-   scalar    
--------------
- f4:1.000000
+    scalar     
+---------------
+ fp32:1.000000
 (1 row)
 
 ```
 Test setting a scalar value from max to 2
 ``` postgres-console
 select set('1'::float4::scalar, 2);
-     set     
--------------
- f4:2.000000
+      set      
+---------------
+ fp32:2.000000
 (1 row)
 
 ```
 Test various casting functions used by the CREATE CAST machinery:
 ``` postgres-console
 select scalar_float4((-1)::float4);
- scalar_float4 
----------------
- f4:-1.000000
+ scalar_float4  
+----------------
+ fp32:-1.000000
 (1 row)
 
 select scalar_float4((0)::float4);
  scalar_float4 
 ---------------
- f4:0.000000
+ fp32:0.000000
 (1 row)
 
 select scalar_float4((1)::float4);
  scalar_float4 
 ---------------
- f4:1.000000
+ fp32:1.000000
 (1 row)
 
 select float4_scalar((-1)::float4::scalar);
@@ -124,21 +124,21 @@ These casting functions cast the Postgres type `float4` to the
 GraphBLAS scalar type `GrB_INT32`.
 ``` postgres-console
 select cast(-1::float4 as scalar);
-    scalar    
---------------
- f4:-1.000000
+     scalar     
+----------------
+ fp32:-1.000000
 (1 row)
 
 select cast(0::float4 as scalar);
-   scalar    
--------------
- f4:0.000000
+    scalar     
+---------------
+ fp32:0.000000
 (1 row)
 
 select cast(1::float4 as scalar);
-   scalar    
--------------
- f4:1.000000
+    scalar     
+---------------
+ fp32:1.000000
 (1 row)
 
 ```
@@ -158,9 +158,9 @@ select cast((0::float4)::scalar as  float4);
 (1 row)
 
 select cast((1::float4)::scalar as scalar);
-   scalar    
--------------
- f4:1.000000
+    scalar     
+---------------
+ fp32:1.000000
 (1 row)
 
 ```

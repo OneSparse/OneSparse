@@ -5,7 +5,7 @@ Test various scalar math operations with native Postgres types
 select (1::bigint)::scalar + -1::bigint;
  ?column? 
 ----------
- i8:0
+ int64:0
 (1 row)
 
 select 1::bigint + (-1::bigint)::scalar;
@@ -17,7 +17,7 @@ select 1::bigint + (-1::bigint)::scalar;
 select (1::bigint)::scalar - 1::bigint;
  ?column? 
 ----------
- i8:0
+ int64:0
 (1 row)
 
 select 1::bigint - (1::bigint)::scalar;
@@ -29,7 +29,7 @@ select 1::bigint - (1::bigint)::scalar;
 select (1::bigint)::scalar * -1::bigint;
  ?column? 
 ----------
- i8:-1
+ int64:-1
 (1 row)
 
 select 1::bigint * (-1::bigint)::scalar;
@@ -41,7 +41,7 @@ select 1::bigint * (-1::bigint)::scalar;
 select (1::bigint)::scalar / 1::bigint;
  ?column? 
 ----------
- i8:1
+ int64:1
 (1 row)
 
 select 1::bigint / (1::bigint)::scalar;
@@ -54,30 +54,30 @@ select 1::bigint / (1::bigint)::scalar;
 Test construction of min, zero and max values:
 ``` postgres-console
 select '-1'::bigint::scalar;
- scalar 
---------
- i8:-1
+  scalar  
+----------
+ int64:-1
 (1 row)
 
 select '0'::bigint::scalar;
- scalar 
---------
- i8:0
+ scalar  
+---------
+ int64:0
 (1 row)
 
 select '1'::bigint::scalar;
- scalar 
---------
- i8:1
+ scalar  
+---------
+ int64:1
 (1 row)
 
 ```
 Test setting a scalar value from max to 2
 ``` postgres-console
 select set('1'::bigint::scalar, 2);
- set  
-------
- i8:2
+   set   
+---------
+ int64:2
 (1 row)
 
 ```
@@ -86,19 +86,19 @@ Test various casting functions used by the CREATE CAST machinery:
 select scalar_bigint((-1)::bigint);
  scalar_bigint 
 ---------------
- i8:-1
+ int64:-1
 (1 row)
 
 select scalar_bigint((0)::bigint);
  scalar_bigint 
 ---------------
- i8:0
+ int64:0
 (1 row)
 
 select scalar_bigint((1)::bigint);
  scalar_bigint 
 ---------------
- i8:1
+ int64:1
 (1 row)
 
 select bigint_scalar((-1)::bigint::scalar);
@@ -124,21 +124,21 @@ These casting functions cast the Postgres type `bigint` to the
 GraphBLAS scalar type `GrB_INT64`.
 ``` postgres-console
 select cast(-1::bigint as scalar);
- scalar 
---------
- i8:-1
+  scalar  
+----------
+ int64:-1
 (1 row)
 
 select cast(0::bigint as scalar);
- scalar 
---------
- i8:0
+ scalar  
+---------
+ int64:0
 (1 row)
 
 select cast(1::bigint as scalar);
- scalar 
---------
- i8:1
+ scalar  
+---------
+ int64:1
 (1 row)
 
 ```
@@ -158,9 +158,9 @@ select cast((0::bigint)::scalar as  bigint);
 (1 row)
 
 select cast((1::bigint)::scalar as scalar);
- scalar 
---------
- i8:1
+ scalar  
+---------
+ int64:1
 (1 row)
 
 ```
