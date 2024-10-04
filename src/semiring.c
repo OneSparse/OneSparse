@@ -120,7 +120,7 @@ context_callback_semiring_free(void* ptr)
 	os_Semiring *semiring = (os_Semiring *) ptr;
 	LOGF();
 
-	CHECK(GrB_Semiring_free(&semiring->semiring),
+	OS_CHECK(GrB_Semiring_free(&semiring->semiring),
 		  semiring->semiring,
 		  "Cannot GrB_Free Semiring");
 }

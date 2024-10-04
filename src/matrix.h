@@ -33,6 +33,11 @@ os_Matrix* DatumGetMatrix(Datum d);
 
 #define OS_DETOAST_MATRIX(_datum) (os_FlatMatrix*)PG_DETOAST_DATUM(datum)
 #define OS_GETARG_MATRIX(_arg_num)  DatumGetMatrix(PG_GETARG_DATUM(_arg_num))
+#define OS_GETARG_MATRIX_HANDLE(_arg_num)  DatumGetMatrix(PG_GETARG_DATUM(_arg_num))->matrix;
+#define OS_GETARG_MATRIX_OR_NULL(_nargs, _arg_num) \
+	_nargs > _arg_num ? PG_ARGISNULL(_arg_num) ? NULL : OS_GETARG_MATRIX(_arg_num) : NULL;
+#define OS_GETARG_MATRIX_HANDLE_OR_NULL(_nargs, _arg_num) \
+	_nargs > _arg_num ? PG_ARGISNULL(_arg_num) ? NULL : OS_GETARG_MATRIX(_arg_num)->matrix : NULL;
 #define OS_RETURN_MATRIX(_matrix) return EOHPGetRWDatum(&(_matrix)->hdr)
 #define OS_MATRIX_FLATSIZE() MAXALIGN(sizeof(os_FlatMatrix))
 

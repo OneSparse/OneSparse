@@ -26,6 +26,11 @@ os_IndexUnaryOp* DatumGetIndexUnaryOp(Datum d);
 
 #define OS_DETOAST_INDEXUNARYOP(_datum) (os_FlatIndexUnaryOp*)PG_DETOAST_DATUM(datum)
 #define OS_GETARG_INDEXUNARYOP(_arg_num)  DatumGetIndexUnaryOp(PG_GETARG_DATUM(_arg_num))
+#define OS_GETARG_INDEXUNARYOP_HANDLE(_arg_num)  DatumGetIndexUnaryOp(PG_GETARG_DATUM(_arg_num))->indexunaryop;
+#define OS_GETARG_INDEXUNARYOP_OR_NULL(_nargs, _arg_num) \
+	_nargs > _arg_num ? PG_ARGISNULL(_arg_num) ? NULL : OS_GETARG_INDEXUNARYOP(_arg_num) : NULL;
+#define OS_GETARG_INDEXUNARYOP_HANDLE_OR_NULL(_nargs, _arg_num) \
+	_nargs > _arg_num ? PG_ARGISNULL(_arg_num) ? NULL : OS_GETARG_INDEXUNARYOP(_arg_num)->indexunaryop : NULL;
 #define OS_RETURN_INDEXUNARYOP(_indexunaryop) return EOHPGetRWDatum(&(_indexunaryop)->hdr)
 #define OS_INDEXUNARYOP_FLATSIZE() MAXALIGN(sizeof(os_FlatIndexUnaryOp))
 

@@ -120,7 +120,7 @@ context_callback_binaryop_free(void* ptr)
 	os_BinaryOp *binaryop = (os_BinaryOp *) ptr;
 	LOGF();
 
-	CHECK(GrB_BinaryOp_free(&binaryop->binaryop),
+	OS_CHECK(GrB_BinaryOp_free(&binaryop->binaryop),
 		  binaryop->binaryop,
 		  "Cannot GrB_Free BinaryOp");
 }

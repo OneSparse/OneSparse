@@ -26,6 +26,11 @@ os_UnaryOp* DatumGetUnaryOp(Datum d);
 
 #define OS_DETOAST_UNARYOP(_datum) (os_FlatUnaryOp*)PG_DETOAST_DATUM(datum)
 #define OS_GETARG_UNARYOP(_arg_num)  DatumGetUnaryOp(PG_GETARG_DATUM(_arg_num))
+#define OS_GETARG_UNARYOP_HANDLE(_arg_num)  DatumGetUnaryOp(PG_GETARG_DATUM(_arg_num))->unaryop;
+#define OS_GETARG_UNARYOP_OR_NULL(_nargs, _arg_num) \
+	_nargs > _arg_num ? PG_ARGISNULL(_arg_num) ? NULL : OS_GETARG_UNARYOP(_arg_num) : NULL;
+#define OS_GETARG_UNARYOP_HANDLE_OR_NULL(_nargs, _arg_num) \
+	_nargs > _arg_num ? PG_ARGISNULL(_arg_num) ? NULL : OS_GETARG_UNARYOP(_arg_num)->unaryop : NULL;
 #define OS_RETURN_UNARYOP(_unaryop) return EOHPGetRWDatum(&(_unaryop)->hdr)
 #define OS_UNARYOP_FLATSIZE() MAXALIGN(sizeof(os_FlatUnaryOp))
 

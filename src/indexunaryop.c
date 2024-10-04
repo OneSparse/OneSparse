@@ -120,7 +120,7 @@ context_callback_indexunaryop_free(void* ptr)
 	os_IndexUnaryOp *indexunaryop = (os_IndexUnaryOp *) ptr;
 	LOGF();
 
-	CHECK(GrB_IndexUnaryOp_free(&indexunaryop->indexunaryop),
+	OS_CHECK(GrB_IndexUnaryOp_free(&indexunaryop->indexunaryop),
 		  indexunaryop->indexunaryop,
 		  "Cannot GrB_Free IndexUnaryOp");
 }

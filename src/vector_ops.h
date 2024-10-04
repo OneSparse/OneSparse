@@ -28,7 +28,7 @@ Datum FN(cast_vector)(PG_FUNCTION_ARGS)
 	ERRORNULL(0);
 
 	vector = OS_GETARG_VECTOR(0);
-	CHECK(GrB_Vector_extractElement(
+	OS_CHECK(GrB_Vector_extractElement(
 				&value,
 				vector->vector),
           vector->vector,

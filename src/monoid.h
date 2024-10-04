@@ -26,6 +26,11 @@ os_Monoid* DatumGetMonoid(Datum d);
 
 #define OS_DETOAST_MONOID(_datum) (os_FlatMonoid*)PG_DETOAST_DATUM(datum)
 #define OS_GETARG_MONOID(_arg_num)  DatumGetMonoid(PG_GETARG_DATUM(_arg_num))
+#define OS_GETARG_MONOID_HANDLE(_arg_num)  DatumGetMonoid(PG_GETARG_DATUM(_arg_num))->monoid;
+#define OS_GETARG_MONOID_OR_NULL(_nargs, _arg_num) \
+	_nargs > _arg_num ? PG_ARGISNULL(_arg_num) ? NULL : OS_GETARG_MONOID(_arg_num) : NULL;
+#define OS_GETARG_MONOID_HANDLE_OR_NULL(_nargs, _arg_num) \
+	_nargs > _arg_num ? PG_ARGISNULL(_arg_num) ? NULL : OS_GETARG_MONOID(_arg_num)->monoid : NULL;
 #define OS_RETURN_MONOID(_monoid) return EOHPGetRWDatum(&(_monoid)->hdr)
 #define OS_MONOID_FLATSIZE() MAXALIGN(sizeof(os_FlatMonoid))
 

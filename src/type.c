@@ -117,7 +117,7 @@ context_callback_type_free(void* ptr)
 	os_Type *type = (os_Type *) ptr;
 	LOGF();
 
-	CHECK(GrB_Type_free(&type->type),
+	OS_CHECK(GrB_Type_free(&type->type),
 		  type->type,
 		  "Cannot GrB_Free Type");
 }

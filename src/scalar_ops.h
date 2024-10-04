@@ -21,7 +21,7 @@ Datum FN(scalar)(PG_FUNCTION_ARGS)
 	if (!PG_ARGISNULL(0))
 	{
 		val = PG_GETARG(0);
-		CHECK(GrB_Scalar_setElement(
+		OS_CHECK(GrB_Scalar_setElement(
 					scalar->scalar,
 					val),
               scalar->scalar,
@@ -39,7 +39,7 @@ Datum FN(set_scalar)(PG_FUNCTION_ARGS)
 	ERRORNULL(1);
 	scalar = OS_GETARG_SCALAR(0);
     val = PG_GETARG(1);
-    CHECK(GrB_Scalar_setElement(scalar->scalar, val),
+    OS_CHECK(GrB_Scalar_setElement(scalar->scalar, val),
           scalar->scalar,
           "Error setting Scalar element");
 	OS_RETURN_SCALAR(scalar);
@@ -54,7 +54,7 @@ Datum FN(cast_scalar)(PG_FUNCTION_ARGS)
 	ERRORNULL(0);
 
 	scalar = OS_GETARG_SCALAR(0);
-	CHECK(GrB_Scalar_extractElement(
+	OS_CHECK(GrB_Scalar_extractElement(
 				&value,
 				scalar->scalar),
           scalar->scalar,
@@ -76,14 +76,14 @@ Datum FN(scalar_plus)(PG_FUNCTION_ARGS)
 	scalar = OS_GETARG_SCALAR(0);
 	right = PG_GETARG(1);
 
-	CHECK(GrB_Scalar_extractElement(
+	OS_CHECK(GrB_Scalar_extractElement(
 				&left,
 				scalar->scalar),
           scalar->scalar,
           "Error extracting Scalar element");
 
 	result = new_scalar(GB_TYPE, CurrentMemoryContext, NULL);
-	CHECK(GrB_Scalar_setElement(
+	OS_CHECK(GrB_Scalar_setElement(
 				result->scalar,
 				left + right),
           result->scalar,
@@ -104,7 +104,7 @@ Datum FN(plus_scalar)(PG_FUNCTION_ARGS)
 	left = PG_GETARG(0);
 	scalar = OS_GETARG_SCALAR(1);
 
-	CHECK(GrB_Scalar_extractElement(
+	OS_CHECK(GrB_Scalar_extractElement(
 				&right,
 				scalar->scalar),
           scalar->scalar,
@@ -125,14 +125,14 @@ Datum FN(scalar_minus)(PG_FUNCTION_ARGS)
 	scalar = OS_GETARG_SCALAR(0);
 	right = PG_GETARG(1);
 
-	CHECK(GrB_Scalar_extractElement(
+	OS_CHECK(GrB_Scalar_extractElement(
 				&left,
 				scalar->scalar),
           scalar->scalar,
           "Error extracting Scalar element");
 
 	result = new_scalar(GB_TYPE, CurrentMemoryContext, NULL);
-	CHECK(GrB_Scalar_setElement(
+	OS_CHECK(GrB_Scalar_setElement(
 				result->scalar,
 				left - right),
           result->scalar,
@@ -153,7 +153,7 @@ Datum FN(minus_scalar)(PG_FUNCTION_ARGS)
 	left = PG_GETARG(0);
 	scalar = OS_GETARG_SCALAR(1);
 
-	CHECK(GrB_Scalar_extractElement(
+	OS_CHECK(GrB_Scalar_extractElement(
 				&right,
 				scalar->scalar),
           scalar->scalar,
@@ -174,14 +174,14 @@ Datum FN(scalar_mult)(PG_FUNCTION_ARGS)
 	scalar = OS_GETARG_SCALAR(0);
 	right = PG_GETARG(1);
 
-	CHECK(GrB_Scalar_extractElement(
+	OS_CHECK(GrB_Scalar_extractElement(
 				&left,
 				scalar->scalar),
           scalar->scalar,
           "Error extracting Scalar element");
 
 	result = new_scalar(GB_TYPE, CurrentMemoryContext, NULL);
-	CHECK(GrB_Scalar_setElement(
+	OS_CHECK(GrB_Scalar_setElement(
 				result->scalar,
 				left * right),
           result->scalar,
@@ -202,7 +202,7 @@ Datum FN(mult_scalar)(PG_FUNCTION_ARGS)
 	left = PG_GETARG(0);
 	scalar = OS_GETARG_SCALAR(1);
 
-	CHECK(GrB_Scalar_extractElement(
+	OS_CHECK(GrB_Scalar_extractElement(
 				&right,
 				scalar->scalar),
           scalar->scalar,
@@ -223,14 +223,14 @@ Datum FN(scalar_div)(PG_FUNCTION_ARGS)
 	scalar = OS_GETARG_SCALAR(0);
 	right = PG_GETARG(1);
 
-	CHECK(GrB_Scalar_extractElement(
+	OS_CHECK(GrB_Scalar_extractElement(
 				&left,
 				scalar->scalar),
           scalar->scalar,
           "Error extracting Scalar element");
 
 	result = new_scalar(GB_TYPE, CurrentMemoryContext, NULL);
-	CHECK(GrB_Scalar_setElement(
+	OS_CHECK(GrB_Scalar_setElement(
 				result->scalar,
 				left / right),
           result->scalar,
@@ -251,7 +251,7 @@ Datum FN(div_scalar)(PG_FUNCTION_ARGS)
 	left = PG_GETARG(0);
 	scalar = OS_GETARG_SCALAR(1);
 
-	CHECK(GrB_Scalar_extractElement(
+	OS_CHECK(GrB_Scalar_extractElement(
 				&right,
 				scalar->scalar),
           scalar->scalar,

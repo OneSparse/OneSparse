@@ -120,7 +120,7 @@ context_callback_descriptor_free(void* ptr)
 	os_Descriptor *descriptor = (os_Descriptor *) ptr;
 	LOGF();
 
-	CHECK(GrB_Descriptor_free(&descriptor->descriptor),
+	OS_CHECK(GrB_Descriptor_free(&descriptor->descriptor),
 		  descriptor->descriptor,
 		  "Cannot GrB_Free Descriptor");
 }

@@ -109,6 +109,54 @@ const char* error_name(GrB_Info info)
 	return "Unknown Info enum value";
 }
 
+GrB_Type type_promote(GrB_Type left, GrB_Type right)
+{
+	int i, i1, i2;
+	GrB_Type types[] =
+		{GrB_INT16, GrB_UINT16,
+		 GrB_INT32, GrB_UINT32,
+		 GrB_INT64, GrB_UINT64,
+		 GrB_FP32, GrB_FP64};
+
+	i1 = i2 = -1;
+	for (i = 0; i < 8; i++)
+	{
+        if (left == types[i]) i1 = i;
+        if (right == types[i]) i2 = i;
+    }
+	if (i1 == -1 || i2 == -1)
+		elog(ERROR, "Cannot promote types");
+
+    return (i1 > i2) ? left : right;
+}
+
+GrB_Semiring default_semiring(GrB_Type type)
+{
+	if (type == GrB_INT64)
+		return GrB_PLUS_TIMES_SEMIRING_INT64;
+	else if (type == GrB_INT32)
+		return GrB_PLUS_TIMES_SEMIRING_INT32;
+	else if (type == GrB_INT16)
+		return GrB_PLUS_TIMES_SEMIRING_INT16;
+	else if (type == GrB_INT8)
+		return GrB_PLUS_TIMES_SEMIRING_INT8;
+	if (type == GrB_UINT64)
+		return GrB_PLUS_TIMES_SEMIRING_UINT64;
+	else if (type == GrB_UINT32)
+		return GrB_PLUS_TIMES_SEMIRING_UINT32;
+	else if (type == GrB_UINT16)
+		return GrB_PLUS_TIMES_SEMIRING_UINT16;
+	else if (type == GrB_UINT8)
+		return GrB_PLUS_TIMES_SEMIRING_UINT8;
+	if (type == GrB_FP64)
+		return GrB_PLUS_TIMES_SEMIRING_FP64;
+	else if (type == GrB_FP32)
+		return GrB_PLUS_TIMES_SEMIRING_FP32;
+	else if (type == GrB_BOOL)
+		return GxB_ANY_PAIR_BOOL;
+	return NULL;
+}
+
 void *calloc_function(size_t num, size_t size) {
   MemoryContext oldcxt;
   void *p;

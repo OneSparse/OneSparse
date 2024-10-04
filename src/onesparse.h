@@ -31,7 +31,7 @@
 	if (PG_ARGISNULL(_arg)) elog(ERROR, "Cannot pass NULL to %s", __func__); \
 	} while (0) \
 
-#define CHECK(method, obj, msg)                               \
+#define OS_CHECK(method, obj, msg)                               \
     do {                                                      \
         GrB_Info __info = method ;                            \
         if (! (__info == GrB_SUCCESS || __info == GrB_NO_VALUE))  \
@@ -43,6 +43,40 @@
             }                                                 \
     } while (0)                                               \
 
+#define OS_MTYPE(_mtype, _m)      \
+	OS_CHECK(GxB_Matrix_type(&_mtype, _m->matrix),\
+				  _m->matrix,\
+				  "Cannot get matrix type");
+
+#define OS_MNROWS(_nrows, _m) \
+	OS_CHECK(GrB_Matrix_nrows(&_nrows, _m->matrix), \
+		  _m->matrix, \
+		  "Error extracting matrix nrows.");
+
+#define OS_MNCOLS(_ncols, _m) \
+	OS_CHECK(GrB_Matrix_ncols(&_ncols, _m->matrix),\
+		  _m->matrix,\
+		  "Error extracting matrix ncols.");
+
+#define OS_MNVALS(_nvals, _m) \
+	OS_CHECK(GrB_Matrix_nvals(&_nvals, _m->matrix),\
+		  _m->matrix,\
+		  "Error extracting matrix nvals.");
+
+#define OS_VTYPE(_vtype, _v)      \
+	OS_CHECK(GxB_Vector_type(&_vtype, _v->vector),\
+				  _v->vector,\
+				  "Cannot get vector type");
+
+#define OS_VNVALS(_nvals, _vector)\
+	OS_CHECK(GrB_Vector_nvals(&_nvals, _vector->vector),\
+			 _vector->vector,\
+			 "Error extracting vector nvals.");
+
+#define OS_VSIZE(_size, _v)\
+	OS_CHECK(GrB_Vector_size(&_size, _v->vector), \
+		  _v->vector, \
+		  "Cannot get matrix type");
 
 #ifdef OS_DEBUG
 #define LOGF() elog(INFO, __func__)
@@ -53,6 +87,8 @@
 char* short_code(GrB_Type_Code code);
 GrB_Type short_type(char *name);
 const char* error_name(GrB_Info info);
+GrB_Type type_promote(GrB_Type left, GrB_Type right);
+GrB_Semiring default_semiring(GrB_Type type);
 
 void *malloc_function(size_t);
 void *calloc_function(size_t, size_t);

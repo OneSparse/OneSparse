@@ -120,7 +120,7 @@ context_callback_unaryop_free(void* ptr)
 	os_UnaryOp *unaryop = (os_UnaryOp *) ptr;
 	LOGF();
 
-	CHECK(GrB_UnaryOp_free(&unaryop->unaryop),
+	OS_CHECK(GrB_UnaryOp_free(&unaryop->unaryop),
 		  unaryop->unaryop,
 		  "Cannot GrB_Free UnaryOp");
 }

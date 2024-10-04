@@ -39,11 +39,11 @@ static Size scalar_get_flat_size(ExpandedObjectHeader *eohptr) {
 
 	data_size = 0;
 
-	CHECK(GrB_get(scalar->scalar, &type_code, GrB_EL_TYPE_CODE),
+	OS_CHECK(GrB_get(scalar->scalar, &type_code, GrB_EL_TYPE_CODE),
 		  scalar->scalar,
 		  "Cannot get Scalar Type code.");
 
-	CHECK(GrB_Scalar_nvals(&nvals, scalar->scalar),
+	OS_CHECK(GrB_Scalar_nvals(&nvals, scalar->scalar),
 		  scalar->scalar,
 		  "Error extracting scalar nvals.");
 
@@ -102,11 +102,11 @@ static void flatten_scalar(
 	Assert(allocated_size == scalar->flat_size);
 	memset(flat, 0, allocated_size);
 
-	CHECK(GrB_get(scalar->scalar, &flat->type_code, GrB_EL_TYPE_CODE),
+	OS_CHECK(GrB_get(scalar->scalar, &flat->type_code, GrB_EL_TYPE_CODE),
 		  scalar->scalar,
 		  "Cannot get Scalar Type code.");
 
-	CHECK(GrB_Scalar_nvals(&nvals, scalar->scalar),
+	OS_CHECK(GrB_Scalar_nvals(&nvals, scalar->scalar),
 		  scalar->scalar,
 		  "Error extracting scalar nvals.");
 
@@ -116,37 +116,37 @@ static void flatten_scalar(
 		data = OS_SCALAR_DATA(flat);
 		if (flat->type_code == GrB_INT64_CODE)
 		{
-			CHECK(GrB_Scalar_extractElement((int64_t*)data, scalar->scalar),
+			OS_CHECK(GrB_Scalar_extractElement((int64_t*)data, scalar->scalar),
 				  scalar->scalar,
 				  "Cannot extract Scalar element.");
 		}
 		else if (flat->type_code == GrB_INT32_CODE)
 		{
-			CHECK(GrB_Scalar_extractElement((int32_t*)data, scalar->scalar),
+			OS_CHECK(GrB_Scalar_extractElement((int32_t*)data, scalar->scalar),
 				  scalar->scalar,
 				  "Cannot extract Scalar element.");
 		}
 		else if (flat->type_code == GrB_INT16_CODE)
 		{
-			CHECK(GrB_Scalar_extractElement((int16_t*)data, scalar->scalar),
+			OS_CHECK(GrB_Scalar_extractElement((int16_t*)data, scalar->scalar),
 				  scalar->scalar,
 				  "Cannot extract Scalar element.");
 		}
 		else if (flat->type_code == GrB_FP64_CODE)
 		{
-			CHECK(GrB_Scalar_extractElement((double*)data, scalar->scalar),
+			OS_CHECK(GrB_Scalar_extractElement((double*)data, scalar->scalar),
 				  scalar->scalar,
 				  "Cannot extract Scalar element.");
 		}
 		else if (flat->type_code == GrB_FP32_CODE)
 		{
-			CHECK(GrB_Scalar_extractElement((float*)data, scalar->scalar),
+			OS_CHECK(GrB_Scalar_extractElement((float*)data, scalar->scalar),
 				  scalar->scalar,
 				  "Cannot extract Scalar element.");
 		}
 		else if (flat->type_code == GrB_BOOL_CODE)
 		{
-			CHECK(GrB_Scalar_extractElement((bool*)data, scalar->scalar),
+			OS_CHECK(GrB_Scalar_extractElement((bool*)data, scalar->scalar),
 				  scalar->scalar,
 				  "Cannot extract Scalar element.");
 		}
@@ -183,7 +183,7 @@ os_Scalar* new_scalar(
 
 	if (_scalar == NULL)
 	{
-		CHECK(GrB_Scalar_new(&scalar->scalar, type),
+		OS_CHECK(GrB_Scalar_new(&scalar->scalar, type),
 			  scalar->scalar,
 			  "Cannot create new Scalar.");
 	}
@@ -245,37 +245,37 @@ Datum expand_scalar(os_FlatScalar *flat, MemoryContext parentcontext)
 		data = OS_SCALAR_DATA(flat);
 		if (type == GrB_INT64)
 		{
-			CHECK(GrB_Scalar_setElement(scalar->scalar, *(int64_t*)data),
+			OS_CHECK(GrB_Scalar_setElement(scalar->scalar, *(int64_t*)data),
 				  scalar->scalar,
 				  "Cannot set scalar element in expand.");
 		}
 		else if (type == GrB_INT32)
 		{
-			CHECK(GrB_Scalar_setElement(scalar->scalar, *(int32_t*)data),
+			OS_CHECK(GrB_Scalar_setElement(scalar->scalar, *(int32_t*)data),
 				  scalar->scalar,
 				  "Cannot set scalar element in expand.");
 		}
 		else if (type == GrB_INT16)
 		{
-			CHECK(GrB_Scalar_setElement(scalar->scalar, *(int16_t*)data),
+			OS_CHECK(GrB_Scalar_setElement(scalar->scalar, *(int16_t*)data),
 				  scalar->scalar,
 				  "Cannot set scalar element in expand.");
 		}
 		else if (type == GrB_FP64)
 		{
-			CHECK(GrB_Scalar_setElement(scalar->scalar, *(double*)data),
+			OS_CHECK(GrB_Scalar_setElement(scalar->scalar, *(double*)data),
 				  scalar->scalar,
 				  "Cannot set scalar element in expand.");
 		}
 		else if (type == GrB_FP32)
 		{
-			CHECK(GrB_Scalar_setElement(scalar->scalar, *(float*)data),
+			OS_CHECK(GrB_Scalar_setElement(scalar->scalar, *(float*)data),
 				  scalar->scalar,
 				  "Cannot set scalar element in expand.");
 		}
 		else if (type == GrB_BOOL)
 		{
-			CHECK(GrB_Scalar_setElement(scalar->scalar, *(bool*)data),
+			OS_CHECK(GrB_Scalar_setElement(scalar->scalar, *(bool*)data),
 				  scalar->scalar,
 				  "Cannot set scalar element in expand.");
 		}
@@ -291,7 +291,7 @@ context_callback_scalar_free(void* ptr)
 	os_Scalar *scalar = (os_Scalar *) ptr;
 	LOGF();
 
-	CHECK(GrB_Scalar_free(&scalar->scalar),
+	OS_CHECK(GrB_Scalar_free(&scalar->scalar),
 		  scalar->scalar,
 		  "Cannot GrB_Free Scalar");
 }
@@ -338,7 +338,7 @@ Datum _scalar_in(char *input)
 		{
 			if (sscanf(str_val, fmt, &value) == 1)
 			{
-				CHECK(GrB_Scalar_setElement(scalar->scalar, value),
+				OS_CHECK(GrB_Scalar_setElement(scalar->scalar, value),
 					  scalar->scalar,
 					  "Cannot set scalar element in expand.");
 			}
@@ -356,7 +356,7 @@ Datum _scalar_in(char *input)
 		{
 			if (sscanf(str_val, fmt, &value) == 1)
 			{
-				CHECK(GrB_Scalar_setElement(scalar->scalar, value),
+				OS_CHECK(GrB_Scalar_setElement(scalar->scalar, value),
 					  scalar->scalar,
 					  "Cannot set scalar element in expand.");
 			}
@@ -374,7 +374,7 @@ Datum _scalar_in(char *input)
 		{
 			if (sscanf(str_val, fmt, &value) == 1)
 			{
-				CHECK(GrB_Scalar_setElement(scalar->scalar, value),
+				OS_CHECK(GrB_Scalar_setElement(scalar->scalar, value),
 					  scalar->scalar,
 					  "Cannot set scalar element in expand.");
 			}
@@ -392,7 +392,7 @@ Datum _scalar_in(char *input)
 		{
 			if (sscanf(str_val, fmt, &value) == 1)
 			{
-				CHECK(GrB_Scalar_setElement(scalar->scalar, value),
+				OS_CHECK(GrB_Scalar_setElement(scalar->scalar, value),
 					  scalar->scalar,
 					  "Cannot set scalar element in expand.");
 			}
@@ -410,7 +410,7 @@ Datum _scalar_in(char *input)
 		{
 			if (sscanf(str_val, fmt, &value) == 1)
 			{
-				CHECK(GrB_Scalar_setElement(scalar->scalar, value),
+				OS_CHECK(GrB_Scalar_setElement(scalar->scalar, value),
 					  scalar->scalar,
 					  "Cannot set scalar element in expand.");
 			}
@@ -435,7 +435,7 @@ Datum _scalar_in(char *input)
 					_value = false;
 				else
 					elog(ERROR, "Invalid value for bool %c", value);
-				CHECK(GrB_Scalar_setElement(scalar->scalar, _value),
+				OS_CHECK(GrB_Scalar_setElement(scalar->scalar, _value),
 					  scalar->scalar,
 					  "Cannot set scalar element in expand.");
 			}
@@ -466,11 +466,11 @@ Datum scalar_out(PG_FUNCTION_ARGS)
 	scalar = OS_GETARG_SCALAR(0);
 
 	nvals = 0;
-	CHECK(GrB_Scalar_nvals(&nvals, scalar->scalar),
+	OS_CHECK(GrB_Scalar_nvals(&nvals, scalar->scalar),
 		  scalar->scalar,
 		  "Error extracting scalar nvals.");
 
-	CHECK(GrB_get(scalar->scalar, &type_code, GrB_EL_TYPE_CODE),
+	OS_CHECK(GrB_get(scalar->scalar, &type_code, GrB_EL_TYPE_CODE),
 		  scalar->scalar,
 		  "Cannot get Scalar Type code.");
 
@@ -481,7 +481,7 @@ Datum scalar_out(PG_FUNCTION_ARGS)
 		if (type_code == GrB_INT64_CODE)
 		{
 			int64_t value;
-			CHECK(GrB_Scalar_extractElement(&value, scalar->scalar),
+			OS_CHECK(GrB_Scalar_extractElement(&value, scalar->scalar),
 				  scalar->scalar,
 				  "Error extracting scalar element.");
 			result = palloc(GxB_MAX_NAME_LEN);
@@ -490,7 +490,7 @@ Datum scalar_out(PG_FUNCTION_ARGS)
 		else if (type_code == GrB_INT32_CODE)
 		{
 			int32_t value;
-			CHECK(GrB_Scalar_extractElement(&value, scalar->scalar),
+			OS_CHECK(GrB_Scalar_extractElement(&value, scalar->scalar),
 				  scalar->scalar,
 				  "Error extracting scalar element.");
 			result = palloc(GxB_MAX_NAME_LEN);
@@ -499,7 +499,7 @@ Datum scalar_out(PG_FUNCTION_ARGS)
 		else if (type_code == GrB_INT16_CODE)
 		{
 			int16_t value;
-			CHECK(GrB_Scalar_extractElement(&value, scalar->scalar),
+			OS_CHECK(GrB_Scalar_extractElement(&value, scalar->scalar),
 				  scalar->scalar,
 				  "Error extracting scalar element.");
 			result = palloc(GxB_MAX_NAME_LEN);
@@ -508,7 +508,7 @@ Datum scalar_out(PG_FUNCTION_ARGS)
 		else if (type_code == GrB_FP64_CODE)
 		{
 			double value;
-			CHECK(GrB_Scalar_extractElement(&value, scalar->scalar),
+			OS_CHECK(GrB_Scalar_extractElement(&value, scalar->scalar),
 				  scalar->scalar,
 				  "Error extracting scalar element.");
 			result = palloc(GxB_MAX_NAME_LEN);
@@ -517,7 +517,7 @@ Datum scalar_out(PG_FUNCTION_ARGS)
 		else if (type_code == GrB_FP32_CODE)
 		{
 			float value;
-			CHECK(GrB_Scalar_extractElement(&value, scalar->scalar),
+			OS_CHECK(GrB_Scalar_extractElement(&value, scalar->scalar),
 				  scalar->scalar,
 				  "Error extracting scalar element.");
 			result = palloc(GxB_MAX_NAME_LEN);
@@ -526,7 +526,7 @@ Datum scalar_out(PG_FUNCTION_ARGS)
 		else if (type_code == GrB_BOOL_CODE)
 		{
 			bool value;
-			CHECK(GrB_Scalar_extractElement(&value, scalar->scalar),
+			OS_CHECK(GrB_Scalar_extractElement(&value, scalar->scalar),
 				   scalar->scalar,
 				   "Error extracting scalar element.");
 			result = palloc(GxB_MAX_NAME_LEN);
@@ -553,7 +553,7 @@ Datum scalar_nvals(PG_FUNCTION_ARGS)
 
 	scalar = OS_GETARG_SCALAR(0);
 
-	CHECK(GrB_Scalar_nvals(&result, scalar->scalar),
+	OS_CHECK(GrB_Scalar_nvals(&result, scalar->scalar),
 		  scalar->scalar,
 		  "Error extracting scalar nvals.");
 	PG_RETURN_INT16(result ? 1 : 0);
@@ -570,7 +570,7 @@ Datum scalar_wait(PG_FUNCTION_ARGS)
 	scalar = OS_GETARG_SCALAR(0);
 	waitmode = PG_GETARG_INT32(1);
 
-	CHECK(GrB_Scalar_wait(scalar->scalar, waitmode),
+	OS_CHECK(GrB_Scalar_wait(scalar->scalar, waitmode),
 		  scalar->scalar,
 		  "Error waiting for scalar.");
 	OS_RETURN_SCALAR(scalar);
@@ -586,13 +586,13 @@ Datum scalar_dup(PG_FUNCTION_ARGS)
 	ERRORNULL(0);
 
 	scalar = OS_GETARG_SCALAR(0);
-	CHECK(GxB_Scalar_type(&type, scalar->scalar),
+	OS_CHECK(GxB_Scalar_type(&type, scalar->scalar),
 		  scalar->scalar,
 		  "Cannot get scalar type");
 
 	result = new_scalar(type, CurrentMemoryContext, NULL);
 
-	CHECK(GrB_Scalar_dup(&result->scalar, scalar->scalar),
+	OS_CHECK(GrB_Scalar_dup(&result->scalar, scalar->scalar),
 		  scalar->scalar,
 		  "Error duping scalar.");
 	OS_RETURN_SCALAR(result);
@@ -607,7 +607,7 @@ Datum scalar_clear(PG_FUNCTION_ARGS)
 
 	scalar = OS_GETARG_SCALAR(0);
 
-	CHECK(GrB_Scalar_clear(scalar->scalar),
+	OS_CHECK(GrB_Scalar_clear(scalar->scalar),
 		  scalar->scalar,
 		  "Error clearing scalar.");
 	OS_RETURN_SCALAR(scalar);
@@ -648,17 +648,17 @@ Datum scalar_type(PG_FUNCTION_ARGS) {
 
 	A = OS_GETARG_SCALAR(0);
 
-	CHECK(GxB_Scalar_type(&type, A->scalar),
+	OS_CHECK(GxB_Scalar_type(&type, A->scalar),
 		  A->scalar,
 		  "Cannot get scalar type");
 
-	CHECK(GrB_get(type, &type_name_len, GrB_NAME),
+	OS_CHECK(GrB_get(type, &type_name_len, GrB_NAME),
 		  type,
 		  "Cannot get type name len.");
 
 	type_name = palloc(type_name_len);
 
-	CHECK(GrB_get(type, type_name, GrB_NAME),
+	OS_CHECK(GrB_get(type, type_name, GrB_NAME),
 		  type,
 		  "Cannot get type name.");
 

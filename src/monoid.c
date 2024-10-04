@@ -120,7 +120,7 @@ context_callback_monoid_free(void* ptr)
 	os_Monoid *monoid = (os_Monoid *) ptr;
 	LOGF();
 
-	CHECK(GrB_Monoid_free(&monoid->monoid),
+	OS_CHECK(GrB_Monoid_free(&monoid->monoid),
 		  monoid->monoid,
 		  "Cannot GrB_Free Monoid");
 }
