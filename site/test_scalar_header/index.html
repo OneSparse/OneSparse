@@ -112,37 +112,25 @@ is installed.
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="go">create extension if not exists onesparse;</span>
 </span></code></pre></div>
 Describe the scalar type
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kp">\dT+</span><span class="w"> </span><span class="ss">scalar</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="go">                                        List of data types</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="go">  Schema   |  Name  | Internal name | Size | Elements |  Owner   | Access privileges | Description </span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="go">-----------+--------+---------------+------+----------+----------+-------------------+-------------</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="go"> onesparse | scalar | scalar        | var  |          | postgres |                   | </span>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="go">(1 row)</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="w">                                        </span><span class="n">List</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="k">data</span><span class="w"> </span><span class="k">types</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="k">Schema</span><span class="w">   </span><span class="o">|</span><span class="w">  </span><span class="k">Name</span><span class="w">  </span><span class="o">|</span><span class="w"> </span><span class="nb">Internal</span><span class="w"> </span><span class="k">name</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Size</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Elements</span><span class="w"> </span><span class="o">|</span><span class="w">  </span><span class="k">Owner</span><span class="w">   </span><span class="o">|</span><span class="w"> </span><span class="k">Access</span><span class="w"> </span><span class="k">privileges</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Description</span><span class="w"> </span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="c1">-----------+--------+---------------+------+----------+----------+-------------------+-------------</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w"> </span><span class="n">onesparse</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">scalar</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">scalar</span><span class="w">        </span><span class="o">|</span><span class="w"> </span><span class="n">var</span><span class="w">  </span><span class="o">|</span><span class="w">          </span><span class="o">|</span><span class="w"> </span><span class="n">postgres</span><span class="w"> </span><span class="o">|</span><span class="w">                   </span><span class="o">|</span><span class="w"> </span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="p">(</span><span class="mf">1</span><span class="w"> </span><span class="k">row</span><span class="p">)</span>
 </span></code></pre></div>
 print a scalar
 <div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">select</span><span class="w"> </span><span class="n">print</span><span class="p">(</span><span class="s1">&#39;int32:42&#39;</span><span class="o">::</span><span class="n">scalar</span><span class="p">);</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="go">                    print                    </span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="go">---------------------------------------------</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="go">                                            +</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="go">   1x1 GraphBLAS int32_t scalar, full by col+</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="go">   A-&gt;scalar, 1 entry, memory: 240 bytes    +</span>
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="go">   iso value:   42                          +</span>
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="go">                                            +</span>
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="go">(1 row)</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="go"> print </span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="go">-------</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="go"> 42</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="go">(1 row)</span>
 </span></code></pre></div>
 print a scalar
 <div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">select</span><span class="w"> </span><span class="n">print</span><span class="p">(</span><span class="s1">&#39;int32:42&#39;</span><span class="o">::</span><span class="n">scalar</span><span class="p">,</span><span class="w"> </span><span class="mf">5</span><span class="p">);</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="go">                    print                    </span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="go">---------------------------------------------</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="go">                                            +</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="go">   1x1 GraphBLAS int32_t scalar, full by col+</span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="go">   A-&gt;scalar, 1 entry, memory: 240 bytes    +</span>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="go">   iso value:   42                          +</span>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="go">                                            +</span>
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="go">     (0,0)   42                             +</span>
-</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>
-</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="go">(1 row)</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="gs">ERROR:</span><span class="gr">  function print(scalar, integer) does not exist</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="gs">LINE 1:</span><span class="gr"> select print(&#39;int32:42&#39;::scalar, 5);</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="gr">               ^</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="gs">HINT:</span><span class="gr">  No function matches the given name and argument types. You might need to add explicit type casts.</span>
 </span></code></pre></div>
 Duplicate a scalar
 <div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">select</span><span class="w"> </span><span class="n">dup</span><span class="p">(</span><span class="s1">&#39;int32:42&#39;</span><span class="o">::</span><span class="n">scalar</span><span class="p">);</span>

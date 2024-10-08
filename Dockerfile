@@ -1,11 +1,12 @@
 FROM ubuntu:latest
 ARG UID    
 ARG GID
-
+   
 # install base dependences    
 RUN apt-get update && \
     apt-get install -y make cmake git curl build-essential m4 sudo gdbserver python3-pip \
-    gdb libreadline-dev bison flex zlib1g-dev libicu-dev icu-devtools tmux zile zip vim gawk wget python3-full python3-virtualenv
+    gdb libreadline-dev bison flex zlib1g-dev libicu-dev icu-devtools tmux zile zip vim \
+    gawk wget python3-full python3-virtualenv graphviz
 
 RUN deluser --remove-home ubuntu
 # add postgres user and make data dir        
@@ -57,7 +58,7 @@ RUN .virt/bin/python3 generate.py onesparse/onesparse--0.1.0.sql
 RUN make && sudo make install && make clean
 
 # start the database            
-RUN initdb -D "$PGDATA" -c shared_preload_libraries='onesparse' -c search_path='onesparse'
+RUN initdb -D "$PGDATA" -c shared_preload_libraries='onesparse' -c search_path='onesparse' --encoding UTF8
 EXPOSE 5432
 # wait forever
 

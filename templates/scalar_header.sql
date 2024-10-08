@@ -31,7 +31,7 @@ RETURNS int2
 AS '$libdir/onesparse', 'scalar_nvals'
 LANGUAGE C;
 
-CREATE FUNCTION print(a scalar, level int default 1)
+CREATE FUNCTION print(a scalar)
 RETURNS text
 AS '$libdir/onesparse', 'scalar_print'
 LANGUAGE C STABLE;

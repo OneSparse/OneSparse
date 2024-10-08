@@ -11,6 +11,8 @@ def doctestify(test):
     in_code_block = False
 
     for line in lines:
+        if line.startswith("\\") or "\gset" in line or "-- pragma:hide" in line:
+            continue
         if line.startswith("--") and not line.startswith("---"):
             if in_code_block:
                 markdown_lines.append("```")
@@ -20,6 +22,7 @@ def doctestify(test):
             if not in_code_block:
                 markdown_lines.append("``` postgres-console")
                 in_code_block = True
+            line = line.replace("\u21B5", " ")
             markdown_lines.append(line)
 
     if in_code_block:
@@ -33,7 +36,6 @@ class Template:
     name: str
     context: defaultdict[dict] = field(default_factory=lambda: defaultdict(dict))
     expected_dir: str = 'expected/'
-    source_dir: str = 'src/'
     version: str = VERSION
 
     def write(self, part):

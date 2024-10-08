@@ -3,50 +3,77 @@
 This documentation is also tests for the code, the examples below
 show the literal output of these statements from Postgres.
 
-Some setup to make sure warnings are shown, and that the extension
-is installed.
+Some setup to make sure the extension is installed.
 ``` postgres-console
-set client_min_messages = 'WARNING';
 create extension if not exists onesparse;
 ```
 The `matrix` data type wraps a SuiteSparse GrB_Matrix handle and
 delegates functions from SQL to the library through instances of
 this type.
 ``` postgres-console
-\dT+ matrix
-                                        List of data types
-  Schema   |  Name  | Internal name | Size | Elements |  Owner   | Access privileges | Description 
------------+--------+---------------+------+----------+----------+-------------------+-------------
- onesparse | matrix | matrix        | var  |          | postgres |                   | 
+                                         List of data types
+┌───────────┬────────┬───────────────┬──────┬──────────┬──────────┬───────────────────┬─────────────┐
+│  Schema   │  Name  │ Internal name │ Size │ Elements │  Owner   │ Access privileges │ Description │
+├───────────┼────────┼───────────────┼──────┼──────────┼──────────┼───────────────────┼─────────────┤
+│ onesparse │ matrix │ matrix        │ var  │          │ postgres │                   │             │
+└───────────┴────────┴───────────────┴──────┴──────────┴──────────┴───────────────────┴─────────────┘
 (1 row)
 
 ```
 An empty matrix can be constructed many ways, but one of the
 simplest is casting a type code to the matrix type.  In this case
-`int32` means GrB_INT32.  The type codes are intentionally compressed
-to be as short as possible for smaller pg_dumps.
+`int32` means the SuiteSparse type `GrB_INT32`.
 ``` postgres-console
 select 'int32'::matrix;
- matrix  
----------
- int32[]
+┌────────┐
+│ matrix │
+├────────┤
+│ int32  │
+└────────┘
 (1 row)
 
 ```
-A matrix can have a fixed number of rows and/or columns.  The
-default possible number of rows and columns is defined by the
-SuiteSparse library to be `GrB_INDEX_MAX` which is `2^60` power
-indexes.  For the purposes of this documentation this will be
-referred to as `INDEX_MAX` and matrices and vector dimensions that
-are `INDEX_MAX` in size are reffered to as "unbounded".  For
-matrices with known dimensions, the dimensions can be provided in
-parentesis after the type code.  Here a 10 row by 10 column matrix
-is created:
+Another way to create an empty matrix is to use the `matrix()`
+constructor function:
+``` postgres-console
+select matrix('int32');
+┌────────┐
+│ matrix │
+├────────┤
+│ int32  │
+└────────┘
+(1 row)
+
+```
+The above matrices are "unbounced", they do not have a fixed number
+of rows and/or columns.  The default possible number of rows and
+columns is defined by the SuiteSparse library to be `GrB_INDEX_MAX`
+which is `2^60` power indexes.  For the purposes of this
+documentation this will be referred to as `INDEX_MAX` and matrices
+and vector dimensions that are `INDEX_MAX` in size are reffered to
+as "unbounded".
+For matrices with known dimensions, the dimensions can be provided
+in parentesis after the type code.  Here a 10 row by 10 column
+matrix is created:
 ``` postgres-console
 select 'int32(10:10)'::matrix;
- matrix  
----------
- int32[]
+┌──────────────┐
+│    matrix    │
+├──────────────┤
+│ int32(10:10) │
+└──────────────┘
+(1 row)
+
+```
+Another way to make a new matrix is with the `matrix` constructor
+function.
+``` postgres-console
+select matrix('int32', 8, 8);
+┌────────────┐
+│   matrix   │
+├────────────┤
+│ int32(8:8) │
+└────────────┘
 (1 row)
 
 ```
@@ -54,18 +81,22 @@ Either dimension can be ommited, this creates a 10 row by unbounded
 column matrix.
 ``` postgres-console
 select 'int32(10:)'::matrix;
- matrix  
----------
- int32[]
+┌────────────┐
+│   matrix   │
+├────────────┤
+│ int32(10:) │
+└────────────┘
 (1 row)
 
 ```
 This creates a unbounded row by 10 column matrix.
 ``` postgres-console
-select 'int32(10:)'::matrix;
- matrix  
----------
- int32[]
+select 'int32(:10)'::matrix;
+┌────────────┐
+│   matrix   │
+├────────────┤
+│ int32(:10) │
+└────────────┘
 (1 row)
 
 ```
@@ -82,394 +113,1018 @@ operators.  Here we see three very common operations, returning the
 number of rows, the number of columns, and the number of store
 values.
 ``` postgres-console
-select nrows('int32'::matrix);
-        nrows        
----------------------
- 1152921504606846976
-(1 row)
-
-select ncols('int32'::matrix);
-        ncols        
----------------------
- 1152921504606846976
-(1 row)
-
-select nvals('int32'::matrix);
- nvals 
--------
-     0
+select nrows('int32'::matrix),
+       ncols('int32'::matrix),
+       nvals('int32'::matrix);
+┌─────────────────────┬─────────────────────┬───────┐
+│        nrows        │        ncols        │ nvals │
+├─────────────────────┼─────────────────────┼───────┤
+│ 1152921504606846976 │ 1152921504606846976 │     0 │
+└─────────────────────┴─────────────────────┴───────┘
 (1 row)
 
 ```
 Above you can see the matrix has unbounded rows and columns (the
 very large number is the number of *possible* entries).  And the
-number of stored values is zero.
+number of stored values is zero.  These matrices are empty, they
+contain no elements.
 Values can be specified after the `type(dimension)` prefix as an
 array of elements between square brackets.  Empty brackets imply no
-elements:
+elements, so empty square brackets are the same as no square
+brackets as above:
 ``` postgres-console
-select nrows('int32[]'::matrix);
-        nrows        
----------------------
- 1152921504606846976
-(1 row)
-
-select ncols('int32[]'::matrix);
-        ncols        
----------------------
- 1152921504606846976
-(1 row)
-
-select nvals('int32[]'::matrix);
- nvals 
--------
-     0
+select nrows('int32[]'::matrix),
+       ncols('int32[]'::matrix),
+       nvals('int32[]'::matrix);
+┌─────────────────────┬─────────────────────┬───────┐
+│        nrows        │        ncols        │ nvals │
+├─────────────────────┼─────────────────────┼───────┤
+│ 1152921504606846976 │ 1152921504606846976 │     0 │
+└─────────────────────┴─────────────────────┴───────┘
 (1 row)
 
 ```
 Elements are specified between square brackets are coordinates of
 'row_id:column_id:value' separated by spaces:
 ``` postgres-console
-select 'int32[1:1:1 2:2:2 3:3:3]'::matrix;
-          matrix          
---------------------------
- int32[1:1:1 2:2:2 3:3:3]
-(1 row)
-
-select 'int32(10:)[1:1:1 2:2:2 3:3:3]'::matrix;
-          matrix          
---------------------------
- int32[1:1:1 2:2:2 3:3:3]
-(1 row)
-
-select 'int32(:10)[1:1:1 2:2:2 3:3:3]'::matrix;
-          matrix          
---------------------------
- int32[1:1:1 2:2:2 3:3:3]
+select 'int32[1:2:1 2:3:2 3:1:3]'::matrix,
+       'int32(10:)[1:2:1 2:3:2 3:1:3]'::matrix,
+       'int32(:10)[1:2:1 2:3:2 3:3:1]'::matrix;
+┌──────────────────────────┬───────────────────────────────┬───────────────────────────────┐
+│          matrix          │            matrix             │            matrix             │
+├──────────────────────────┼───────────────────────────────┼───────────────────────────────┤
+│ int32[1:2:1 2:3:2 3:1:3] │ int32(10:)[1:2:1 2:3:2 3:1:3] │ int32(:10)[1:2:1 2:3:2 3:3:1] │
+└──────────────────────────┴───────────────────────────────┴───────────────────────────────┘
 (1 row)
 
 ```
+Seeing matrices in this format is pretty hard to understand, there
+are two helpful functions for visualizing matrices, the first is
+`print` which prints the matrix in
 Below you see the number of rows, columns and spaces for a variety
 of combinations:
 ``` postgres-console
+select print('int32(8:8)[1:2:1 2:3:2 3:1:3]'::matrix) as matrix;
+┌────────────────────────────────┐
+│             matrix             │
+├────────────────────────────────┤
+│      0  1  2  3  4  5  6  7    │
+│    ────────────────────────    │
+│  0│                            │
+│  1│        1                   │
+│  2│           2                │
+│  3│     3                      │
+│  4│                            │
+│  5│                            │
+│  6│                            │
+│  7│                            │
+│                                │
+└────────────────────────────────┘
+(1 row)
+
+```
+Above you can see the sparse matrix format of an 8x8 matrix.  It's
+only possible to print matrices that have fixed dimensions of a
+reasonable size.
+Another useful function is `dot_matrix()` This turns a matrix into the
+Graphviz DOT language that is used to draw graph diagrams:
+``` postgres-console
+select dot_matrix('int32(8:8)[1:2:1 2:3:2 3:1:3]'::matrix) as dot_matrix;
+┌────────────────────┐
+│     dot_matrix     │
+├────────────────────┤
+│ digraph {          │
+│ 1 -> 2 [label="1"] │
+│ 2 -> 3 [label="2"] │
+│ 3 -> 1 [label="3"] │
+│ }                  │
+│                    │
+└────────────────────┘
+(1 row)
+
+```
+Will generate the following diagram:
+
+
+
+<div>
+<!-- Title: %3 Pages: 1 -->
+<svg width="109pt" height="218pt"
+ viewBox="0.00 0.00 109.00 218.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 214)">
+<title>%3</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-214 105,-214 105,4 -4,4"/>
+<!-- 1 -->
+<g id="node1" class="node">
+<title>1</title>
+<ellipse fill="none" stroke="black" cx="74" cy="-192" rx="27" ry="18"/>
+<text text-anchor="middle" x="74" y="-188.3" font-family="Times,serif" font-size="14.00">1</text>
+</g>
+<!-- 2 -->
+<g id="node2" class="node">
+<title>2</title>
+<ellipse fill="none" stroke="black" cx="27" cy="-105" rx="27" ry="18"/>
+<text text-anchor="middle" x="27" y="-101.3" font-family="Times,serif" font-size="14.00">2</text>
+</g>
+<!-- 1&#45;&gt;2 -->
+<g id="edge1" class="edge">
+<title>1&#45;&gt;2</title>
+<path fill="none" stroke="black" d="M64.94,-174.61C58.13,-162.3 48.69,-145.23 40.93,-131.19"/>
+<polygon fill="black" stroke="black" points="43.78,-129.11 35.87,-122.05 37.65,-132.5 43.78,-129.11"/>
+<text text-anchor="middle" x="59" y="-144.8" font-family="Times,serif" font-size="14.00">1</text>
+</g>
+<!-- 3 -->
+<g id="node3" class="node">
+<title>3</title>
+<ellipse fill="none" stroke="black" cx="58" cy="-18" rx="27" ry="18"/>
+<text text-anchor="middle" x="58" y="-14.3" font-family="Times,serif" font-size="14.00">3</text>
+</g>
+<!-- 2&#45;&gt;3 -->
+<g id="edge2" class="edge">
+<title>2&#45;&gt;3</title>
+<path fill="none" stroke="black" d="M33.12,-87.21C37.5,-75.22 43.47,-58.85 48.46,-45.16"/>
+<polygon fill="black" stroke="black" points="51.75,-46.35 51.89,-35.76 45.17,-43.95 51.75,-46.35"/>
+<text text-anchor="middle" x="50" y="-57.8" font-family="Times,serif" font-size="14.00">2</text>
+</g>
+<!-- 3&#45;&gt;1 -->
+<g id="edge3" class="edge">
+<title>3&#45;&gt;1</title>
+<path fill="none" stroke="black" d="M59.59,-36.05C62.36,-65.88 68.12,-127.76 71.46,-163.64"/>
+<polygon fill="black" stroke="black" points="68,-164.25 72.41,-173.88 74.97,-163.6 68,-164.25"/>
+<text text-anchor="middle" x="72" y="-101.3" font-family="Times,serif" font-size="14.00">3</text>
+</g>
+</g>
+</svg>
+</div>
+Another useful function is `random_matrix()`.  This will generate a
+random matrix provided the type, number of rows, number of columns,
+and the number of (approximate) values and an optional random seed
+for deterministic generation:
+
+``` postgres-console
+select print(random_matrix(8, 8, 16, seed=>0.42, max=>42)) as random_matrix;
+┌────────────────────────────────┐
+│         random_matrix          │
+├────────────────────────────────┤
+│      0  1  2  3  4  5  6  7    │
+│    ────────────────────────    │
+│  0│           6 31             │
+│  1│             12       26    │
+│  2│                            │
+│  3│    40          11    15    │
+│  4│        7 20 12    22       │
+│  5│  1                 1       │
+│  6│          17                │
+│  7│       20                   │
+│                                │
+└────────────────────────────────┘
+(1 row)
+
+```
+
+
+<div>
+<!-- Title: %3 Pages: 1 -->
+<svg width="281pt" height="392pt"
+ viewBox="0.00 0.00 281.00 392.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 388)">
+<title>%3</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-388 277,-388 277,4 -4,4"/>
+<!-- 0 -->
+<g id="node1" class="node">
+<title>0</title>
+<ellipse fill="none" stroke="black" cx="144" cy="-366" rx="27" ry="18"/>
+<text text-anchor="middle" x="144" y="-362.3" font-family="Times,serif" font-size="14.00">0</text>
+</g>
+<!-- 3 -->
+<g id="node2" class="node">
+<title>3</title>
+<ellipse fill="none" stroke="black" cx="144" cy="-279" rx="27" ry="18"/>
+<text text-anchor="middle" x="144" y="-275.3" font-family="Times,serif" font-size="14.00">3</text>
+</g>
+<!-- 0&#45;&gt;3 -->
+<g id="edge1" class="edge">
+<title>0&#45;&gt;3</title>
+<path fill="none" stroke="black" d="M144,-347.8C144,-336.16 144,-320.55 144,-307.24"/>
+<polygon fill="black" stroke="black" points="147.5,-307.18 144,-297.18 140.5,-307.18 147.5,-307.18"/>
+<text text-anchor="middle" x="149" y="-318.8" font-family="Times,serif" font-size="14.00">6</text>
+</g>
+<!-- 4 -->
+<g id="node3" class="node">
+<title>4</title>
+<ellipse fill="none" stroke="black" cx="99" cy="-105" rx="27" ry="18"/>
+<text text-anchor="middle" x="99" y="-101.3" font-family="Times,serif" font-size="14.00">4</text>
+</g>
+<!-- 0&#45;&gt;4 -->
+<g id="edge2" class="edge">
+<title>0&#45;&gt;4</title>
+<path fill="none" stroke="black" d="M126.96,-351.94C97.02,-327.8 36.01,-272.87 13,-210 7.5,-194.97 6.77,-188.74 13,-174 23.29,-149.68 47.69,-131.74 67.88,-120.42"/>
+<polygon fill="black" stroke="black" points="69.61,-123.47 76.79,-115.68 66.32,-117.28 69.61,-123.47"/>
+<text text-anchor="middle" x="38.5" y="-231.8" font-family="Times,serif" font-size="14.00">31</text>
+</g>
+<!-- 1 -->
+<g id="node4" class="node">
+<title>1</title>
+<ellipse fill="none" stroke="black" cx="81" cy="-192" rx="27" ry="18"/>
+<text text-anchor="middle" x="81" y="-188.3" font-family="Times,serif" font-size="14.00">1</text>
+</g>
+<!-- 3&#45;&gt;1 -->
+<g id="edge5" class="edge">
+<title>3&#45;&gt;1</title>
+<path fill="none" stroke="black" d="M129.12,-263.64C123.17,-257.54 116.45,-250.19 111,-243 105.14,-235.26 99.46,-226.3 94.65,-218.13"/>
+<polygon fill="black" stroke="black" points="97.62,-216.28 89.62,-209.33 91.54,-219.75 97.62,-216.28"/>
+<text text-anchor="middle" x="120.5" y="-231.8" font-family="Times,serif" font-size="14.00">40</text>
+</g>
+<!-- 7 -->
+<g id="node5" class="node">
+<title>7</title>
+<ellipse fill="none" stroke="black" cx="27" cy="-105" rx="27" ry="18"/>
+<text text-anchor="middle" x="27" y="-101.3" font-family="Times,serif" font-size="14.00">7</text>
+</g>
+<!-- 3&#45;&gt;7 -->
+<g id="edge7" class="edge">
+<title>3&#45;&gt;7</title>
+<path fill="none" stroke="black" d="M119.05,-271.69C90.75,-263.04 45.93,-244.49 26,-210 12.43,-186.52 15.13,-154.79 19.68,-132.57"/>
+<polygon fill="black" stroke="black" points="23.09,-133.33 21.92,-122.8 16.27,-131.77 23.09,-133.33"/>
+<text text-anchor="middle" x="35.5" y="-188.3" font-family="Times,serif" font-size="14.00">15</text>
+</g>
+<!-- 5 -->
+<g id="node6" class="node">
+<title>5</title>
+<ellipse fill="none" stroke="black" cx="246" cy="-192" rx="27" ry="18"/>
+<text text-anchor="middle" x="246" y="-188.3" font-family="Times,serif" font-size="14.00">5</text>
+</g>
+<!-- 3&#45;&gt;5 -->
+<g id="edge6" class="edge">
+<title>3&#45;&gt;5</title>
+<path fill="none" stroke="black" d="M164.88,-267.44C176.4,-261.13 190.63,-252.5 202,-243 211.38,-235.17 220.51,-225.28 228,-216.37"/>
+<polygon fill="black" stroke="black" points="230.77,-218.52 234.38,-208.55 225.34,-214.09 230.77,-218.52"/>
+<text text-anchor="middle" x="225.5" y="-231.8" font-family="Times,serif" font-size="14.00">11</text>
+</g>
+<!-- 4&#45;&gt;3 -->
+<g id="edge9" class="edge">
+<title>4&#45;&gt;3</title>
+<path fill="none" stroke="black" d="M106.83,-122.49C109.36,-128.26 112.02,-134.83 114,-141 125.94,-178.25 134.71,-222.71 139.59,-250.65"/>
+<polygon fill="black" stroke="black" points="136.19,-251.58 141.32,-260.85 143.09,-250.41 136.19,-251.58"/>
+<text text-anchor="middle" x="140.5" y="-188.3" font-family="Times,serif" font-size="14.00">20</text>
+</g>
+<!-- 4&#45;&gt;4 -->
+<g id="edge10" class="edge">
+<title>4&#45;&gt;4</title>
+<path fill="none" stroke="black" d="M123.53,-112.75C134.51,-113.49 144,-110.91 144,-105 144,-101.03 139.72,-98.56 133.57,-97.59"/>
+<polygon fill="black" stroke="black" points="133.65,-94.09 123.53,-97.25 133.41,-101.09 133.65,-94.09"/>
+<text text-anchor="middle" x="153.5" y="-101.3" font-family="Times,serif" font-size="14.00">12</text>
+</g>
+<!-- 2 -->
+<g id="node7" class="node">
+<title>2</title>
+<ellipse fill="none" stroke="black" cx="63" cy="-18" rx="27" ry="18"/>
+<text text-anchor="middle" x="63" y="-14.3" font-family="Times,serif" font-size="14.00">2</text>
+</g>
+<!-- 4&#45;&gt;2 -->
+<g id="edge8" class="edge">
+<title>4&#45;&gt;2</title>
+<path fill="none" stroke="black" d="M91.89,-87.21C86.78,-75.14 79.79,-58.64 73.97,-44.89"/>
+<polygon fill="black" stroke="black" points="77.1,-43.31 69.98,-35.47 70.65,-46.04 77.1,-43.31"/>
+<text text-anchor="middle" x="88" y="-57.8" font-family="Times,serif" font-size="14.00">7</text>
+</g>
+<!-- 6 -->
+<g id="node8" class="node">
+<title>6</title>
+<ellipse fill="none" stroke="black" cx="191" cy="-18" rx="27" ry="18"/>
+<text text-anchor="middle" x="191" y="-14.3" font-family="Times,serif" font-size="14.00">6</text>
+</g>
+<!-- 4&#45;&gt;6 -->
+<g id="edge11" class="edge">
+<title>4&#45;&gt;6</title>
+<path fill="none" stroke="black" d="M114.19,-89.96C128.84,-76.43 151.2,-55.77 168.03,-40.22"/>
+<polygon fill="black" stroke="black" points="170.82,-42.41 175.79,-33.06 166.07,-37.27 170.82,-42.41"/>
+<text text-anchor="middle" x="159.5" y="-57.8" font-family="Times,serif" font-size="14.00">22</text>
+</g>
+<!-- 1&#45;&gt;4 -->
+<g id="edge3" class="edge">
+<title>1&#45;&gt;4</title>
+<path fill="none" stroke="black" d="M84.64,-173.8C87.12,-162.09 90.46,-146.34 93.29,-132.97"/>
+<polygon fill="black" stroke="black" points="96.78,-133.39 95.42,-122.89 89.93,-131.94 96.78,-133.39"/>
+<text text-anchor="middle" x="100.5" y="-144.8" font-family="Times,serif" font-size="14.00">12</text>
+</g>
+<!-- 1&#45;&gt;7 -->
+<g id="edge4" class="edge">
+<title>1&#45;&gt;7</title>
+<path fill="none" stroke="black" d="M70.84,-175.01C62.92,-162.55 51.78,-145.01 42.72,-130.74"/>
+<polygon fill="black" stroke="black" points="45.43,-128.48 37.11,-121.92 39.52,-132.23 45.43,-128.48"/>
+<text text-anchor="middle" x="66.5" y="-144.8" font-family="Times,serif" font-size="14.00">26</text>
+</g>
+<!-- 7&#45;&gt;2 -->
+<g id="edge15" class="edge">
+<title>7&#45;&gt;2</title>
+<path fill="none" stroke="black" d="M34.11,-87.21C39.22,-75.14 46.21,-58.64 52.03,-44.89"/>
+<polygon fill="black" stroke="black" points="55.35,-46.04 56.02,-35.47 48.9,-43.31 55.35,-46.04"/>
+<text text-anchor="middle" x="57.5" y="-57.8" font-family="Times,serif" font-size="14.00">20</text>
+</g>
+<!-- 5&#45;&gt;0 -->
+<g id="edge12" class="edge">
+<title>5&#45;&gt;0</title>
+<path fill="none" stroke="black" d="M245.78,-210.25C245.12,-220.17 243.37,-232.67 239,-243 222.08,-282.98 188.63,-321.13 166.28,-343.81"/>
+<polygon fill="black" stroke="black" points="163.79,-341.36 159.17,-350.89 168.72,-346.32 163.79,-341.36"/>
+<text text-anchor="middle" x="234" y="-275.3" font-family="Times,serif" font-size="14.00">1</text>
+</g>
+<!-- 5&#45;&gt;6 -->
+<g id="edge13" class="edge">
+<title>5&#45;&gt;6</title>
+<path fill="none" stroke="black" d="M241.43,-173.97C234.33,-147.91 219.88,-96.66 205,-54 203.98,-51.07 202.85,-48.02 201.7,-45"/>
+<polygon fill="black" stroke="black" points="204.92,-43.64 198,-35.62 198.41,-46.21 204.92,-43.64"/>
+<text text-anchor="middle" x="231" y="-101.3" font-family="Times,serif" font-size="14.00">1</text>
+</g>
+<!-- 6&#45;&gt;3 -->
+<g id="edge14" class="edge">
+<title>6&#45;&gt;3</title>
+<path fill="none" stroke="black" d="M187.9,-36.06C179.92,-80.03 158.6,-197.54 148.91,-250.93"/>
+<polygon fill="black" stroke="black" points="145.43,-250.54 147.08,-261.01 152.31,-251.79 145.43,-250.54"/>
+<text text-anchor="middle" x="177.5" y="-144.8" font-family="Times,serif" font-size="14.00">17</text>
+</g>
+</g>
+</svg>
+</div>
+# Test Fixtures
+
+Let's get a test fixture table with a couple matrix and vector
+columns so that we can do some operations without tediously
+repeating the literal syntax.  These matrices and vectors are
+construction with `random_matrix()` show above, and the
+`random_vector()` function:
+``` postgres-console
+select print(a) as a, print(b) as b, print(u) as u, print(v) as v from test_fixture;
+┌───────────────────────┬───────────────────────┬───────────┬───────────┐
+│           a           │           b           │     u     │     v     │
+├───────────────────────┼───────────────────────┼───────────┼───────────┤
+│      0  1  2  3  4    │      0  1  2  3  4    │           │           │
+│    ───────────────    │    ───────────────    │    ───    │    ───    │
+│  0│                   │  0│                   │  0│  5    │  0│  4    │
+│  1│           8  3    │  1│                   │  1│       │  1│  1    │
+│  2│     2     5       │  2│  5     8     4    │  2│       │  2│       │
+│  3│              1    │  3│     4  7     5    │  3│       │  3│  4    │
+│  4│        7     5    │  4│           8       │  4│  0    │  4│       │
+│                       │                       │           │           │
+│      0  1  2  3  4    │      0  1  2  3  4    │           │           │
+│    ───────────────    │    ───────────────    │    ───    │    ───    │
+│  0│     0  7  4       │  0│        8          │  0│       │  0│       │
+│  1│     5             │  1│     3             │  1│  0    │  1│       │
+│  2│  0  4 10  5       │  2│  4           1    │  2│  3    │  2│  4    │
+│  3│  2           1    │  3│     1     5 10    │  3│  2    │  3│       │
+│  4│     9  5          │  4│     1  9  1       │  4│  5    │  4│  3    │
+│                       │                       │           │           │
+│      0  1  2  3  4    │      0  1  2  3  4    │           │           │
+│    ───────────────    │    ───────────────    │    ───    │    ───    │
+│  0│        2          │  0│ 10  6  8  6       │  0│       │  0│  5    │
+│  1│  2                │  1│        0  8       │  1│       │  1│       │
+│  2│                   │  2│                   │  2│  1    │  2│  3    │
+│  3│           5  1    │  3│                   │  3│       │  3│  4    │
+│  4│        9          │  4│  7  3             │  4│       │  4│  3    │
+│                       │                       │           │           │
+└───────────────────────┴───────────────────────┴───────────┴───────────┘
+(3 rows)
+
+select print(a) as a, binaryop, print(b) as b, print(eadd(A, B, binaryop)) as union from test_fixture;
+┌───────────────────────┬─────────────┬───────────────────────┬───────────────────────┐
+│           a           │  binaryop   │           b           │         union         │
+├───────────────────────┼─────────────┼───────────────────────┼───────────────────────┤
+│      0  1  2  3  4    │ times_int16 │      0  1  2  3  4    │      0  1  2  3  4    │
+│    ───────────────    │             │    ───────────────    │    ───────────────    │
+│  0│                   │             │  0│                   │  0│                   │
+│  1│           8  3    │             │  1│                   │  1│           8  3    │
+│  2│     2     5       │             │  2│  5     8     4    │  2│  5  2  8  5  4    │
+│  3│              1    │             │  3│     4  7     5    │  3│     4  7     5    │
+│  4│        7     5    │             │  4│           8       │  4│        7  8  5    │
+│                       │             │                       │                       │
+│      0  1  2  3  4    │ times_int32 │      0  1  2  3  4    │      0  1  2  3  4    │
+│    ───────────────    │             │    ───────────────    │    ───────────────    │
+│  0│     0  7  4       │             │  0│        8          │  0│     0 56  4       │
+│  1│     5             │             │  1│     3             │  1│    15             │
+│  2│  0  4 10  5       │             │  2│  4           1    │  2│  0  4 10  5  1    │
+│  3│  2           1    │             │  3│     1     5 10    │  3│  2  1     5 10    │
+│  4│     9  5          │             │  4│     1  9  1       │  4│     9 45  1       │
+│                       │             │                       │                       │
+│      0  1  2  3  4    │ times_int64 │      0  1  2  3  4    │      0  1  2  3  4    │
+│    ───────────────    │             │    ───────────────    │    ───────────────    │
+│  0│        2          │             │  0│ 10  6  8  6       │  0│ 10  6 16  6       │
+│  1│  2                │             │  1│        0  8       │  1│  2     0  8       │
+│  2│                   │             │  2│                   │  2│                   │
+│  3│           5  1    │             │  3│                   │  3│           5  1    │
+│  4│        9          │             │  4│  7  3             │  4│  7  3  9          │
+│                       │             │                       │                       │
+└───────────────────────┴─────────────┴───────────────────────┴───────────────────────┘
+(3 rows)
+
+select print(a) as a, binaryop, print(b) as b, print(emult(A, B, binaryop)) as intersect from test_fixture;
+┌───────────────────────┬─────────────┬───────────────────────┬───────────────────────┐
+│           a           │  binaryop   │           b           │       intersect       │
+├───────────────────────┼─────────────┼───────────────────────┼───────────────────────┤
+│      0  1  2  3  4    │ times_int16 │      0  1  2  3  4    │      0  1  2  3  4    │
+│    ───────────────    │             │    ───────────────    │    ───────────────    │
+│  0│                   │             │  0│                   │  0│                   │
+│  1│           8  3    │             │  1│                   │  1│                   │
+│  2│     2     5       │             │  2│  5     8     4    │  2│                   │
+│  3│              1    │             │  3│     4  7     5    │  3│              5    │
+│  4│        7     5    │             │  4│           8       │  4│                   │
+│                       │             │                       │                       │
+│      0  1  2  3  4    │ times_int32 │      0  1  2  3  4    │      0  1  2  3  4    │
+│    ───────────────    │             │    ───────────────    │    ───────────────    │
+│  0│     0  7  4       │             │  0│        8          │  0│       56          │
+│  1│     5             │             │  1│     3             │  1│    15             │
+│  2│  0  4 10  5       │             │  2│  4           1    │  2│  0                │
+│  3│  2           1    │             │  3│     1     5 10    │  3│             10    │
+│  4│     9  5          │             │  4│     1  9  1       │  4│     9 45          │
+│                       │             │                       │                       │
+│      0  1  2  3  4    │ times_int64 │      0  1  2  3  4    │      0  1  2  3  4    │
+│    ───────────────    │             │    ───────────────    │    ───────────────    │
+│  0│        2          │             │  0│ 10  6  8  6       │  0│       16          │
+│  1│  2                │             │  1│        0  8       │  1│                   │
+│  2│                   │             │  2│                   │  2│                   │
+│  3│           5  1    │             │  3│                   │  3│                   │
+│  4│        9          │             │  4│  7  3             │  4│                   │
+│                       │             │                       │                       │
+└───────────────────────┴─────────────┴───────────────────────┴───────────────────────┘
+(3 rows)
+
+select print(a) as a, binaryop, print(b) as b, print(eunion(A, 3, B, 4, binaryop)) as union from test_fixture;
+ERROR:  function eunion(matrix, integer, matrix, integer, binaryop) does not exist
+LINE 1: ...ect print(a) as a, binaryop, print(b) as b, print(eunion(A, ...
+                                                             ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+select print(a) as a, reduce_scalar(a, monoid) from test_fixture;
+┌───────────────────────┬───────────────┐
+│           a           │ reduce_scalar │
+├───────────────────────┼───────────────┤
+│      0  1  2  3  4    │ int32:31      │
+│    ───────────────    │               │
+│  0│                   │               │
+│  1│           8  3    │               │
+│  2│     2     5       │               │
+│  3│              1    │               │
+│  4│        7     5    │               │
+│                       │               │
+│      0  1  2  3  4    │ int32:52      │
+│    ───────────────    │               │
+│  0│     0  7  4       │               │
+│  1│     5             │               │
+│  2│  0  4 10  5       │               │
+│  3│  2           1    │               │
+│  4│     9  5          │               │
+│                       │               │
+│      0  1  2  3  4    │ int32:19      │
+│    ───────────────    │               │
+│  0│        2          │               │
+│  1│  2                │               │
+│  2│                   │               │
+│  3│           5  1    │               │
+│  4│        9          │               │
+│                       │               │
+└───────────────────────┴───────────────┘
+(3 rows)
+
+select print(a) as a, monoid, print(reduce_vector(a, monoid)) as reduce_vector from test_fixture;
+┌───────────────────────┬───────────────────┬───────────────┐
+│           a           │      monoid       │ reduce_vector │
+├───────────────────────┼───────────────────┼───────────────┤
+│      0  1  2  3  4    │ plus_monoid_int16 │               │
+│    ───────────────    │                   │    ───        │
+│  0│                   │                   │  0│           │
+│  1│           8  3    │                   │  1│ 11        │
+│  2│     2     5       │                   │  2│  7        │
+│  3│              1    │                   │  3│  1        │
+│  4│        7     5    │                   │  4│ 12        │
+│                       │                   │               │
+│      0  1  2  3  4    │ plus_monoid_int32 │               │
+│    ───────────────    │                   │    ───        │
+│  0│     0  7  4       │                   │  0│ 11        │
+│  1│     5             │                   │  1│  5        │
+│  2│  0  4 10  5       │                   │  2│ 19        │
+│  3│  2           1    │                   │  3│  3        │
+│  4│     9  5          │                   │  4│ 14        │
+│                       │                   │               │
+│      0  1  2  3  4    │ plus_monoid_int64 │               │
+│    ───────────────    │                   │    ───        │
+│  0│        2          │                   │  0│  2        │
+│  1│  2                │                   │  1│  2        │
+│  2│                   │                   │  2│           │
+│  3│           5  1    │                   │  3│  6        │
+│  4│        9          │                   │  4│  9        │
+│                       │                   │               │
+└───────────────────────┴───────────────────┴───────────────┘
+(3 rows)
+
+select print(a) as a, monoid, print(reduce_vector(a, monoid, descriptor=>'t0')) as transpose_reduce_vector from test_fixture;
+┌───────────────────────┬───────────────────┬─────────────────────────┐
+│           a           │      monoid       │ transpose_reduce_vector │
+├───────────────────────┼───────────────────┼─────────────────────────┤
+│      0  1  2  3  4    │ plus_monoid_int16 │                         │
+│    ───────────────    │                   │    ───                  │
+│  0│                   │                   │  0│                     │
+│  1│           8  3    │                   │  1│  2                  │
+│  2│     2     5       │                   │  2│  7                  │
+│  3│              1    │                   │  3│ 13                  │
+│  4│        7     5    │                   │  4│  9                  │
+│                       │                   │                         │
+│      0  1  2  3  4    │ plus_monoid_int32 │                         │
+│    ───────────────    │                   │    ───                  │
+│  0│     0  7  4       │                   │  0│  2                  │
+│  1│     5             │                   │  1│ 18                  │
+│  2│  0  4 10  5       │                   │  2│ 22                  │
+│  3│  2           1    │                   │  3│  9                  │
+│  4│     9  5          │                   │  4│  1                  │
+│                       │                   │                         │
+│      0  1  2  3  4    │ plus_monoid_int64 │                         │
+│    ───────────────    │                   │    ───                  │
+│  0│        2          │                   │  0│  2                  │
+│  1│  2                │                   │  1│                     │
+│  2│                   │                   │  2│ 11                  │
+│  3│           5  1    │                   │  3│  5                  │
+│  4│        9          │                   │  4│  1                  │
+│                       │                   │                         │
+└───────────────────────┴───────────────────┴─────────────────────────┘
+(3 rows)
+
+select print(a) as a, semiring, print(b) as b, print(mxm(a, b, semiring)) as mxm from test_fixture;
+┌───────────────────────┬──────────────────┬───────────────────────┬───────────────────────┐
+│           a           │     semiring     │           b           │          mxm          │
+├───────────────────────┼──────────────────┼───────────────────────┼───────────────────────┤
+│      0  1  2  3  4    │ plus_times_int16 │      0  1  2  3  4    │      0  1  2  3  4    │
+│    ───────────────    │                  │    ───────────────    │    ───────────────    │
+│  0│                   │                  │  0│                   │  0│                   │
+│  1│           8  3    │                  │  1│                   │  1│    32 56 24 40    │
+│  2│     2     5       │                  │  2│  5     8     4    │  2│    20 35    25    │
+│  3│              1    │                  │  3│     4  7     5    │  3│           8       │
+│  4│        7     5    │                  │  4│           8       │  4│ 35    56 40 28    │
+│                       │                  │                       │                       │
+│      0  1  2  3  4    │ plus_times_int32 │      0  1  2  3  4    │      0  1  2  3  4    │
+│    ───────────────    │                  │    ───────────────    │    ───────────────    │
+│  0│     0  7  4       │                  │  0│        8          │  0│ 28  4    20 47    │
+│  1│     5             │                  │  1│     3             │  1│    15             │
+│  2│  0  4 10  5       │                  │  2│  4           1    │  2│ 40 17  0 25 60    │
+│  3│  2           1    │                  │  3│     1     5 10    │  3│     1 25  1       │
+│  4│     9  5          │                  │  4│     1  9  1       │  4│ 20 27        5    │
+│                       │                  │                       │                       │
+│      0  1  2  3  4    │ plus_times_int64 │      0  1  2  3  4    │      0  1  2  3  4    │
+│    ───────────────    │                  │    ───────────────    │    ───────────────    │
+│  0│        2          │                  │  0│ 10  6  8  6       │  0│                   │
+│  1│  2                │                  │  1│        0  8       │  1│ 20 12 16 12       │
+│  2│                   │                  │  2│                   │  2│                   │
+│  3│           5  1    │                  │  3│                   │  3│  7  3             │
+│  4│        9          │                  │  4│  7  3             │  4│                   │
+│                       │                  │                       │                       │
+└───────────────────────┴──────────────────┴───────────────────────┴───────────────────────┘
+(3 rows)
+
+select print(a) as a, '@' as "@", print(b) as b, print(a @ b) as mxm from test_fixture;
+┌───────────────────────┬───┬───────────────────────┬───────────────────────┐
+│           a           │ @ │           b           │          mxm          │
+├───────────────────────┼───┼───────────────────────┼───────────────────────┤
+│      0  1  2  3  4    │ @ │      0  1  2  3  4    │      0  1  2  3  4    │
+│    ───────────────    │   │    ───────────────    │    ───────────────    │
+│  0│                   │   │  0│                   │  0│                   │
+│  1│           8  3    │   │  1│                   │  1│     3  3  4  3    │
+│  2│     2     5       │   │  2│  5     8     4    │  2│     3  3     3    │
+│  3│              1    │   │  3│     4  7     5    │  3│           4       │
+│  4│        7     5    │   │  4│           8       │  4│  2     2  4  2    │
+│                       │   │                       │                       │
+│      0  1  2  3  4    │ @ │      0  1  2  3  4    │      0  1  2  3  4    │
+│    ───────────────    │   │    ───────────────    │    ───────────────    │
+│  0│     0  7  4       │   │  0│        8          │  0│  2  3     3  3    │
+│  1│     5             │   │  1│     3             │  1│     1             │
+│  2│  0  4 10  5       │   │  2│  4           1    │  2│  2  3  0  3  3    │
+│  3│  2           1    │   │  3│     1     5 10    │  3│     4  4  4       │
+│  4│     9  5          │   │  4│     1  9  1       │  4│  2  1        2    │
+│                       │   │                       │                       │
+│      0  1  2  3  4    │ @ │      0  1  2  3  4    │      0  1  2  3  4    │
+│    ───────────────    │   │    ───────────────    │    ───────────────    │
+│  0│        2          │   │  0│ 10  6  8  6       │  0│                   │
+│  1│  2                │   │  1│        0  8       │  1│  0  0  0  0       │
+│  2│                   │   │  2│                   │  2│                   │
+│  3│           5  1    │   │  3│                   │  3│  4  4             │
+│  4│        9          │   │  4│  7  3             │  4│                   │
+│                       │   │                       │                       │
+└───────────────────────┴───┴───────────────────────┴───────────────────────┘
+(3 rows)
+
+select print(a), semiring, print(u), print(mxv(a, u, semiring)) from test_fixture;
+┌───────────────────────┬──────────────────┬───────────┬───────────┐
+│         print         │     semiring     │   print   │   print   │
+├───────────────────────┼──────────────────┼───────────┼───────────┤
+│      0  1  2  3  4    │ plus_times_int16 │           │           │
+│    ───────────────    │                  │    ───    │    ───    │
+│  0│                   │                  │  0│  5    │  0│       │
+│  1│           8  3    │                  │  1│       │  1│  0    │
+│  2│     2     5       │                  │  2│       │  2│       │
+│  3│              1    │                  │  3│       │  3│  0    │
+│  4│        7     5    │                  │  4│  0    │  4│  0    │
+│                       │                  │           │           │
+│      0  1  2  3  4    │ plus_times_int32 │           │           │
+│    ───────────────    │                  │    ───    │    ───    │
+│  0│     0  7  4       │                  │  0│       │  0│ 29    │
+│  1│     5             │                  │  1│  0    │  1│  0    │
+│  2│  0  4 10  5       │                  │  2│  3    │  2│ 40    │
+│  3│  2           1    │                  │  3│  2    │  3│  5    │
+│  4│     9  5          │                  │  4│  5    │  4│ 15    │
+│                       │                  │           │           │
+│      0  1  2  3  4    │ plus_times_int64 │           │           │
+│    ───────────────    │                  │    ───    │    ───    │
+│  0│        2          │                  │  0│       │  0│  2    │
+│  1│  2                │                  │  1│       │  1│       │
+│  2│                   │                  │  2│  1    │  2│       │
+│  3│           5  1    │                  │  3│       │  3│       │
+│  4│        9          │                  │  4│       │  4│  9    │
+│                       │                  │           │           │
+└───────────────────────┴──────────────────┴───────────┴───────────┘
+(3 rows)
+
+select print(a), '@', print(u), print(a @ u) from test_fixture;
+┌───────────────────────┬──────────┬───────────┬───────────┐
+│         print         │ ?column? │   print   │   print   │
+├───────────────────────┼──────────┼───────────┼───────────┤
+│      0  1  2  3  4    │ @        │           │           │
+│    ───────────────    │          │    ───    │    ───    │
+│  0│                   │          │  0│  5    │  0│       │
+│  1│           8  3    │          │  1│       │  1│  4    │
+│  2│     2     5       │          │  2│       │  2│       │
+│  3│              1    │          │  3│       │  3│  4    │
+│  4│        7     5    │          │  4│  0    │  4│  4    │
+│                       │          │           │           │
+│      0  1  2  3  4    │ @        │           │           │
+│    ───────────────    │          │    ───    │    ───    │
+│  0│     0  7  4       │          │  0│       │  0│  1    │
+│  1│     5             │          │  1│  0    │  1│  1    │
+│  2│  0  4 10  5       │          │  2│  3    │  2│  1    │
+│  3│  2           1    │          │  3│  2    │  3│  4    │
+│  4│     9  5          │          │  4│  5    │  4│  1    │
+│                       │          │           │           │
+│      0  1  2  3  4    │ @        │           │           │
+│    ───────────────    │          │    ───    │    ───    │
+│  0│        2          │          │  0│       │  0│  2    │
+│  1│  2                │          │  1│       │  1│       │
+│  2│                   │          │  2│  1    │  2│       │
+│  3│           5  1    │          │  3│       │  3│       │
+│  4│        9          │          │  4│       │  4│  2    │
+│                       │          │           │           │
+└───────────────────────┴──────────┴───────────┴───────────┘
+(3 rows)
+
+select print(v), semiring, print(b), print(vxm(v, b, semiring)) from test_fixture;
+┌───────────┬──────────────────┬───────────────────────┬───────────┐
+│   print   │     semiring     │         print         │   print   │
+├───────────┼──────────────────┼───────────────────────┼───────────┤
+│           │ plus_times_int16 │      0  1  2  3  4    │           │
+│    ───    │                  │    ───────────────    │    ───    │
+│  0│  4    │                  │  0│                   │  0│       │
+│  1│  1    │                  │  1│                   │  1│ 16    │
+│  2│       │                  │  2│  5     8     4    │  2│ 28    │
+│  3│  4    │                  │  3│     4  7     5    │  3│       │
+│  4│       │                  │  4│           8       │  4│ 20    │
+│           │                  │                       │           │
+│           │ plus_times_int32 │      0  1  2  3  4    │           │
+│    ───    │                  │    ───────────────    │    ───    │
+│  0│       │                  │  0│        8          │  0│ 16    │
+│  1│       │                  │  1│     3             │  1│  3    │
+│  2│  4    │                  │  2│  4           1    │  2│ 27    │
+│  3│       │                  │  3│     1     5 10    │  3│  3    │
+│  4│  3    │                  │  4│     1  9  1       │  4│  4    │
+│           │                  │                       │           │
+│           │ plus_times_int64 │      0  1  2  3  4    │           │
+│    ───    │                  │    ───────────────    │    ───    │
+│  0│  5    │                  │  0│ 10  6  8  6       │  0│ 71    │
+│  1│       │                  │  1│        0  8       │  1│ 39    │
+│  2│  3    │                  │  2│                   │  2│ 40    │
+│  3│  4    │                  │  3│                   │  3│ 30    │
+│  4│  3    │                  │  4│  7  3             │  4│       │
+│           │                  │                       │           │
+└───────────┴──────────────────┴───────────────────────┴───────────┘
+(3 rows)
+
+select print(v), '@', print(b), print(v @ b) from test_fixture;
+┌───────────┬──────────┬───────────────────────┬───────────┐
+│   print   │ ?column? │         print         │   print   │
+├───────────┼──────────┼───────────────────────┼───────────┤
+│           │ @        │      0  1  2  3  4    │           │
+│    ───    │          │    ───────────────    │    ───    │
+│  0│  4    │          │  0│                   │  0│       │
+│  1│  1    │          │  1│                   │  1│  3    │
+│  2│       │          │  2│  5     8     4    │  2│  3    │
+│  3│  4    │          │  3│     4  7     5    │  3│       │
+│  4│       │          │  4│           8       │  4│  3    │
+│           │          │                       │           │
+│           │ @        │      0  1  2  3  4    │           │
+│    ───    │          │    ───────────────    │    ───    │
+│  0│       │          │  0│        8          │  0│  2    │
+│  1│       │          │  1│     3             │  1│  4    │
+│  2│  4    │          │  2│  4           1    │  2│  4    │
+│  3│       │          │  3│     1     5 10    │  3│  4    │
+│  4│  3    │          │  4│     1  9  1       │  4│  2    │
+│           │          │                       │           │
+│           │ @        │      0  1  2  3  4    │           │
+│    ───    │          │    ───────────────    │    ───    │
+│  0│  5    │          │  0│ 10  6  8  6       │  0│  4    │
+│  1│       │          │  1│        0  8       │  1│  4    │
+│  2│  3    │          │  2│                   │  2│  0    │
+│  3│  4    │          │  3│                   │  3│  0    │
+│  4│  3    │          │  4│  7  3             │  4│       │
+│           │          │                       │           │
+└───────────┴──────────┴───────────────────────┴───────────┘
+(3 rows)
+
+select print(a), indexunaryop, print(selection(a, indexunaryop, 50)) from test_fixture;
+┌───────────────────────┬───────────────┬───────────────────────┐
+│         print         │ indexunaryop  │         print         │
+├───────────────────────┼───────────────┼───────────────────────┤
+│      0  1  2  3  4    │ valuegt_int16 │      0  1  2  3  4    │
+│    ───────────────    │               │    ───────────────    │
+│  0│                   │               │  0│                   │
+│  1│           8  3    │               │  1│                   │
+│  2│     2     5       │               │  2│                   │
+│  3│              1    │               │  3│                   │
+│  4│        7     5    │               │  4│                   │
+│                       │               │                       │
+│      0  1  2  3  4    │ valuegt_int32 │      0  1  2  3  4    │
+│    ───────────────    │               │    ───────────────    │
+│  0│     0  7  4       │               │  0│                   │
+│  1│     5             │               │  1│                   │
+│  2│  0  4 10  5       │               │  2│                   │
+│  3│  2           1    │               │  3│                   │
+│  4│     9  5          │               │  4│                   │
+│                       │               │                       │
+│      0  1  2  3  4    │ valuegt_int64 │      0  1  2  3  4    │
+│    ───────────────    │               │    ───────────────    │
+│  0│        2          │               │  0│                   │
+│  1│  2                │               │  1│                   │
+│  2│                   │               │  2│                   │
+│  3│           5  1    │               │  3│                   │
+│  4│        9          │               │  4│                   │
+│                       │               │                       │
+└───────────────────────┴───────────────┴───────────────────────┘
+(3 rows)
+
+select print(a), unaryop, print(apply(a, unaryop)) from test_fixture;
+┌───────────────────────┬────────────┬───────────────────────┐
+│         print         │  unaryop   │         print         │
+├───────────────────────┼────────────┼───────────────────────┤
+│      0  1  2  3  4    │ ainv_int16 │      0  1  2  3  4    │
+│    ───────────────    │            │    ───────────────    │
+│  0│                   │            │  0│                   │
+│  1│           8  3    │            │  1│          -8 -3    │
+│  2│     2     5       │            │  2│    -2    -5       │
+│  3│              1    │            │  3│             -1    │
+│  4│        7     5    │            │  4│       -7    -5    │
+│                       │            │                       │
+│      0  1  2  3  4    │ ainv_int32 │      0  1  2  3  4    │
+│    ───────────────    │            │    ───────────────    │
+│  0│     0  7  4       │            │  0│     0 -7 -4       │
+│  1│     5             │            │  1│    -5             │
+│  2│  0  4 10  5       │            │  2│  0 -4-10 -5       │
+│  3│  2           1    │            │  3│ -2          -1    │
+│  4│     9  5          │            │  4│    -9 -5          │
+│                       │            │                       │
+│      0  1  2  3  4    │ ainv_int64 │      0  1  2  3  4    │
+│    ───────────────    │            │    ───────────────    │
+│  0│        2          │            │  0│       -2          │
+│  1│  2                │            │  1│ -2                │
+│  2│                   │            │  2│                   │
+│  3│           5  1    │            │  3│          -5 -1    │
+│  4│        9          │            │  4│       -9          │
+│                       │            │                       │
+└───────────────────────┴────────────┴───────────────────────┘
+(3 rows)
+
+select print(set_element(a, 4, 4, 4)) from test_fixture;
+┌───────────────────────┐
+│         print         │
+├───────────────────────┤
+│      0  1  2  3  4    │
+│    ───────────────    │
+│  0│                   │
+│  1│           8  3    │
+│  2│     2     5       │
+│  3│              1    │
+│  4│        7     4    │
+│                       │
+│      0  1  2  3  4    │
+│    ───────────────    │
+│  0│     0  7  4       │
+│  1│     5             │
+│  2│  0  4 10  5       │
+│  3│  2           1    │
+│  4│     9  5     4    │
+│                       │
+│      0  1  2  3  4    │
+│    ───────────────    │
+│  0│        2          │
+│  1│  2                │
+│  2│                   │
+│  3│           5  1    │
+│  4│        9     4    │
+│                       │
+└───────────────────────┘
+(3 rows)
+
+select get_element(a, 3, 3) from test_fixture;
+┌─────────────┐
+│ get_element │
+├─────────────┤
+│ int         │
+│ int         │
+│ int32:5     │
+└─────────────┘
+(3 rows)
+
+select info(a) from test_fixture;
+┌───────────────────────────────────────────────┐
+│                     info                      │
+├───────────────────────────────────────────────┤
+│                                               │
+│   5x5 GraphBLAS int32_t matrix, bitmap by row │
+│   A->matrix, 7 entries, memory: 357 bytes     │
+│                                               │
+│                                               │
+│                                               │
+│   5x5 GraphBLAS int32_t matrix, bitmap by row │
+│   A->matrix, 12 entries, memory: 357 bytes    │
+│                                               │
+│                                               │
+│                                               │
+│   5x5 GraphBLAS int32_t matrix, bitmap by row │
+│   A->matrix, 5 entries, memory: 357 bytes     │
+│                                               │
+│                                               │
+└───────────────────────────────────────────────┘
+(3 rows)
+
+select info(a, 5) from test_fixture;
+┌───────────────────────────────────────────────┐
+│                     info                      │
+├───────────────────────────────────────────────┤
+│                                               │
+│   5x5 GraphBLAS int32_t matrix, bitmap by row │
+│   A->matrix, 7 entries, memory: 357 bytes     │
+│                                               │
+│     (1,3)   8                                 │
+│     (1,4)   3                                 │
+│     (2,1)   2                                 │
+│     (2,3)   5                                 │
+│     (3,4)   1                                 │
+│     (4,2)   7                                 │
+│     (4,4)   5                                 │
+│                                               │
+│                                               │
+│                                               │
+│   5x5 GraphBLAS int32_t matrix, bitmap by row │
+│   A->matrix, 12 entries, memory: 357 bytes    │
+│                                               │
+│     (0,1)   0                                 │
+│     (0,2)   7                                 │
+│     (0,3)   4                                 │
+│     (1,1)   5                                 │
+│     (2,0)   0                                 │
+│     (2,1)   4                                 │
+│     (2,2)   10                                │
+│     (2,3)   5                                 │
+│     (3,0)   2                                 │
+│     (3,4)   1                                 │
+│     (4,1)   9                                 │
+│     (4,2)   5                                 │
+│                                               │
+│                                               │
+│                                               │
+│   5x5 GraphBLAS int32_t matrix, bitmap by row │
+│   A->matrix, 5 entries, memory: 357 bytes     │
+│                                               │
+│     (0,2)   2                                 │
+│     (1,0)   2                                 │
+│     (3,3)   5                                 │
+│     (3,4)   1                                 │
+│     (4,2)   9                                 │
+│                                               │
+│                                               │
+└───────────────────────────────────────────────┘
+(3 rows)
+
+select dup(a) from test_fixture;
+┌──────────────────────────────────────────────────────────────────────────────────────┐
+│                                         dup                                          │
+├──────────────────────────────────────────────────────────────────────────────────────┤
+│ int32(5:5)[1:3:8 1:4:3 2:1:2 2:3:5 3:4:1 4:2:7 4:4:5]                                │
+│ int32(5:5)[0:1:0 0:2:7 0:3:4 1:1:5 2:0:0 2:1:4 2:2:10 2:3:5 3:0:2 3:4:1 4:1:9 4:2:5] │
+│ int32(5:5)[0:2:2 1:0:2 3:3:5 3:4:1 4:2:9]                                            │
+└──────────────────────────────────────────────────────────────────────────────────────┘
+(3 rows)
+
+select wait('int32[2:2:2 3:3:3 1:1:1]'::matrix);
+┌──────────────────────────┐
+│           wait           │
+├──────────────────────────┤
+│ int32[1:1:1 2:2:2 3:3:3] │
+└──────────────────────────┘
+(1 row)
+
+select clear('int32[1:1:1 2:2:2 3:3:3]'::matrix);
+┌───────┐
+│ clear │
+├───────┤
+│ int32 │
+└───────┘
+(1 row)
+
 select nrows('int32(10)[1:1:1 2:2:2 3:3:3]'::matrix);
- nrows 
--------
-    10
+┌───────┐
+│ nrows │
+├───────┤
+│    10 │
+└───────┘
 (1 row)
 
 select ncols('int32(10)[1:1:1 2:2:2 3:3:3]'::matrix);
-        ncols        
----------------------
- 1152921504606846976
+┌─────────────────────┐
+│        ncols        │
+├─────────────────────┤
+│ 1152921504606846976 │
+└─────────────────────┘
 (1 row)
 
 select nvals('int32(10)[1:1:1 2:2:2 3:3:3]'::matrix);
- nvals 
--------
-     3
+┌───────┐
+│ nvals │
+├───────┤
+│     3 │
+└───────┘
 (1 row)
 
 select nrows('int32(10:)[1:1:1 2:2:2 3:3:3]'::matrix);
- nrows 
--------
-    10
+┌───────┐
+│ nrows │
+├───────┤
+│    10 │
+└───────┘
 (1 row)
 
 select ncols('int32(10:)[1:1:1 2:2:2 3:3:3]'::matrix);
-        ncols        
----------------------
- 1152921504606846976
+┌─────────────────────┐
+│        ncols        │
+├─────────────────────┤
+│ 1152921504606846976 │
+└─────────────────────┘
 (1 row)
 
 select nvals('int32(10:)[1:1:1 2:2:2 3:3:3]'::matrix);
- nvals 
--------
-     3
+┌───────┐
+│ nvals │
+├───────┤
+│     3 │
+└───────┘
 (1 row)
 
 select nrows('int32(:10)[1:1:1 2:2:2 3:3:3]'::matrix);
-        nrows        
----------------------
- 1152921504606846976
+┌─────────────────────┐
+│        nrows        │
+├─────────────────────┤
+│ 1152921504606846976 │
+└─────────────────────┘
 (1 row)
 
 select ncols('int32(:10)[1:1:1 2:2:2 3:3:3]'::matrix);
- ncols 
--------
-    10
+┌───────┐
+│ ncols │
+├───────┤
+│    10 │
+└───────┘
 (1 row)
 
 select nvals('int32(:10)[1:1:1 2:2:2 3:3:3]'::matrix);
- nvals 
--------
-     3
+┌───────┐
+│ nvals │
+├───────┤
+│     3 │
+└───────┘
 (1 row)
 
 select nrows('int32(10:10)[1:1:1 2:2:2 3:3:3]'::matrix);
- nrows 
--------
-    10
+┌───────┐
+│ nrows │
+├───────┤
+│    10 │
+└───────┘
 (1 row)
 
 select ncols('int32(10:10)[1:1:1 2:2:2 3:3:3]'::matrix);
- ncols 
--------
-    10
+┌───────┐
+│ ncols │
+├───────┤
+│    10 │
+└───────┘
 (1 row)
 
 select nvals('int32(10:10)[1:1:1 2:2:2 3:3:3]'::matrix);
- nvals 
--------
-     3
-(1 row)
-
-```
-# Element-wise operations
-
-The GraphBLAS API has elementwise operations on matrices that
-operate pairs of matrices.  `ewise_add` computes the element-wise
-“addition” of two matrices A and B, element-wise using any binary
-operator.  Elements present on both sides of the operation are
-included in the result.
-``` postgres-console
-select ewise_add('int32[1:1:1 2:2:2 3:3:3]'::matrix, 'int32[1:1:1 2:2:2 3:3:3]'::matrix, 'plus_int32');
-        ewise_add         
---------------------------
- int32[1:1:2 2:2:4 3:3:6]
-(1 row)
-
-```
-`ewise_mult` multiplies elements of two matrices, taking only the
-intersection of common elements in both matrices, if an element is
-missing from either the left or right side, it is ommited from the
-result:
-``` postgres-console
-select ewise_mult('int32[1:1:1 2:2:2 3:3:3]'::matrix, 'int32[1:1:1 2:2:2 3:3:3]'::matrix, 'times_int32');
-        ewise_mult        
---------------------------
- int32[1:1:1 2:2:4 3:3:9]
-(1 row)
-
-```
-`ewise_union` is like `ewise_add` but differs in how the binary op
-is applied. A pair of scalars, `alpha` and `beta` define the inputs
-to the operator when entries are present in one matrix but not the
-other.
-``` postgres-console
-select ewise_union('int32[1:1:1 2:2:2 3:3:3]'::matrix, 42, 'int32[1:1:1 2:2:2 3:3:3]'::matrix, 84, 'plus_int32');
-       ewise_union        
---------------------------
- int32[1:1:2 2:2:4 3:3:6]
-(1 row)
-
-```
-The entire matrix can be reduced to a scalar value:
-``` postgres-console
-select reduce_scalar('int32[1:1:1 2:2:2 3:3:3]'::matrix, 'plus_monoid_int32');
- reduce_scalar 
----------------
- int32:6
-(1 row)
-
-```
-The matrix can also be reduced to a column vector:
-``` postgres-console
-select reduce_vector('int32[1:1:1 1:2:3 2:2:2]'::matrix, 'plus_monoid_int32');
- reduce_vector  
-----------------
- int32[1:4 2:2]
-(1 row)
-
-```
-To reduce a row vector, specify that the input should be transposed
-with the descriptor `t0`:
-``` postgres-console
-select reduce_vector('int32[1:1:1 1:2:3 2:2:2]'::matrix, 'plus_monoid_int32', descriptor=>'t0');
- reduce_vector  
-----------------
- int32[1:1 2:5]
-(1 row)
-
-```
-Matrix Multiplication (referred to here as A @ B) is the heart of
-linear algebra.  All matrix multiplication happens over a semiring.
-For the most common form of matrix multiplication, the outer
-opperation is to multiply coresponding elements with the "times"
-operator and then reduce those products with the "plus" operator.
-This is called the `plus_times` semiring:
-``` postgres-console
-select mxm('int32[0:0:1 0:1:2]'::matrix, 'int32[0:0:1 0:1:3]'::matrix, 'plus_times_int32');
-        mxm         
---------------------
- int32[0:0:1 0:1:3]
-(1 row)
-
-```
-AxB can also be done with the `@` operator, mimicking the Python
-syntax:
-``` postgres-console
-select 'int32[0:0:1 0:1:2]'::matrix @ 'int32[0:0:1 0:1:3]'::matrix;
-      ?column?      
---------------------
- int32[0:0:0 0:1:0]
-(1 row)
-
-```
-Matrices can be multipled by vectors on the right taking the linear
-combination of the matrices columns using the vectors elements as
-coefficients:
-``` postgres-console
-select mxv('int32[0:0:1 0:1:2]'::matrix, 'int32[0:0 1:1]'::vector, 'plus_times_int32');
-    mxv     
-------------
- int32[0:2]
-(1 row)
-
-```
-'mxv' is also supported by the `@` operator:
-``` postgres-console
-select 'int32[0:0:1 0:1:2]'::matrix @ 'int32[0:0 1:1]'::vector;
-  ?column?  
-------------
- int32[0:0]
-(1 row)
-
-```
-Matrices can be multipled by vectors on the right taking the linear
-combination of the matrices rows using the vectors elements as
-coefficients:
-``` postgres-console
-select vxm('int32[0:0 1:1]'::vector, 'int32[0:0:1 0:1:2]'::matrix, 'plus_times_int32');
-      vxm       
-----------------
- int32[0:0 1:0]
-(1 row)
-
-```
-'vxm' is also supported by the `@` operator:
-``` postgres-console
-select 'int32[0:0 1:1]'::vector @ 'int32[0:0:1 0:1:2]'::matrix;
-    ?column?    
-----------------
- int32[0:0 1:0]
-(1 row)
-
-```
-The `selection` method calls the `GrB_select()` API function.  The
-name `selection` was chosen not to conflict with the SQL keyword
-`select`.  Selection provides a conditional operator called an
-`indexunaryop` and a parameter for the operator to use to compare
-elements in the matrix.  Below, all elements with values greater
-than 1 are returned:
-``` postgres-console
-select selection('int32[1:1:1 2:2:2 3:3:3]'::matrix, 'valuegt_int32'::indexunaryop, 1::scalar);
-     selection      
---------------------
- int32[2:2:2 3:3:3]
-(1 row)
-
-```
-Here are all values equal to 2:
-``` postgres-console
-select selection('int32[1:1:1 2:2:2 3:3:3]'::matrix, 'valueeq_int32'::indexunaryop, 2::scalar);
-  selection   
---------------
- int32[2:2:2]
-(1 row)
-
-```
-`apply` takes an operator of type `unaryop` and applies it to every
-element of the matrix.  The 'ainv_int32' returned the additive
-inverse (the negative value for integers) of every element:
-``` postgres-console
-select apply('int32[1:1:1 2:2:2 3:3:3]'::matrix, 'ainv_int32'::unaryop);
-            apply            
------------------------------
- int32[1:1:-1 2:2:-2 3:3:-3]
-(1 row)
-
-```
-Elements can be set individually with `set_element`, the modified
-input is returned:
-``` postgres-console
-select set_element('int32[1:1:1 2:2:2 3:3:3]'::matrix, 4, 4, 4);
-          set_element           
---------------------------------
- int32[1:1:1 2:2:2 3:3:3 4:4:4]
-(1 row)
-
-```
-Scalar elements can be extracted individually with `get_element`
-``` postgres-console
-select get_element('int32[1:1:1 2:2:2 3:3:3]'::matrix, 3, 3);
- get_element 
--------------
- int32:3
-(1 row)
-
-```
-The `print` function returns a descripton of the matrix from
-SuiteSparse.
-``` postgres-console
-select print('int32[1:1:1 2:2:2 3:3:3]'::matrix);
-                                         print                                          
-----------------------------------------------------------------------------------------
-                                                                                       +
-   1152921504606846976x1152921504606846976 GraphBLAS int32_t matrix, hypersparse by row+
-   A->matrix, 3 entries, memory: 324 bytes                                             +
-                                                                                       +
- 
-(1 row)
-
-```
-The `print` function takes an optional "level" argument that
-defaults to `1` which is a short summary.
-``` postgres-console
-select print('int32[1:1:1 2:2:2 3:3:3]'::matrix, 5);
-                                         print                                          
-----------------------------------------------------------------------------------------
-                                                                                       +
-   1152921504606846976x1152921504606846976 GraphBLAS int32_t matrix, hypersparse by row+
-   A->matrix, 3 entries, memory: 324 bytes                                             +
-                                                                                       +
-     (1,1)   1                                                                         +
-     (2,2)   2                                                                         +
-     (3,3)   3                                                                         +
-                                                                                       +
- 
-(1 row)
-
-```
-The `dup` function duplicates a matrix returning a new matrix
-object with the same values:
-``` postgres-console
-select dup('int32[1:1:1 2:2:2 3:3:3]'::matrix);
-           dup            
---------------------------
- int32[1:1:1 2:2:2 3:3:3]
-(1 row)
-
-```
-The `wait` method is used to "complete" a matrix, which may have
-pending operations waiting to be performed when using the default
-SuiteSparse non-blocking mode.  As a side effect, wait will sort
-the elements of the input:
-``` postgres-console
-select wait('int32[2:2:2 3:3:3 1:1:1]'::matrix);
-           wait           
---------------------------
- int32[1:1:1 2:2:2 3:3:3]
-(1 row)
-
-```
-The `clear` function clears the matrix of all elements and returns
-the same object, but empty.  The dimensions do not change:
-``` postgres-console
-select clear('int32[1:1:1 2:2:2 3:3:3]'::matrix);
-  clear  
----------
- int32[]
+┌───────┐
+│ nvals │
+├───────┤
+│     3 │
+└───────┘
 (1 row)
 
 ```

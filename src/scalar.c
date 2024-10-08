@@ -614,27 +614,68 @@ Datum scalar_clear(PG_FUNCTION_ARGS)
 }
 
 Datum scalar_print(PG_FUNCTION_ARGS) {
-	os_Scalar *A;
-	char *result, *buf;
-	size_t size;
-	FILE *fp;
-	int level;
-	A = OS_GETARG_SCALAR(0);
-	level = PG_GETARG_INT32(1);
-	if (level > 5)
+	int32 type_code;
+	os_Scalar *s;
+	GrB_Type type;
+    StringInfoData buf;
+	s = OS_GETARG_SCALAR(0);
+	OS_STYPE(type, s);
+    initStringInfo(&buf);
+
+	OS_CHECK(GrB_get(s->scalar, &type_code, GrB_EL_TYPE_CODE),
+		  s->scalar,
+		  "Cannot get Scalar Type code.");
+
+	switch(type_code)
 	{
-		elog(ERROR, "Print level is from 0 to 5");
+		case GrB_INT64_CODE:
+			{
+				int64_t vi64;
+				OS_CHECK(GrB_Scalar_extractElement(&vi64, s->scalar),
+					  s->scalar,
+					  "Error extracting scalar value.");
+				appendStringInfo(&buf, "%ld", vi64);
+				break;
+			}
+		case GrB_INT32_CODE:
+			{
+				int32_t vi32;
+				OS_CHECK(GrB_Scalar_extractElement(&vi32, s->scalar),
+					  s->scalar,
+					  "Error extracting scalar value.");
+				appendStringInfo(&buf, "%d", vi32);
+				break;
+			}
+		case GrB_INT16_CODE:
+			{
+				int32_t vi16;
+				OS_CHECK(GrB_Scalar_extractElement(&vi16, s->scalar),
+					  s->scalar,
+					  "Error extracting scalar value.");
+				appendStringInfo(&buf, "%d", vi16);
+				break;
+			}
+		case GrB_FP64_CODE:
+			{
+				double fp64;
+				OS_CHECK(GrB_Scalar_extractElement(&fp64, s->scalar),
+					  s->scalar,
+					  "Error extracting scalar value.");
+				appendStringInfo(&buf, "%f", fp64);
+				break;
+			}
+		case GrB_FP32_CODE:
+			{
+				float fp64;
+				OS_CHECK(GrB_Scalar_extractElement(&fp64, s->scalar),
+					  s->scalar,
+					  "Error extracting scalar value.");
+				appendStringInfo(&buf, "%f", fp64);
+				break;
+			}
 	}
 
-	fp = open_memstream(&buf, &size);
-	if (fp == NULL)
-		elog(ERROR, "unable to open memstream for scalar_print");
-	GxB_fprint(A->scalar, level, fp);
-	fflush(fp);
-	result = palloc(size + 1);
-	memcpy(result, buf, size+1);
-	free(buf);
-	PG_RETURN_TEXT_P(cstring_to_text_with_len(result, size+1));
+	PG_RETURN_TEXT_P(cstring_to_text(buf.data));
 }
 
 Datum scalar_type(PG_FUNCTION_ARGS) {

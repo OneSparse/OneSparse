@@ -21,6 +21,11 @@ CREATE TYPE vector (
     internallength = VARIABLE
     );
 
+CREATE FUNCTION vector(t type, vsize bigint default -1)
+RETURNS vector
+AS '$libdir/onesparse', 'vector_new'
+LANGUAGE C STABLE;
+
 CREATE FUNCTION type(vector)
 RETURNS type
 AS '$libdir/onesparse', 'vector_type'
@@ -36,7 +41,7 @@ RETURNS int8
 AS '$libdir/onesparse', 'vector_size'
 LANGUAGE C;
 
-CREATE FUNCTION ewise_add(
+CREATE FUNCTION eadd(
     u vector,
     v vector,
     op binaryop,
@@ -49,7 +54,7 @@ RETURNS vector
 AS '$libdir/onesparse', 'vector_ewise_add'
 LANGUAGE C STABLE;
 
-CREATE FUNCTION ewise_mult(
+CREATE FUNCTION emult(
     u vector,
     v vector,
     op binaryop,
@@ -62,7 +67,7 @@ RETURNS vector
 AS '$libdir/onesparse', 'vector_ewise_mult'
 LANGUAGE C STABLE;
 
-CREATE FUNCTION ewise_union(
+CREATE FUNCTION eunion(
     u vector,
     alpha scalar,
     v vector,
@@ -139,9 +144,14 @@ RETURNS vector
 AS '$libdir/onesparse', 'vector_remove_element'
 LANGUAGE C STABLE;
 
-CREATE FUNCTION print(a vector, level int default 1)
+CREATE FUNCTION contains(a vector, i bigint)
+RETURNS bool
+AS '$libdir/onesparse', 'vector_contains'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION info(a vector, level int default 1)
 RETURNS text
-AS '$libdir/onesparse', 'vector_print'
+AS '$libdir/onesparse', 'vector_info'
 LANGUAGE C STABLE;
 
 CREATE FUNCTION wait(vector, waitmode integer default 0)
@@ -158,3 +168,59 @@ CREATE FUNCTION clear(vector)
 RETURNS void
 AS '$libdir/onesparse', 'vector_clear'
 LANGUAGE C;
+
+create function print(a vector) returns text language plpgsql as
+    $$
+    declare
+        imax int = size(a) - 1;
+        out text = E'\n   \u2500\u2500\u2500\n';
+    begin
+        for i in 0..imax loop
+            out = out || lpad(i::text, 2) || E'\u2502';
+            if contains(a, i) then
+                out = out || lpad(print(get_element(a, i)), 3);
+            else
+                out = out || E'   ';
+            end if;
+            out = out || E'   \n';
+        end loop;
+        return out;
+    end;
+    $$;
+
+create function random_vector(
+    vsize integer,
+    nvals integer,
+    max integer default 2^31 - 1,
+    seed double precision default null)
+    returns vector language plpgsql as
+    $$
+    declare v vector = vector('int32', vsize);
+    prob double precision = nvals::double precision / vsize;
+    begin
+        if (seed is not null) then
+            perform setseed(seed);
+        end if;
+        for i in 0..vsize-1 loop
+            if random() < prob then
+                v = set_element(v, i, random(0, max));
+            end if;
+        end loop;
+        return v;
+    end;
+    $$;
+
+create function dense_vector(
+    t type,
+    vsize integer,
+    fill integer default 0)
+        returns vector language plpgsql as
+    $$
+    declare v vector = vector(t, vsize);
+    begin
+        for i in 0..vsize-1 loop
+            v = set_element(v, i, fill);
+        end loop;
+        return v;
+    end;
+    $$;

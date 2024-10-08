@@ -11,7 +11,6 @@ create extension if not exists onesparse;
 ```
 Describe the scalar type
 ``` postgres-console
-\dT+ scalar
                                         List of data types
   Schema   |  Name  | Internal name | Size | Elements |  Owner   | Access privileges | Description 
 -----------+--------+---------------+------+----------+----------+-------------------+-------------
@@ -22,31 +21,19 @@ Describe the scalar type
 print a scalar
 ``` postgres-console
 select print('int32:42'::scalar);
-                    print                    
----------------------------------------------
-                                            +
-   1x1 GraphBLAS int32_t scalar, full by col+
-   A->scalar, 1 entry, memory: 240 bytes    +
-   iso value:   42                          +
-                                            +
- 
+ print 
+-------
+ 42
 (1 row)
 
 ```
 print a scalar
 ``` postgres-console
 select print('int32:42'::scalar, 5);
-                    print                    
----------------------------------------------
-                                            +
-   1x1 GraphBLAS int32_t scalar, full by col+
-   A->scalar, 1 entry, memory: 240 bytes    +
-   iso value:   42                          +
-                                            +
-     (0,0)   42                             +
- 
-(1 row)
-
+ERROR:  function print(scalar, integer) does not exist
+LINE 1: select print('int32:42'::scalar, 5);
+               ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
 ```
 Duplicate a scalar
 ``` postgres-console

@@ -112,12 +112,11 @@ is installed.
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="go">create extension if not exists onesparse;</span>
 </span></code></pre></div>
 Describe the vector type:
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kp">\dT+</span><span class="w"> </span><span class="ss">vector</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="go">                                        List of data types</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="go">  Schema   |  Name  | Internal name | Size | Elements |  Owner   | Access privileges | Description </span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="go">-----------+--------+---------------+------+----------+----------+-------------------+-------------</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="go"> onesparse | vector | vector        | var  |          | postgres |                   | </span>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="go">(1 row)</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="w">                                        </span><span class="n">List</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="k">data</span><span class="w"> </span><span class="k">types</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="k">Schema</span><span class="w">   </span><span class="o">|</span><span class="w">  </span><span class="k">Name</span><span class="w">  </span><span class="o">|</span><span class="w"> </span><span class="nb">Internal</span><span class="w"> </span><span class="k">name</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Size</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Elements</span><span class="w"> </span><span class="o">|</span><span class="w">  </span><span class="k">Owner</span><span class="w">   </span><span class="o">|</span><span class="w"> </span><span class="k">Access</span><span class="w"> </span><span class="k">privileges</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Description</span><span class="w"> </span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="c1">-----------+--------+---------------+------+----------+----------+-------------------+-------------</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w"> </span><span class="n">onesparse</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">vector</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">vector</span><span class="w">        </span><span class="o">|</span><span class="w"> </span><span class="n">var</span><span class="w">  </span><span class="o">|</span><span class="w">          </span><span class="o">|</span><span class="w"> </span><span class="n">postgres</span><span class="w"> </span><span class="o">|</span><span class="w">                   </span><span class="o">|</span><span class="w"> </span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="p">(</span><span class="mf">1</span><span class="w"> </span><span class="k">row</span><span class="p">)</span>
 </span></code></pre></div>
 An empty vector can be constructed many ways, but one of the
 simplest is casting a type code to the matrix type.  In this case
@@ -228,40 +227,37 @@ functions for matrix.  See those docs for details:
 </span><span id="__span-2-101"><a id="__codelineno-2-101" name="__codelineno-2-101" href="#__codelineno-2-101"></a><span class="gs">LINE 1:</span><span class="gr"> select size(&#39;int32(2)[0:1 1:2 2:3]&#39;::vector);</span>
 </span><span id="__span-2-102"><a id="__codelineno-2-102" name="__codelineno-2-102" href="#__codelineno-2-102"></a><span class="gr">                    ^</span>
 </span><span id="__span-2-103"><a id="__codelineno-2-103" name="__codelineno-2-103" href="#__codelineno-2-103"></a><span class="gr">select ewise_add(&#39;int32[0:1 1:2 2:3]&#39;::vector, &#39;int32[0:1 1:2 2:3]&#39;::vector, &#39;plus_int32&#39;);</span>
-</span><span id="__span-2-104"><a id="__codelineno-2-104" name="__codelineno-2-104" href="#__codelineno-2-104"></a><span class="gr">     ewise_add      </span>
-</span><span id="__span-2-105"><a id="__codelineno-2-105" name="__codelineno-2-105" href="#__codelineno-2-105"></a><span class="gr">--------------------</span>
-</span><span id="__span-2-106"><a id="__codelineno-2-106" name="__codelineno-2-106" href="#__codelineno-2-106"></a><span class="gr"> int32[0:2 1:4 2:6]</span>
-</span><span id="__span-2-107"><a id="__codelineno-2-107" name="__codelineno-2-107" href="#__codelineno-2-107"></a><span class="gr">(1 row)</span>
-</span><span id="__span-2-108"><a id="__codelineno-2-108" name="__codelineno-2-108" href="#__codelineno-2-108"></a>
-</span><span id="__span-2-109"><a id="__codelineno-2-109" name="__codelineno-2-109" href="#__codelineno-2-109"></a><span class="gr">select ewise_mult(&#39;int32[0:1 1:2 2:3]&#39;::vector, &#39;int32[0:1 1:2 2:3]&#39;::vector, &#39;times_int32&#39;);</span>
-</span><span id="__span-2-110"><a id="__codelineno-2-110" name="__codelineno-2-110" href="#__codelineno-2-110"></a><span class="gr">     ewise_mult     </span>
-</span><span id="__span-2-111"><a id="__codelineno-2-111" name="__codelineno-2-111" href="#__codelineno-2-111"></a><span class="gr">--------------------</span>
-</span><span id="__span-2-112"><a id="__codelineno-2-112" name="__codelineno-2-112" href="#__codelineno-2-112"></a><span class="gr"> int32[0:1 1:4 2:9]</span>
-</span><span id="__span-2-113"><a id="__codelineno-2-113" name="__codelineno-2-113" href="#__codelineno-2-113"></a><span class="gr">(1 row)</span>
-</span><span id="__span-2-114"><a id="__codelineno-2-114" name="__codelineno-2-114" href="#__codelineno-2-114"></a>
-</span><span id="__span-2-115"><a id="__codelineno-2-115" name="__codelineno-2-115" href="#__codelineno-2-115"></a><span class="gr">select ewise_union(&#39;int32[0:1 1:2 2:3]&#39;::vector, 42, &#39;int32[0:1 1:2 2:3]&#39;::vector, 84, &#39;plus_int32&#39;);</span>
-</span><span id="__span-2-116"><a id="__codelineno-2-116" name="__codelineno-2-116" href="#__codelineno-2-116"></a><span class="gr">    ewise_union     </span>
-</span><span id="__span-2-117"><a id="__codelineno-2-117" name="__codelineno-2-117" href="#__codelineno-2-117"></a><span class="gr">--------------------</span>
-</span><span id="__span-2-118"><a id="__codelineno-2-118" name="__codelineno-2-118" href="#__codelineno-2-118"></a><span class="gr"> int32[0:2 1:4 2:6]</span>
-</span><span id="__span-2-119"><a id="__codelineno-2-119" name="__codelineno-2-119" href="#__codelineno-2-119"></a><span class="gr">(1 row)</span>
-</span><span id="__span-2-120"><a id="__codelineno-2-120" name="__codelineno-2-120" href="#__codelineno-2-120"></a>
-</span><span id="__span-2-121"><a id="__codelineno-2-121" name="__codelineno-2-121" href="#__codelineno-2-121"></a><span class="gr">select reduce_scalar(&#39;int32[0:1 1:2 2:3]&#39;::vector, &#39;plus_monoid_int32&#39;);</span>
-</span><span id="__span-2-122"><a id="__codelineno-2-122" name="__codelineno-2-122" href="#__codelineno-2-122"></a><span class="gr"> reduce_scalar </span>
-</span><span id="__span-2-123"><a id="__codelineno-2-123" name="__codelineno-2-123" href="#__codelineno-2-123"></a><span class="gr">---------------</span>
-</span><span id="__span-2-124"><a id="__codelineno-2-124" name="__codelineno-2-124" href="#__codelineno-2-124"></a><span class="gr"> int32:6</span>
-</span><span id="__span-2-125"><a id="__codelineno-2-125" name="__codelineno-2-125" href="#__codelineno-2-125"></a><span class="gr">(1 row)</span>
-</span><span id="__span-2-126"><a id="__codelineno-2-126" name="__codelineno-2-126" href="#__codelineno-2-126"></a>
-</span><span id="__span-2-127"><a id="__codelineno-2-127" name="__codelineno-2-127" href="#__codelineno-2-127"></a><span class="gr">select selection(&#39;int32[0:1 1:2 2:3]&#39;::vector, &#39;valuegt_int32&#39;, 1);</span>
-</span><span id="__span-2-128"><a id="__codelineno-2-128" name="__codelineno-2-128" href="#__codelineno-2-128"></a><span class="gr">   selection    </span>
-</span><span id="__span-2-129"><a id="__codelineno-2-129" name="__codelineno-2-129" href="#__codelineno-2-129"></a><span class="gr">----------------</span>
-</span><span id="__span-2-130"><a id="__codelineno-2-130" name="__codelineno-2-130" href="#__codelineno-2-130"></a><span class="gr"> int32[1:2 2:3]</span>
-</span><span id="__span-2-131"><a id="__codelineno-2-131" name="__codelineno-2-131" href="#__codelineno-2-131"></a><span class="gr">(1 row)</span>
-</span><span id="__span-2-132"><a id="__codelineno-2-132" name="__codelineno-2-132" href="#__codelineno-2-132"></a>
-</span><span id="__span-2-133"><a id="__codelineno-2-133" name="__codelineno-2-133" href="#__codelineno-2-133"></a><span class="gr">select apply(&#39;int32[1:1 2:2 3:3]&#39;::vector, &#39;ainv_int32&#39;::unaryop);</span>
-</span><span id="__span-2-134"><a id="__codelineno-2-134" name="__codelineno-2-134" href="#__codelineno-2-134"></a><span class="gr">         apply         </span>
-</span><span id="__span-2-135"><a id="__codelineno-2-135" name="__codelineno-2-135" href="#__codelineno-2-135"></a><span class="gr">-----------------------</span>
-</span><span id="__span-2-136"><a id="__codelineno-2-136" name="__codelineno-2-136" href="#__codelineno-2-136"></a><span class="gr"> int32[1:-1 2:-2 3:-3]</span>
-</span><span id="__span-2-137"><a id="__codelineno-2-137" name="__codelineno-2-137" href="#__codelineno-2-137"></a><span class="gr">(1 row)</span>
+</span><span id="__span-2-104"><a id="__codelineno-2-104" name="__codelineno-2-104" href="#__codelineno-2-104"></a><span class="gs">ERROR:</span><span class="gr">  function ewise_add(vector, vector, unknown) does not exist</span>
+</span><span id="__span-2-105"><a id="__codelineno-2-105" name="__codelineno-2-105" href="#__codelineno-2-105"></a><span class="gs">LINE 1:</span><span class="gr"> select ewise_add(&#39;int32[0:1 1:2 2:3]&#39;::vector, &#39;int32[0:1 1:...</span>
+</span><span id="__span-2-106"><a id="__codelineno-2-106" name="__codelineno-2-106" href="#__codelineno-2-106"></a><span class="gr">               ^</span>
+</span><span id="__span-2-107"><a id="__codelineno-2-107" name="__codelineno-2-107" href="#__codelineno-2-107"></a><span class="gs">HINT:</span><span class="gr">  No function matches the given name and argument types. You might need to add explicit type casts.</span>
+</span><span id="__span-2-108"><a id="__codelineno-2-108" name="__codelineno-2-108" href="#__codelineno-2-108"></a><span class="gr">select ewise_mult(&#39;int32[0:1 1:2 2:3]&#39;::vector, &#39;int32[0:1 1:2 2:3]&#39;::vector, &#39;times_int32&#39;);</span>
+</span><span id="__span-2-109"><a id="__codelineno-2-109" name="__codelineno-2-109" href="#__codelineno-2-109"></a><span class="gs">ERROR:</span><span class="gr">  function ewise_mult(vector, vector, unknown) does not exist</span>
+</span><span id="__span-2-110"><a id="__codelineno-2-110" name="__codelineno-2-110" href="#__codelineno-2-110"></a><span class="gs">LINE 1:</span><span class="gr"> select ewise_mult(&#39;int32[0:1 1:2 2:3]&#39;::vector, &#39;int32[0:1 1...</span>
+</span><span id="__span-2-111"><a id="__codelineno-2-111" name="__codelineno-2-111" href="#__codelineno-2-111"></a><span class="gr">               ^</span>
+</span><span id="__span-2-112"><a id="__codelineno-2-112" name="__codelineno-2-112" href="#__codelineno-2-112"></a><span class="gs">HINT:</span><span class="gr">  No function matches the given name and argument types. You might need to add explicit type casts.</span>
+</span><span id="__span-2-113"><a id="__codelineno-2-113" name="__codelineno-2-113" href="#__codelineno-2-113"></a><span class="gr">select ewise_union(&#39;int32[0:1 1:2 2:3]&#39;::vector, 42, &#39;int32[0:1 1:2 2:3]&#39;::vector, 84, &#39;plus_int32&#39;);</span>
+</span><span id="__span-2-114"><a id="__codelineno-2-114" name="__codelineno-2-114" href="#__codelineno-2-114"></a><span class="gs">ERROR:</span><span class="gr">  function ewise_union(vector, integer, vector, integer, unknown) does not exist</span>
+</span><span id="__span-2-115"><a id="__codelineno-2-115" name="__codelineno-2-115" href="#__codelineno-2-115"></a><span class="gs">LINE 1:</span><span class="gr"> select ewise_union(&#39;int32[0:1 1:2 2:3]&#39;::vector, 42, &#39;int32[...</span>
+</span><span id="__span-2-116"><a id="__codelineno-2-116" name="__codelineno-2-116" href="#__codelineno-2-116"></a><span class="gr">               ^</span>
+</span><span id="__span-2-117"><a id="__codelineno-2-117" name="__codelineno-2-117" href="#__codelineno-2-117"></a><span class="gs">HINT:</span><span class="gr">  No function matches the given name and argument types. You might need to add explicit type casts.</span>
+</span><span id="__span-2-118"><a id="__codelineno-2-118" name="__codelineno-2-118" href="#__codelineno-2-118"></a><span class="gr">select reduce_scalar(&#39;int32[0:1 1:2 2:3]&#39;::vector, &#39;plus_monoid_int32&#39;);</span>
+</span><span id="__span-2-119"><a id="__codelineno-2-119" name="__codelineno-2-119" href="#__codelineno-2-119"></a><span class="gr"> reduce_scalar </span>
+</span><span id="__span-2-120"><a id="__codelineno-2-120" name="__codelineno-2-120" href="#__codelineno-2-120"></a><span class="gr">---------------</span>
+</span><span id="__span-2-121"><a id="__codelineno-2-121" name="__codelineno-2-121" href="#__codelineno-2-121"></a><span class="gr"> int32:6</span>
+</span><span id="__span-2-122"><a id="__codelineno-2-122" name="__codelineno-2-122" href="#__codelineno-2-122"></a><span class="gr">(1 row)</span>
+</span><span id="__span-2-123"><a id="__codelineno-2-123" name="__codelineno-2-123" href="#__codelineno-2-123"></a>
+</span><span id="__span-2-124"><a id="__codelineno-2-124" name="__codelineno-2-124" href="#__codelineno-2-124"></a><span class="gr">select selection(&#39;int32[0:1 1:2 2:3]&#39;::vector, &#39;valuegt_int32&#39;, 1);</span>
+</span><span id="__span-2-125"><a id="__codelineno-2-125" name="__codelineno-2-125" href="#__codelineno-2-125"></a><span class="gr">   selection    </span>
+</span><span id="__span-2-126"><a id="__codelineno-2-126" name="__codelineno-2-126" href="#__codelineno-2-126"></a><span class="gr">----------------</span>
+</span><span id="__span-2-127"><a id="__codelineno-2-127" name="__codelineno-2-127" href="#__codelineno-2-127"></a><span class="gr"> int32[1:2 2:3]</span>
+</span><span id="__span-2-128"><a id="__codelineno-2-128" name="__codelineno-2-128" href="#__codelineno-2-128"></a><span class="gr">(1 row)</span>
+</span><span id="__span-2-129"><a id="__codelineno-2-129" name="__codelineno-2-129" href="#__codelineno-2-129"></a>
+</span><span id="__span-2-130"><a id="__codelineno-2-130" name="__codelineno-2-130" href="#__codelineno-2-130"></a><span class="gr">select apply(&#39;int32[1:1 2:2 3:3]&#39;::vector, &#39;ainv_int32&#39;::unaryop);</span>
+</span><span id="__span-2-131"><a id="__codelineno-2-131" name="__codelineno-2-131" href="#__codelineno-2-131"></a><span class="gr">         apply         </span>
+</span><span id="__span-2-132"><a id="__codelineno-2-132" name="__codelineno-2-132" href="#__codelineno-2-132"></a><span class="gr">-----------------------</span>
+</span><span id="__span-2-133"><a id="__codelineno-2-133" name="__codelineno-2-133" href="#__codelineno-2-133"></a><span class="gr"> int32[1:-1 2:-2 3:-3]</span>
+</span><span id="__span-2-134"><a id="__codelineno-2-134" name="__codelineno-2-134" href="#__codelineno-2-134"></a><span class="gr">(1 row)</span>
 </span></code></pre></div>
 Elements can be set individually with <code>set_element</code>, the modified
 input is returned:
@@ -279,46 +275,30 @@ Scalar elements can be extracted individually with <code>get_element</code>
 </span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="go">(1 row)</span>
 </span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
 </span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="go">select print(&#39;int32[1:1 2:2 3:3]&#39;::vector);</span>
-</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="go">                              print                              </span>
-</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="go">-----------------------------------------------------------------</span>
-</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="go">                                                                +</span>
-</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="go">   1152921504606846976x1 GraphBLAS int32_t vector, sparse by col+</span>
-</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="go">   A-&gt;vector, 3 entries, memory: 284 bytes                      +</span>
-</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="go">                                                                +</span>
-</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>
-</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="go">(1 row)</span>
-</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a>
-</span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a><span class="go">select print(&#39;int32[1:1 2:2 3:3]&#39;::vector, 5);</span>
-</span><span id="__span-4-18"><a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a><span class="go">                              print                              </span>
-</span><span id="__span-4-19"><a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a><span class="go">-----------------------------------------------------------------</span>
-</span><span id="__span-4-20"><a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a><span class="go">                                                                +</span>
-</span><span id="__span-4-21"><a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a><span class="go">   1152921504606846976x1 GraphBLAS int32_t vector, sparse by col+</span>
-</span><span id="__span-4-22"><a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a><span class="go">   A-&gt;vector, 3 entries, memory: 284 bytes                      +</span>
-</span><span id="__span-4-23"><a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a><span class="go">                                                                +</span>
-</span><span id="__span-4-24"><a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a><span class="go">     (1,0)   1                                                  +</span>
-</span><span id="__span-4-25"><a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a><span class="go">     (2,0)   2                                                  +</span>
-</span><span id="__span-4-26"><a id="__codelineno-4-26" name="__codelineno-4-26" href="#__codelineno-4-26"></a><span class="go">     (3,0)   3                                                  +</span>
-</span><span id="__span-4-27"><a id="__codelineno-4-27" name="__codelineno-4-27" href="#__codelineno-4-27"></a><span class="go">                                                                +</span>
-</span><span id="__span-4-28"><a id="__codelineno-4-28" name="__codelineno-4-28" href="#__codelineno-4-28"></a>
-</span><span id="__span-4-29"><a id="__codelineno-4-29" name="__codelineno-4-29" href="#__codelineno-4-29"></a><span class="go">(1 row)</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="gs">ERROR:</span><span class="gr">  integer out of range</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="gs">CONTEXT:</span><span class="gr">  PL/pgSQL function print(vector) line 3 during statement block local variable initialization</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="gr">select print(&#39;int32[1:1 2:2 3:3]&#39;::vector, 5);</span>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="gs">ERROR:</span><span class="gr">  function print(vector, integer) does not exist</span>
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="gs">LINE 1:</span><span class="gr"> select print(&#39;int32[1:1 2:2 3:3]&#39;::vector, 5);</span>
+</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="gr">               ^</span>
+</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="gs">HINT:</span><span class="gr">  No function matches the given name and argument types. You might need to add explicit type casts.</span>
+</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="gr">select wait(&#39;int32[0:1 1:2 2:3]&#39;::vector);</span>
+</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="gr"> wait </span>
+</span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a><span class="gr">------</span>
+</span><span id="__span-4-18"><a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a>
+</span><span id="__span-4-19"><a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a><span class="gr">(1 row)</span>
+</span><span id="__span-4-20"><a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a>
+</span><span id="__span-4-21"><a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a><span class="gr">select dup(&#39;int32[0:1 1:2 2:3]&#39;::vector);</span>
+</span><span id="__span-4-22"><a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a><span class="gr">        dup         </span>
+</span><span id="__span-4-23"><a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a><span class="gr">--------------------</span>
+</span><span id="__span-4-24"><a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a><span class="gr"> int32[0:1 1:2 2:3]</span>
+</span><span id="__span-4-25"><a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a><span class="gr">(1 row)</span>
+</span><span id="__span-4-26"><a id="__codelineno-4-26" name="__codelineno-4-26" href="#__codelineno-4-26"></a>
+</span><span id="__span-4-27"><a id="__codelineno-4-27" name="__codelineno-4-27" href="#__codelineno-4-27"></a><span class="gr">select clear(&#39;int32[0:1 1:2 2:3]&#39;::vector);</span>
+</span><span id="__span-4-28"><a id="__codelineno-4-28" name="__codelineno-4-28" href="#__codelineno-4-28"></a><span class="gr"> clear </span>
+</span><span id="__span-4-29"><a id="__codelineno-4-29" name="__codelineno-4-29" href="#__codelineno-4-29"></a><span class="gr">-------</span>
 </span><span id="__span-4-30"><a id="__codelineno-4-30" name="__codelineno-4-30" href="#__codelineno-4-30"></a>
-</span><span id="__span-4-31"><a id="__codelineno-4-31" name="__codelineno-4-31" href="#__codelineno-4-31"></a><span class="go">select wait(&#39;int32[0:1 1:2 2:3]&#39;::vector);</span>
-</span><span id="__span-4-32"><a id="__codelineno-4-32" name="__codelineno-4-32" href="#__codelineno-4-32"></a><span class="go"> wait </span>
-</span><span id="__span-4-33"><a id="__codelineno-4-33" name="__codelineno-4-33" href="#__codelineno-4-33"></a><span class="go">------</span>
-</span><span id="__span-4-34"><a id="__codelineno-4-34" name="__codelineno-4-34" href="#__codelineno-4-34"></a>
-</span><span id="__span-4-35"><a id="__codelineno-4-35" name="__codelineno-4-35" href="#__codelineno-4-35"></a><span class="go">(1 row)</span>
-</span><span id="__span-4-36"><a id="__codelineno-4-36" name="__codelineno-4-36" href="#__codelineno-4-36"></a>
-</span><span id="__span-4-37"><a id="__codelineno-4-37" name="__codelineno-4-37" href="#__codelineno-4-37"></a><span class="go">select dup(&#39;int32[0:1 1:2 2:3]&#39;::vector);</span>
-</span><span id="__span-4-38"><a id="__codelineno-4-38" name="__codelineno-4-38" href="#__codelineno-4-38"></a><span class="go">        dup         </span>
-</span><span id="__span-4-39"><a id="__codelineno-4-39" name="__codelineno-4-39" href="#__codelineno-4-39"></a><span class="go">--------------------</span>
-</span><span id="__span-4-40"><a id="__codelineno-4-40" name="__codelineno-4-40" href="#__codelineno-4-40"></a><span class="go"> int32[0:1 1:2 2:3]</span>
-</span><span id="__span-4-41"><a id="__codelineno-4-41" name="__codelineno-4-41" href="#__codelineno-4-41"></a><span class="go">(1 row)</span>
-</span><span id="__span-4-42"><a id="__codelineno-4-42" name="__codelineno-4-42" href="#__codelineno-4-42"></a>
-</span><span id="__span-4-43"><a id="__codelineno-4-43" name="__codelineno-4-43" href="#__codelineno-4-43"></a><span class="go">select clear(&#39;int32[0:1 1:2 2:3]&#39;::vector);</span>
-</span><span id="__span-4-44"><a id="__codelineno-4-44" name="__codelineno-4-44" href="#__codelineno-4-44"></a><span class="go"> clear </span>
-</span><span id="__span-4-45"><a id="__codelineno-4-45" name="__codelineno-4-45" href="#__codelineno-4-45"></a><span class="go">-------</span>
-</span><span id="__span-4-46"><a id="__codelineno-4-46" name="__codelineno-4-46" href="#__codelineno-4-46"></a>
-</span><span id="__span-4-47"><a id="__codelineno-4-47" name="__codelineno-4-47" href="#__codelineno-4-47"></a><span class="go">(1 row)</span>
+</span><span id="__span-4-31"><a id="__codelineno-4-31" name="__codelineno-4-31" href="#__codelineno-4-31"></a><span class="gr">(1 row)</span>
 </span></code></pre></div></p>
               
             </div>

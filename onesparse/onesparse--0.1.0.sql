@@ -220,7 +220,7 @@ RETURNS int2
 AS '$libdir/onesparse', 'scalar_nvals'
 LANGUAGE C;
 
-CREATE FUNCTION print(a scalar, level int default 1)
+CREATE FUNCTION print(a scalar)
 RETURNS text
 AS '$libdir/onesparse', 'scalar_print'
 LANGUAGE C STABLE;
@@ -835,6 +835,11 @@ CREATE TYPE vector (
     internallength = VARIABLE
     );
 
+CREATE FUNCTION vector(t type, vsize bigint default -1)
+RETURNS vector
+AS '$libdir/onesparse', 'vector_new'
+LANGUAGE C STABLE;
+
 CREATE FUNCTION type(vector)
 RETURNS type
 AS '$libdir/onesparse', 'vector_type'
@@ -850,7 +855,7 @@ RETURNS int8
 AS '$libdir/onesparse', 'vector_size'
 LANGUAGE C;
 
-CREATE FUNCTION ewise_add(
+CREATE FUNCTION eadd(
     u vector,
     v vector,
     op binaryop,
@@ -863,7 +868,7 @@ RETURNS vector
 AS '$libdir/onesparse', 'vector_ewise_add'
 LANGUAGE C STABLE;
 
-CREATE FUNCTION ewise_mult(
+CREATE FUNCTION emult(
     u vector,
     v vector,
     op binaryop,
@@ -876,7 +881,7 @@ RETURNS vector
 AS '$libdir/onesparse', 'vector_ewise_mult'
 LANGUAGE C STABLE;
 
-CREATE FUNCTION ewise_union(
+CREATE FUNCTION eunion(
     u vector,
     alpha scalar,
     v vector,
@@ -953,9 +958,14 @@ RETURNS vector
 AS '$libdir/onesparse', 'vector_remove_element'
 LANGUAGE C STABLE;
 
-CREATE FUNCTION print(a vector, level int default 1)
+CREATE FUNCTION contains(a vector, i bigint)
+RETURNS bool
+AS '$libdir/onesparse', 'vector_contains'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION info(a vector, level int default 1)
 RETURNS text
-AS '$libdir/onesparse', 'vector_print'
+AS '$libdir/onesparse', 'vector_info'
 LANGUAGE C STABLE;
 
 CREATE FUNCTION wait(vector, waitmode integer default 0)
@@ -972,6 +982,62 @@ CREATE FUNCTION clear(vector)
 RETURNS void
 AS '$libdir/onesparse', 'vector_clear'
 LANGUAGE C;
+
+create function print(a vector) returns text language plpgsql as
+    $$
+    declare
+        imax int = size(a) - 1;
+        out text = E'\n   \u2500\u2500\u2500\n';
+    begin
+        for i in 0..imax loop
+            out = out || lpad(i::text, 2) || E'\u2502';
+            if contains(a, i) then
+                out = out || lpad(print(get_element(a, i)), 3);
+            else
+                out = out || E'   ';
+            end if;
+            out = out || E'   \n';
+        end loop;
+        return out;
+    end;
+    $$;
+
+create function random_vector(
+    vsize integer,
+    nvals integer,
+    max integer default 2^31 - 1,
+    seed double precision default null)
+    returns vector language plpgsql as
+    $$
+    declare v vector = vector('int32', vsize);
+    prob double precision = nvals::double precision / vsize;
+    begin
+        if (seed is not null) then
+            perform setseed(seed);
+        end if;
+        for i in 0..vsize-1 loop
+            if random() < prob then
+                v = set_element(v, i, random(0, max));
+            end if;
+        end loop;
+        return v;
+    end;
+    $$;
+
+create function dense_vector(
+    t type,
+    vsize integer,
+    fill integer default 0)
+        returns vector language plpgsql as
+    $$
+    declare v vector = vector(t, vsize);
+    begin
+        for i in 0..vsize-1 loop
+            v = set_element(v, i, fill);
+        end loop;
+        return v;
+    end;
+    $$;
 
 
 
@@ -1018,6 +1084,18 @@ CREATE TYPE matrix (
     internallength = VARIABLE
     );
 
+CREATE TYPE matrix_element AS (row bigint, col bigint, value scalar);
+
+CREATE FUNCTION matrix(t type, nrows bigint default -1, ncols bigint default -1)
+RETURNS matrix
+AS '$libdir/onesparse', 'matrix_new'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION elements(A matrix)
+RETURNS SETOF matrix_element
+AS '$libdir/onesparse', 'matrix_elements'
+LANGUAGE C STABLE STRICT;
+
 CREATE FUNCTION type(matrix)
 RETURNS type
 AS '$libdir/onesparse', 'matrix_type'
@@ -1038,7 +1116,7 @@ RETURNS int8
 AS '$libdir/onesparse', 'matrix_ncols'
 LANGUAGE C;
 
-CREATE FUNCTION ewise_add(
+CREATE FUNCTION eadd(
     a matrix,
     b matrix,
     op binaryop,
@@ -1050,7 +1128,7 @@ RETURNS matrix
 AS '$libdir/onesparse', 'matrix_ewise_add'
 LANGUAGE C STABLE;
 
-CREATE FUNCTION ewise_mult(
+CREATE FUNCTION emult(
     a matrix,
     b matrix,
     op binaryop,
@@ -1062,7 +1140,7 @@ RETURNS matrix
 AS '$libdir/onesparse', 'matrix_ewise_mult'
 LANGUAGE C STABLE;
 
-CREATE FUNCTION ewise_union(
+CREATE FUNCTION eadd(
     a matrix,
     alpha scalar,
     b matrix,
@@ -1200,6 +1278,11 @@ RETURNS matrix
 AS '$libdir/onesparse', 'matrix_remove_element'
 LANGUAGE C STABLE;
 
+CREATE FUNCTION contains(a matrix, i bigint, j bigint)
+RETURNS bool
+AS '$libdir/onesparse', 'matrix_contains'
+LANGUAGE C STABLE;
+
 CREATE FUNCTION wait(matrix, waitmode integer default 0)
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_wait'
@@ -1215,9 +1298,9 @@ RETURNS matrix
 AS '$libdir/onesparse', 'matrix_clear'
 LANGUAGE C;
 
-CREATE FUNCTION print(a matrix, level int default 1)
+CREATE FUNCTION info(a matrix, level int default 1)
 RETURNS text
-AS '$libdir/onesparse', 'matrix_print'
+AS '$libdir/onesparse', 'matrix_info'
 LANGUAGE C STABLE;
 
 CREATE FUNCTION mxm_op(a matrix, b matrix)
@@ -1249,3 +1332,95 @@ CREATE OPERATOR @ (
     RIGHTARG = matrix,
     FUNCTION = vxm_op
     );
+
+create function print(a matrix) returns text language plpgsql as
+    $$
+    declare
+        imax int = nrows(a) - 1;
+        jmax int = ncols(a) - 1;
+        out text = '';
+    begin
+        out = out || repeat(' ', 3);
+        for i in 0..jmax loop
+            out = out || lpad(i::text, 3);
+        end loop;
+        out = out || E'\n   ';
+        for i in 0..jmax loop
+            out = out || repeat(E'\u2500', 3);
+        end loop;
+        out = out || E'\n';
+        for i in 0..imax loop
+            out = out || lpad(i::text, 2) || E'\u2502';
+            for j in 0..jmax loop
+                if contains(a, i, j) then
+                    out = out || lpad(print(get_element(a, i, j)), 3);
+                else
+                    out = out || E'   ';
+                end if;
+            end loop;
+            out = out || E'   \n';
+        end loop;
+        return out;
+    end;
+    $$;
+
+create function random_matrix(
+    nrows integer,
+    ncols integer,
+    nvals integer,
+    max integer default 2^31 - 1,
+    seed double precision default null)
+    returns matrix language plpgsql as
+    $$
+    declare m matrix = matrix('int32', nrows, ncols);
+    prob double precision = nvals::double precision / (nrows * ncols);
+    begin
+        if (seed is not null) then
+            perform setseed(seed);
+        end if;
+        for i in 0..nrows-1 loop
+            for j in 0..ncols-1 loop
+                if random() < prob then
+                    m = set_element(m, i, j, random(0, max));
+                end if;
+            end loop;
+        end loop;
+        return m;
+    end;
+    $$;
+
+
+create function dense_matrix(
+    t type,
+    nrows integer,
+    ncols integer,
+    fill integer default 0)
+        returns matrix language plpgsql as
+    $$
+    declare m matrix = matrix(t, nrows, ncols);
+    begin
+        for i in 0..nrows-1 loop
+            for j in 0..ncols-1 loop
+                m = set_element(m, i, j, fill);
+            end loop;
+        end loop;
+        return m;
+    end;
+    $$;
+
+
+create or replace function dot_matrix(a matrix) returns text language plpgsql as
+    $$
+    declare
+        row bigint;
+        col bigint;
+        value scalar;
+        result text = E'digraph {\n';
+    begin
+        for row, col, value in select * from elements(a) loop
+            result = result || format(E'%s -> %s [label="%s"]\n', row, col, print(value));
+        end loop;
+        result = result || E'}\n';
+        return result;
+    end;
+    $$;

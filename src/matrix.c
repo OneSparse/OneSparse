@@ -15,6 +15,8 @@ static const ExpandedObjectMethods matrix_methods = {
 
 PG_FUNCTION_INFO_V1(matrix_in);
 PG_FUNCTION_INFO_V1(matrix_out);
+PG_FUNCTION_INFO_V1(matrix_new);
+PG_FUNCTION_INFO_V1(matrix_elements);
 PG_FUNCTION_INFO_V1(matrix_nvals);
 PG_FUNCTION_INFO_V1(matrix_nrows);
 PG_FUNCTION_INFO_V1(matrix_ncols);
@@ -36,8 +38,10 @@ PG_FUNCTION_INFO_V1(matrix_apply);
 PG_FUNCTION_INFO_V1(matrix_get_element);
 PG_FUNCTION_INFO_V1(matrix_set_element);
 PG_FUNCTION_INFO_V1(matrix_remove_element);
-PG_FUNCTION_INFO_V1(matrix_print);
+PG_FUNCTION_INFO_V1(matrix_contains);
+PG_FUNCTION_INFO_V1(matrix_info);
 PG_FUNCTION_INFO_V1(matrix_type);
+PG_FUNCTION_INFO_V1(matrix_kron);
 
 static Size matrix_get_flat_size(ExpandedObjectHeader *eohptr) {
 	os_Matrix *matrix;
@@ -391,7 +395,7 @@ Datum matrix_in(PG_FUNCTION_ARGS)
 Datum matrix_out(PG_FUNCTION_ARGS)
 {
 	GrB_Info info;
-	GrB_Index row, col;
+	GrB_Index row, col, nrows, ncols, nvals;
 	GxB_Iterator iterator;
 	os_Matrix *matrix;
 	StringInfoData buf;
@@ -410,7 +414,32 @@ Datum matrix_out(PG_FUNCTION_ARGS)
 		  matrix->matrix,
 		  "Cannot get Matrix Type code.");
 
-	appendStringInfo(&buf, "%s[", short_code(type_code));
+	appendStringInfo(&buf, "%s", short_code(type_code));
+
+	OS_MNROWS(nrows, matrix);
+	OS_MNCOLS(ncols, matrix);
+	if (nrows < GrB_INDEX_MAX+1 || ncols < GrB_INDEX_MAX+1)
+	{
+		appendStringInfo(&buf, "(");
+		if (nrows < GrB_INDEX_MAX+1)
+		{
+			appendStringInfo(&buf, "%lu", nrows);
+		}
+		appendStringInfo(&buf, ":");
+		if (ncols < GrB_INDEX_MAX+1)
+		{
+			appendStringInfo(&buf, "%lu", ncols);
+		}
+		appendStringInfo(&buf, ")");
+	}
+	OS_MNVALS(nvals, matrix);
+
+	if (nvals == 0)
+	{
+		PG_RETURN_CSTRING(buf.data);
+	}
+
+	appendStringInfo(&buf, "[");
 
 	info = GxB_Matrix_Iterator_seek(iterator, 0);
 	while (info != GxB_EXHAUSTED)
@@ -448,6 +477,12 @@ Datum matrix_out(PG_FUNCTION_ARGS)
 				appendStringInfo(&buf, "%lu:%lu:%f", row, col, vf32);
 				break;
 				}
+			case GrB_BOOL_CODE:
+				{
+				bool b = GxB_Iterator_get_BOOL(iterator);
+				appendStringInfo(&buf, "%lu:%lu:%s", row, col, b ? "t" : "f");
+				break;
+				}
 		}
 		info = GxB_Matrix_Iterator_next(iterator);
 		if (info != GxB_EXHAUSTED)
@@ -457,6 +492,102 @@ Datum matrix_out(PG_FUNCTION_ARGS)
 
 	appendStringInfo(&buf, "]");
 	PG_RETURN_CSTRING(buf.data);
+}
+
+Datum matrix_new(PG_FUNCTION_ARGS)
+{
+	os_Type *type;
+	GrB_Index nrows, ncols;
+	os_Matrix *A;
+
+	type = OS_GETARG_TYPE(0);
+	nrows = PG_GETARG_INT64(1);
+	ncols = PG_GETARG_INT64(2);
+	if (nrows == -1)
+	{
+		nrows = GrB_INDEX_MAX+1;
+	}
+	if (ncols == -1)
+		ncols = GrB_INDEX_MAX+1;
+	A = new_matrix(type->type, nrows, ncols, CurrentMemoryContext, NULL);
+	OS_RETURN_MATRIX(A);
+}
+
+
+typedef struct os_Matrix_ExtractState {
+	GrB_Type type;
+	GrB_Info info;
+	os_Matrix *matrix;
+	GxB_Iterator iterator;
+} os_Matrix_ExtractState;
+
+Datum matrix_elements(PG_FUNCTION_ARGS)
+{
+	FuncCallContext  *funcctx;
+	TupleDesc tupdesc;
+	Datum result;
+
+	Datum values[3];
+	bool nulls[3] = {false, false, false};
+	HeapTuple tuple;
+	GrB_Index nvals, row, col;
+	os_Matrix *matrix;
+	os_Scalar *scalar;
+	os_Matrix_ExtractState *state;
+
+	if (SRF_IS_FIRSTCALL()) {
+		MemoryContext oldcontext;
+
+		funcctx = SRF_FIRSTCALL_INIT();
+		oldcontext = MemoryContextSwitchTo(funcctx->multi_call_memory_ctx);
+		matrix = OS_GETARG_MATRIX(0);
+
+		state = (os_Matrix_ExtractState*)palloc(sizeof(os_Matrix_ExtractState));
+		OS_MNVALS(nvals, matrix);
+
+		state->matrix = matrix;
+		GxB_Iterator_new(&(state->iterator));
+		OS_CHECK(GxB_Matrix_Iterator_attach(state->iterator, matrix->matrix, NULL),
+				 matrix->matrix,
+				 "Cannot attach matrix iterator.");
+		OS_MTYPE(state->type, matrix);
+		state->info = GxB_Matrix_Iterator_seek(state->iterator, 0);
+		funcctx->max_calls = nvals;
+		funcctx->user_fctx = (void*)state;
+
+		if (get_call_result_type(fcinfo, NULL, &tupdesc) != TYPEFUNC_COMPOSITE)
+			ereport(ERROR,
+					(errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
+					 errmsg("function returning record called in context "
+							"that cannot accept type record")));
+		BlessTupleDesc(tupdesc);
+		funcctx->tuple_desc = tupdesc;
+		MemoryContextSwitchTo(oldcontext);
+	}
+
+	funcctx = SRF_PERCALL_SETUP();
+	state = (os_Matrix_ExtractState*)funcctx->user_fctx;
+	if (state->info == GxB_EXHAUSTED)
+	{
+		SRF_RETURN_DONE(funcctx);
+	}
+	matrix = state->matrix;
+	if (funcctx->call_cntr < funcctx->max_calls)
+	{
+		GxB_Matrix_Iterator_getIndex(state->iterator, &row, &col);
+		values[0] = Int64GetDatum(row);
+		values[1] = Int64GetDatum(col);
+		scalar = new_scalar(state->type, CurrentMemoryContext, NULL);
+		OS_CHECK(GrB_Matrix_extractElement(scalar->scalar, matrix->matrix, row, col),
+				 matrix->matrix,
+				 "Error extracting setting matrix element.");
+		values[2] = EOHPGetRWDatum(&(scalar)->hdr);
+		tuple = heap_form_tuple(funcctx->tuple_desc, values, nulls);
+		result = HeapTupleGetDatum(tuple);
+		state->info = GxB_Matrix_Iterator_next(state->iterator);
+		SRF_RETURN_NEXT(funcctx, result);
+	}
+	SRF_RETURN_DONE(funcctx);
 }
 
 Datum matrix_nvals(PG_FUNCTION_ARGS)
@@ -509,14 +640,10 @@ Datum matrix_ewise_add(PG_FUNCTION_ARGS)
 	ERRORNULL(1);
 	ERRORNULL(2);
 
+	nargs = PG_NARGS();
 	u = OS_GETARG_MATRIX(0);
 	v = OS_GETARG_MATRIX(1);
 	op = OS_GETARG_BINARYOP(2);
-
-	mask = NULL;
-	accum = NULL;
-	descriptor = NULL;
-	nargs = PG_NARGS();
 
 	if (nargs > 3)
 	{
@@ -563,14 +690,10 @@ Datum matrix_ewise_mult(PG_FUNCTION_ARGS)
 	ERRORNULL(1);
 	ERRORNULL(2);
 
+	nargs = PG_NARGS();
 	u = OS_GETARG_MATRIX(0);
 	v = OS_GETARG_MATRIX(1);
 	op = OS_GETARG_BINARYOP(2);
-
-	mask = NULL;
-	accum = NULL;
-	descriptor = NULL;
-	nargs = PG_NARGS();
 
 	if (nargs > 3)
 	{
@@ -620,16 +743,12 @@ Datum matrix_ewise_union(PG_FUNCTION_ARGS)
 	ERRORNULL(3);
 	ERRORNULL(4);
 
+	nargs = PG_NARGS();
 	u = OS_GETARG_MATRIX(0);
 	a = OS_GETARG_SCALAR(1);
 	v = OS_GETARG_MATRIX(2);
 	b = OS_GETARG_SCALAR(3);
 	op = OS_GETARG_BINARYOP(4);
-
-	mask = NULL;
-	accum = NULL;
-	descriptor = NULL;
-	nargs = PG_NARGS();
 
 	if (nargs > 5)
 	{
@@ -676,14 +795,10 @@ Datum matrix_mxm(PG_FUNCTION_ARGS)
 	ERRORNULL(1);
 	ERRORNULL(2);
 
+	nargs = PG_NARGS();
 	u = OS_GETARG_MATRIX(0);
 	v = OS_GETARG_MATRIX(1);
 	op = OS_GETARG_SEMIRING(2);
-
-	mask = NULL;
-	accum = NULL;
-	descriptor = NULL;
-	nargs = PG_NARGS();
 
 	if (nargs > 3)
 	{
@@ -732,14 +847,10 @@ Datum matrix_mxv(PG_FUNCTION_ARGS)
 	ERRORNULL(1);
 	ERRORNULL(2);
 
+	nargs = PG_NARGS();
 	u = OS_GETARG_MATRIX(0);
 	v = OS_GETARG_VECTOR(1);
 	op = OS_GETARG_SEMIRING(2);
-
-	mask = NULL;
-	accum = NULL;
-	descriptor = NULL;
-	nargs = PG_NARGS();
 
 	if (nargs > 3)
 	{
@@ -787,14 +898,10 @@ Datum matrix_vxm(PG_FUNCTION_ARGS)
 	ERRORNULL(1);
 	ERRORNULL(2);
 
+	nargs = PG_NARGS();
 	u = OS_GETARG_VECTOR(0);
 	v = OS_GETARG_MATRIX(1);
 	op = OS_GETARG_SEMIRING(2);
-
-	mask = NULL;
-	accum = NULL;
-	descriptor = NULL;
-	nargs = PG_NARGS();
 
 	if (nargs > 3)
 	{
@@ -841,11 +948,9 @@ Datum matrix_reduce_vector(PG_FUNCTION_ARGS)
 	ERRORNULL(0);
 	ERRORNULL(1);
 
+	nargs = PG_NARGS();
 	u = OS_GETARG_MATRIX(0);
 	op = OS_GETARG_MONOID(1);
-
-	descriptor = NULL;
-	nargs = PG_NARGS();
 
 	if (nargs > 2)
 	{
@@ -886,9 +991,9 @@ matrix_reduce_scalar(PG_FUNCTION_ARGS)
 	GrB_Type type;
 	int nargs;
 
+	nargs = PG_NARGS();
 	A = OS_GETARG_MATRIX(0);
 	monoid = OS_GETARG_MONOID(1);
-	nargs = PG_NARGS();
 
 	accum = OS_GETARG_BINARYOP_OR_NULL(nargs, 2);
 	descriptor = OS_GETARG_DESCRIPTOR_OR_NULL(nargs, 3);
@@ -917,9 +1022,9 @@ matrix_assign_matrix(PG_FUNCTION_ARGS)
 	GrB_Index nvals, *rows = NULL, *cols = NULL;
 	int nargs;
 
+	nargs = PG_NARGS();
 	A = OS_GETARG_MATRIX(0);
 	B = OS_GETARG_MATRIX(1);
-	nargs = PG_NARGS();
 
 	accum = OS_GETARG_BINARYOP_OR_NULL(nargs, 2);
 	mask = OS_GETARG_MATRIX_OR_NULL(nargs, 3);
@@ -961,9 +1066,9 @@ matrix_extract_matrix(PG_FUNCTION_ARGS)
 	GrB_Index nvals, *rows = NULL, *cols = NULL;
 	int nargs;
 
+	nargs = PG_NARGS();
 	A = OS_GETARG_MATRIX(0);
 	B = OS_GETARG_MATRIX(1);
-	nargs = PG_NARGS();
 
 	accum = OS_GETARG_BINARYOP_OR_NULL(nargs, 2);
 	mask = OS_GETARG_MATRIX_OR_NULL(nargs, 3);
@@ -1015,14 +1120,10 @@ Datum matrix_select(PG_FUNCTION_ARGS)
 	ERRORNULL(1);
 	ERRORNULL(2);
 
+	nargs = PG_NARGS();
 	A = OS_GETARG_MATRIX(0);
 	op = OS_GETARG_INDEXUNARYOP(1);
 	y = OS_GETARG_SCALAR(2);
-
-	mask = NULL;
-	accum = NULL;
-	descriptor = NULL;
-	nargs = PG_NARGS();
 
 	if (nargs > 3)
 	{
@@ -1067,13 +1168,9 @@ Datum matrix_apply(PG_FUNCTION_ARGS)
 	ERRORNULL(0);
 	ERRORNULL(1);
 
+	nargs = PG_NARGS();
 	A = OS_GETARG_MATRIX(0);
 	op = OS_GETARG_UNARYOP(1);
-
-	mask = NULL;
-	accum = NULL;
-	descriptor = NULL;
-	nargs = PG_NARGS();
 
 	if (nargs > 2)
 	{
@@ -1150,6 +1247,31 @@ Datum matrix_remove_element(PG_FUNCTION_ARGS)
 		  "Error waiting to materialize matrix.");
 
 	OS_RETURN_MATRIX(matrix);
+}
+
+Datum matrix_contains(PG_FUNCTION_ARGS)
+{
+	os_Matrix *matrix;
+	GrB_Index i, j;
+	GrB_Info info;
+
+	LOGF();
+	ERRORNULL(0);
+	ERRORNULL(1);
+	ERRORNULL(2);
+
+	matrix = OS_GETARG_MATRIX(0);
+	i = PG_GETARG_INT64(1);
+	j = PG_GETARG_INT64(2);
+
+	info = GxB_Matrix_isStoredElement(matrix->matrix, i, j);
+	if (info == GrB_SUCCESS)
+		PG_RETURN_BOOL(true);
+	else if (info == GrB_NO_VALUE)
+		PG_RETURN_BOOL(false);
+	else
+		elog(ERROR, "Error checking stored element.");
+	PG_RETURN_BOOL(false);
 }
 
 Datum matrix_get_element(PG_FUNCTION_ARGS)
@@ -1232,7 +1354,7 @@ Datum matrix_clear(PG_FUNCTION_ARGS)
 	OS_RETURN_MATRIX(A);
 }
 
-Datum matrix_print(PG_FUNCTION_ARGS) {
+Datum matrix_info(PG_FUNCTION_ARGS) {
 	os_Matrix *A;
 	char *result, *buf;
 	size_t size;

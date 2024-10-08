@@ -68,15 +68,26 @@
 				  _v->vector,\
 				  "Cannot get vector type");
 
-#define OS_VNVALS(_nvals, _vector)\
-	OS_CHECK(GrB_Vector_nvals(&_nvals, _vector->vector),\
-			 _vector->vector,\
+#define OS_VNVALS(_nvals, _v)\
+	OS_CHECK(GrB_Vector_nvals(&_nvals, _v->vector),\
+			 _v->vector,\
 			 "Error extracting vector nvals.");
 
 #define OS_VSIZE(_size, _v)\
 	OS_CHECK(GrB_Vector_size(&_size, _v->vector), \
 		  _v->vector, \
 		  "Cannot get matrix type");
+
+#define OS_STYPE(_stype, _s)      \
+	OS_CHECK(GxB_Scalar_type(&_stype, _s->scalar),\
+				  _s->scalar,\
+				  "Cannot get scalar type");
+
+#define OS_SNVALS(_nvals, _s)\
+	OS_CHECK(GrB_Scalar_nvals(&_nvals, _s->scalar),\
+			 _s->scalar,\
+			 "Error extracting scalar nvals.");
+
 
 #ifdef OS_DEBUG
 #define LOGF() elog(INFO, __func__)

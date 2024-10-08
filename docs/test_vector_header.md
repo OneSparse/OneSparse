@@ -11,7 +11,6 @@ create extension if not exists onesparse;
 ```
 Describe the vector type:
 ``` postgres-console
-\dT+ vector
                                         List of data types
   Schema   |  Name  | Internal name | Size | Elements |  Owner   | Access privileges | Description 
 -----------+--------+---------------+------+----------+----------+-------------------+-------------
@@ -130,23 +129,20 @@ Row index 2 out of range; must be < 2: Error setting Vector Element
 LINE 1: select size('int32(2)[0:1 1:2 2:3]'::vector);
                     ^
 select ewise_add('int32[0:1 1:2 2:3]'::vector, 'int32[0:1 1:2 2:3]'::vector, 'plus_int32');
-     ewise_add      
---------------------
- int32[0:2 1:4 2:6]
-(1 row)
-
+ERROR:  function ewise_add(vector, vector, unknown) does not exist
+LINE 1: select ewise_add('int32[0:1 1:2 2:3]'::vector, 'int32[0:1 1:...
+               ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
 select ewise_mult('int32[0:1 1:2 2:3]'::vector, 'int32[0:1 1:2 2:3]'::vector, 'times_int32');
-     ewise_mult     
---------------------
- int32[0:1 1:4 2:9]
-(1 row)
-
+ERROR:  function ewise_mult(vector, vector, unknown) does not exist
+LINE 1: select ewise_mult('int32[0:1 1:2 2:3]'::vector, 'int32[0:1 1...
+               ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
 select ewise_union('int32[0:1 1:2 2:3]'::vector, 42, 'int32[0:1 1:2 2:3]'::vector, 84, 'plus_int32');
-    ewise_union     
---------------------
- int32[0:2 1:4 2:6]
-(1 row)
-
+ERROR:  function ewise_union(vector, integer, vector, integer, unknown) does not exist
+LINE 1: select ewise_union('int32[0:1 1:2 2:3]'::vector, 42, 'int32[...
+               ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
 select reduce_scalar('int32[0:1 1:2 2:3]'::vector, 'plus_monoid_int32');
  reduce_scalar 
 ---------------
@@ -185,29 +181,13 @@ select get_element('int32[1:1 2:2 3:3]'::vector, 3);
 (1 row)
 
 select print('int32[1:1 2:2 3:3]'::vector);
-                              print                              
------------------------------------------------------------------
-                                                                +
-   1152921504606846976x1 GraphBLAS int32_t vector, sparse by col+
-   A->vector, 3 entries, memory: 284 bytes                      +
-                                                                +
- 
-(1 row)
-
+ERROR:  integer out of range
+CONTEXT:  PL/pgSQL function print(vector) line 3 during statement block local variable initialization
 select print('int32[1:1 2:2 3:3]'::vector, 5);
-                              print                              
------------------------------------------------------------------
-                                                                +
-   1152921504606846976x1 GraphBLAS int32_t vector, sparse by col+
-   A->vector, 3 entries, memory: 284 bytes                      +
-                                                                +
-     (1,0)   1                                                  +
-     (2,0)   2                                                  +
-     (3,0)   3                                                  +
-                                                                +
- 
-(1 row)
-
+ERROR:  function print(vector, integer) does not exist
+LINE 1: select print('int32[1:1 2:2 3:3]'::vector, 5);
+               ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
 select wait('int32[0:1 1:2 2:3]'::vector);
  wait 
 ------

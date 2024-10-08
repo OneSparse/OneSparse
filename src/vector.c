@@ -15,7 +15,7 @@ static const ExpandedObjectMethods vector_methods = {
 
 PG_FUNCTION_INFO_V1(vector_in);
 PG_FUNCTION_INFO_V1(vector_out);
-
+PG_FUNCTION_INFO_V1(vector_new);
 PG_FUNCTION_INFO_V1(vector_nvals);
 PG_FUNCTION_INFO_V1(vector_size);
 PG_FUNCTION_INFO_V1(vector_wait);
@@ -31,7 +31,8 @@ PG_FUNCTION_INFO_V1(vector_apply);
 PG_FUNCTION_INFO_V1(vector_get_element);
 PG_FUNCTION_INFO_V1(vector_set_element);
 PG_FUNCTION_INFO_V1(vector_remove_element);
-PG_FUNCTION_INFO_V1(vector_print);
+PG_FUNCTION_INFO_V1(vector_contains);
+PG_FUNCTION_INFO_V1(vector_info);
 PG_FUNCTION_INFO_V1(vector_type);
 
 static Size vector_get_flat_size(ExpandedObjectHeader *eohptr) {
@@ -421,6 +422,12 @@ Datum vector_out(PG_FUNCTION_ARGS)
 				appendStringInfo(&buf, "%lu:%f", i, vf32);
 				break;
 				}
+			case GrB_BOOL_CODE:
+				{
+				bool b = GxB_Iterator_get_BOOL(iterator);
+				appendStringInfo(&buf, "%lu:%s", i, b ? "t" : "f");
+				break;
+				}
 		}
         info = GxB_Vector_Iterator_next(iterator);
 		if (info != GxB_EXHAUSTED)
@@ -430,6 +437,22 @@ Datum vector_out(PG_FUNCTION_ARGS)
 
 	appendStringInfo(&buf, "]");
 	PG_RETURN_CSTRING(buf.data);
+}
+
+Datum vector_new(PG_FUNCTION_ARGS)
+{
+	os_Type *type;
+	GrB_Index size;
+	os_Vector *A;
+
+	type = OS_GETARG_TYPE(0);
+	size = PG_GETARG_INT64(1);
+	if (size == -1)
+	{
+		size = GrB_INDEX_MAX+1;
+	}
+	A = new_vector(type->type, size, CurrentMemoryContext, NULL);
+	OS_RETURN_VECTOR(A);
 }
 
 Datum vector_nvals(PG_FUNCTION_ARGS)
@@ -846,6 +869,29 @@ Datum vector_remove_element(PG_FUNCTION_ARGS)
 	OS_RETURN_VECTOR(vector);
 }
 
+Datum vector_contains(PG_FUNCTION_ARGS)
+{
+	os_Vector *vector;
+	GrB_Index i;
+	GrB_Info info;
+
+	LOGF();
+	ERRORNULL(0);
+	ERRORNULL(1);
+
+	vector = OS_GETARG_VECTOR(0);
+	i = PG_GETARG_INT64(1);
+
+	info = GxB_Vector_isStoredElement(vector->vector, i);
+	if (info == GrB_SUCCESS)
+		PG_RETURN_BOOL(true);
+	else if (info == GrB_NO_VALUE)
+		PG_RETURN_BOOL(false);
+	else
+		elog(ERROR, "Error checking stored element.");
+	PG_RETURN_BOOL(false);
+}
+
 Datum vector_get_element(PG_FUNCTION_ARGS)
 {
 	os_Vector *vector;
@@ -926,7 +972,7 @@ Datum vector_clear(PG_FUNCTION_ARGS)
 	PG_RETURN_VOID();
 }
 
-Datum vector_print(PG_FUNCTION_ARGS) {
+Datum vector_info(PG_FUNCTION_ARGS) {
 	os_Vector *A;
 	char *result, *buf;
 	size_t size;
