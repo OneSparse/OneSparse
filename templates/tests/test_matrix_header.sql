@@ -147,7 +147,7 @@ select dot_matrix(random_matrix(8, 8, 16, seed=>0.42, max=>42)) as dot_source \g
 \o /dev/null
 \set ECHO none
 \i sql/fixtures.sql
-\set ECHO queries
+\set ECHO all
 \o
 
 select print(a) as a, print(b) as b, print(u) as u, print(v) as v from test_fixture;

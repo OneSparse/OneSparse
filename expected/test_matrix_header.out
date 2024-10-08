@@ -188,7 +188,7 @@ select dot_matrix('int32(8:8)[1:2:1 2:3:2 3:1:3]'::matrix) as dot_source \gset
 --
 \i sql/dot.sql
 \setenv dot_source :dot_source
-\! echo $dot_source | dot -Tsvg | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>' | sed 's/^/-- /'
+\! echo $dot_source | dot -Tsvg | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
 -- <div>
 -- <!-- Title: %3 Pages: 1 -->
 -- <svg width="109pt" height="218pt"
@@ -238,6 +238,7 @@ select dot_matrix('int32(8:8)[1:2:1 2:3:2 3:1:3]'::matrix) as dot_source \gset
 -- </g>
 -- </svg>
 -- </div>
+-- 
 -- Another useful function is `random_matrix()`.  This will generate a
 -- random matrix provided the type, number of rows, number of columns,
 -- and the number of (approximate) values and an optional random seed
@@ -266,7 +267,7 @@ select print(random_matrix(8, 8, 16, seed=>0.42, max=>42)) as random_matrix;
 select dot_matrix(random_matrix(8, 8, 16, seed=>0.42, max=>42)) as dot_source \gset
 \i sql/dot.sql
 \setenv dot_source :dot_source
-\! echo $dot_source | dot -Tsvg | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>' | sed 's/^/-- /'
+\! echo $dot_source | dot -Tsvg | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
 -- <div>
 -- <!-- Title: %3 Pages: 1 -->
 -- <svg width="281pt" height="392pt"
@@ -430,6 +431,7 @@ select dot_matrix(random_matrix(8, 8, 16, seed=>0.42, max=>42)) as dot_source \g
 -- </g>
 -- </svg>
 -- </div>
+-- 
 -- # Test Fixtures
 --
 -- Let's get a test fixture table with a couple matrix and vector
@@ -439,6 +441,7 @@ select dot_matrix(random_matrix(8, 8, 16, seed=>0.42, max=>42)) as dot_source \g
 -- `random_vector()` function:
 \o /dev/null
 \set ECHO none
+\o
 select print(a) as a, print(b) as b, print(u) as u, print(v) as v from test_fixture;
 ┌───────────────────────┬───────────────────────┬───────────┬───────────┐
 │           a           │           b           │     u     │     v     │
@@ -470,6 +473,13 @@ select print(a) as a, print(b) as b, print(u) as u, print(v) as v from test_fixt
 └───────────────────────┴───────────────────────┴───────────┴───────────┘
 (3 rows)
 
+-- # Element-wise operations
+--
+-- The GraphBLAS API has elementwise operations on matrices that
+-- operate pairs of matrices.  `eadd` computes the element-wise
+-- “addition” of two matrices A and B, element-wise using any binary
+-- operator.  Elements present on both sides of the operation are
+-- included in the result.
 select print(a) as a, binaryop, print(b) as b, print(eadd(A, B, binaryop)) as union from test_fixture;
 ┌───────────────────────┬─────────────┬───────────────────────┬───────────────────────┐
 │           a           │  binaryop   │           b           │         union         │
@@ -501,6 +511,10 @@ select print(a) as a, binaryop, print(b) as b, print(eadd(A, B, binaryop)) as un
 └───────────────────────┴─────────────┴───────────────────────┴───────────────────────┘
 (3 rows)
 
+-- `emult` multiplies elements of two matrices, taking only the
+-- intersection of common elements in both matrices, if an element is
+-- missing from either the left or right side, it is ommited from the
+-- result:
 select print(a) as a, binaryop, print(b) as b, print(emult(A, B, binaryop)) as intersect from test_fixture;
 ┌───────────────────────┬─────────────┬───────────────────────┬───────────────────────┐
 │           a           │  binaryop   │           b           │       intersect       │
@@ -532,11 +546,16 @@ select print(a) as a, binaryop, print(b) as b, print(emult(A, B, binaryop)) as i
 └───────────────────────┴─────────────┴───────────────────────┴───────────────────────┘
 (3 rows)
 
+-- `eunion` is like `eadd` but differs in how the binary op is
+-- applied. A pair of scalars, `alpha` and `beta` define the inputs to
+-- the operator when entries are present in one matrix but not the
+-- other.
 select print(a) as a, binaryop, print(b) as b, print(eunion(A, 3, B, 4, binaryop)) as union from test_fixture;
 ERROR:  function eunion(matrix, integer, matrix, integer, binaryop) does not exist
 LINE 1: ...ect print(a) as a, binaryop, print(b) as b, print(eunion(A, ...
                                                              ^
 HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+-- The entire matrix can be reduced to a scalar value:
 select print(a) as a, reduce_scalar(a, monoid) from test_fixture;
 ┌───────────────────────┬───────────────┐
 │           a           │ reduce_scalar │
@@ -568,6 +587,7 @@ select print(a) as a, reduce_scalar(a, monoid) from test_fixture;
 └───────────────────────┴───────────────┘
 (3 rows)
 
+-- The matrix can also be reduced to a column vector:
 select print(a) as a, monoid, print(reduce_vector(a, monoid)) as reduce_vector from test_fixture;
 ┌───────────────────────┬───────────────────┬───────────────┐
 │           a           │      monoid       │ reduce_vector │
@@ -599,6 +619,8 @@ select print(a) as a, monoid, print(reduce_vector(a, monoid)) as reduce_vector f
 └───────────────────────┴───────────────────┴───────────────┘
 (3 rows)
 
+-- To reduce a row vector, specify that the input should be transposed
+-- with the descriptor `t0`:
 select print(a) as a, monoid, print(reduce_vector(a, monoid, descriptor=>'t0')) as transpose_reduce_vector from test_fixture;
 ┌───────────────────────┬───────────────────┬─────────────────────────┐
 │           a           │      monoid       │ transpose_reduce_vector │
@@ -630,6 +652,12 @@ select print(a) as a, monoid, print(reduce_vector(a, monoid, descriptor=>'t0')) 
 └───────────────────────┴───────────────────┴─────────────────────────┘
 (3 rows)
 
+-- Matrix Multiplication (referred to here as A @ B) is the heart of
+-- linear algebra.  All matrix multiplication happens over a semiring.
+-- For the most common form of matrix multiplication, the outer
+-- opperation is to multiply coresponding elements with the "times"
+-- operator and then reduce those products with the "plus" operator.
+-- This is called the `plus_times` semiring:
 select print(a) as a, semiring, print(b) as b, print(mxm(a, b, semiring)) as mxm from test_fixture;
 ┌───────────────────────┬──────────────────┬───────────────────────┬───────────────────────┐
 │           a           │     semiring     │           b           │          mxm          │
@@ -661,6 +689,8 @@ select print(a) as a, semiring, print(b) as b, print(mxm(a, b, semiring)) as mxm
 └───────────────────────┴──────────────────┴───────────────────────┴───────────────────────┘
 (3 rows)
 
+-- AxB can also be done with the `@` operator, mimicking the Python
+-- syntax.  The default semiring for numeric types is `plus_times`.
 select print(a) as a, '@' as "@", print(b) as b, print(a @ b) as mxm from test_fixture;
 ┌───────────────────────┬───┬───────────────────────┬───────────────────────┐
 │           a           │ @ │           b           │          mxm          │
@@ -692,6 +722,9 @@ select print(a) as a, '@' as "@", print(b) as b, print(a @ b) as mxm from test_f
 └───────────────────────┴───┴───────────────────────┴───────────────────────┘
 (3 rows)
 
+-- Matrices can be multipled by vectors on the right taking the linear
+-- combination of the matrices columns using the vectors elements as
+-- coefficients:
 select print(a), semiring, print(u), print(mxv(a, u, semiring)) from test_fixture;
 ┌───────────────────────┬──────────────────┬───────────┬───────────┐
 │         print         │     semiring     │   print   │   print   │
@@ -723,6 +756,7 @@ select print(a), semiring, print(u), print(mxv(a, u, semiring)) from test_fixtur
 └───────────────────────┴──────────────────┴───────────┴───────────┘
 (3 rows)
 
+-- 'mxv' is also supported by the `@` operator:
 select print(a), '@', print(u), print(a @ u) from test_fixture;
 ┌───────────────────────┬──────────┬───────────┬───────────┐
 │         print         │ ?column? │   print   │   print   │
@@ -754,6 +788,9 @@ select print(a), '@', print(u), print(a @ u) from test_fixture;
 └───────────────────────┴──────────┴───────────┴───────────┘
 (3 rows)
 
+-- Matrices can be multipled by vectors on the right taking the linear
+-- combination of the matrices rows using the vectors elements as
+-- coefficients:
 select print(v), semiring, print(b), print(vxm(v, b, semiring)) from test_fixture;
 ┌───────────┬──────────────────┬───────────────────────┬───────────┐
 │   print   │     semiring     │         print         │   print   │
@@ -785,6 +822,7 @@ select print(v), semiring, print(b), print(vxm(v, b, semiring)) from test_fixtur
 └───────────┴──────────────────┴───────────────────────┴───────────┘
 (3 rows)
 
+-- 'vxm' is also supported by the `@` operator:
 select print(v), '@', print(b), print(v @ b) from test_fixture;
 ┌───────────┬──────────┬───────────────────────┬───────────┐
 │   print   │ ?column? │         print         │   print   │
@@ -816,6 +854,12 @@ select print(v), '@', print(b), print(v @ b) from test_fixture;
 └───────────┴──────────┴───────────────────────┴───────────┘
 (3 rows)
 
+-- The `selection` method calls the `GrB_select()` API function.  The
+-- name `selection` was chosen not to conflict with the SQL keyword
+-- `select`.  Selection provides a conditional operator called an
+-- `indexunaryop` and a parameter for the operator to use to compare
+-- elements in the matrix.  Below, all elements with values greater
+-- than 50 are returned:
 select print(a), indexunaryop, print(selection(a, indexunaryop, 50)) from test_fixture;
 ┌───────────────────────┬───────────────┬───────────────────────┐
 │         print         │ indexunaryop  │         print         │
@@ -847,6 +891,9 @@ select print(a), indexunaryop, print(selection(a, indexunaryop, 50)) from test_f
 └───────────────────────┴───────────────┴───────────────────────┘
 (3 rows)
 
+-- `apply` takes an operator of type `unaryop` and applies it to every
+-- element of the matrix.  The 'ainv_int32' returned the additive
+-- inverse (the negative value for integers) of every element:
 select print(a), unaryop, print(apply(a, unaryop)) from test_fixture;
 ┌───────────────────────┬────────────┬───────────────────────┐
 │         print         │  unaryop   │         print         │
@@ -878,6 +925,8 @@ select print(a), unaryop, print(apply(a, unaryop)) from test_fixture;
 └───────────────────────┴────────────┴───────────────────────┘
 (3 rows)
 
+-- Elements can be set individually with `set_element`, the modified
+-- input is returned:
 select print(set_element(a, 4, 4, 4)) from test_fixture;
 ┌───────────────────────┐
 │         print         │
@@ -909,6 +958,7 @@ select print(set_element(a, 4, 4, 4)) from test_fixture;
 └───────────────────────┘
 (3 rows)
 
+-- Scalar elements can be extracted individually with `get_element`
 select get_element(a, 3, 3) from test_fixture;
 ┌─────────────┐
 │ get_element │
@@ -919,6 +969,8 @@ select get_element(a, 3, 3) from test_fixture;
 └─────────────┘
 (3 rows)
 
+-- The `print` function returns a descripton of the matrix from
+-- SuiteSparse.
 select info(a) from test_fixture;
 ┌───────────────────────────────────────────────┐
 │                     info                      │
@@ -941,6 +993,8 @@ select info(a) from test_fixture;
 └───────────────────────────────────────────────┘
 (3 rows)
 
+-- The `print` function takes an optional "level" argument that
+-- defaults to `1` which is a short summary.
 select info(a, 5) from test_fixture;
 ┌───────────────────────────────────────────────┐
 │                     info                      │
@@ -990,6 +1044,8 @@ select info(a, 5) from test_fixture;
 └───────────────────────────────────────────────┘
 (3 rows)
 
+-- The `dup` function duplicates a matrix returning a new matrix
+-- object with the same values:
 select dup(a) from test_fixture;
 ┌──────────────────────────────────────────────────────────────────────────────────────┐
 │                                         dup                                          │
@@ -1000,6 +1056,10 @@ select dup(a) from test_fixture;
 └──────────────────────────────────────────────────────────────────────────────────────┘
 (3 rows)
 
+-- The `wait` method is used to "complete" a matrix, which may have
+-- pending operations waiting to be performed when using the default
+-- SuiteSparse non-blocking mode.  As a side effect, wait will sort
+-- the elements of the input:
 select wait('int32[2:2:2 3:3:3 1:1:1]'::matrix);
 ┌──────────────────────────┐
 │           wait           │
@@ -1008,6 +1068,8 @@ select wait('int32[2:2:2 3:3:3 1:1:1]'::matrix);
 └──────────────────────────┘
 (1 row)
 
+-- The `clear` function clears the matrix of all elements and returns
+-- the same object, but empty.  The dimensions do not change:
 select clear('int32[1:1:1 2:2:2 3:3:3]'::matrix);
 ┌───────┐
 │ clear │
@@ -1016,6 +1078,11 @@ select clear('int32[1:1:1 2:2:2 3:3:3]'::matrix);
 └───────┘
 (1 row)
 
+-- # Extra tests
+--
+-- This documentation also forms the basis for the onesparse tests,
+-- These tests run the documentation against a live server, all the
+-- above results are automatically generated.
 select nrows('int32(10)[1:1:1 2:2:2 3:3:3]'::matrix);
 ┌───────┐
 │ nrows │
