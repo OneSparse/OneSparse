@@ -33,6 +33,7 @@ PG_FUNCTION_INFO_V1(matrix_extract_matrix);
 PG_FUNCTION_INFO_V1(matrix_mxm);
 PG_FUNCTION_INFO_V1(matrix_mxv);
 PG_FUNCTION_INFO_V1(matrix_vxm);
+PG_FUNCTION_INFO_V1(matrix_kron);
 PG_FUNCTION_INFO_V1(matrix_select);
 PG_FUNCTION_INFO_V1(matrix_apply);
 PG_FUNCTION_INFO_V1(matrix_get_element);
@@ -41,7 +42,6 @@ PG_FUNCTION_INFO_V1(matrix_remove_element);
 PG_FUNCTION_INFO_V1(matrix_contains);
 PG_FUNCTION_INFO_V1(matrix_info);
 PG_FUNCTION_INFO_V1(matrix_type);
-PG_FUNCTION_INFO_V1(matrix_kron);
 
 static Size matrix_get_flat_size(ExpandedObjectHeader *eohptr) {
 	os_Matrix *matrix;
@@ -782,155 +782,232 @@ Datum matrix_ewise_union(PG_FUNCTION_ARGS)
 
 Datum matrix_mxm(PG_FUNCTION_ARGS)
 {
-	GrB_Type type, utype, vtype;
-	os_Matrix *u, *v, *w, *mask;
-	os_Descriptor *descriptor;
-	os_BinaryOp *accum;
-	os_Semiring *op;
+	GrB_Type atype, btype, ctype;
+	os_Matrix *a, *b, *c;
+	GrB_Matrix mask;
+	GrB_Descriptor descriptor;
+	GrB_BinaryOp accum;
+	GrB_Semiring semiring;
 	GrB_Index nrows, ncols;
 	int nargs;
 
 	LOGF();
 	ERRORNULL(0);
 	ERRORNULL(1);
-	ERRORNULL(2);
 
 	nargs = PG_NARGS();
-	u = OS_GETARG_MATRIX(0);
-	v = OS_GETARG_MATRIX(1);
-	op = OS_GETARG_SEMIRING(2);
+	a = OS_GETARG_MATRIX(0);
+	b = OS_GETARG_MATRIX(1);
+
+	OS_MTYPE(atype, a);
+	OS_MTYPE(btype, b);
+	ctype = type_promote(atype, btype);
+
+	semiring = OS_GETARG_SEMIRING_HANDLE_OR_NULL(nargs, 2);
+	if (semiring == NULL)
+	{
+		semiring = default_semiring(ctype);
+	}
 
 	if (nargs > 3)
 	{
 		if (PG_ARGISNULL(3))
 		{
-			OS_MTYPE(utype, u);
-			OS_MTYPE(vtype, u);
-			OS_MNROWS(nrows, u);
-			OS_MNCOLS(ncols, v);
-			type = type_promote(utype, vtype);
-			w = new_matrix(type, nrows, ncols, CurrentMemoryContext, NULL);
+			OS_MNROWS(nrows, a);
+			OS_MNCOLS(ncols, b);
+			c = new_matrix(ctype, nrows, ncols, CurrentMemoryContext, NULL);
 		}
 		else
-			w = OS_GETARG_MATRIX(3);
+			c = OS_GETARG_MATRIX(3);
 	}
-	mask = OS_GETARG_MATRIX_OR_NULL(nargs, 4);
-	accum = OS_GETARG_BINARYOP_OR_NULL(nargs, 5);
-	descriptor = OS_GETARG_DESCRIPTOR_OR_NULL(nargs, 6);
+	mask = OS_GETARG_MATRIX_HANDLE_OR_NULL(nargs, 4);
+	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 5);
+	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 6);
 
-	OS_CHECK(GrB_mxm(w->matrix,
-				  mask ? mask->matrix : NULL,
-				  accum ? accum->binaryop : NULL,
-				  op->semiring,
-				  u->matrix,
-				  v->matrix,
-				  descriptor ? descriptor->descriptor : NULL),
-		  w->matrix,
+	OS_CHECK(GrB_mxm(c->matrix,
+					 mask,
+					 accum,
+					 semiring,
+					 a->matrix,
+					 b->matrix,
+					 descriptor),
+		  c->matrix,
 		  "Error matrix mxm.");
 
-	OS_RETURN_MATRIX(w);
+	OS_RETURN_MATRIX(c);
 }
 
 Datum matrix_mxv(PG_FUNCTION_ARGS)
 {
-	GrB_Type type, utype, vtype;
-	os_Matrix *u;
-	os_Vector *v, *w, *mask;
-	os_Descriptor *descriptor;
-	os_BinaryOp *accum;
-	os_Semiring *op;
-	GrB_Index vsize;
+	GrB_Type atype, btype, ctype;
+	os_Matrix *a;
+	os_Vector *b, *c;
+	GrB_Vector mask;
+	GrB_Descriptor descriptor;
+	GrB_BinaryOp accum;
+	GrB_Semiring semiring;
+	GrB_Index bsize;
 	int nargs;
 
 	LOGF();
 	ERRORNULL(0);
 	ERRORNULL(1);
-	ERRORNULL(2);
 
 	nargs = PG_NARGS();
-	u = OS_GETARG_MATRIX(0);
-	v = OS_GETARG_VECTOR(1);
-	op = OS_GETARG_SEMIRING(2);
+	a = OS_GETARG_MATRIX(0);
+	b = OS_GETARG_VECTOR(1);
+
+	OS_MTYPE(atype, a);
+	OS_VTYPE(btype, b);
+	ctype = type_promote(atype, btype);
+
+	semiring = OS_GETARG_SEMIRING_HANDLE_OR_NULL(nargs, 2);
+	if (semiring == NULL)
+	{
+		semiring = default_semiring(ctype);
+	}
 
 	if (nargs > 3)
 	{
 		if (PG_ARGISNULL(3))
 		{
-			OS_MTYPE(utype, u);
-			OS_VTYPE(vtype, v);
-			OS_VSIZE(vsize, v);
-			type = type_promote(utype, vtype);
-			w = new_vector(type, vsize, CurrentMemoryContext, NULL);
+			OS_VSIZE(bsize, b);
+			c = new_vector(ctype, bsize, CurrentMemoryContext, NULL);
 		}
 		else
-			w = OS_GETARG_VECTOR(3);
+			c = OS_GETARG_VECTOR(3);
 	}
-	mask = OS_GETARG_VECTOR_OR_NULL(nargs, 4);
-	accum = OS_GETARG_BINARYOP_OR_NULL(nargs, 5);
-	descriptor = OS_GETARG_DESCRIPTOR_OR_NULL(nargs, 6);
+	mask = OS_GETARG_VECTOR_HANDLE_OR_NULL(nargs, 4);
+	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 5);
+	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 6);
 
-	OS_CHECK(GrB_mxv(w->vector,
-				  mask ? mask->vector : NULL,
-				  accum ? accum->binaryop : NULL,
-				  op->semiring,
-				  u->matrix,
-				  v->vector,
-				  descriptor ? descriptor->descriptor : NULL),
-		  w->vector,
-		  "Error matrix mxm.");
+	OS_CHECK(GrB_mxv(c->vector,
+					 mask,
+					 accum,
+					 semiring,
+					 a->matrix,
+					 b->vector,
+					 descriptor),
+		  c->vector,
+		  "Error matrix mxv.");
 
-	OS_RETURN_VECTOR(w);
+	OS_RETURN_VECTOR(c);
 }
 
 Datum matrix_vxm(PG_FUNCTION_ARGS)
 {
-	GrB_Type type, utype, vtype;
-	os_Vector *u, *w, *mask;
-	os_Matrix *v;
-	os_Descriptor *descriptor;
-	os_BinaryOp *accum;
-	os_Semiring *op;
-	GrB_Index vsize;
+	GrB_Type atype, btype, ctype;
+	os_Vector *a, *c;
+	os_Matrix *b;
+	GrB_Vector mask;
+	GrB_Descriptor descriptor;
+	GrB_BinaryOp accum;
+	GrB_Semiring semiring;
+	GrB_Index asize;
 	int nargs;
 
 	LOGF();
 	ERRORNULL(0);
 	ERRORNULL(1);
-	ERRORNULL(2);
 
 	nargs = PG_NARGS();
-	u = OS_GETARG_VECTOR(0);
-	v = OS_GETARG_MATRIX(1);
-	op = OS_GETARG_SEMIRING(2);
+	a = OS_GETARG_VECTOR(0);
+	b = OS_GETARG_MATRIX(1);
+
+	OS_VTYPE(atype, a);
+	OS_MTYPE(btype, b);
+	ctype = type_promote(atype, btype);
+
+	semiring = OS_GETARG_SEMIRING_HANDLE_OR_NULL(nargs, 2);
+	if (semiring == NULL)
+	{
+		semiring = default_semiring(ctype);
+	}
 
 	if (nargs > 3)
 	{
 		if (PG_ARGISNULL(3))
 		{
-			OS_VTYPE(utype, u);
-			OS_MTYPE(vtype, v);
-			OS_VSIZE(vsize, u);
-			type = type_promote(utype, vtype);
-			w = new_vector(type, vsize, CurrentMemoryContext, NULL);
+			OS_VSIZE(asize, a);
+			c = new_vector(ctype, asize, CurrentMemoryContext, NULL);
 		}
 		else
-			w = OS_GETARG_VECTOR(3);
+			c = OS_GETARG_VECTOR(3);
 	}
-	mask = OS_GETARG_VECTOR_OR_NULL(nargs, 4);
-	accum = OS_GETARG_BINARYOP_OR_NULL(nargs, 5);
-	descriptor = OS_GETARG_DESCRIPTOR_OR_NULL(nargs, 6);
+	mask = OS_GETARG_VECTOR_HANDLE_OR_NULL(nargs, 4);
+	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 5);
+	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 6);
 
-	OS_CHECK(GrB_vxm(w->vector,
-				  mask ? mask->vector : NULL,
-				  accum ? accum->binaryop : NULL,
-				  op->semiring,
-				  u->vector,
-				  v->matrix,
-				  descriptor ? descriptor->descriptor : NULL),
-		  w->vector,
-		  "Error matrix mxm.");
+	OS_CHECK(GrB_vxm(c->vector,
+					 mask,
+					 accum,
+					 semiring,
+					 a->vector,
+					 b->matrix,
+					 descriptor),
+		  c->vector,
+		  "Error matrix mxv.");
 
-	OS_RETURN_VECTOR(w);
+	OS_RETURN_VECTOR(c);
+}
+
+Datum matrix_kron(PG_FUNCTION_ARGS)
+{
+	GrB_Type atype, btype, ctype;
+	os_Matrix *a, *b, *c;
+	GrB_Matrix mask;
+	GrB_Descriptor descriptor;
+	GrB_BinaryOp accum;
+	GrB_Semiring semiring;
+	GrB_Index anrows, ancols, bnrows, bncols;
+	int nargs;
+
+	LOGF();
+	ERRORNULL(0);
+	ERRORNULL(1);
+
+	nargs = PG_NARGS();
+	a = OS_GETARG_MATRIX(0);
+	b = OS_GETARG_MATRIX(1);
+
+	OS_MTYPE(atype, a);
+	OS_MTYPE(btype, b);
+	ctype = type_promote(atype, btype);
+
+	semiring = OS_GETARG_SEMIRING_HANDLE_OR_NULL(nargs, 2);
+	if (semiring == NULL)
+	{
+		semiring = default_semiring(ctype);
+	}
+
+	if (nargs > 3)
+	{
+		if (PG_ARGISNULL(3))
+		{
+			OS_MNROWS(anrows, a);
+			OS_MNROWS(bnrows, b);
+			OS_MNCOLS(ancols, a);
+			OS_MNCOLS(bncols, b);
+			ctype = type_promote(atype, btype);
+			c = new_matrix(ctype, anrows * bncols, ancols * bnrows, CurrentMemoryContext, NULL);
+		}
+		else
+			c = OS_GETARG_MATRIX(3);
+	}
+	mask = OS_GETARG_MATRIX_HANDLE_OR_NULL(nargs, 4);
+	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 5);
+	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 6);
+
+	OS_CHECK(GrB_kronecker(c->matrix,
+						   mask,
+						   accum,
+						   semiring,
+						   a->matrix,
+						   b->matrix,
+						   descriptor),
+			 c->matrix,
+			 "Error matrix kron.");
+	OS_RETURN_MATRIX(c);
 }
 
 Datum matrix_reduce_vector(PG_FUNCTION_ARGS)

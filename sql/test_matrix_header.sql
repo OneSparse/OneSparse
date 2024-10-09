@@ -14,9 +14,7 @@ create extension if not exists onesparse;
 -- The `matrix` data type wraps a SuiteSparse GrB_Matrix handle and
 -- delegates functions from SQL to the library through instances of
 -- this type.
-
-\dT+ matrix
-
+--
 -- An empty matrix can be constructed many ways, but one of the
 -- simplest is casting a type code to the matrix type.  In this case
 -- `int32` means the SuiteSparse type `GrB_INT32`.
@@ -37,24 +35,24 @@ select matrix('int32');
 -- as "unbounded".
 
 -- For matrices with known dimensions, the dimensions can be provided
--- in parentesis after the type code.  Here a 10 row by 10 column
+-- in parentesis after the type code.  Here a 4 row by 4 column
 -- matrix is created:
 
-select 'int32(10:10)'::matrix;
+select 'int32(4:4)'::matrix;
 
 -- Another way to make a new matrix is with the `matrix` constructor
 -- function.
 
-select matrix('int32', 8, 8);
+select matrix('int32', 4, 4);
 
--- Either dimension can be ommited, this creates a 10 row by unbounded
+-- Either dimension can be ommited, this creates a 4 row by unbounded
 -- column matrix.
 
-select 'int32(10:)'::matrix;
+select 'int32(4:)'::matrix;
 
--- This creates a unbounded row by 10 column matrix.
+-- This creates a unbounded row by 4 column matrix.
 
-select 'int32(:10)'::matrix;
+select 'int32(:4)'::matrix;
 
 -- Note that in all the above cases the matrices created are *empty*.
 -- They contain no stored elements.  The memory needed to hold the
@@ -91,8 +89,8 @@ select nrows('int32[]'::matrix),
 -- 'row_id:column_id:value' separated by spaces:
 
 select 'int32[1:2:1 2:3:2 3:1:3]'::matrix,
-       'int32(10:)[1:2:1 2:3:2 3:1:3]'::matrix,
-       'int32(:10)[1:2:1 2:3:2 3:3:1]'::matrix;
+       'int32(4:)[1:2:1 2:3:2 3:1:3]'::matrix,
+       'int32(:4)[1:2:1 2:3:2 3:3:1]'::matrix;
 
 -- Seeing matrices in this format is pretty hard to understand, there
 -- are two helpful functions for visualizing matrices, the first is
@@ -101,39 +99,59 @@ select 'int32[1:2:1 2:3:2 3:1:3]'::matrix,
 -- Below you see the number of rows, columns and spaces for a variety
 -- of combinations:
 
-select print('int32(8:8)[1:2:1 2:3:2 3:1:3]'::matrix) as matrix;
+select print('int32(4:4)[1:2:1 2:3:2 3:1:3]'::matrix) as matrix;
 
 -- Above you can see the sparse matrix format of an 8x8 matrix.  It's
 -- only possible to print matrices that have fixed dimensions of a
 -- reasonable size.
 
--- Another useful function is `dot_matrix()` This turns a matrix into the
+-- Another useful function is `dot()` This turns a matrix into the
 -- Graphviz DOT language that is used to draw graph diagrams:
 
-select dot_matrix('int32(8:8)[1:2:1 2:3:2 3:1:3]'::matrix) as dot_matrix;
+select dot('int32(4:4)[1:2:1 2:3:2 3:1:3]'::matrix) as dot;
 
 -- Will generate the following diagram:
 --
 
-select dot_matrix('int32(8:8)[1:2:1 2:3:2 3:1:3]'::matrix) as dot_source \gset
-
---
---
-
+select dot('int32(4:4)[1:2:1 2:3:2 3:1:3]'::matrix) as dot_source \gset
 \i sql/dot.sql
 
--- Another useful function is `random_matrix()`.  This will generate a
--- random matrix provided the type, number of rows, number of columns,
--- and the number of (approximate) values and an optional random seed
--- for deterministic generation:
+-- # Adjacency Matrices
+--
+-- Onesparse sparse matrices are very similar to matrix objects from
+-- other libraries like `scipy.sparse` and NVIDIA's `cuSparse`.  The
+-- primary difference with the the GraphBLAS there also comes an
+-- entire library of pre-optimized algebraic kernels.
+--
+-- A useful function to illustrate this concept is `random_matrix()`.
+-- This will generate a random matrix provided the type, number of
+-- rows, number of columns, and the number of (approximate) values and
+-- an optional random seed for deterministic generation:
 --
 
 select print(random_matrix(8, 8, 16, seed=>0.42, max=>42)) as random_matrix;
 
---
+-- This random matrix is also a random *graph*:
 --
 
-select dot_matrix(random_matrix(8, 8, 16, seed=>0.42, max=>42)) as dot_source \gset
+select dot(random_matrix(8, 8, 16, seed=>0.42, max=>42)) as dot_source \gset
+\i sql/dot.sql
+
+-- # Every Matrix is a Graph
+--
+-- In fact every matrix is a graph, whether you think of it that way
+-- or not.  And every graph has a corresponding matrix.  The data that
+-- you put into tables can also describe a graph, and thus a matrix.
+-- These three different ways of thinking about tables, graphs, and
+-- matrices is one of the core concepts of OneSparse:
+--
+-- ![Tables, Graphs, and Matrices](./table_graph_matrix.png)
+--
+-- One way of thinking about a "dense" matrix is a fully connected
+-- graph, these can be constructed with the `dense_matrix()` function:
+
+select print(dense_matrix('int32', 4, 4, 42));
+select dot(dense_matrix('int32', 4, 4, 42)) as dot_source \gset
 \i sql/dot.sql
 
 -- # Test Fixtures
@@ -160,25 +178,37 @@ select print(a) as a, print(b) as b, print(u) as u, print(v) as v from test_fixt
 -- operator.  Elements present on both sides of the operation are
 -- included in the result.
 
-select print(a) as a, binaryop, print(b) as b, print(eadd(A, B, binaryop)) as union from test_fixture;
+select print(a) as a, binaryop, print(b) as b, print(eadd(A, B, binaryop)) as eadd from test_fixture;
+
+select dot(a) as binop_a_source, dot(b) as binop_b_source, dot(eadd(A, B, binaryop)) as binop_c_source from test_fixture \gset
+
+\i sql/binop.sql
 
 -- `emult` multiplies elements of two matrices, taking only the
 -- intersection of common elements in both matrices, if an element is
 -- missing from either the left or right side, it is ommited from the
 -- result:
 
-select print(a) as a, binaryop, print(b) as b, print(emult(A, B, binaryop)) as intersect from test_fixture;
+select print(a) as a, binaryop, print(b) as b, print(emult(A, B, binaryop)) as emult from test_fixture;
+
+select dot(a) as binop_a_source, dot(b) as binop_b_source, dot(emult(A, B, binaryop)) as binop_c_source from test_fixture \gset
+
+\i sql/binop.sql
 
 -- `eunion` is like `eadd` but differs in how the binary op is
 -- applied. A pair of scalars, `alpha` and `beta` define the inputs to
 -- the operator when entries are present in one matrix but not the
 -- other.
 
-select print(a) as a, binaryop, print(b) as b, print(eunion(A, 3, B, 4, binaryop)) as union from test_fixture;
+select print(a) as a, binaryop, print(b) as b, print(eunion(A, 3::scalar, B, 4::scalar, binaryop)) as eunion from test_fixture;
+
+select dot(a) as binop_a_source, dot(b) as binop_b_source, dot(eunion(A, 3::scalar, B, 4::scalar, binaryop)) as binop_c_source from test_fixture \gset
+
+\i sql/binop.sql
 
 -- The entire matrix can be reduced to a scalar value:
 
-select print(a) as a, reduce_scalar(a, monoid) from test_fixture;
+select print(a) as a, monoid, reduce_scalar(a, monoid) from test_fixture;
 
 -- The matrix can also be reduced to a column vector:
 
@@ -196,7 +226,10 @@ select print(a) as a, monoid, print(reduce_vector(a, monoid, descriptor=>'t0')) 
 -- operator and then reduce those products with the "plus" operator.
 -- This is called the `plus_times` semiring:
 
-select print(a) as a, semiring, print(b) as b, print(mxm(a, b, semiring)) as mxm from test_fixture;
+select print(a) as a, semiring, print(b) as b, print(mxm(a, b)) as mxm from test_fixture;
+
+select dot(a) as binop_a_source, dot(b) as binop_b_source, dot(mxm(a, b)) as binop_c_source from test_fixture \gset
+\i sql/binop.sql
 
 -- AxB can also be done with the `@` operator, mimicking the Python
 -- syntax.  The default semiring for numeric types is `plus_times`.
@@ -207,21 +240,27 @@ select print(a) as a, '@' as "@", print(b) as b, print(a @ b) as mxm from test_f
 -- combination of the matrices columns using the vectors elements as
 -- coefficients:
 
-select print(a), semiring, print(u), print(mxv(a, u, semiring)) from test_fixture;
+select print(a) as a, '@' as "@", semiring, print(u) as u, print(mxv(a, u)) as mxv from test_fixture;
+
+select dot(a) as binop_a_source, dot(u) as binop_b_source, dot(mxv(a, u)) as binop_c_source from test_fixture \gset
+\i sql/binop.sql
 
 -- 'mxv' is also supported by the `@` operator:
 
-select print(a), '@', print(u), print(a @ u) from test_fixture;
+select print(a) as a, '@' as "@", print(u) as u, print(a @ u) as mxv from test_fixture;
 
 -- Matrices can be multipled by vectors on the right taking the linear
 -- combination of the matrices rows using the vectors elements as
 -- coefficients:
 
-select print(v), semiring, print(b), print(vxm(v, b, semiring)) from test_fixture;
+select print(v) as v, semiring, print(b) as b, print(vxm(v, b, semiring)) as vxm from test_fixture;
+
+select dot(v) as binop_a_source, dot(b) as binop_b_source, dot(vxm(v, b)) as binop_c_source from test_fixture \gset
+\i sql/binop.sql
 
 -- 'vxm' is also supported by the `@` operator:
 
-select print(v), '@', print(b), print(v @ b) from test_fixture;
+select print(v) as v, '@' as "@", print(b) as b, print(v @ b) as vxm from test_fixture;
 
 -- The `selection` method calls the `GrB_select()` API function.  The
 -- name `selection` was chosen not to conflict with the SQL keyword
@@ -230,22 +269,25 @@ select print(v), '@', print(b), print(v @ b) from test_fixture;
 -- elements in the matrix.  Below, all elements with values greater
 -- than 50 are returned:
 
-select print(a), indexunaryop, print(selection(a, indexunaryop, 50)) from test_fixture;
+select print(a) as a, indexunaryop, print(selection(a, indexunaryop, 1)) as selected from test_fixture;
+
+select dot(a) as uop_a_source, dot(selection(a, indexunaryop, 1)) as uop_b_source from test_fixture \gset
+\i sql/uop.sql
 
 -- `apply` takes an operator of type `unaryop` and applies it to every
 -- element of the matrix.  The 'ainv_int32' returned the additive
 -- inverse (the negative value for integers) of every element:
 
-select print(a), unaryop, print(apply(a, unaryop)) from test_fixture;
+select print(a) as a, unaryop, print(apply(a, unaryop)) as applied from test_fixture;
 
 -- Elements can be set individually with `set_element`, the modified
 -- input is returned:
 
-select print(set_element(a, 4, 4, 4)) from test_fixture;
+select print(set_element(a, 1, 1, 1)) as set_element from test_fixture;
 
 -- Scalar elements can be extracted individually with `get_element`
 
-select get_element(a, 3, 3) from test_fixture;
+select get_element(a, 3, 3) as get_element from test_fixture;
 
 -- The `print` function returns a descripton of the matrix from
 -- SuiteSparse.

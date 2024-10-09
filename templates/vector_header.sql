@@ -224,3 +224,31 @@ create function dense_vector(
         return v;
     end;
     $$;
+
+create or replace function dot(a vector) returns text language plpgsql as
+    $$
+    declare
+        imax int = size(a) - 1;
+        value scalar;
+        result text = E'digraph vector {{\ngraph [rankdir=TB]; node [shape=box];\nsubgraph cluster_vector {{\nstyle=dashed; color=black; bgcolor=lightgray;\n';
+    begin
+        for i in 0..imax loop
+            result = result || 'node' || i::text;
+            if contains(a, i) then
+                result = result || ' [label="' || i::text || ':' || print(get_element(a, i)) || E'"];\n';
+            else
+                result = result || E' [label=""];\n';
+            end if;
+        end loop;
+        result = result || E'}}\n';
+        for i in 0..imax loop
+            if i != imax then
+                result = result || 'node' || i::text || ' -> ';
+            else
+                result = result || 'node' || i::text ||  E' [style=invis];\n';
+            end if;
+        end loop;
+        result = result || E'}}\n';
+        return result;
+    end;
+    $$;

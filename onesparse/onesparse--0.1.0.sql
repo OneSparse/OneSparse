@@ -1039,6 +1039,34 @@ create function dense_vector(
     end;
     $$;
 
+create or replace function dot(a vector) returns text language plpgsql as
+    $$
+    declare
+        imax int = size(a) - 1;
+        value scalar;
+        result text = E'digraph vector {\ngraph [rankdir=TB]; node [shape=box];\nsubgraph cluster_vector {\nstyle=dashed; color=black; bgcolor=lightgray;\n';
+    begin
+        for i in 0..imax loop
+            result = result || 'node' || i::text;
+            if contains(a, i) then
+                result = result || ' [label="' || i::text || ':' || print(get_element(a, i)) || E'"];\n';
+            else
+                result = result || E' [label=""];\n';
+            end if;
+        end loop;
+        result = result || E'}\n';
+        for i in 0..imax loop
+            if i != imax then
+                result = result || 'node' || i::text || ' -> ';
+            else
+                result = result || 'node' || i::text ||  E' [style=invis];\n';
+            end if;
+        end loop;
+        result = result || E'}\n';
+        return result;
+    end;
+    $$;
+
 
 
 
@@ -1140,7 +1168,7 @@ RETURNS matrix
 AS '$libdir/onesparse', 'matrix_ewise_mult'
 LANGUAGE C STABLE;
 
-CREATE FUNCTION eadd(
+CREATE FUNCTION eunion(
     a matrix,
     alpha scalar,
     b matrix,
@@ -1202,7 +1230,7 @@ LANGUAGE C STABLE;
 CREATE FUNCTION mxm(
     a matrix,
     b matrix,
-    op semiring,
+    op semiring default null,
     inout c matrix default null,
     mask matrix default null,
     accum binaryop default null,
@@ -1215,7 +1243,7 @@ LANGUAGE C STABLE;
 CREATE FUNCTION mxv(
     a matrix,
     v vector,
-    op semiring,
+    op semiring default null,
     inout w vector default null,
     mask matrix default null,
     accum binaryop default null,
@@ -1228,7 +1256,7 @@ LANGUAGE C STABLE;
 CREATE FUNCTION vxm(
     u vector,
     b matrix,
-    op semiring,
+    op semiring default null,
     inout w vector default null,
     mask matrix default null,
     accum binaryop default null,
@@ -1236,6 +1264,19 @@ CREATE FUNCTION vxm(
     )
 RETURNS vector
 AS '$libdir/onesparse', 'matrix_vxm'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION kronecker(
+    a matrix,
+    b matrix,
+    op semiring default null,
+    inout c matrix default null,
+    mask matrix default null,
+    accum binaryop default null,
+    descriptor descriptor default null
+    )
+RETURNS matrix
+AS '$libdir/onesparse', 'matrix_kron'
 LANGUAGE C STABLE;
 
 CREATE FUNCTION selection(
@@ -1305,15 +1346,15 @@ LANGUAGE C STABLE;
 
 CREATE FUNCTION mxm_op(a matrix, b matrix)
 RETURNS matrix
-RETURN onesparse.mxm(a, b, 'any_secondi_int64'::semiring);
+RETURN onesparse.mxm(a, b);
 
 CREATE FUNCTION mxv_op(a matrix, b vector)
 RETURNS vector
-RETURN onesparse.mxv(a, b, 'any_secondi_int64'::semiring);
+RETURN onesparse.mxv(a, b);
 
 CREATE FUNCTION vxm_op(a vector, b matrix)
 RETURNS vector
-RETURN onesparse.vxm(a, b, 'any_secondi_int64'::semiring);
+RETURN onesparse.vxm(a, b);
 
 CREATE OPERATOR @ (
     LEFTARG = matrix,
@@ -1380,6 +1421,7 @@ create function random_matrix(
         end if;
         for i in 0..nrows-1 loop
             for j in 0..ncols-1 loop
+                if i = j then continue; end if;
                 if random() < prob then
                     m = set_element(m, i, j, random(0, max));
                 end if;
@@ -1388,7 +1430,6 @@ create function random_matrix(
         return m;
     end;
     $$;
-
 
 create function dense_matrix(
     t type,
@@ -1409,7 +1450,7 @@ create function dense_matrix(
     $$;
 
 
-create or replace function dot_matrix(a matrix) returns text language plpgsql as
+create or replace function dot(a matrix) returns text language plpgsql as
     $$
     declare
         row bigint;
@@ -1422,5 +1463,18 @@ create or replace function dot_matrix(a matrix) returns text language plpgsql as
         end loop;
         result = result || E'}\n';
         return result;
+    end;
+    $$;
+
+create or replace function kronpower(m matrix, k integer, s semiring default 'plus_times_int32')
+    returns matrix language plpgsql as
+    $$
+    declare
+    i integer;
+    begin
+        for i in select generate_series(0, k-1) loop
+            m = kronecker(m, m, s);
+        end loop;
+    return m;
     end;
     $$;
