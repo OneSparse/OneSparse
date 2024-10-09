@@ -160,21 +160,30 @@ function: GrB_Vector_setElement_INT64 (w, x, row)
 Row index 2 out of range; must be < 2: Error setting Vector Element
 LINE 1: select size('int32(2)[0:1 1:2 2:3]'::vector);
                     ^
-select ewise_add('int32[0:1 1:2 2:3]'::vector, 'int32[0:1 1:2 2:3]'::vector, 'plus_int32');
-ERROR:  function ewise_add(vector, vector, unknown) does not exist
-LINE 1: select ewise_add('int32[0:1 1:2 2:3]'::vector, 'int32[0:1 1:...
-               ^
-HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
-select ewise_mult('int32[0:1 1:2 2:3]'::vector, 'int32[0:1 1:2 2:3]'::vector, 'times_int32');
-ERROR:  function ewise_mult(vector, vector, unknown) does not exist
-LINE 1: select ewise_mult('int32[0:1 1:2 2:3]'::vector, 'int32[0:1 1...
-               ^
-HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
-select ewise_union('int32[0:1 1:2 2:3]'::vector, 42, 'int32[0:1 1:2 2:3]'::vector, 84, 'plus_int32');
-ERROR:  function ewise_union(vector, integer, vector, integer, unknown) does not exist
-LINE 1: select ewise_union('int32[0:1 1:2 2:3]'::vector, 42, 'int32[...
-               ^
-HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+select eadd('int32[0:1 1:2 2:3]'::vector, 'int32[0:1 1:2 2:3]'::vector, 'plus_int32');
+┌────────────────────┐
+│        eadd        │
+├────────────────────┤
+│ int32[0:2 1:4 2:6] │
+└────────────────────┘
+(1 row)
+
+select emult('int32[0:1 1:2 2:3]'::vector, 'int32[0:1 1:2 2:3]'::vector, 'times_int32');
+┌────────────────────┐
+│       emult        │
+├────────────────────┤
+│ int32[0:1 1:4 2:9] │
+└────────────────────┘
+(1 row)
+
+select eunion('int32[0:1 1:2 2:3]'::vector, 42, 'int32[0:1 1:2 2:3]'::vector, 84, 'plus_int32');
+┌────────────────────┐
+│       eunion       │
+├────────────────────┤
+│ int32[0:2 1:4 2:6] │
+└────────────────────┘
+(1 row)
+
 select reduce_scalar('int32[0:1 1:2 2:3]'::vector, 'plus_monoid_int32');
 ┌───────────────┐
 │ reduce_scalar │
@@ -218,9 +227,20 @@ select get_element('int32[1:1 2:2 3:3]'::vector, 3);
 └─────────────┘
 (1 row)
 
-select print('int32[1:1 2:2 3:3]'::vector);
-ERROR:  integer out of range
-CONTEXT:  PL/pgSQL function print(vector) line 3 during statement block local variable initialization
+select print('int32(4)[1:1 2:2 3:3]'::vector);
+┌───────────┐
+│   print   │
+├───────────┤
+│          ↵│
+│    ───   ↵│
+│  0│      ↵│
+│  1│  1   ↵│
+│  2│  2   ↵│
+│  3│  3   ↵│
+│           │
+└───────────┘
+(1 row)
+
 select wait('int32[0:1 1:2 2:3]'::vector);
 ┌──────┐
 │ wait │

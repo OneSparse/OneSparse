@@ -15,19 +15,13 @@ create extension if not exists onesparse;
  onesparse | scalar | scalar        | var  |          | postgres |                   | 
 (1 row)
 
--- print a scalar
+-- print a scalar, this renders the value with no prefix
 select print('int32:42'::scalar);
  print 
 -------
  42
 (1 row)
 
--- print a scalar
-select print('int32:42'::scalar, 5);
-ERROR:  function print(scalar, integer) does not exist
-LINE 1: select print('int32:42'::scalar, 5);
-               ^
-HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
 -- Duplicate a scalar
 select dup('int32:42'::scalar);
    dup    

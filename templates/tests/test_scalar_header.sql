@@ -11,11 +11,8 @@ create extension if not exists onesparse;
 -- Describe the scalar type
 \dT+ scalar
 
--- print a scalar
+-- print a scalar, this renders the value with no prefix
 select print('int32:42'::scalar);
-
--- print a scalar
-select print('int32:42'::scalar, 5);
 
 -- Duplicate a scalar
 select dup('int32:42'::scalar);

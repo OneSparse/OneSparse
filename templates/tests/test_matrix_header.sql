@@ -54,13 +54,19 @@ select 'int32(4:)'::matrix;
 
 select 'int32(:4)'::matrix;
 
--- Note that in all the above cases the matrices created are *empty*.
--- They contain no stored elements.  The memory needed to hold the
--- matrix contains only stored elements, if there isn't a value stored
--- at a given row or column position, no memory is consumed.  This is
--- the "sparse" in sparse matrix.  This is how it's possible to create
--- an unbounded row by unbounded column matrix without exhausting
--- memory trying to allocate `2^120` entries.
+-- If the matrix has bounds, it can be printed to the console if they
+-- are reasonable size, this is useful for debugging and
+-- experimentation:
+
+select print('int32(4:4)'::matrix);
+
+-- Note that this matrix is empty, it's not filled with "zeros", it
+-- contains *no elements*.  The memory needed to hold the matrix
+-- contains only stored elements, if there isn't a value stored at a
+-- given row or column position, no memory is consumed.  This is the
+-- "sparse" in sparse matrix.  This is how it's possible to create an
+-- unbounded row by unbounded column matrix without exhausting memory
+-- trying to allocate `2^120` entries.
 --
 -- All graphblas operations are exposed by a series of functions and
 -- operators.  Here we see three very common operations, returning the
@@ -91,6 +97,48 @@ select nrows('int32[]'::matrix),
 select 'int32[1:2:1 2:3:2 3:1:3]'::matrix,
        'int32(4:)[1:2:1 2:3:2 3:1:3]'::matrix,
        'int32(:4)[1:2:1 2:3:2 3:3:1]'::matrix;
+
+-- # Test Fixtures
+--
+-- Let's get a test fixture table with a couple matrix and vector
+-- columns so that we can do some operations without tediously
+-- repeating the literal syntax.  These matrices and vectors are
+-- construction with `random_matrix()` show above, and the
+-- `random_vector()` function:
+
+\o /dev/null
+\set ECHO none
+\i sql/fixtures.sql
+\set ECHO all
+\o
+
+select print(a) as a, print(b) as b, print(u) as u, print(v) as v from test_fixture;
+
+-- # Elements
+--
+-- All the elements in a matrix can be iterated with the `elements()`
+-- function:
+
+select * from elements((select a from test_fixture));
+
+-- The inverse operation of constructing matrices from rows can be
+-- done with `matrix_agg()`:
+
+select matrix_agg(i, i, i) as unbound_matrix from generate_series(0, 10) as i;
+
+-- Aggregate matrices are always unbounded so use `resize()` to bound
+-- the matrix:
+
+select print(resize(matrix_agg(i, i, i), 10, 10)) as bound_matrix from generate_series(0, 10) as i;
+
+-- Elements can be set individually with `set_element`, the modified
+-- input is returned:
+
+select print(set_element(a, 1, 1, 1)) as set_element from test_fixture;
+
+-- Scalar elements can be extracted individually with `get_element`
+
+select get_element(a, 3, 3) as get_element from test_fixture;
 
 -- Seeing matrices in this format is pretty hard to understand, there
 -- are two helpful functions for visualizing matrices, the first is
@@ -152,22 +200,6 @@ select draw(random_matrix(8, 8, 16, seed=>0.42, max=>42)) as draw_source \gset
 select print(dense_matrix('int32', 4, 4, 42));
 select draw(dense_matrix('int32', 4, 4, 42)) as draw_source \gset
 \i sql/draw.sql
-
--- # Test Fixtures
---
--- Let's get a test fixture table with a couple matrix and vector
--- columns so that we can do some operations without tediously
--- repeating the literal syntax.  These matrices and vectors are
--- construction with `random_matrix()` show above, and the
--- `random_vector()` function:
-
-\o /dev/null
-\set ECHO none
-\i sql/fixtures.sql
-\set ECHO all
-\o
-
-select print(a) as a, print(b) as b, print(u) as u, print(v) as v from test_fixture;
 
 -- # Element-wise operations
 --
@@ -273,42 +305,27 @@ select print(a) as a, indexunaryop, print(selection(a, indexunaryop, 1)) as sele
 select draw(a) as uop_a_source, draw(selection(a, indexunaryop, 1)) as uop_b_source from test_fixture \gset
 \i sql/uop.sql
 
+-- A useful select operator is `triu`, it select only upper triangular
+-- values, this turns your graph into a direct acyclic graph (DAG) by
+-- removing all the links "back" from higher number nodes to lower.
+
+select print(selection(random_matrix(8, 8, 16, seed=>0.42, max=>42), 'triu', 0)) as tril from test_fixture;
+
+select draw(random_matrix(8, 8, 16, seed=>0.42, max=>42)) as uop_a_source, draw(selection(random_matrix(8, 8, 16, seed=>0.42, max=>42), 'triu', 0)) as uop_b_source from test_fixture \gset
+\i sql/uop.sql
+
 -- `apply` takes an operator of type `unaryop` and applies it to every
 -- element of the matrix.  The 'ainv_int32' returned the additive
 -- inverse (the negative value for integers) of every element:
 
 select print(a) as a, unaryop, print(apply(a, unaryop)) as applied from test_fixture;
 
--- All the elements in a matrix can be iterated with the `elements()`
--- function:
-
-select * from elements((select a from test_fixture));
-
--- The inverse operation of constructing matrices from rows can be
--- done with `matrix_agg()`:
-
-select matrix_agg(i, i, i) as unbound_matrix from generate_series(0, 10) as i;
-
--- Aggregate matrices are always unbounded so use `resize()` to bound
--- the matrix:
-
-select print(resize(matrix_agg(i, i, i), 10, 10)) as bound_matrix from generate_series(0, 10) as i;
-
--- Elements can be set individually with `set_element`, the modified
--- input is returned:
-
-select print(set_element(a, 1, 1, 1)) as set_element from test_fixture;
-
--- Scalar elements can be extracted individually with `get_element`
-
-select get_element(a, 3, 3) as get_element from test_fixture;
-
--- The `print` function returns a descripton of the matrix from
+-- The `info` function returns a descripton of the matrix from
 -- SuiteSparse.
 
 select info(a) from test_fixture;
 
--- The `print` function takes an optional "level" argument that
+-- The `infot` function takes an optional "level" argument that
 -- defaults to `1` which is a short summary.
 
 select info(a, 5) from test_fixture;

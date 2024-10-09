@@ -18,7 +18,7 @@ Describe the scalar type
 (1 row)
 
 ```
-print a scalar
+print a scalar, this renders the value with no prefix
 ``` postgres-console
 select print('int32:42'::scalar);
  print 
@@ -26,14 +26,6 @@ select print('int32:42'::scalar);
  42
 (1 row)
 
-```
-print a scalar
-``` postgres-console
-select print('int32:42'::scalar, 5);
-ERROR:  function print(scalar, integer) does not exist
-LINE 1: select print('int32:42'::scalar, 5);
-               ^
-HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
 ```
 Duplicate a scalar
 ``` postgres-console

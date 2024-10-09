@@ -56,11 +56,11 @@ select size('int32(10)[0:1 1:2 2:3]'::vector);
 
 select size('int32(2)[0:1 1:2 2:3]'::vector);
 
-select ewise_add('int32[0:1 1:2 2:3]'::vector, 'int32[0:1 1:2 2:3]'::vector, 'plus_int32');
+select eadd('int32[0:1 1:2 2:3]'::vector, 'int32[0:1 1:2 2:3]'::vector, 'plus_int32');
 
-select ewise_mult('int32[0:1 1:2 2:3]'::vector, 'int32[0:1 1:2 2:3]'::vector, 'times_int32');
+select emult('int32[0:1 1:2 2:3]'::vector, 'int32[0:1 1:2 2:3]'::vector, 'times_int32');
 
-select ewise_union('int32[0:1 1:2 2:3]'::vector, 42, 'int32[0:1 1:2 2:3]'::vector, 84, 'plus_int32');
+select eunion('int32[0:1 1:2 2:3]'::vector, 42, 'int32[0:1 1:2 2:3]'::vector, 84, 'plus_int32');
 
 select reduce_scalar('int32[0:1 1:2 2:3]'::vector, 'plus_monoid_int32');
 
@@ -77,7 +77,7 @@ select set_element('int32[1:1 2:2 3:3]'::vector, 4, 4);
 
 select get_element('int32[1:1 2:2 3:3]'::vector, 3);
 
-select print('int32[1:1 2:2 3:3]'::vector);
+select print('int32(4)[1:1 2:2 3:3]'::vector);
 
 select wait('int32[0:1 1:2 2:3]'::vector);
 
