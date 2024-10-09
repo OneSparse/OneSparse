@@ -845,6 +845,11 @@ RETURNS type
 AS '$libdir/onesparse', 'vector_type'
 LANGUAGE C STABLE;
 
+CREATE FUNCTION elements(v vector)
+RETURNS TABLE (i bigint, v scalar)
+AS '$libdir/onesparse', 'vector_elements'
+LANGUAGE C STABLE STRICT;
+
 CREATE FUNCTION nvals(vector)
 RETURNS int8
 AS '$libdir/onesparse', 'vector_nvals'
@@ -1039,7 +1044,7 @@ create function dense_vector(
     end;
     $$;
 
-create or replace function dot(a vector) returns text language plpgsql as
+create or replace function draw(a vector) returns text language plpgsql as
     $$
     declare
         imax int = size(a) - 1;
@@ -1112,15 +1117,13 @@ CREATE TYPE matrix (
     internallength = VARIABLE
     );
 
-CREATE TYPE matrix_element AS (row bigint, col bigint, value scalar);
-
 CREATE FUNCTION matrix(t type, nrows bigint default -1, ncols bigint default -1)
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_new'
 LANGUAGE C STABLE;
 
-CREATE FUNCTION elements(A matrix)
-RETURNS SETOF matrix_element
+CREATE FUNCTION elements(a matrix)
+RETURNS TABLE (i bigint, j bigint, v scalar)
 AS '$libdir/onesparse', 'matrix_elements'
 LANGUAGE C STABLE STRICT;
 
@@ -1304,6 +1307,11 @@ RETURNS matrix
 AS '$libdir/onesparse', 'matrix_apply'
 LANGUAGE C STABLE;
 
+CREATE FUNCTION matrix_agg_final(state matrix)
+RETURNS matrix
+AS '$libdir/onesparse', 'matrix_agg_final'
+LANGUAGE C STABLE;
+
 CREATE FUNCTION set_element(a matrix, i bigint, j bigint, s scalar)
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_set_element'
@@ -1338,6 +1346,11 @@ CREATE FUNCTION clear(matrix)
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_clear'
 LANGUAGE C;
+
+CREATE FUNCTION resize(a matrix, i bigint, j bigint)
+RETURNS matrix
+AS '$libdir/onesparse', 'matrix_resize'
+LANGUAGE C STABLE;
 
 CREATE FUNCTION info(a matrix, level int default 1)
 RETURNS text
@@ -1450,7 +1463,7 @@ create function dense_matrix(
     $$;
 
 
-create or replace function dot(a matrix) returns text language plpgsql as
+create or replace function draw(a matrix) returns text language plpgsql as
     $$
     declare
         row bigint;
@@ -1478,3 +1491,58 @@ create or replace function kronpower(m matrix, k integer, s semiring default 'pl
     return m;
     end;
     $$;
+CREATE FUNCTION matrix_agg_bigint (state matrix, i bigint, j bigint, v bigint)
+RETURNS matrix
+AS '$libdir/onesparse', 'matrix_agg_int64'
+LANGUAGE C STABLE;
+
+CREATE AGGREGATE matrix_agg (i bigint, j bigint, v bigint )
+    (
+    SFUNC=matrix_agg_bigint,
+    STYPE=matrix,
+    FINALFUNC=matrix_agg_final
+    );
+CREATE FUNCTION matrix_agg_integer (state matrix, i bigint, j bigint, v integer)
+RETURNS matrix
+AS '$libdir/onesparse', 'matrix_agg_int32'
+LANGUAGE C STABLE;
+
+CREATE AGGREGATE matrix_agg (i bigint, j bigint, v integer )
+    (
+    SFUNC=matrix_agg_integer,
+    STYPE=matrix,
+    FINALFUNC=matrix_agg_final
+    );
+CREATE FUNCTION matrix_agg_smallint (state matrix, i bigint, j bigint, v smallint)
+RETURNS matrix
+AS '$libdir/onesparse', 'matrix_agg_int16'
+LANGUAGE C STABLE;
+
+CREATE AGGREGATE matrix_agg (i bigint, j bigint, v smallint )
+    (
+    SFUNC=matrix_agg_smallint,
+    STYPE=matrix,
+    FINALFUNC=matrix_agg_final
+    );
+CREATE FUNCTION matrix_agg_float4 (state matrix, i bigint, j bigint, v float4)
+RETURNS matrix
+AS '$libdir/onesparse', 'matrix_agg_fp32'
+LANGUAGE C STABLE;
+
+CREATE AGGREGATE matrix_agg (i bigint, j bigint, v float4 )
+    (
+    SFUNC=matrix_agg_float4,
+    STYPE=matrix,
+    FINALFUNC=matrix_agg_final
+    );
+CREATE FUNCTION matrix_agg_float8 (state matrix, i bigint, j bigint, v float8)
+RETURNS matrix
+AS '$libdir/onesparse', 'matrix_agg_fp64'
+LANGUAGE C STABLE;
+
+CREATE AGGREGATE matrix_agg (i bigint, j bigint, v float8 )
+    (
+    SFUNC=matrix_agg_float8,
+    STYPE=matrix,
+    FINALFUNC=matrix_agg_final
+    );

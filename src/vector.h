@@ -19,6 +19,13 @@ typedef struct os_Vector  {
     GrB_Index serialized_size;
 } os_Vector;
 
+typedef struct os_Vector_ExtractState {
+	GrB_Type type;
+	GrB_Info info;
+	os_Vector *vector;
+	GxB_Iterator iterator;
+} os_Vector_ExtractState;
+
 Datum expand_vector(os_FlatVector *flat,	MemoryContext parentcontext);
 
 os_Vector* new_vector(

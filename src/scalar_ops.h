@@ -267,3 +267,8 @@ Datum FN(div_scalar)(PG_FUNCTION_ARGS)
 #undef PG_GETARG
 #undef PG_RETURN
 #undef NO_SCALAR_MATH
+
+/* Local Variables: */
+/* mode: c */
+/* c-file-style: "postgresql" */
+/* End: */

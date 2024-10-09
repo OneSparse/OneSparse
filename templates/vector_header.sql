@@ -31,6 +31,11 @@ RETURNS type
 AS '$libdir/onesparse', 'vector_type'
 LANGUAGE C STABLE;
 
+CREATE FUNCTION elements(v vector)
+RETURNS TABLE (i bigint, v scalar)
+AS '$libdir/onesparse', 'vector_elements'
+LANGUAGE C STABLE STRICT;
+
 CREATE FUNCTION nvals(vector)
 RETURNS int8
 AS '$libdir/onesparse', 'vector_nvals'
@@ -225,7 +230,7 @@ create function dense_vector(
     end;
     $$;
 
-create or replace function dot(a vector) returns text language plpgsql as
+create or replace function draw(a vector) returns text language plpgsql as
     $$
     declare
         imax int = size(a) - 1;

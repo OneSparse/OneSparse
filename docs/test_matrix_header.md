@@ -36,7 +36,7 @@ select matrix('int32');
 (1 row)
 
 ```
-The above matrices are "unbounced", they do not have a fixed number
+The above matrices are "unbounded", they do not have a fixed number
 of rows and/or columns.  The default possible number of rows and
 columns is defined by the SuiteSparse library to be `GrB_INDEX_MAX`
 which is `2^60` power indexes.  For the purposes of this
@@ -173,12 +173,12 @@ select print('int32(4:4)[1:2:1 2:3:2 3:1:3]'::matrix) as matrix;
 Above you can see the sparse matrix format of an 8x8 matrix.  It's
 only possible to print matrices that have fixed dimensions of a
 reasonable size.
-Another useful function is `dot()` This turns a matrix into the
+Another useful function is `draw()` This turns a matrix into the
 Graphviz DOT language that is used to draw graph diagrams:
 ``` postgres-console
-select dot('int32(4:4)[1:2:1 2:3:2 3:1:3]'::matrix) as dot;
+select draw('int32(4:4)[1:2:1 2:3:2 3:1:3]'::matrix) as draw;
 ┌────────────────────┐
-│        dot         │
+│        draw        │
 ├────────────────────┤
 │ digraph {          │
 │ 1 -> 2 [label="1"] │
@@ -241,13 +241,6 @@ Will generate the following diagram:
 </g>
 </svg>
 </div>
-
-# Adjacency Matrices
-
-Onesparse sparse matrices are very similar to matrix objects from
-other libraries like `scipy.sparse` and NVIDIA's `cuSparse`.  The
-primary difference with the the GraphBLAS there also comes an
-entire library of pre-optimized algebraic kernels.
 
 A useful function to illustrate this concept is `random_matrix()`.
 This will generate a random matrix provided the type, number of
@@ -435,13 +428,19 @@ This random matrix is also a random *graph*:
 
 # Every Matrix is a Graph
 
-In fact every matrix is a graph, whether you think of it that way
-or not.  And every graph has a corresponding matrix.  The data that
-you put into tables can also describe a graph, and thus a matrix.
-These three different ways of thinking about tables, graphs, and
-matrices is one of the core concepts of OneSparse:
+Every matrix is a graph, whether you think of it that way or not.
+And every graph has a corresponding matrix.  The data that you put
+into tables can also describe a graph, and thus a matrix.  These
+three different ways of thinking about tables, graphs, and matrices
+is one of the core concepts of OneSparse:
 
 ![Tables, Graphs, and Matrices](./table_graph_matrix.png)
+
+While SuiteSparse is optimized for processing sparse matrices and
+vectors, it also supports optimized kernels for dense objects.  A
+dense matrix is just a sparse matrix with all its elements.  In
+this case SuiteSparse will automatically store it in a dense
+optimal format and use CPUs or GPUs appropriately to process them.
 
 One way of thinking about a "dense" matrix is a fully connected
 graph, these can be constructed with the `dense_matrix()` function:
@@ -2631,6 +2630,62 @@ select print(a) as a, unaryop, print(apply(a, unaryop)) as applied from test_fix
 │  3│  2     1       │            │  3│ -2    -1       │
 │                    │            │                    │
 └────────────────────┴────────────┴────────────────────┘
+(1 row)
+
+```
+All the elements in a matrix can be iterated with the `elements()`
+function:
+``` postgres-console
+select * from elements((select a from test_fixture));
+┌───┬───┬─────────┐
+│ i │ j │    v    │
+├───┼───┼─────────┤
+│ 0 │ 2 │ int32:0 │
+│ 0 │ 3 │ int32:3 │
+│ 1 │ 0 │ int32:2 │
+│ 1 │ 2 │ int32:1 │
+│ 1 │ 3 │ int32:0 │
+│ 2 │ 0 │ int32:2 │
+│ 2 │ 1 │ int32:2 │
+│ 3 │ 0 │ int32:2 │
+│ 3 │ 2 │ int32:1 │
+└───┴───┴─────────┘
+(9 rows)
+
+```
+The inverse operation of constructing matrices from rows can be
+done with `matrix_agg()`:
+``` postgres-console
+select matrix_agg(i, i, i) as unbound_matrix from generate_series(0, 10) as i;
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                               unbound_matrix                                │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ int32[0:0:0 1:1:1 2:2:2 3:3:3 4:4:4 5:5:5 6:6:6 7:7:7 8:8:8 9:9:9 10:10:10] │
+└─────────────────────────────────────────────────────────────────────────────┘
+(1 row)
+
+```
+Aggregate matrices are always unbounded so use `resize()` to bound
+the matrix:
+``` postgres-console
+select print(resize(matrix_agg(i, i, i), 10, 10)) as bound_matrix from generate_series(0, 10) as i;
+┌──────────────────────────────────────┐
+│             bound_matrix             │
+├──────────────────────────────────────┤
+│      0  1  2  3  4  5  6  7  8  9    │
+│    ──────────────────────────────    │
+│  0│  0                               │
+│  1│     1                            │
+│  2│        2                         │
+│  3│           3                      │
+│  4│              4                   │
+│  5│                 5                │
+│  6│                    6             │
+│  7│                       7          │
+│  8│                          8       │
+│  9│                             9    │
+│                                      │
+└──────────────────────────────────────┘
 (1 row)
 
 ```

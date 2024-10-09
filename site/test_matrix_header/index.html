@@ -134,7 +134,7 @@ constructor function:
 </span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="go">└────────┘</span>
 </span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="go">(1 row)</span>
 </span></code></pre></div>
-The above matrices are "unbounced", they do not have a fixed number
+The above matrices are "unbounded", they do not have a fixed number
 of rows and/or columns.  The default possible number of rows and
 columns is defined by the SuiteSparse library to be <code>GrB_INDEX_MAX</code>
 which is <code>2^60</code> power indexes.  For the purposes of this
@@ -254,11 +254,11 @@ of combinations:
 Above you can see the sparse matrix format of an 8x8 matrix.  It's
 only possible to print matrices that have fixed dimensions of a
 reasonable size.
-Another useful function is <code>dot()</code> This turns a matrix into the
+Another useful function is <code>draw()</code> This turns a matrix into the
 Graphviz DOT language that is used to draw graph diagrams:
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="k">select</span><span class="w"> </span><span class="n">dot</span><span class="p">(</span><span class="s1">&#39;int32(4:4)[1:2:1 2:3:2 3:1:3]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">dot</span><span class="p">;</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="k">select</span><span class="w"> </span><span class="n">draw</span><span class="p">(</span><span class="s1">&#39;int32(4:4)[1:2:1 2:3:2 3:1:3]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">draw</span><span class="p">;</span>
 </span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="go">┌────────────────────┐</span>
-</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="go">│        dot         │</span>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="go">│        draw        │</span>
 </span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="go">├────────────────────┤</span>
 </span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="go">│ digraph {          │</span>
 </span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="gp">│ 1 -&gt;</span><span class="w"> </span><span class="mf">2</span><span class="w"> </span><span class="p">[</span><span class="k">label</span><span class="o">=</span><span class="s s-Name">&quot;1&quot;</span><span class="p">]</span><span class="w"> </span><span class="err">│</span>
@@ -320,11 +320,6 @@ Will generate the following diagram:</p>
 </svg>
 </div>
 
-<h1 id="adjacency-matrices">Adjacency Matrices</h1>
-<p>Onesparse sparse matrices are very similar to matrix objects from
-other libraries like <code>scipy.sparse</code> and NVIDIA's <code>cuSparse</code>.  The
-primary difference with the the GraphBLAS there also comes an
-entire library of pre-optimized algebraic kernels.</p>
 <p>A useful function to illustrate this concept is <code>random_matrix()</code>.
 This will generate a random matrix provided the type, number of
 rows, number of columns, and the number of (approximate) values and
@@ -506,12 +501,17 @@ This random matrix is also a random <em>graph</em>:</p>
 </div>
 
 <h1 id="every-matrix-is-a-graph">Every Matrix is a Graph</h1>
-<p>In fact every matrix is a graph, whether you think of it that way
-or not.  And every graph has a corresponding matrix.  The data that
-you put into tables can also describe a graph, and thus a matrix.
-These three different ways of thinking about tables, graphs, and
-matrices is one of the core concepts of OneSparse:</p>
+<p>Every matrix is a graph, whether you think of it that way or not.
+And every graph has a corresponding matrix.  The data that you put
+into tables can also describe a graph, and thus a matrix.  These
+three different ways of thinking about tables, graphs, and matrices
+is one of the core concepts of OneSparse:</p>
 <p><img alt="Tables, Graphs, and Matrices" src="../table_graph_matrix.png" /></p>
+<p>While SuiteSparse is optimized for processing sparse matrices and
+vectors, it also supports optimized kernels for dense objects.  A
+dense matrix is just a sparse matrix with all its elements.  In
+this case SuiteSparse will automatically store it in a dense
+optimal format and use CPUs or GPUs appropriately to process them.</p>
 <p>One way of thinking about a "dense" matrix is a fully connected
 graph, these can be constructed with the <code>dense_matrix()</code> function:
 <div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="k">select</span><span class="w"> </span><span class="n">print</span><span class="p">(</span><span class="n">dense_matrix</span><span class="p">(</span><span class="s1">&#39;int32&#39;</span><span class="p">,</span><span class="w"> </span><span class="mf">4</span><span class="p">,</span><span class="w"> </span><span class="mf">4</span><span class="p">,</span><span class="w"> </span><span class="mf">42</span><span class="p">));</span>
@@ -2669,200 +2669,250 @@ inverse (the negative value for integers) of every element:
 </span><span id="__span-28-12"><a id="__codelineno-28-12" name="__codelineno-28-12" href="#__codelineno-28-12"></a><span class="go">└────────────────────┴────────────┴────────────────────┘</span>
 </span><span id="__span-28-13"><a id="__codelineno-28-13" name="__codelineno-28-13" href="#__codelineno-28-13"></a><span class="go">(1 row)</span>
 </span></code></pre></div>
+All the elements in a matrix can be iterated with the <code>elements()</code>
+function:
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="k">select</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">elements</span><span class="p">((</span><span class="k">select</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">test_fixture</span><span class="p">));</span>
+</span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="go">┌───┬───┬─────────┐</span>
+</span><span id="__span-29-3"><a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a><span class="go">│ i │ j │    v    │</span>
+</span><span id="__span-29-4"><a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a><span class="go">├───┼───┼─────────┤</span>
+</span><span id="__span-29-5"><a id="__codelineno-29-5" name="__codelineno-29-5" href="#__codelineno-29-5"></a><span class="go">│ 0 │ 2 │ int32:0 │</span>
+</span><span id="__span-29-6"><a id="__codelineno-29-6" name="__codelineno-29-6" href="#__codelineno-29-6"></a><span class="go">│ 0 │ 3 │ int32:3 │</span>
+</span><span id="__span-29-7"><a id="__codelineno-29-7" name="__codelineno-29-7" href="#__codelineno-29-7"></a><span class="go">│ 1 │ 0 │ int32:2 │</span>
+</span><span id="__span-29-8"><a id="__codelineno-29-8" name="__codelineno-29-8" href="#__codelineno-29-8"></a><span class="go">│ 1 │ 2 │ int32:1 │</span>
+</span><span id="__span-29-9"><a id="__codelineno-29-9" name="__codelineno-29-9" href="#__codelineno-29-9"></a><span class="go">│ 1 │ 3 │ int32:0 │</span>
+</span><span id="__span-29-10"><a id="__codelineno-29-10" name="__codelineno-29-10" href="#__codelineno-29-10"></a><span class="go">│ 2 │ 0 │ int32:2 │</span>
+</span><span id="__span-29-11"><a id="__codelineno-29-11" name="__codelineno-29-11" href="#__codelineno-29-11"></a><span class="go">│ 2 │ 1 │ int32:2 │</span>
+</span><span id="__span-29-12"><a id="__codelineno-29-12" name="__codelineno-29-12" href="#__codelineno-29-12"></a><span class="go">│ 3 │ 0 │ int32:2 │</span>
+</span><span id="__span-29-13"><a id="__codelineno-29-13" name="__codelineno-29-13" href="#__codelineno-29-13"></a><span class="go">│ 3 │ 2 │ int32:1 │</span>
+</span><span id="__span-29-14"><a id="__codelineno-29-14" name="__codelineno-29-14" href="#__codelineno-29-14"></a><span class="go">└───┴───┴─────────┘</span>
+</span><span id="__span-29-15"><a id="__codelineno-29-15" name="__codelineno-29-15" href="#__codelineno-29-15"></a><span class="go">(9 rows)</span>
+</span></code></pre></div>
+The inverse operation of constructing matrices from rows can be
+done with <code>matrix_agg()</code>:
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="k">select</span><span class="w"> </span><span class="n">matrix_agg</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">unbound_matrix</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">generate_series</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span><span class="w"> </span><span class="mf">10</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">i</span><span class="p">;</span>
+</span><span id="__span-30-2"><a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a><span class="go">┌─────────────────────────────────────────────────────────────────────────────┐</span>
+</span><span id="__span-30-3"><a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a><span class="go">│                               unbound_matrix                                │</span>
+</span><span id="__span-30-4"><a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a><span class="go">├─────────────────────────────────────────────────────────────────────────────┤</span>
+</span><span id="__span-30-5"><a id="__codelineno-30-5" name="__codelineno-30-5" href="#__codelineno-30-5"></a><span class="go">│ int32[0:0:0 1:1:1 2:2:2 3:3:3 4:4:4 5:5:5 6:6:6 7:7:7 8:8:8 9:9:9 10:10:10] │</span>
+</span><span id="__span-30-6"><a id="__codelineno-30-6" name="__codelineno-30-6" href="#__codelineno-30-6"></a><span class="go">└─────────────────────────────────────────────────────────────────────────────┘</span>
+</span><span id="__span-30-7"><a id="__codelineno-30-7" name="__codelineno-30-7" href="#__codelineno-30-7"></a><span class="go">(1 row)</span>
+</span></code></pre></div>
+Aggregate matrices are always unbounded so use <code>resize()</code> to bound
+the matrix:
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-31-1"><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="k">select</span><span class="w"> </span><span class="n">print</span><span class="p">(</span><span class="n">resize</span><span class="p">(</span><span class="n">matrix_agg</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">),</span><span class="w"> </span><span class="mf">10</span><span class="p">,</span><span class="w"> </span><span class="mf">10</span><span class="p">))</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">bound_matrix</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">generate_series</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span><span class="w"> </span><span class="mf">10</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">i</span><span class="p">;</span>
+</span><span id="__span-31-2"><a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a><span class="go">┌──────────────────────────────────────┐</span>
+</span><span id="__span-31-3"><a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a><span class="go">│             bound_matrix             │</span>
+</span><span id="__span-31-4"><a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a><span class="go">├──────────────────────────────────────┤</span>
+</span><span id="__span-31-5"><a id="__codelineno-31-5" name="__codelineno-31-5" href="#__codelineno-31-5"></a><span class="go">│      0  1  2  3  4  5  6  7  8  9    │</span>
+</span><span id="__span-31-6"><a id="__codelineno-31-6" name="__codelineno-31-6" href="#__codelineno-31-6"></a><span class="go">│    ──────────────────────────────    │</span>
+</span><span id="__span-31-7"><a id="__codelineno-31-7" name="__codelineno-31-7" href="#__codelineno-31-7"></a><span class="go">│  0│  0                               │</span>
+</span><span id="__span-31-8"><a id="__codelineno-31-8" name="__codelineno-31-8" href="#__codelineno-31-8"></a><span class="go">│  1│     1                            │</span>
+</span><span id="__span-31-9"><a id="__codelineno-31-9" name="__codelineno-31-9" href="#__codelineno-31-9"></a><span class="go">│  2│        2                         │</span>
+</span><span id="__span-31-10"><a id="__codelineno-31-10" name="__codelineno-31-10" href="#__codelineno-31-10"></a><span class="go">│  3│           3                      │</span>
+</span><span id="__span-31-11"><a id="__codelineno-31-11" name="__codelineno-31-11" href="#__codelineno-31-11"></a><span class="go">│  4│              4                   │</span>
+</span><span id="__span-31-12"><a id="__codelineno-31-12" name="__codelineno-31-12" href="#__codelineno-31-12"></a><span class="go">│  5│                 5                │</span>
+</span><span id="__span-31-13"><a id="__codelineno-31-13" name="__codelineno-31-13" href="#__codelineno-31-13"></a><span class="go">│  6│                    6             │</span>
+</span><span id="__span-31-14"><a id="__codelineno-31-14" name="__codelineno-31-14" href="#__codelineno-31-14"></a><span class="go">│  7│                       7          │</span>
+</span><span id="__span-31-15"><a id="__codelineno-31-15" name="__codelineno-31-15" href="#__codelineno-31-15"></a><span class="go">│  8│                          8       │</span>
+</span><span id="__span-31-16"><a id="__codelineno-31-16" name="__codelineno-31-16" href="#__codelineno-31-16"></a><span class="go">│  9│                             9    │</span>
+</span><span id="__span-31-17"><a id="__codelineno-31-17" name="__codelineno-31-17" href="#__codelineno-31-17"></a><span class="go">│                                      │</span>
+</span><span id="__span-31-18"><a id="__codelineno-31-18" name="__codelineno-31-18" href="#__codelineno-31-18"></a><span class="go">└──────────────────────────────────────┘</span>
+</span><span id="__span-31-19"><a id="__codelineno-31-19" name="__codelineno-31-19" href="#__codelineno-31-19"></a><span class="go">(1 row)</span>
+</span></code></pre></div>
 Elements can be set individually with <code>set_element</code>, the modified
 input is returned:
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="k">select</span><span class="w"> </span><span class="n">print</span><span class="p">(</span><span class="n">set_element</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="mf">1</span><span class="p">,</span><span class="w"> </span><span class="mf">1</span><span class="p">,</span><span class="w"> </span><span class="mf">1</span><span class="p">))</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">set_element</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">test_fixture</span><span class="p">;</span>
-</span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="go">┌────────────────────┐</span>
-</span><span id="__span-29-3"><a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a><span class="go">│    set_element     │</span>
-</span><span id="__span-29-4"><a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a><span class="go">├────────────────────┤</span>
-</span><span id="__span-29-5"><a id="__codelineno-29-5" name="__codelineno-29-5" href="#__codelineno-29-5"></a><span class="go">│      0  1  2  3    │</span>
-</span><span id="__span-29-6"><a id="__codelineno-29-6" name="__codelineno-29-6" href="#__codelineno-29-6"></a><span class="go">│    ────────────    │</span>
-</span><span id="__span-29-7"><a id="__codelineno-29-7" name="__codelineno-29-7" href="#__codelineno-29-7"></a><span class="go">│  0│        0  3    │</span>
-</span><span id="__span-29-8"><a id="__codelineno-29-8" name="__codelineno-29-8" href="#__codelineno-29-8"></a><span class="go">│  1│  2  1  1  0    │</span>
-</span><span id="__span-29-9"><a id="__codelineno-29-9" name="__codelineno-29-9" href="#__codelineno-29-9"></a><span class="go">│  2│  2  2          │</span>
-</span><span id="__span-29-10"><a id="__codelineno-29-10" name="__codelineno-29-10" href="#__codelineno-29-10"></a><span class="go">│  3│  2     1       │</span>
-</span><span id="__span-29-11"><a id="__codelineno-29-11" name="__codelineno-29-11" href="#__codelineno-29-11"></a><span class="go">│                    │</span>
-</span><span id="__span-29-12"><a id="__codelineno-29-12" name="__codelineno-29-12" href="#__codelineno-29-12"></a><span class="go">└────────────────────┘</span>
-</span><span id="__span-29-13"><a id="__codelineno-29-13" name="__codelineno-29-13" href="#__codelineno-29-13"></a><span class="go">(1 row)</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-32-1"><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="k">select</span><span class="w"> </span><span class="n">print</span><span class="p">(</span><span class="n">set_element</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="mf">1</span><span class="p">,</span><span class="w"> </span><span class="mf">1</span><span class="p">,</span><span class="w"> </span><span class="mf">1</span><span class="p">))</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">set_element</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">test_fixture</span><span class="p">;</span>
+</span><span id="__span-32-2"><a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a><span class="go">┌────────────────────┐</span>
+</span><span id="__span-32-3"><a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a><span class="go">│    set_element     │</span>
+</span><span id="__span-32-4"><a id="__codelineno-32-4" name="__codelineno-32-4" href="#__codelineno-32-4"></a><span class="go">├────────────────────┤</span>
+</span><span id="__span-32-5"><a id="__codelineno-32-5" name="__codelineno-32-5" href="#__codelineno-32-5"></a><span class="go">│      0  1  2  3    │</span>
+</span><span id="__span-32-6"><a id="__codelineno-32-6" name="__codelineno-32-6" href="#__codelineno-32-6"></a><span class="go">│    ────────────    │</span>
+</span><span id="__span-32-7"><a id="__codelineno-32-7" name="__codelineno-32-7" href="#__codelineno-32-7"></a><span class="go">│  0│        0  3    │</span>
+</span><span id="__span-32-8"><a id="__codelineno-32-8" name="__codelineno-32-8" href="#__codelineno-32-8"></a><span class="go">│  1│  2  1  1  0    │</span>
+</span><span id="__span-32-9"><a id="__codelineno-32-9" name="__codelineno-32-9" href="#__codelineno-32-9"></a><span class="go">│  2│  2  2          │</span>
+</span><span id="__span-32-10"><a id="__codelineno-32-10" name="__codelineno-32-10" href="#__codelineno-32-10"></a><span class="go">│  3│  2     1       │</span>
+</span><span id="__span-32-11"><a id="__codelineno-32-11" name="__codelineno-32-11" href="#__codelineno-32-11"></a><span class="go">│                    │</span>
+</span><span id="__span-32-12"><a id="__codelineno-32-12" name="__codelineno-32-12" href="#__codelineno-32-12"></a><span class="go">└────────────────────┘</span>
+</span><span id="__span-32-13"><a id="__codelineno-32-13" name="__codelineno-32-13" href="#__codelineno-32-13"></a><span class="go">(1 row)</span>
 </span></code></pre></div>
 Scalar elements can be extracted individually with <code>get_element</code>
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="k">select</span><span class="w"> </span><span class="n">get_element</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="mf">3</span><span class="p">,</span><span class="w"> </span><span class="mf">3</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">get_element</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">test_fixture</span><span class="p">;</span>
-</span><span id="__span-30-2"><a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a><span class="go">┌─────────────┐</span>
-</span><span id="__span-30-3"><a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a><span class="go">│ get_element │</span>
-</span><span id="__span-30-4"><a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a><span class="go">├─────────────┤</span>
-</span><span id="__span-30-5"><a id="__codelineno-30-5" name="__codelineno-30-5" href="#__codelineno-30-5"></a><span class="go">│ int         │</span>
-</span><span id="__span-30-6"><a id="__codelineno-30-6" name="__codelineno-30-6" href="#__codelineno-30-6"></a><span class="go">└─────────────┘</span>
-</span><span id="__span-30-7"><a id="__codelineno-30-7" name="__codelineno-30-7" href="#__codelineno-30-7"></a><span class="go">(1 row)</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-33-1"><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="k">select</span><span class="w"> </span><span class="n">get_element</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="mf">3</span><span class="p">,</span><span class="w"> </span><span class="mf">3</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">get_element</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">test_fixture</span><span class="p">;</span>
+</span><span id="__span-33-2"><a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a><span class="go">┌─────────────┐</span>
+</span><span id="__span-33-3"><a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a><span class="go">│ get_element │</span>
+</span><span id="__span-33-4"><a id="__codelineno-33-4" name="__codelineno-33-4" href="#__codelineno-33-4"></a><span class="go">├─────────────┤</span>
+</span><span id="__span-33-5"><a id="__codelineno-33-5" name="__codelineno-33-5" href="#__codelineno-33-5"></a><span class="go">│ int         │</span>
+</span><span id="__span-33-6"><a id="__codelineno-33-6" name="__codelineno-33-6" href="#__codelineno-33-6"></a><span class="go">└─────────────┘</span>
+</span><span id="__span-33-7"><a id="__codelineno-33-7" name="__codelineno-33-7" href="#__codelineno-33-7"></a><span class="go">(1 row)</span>
 </span></code></pre></div>
 The <code>print</code> function returns a descripton of the matrix from
 SuiteSparse.
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-31-1"><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="k">select</span><span class="w"> </span><span class="n">info</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">test_fixture</span><span class="p">;</span>
-</span><span id="__span-31-2"><a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a><span class="go">┌───────────────────────────────────────────────┐</span>
-</span><span id="__span-31-3"><a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a><span class="go">│                     info                      │</span>
-</span><span id="__span-31-4"><a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a><span class="go">├───────────────────────────────────────────────┤</span>
-</span><span id="__span-31-5"><a id="__codelineno-31-5" name="__codelineno-31-5" href="#__codelineno-31-5"></a><span class="go">│                                               │</span>
-</span><span id="__span-31-6"><a id="__codelineno-31-6" name="__codelineno-31-6" href="#__codelineno-31-6"></a><span class="go">│   4x4 GraphBLAS int32_t matrix, bitmap by row │</span>
-</span><span id="__span-31-7"><a id="__codelineno-31-7" name="__codelineno-31-7" href="#__codelineno-31-7"></a><span class="gp">│   A-&gt;</span><span class="n">matrix</span><span class="p">,</span><span class="w"> </span><span class="mf">9</span><span class="w"> </span><span class="n">entries</span><span class="p">,</span><span class="w"> </span><span class="n">memory</span><span class="p">:</span><span class="w"> </span><span class="mf">312</span><span class="w"> </span><span class="n">bytes</span><span class="w">     </span><span class="err">│</span>
-</span><span id="__span-31-8"><a id="__codelineno-31-8" name="__codelineno-31-8" href="#__codelineno-31-8"></a><span class="err">│</span><span class="w">                                               </span><span class="err">│</span>
-</span><span id="__span-31-9"><a id="__codelineno-31-9" name="__codelineno-31-9" href="#__codelineno-31-9"></a><span class="err">│</span><span class="w">                                               </span><span class="err">│</span>
-</span><span id="__span-31-10"><a id="__codelineno-31-10" name="__codelineno-31-10" href="#__codelineno-31-10"></a><span class="err">└───────────────────────────────────────────────┘</span>
-</span><span id="__span-31-11"><a id="__codelineno-31-11" name="__codelineno-31-11" href="#__codelineno-31-11"></a><span class="p">(</span><span class="mf">1</span><span class="w"> </span><span class="k">row</span><span class="p">)</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-34-1"><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="k">select</span><span class="w"> </span><span class="n">info</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">test_fixture</span><span class="p">;</span>
+</span><span id="__span-34-2"><a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a><span class="go">┌───────────────────────────────────────────────┐</span>
+</span><span id="__span-34-3"><a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a><span class="go">│                     info                      │</span>
+</span><span id="__span-34-4"><a id="__codelineno-34-4" name="__codelineno-34-4" href="#__codelineno-34-4"></a><span class="go">├───────────────────────────────────────────────┤</span>
+</span><span id="__span-34-5"><a id="__codelineno-34-5" name="__codelineno-34-5" href="#__codelineno-34-5"></a><span class="go">│                                               │</span>
+</span><span id="__span-34-6"><a id="__codelineno-34-6" name="__codelineno-34-6" href="#__codelineno-34-6"></a><span class="go">│   4x4 GraphBLAS int32_t matrix, bitmap by row │</span>
+</span><span id="__span-34-7"><a id="__codelineno-34-7" name="__codelineno-34-7" href="#__codelineno-34-7"></a><span class="gp">│   A-&gt;</span><span class="n">matrix</span><span class="p">,</span><span class="w"> </span><span class="mf">9</span><span class="w"> </span><span class="n">entries</span><span class="p">,</span><span class="w"> </span><span class="n">memory</span><span class="p">:</span><span class="w"> </span><span class="mf">312</span><span class="w"> </span><span class="n">bytes</span><span class="w">     </span><span class="err">│</span>
+</span><span id="__span-34-8"><a id="__codelineno-34-8" name="__codelineno-34-8" href="#__codelineno-34-8"></a><span class="err">│</span><span class="w">                                               </span><span class="err">│</span>
+</span><span id="__span-34-9"><a id="__codelineno-34-9" name="__codelineno-34-9" href="#__codelineno-34-9"></a><span class="err">│</span><span class="w">                                               </span><span class="err">│</span>
+</span><span id="__span-34-10"><a id="__codelineno-34-10" name="__codelineno-34-10" href="#__codelineno-34-10"></a><span class="err">└───────────────────────────────────────────────┘</span>
+</span><span id="__span-34-11"><a id="__codelineno-34-11" name="__codelineno-34-11" href="#__codelineno-34-11"></a><span class="p">(</span><span class="mf">1</span><span class="w"> </span><span class="k">row</span><span class="p">)</span>
 </span></code></pre></div>
 The <code>print</code> function takes an optional "level" argument that
 defaults to <code>1</code> which is a short summary.
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-32-1"><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="k">select</span><span class="w"> </span><span class="n">info</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="mf">5</span><span class="p">)</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">test_fixture</span><span class="p">;</span>
-</span><span id="__span-32-2"><a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a><span class="go">┌───────────────────────────────────────────────┐</span>
-</span><span id="__span-32-3"><a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a><span class="go">│                     info                      │</span>
-</span><span id="__span-32-4"><a id="__codelineno-32-4" name="__codelineno-32-4" href="#__codelineno-32-4"></a><span class="go">├───────────────────────────────────────────────┤</span>
-</span><span id="__span-32-5"><a id="__codelineno-32-5" name="__codelineno-32-5" href="#__codelineno-32-5"></a><span class="go">│                                               │</span>
-</span><span id="__span-32-6"><a id="__codelineno-32-6" name="__codelineno-32-6" href="#__codelineno-32-6"></a><span class="go">│   4x4 GraphBLAS int32_t matrix, bitmap by row │</span>
-</span><span id="__span-32-7"><a id="__codelineno-32-7" name="__codelineno-32-7" href="#__codelineno-32-7"></a><span class="gp">│   A-&gt;</span><span class="n">matrix</span><span class="p">,</span><span class="w"> </span><span class="mf">9</span><span class="w"> </span><span class="n">entries</span><span class="p">,</span><span class="w"> </span><span class="n">memory</span><span class="p">:</span><span class="w"> </span><span class="mf">312</span><span class="w"> </span><span class="n">bytes</span><span class="w">     </span><span class="err">│</span>
-</span><span id="__span-32-8"><a id="__codelineno-32-8" name="__codelineno-32-8" href="#__codelineno-32-8"></a><span class="err">│</span><span class="w">                                               </span><span class="err">│</span>
-</span><span id="__span-32-9"><a id="__codelineno-32-9" name="__codelineno-32-9" href="#__codelineno-32-9"></a><span class="err">│</span><span class="w">     </span><span class="p">(</span><span class="mf">0</span><span class="p">,</span><span class="mf">2</span><span class="p">)</span><span class="w">   </span><span class="mf">0</span><span class="w">                                 </span><span class="err">│</span>
-</span><span id="__span-32-10"><a id="__codelineno-32-10" name="__codelineno-32-10" href="#__codelineno-32-10"></a><span class="err">│</span><span class="w">     </span><span class="p">(</span><span class="mf">0</span><span class="p">,</span><span class="mf">3</span><span class="p">)</span><span class="w">   </span><span class="mf">3</span><span class="w">                                 </span><span class="err">│</span>
-</span><span id="__span-32-11"><a id="__codelineno-32-11" name="__codelineno-32-11" href="#__codelineno-32-11"></a><span class="err">│</span><span class="w">     </span><span class="p">(</span><span class="mf">1</span><span class="p">,</span><span class="mf">0</span><span class="p">)</span><span class="w">   </span><span class="mf">2</span><span class="w">                                 </span><span class="err">│</span>
-</span><span id="__span-32-12"><a id="__codelineno-32-12" name="__codelineno-32-12" href="#__codelineno-32-12"></a><span class="err">│</span><span class="w">     </span><span class="p">(</span><span class="mf">1</span><span class="p">,</span><span class="mf">2</span><span class="p">)</span><span class="w">   </span><span class="mf">1</span><span class="w">                                 </span><span class="err">│</span>
-</span><span id="__span-32-13"><a id="__codelineno-32-13" name="__codelineno-32-13" href="#__codelineno-32-13"></a><span class="err">│</span><span class="w">     </span><span class="p">(</span><span class="mf">1</span><span class="p">,</span><span class="mf">3</span><span class="p">)</span><span class="w">   </span><span class="mf">0</span><span class="w">                                 </span><span class="err">│</span>
-</span><span id="__span-32-14"><a id="__codelineno-32-14" name="__codelineno-32-14" href="#__codelineno-32-14"></a><span class="err">│</span><span class="w">     </span><span class="p">(</span><span class="mf">2</span><span class="p">,</span><span class="mf">0</span><span class="p">)</span><span class="w">   </span><span class="mf">2</span><span class="w">                                 </span><span class="err">│</span>
-</span><span id="__span-32-15"><a id="__codelineno-32-15" name="__codelineno-32-15" href="#__codelineno-32-15"></a><span class="err">│</span><span class="w">     </span><span class="p">(</span><span class="mf">2</span><span class="p">,</span><span class="mf">1</span><span class="p">)</span><span class="w">   </span><span class="mf">2</span><span class="w">                                 </span><span class="err">│</span>
-</span><span id="__span-32-16"><a id="__codelineno-32-16" name="__codelineno-32-16" href="#__codelineno-32-16"></a><span class="err">│</span><span class="w">     </span><span class="p">(</span><span class="mf">3</span><span class="p">,</span><span class="mf">0</span><span class="p">)</span><span class="w">   </span><span class="mf">2</span><span class="w">                                 </span><span class="err">│</span>
-</span><span id="__span-32-17"><a id="__codelineno-32-17" name="__codelineno-32-17" href="#__codelineno-32-17"></a><span class="err">│</span><span class="w">     </span><span class="p">(</span><span class="mf">3</span><span class="p">,</span><span class="mf">2</span><span class="p">)</span><span class="w">   </span><span class="mf">1</span><span class="w">                                 </span><span class="err">│</span>
-</span><span id="__span-32-18"><a id="__codelineno-32-18" name="__codelineno-32-18" href="#__codelineno-32-18"></a><span class="err">│</span><span class="w">                                               </span><span class="err">│</span>
-</span><span id="__span-32-19"><a id="__codelineno-32-19" name="__codelineno-32-19" href="#__codelineno-32-19"></a><span class="err">│</span><span class="w">                                               </span><span class="err">│</span>
-</span><span id="__span-32-20"><a id="__codelineno-32-20" name="__codelineno-32-20" href="#__codelineno-32-20"></a><span class="err">└───────────────────────────────────────────────┘</span>
-</span><span id="__span-32-21"><a id="__codelineno-32-21" name="__codelineno-32-21" href="#__codelineno-32-21"></a><span class="p">(</span><span class="mf">1</span><span class="w"> </span><span class="k">row</span><span class="p">)</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-35-1"><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="k">select</span><span class="w"> </span><span class="n">info</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="mf">5</span><span class="p">)</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">test_fixture</span><span class="p">;</span>
+</span><span id="__span-35-2"><a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a><span class="go">┌───────────────────────────────────────────────┐</span>
+</span><span id="__span-35-3"><a id="__codelineno-35-3" name="__codelineno-35-3" href="#__codelineno-35-3"></a><span class="go">│                     info                      │</span>
+</span><span id="__span-35-4"><a id="__codelineno-35-4" name="__codelineno-35-4" href="#__codelineno-35-4"></a><span class="go">├───────────────────────────────────────────────┤</span>
+</span><span id="__span-35-5"><a id="__codelineno-35-5" name="__codelineno-35-5" href="#__codelineno-35-5"></a><span class="go">│                                               │</span>
+</span><span id="__span-35-6"><a id="__codelineno-35-6" name="__codelineno-35-6" href="#__codelineno-35-6"></a><span class="go">│   4x4 GraphBLAS int32_t matrix, bitmap by row │</span>
+</span><span id="__span-35-7"><a id="__codelineno-35-7" name="__codelineno-35-7" href="#__codelineno-35-7"></a><span class="gp">│   A-&gt;</span><span class="n">matrix</span><span class="p">,</span><span class="w"> </span><span class="mf">9</span><span class="w"> </span><span class="n">entries</span><span class="p">,</span><span class="w"> </span><span class="n">memory</span><span class="p">:</span><span class="w"> </span><span class="mf">312</span><span class="w"> </span><span class="n">bytes</span><span class="w">     </span><span class="err">│</span>
+</span><span id="__span-35-8"><a id="__codelineno-35-8" name="__codelineno-35-8" href="#__codelineno-35-8"></a><span class="err">│</span><span class="w">                                               </span><span class="err">│</span>
+</span><span id="__span-35-9"><a id="__codelineno-35-9" name="__codelineno-35-9" href="#__codelineno-35-9"></a><span class="err">│</span><span class="w">     </span><span class="p">(</span><span class="mf">0</span><span class="p">,</span><span class="mf">2</span><span class="p">)</span><span class="w">   </span><span class="mf">0</span><span class="w">                                 </span><span class="err">│</span>
+</span><span id="__span-35-10"><a id="__codelineno-35-10" name="__codelineno-35-10" href="#__codelineno-35-10"></a><span class="err">│</span><span class="w">     </span><span class="p">(</span><span class="mf">0</span><span class="p">,</span><span class="mf">3</span><span class="p">)</span><span class="w">   </span><span class="mf">3</span><span class="w">                                 </span><span class="err">│</span>
+</span><span id="__span-35-11"><a id="__codelineno-35-11" name="__codelineno-35-11" href="#__codelineno-35-11"></a><span class="err">│</span><span class="w">     </span><span class="p">(</span><span class="mf">1</span><span class="p">,</span><span class="mf">0</span><span class="p">)</span><span class="w">   </span><span class="mf">2</span><span class="w">                                 </span><span class="err">│</span>
+</span><span id="__span-35-12"><a id="__codelineno-35-12" name="__codelineno-35-12" href="#__codelineno-35-12"></a><span class="err">│</span><span class="w">     </span><span class="p">(</span><span class="mf">1</span><span class="p">,</span><span class="mf">2</span><span class="p">)</span><span class="w">   </span><span class="mf">1</span><span class="w">                                 </span><span class="err">│</span>
+</span><span id="__span-35-13"><a id="__codelineno-35-13" name="__codelineno-35-13" href="#__codelineno-35-13"></a><span class="err">│</span><span class="w">     </span><span class="p">(</span><span class="mf">1</span><span class="p">,</span><span class="mf">3</span><span class="p">)</span><span class="w">   </span><span class="mf">0</span><span class="w">                                 </span><span class="err">│</span>
+</span><span id="__span-35-14"><a id="__codelineno-35-14" name="__codelineno-35-14" href="#__codelineno-35-14"></a><span class="err">│</span><span class="w">     </span><span class="p">(</span><span class="mf">2</span><span class="p">,</span><span class="mf">0</span><span class="p">)</span><span class="w">   </span><span class="mf">2</span><span class="w">                                 </span><span class="err">│</span>
+</span><span id="__span-35-15"><a id="__codelineno-35-15" name="__codelineno-35-15" href="#__codelineno-35-15"></a><span class="err">│</span><span class="w">     </span><span class="p">(</span><span class="mf">2</span><span class="p">,</span><span class="mf">1</span><span class="p">)</span><span class="w">   </span><span class="mf">2</span><span class="w">                                 </span><span class="err">│</span>
+</span><span id="__span-35-16"><a id="__codelineno-35-16" name="__codelineno-35-16" href="#__codelineno-35-16"></a><span class="err">│</span><span class="w">     </span><span class="p">(</span><span class="mf">3</span><span class="p">,</span><span class="mf">0</span><span class="p">)</span><span class="w">   </span><span class="mf">2</span><span class="w">                                 </span><span class="err">│</span>
+</span><span id="__span-35-17"><a id="__codelineno-35-17" name="__codelineno-35-17" href="#__codelineno-35-17"></a><span class="err">│</span><span class="w">     </span><span class="p">(</span><span class="mf">3</span><span class="p">,</span><span class="mf">2</span><span class="p">)</span><span class="w">   </span><span class="mf">1</span><span class="w">                                 </span><span class="err">│</span>
+</span><span id="__span-35-18"><a id="__codelineno-35-18" name="__codelineno-35-18" href="#__codelineno-35-18"></a><span class="err">│</span><span class="w">                                               </span><span class="err">│</span>
+</span><span id="__span-35-19"><a id="__codelineno-35-19" name="__codelineno-35-19" href="#__codelineno-35-19"></a><span class="err">│</span><span class="w">                                               </span><span class="err">│</span>
+</span><span id="__span-35-20"><a id="__codelineno-35-20" name="__codelineno-35-20" href="#__codelineno-35-20"></a><span class="err">└───────────────────────────────────────────────┘</span>
+</span><span id="__span-35-21"><a id="__codelineno-35-21" name="__codelineno-35-21" href="#__codelineno-35-21"></a><span class="p">(</span><span class="mf">1</span><span class="w"> </span><span class="k">row</span><span class="p">)</span>
 </span></code></pre></div>
 The <code>dup</code> function duplicates a matrix returning a new matrix
 object with the same values:
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-33-1"><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="k">select</span><span class="w"> </span><span class="n">dup</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">test_fixture</span><span class="p">;</span>
-</span><span id="__span-33-2"><a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a><span class="go">┌───────────────────────────────────────────────────────────────────┐</span>
-</span><span id="__span-33-3"><a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a><span class="go">│                                dup                                │</span>
-</span><span id="__span-33-4"><a id="__codelineno-33-4" name="__codelineno-33-4" href="#__codelineno-33-4"></a><span class="go">├───────────────────────────────────────────────────────────────────┤</span>
-</span><span id="__span-33-5"><a id="__codelineno-33-5" name="__codelineno-33-5" href="#__codelineno-33-5"></a><span class="go">│ int32(4:4)[0:2:0 0:3:3 1:0:2 1:2:1 1:3:0 2:0:2 2:1:2 3:0:2 3:2:1] │</span>
-</span><span id="__span-33-6"><a id="__codelineno-33-6" name="__codelineno-33-6" href="#__codelineno-33-6"></a><span class="go">└───────────────────────────────────────────────────────────────────┘</span>
-</span><span id="__span-33-7"><a id="__codelineno-33-7" name="__codelineno-33-7" href="#__codelineno-33-7"></a><span class="go">(1 row)</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-36-1"><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="k">select</span><span class="w"> </span><span class="n">dup</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">test_fixture</span><span class="p">;</span>
+</span><span id="__span-36-2"><a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a><span class="go">┌───────────────────────────────────────────────────────────────────┐</span>
+</span><span id="__span-36-3"><a id="__codelineno-36-3" name="__codelineno-36-3" href="#__codelineno-36-3"></a><span class="go">│                                dup                                │</span>
+</span><span id="__span-36-4"><a id="__codelineno-36-4" name="__codelineno-36-4" href="#__codelineno-36-4"></a><span class="go">├───────────────────────────────────────────────────────────────────┤</span>
+</span><span id="__span-36-5"><a id="__codelineno-36-5" name="__codelineno-36-5" href="#__codelineno-36-5"></a><span class="go">│ int32(4:4)[0:2:0 0:3:3 1:0:2 1:2:1 1:3:0 2:0:2 2:1:2 3:0:2 3:2:1] │</span>
+</span><span id="__span-36-6"><a id="__codelineno-36-6" name="__codelineno-36-6" href="#__codelineno-36-6"></a><span class="go">└───────────────────────────────────────────────────────────────────┘</span>
+</span><span id="__span-36-7"><a id="__codelineno-36-7" name="__codelineno-36-7" href="#__codelineno-36-7"></a><span class="go">(1 row)</span>
 </span></code></pre></div>
 The <code>wait</code> method is used to "complete" a matrix, which may have
 pending operations waiting to be performed when using the default
 SuiteSparse non-blocking mode.  As a side effect, wait will sort
 the elements of the input:
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-34-1"><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="k">select</span><span class="w"> </span><span class="n">wait</span><span class="p">(</span><span class="s1">&#39;int32[2:2:2 3:3:3 1:1:1]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">);</span>
-</span><span id="__span-34-2"><a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a><span class="go">┌──────────────────────────┐</span>
-</span><span id="__span-34-3"><a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a><span class="go">│           wait           │</span>
-</span><span id="__span-34-4"><a id="__codelineno-34-4" name="__codelineno-34-4" href="#__codelineno-34-4"></a><span class="go">├──────────────────────────┤</span>
-</span><span id="__span-34-5"><a id="__codelineno-34-5" name="__codelineno-34-5" href="#__codelineno-34-5"></a><span class="go">│ int32[1:1:1 2:2:2 3:3:3] │</span>
-</span><span id="__span-34-6"><a id="__codelineno-34-6" name="__codelineno-34-6" href="#__codelineno-34-6"></a><span class="go">└──────────────────────────┘</span>
-</span><span id="__span-34-7"><a id="__codelineno-34-7" name="__codelineno-34-7" href="#__codelineno-34-7"></a><span class="go">(1 row)</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-37-1"><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a><span class="k">select</span><span class="w"> </span><span class="n">wait</span><span class="p">(</span><span class="s1">&#39;int32[2:2:2 3:3:3 1:1:1]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">);</span>
+</span><span id="__span-37-2"><a id="__codelineno-37-2" name="__codelineno-37-2" href="#__codelineno-37-2"></a><span class="go">┌──────────────────────────┐</span>
+</span><span id="__span-37-3"><a id="__codelineno-37-3" name="__codelineno-37-3" href="#__codelineno-37-3"></a><span class="go">│           wait           │</span>
+</span><span id="__span-37-4"><a id="__codelineno-37-4" name="__codelineno-37-4" href="#__codelineno-37-4"></a><span class="go">├──────────────────────────┤</span>
+</span><span id="__span-37-5"><a id="__codelineno-37-5" name="__codelineno-37-5" href="#__codelineno-37-5"></a><span class="go">│ int32[1:1:1 2:2:2 3:3:3] │</span>
+</span><span id="__span-37-6"><a id="__codelineno-37-6" name="__codelineno-37-6" href="#__codelineno-37-6"></a><span class="go">└──────────────────────────┘</span>
+</span><span id="__span-37-7"><a id="__codelineno-37-7" name="__codelineno-37-7" href="#__codelineno-37-7"></a><span class="go">(1 row)</span>
 </span></code></pre></div>
 The <code>clear</code> function clears the matrix of all elements and returns
 the same object, but empty.  The dimensions do not change:
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-35-1"><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="k">select</span><span class="w"> </span><span class="n">clear</span><span class="p">(</span><span class="s1">&#39;int32[1:1:1 2:2:2 3:3:3]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">);</span>
-</span><span id="__span-35-2"><a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a><span class="go">┌───────┐</span>
-</span><span id="__span-35-3"><a id="__codelineno-35-3" name="__codelineno-35-3" href="#__codelineno-35-3"></a><span class="go">│ clear │</span>
-</span><span id="__span-35-4"><a id="__codelineno-35-4" name="__codelineno-35-4" href="#__codelineno-35-4"></a><span class="go">├───────┤</span>
-</span><span id="__span-35-5"><a id="__codelineno-35-5" name="__codelineno-35-5" href="#__codelineno-35-5"></a><span class="go">│ int32 │</span>
-</span><span id="__span-35-6"><a id="__codelineno-35-6" name="__codelineno-35-6" href="#__codelineno-35-6"></a><span class="go">└───────┘</span>
-</span><span id="__span-35-7"><a id="__codelineno-35-7" name="__codelineno-35-7" href="#__codelineno-35-7"></a><span class="go">(1 row)</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-38-1"><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a><span class="k">select</span><span class="w"> </span><span class="n">clear</span><span class="p">(</span><span class="s1">&#39;int32[1:1:1 2:2:2 3:3:3]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">);</span>
+</span><span id="__span-38-2"><a id="__codelineno-38-2" name="__codelineno-38-2" href="#__codelineno-38-2"></a><span class="go">┌───────┐</span>
+</span><span id="__span-38-3"><a id="__codelineno-38-3" name="__codelineno-38-3" href="#__codelineno-38-3"></a><span class="go">│ clear │</span>
+</span><span id="__span-38-4"><a id="__codelineno-38-4" name="__codelineno-38-4" href="#__codelineno-38-4"></a><span class="go">├───────┤</span>
+</span><span id="__span-38-5"><a id="__codelineno-38-5" name="__codelineno-38-5" href="#__codelineno-38-5"></a><span class="go">│ int32 │</span>
+</span><span id="__span-38-6"><a id="__codelineno-38-6" name="__codelineno-38-6" href="#__codelineno-38-6"></a><span class="go">└───────┘</span>
+</span><span id="__span-38-7"><a id="__codelineno-38-7" name="__codelineno-38-7" href="#__codelineno-38-7"></a><span class="go">(1 row)</span>
 </span></code></pre></div></p>
 <h1 id="extra-tests">Extra tests</h1>
 <p>This documentation also forms the basis for the onesparse tests,
 These tests run the documentation against a live server, all the
 above results are automatically generated.
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-36-1"><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="k">select</span><span class="w"> </span><span class="n">nrows</span><span class="p">(</span><span class="s1">&#39;int32(10)[1:1:1 2:2:2 3:3:3]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">);</span>
-</span><span id="__span-36-2"><a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a><span class="go">┌───────┐</span>
-</span><span id="__span-36-3"><a id="__codelineno-36-3" name="__codelineno-36-3" href="#__codelineno-36-3"></a><span class="go">│ nrows │</span>
-</span><span id="__span-36-4"><a id="__codelineno-36-4" name="__codelineno-36-4" href="#__codelineno-36-4"></a><span class="go">├───────┤</span>
-</span><span id="__span-36-5"><a id="__codelineno-36-5" name="__codelineno-36-5" href="#__codelineno-36-5"></a><span class="go">│    10 │</span>
-</span><span id="__span-36-6"><a id="__codelineno-36-6" name="__codelineno-36-6" href="#__codelineno-36-6"></a><span class="go">└───────┘</span>
-</span><span id="__span-36-7"><a id="__codelineno-36-7" name="__codelineno-36-7" href="#__codelineno-36-7"></a><span class="go">(1 row)</span>
-</span><span id="__span-36-8"><a id="__codelineno-36-8" name="__codelineno-36-8" href="#__codelineno-36-8"></a>
-</span><span id="__span-36-9"><a id="__codelineno-36-9" name="__codelineno-36-9" href="#__codelineno-36-9"></a><span class="go">select ncols(&#39;int32(10)[1:1:1 2:2:2 3:3:3]&#39;::matrix);</span>
-</span><span id="__span-36-10"><a id="__codelineno-36-10" name="__codelineno-36-10" href="#__codelineno-36-10"></a><span class="go">┌─────────────────────┐</span>
-</span><span id="__span-36-11"><a id="__codelineno-36-11" name="__codelineno-36-11" href="#__codelineno-36-11"></a><span class="go">│        ncols        │</span>
-</span><span id="__span-36-12"><a id="__codelineno-36-12" name="__codelineno-36-12" href="#__codelineno-36-12"></a><span class="go">├─────────────────────┤</span>
-</span><span id="__span-36-13"><a id="__codelineno-36-13" name="__codelineno-36-13" href="#__codelineno-36-13"></a><span class="go">│ 1152921504606846976 │</span>
-</span><span id="__span-36-14"><a id="__codelineno-36-14" name="__codelineno-36-14" href="#__codelineno-36-14"></a><span class="go">└─────────────────────┘</span>
-</span><span id="__span-36-15"><a id="__codelineno-36-15" name="__codelineno-36-15" href="#__codelineno-36-15"></a><span class="go">(1 row)</span>
-</span><span id="__span-36-16"><a id="__codelineno-36-16" name="__codelineno-36-16" href="#__codelineno-36-16"></a>
-</span><span id="__span-36-17"><a id="__codelineno-36-17" name="__codelineno-36-17" href="#__codelineno-36-17"></a><span class="go">select nvals(&#39;int32(10)[1:1:1 2:2:2 3:3:3]&#39;::matrix);</span>
-</span><span id="__span-36-18"><a id="__codelineno-36-18" name="__codelineno-36-18" href="#__codelineno-36-18"></a><span class="go">┌───────┐</span>
-</span><span id="__span-36-19"><a id="__codelineno-36-19" name="__codelineno-36-19" href="#__codelineno-36-19"></a><span class="go">│ nvals │</span>
-</span><span id="__span-36-20"><a id="__codelineno-36-20" name="__codelineno-36-20" href="#__codelineno-36-20"></a><span class="go">├───────┤</span>
-</span><span id="__span-36-21"><a id="__codelineno-36-21" name="__codelineno-36-21" href="#__codelineno-36-21"></a><span class="go">│     3 │</span>
-</span><span id="__span-36-22"><a id="__codelineno-36-22" name="__codelineno-36-22" href="#__codelineno-36-22"></a><span class="go">└───────┘</span>
-</span><span id="__span-36-23"><a id="__codelineno-36-23" name="__codelineno-36-23" href="#__codelineno-36-23"></a><span class="go">(1 row)</span>
-</span><span id="__span-36-24"><a id="__codelineno-36-24" name="__codelineno-36-24" href="#__codelineno-36-24"></a>
-</span><span id="__span-36-25"><a id="__codelineno-36-25" name="__codelineno-36-25" href="#__codelineno-36-25"></a><span class="go">select nrows(&#39;int32(10:)[1:1:1 2:2:2 3:3:3]&#39;::matrix);</span>
-</span><span id="__span-36-26"><a id="__codelineno-36-26" name="__codelineno-36-26" href="#__codelineno-36-26"></a><span class="go">┌───────┐</span>
-</span><span id="__span-36-27"><a id="__codelineno-36-27" name="__codelineno-36-27" href="#__codelineno-36-27"></a><span class="go">│ nrows │</span>
-</span><span id="__span-36-28"><a id="__codelineno-36-28" name="__codelineno-36-28" href="#__codelineno-36-28"></a><span class="go">├───────┤</span>
-</span><span id="__span-36-29"><a id="__codelineno-36-29" name="__codelineno-36-29" href="#__codelineno-36-29"></a><span class="go">│    10 │</span>
-</span><span id="__span-36-30"><a id="__codelineno-36-30" name="__codelineno-36-30" href="#__codelineno-36-30"></a><span class="go">└───────┘</span>
-</span><span id="__span-36-31"><a id="__codelineno-36-31" name="__codelineno-36-31" href="#__codelineno-36-31"></a><span class="go">(1 row)</span>
-</span><span id="__span-36-32"><a id="__codelineno-36-32" name="__codelineno-36-32" href="#__codelineno-36-32"></a>
-</span><span id="__span-36-33"><a id="__codelineno-36-33" name="__codelineno-36-33" href="#__codelineno-36-33"></a><span class="go">select ncols(&#39;int32(10:)[1:1:1 2:2:2 3:3:3]&#39;::matrix);</span>
-</span><span id="__span-36-34"><a id="__codelineno-36-34" name="__codelineno-36-34" href="#__codelineno-36-34"></a><span class="go">┌─────────────────────┐</span>
-</span><span id="__span-36-35"><a id="__codelineno-36-35" name="__codelineno-36-35" href="#__codelineno-36-35"></a><span class="go">│        ncols        │</span>
-</span><span id="__span-36-36"><a id="__codelineno-36-36" name="__codelineno-36-36" href="#__codelineno-36-36"></a><span class="go">├─────────────────────┤</span>
-</span><span id="__span-36-37"><a id="__codelineno-36-37" name="__codelineno-36-37" href="#__codelineno-36-37"></a><span class="go">│ 1152921504606846976 │</span>
-</span><span id="__span-36-38"><a id="__codelineno-36-38" name="__codelineno-36-38" href="#__codelineno-36-38"></a><span class="go">└─────────────────────┘</span>
-</span><span id="__span-36-39"><a id="__codelineno-36-39" name="__codelineno-36-39" href="#__codelineno-36-39"></a><span class="go">(1 row)</span>
-</span><span id="__span-36-40"><a id="__codelineno-36-40" name="__codelineno-36-40" href="#__codelineno-36-40"></a>
-</span><span id="__span-36-41"><a id="__codelineno-36-41" name="__codelineno-36-41" href="#__codelineno-36-41"></a><span class="go">select nvals(&#39;int32(10:)[1:1:1 2:2:2 3:3:3]&#39;::matrix);</span>
-</span><span id="__span-36-42"><a id="__codelineno-36-42" name="__codelineno-36-42" href="#__codelineno-36-42"></a><span class="go">┌───────┐</span>
-</span><span id="__span-36-43"><a id="__codelineno-36-43" name="__codelineno-36-43" href="#__codelineno-36-43"></a><span class="go">│ nvals │</span>
-</span><span id="__span-36-44"><a id="__codelineno-36-44" name="__codelineno-36-44" href="#__codelineno-36-44"></a><span class="go">├───────┤</span>
-</span><span id="__span-36-45"><a id="__codelineno-36-45" name="__codelineno-36-45" href="#__codelineno-36-45"></a><span class="go">│     3 │</span>
-</span><span id="__span-36-46"><a id="__codelineno-36-46" name="__codelineno-36-46" href="#__codelineno-36-46"></a><span class="go">└───────┘</span>
-</span><span id="__span-36-47"><a id="__codelineno-36-47" name="__codelineno-36-47" href="#__codelineno-36-47"></a><span class="go">(1 row)</span>
-</span><span id="__span-36-48"><a id="__codelineno-36-48" name="__codelineno-36-48" href="#__codelineno-36-48"></a>
-</span><span id="__span-36-49"><a id="__codelineno-36-49" name="__codelineno-36-49" href="#__codelineno-36-49"></a><span class="go">select nrows(&#39;int32(:10)[1:1:1 2:2:2 3:3:3]&#39;::matrix);</span>
-</span><span id="__span-36-50"><a id="__codelineno-36-50" name="__codelineno-36-50" href="#__codelineno-36-50"></a><span class="go">┌─────────────────────┐</span>
-</span><span id="__span-36-51"><a id="__codelineno-36-51" name="__codelineno-36-51" href="#__codelineno-36-51"></a><span class="go">│        nrows        │</span>
-</span><span id="__span-36-52"><a id="__codelineno-36-52" name="__codelineno-36-52" href="#__codelineno-36-52"></a><span class="go">├─────────────────────┤</span>
-</span><span id="__span-36-53"><a id="__codelineno-36-53" name="__codelineno-36-53" href="#__codelineno-36-53"></a><span class="go">│ 1152921504606846976 │</span>
-</span><span id="__span-36-54"><a id="__codelineno-36-54" name="__codelineno-36-54" href="#__codelineno-36-54"></a><span class="go">└─────────────────────┘</span>
-</span><span id="__span-36-55"><a id="__codelineno-36-55" name="__codelineno-36-55" href="#__codelineno-36-55"></a><span class="go">(1 row)</span>
-</span><span id="__span-36-56"><a id="__codelineno-36-56" name="__codelineno-36-56" href="#__codelineno-36-56"></a>
-</span><span id="__span-36-57"><a id="__codelineno-36-57" name="__codelineno-36-57" href="#__codelineno-36-57"></a><span class="go">select ncols(&#39;int32(:10)[1:1:1 2:2:2 3:3:3]&#39;::matrix);</span>
-</span><span id="__span-36-58"><a id="__codelineno-36-58" name="__codelineno-36-58" href="#__codelineno-36-58"></a><span class="go">┌───────┐</span>
-</span><span id="__span-36-59"><a id="__codelineno-36-59" name="__codelineno-36-59" href="#__codelineno-36-59"></a><span class="go">│ ncols │</span>
-</span><span id="__span-36-60"><a id="__codelineno-36-60" name="__codelineno-36-60" href="#__codelineno-36-60"></a><span class="go">├───────┤</span>
-</span><span id="__span-36-61"><a id="__codelineno-36-61" name="__codelineno-36-61" href="#__codelineno-36-61"></a><span class="go">│    10 │</span>
-</span><span id="__span-36-62"><a id="__codelineno-36-62" name="__codelineno-36-62" href="#__codelineno-36-62"></a><span class="go">└───────┘</span>
-</span><span id="__span-36-63"><a id="__codelineno-36-63" name="__codelineno-36-63" href="#__codelineno-36-63"></a><span class="go">(1 row)</span>
-</span><span id="__span-36-64"><a id="__codelineno-36-64" name="__codelineno-36-64" href="#__codelineno-36-64"></a>
-</span><span id="__span-36-65"><a id="__codelineno-36-65" name="__codelineno-36-65" href="#__codelineno-36-65"></a><span class="go">select nvals(&#39;int32(:10)[1:1:1 2:2:2 3:3:3]&#39;::matrix);</span>
-</span><span id="__span-36-66"><a id="__codelineno-36-66" name="__codelineno-36-66" href="#__codelineno-36-66"></a><span class="go">┌───────┐</span>
-</span><span id="__span-36-67"><a id="__codelineno-36-67" name="__codelineno-36-67" href="#__codelineno-36-67"></a><span class="go">│ nvals │</span>
-</span><span id="__span-36-68"><a id="__codelineno-36-68" name="__codelineno-36-68" href="#__codelineno-36-68"></a><span class="go">├───────┤</span>
-</span><span id="__span-36-69"><a id="__codelineno-36-69" name="__codelineno-36-69" href="#__codelineno-36-69"></a><span class="go">│     3 │</span>
-</span><span id="__span-36-70"><a id="__codelineno-36-70" name="__codelineno-36-70" href="#__codelineno-36-70"></a><span class="go">└───────┘</span>
-</span><span id="__span-36-71"><a id="__codelineno-36-71" name="__codelineno-36-71" href="#__codelineno-36-71"></a><span class="go">(1 row)</span>
-</span><span id="__span-36-72"><a id="__codelineno-36-72" name="__codelineno-36-72" href="#__codelineno-36-72"></a>
-</span><span id="__span-36-73"><a id="__codelineno-36-73" name="__codelineno-36-73" href="#__codelineno-36-73"></a><span class="go">select nrows(&#39;int32(10:10)[1:1:1 2:2:2 3:3:3]&#39;::matrix);</span>
-</span><span id="__span-36-74"><a id="__codelineno-36-74" name="__codelineno-36-74" href="#__codelineno-36-74"></a><span class="go">┌───────┐</span>
-</span><span id="__span-36-75"><a id="__codelineno-36-75" name="__codelineno-36-75" href="#__codelineno-36-75"></a><span class="go">│ nrows │</span>
-</span><span id="__span-36-76"><a id="__codelineno-36-76" name="__codelineno-36-76" href="#__codelineno-36-76"></a><span class="go">├───────┤</span>
-</span><span id="__span-36-77"><a id="__codelineno-36-77" name="__codelineno-36-77" href="#__codelineno-36-77"></a><span class="go">│    10 │</span>
-</span><span id="__span-36-78"><a id="__codelineno-36-78" name="__codelineno-36-78" href="#__codelineno-36-78"></a><span class="go">└───────┘</span>
-</span><span id="__span-36-79"><a id="__codelineno-36-79" name="__codelineno-36-79" href="#__codelineno-36-79"></a><span class="go">(1 row)</span>
-</span><span id="__span-36-80"><a id="__codelineno-36-80" name="__codelineno-36-80" href="#__codelineno-36-80"></a>
-</span><span id="__span-36-81"><a id="__codelineno-36-81" name="__codelineno-36-81" href="#__codelineno-36-81"></a><span class="go">select ncols(&#39;int32(10:10)[1:1:1 2:2:2 3:3:3]&#39;::matrix);</span>
-</span><span id="__span-36-82"><a id="__codelineno-36-82" name="__codelineno-36-82" href="#__codelineno-36-82"></a><span class="go">┌───────┐</span>
-</span><span id="__span-36-83"><a id="__codelineno-36-83" name="__codelineno-36-83" href="#__codelineno-36-83"></a><span class="go">│ ncols │</span>
-</span><span id="__span-36-84"><a id="__codelineno-36-84" name="__codelineno-36-84" href="#__codelineno-36-84"></a><span class="go">├───────┤</span>
-</span><span id="__span-36-85"><a id="__codelineno-36-85" name="__codelineno-36-85" href="#__codelineno-36-85"></a><span class="go">│    10 │</span>
-</span><span id="__span-36-86"><a id="__codelineno-36-86" name="__codelineno-36-86" href="#__codelineno-36-86"></a><span class="go">└───────┘</span>
-</span><span id="__span-36-87"><a id="__codelineno-36-87" name="__codelineno-36-87" href="#__codelineno-36-87"></a><span class="go">(1 row)</span>
-</span><span id="__span-36-88"><a id="__codelineno-36-88" name="__codelineno-36-88" href="#__codelineno-36-88"></a>
-</span><span id="__span-36-89"><a id="__codelineno-36-89" name="__codelineno-36-89" href="#__codelineno-36-89"></a><span class="go">select nvals(&#39;int32(10:10)[1:1:1 2:2:2 3:3:3]&#39;::matrix);</span>
-</span><span id="__span-36-90"><a id="__codelineno-36-90" name="__codelineno-36-90" href="#__codelineno-36-90"></a><span class="go">┌───────┐</span>
-</span><span id="__span-36-91"><a id="__codelineno-36-91" name="__codelineno-36-91" href="#__codelineno-36-91"></a><span class="go">│ nvals │</span>
-</span><span id="__span-36-92"><a id="__codelineno-36-92" name="__codelineno-36-92" href="#__codelineno-36-92"></a><span class="go">├───────┤</span>
-</span><span id="__span-36-93"><a id="__codelineno-36-93" name="__codelineno-36-93" href="#__codelineno-36-93"></a><span class="go">│     3 │</span>
-</span><span id="__span-36-94"><a id="__codelineno-36-94" name="__codelineno-36-94" href="#__codelineno-36-94"></a><span class="go">└───────┘</span>
-</span><span id="__span-36-95"><a id="__codelineno-36-95" name="__codelineno-36-95" href="#__codelineno-36-95"></a><span class="go">(1 row)</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-39-1"><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a><span class="k">select</span><span class="w"> </span><span class="n">nrows</span><span class="p">(</span><span class="s1">&#39;int32(10)[1:1:1 2:2:2 3:3:3]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">);</span>
+</span><span id="__span-39-2"><a id="__codelineno-39-2" name="__codelineno-39-2" href="#__codelineno-39-2"></a><span class="go">┌───────┐</span>
+</span><span id="__span-39-3"><a id="__codelineno-39-3" name="__codelineno-39-3" href="#__codelineno-39-3"></a><span class="go">│ nrows │</span>
+</span><span id="__span-39-4"><a id="__codelineno-39-4" name="__codelineno-39-4" href="#__codelineno-39-4"></a><span class="go">├───────┤</span>
+</span><span id="__span-39-5"><a id="__codelineno-39-5" name="__codelineno-39-5" href="#__codelineno-39-5"></a><span class="go">│    10 │</span>
+</span><span id="__span-39-6"><a id="__codelineno-39-6" name="__codelineno-39-6" href="#__codelineno-39-6"></a><span class="go">└───────┘</span>
+</span><span id="__span-39-7"><a id="__codelineno-39-7" name="__codelineno-39-7" href="#__codelineno-39-7"></a><span class="go">(1 row)</span>
+</span><span id="__span-39-8"><a id="__codelineno-39-8" name="__codelineno-39-8" href="#__codelineno-39-8"></a>
+</span><span id="__span-39-9"><a id="__codelineno-39-9" name="__codelineno-39-9" href="#__codelineno-39-9"></a><span class="go">select ncols(&#39;int32(10)[1:1:1 2:2:2 3:3:3]&#39;::matrix);</span>
+</span><span id="__span-39-10"><a id="__codelineno-39-10" name="__codelineno-39-10" href="#__codelineno-39-10"></a><span class="go">┌─────────────────────┐</span>
+</span><span id="__span-39-11"><a id="__codelineno-39-11" name="__codelineno-39-11" href="#__codelineno-39-11"></a><span class="go">│        ncols        │</span>
+</span><span id="__span-39-12"><a id="__codelineno-39-12" name="__codelineno-39-12" href="#__codelineno-39-12"></a><span class="go">├─────────────────────┤</span>
+</span><span id="__span-39-13"><a id="__codelineno-39-13" name="__codelineno-39-13" href="#__codelineno-39-13"></a><span class="go">│ 1152921504606846976 │</span>
+</span><span id="__span-39-14"><a id="__codelineno-39-14" name="__codelineno-39-14" href="#__codelineno-39-14"></a><span class="go">└─────────────────────┘</span>
+</span><span id="__span-39-15"><a id="__codelineno-39-15" name="__codelineno-39-15" href="#__codelineno-39-15"></a><span class="go">(1 row)</span>
+</span><span id="__span-39-16"><a id="__codelineno-39-16" name="__codelineno-39-16" href="#__codelineno-39-16"></a>
+</span><span id="__span-39-17"><a id="__codelineno-39-17" name="__codelineno-39-17" href="#__codelineno-39-17"></a><span class="go">select nvals(&#39;int32(10)[1:1:1 2:2:2 3:3:3]&#39;::matrix);</span>
+</span><span id="__span-39-18"><a id="__codelineno-39-18" name="__codelineno-39-18" href="#__codelineno-39-18"></a><span class="go">┌───────┐</span>
+</span><span id="__span-39-19"><a id="__codelineno-39-19" name="__codelineno-39-19" href="#__codelineno-39-19"></a><span class="go">│ nvals │</span>
+</span><span id="__span-39-20"><a id="__codelineno-39-20" name="__codelineno-39-20" href="#__codelineno-39-20"></a><span class="go">├───────┤</span>
+</span><span id="__span-39-21"><a id="__codelineno-39-21" name="__codelineno-39-21" href="#__codelineno-39-21"></a><span class="go">│     3 │</span>
+</span><span id="__span-39-22"><a id="__codelineno-39-22" name="__codelineno-39-22" href="#__codelineno-39-22"></a><span class="go">└───────┘</span>
+</span><span id="__span-39-23"><a id="__codelineno-39-23" name="__codelineno-39-23" href="#__codelineno-39-23"></a><span class="go">(1 row)</span>
+</span><span id="__span-39-24"><a id="__codelineno-39-24" name="__codelineno-39-24" href="#__codelineno-39-24"></a>
+</span><span id="__span-39-25"><a id="__codelineno-39-25" name="__codelineno-39-25" href="#__codelineno-39-25"></a><span class="go">select nrows(&#39;int32(10:)[1:1:1 2:2:2 3:3:3]&#39;::matrix);</span>
+</span><span id="__span-39-26"><a id="__codelineno-39-26" name="__codelineno-39-26" href="#__codelineno-39-26"></a><span class="go">┌───────┐</span>
+</span><span id="__span-39-27"><a id="__codelineno-39-27" name="__codelineno-39-27" href="#__codelineno-39-27"></a><span class="go">│ nrows │</span>
+</span><span id="__span-39-28"><a id="__codelineno-39-28" name="__codelineno-39-28" href="#__codelineno-39-28"></a><span class="go">├───────┤</span>
+</span><span id="__span-39-29"><a id="__codelineno-39-29" name="__codelineno-39-29" href="#__codelineno-39-29"></a><span class="go">│    10 │</span>
+</span><span id="__span-39-30"><a id="__codelineno-39-30" name="__codelineno-39-30" href="#__codelineno-39-30"></a><span class="go">└───────┘</span>
+</span><span id="__span-39-31"><a id="__codelineno-39-31" name="__codelineno-39-31" href="#__codelineno-39-31"></a><span class="go">(1 row)</span>
+</span><span id="__span-39-32"><a id="__codelineno-39-32" name="__codelineno-39-32" href="#__codelineno-39-32"></a>
+</span><span id="__span-39-33"><a id="__codelineno-39-33" name="__codelineno-39-33" href="#__codelineno-39-33"></a><span class="go">select ncols(&#39;int32(10:)[1:1:1 2:2:2 3:3:3]&#39;::matrix);</span>
+</span><span id="__span-39-34"><a id="__codelineno-39-34" name="__codelineno-39-34" href="#__codelineno-39-34"></a><span class="go">┌─────────────────────┐</span>
+</span><span id="__span-39-35"><a id="__codelineno-39-35" name="__codelineno-39-35" href="#__codelineno-39-35"></a><span class="go">│        ncols        │</span>
+</span><span id="__span-39-36"><a id="__codelineno-39-36" name="__codelineno-39-36" href="#__codelineno-39-36"></a><span class="go">├─────────────────────┤</span>
+</span><span id="__span-39-37"><a id="__codelineno-39-37" name="__codelineno-39-37" href="#__codelineno-39-37"></a><span class="go">│ 1152921504606846976 │</span>
+</span><span id="__span-39-38"><a id="__codelineno-39-38" name="__codelineno-39-38" href="#__codelineno-39-38"></a><span class="go">└─────────────────────┘</span>
+</span><span id="__span-39-39"><a id="__codelineno-39-39" name="__codelineno-39-39" href="#__codelineno-39-39"></a><span class="go">(1 row)</span>
+</span><span id="__span-39-40"><a id="__codelineno-39-40" name="__codelineno-39-40" href="#__codelineno-39-40"></a>
+</span><span id="__span-39-41"><a id="__codelineno-39-41" name="__codelineno-39-41" href="#__codelineno-39-41"></a><span class="go">select nvals(&#39;int32(10:)[1:1:1 2:2:2 3:3:3]&#39;::matrix);</span>
+</span><span id="__span-39-42"><a id="__codelineno-39-42" name="__codelineno-39-42" href="#__codelineno-39-42"></a><span class="go">┌───────┐</span>
+</span><span id="__span-39-43"><a id="__codelineno-39-43" name="__codelineno-39-43" href="#__codelineno-39-43"></a><span class="go">│ nvals │</span>
+</span><span id="__span-39-44"><a id="__codelineno-39-44" name="__codelineno-39-44" href="#__codelineno-39-44"></a><span class="go">├───────┤</span>
+</span><span id="__span-39-45"><a id="__codelineno-39-45" name="__codelineno-39-45" href="#__codelineno-39-45"></a><span class="go">│     3 │</span>
+</span><span id="__span-39-46"><a id="__codelineno-39-46" name="__codelineno-39-46" href="#__codelineno-39-46"></a><span class="go">└───────┘</span>
+</span><span id="__span-39-47"><a id="__codelineno-39-47" name="__codelineno-39-47" href="#__codelineno-39-47"></a><span class="go">(1 row)</span>
+</span><span id="__span-39-48"><a id="__codelineno-39-48" name="__codelineno-39-48" href="#__codelineno-39-48"></a>
+</span><span id="__span-39-49"><a id="__codelineno-39-49" name="__codelineno-39-49" href="#__codelineno-39-49"></a><span class="go">select nrows(&#39;int32(:10)[1:1:1 2:2:2 3:3:3]&#39;::matrix);</span>
+</span><span id="__span-39-50"><a id="__codelineno-39-50" name="__codelineno-39-50" href="#__codelineno-39-50"></a><span class="go">┌─────────────────────┐</span>
+</span><span id="__span-39-51"><a id="__codelineno-39-51" name="__codelineno-39-51" href="#__codelineno-39-51"></a><span class="go">│        nrows        │</span>
+</span><span id="__span-39-52"><a id="__codelineno-39-52" name="__codelineno-39-52" href="#__codelineno-39-52"></a><span class="go">├─────────────────────┤</span>
+</span><span id="__span-39-53"><a id="__codelineno-39-53" name="__codelineno-39-53" href="#__codelineno-39-53"></a><span class="go">│ 1152921504606846976 │</span>
+</span><span id="__span-39-54"><a id="__codelineno-39-54" name="__codelineno-39-54" href="#__codelineno-39-54"></a><span class="go">└─────────────────────┘</span>
+</span><span id="__span-39-55"><a id="__codelineno-39-55" name="__codelineno-39-55" href="#__codelineno-39-55"></a><span class="go">(1 row)</span>
+</span><span id="__span-39-56"><a id="__codelineno-39-56" name="__codelineno-39-56" href="#__codelineno-39-56"></a>
+</span><span id="__span-39-57"><a id="__codelineno-39-57" name="__codelineno-39-57" href="#__codelineno-39-57"></a><span class="go">select ncols(&#39;int32(:10)[1:1:1 2:2:2 3:3:3]&#39;::matrix);</span>
+</span><span id="__span-39-58"><a id="__codelineno-39-58" name="__codelineno-39-58" href="#__codelineno-39-58"></a><span class="go">┌───────┐</span>
+</span><span id="__span-39-59"><a id="__codelineno-39-59" name="__codelineno-39-59" href="#__codelineno-39-59"></a><span class="go">│ ncols │</span>
+</span><span id="__span-39-60"><a id="__codelineno-39-60" name="__codelineno-39-60" href="#__codelineno-39-60"></a><span class="go">├───────┤</span>
+</span><span id="__span-39-61"><a id="__codelineno-39-61" name="__codelineno-39-61" href="#__codelineno-39-61"></a><span class="go">│    10 │</span>
+</span><span id="__span-39-62"><a id="__codelineno-39-62" name="__codelineno-39-62" href="#__codelineno-39-62"></a><span class="go">└───────┘</span>
+</span><span id="__span-39-63"><a id="__codelineno-39-63" name="__codelineno-39-63" href="#__codelineno-39-63"></a><span class="go">(1 row)</span>
+</span><span id="__span-39-64"><a id="__codelineno-39-64" name="__codelineno-39-64" href="#__codelineno-39-64"></a>
+</span><span id="__span-39-65"><a id="__codelineno-39-65" name="__codelineno-39-65" href="#__codelineno-39-65"></a><span class="go">select nvals(&#39;int32(:10)[1:1:1 2:2:2 3:3:3]&#39;::matrix);</span>
+</span><span id="__span-39-66"><a id="__codelineno-39-66" name="__codelineno-39-66" href="#__codelineno-39-66"></a><span class="go">┌───────┐</span>
+</span><span id="__span-39-67"><a id="__codelineno-39-67" name="__codelineno-39-67" href="#__codelineno-39-67"></a><span class="go">│ nvals │</span>
+</span><span id="__span-39-68"><a id="__codelineno-39-68" name="__codelineno-39-68" href="#__codelineno-39-68"></a><span class="go">├───────┤</span>
+</span><span id="__span-39-69"><a id="__codelineno-39-69" name="__codelineno-39-69" href="#__codelineno-39-69"></a><span class="go">│     3 │</span>
+</span><span id="__span-39-70"><a id="__codelineno-39-70" name="__codelineno-39-70" href="#__codelineno-39-70"></a><span class="go">└───────┘</span>
+</span><span id="__span-39-71"><a id="__codelineno-39-71" name="__codelineno-39-71" href="#__codelineno-39-71"></a><span class="go">(1 row)</span>
+</span><span id="__span-39-72"><a id="__codelineno-39-72" name="__codelineno-39-72" href="#__codelineno-39-72"></a>
+</span><span id="__span-39-73"><a id="__codelineno-39-73" name="__codelineno-39-73" href="#__codelineno-39-73"></a><span class="go">select nrows(&#39;int32(10:10)[1:1:1 2:2:2 3:3:3]&#39;::matrix);</span>
+</span><span id="__span-39-74"><a id="__codelineno-39-74" name="__codelineno-39-74" href="#__codelineno-39-74"></a><span class="go">┌───────┐</span>
+</span><span id="__span-39-75"><a id="__codelineno-39-75" name="__codelineno-39-75" href="#__codelineno-39-75"></a><span class="go">│ nrows │</span>
+</span><span id="__span-39-76"><a id="__codelineno-39-76" name="__codelineno-39-76" href="#__codelineno-39-76"></a><span class="go">├───────┤</span>
+</span><span id="__span-39-77"><a id="__codelineno-39-77" name="__codelineno-39-77" href="#__codelineno-39-77"></a><span class="go">│    10 │</span>
+</span><span id="__span-39-78"><a id="__codelineno-39-78" name="__codelineno-39-78" href="#__codelineno-39-78"></a><span class="go">└───────┘</span>
+</span><span id="__span-39-79"><a id="__codelineno-39-79" name="__codelineno-39-79" href="#__codelineno-39-79"></a><span class="go">(1 row)</span>
+</span><span id="__span-39-80"><a id="__codelineno-39-80" name="__codelineno-39-80" href="#__codelineno-39-80"></a>
+</span><span id="__span-39-81"><a id="__codelineno-39-81" name="__codelineno-39-81" href="#__codelineno-39-81"></a><span class="go">select ncols(&#39;int32(10:10)[1:1:1 2:2:2 3:3:3]&#39;::matrix);</span>
+</span><span id="__span-39-82"><a id="__codelineno-39-82" name="__codelineno-39-82" href="#__codelineno-39-82"></a><span class="go">┌───────┐</span>
+</span><span id="__span-39-83"><a id="__codelineno-39-83" name="__codelineno-39-83" href="#__codelineno-39-83"></a><span class="go">│ ncols │</span>
+</span><span id="__span-39-84"><a id="__codelineno-39-84" name="__codelineno-39-84" href="#__codelineno-39-84"></a><span class="go">├───────┤</span>
+</span><span id="__span-39-85"><a id="__codelineno-39-85" name="__codelineno-39-85" href="#__codelineno-39-85"></a><span class="go">│    10 │</span>
+</span><span id="__span-39-86"><a id="__codelineno-39-86" name="__codelineno-39-86" href="#__codelineno-39-86"></a><span class="go">└───────┘</span>
+</span><span id="__span-39-87"><a id="__codelineno-39-87" name="__codelineno-39-87" href="#__codelineno-39-87"></a><span class="go">(1 row)</span>
+</span><span id="__span-39-88"><a id="__codelineno-39-88" name="__codelineno-39-88" href="#__codelineno-39-88"></a>
+</span><span id="__span-39-89"><a id="__codelineno-39-89" name="__codelineno-39-89" href="#__codelineno-39-89"></a><span class="go">select nvals(&#39;int32(10:10)[1:1:1 2:2:2 3:3:3]&#39;::matrix);</span>
+</span><span id="__span-39-90"><a id="__codelineno-39-90" name="__codelineno-39-90" href="#__codelineno-39-90"></a><span class="go">┌───────┐</span>
+</span><span id="__span-39-91"><a id="__codelineno-39-91" name="__codelineno-39-91" href="#__codelineno-39-91"></a><span class="go">│ nvals │</span>
+</span><span id="__span-39-92"><a id="__codelineno-39-92" name="__codelineno-39-92" href="#__codelineno-39-92"></a><span class="go">├───────┤</span>
+</span><span id="__span-39-93"><a id="__codelineno-39-93" name="__codelineno-39-93" href="#__codelineno-39-93"></a><span class="go">│     3 │</span>
+</span><span id="__span-39-94"><a id="__codelineno-39-94" name="__codelineno-39-94" href="#__codelineno-39-94"></a><span class="go">└───────┘</span>
+</span><span id="__span-39-95"><a id="__codelineno-39-95" name="__codelineno-39-95" href="#__codelineno-39-95"></a><span class="go">(1 row)</span>
 </span></code></pre></div></p>
               
             </div>

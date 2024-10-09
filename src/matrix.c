@@ -16,6 +16,7 @@ static const ExpandedObjectMethods matrix_methods = {
 PG_FUNCTION_INFO_V1(matrix_in);
 PG_FUNCTION_INFO_V1(matrix_out);
 PG_FUNCTION_INFO_V1(matrix_new);
+PG_FUNCTION_INFO_V1(matrix_agg_final);
 PG_FUNCTION_INFO_V1(matrix_elements);
 PG_FUNCTION_INFO_V1(matrix_nvals);
 PG_FUNCTION_INFO_V1(matrix_nrows);
@@ -40,6 +41,7 @@ PG_FUNCTION_INFO_V1(matrix_get_element);
 PG_FUNCTION_INFO_V1(matrix_set_element);
 PG_FUNCTION_INFO_V1(matrix_remove_element);
 PG_FUNCTION_INFO_V1(matrix_contains);
+PG_FUNCTION_INFO_V1(matrix_resize);
 PG_FUNCTION_INFO_V1(matrix_info);
 PG_FUNCTION_INFO_V1(matrix_type);
 
@@ -513,14 +515,6 @@ Datum matrix_new(PG_FUNCTION_ARGS)
 	OS_RETURN_MATRIX(A);
 }
 
-
-typedef struct os_Matrix_ExtractState {
-	GrB_Type type;
-	GrB_Info info;
-	os_Matrix *matrix;
-	GxB_Iterator iterator;
-} os_Matrix_ExtractState;
-
 Datum matrix_elements(PG_FUNCTION_ARGS)
 {
 	FuncCallContext  *funcctx;
@@ -567,17 +561,17 @@ Datum matrix_elements(PG_FUNCTION_ARGS)
 
 	funcctx = SRF_PERCALL_SETUP();
 	state = (os_Matrix_ExtractState*)funcctx->user_fctx;
-	if (state->info == GxB_EXHAUSTED)
+	if (state->info == GxB_EXHAUSTED || funcctx->call_cntr > funcctx->max_calls)
 	{
 		SRF_RETURN_DONE(funcctx);
 	}
-	matrix = state->matrix;
-	if (funcctx->call_cntr < funcctx->max_calls)
+	else
 	{
 		GxB_Matrix_Iterator_getIndex(state->iterator, &row, &col);
 		values[0] = Int64GetDatum(row);
 		values[1] = Int64GetDatum(col);
 		scalar = new_scalar(state->type, CurrentMemoryContext, NULL);
+		matrix = state->matrix;
 		OS_CHECK(GrB_Matrix_extractElement(scalar->scalar, matrix->matrix, row, col),
 				 matrix->matrix,
 				 "Error extracting setting matrix element.");
@@ -587,7 +581,6 @@ Datum matrix_elements(PG_FUNCTION_ARGS)
 		state->info = GxB_Matrix_Iterator_next(state->iterator);
 		SRF_RETURN_NEXT(funcctx, result);
 	}
-	SRF_RETURN_DONE(funcctx);
 }
 
 Datum matrix_nvals(PG_FUNCTION_ARGS)
@@ -1431,6 +1424,26 @@ Datum matrix_clear(PG_FUNCTION_ARGS)
 	OS_RETURN_MATRIX(A);
 }
 
+Datum matrix_resize(PG_FUNCTION_ARGS)
+{
+	os_Matrix *A;
+	GrB_Index i, j;
+
+	LOGF();
+	ERRORNULL(0);
+	ERRORNULL(1);
+	ERRORNULL(2);
+
+	A = OS_GETARG_MATRIX(0);
+	i = PG_GETARG_INT64(1);
+	j = PG_GETARG_INT64(2);
+
+	OS_CHECK(GrB_Matrix_resize(A->matrix, i, j),
+		  A->matrix,
+		  "Error resizing matrix.");
+	OS_RETURN_MATRIX(A);
+}
+
 Datum matrix_info(PG_FUNCTION_ARGS) {
 	os_Matrix *A;
 	char *result, *buf;
@@ -1486,6 +1499,60 @@ Datum matrix_type(PG_FUNCTION_ARGS) {
 	result = new_type(type_name, CurrentMemoryContext);
 	OS_RETURN_TYPE(result);
 }
+
+Datum
+matrix_agg_final(PG_FUNCTION_ARGS)
+{
+    os_Matrix *state = OS_GETARG_MATRIX(0);
+
+    // If no inputs were processed, return NULL
+    if (state == NULL)
+        PG_RETURN_NULL();
+
+    OS_RETURN_MATRIX(state);
+}
+
+#define SUFFIX _int64                // suffix for names
+#define PG_TYPE int64                // postgres type
+#define GB_TYPE GrB_INT64            // graphblas matrix type
+#define PG_GETARG PG_GETARG_INT64       // how to get value args
+#define PG_RETURN PG_RETURN_INT64
+#include "matrix_ops.h"
+
+#define SUFFIX _int32                // suffix for names
+#define PG_TYPE int32                // postgres type
+#define GB_TYPE GrB_INT32            // graphblas matrix type
+#define PG_GETARG PG_GETARG_INT32       // how to get value args
+#define PG_RETURN PG_RETURN_INT32
+#include "matrix_ops.h"
+
+#define SUFFIX _int16                // suffix for names
+#define PG_TYPE int16                // postgres type
+#define GB_TYPE GrB_INT16            // graphblas matrix type
+#define PG_GETARG PG_GETARG_INT16       // how to get value args
+#define PG_RETURN PG_RETURN_INT16
+#include "matrix_ops.h"
+
+#define SUFFIX _fp64                // suffix for names
+#define PG_TYPE float8                // postgres type
+#define GB_TYPE GrB_FP64            // graphblas matrix type
+#define PG_GETARG PG_GETARG_FLOAT8       // how to get value args
+#define PG_RETURN PG_RETURN_FLOAT8
+#include "matrix_ops.h"
+
+#define SUFFIX _fp32                // suffix for names
+#define PG_TYPE float4                // postgres type
+#define GB_TYPE GrB_FP32            // graphblas matrix type
+#define PG_GETARG PG_GETARG_FLOAT4       // how to get value args
+#define PG_RETURN PG_RETURN_FLOAT4
+#include "matrix_ops.h"
+
+#define SUFFIX _bool                // suffix for names
+#define PG_TYPE bool                // postgres type
+#define GB_TYPE GrB_BOOL            // graphblas matrix type
+#define PG_GETARG PG_GETARG_BOOL       // how to get value args
+#define PG_RETURN PG_RETURN_BOOL
+#include "matrix_ops.h"
 
 /* Local Variables: */
 /* mode: c */

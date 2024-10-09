@@ -9,9 +9,8 @@
 set client_min_messages = 'WARNING';
 create extension if not exists onesparse;
 
--- Describe the vector type:
-
-\dT+ vector
+\pset linestyle unicode
+\pset border 2
 
 -- An empty vector can be constructed many ways, but one of the
 -- simplest is casting a type code to the matrix type.  In this case
@@ -49,6 +48,8 @@ select 'int32[0:1 1:2 2:3]'::vector;
 
 select nvals('int32[0:1 1:2 2:3]'::vector);
 
+select * from elements('int32[0:1 1:2 2:3]'::vector);
+
 select 'int32(10)[0:1 1:2 2:3]'::vector;
 
 select size('int32(10)[0:1 1:2 2:3]'::vector);
@@ -77,8 +78,6 @@ select set_element('int32[1:1 2:2 3:3]'::vector, 4, 4);
 select get_element('int32[1:1 2:2 3:3]'::vector, 3);
 
 select print('int32[1:1 2:2 3:3]'::vector);
-
-select print('int32[1:1 2:2 3:3]'::vector, 5);
 
 select wait('int32[0:1 1:2 2:3]'::vector);
 

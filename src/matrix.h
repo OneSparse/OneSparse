@@ -20,6 +20,13 @@ typedef struct os_Matrix  {
     GrB_Index serialized_size;
 } os_Matrix;
 
+typedef struct os_Matrix_ExtractState {
+	GrB_Type type;
+	GrB_Info info;
+	os_Matrix *matrix;
+	GxB_Iterator iterator;
+} os_Matrix_ExtractState;
+
 Datum expand_matrix(os_FlatMatrix *flat,	MemoryContext parentcontext);
 
 os_Matrix* new_matrix(

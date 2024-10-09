@@ -21,15 +21,13 @@ CREATE TYPE matrix (
     internallength = VARIABLE
     );
 
-CREATE TYPE matrix_element AS (row bigint, col bigint, value scalar);
-
 CREATE FUNCTION matrix(t type, nrows bigint default -1, ncols bigint default -1)
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_new'
 LANGUAGE C STABLE;
 
-CREATE FUNCTION elements(A matrix)
-RETURNS SETOF matrix_element
+CREATE FUNCTION elements(a matrix)
+RETURNS TABLE (i bigint, j bigint, v scalar)
 AS '$libdir/onesparse', 'matrix_elements'
 LANGUAGE C STABLE STRICT;
 
@@ -213,6 +211,11 @@ RETURNS matrix
 AS '$libdir/onesparse', 'matrix_apply'
 LANGUAGE C STABLE;
 
+CREATE FUNCTION matrix_agg_final(state matrix)
+RETURNS matrix
+AS '$libdir/onesparse', 'matrix_agg_final'
+LANGUAGE C STABLE;
+
 CREATE FUNCTION set_element(a matrix, i bigint, j bigint, s scalar)
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_set_element'
@@ -247,6 +250,11 @@ CREATE FUNCTION clear(matrix)
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_clear'
 LANGUAGE C;
+
+CREATE FUNCTION resize(a matrix, i bigint, j bigint)
+RETURNS matrix
+AS '$libdir/onesparse', 'matrix_resize'
+LANGUAGE C STABLE;
 
 CREATE FUNCTION info(a matrix, level int default 1)
 RETURNS text
@@ -359,7 +367,7 @@ create function dense_matrix(
     $$;
 
 
-create or replace function dot(a matrix) returns text language plpgsql as
+create or replace function draw(a matrix) returns text language plpgsql as
     $$
     declare
         row bigint;

@@ -26,7 +26,7 @@ select 'int32'::matrix;
 
 select matrix('int32');
 
--- The above matrices are "unbounced", they do not have a fixed number
+-- The above matrices are "unbounded", they do not have a fixed number
 -- of rows and/or columns.  The default possible number of rows and
 -- columns is defined by the SuiteSparse library to be `GrB_INDEX_MAX`
 -- which is `2^60` power indexes.  For the purposes of this
@@ -105,24 +105,17 @@ select print('int32(4:4)[1:2:1 2:3:2 3:1:3]'::matrix) as matrix;
 -- only possible to print matrices that have fixed dimensions of a
 -- reasonable size.
 
--- Another useful function is `dot()` This turns a matrix into the
+-- Another useful function is `draw()` This turns a matrix into the
 -- Graphviz DOT language that is used to draw graph diagrams:
 
-select dot('int32(4:4)[1:2:1 2:3:2 3:1:3]'::matrix) as dot;
+select draw('int32(4:4)[1:2:1 2:3:2 3:1:3]'::matrix) as draw;
 
 -- Will generate the following diagram:
 --
 
-select dot('int32(4:4)[1:2:1 2:3:2 3:1:3]'::matrix) as dot_source \gset
-\i sql/dot.sql
+select draw('int32(4:4)[1:2:1 2:3:2 3:1:3]'::matrix) as draw_source \gset
+\i sql/draw.sql
 
--- # Adjacency Matrices
---
--- Onesparse sparse matrices are very similar to matrix objects from
--- other libraries like `scipy.sparse` and NVIDIA's `cuSparse`.  The
--- primary difference with the the GraphBLAS there also comes an
--- entire library of pre-optimized algebraic kernels.
---
 -- A useful function to illustrate this concept is `random_matrix()`.
 -- This will generate a random matrix provided the type, number of
 -- rows, number of columns, and the number of (approximate) values and
@@ -134,25 +127,31 @@ select print(random_matrix(8, 8, 16, seed=>0.42, max=>42)) as random_matrix;
 -- This random matrix is also a random *graph*:
 --
 
-select dot(random_matrix(8, 8, 16, seed=>0.42, max=>42)) as dot_source \gset
-\i sql/dot.sql
+select draw(random_matrix(8, 8, 16, seed=>0.42, max=>42)) as draw_source \gset
+\i sql/draw.sql
 
 -- # Every Matrix is a Graph
 --
--- In fact every matrix is a graph, whether you think of it that way
--- or not.  And every graph has a corresponding matrix.  The data that
--- you put into tables can also describe a graph, and thus a matrix.
--- These three different ways of thinking about tables, graphs, and
--- matrices is one of the core concepts of OneSparse:
+-- Every matrix is a graph, whether you think of it that way or not.
+-- And every graph has a corresponding matrix.  The data that you put
+-- into tables can also describe a graph, and thus a matrix.  These
+-- three different ways of thinking about tables, graphs, and matrices
+-- is one of the core concepts of OneSparse:
 --
 -- ![Tables, Graphs, and Matrices](./table_graph_matrix.png)
+--
+-- While SuiteSparse is optimized for processing sparse matrices and
+-- vectors, it also supports optimized kernels for dense objects.  A
+-- dense matrix is just a sparse matrix with all its elements.  In
+-- this case SuiteSparse will automatically store it in a dense
+-- optimal format and use CPUs or GPUs appropriately to process them.
 --
 -- One way of thinking about a "dense" matrix is a fully connected
 -- graph, these can be constructed with the `dense_matrix()` function:
 
 select print(dense_matrix('int32', 4, 4, 42));
-select dot(dense_matrix('int32', 4, 4, 42)) as dot_source \gset
-\i sql/dot.sql
+select draw(dense_matrix('int32', 4, 4, 42)) as draw_source \gset
+\i sql/draw.sql
 
 -- # Test Fixtures
 --
@@ -180,7 +179,7 @@ select print(a) as a, print(b) as b, print(u) as u, print(v) as v from test_fixt
 
 select print(a) as a, binaryop, print(b) as b, print(eadd(A, B, binaryop)) as eadd from test_fixture;
 
-select dot(a) as binop_a_source, dot(b) as binop_b_source, dot(eadd(A, B, binaryop)) as binop_c_source from test_fixture \gset
+select draw(a) as binop_a_source, draw(b) as binop_b_source, draw(eadd(A, B, binaryop)) as binop_c_source from test_fixture \gset
 
 \i sql/binop.sql
 
@@ -191,7 +190,7 @@ select dot(a) as binop_a_source, dot(b) as binop_b_source, dot(eadd(A, B, binary
 
 select print(a) as a, binaryop, print(b) as b, print(emult(A, B, binaryop)) as emult from test_fixture;
 
-select dot(a) as binop_a_source, dot(b) as binop_b_source, dot(emult(A, B, binaryop)) as binop_c_source from test_fixture \gset
+select draw(a) as binop_a_source, draw(b) as binop_b_source, draw(emult(A, B, binaryop)) as binop_c_source from test_fixture \gset
 
 \i sql/binop.sql
 
@@ -202,7 +201,7 @@ select dot(a) as binop_a_source, dot(b) as binop_b_source, dot(emult(A, B, binar
 
 select print(a) as a, binaryop, print(b) as b, print(eunion(A, 3::scalar, B, 4::scalar, binaryop)) as eunion from test_fixture;
 
-select dot(a) as binop_a_source, dot(b) as binop_b_source, dot(eunion(A, 3::scalar, B, 4::scalar, binaryop)) as binop_c_source from test_fixture \gset
+select draw(a) as binop_a_source, draw(b) as binop_b_source, draw(eunion(A, 3::scalar, B, 4::scalar, binaryop)) as binop_c_source from test_fixture \gset
 
 \i sql/binop.sql
 
@@ -228,7 +227,7 @@ select print(a) as a, monoid, print(reduce_vector(a, monoid, descriptor=>'t0')) 
 
 select print(a) as a, semiring, print(b) as b, print(mxm(a, b)) as mxm from test_fixture;
 
-select dot(a) as binop_a_source, dot(b) as binop_b_source, dot(mxm(a, b)) as binop_c_source from test_fixture \gset
+select draw(a) as binop_a_source, draw(b) as binop_b_source, draw(mxm(a, b)) as binop_c_source from test_fixture \gset
 \i sql/binop.sql
 
 -- AxB can also be done with the `@` operator, mimicking the Python
@@ -242,7 +241,7 @@ select print(a) as a, '@' as "@", print(b) as b, print(a @ b) as mxm from test_f
 
 select print(a) as a, '@' as "@", semiring, print(u) as u, print(mxv(a, u)) as mxv from test_fixture;
 
-select dot(a) as binop_a_source, dot(u) as binop_b_source, dot(mxv(a, u)) as binop_c_source from test_fixture \gset
+select draw(a) as binop_a_source, draw(u) as binop_b_source, draw(mxv(a, u)) as binop_c_source from test_fixture \gset
 \i sql/binop.sql
 
 -- 'mxv' is also supported by the `@` operator:
@@ -255,7 +254,7 @@ select print(a) as a, '@' as "@", print(u) as u, print(a @ u) as mxv from test_f
 
 select print(v) as v, semiring, print(b) as b, print(vxm(v, b, semiring)) as vxm from test_fixture;
 
-select dot(v) as binop_a_source, dot(b) as binop_b_source, dot(vxm(v, b)) as binop_c_source from test_fixture \gset
+select draw(v) as binop_a_source, draw(b) as binop_b_source, draw(vxm(v, b)) as binop_c_source from test_fixture \gset
 \i sql/binop.sql
 
 -- 'vxm' is also supported by the `@` operator:
@@ -271,7 +270,7 @@ select print(v) as v, '@' as "@", print(b) as b, print(v @ b) as vxm from test_f
 
 select print(a) as a, indexunaryop, print(selection(a, indexunaryop, 1)) as selected from test_fixture;
 
-select dot(a) as uop_a_source, dot(selection(a, indexunaryop, 1)) as uop_b_source from test_fixture \gset
+select draw(a) as uop_a_source, draw(selection(a, indexunaryop, 1)) as uop_b_source from test_fixture \gset
 \i sql/uop.sql
 
 -- `apply` takes an operator of type `unaryop` and applies it to every
@@ -279,6 +278,21 @@ select dot(a) as uop_a_source, dot(selection(a, indexunaryop, 1)) as uop_b_sourc
 -- inverse (the negative value for integers) of every element:
 
 select print(a) as a, unaryop, print(apply(a, unaryop)) as applied from test_fixture;
+
+-- All the elements in a matrix can be iterated with the `elements()`
+-- function:
+
+select * from elements((select a from test_fixture));
+
+-- The inverse operation of constructing matrices from rows can be
+-- done with `matrix_agg()`:
+
+select matrix_agg(i, i, i) as unbound_matrix from generate_series(0, 10) as i;
+
+-- Aggregate matrices are always unbounded so use `resize()` to bound
+-- the matrix:
+
+select print(resize(matrix_agg(i, i, i), 10, 10)) as bound_matrix from generate_series(0, 10) as i;
 
 -- Elements can be set individually with `set_element`, the modified
 -- input is returned:

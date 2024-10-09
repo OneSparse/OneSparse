@@ -33,7 +33,7 @@ select matrix('int32');
 └────────┘
 (1 row)
 
--- The above matrices are "unbounced", they do not have a fixed number
+-- The above matrices are "unbounded", they do not have a fixed number
 -- of rows and/or columns.  The default possible number of rows and
 -- columns is defined by the SuiteSparse library to be `GrB_INDEX_MAX`
 -- which is `2^60` power indexes.  For the purposes of this
@@ -154,11 +154,11 @@ select print('int32(4:4)[1:2:1 2:3:2 3:1:3]'::matrix) as matrix;
 -- Above you can see the sparse matrix format of an 8x8 matrix.  It's
 -- only possible to print matrices that have fixed dimensions of a
 -- reasonable size.
--- Another useful function is `dot()` This turns a matrix into the
+-- Another useful function is `draw()` This turns a matrix into the
 -- Graphviz DOT language that is used to draw graph diagrams:
-select dot('int32(4:4)[1:2:1 2:3:2 3:1:3]'::matrix) as dot;
+select draw('int32(4:4)[1:2:1 2:3:2 3:1:3]'::matrix) as draw;
 ┌────────────────────┐
-│        dot         │
+│        draw        │
 ├────────────────────┤
 │ digraph {         ↵│
 │ 1 -> 2 [label="1"]↵│
@@ -171,10 +171,10 @@ select dot('int32(4:4)[1:2:1 2:3:2 3:1:3]'::matrix) as dot;
 
 -- Will generate the following diagram:
 --
-select dot('int32(4:4)[1:2:1 2:3:2 3:1:3]'::matrix) as dot_source \gset
-\i sql/dot.sql
-\setenv dot_source :dot_source
-\! echo $dot_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
+select draw('int32(4:4)[1:2:1 2:3:2 3:1:3]'::matrix) as draw_source \gset
+\i sql/draw.sql
+\setenv draw_source :draw_source
+\! echo $draw_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
 -- <div>
 -- <!-- Title: %3 Pages: 1 -->
 -- <svg width="65pt" height="170pt"
@@ -225,13 +225,6 @@ select dot('int32(4:4)[1:2:1 2:3:2 3:1:3]'::matrix) as dot_source \gset
 -- </svg>
 -- </div>
 -- 
--- # Adjacency Matrices
---
--- Onesparse sparse matrices are very similar to matrix objects from
--- other libraries like `scipy.sparse` and NVIDIA's `cuSparse`.  The
--- primary difference with the the GraphBLAS there also comes an
--- entire library of pre-optimized algebraic kernels.
---
 -- A useful function to illustrate this concept is `random_matrix()`.
 -- This will generate a random matrix provided the type, number of
 -- rows, number of columns, and the number of (approximate) values and
@@ -257,10 +250,10 @@ select print(random_matrix(8, 8, 16, seed=>0.42, max=>42)) as random_matrix;
 
 -- This random matrix is also a random *graph*:
 --
-select dot(random_matrix(8, 8, 16, seed=>0.42, max=>42)) as dot_source \gset
-\i sql/dot.sql
-\setenv dot_source :dot_source
-\! echo $dot_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
+select draw(random_matrix(8, 8, 16, seed=>0.42, max=>42)) as draw_source \gset
+\i sql/draw.sql
+\setenv draw_source :draw_source
+\! echo $draw_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
 -- <div>
 -- <!-- Title: %3 Pages: 1 -->
 -- <svg width="245pt" height="377pt"
@@ -420,13 +413,19 @@ select dot(random_matrix(8, 8, 16, seed=>0.42, max=>42)) as dot_source \gset
 -- 
 -- # Every Matrix is a Graph
 --
--- In fact every matrix is a graph, whether you think of it that way
--- or not.  And every graph has a corresponding matrix.  The data that
--- you put into tables can also describe a graph, and thus a matrix.
--- These three different ways of thinking about tables, graphs, and
--- matrices is one of the core concepts of OneSparse:
+-- Every matrix is a graph, whether you think of it that way or not.
+-- And every graph has a corresponding matrix.  The data that you put
+-- into tables can also describe a graph, and thus a matrix.  These
+-- three different ways of thinking about tables, graphs, and matrices
+-- is one of the core concepts of OneSparse:
 --
 -- ![Tables, Graphs, and Matrices](./table_graph_matrix.png)
+--
+-- While SuiteSparse is optimized for processing sparse matrices and
+-- vectors, it also supports optimized kernels for dense objects.  A
+-- dense matrix is just a sparse matrix with all its elements.  In
+-- this case SuiteSparse will automatically store it in a dense
+-- optimal format and use CPUs or GPUs appropriately to process them.
 --
 -- One way of thinking about a "dense" matrix is a fully connected
 -- graph, these can be constructed with the `dense_matrix()` function:
@@ -444,10 +443,10 @@ select print(dense_matrix('int32', 4, 4, 42));
 └────────────────────┘
 (1 row)
 
-select dot(dense_matrix('int32', 4, 4, 42)) as dot_source \gset
-\i sql/dot.sql
-\setenv dot_source :dot_source
-\! echo $dot_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
+select draw(dense_matrix('int32', 4, 4, 42)) as draw_source \gset
+\i sql/draw.sql
+\setenv draw_source :draw_source
+\! echo $draw_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
 -- <div>
 -- <!-- Title: %3 Pages: 1 -->
 -- <svg width="215pt" height="239pt"
@@ -640,16 +639,16 @@ select print(a) as a, binaryop, print(b) as b, print(eadd(A, B, binaryop)) as ea
 └────────────────────┴─────────────┴────────────────────┴────────────────────┘
 (1 row)
 
-select dot(a) as binop_a_source, dot(b) as binop_b_source, dot(eadd(A, B, binaryop)) as binop_c_source from test_fixture \gset
+select draw(a) as binop_a_source, draw(b) as binop_b_source, draw(eadd(A, B, binaryop)) as binop_c_source from test_fixture \gset
 \i sql/binop.sql
 -- <table style="width: 100%; table-layout: fixed;">
 --   <tr>
 --     <td style="width: 30%;">
 --         <!-- Diagram A -->
-\set dot_source :binop_a_source
-\i sql/dot.sql
-\setenv dot_source :dot_source
-\! echo $dot_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
+\set draw_source :binop_a_source
+\i sql/draw.sql
+\setenv draw_source :draw_source
+\! echo $draw_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
 -- <div>
 -- <!-- Title: %3 Pages: 1 -->
 -- <svg width="153pt" height="239pt"
@@ -752,10 +751,10 @@ select dot(a) as binop_a_source, dot(b) as binop_b_source, dot(eadd(A, B, binary
 --     <td style="font-size: 30px; vertical-align: middle;">op</td>
 --     <td style="width: 30%;">
 --         <!-- Diagram B -->
-\set dot_source :binop_b_source
-\i sql/dot.sql
-\setenv dot_source :dot_source
-\! echo $dot_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
+\set draw_source :binop_b_source
+\i sql/draw.sql
+\setenv draw_source :draw_source
+\! echo $draw_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
 -- <div>
 -- <!-- Title: %3 Pages: 1 -->
 -- <svg width="105pt" height="239pt"
@@ -844,10 +843,10 @@ select dot(a) as binop_a_source, dot(b) as binop_b_source, dot(eadd(A, B, binary
 --     <td style="font-size: 30px; vertical-align: middle;">=</td>
 --     <td style="width: 30%;">
 --         <!-- Diagram C -->
-\set dot_source :binop_c_source
-\i sql/dot.sql
-\setenv dot_source :dot_source
-\! echo $dot_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
+\set draw_source :binop_c_source
+\i sql/draw.sql
+\setenv draw_source :draw_source
+\! echo $draw_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
 -- <div>
 -- <!-- Title: %3 Pages: 1 -->
 -- <svg width="115pt" height="239pt"
@@ -981,16 +980,16 @@ select print(a) as a, binaryop, print(b) as b, print(emult(A, B, binaryop)) as e
 └────────────────────┴─────────────┴────────────────────┴────────────────────┘
 (1 row)
 
-select dot(a) as binop_a_source, dot(b) as binop_b_source, dot(emult(A, B, binaryop)) as binop_c_source from test_fixture \gset
+select draw(a) as binop_a_source, draw(b) as binop_b_source, draw(emult(A, B, binaryop)) as binop_c_source from test_fixture \gset
 \i sql/binop.sql
 -- <table style="width: 100%; table-layout: fixed;">
 --   <tr>
 --     <td style="width: 30%;">
 --         <!-- Diagram A -->
-\set dot_source :binop_a_source
-\i sql/dot.sql
-\setenv dot_source :dot_source
-\! echo $dot_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
+\set draw_source :binop_a_source
+\i sql/draw.sql
+\setenv draw_source :draw_source
+\! echo $draw_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
 -- <div>
 -- <!-- Title: %3 Pages: 1 -->
 -- <svg width="153pt" height="239pt"
@@ -1093,10 +1092,10 @@ select dot(a) as binop_a_source, dot(b) as binop_b_source, dot(emult(A, B, binar
 --     <td style="font-size: 30px; vertical-align: middle;">op</td>
 --     <td style="width: 30%;">
 --         <!-- Diagram B -->
-\set dot_source :binop_b_source
-\i sql/dot.sql
-\setenv dot_source :dot_source
-\! echo $dot_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
+\set draw_source :binop_b_source
+\i sql/draw.sql
+\setenv draw_source :draw_source
+\! echo $draw_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
 -- <div>
 -- <!-- Title: %3 Pages: 1 -->
 -- <svg width="105pt" height="239pt"
@@ -1185,10 +1184,10 @@ select dot(a) as binop_a_source, dot(b) as binop_b_source, dot(emult(A, B, binar
 --     <td style="font-size: 30px; vertical-align: middle;">=</td>
 --     <td style="width: 30%;">
 --         <!-- Diagram C -->
-\set dot_source :binop_c_source
-\i sql/dot.sql
-\setenv dot_source :dot_source
-\! echo $dot_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
+\set draw_source :binop_c_source
+\i sql/draw.sql
+\setenv draw_source :draw_source
+\! echo $draw_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
 -- <div>
 -- <!-- Title: %3 Pages: 1 -->
 -- <svg width="68pt" height="239pt"
@@ -1280,16 +1279,16 @@ select print(a) as a, binaryop, print(b) as b, print(eunion(A, 3::scalar, B, 4::
 └────────────────────┴─────────────┴────────────────────┴────────────────────┘
 (1 row)
 
-select dot(a) as binop_a_source, dot(b) as binop_b_source, dot(eunion(A, 3::scalar, B, 4::scalar, binaryop)) as binop_c_source from test_fixture \gset
+select draw(a) as binop_a_source, draw(b) as binop_b_source, draw(eunion(A, 3::scalar, B, 4::scalar, binaryop)) as binop_c_source from test_fixture \gset
 \i sql/binop.sql
 -- <table style="width: 100%; table-layout: fixed;">
 --   <tr>
 --     <td style="width: 30%;">
 --         <!-- Diagram A -->
-\set dot_source :binop_a_source
-\i sql/dot.sql
-\setenv dot_source :dot_source
-\! echo $dot_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
+\set draw_source :binop_a_source
+\i sql/draw.sql
+\setenv draw_source :draw_source
+\! echo $draw_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
 -- <div>
 -- <!-- Title: %3 Pages: 1 -->
 -- <svg width="153pt" height="239pt"
@@ -1392,10 +1391,10 @@ select dot(a) as binop_a_source, dot(b) as binop_b_source, dot(eunion(A, 3::scal
 --     <td style="font-size: 30px; vertical-align: middle;">op</td>
 --     <td style="width: 30%;">
 --         <!-- Diagram B -->
-\set dot_source :binop_b_source
-\i sql/dot.sql
-\setenv dot_source :dot_source
-\! echo $dot_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
+\set draw_source :binop_b_source
+\i sql/draw.sql
+\setenv draw_source :draw_source
+\! echo $draw_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
 -- <div>
 -- <!-- Title: %3 Pages: 1 -->
 -- <svg width="105pt" height="239pt"
@@ -1484,10 +1483,10 @@ select dot(a) as binop_a_source, dot(b) as binop_b_source, dot(eunion(A, 3::scal
 --     <td style="font-size: 30px; vertical-align: middle;">=</td>
 --     <td style="width: 30%;">
 --         <!-- Diagram C -->
-\set dot_source :binop_c_source
-\i sql/dot.sql
-\setenv dot_source :dot_source
-\! echo $dot_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
+\set draw_source :binop_c_source
+\i sql/draw.sql
+\setenv draw_source :draw_source
+\! echo $draw_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
 -- <div>
 -- <!-- Title: %3 Pages: 1 -->
 -- <svg width="120pt" height="239pt"
@@ -1669,16 +1668,16 @@ select print(a) as a, semiring, print(b) as b, print(mxm(a, b)) as mxm from test
 └────────────────────┴──────────────────┴────────────────────┴────────────────────┘
 (1 row)
 
-select dot(a) as binop_a_source, dot(b) as binop_b_source, dot(mxm(a, b)) as binop_c_source from test_fixture \gset
+select draw(a) as binop_a_source, draw(b) as binop_b_source, draw(mxm(a, b)) as binop_c_source from test_fixture \gset
 \i sql/binop.sql
 -- <table style="width: 100%; table-layout: fixed;">
 --   <tr>
 --     <td style="width: 30%;">
 --         <!-- Diagram A -->
-\set dot_source :binop_a_source
-\i sql/dot.sql
-\setenv dot_source :dot_source
-\! echo $dot_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
+\set draw_source :binop_a_source
+\i sql/draw.sql
+\setenv draw_source :draw_source
+\! echo $draw_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
 -- <div>
 -- <!-- Title: %3 Pages: 1 -->
 -- <svg width="153pt" height="239pt"
@@ -1781,10 +1780,10 @@ select dot(a) as binop_a_source, dot(b) as binop_b_source, dot(mxm(a, b)) as bin
 --     <td style="font-size: 30px; vertical-align: middle;">op</td>
 --     <td style="width: 30%;">
 --         <!-- Diagram B -->
-\set dot_source :binop_b_source
-\i sql/dot.sql
-\setenv dot_source :dot_source
-\! echo $dot_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
+\set draw_source :binop_b_source
+\i sql/draw.sql
+\setenv draw_source :draw_source
+\! echo $draw_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
 -- <div>
 -- <!-- Title: %3 Pages: 1 -->
 -- <svg width="105pt" height="239pt"
@@ -1873,10 +1872,10 @@ select dot(a) as binop_a_source, dot(b) as binop_b_source, dot(mxm(a, b)) as bin
 --     <td style="font-size: 30px; vertical-align: middle;">=</td>
 --     <td style="width: 30%;">
 --         <!-- Diagram C -->
-\set dot_source :binop_c_source
-\i sql/dot.sql
-\setenv dot_source :dot_source
-\! echo $dot_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
+\set draw_source :binop_c_source
+\i sql/draw.sql
+\setenv draw_source :draw_source
+\! echo $draw_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
 -- <div>
 -- <!-- Title: %3 Pages: 1 -->
 -- <svg width="137pt" height="239pt"
@@ -2018,16 +2017,16 @@ select print(a) as a, '@' as "@", semiring, print(u) as u, print(mxv(a, u)) as m
 └────────────────────┴───┴──────────────────┴───────────┴───────────┘
 (1 row)
 
-select dot(a) as binop_a_source, dot(u) as binop_b_source, dot(mxv(a, u)) as binop_c_source from test_fixture \gset
+select draw(a) as binop_a_source, draw(u) as binop_b_source, draw(mxv(a, u)) as binop_c_source from test_fixture \gset
 \i sql/binop.sql
 -- <table style="width: 100%; table-layout: fixed;">
 --   <tr>
 --     <td style="width: 30%;">
 --         <!-- Diagram A -->
-\set dot_source :binop_a_source
-\i sql/dot.sql
-\setenv dot_source :dot_source
-\! echo $dot_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
+\set draw_source :binop_a_source
+\i sql/draw.sql
+\setenv draw_source :draw_source
+\! echo $draw_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
 -- <div>
 -- <!-- Title: %3 Pages: 1 -->
 -- <svg width="153pt" height="239pt"
@@ -2130,10 +2129,10 @@ select dot(a) as binop_a_source, dot(u) as binop_b_source, dot(mxv(a, u)) as bin
 --     <td style="font-size: 30px; vertical-align: middle;">op</td>
 --     <td style="width: 30%;">
 --         <!-- Diagram B -->
-\set dot_source :binop_b_source
-\i sql/dot.sql
-\setenv dot_source :dot_source
-\! echo $dot_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
+\set draw_source :binop_b_source
+\i sql/draw.sql
+\setenv draw_source :draw_source
+\! echo $draw_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
 -- <div>
 -- <!-- Title: vector Pages: 1 -->
 -- <svg width="70pt" height="177pt"
@@ -2177,10 +2176,10 @@ select dot(a) as binop_a_source, dot(u) as binop_b_source, dot(mxv(a, u)) as bin
 --     <td style="font-size: 30px; vertical-align: middle;">=</td>
 --     <td style="width: 30%;">
 --         <!-- Diagram C -->
-\set dot_source :binop_c_source
-\i sql/dot.sql
-\setenv dot_source :dot_source
-\! echo $dot_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
+\set draw_source :binop_c_source
+\i sql/draw.sql
+\setenv draw_source :draw_source
+\! echo $draw_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
 -- <div>
 -- <!-- Title: vector Pages: 1 -->
 -- <svg width="70pt" height="177pt"
@@ -2255,16 +2254,16 @@ select print(v) as v, semiring, print(b) as b, print(vxm(v, b, semiring)) as vxm
 └───────────┴──────────────────┴────────────────────┴───────────┘
 (1 row)
 
-select dot(v) as binop_a_source, dot(b) as binop_b_source, dot(vxm(v, b)) as binop_c_source from test_fixture \gset
+select draw(v) as binop_a_source, draw(b) as binop_b_source, draw(vxm(v, b)) as binop_c_source from test_fixture \gset
 \i sql/binop.sql
 -- <table style="width: 100%; table-layout: fixed;">
 --   <tr>
 --     <td style="width: 30%;">
 --         <!-- Diagram A -->
-\set dot_source :binop_a_source
-\i sql/dot.sql
-\setenv dot_source :dot_source
-\! echo $dot_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
+\set draw_source :binop_a_source
+\i sql/draw.sql
+\setenv draw_source :draw_source
+\! echo $draw_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
 -- <div>
 -- <!-- Title: vector Pages: 1 -->
 -- <svg width="70pt" height="177pt"
@@ -2308,10 +2307,10 @@ select dot(v) as binop_a_source, dot(b) as binop_b_source, dot(vxm(v, b)) as bin
 --     <td style="font-size: 30px; vertical-align: middle;">op</td>
 --     <td style="width: 30%;">
 --         <!-- Diagram B -->
-\set dot_source :binop_b_source
-\i sql/dot.sql
-\setenv dot_source :dot_source
-\! echo $dot_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
+\set draw_source :binop_b_source
+\i sql/draw.sql
+\setenv draw_source :draw_source
+\! echo $draw_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
 -- <div>
 -- <!-- Title: %3 Pages: 1 -->
 -- <svg width="105pt" height="239pt"
@@ -2400,10 +2399,10 @@ select dot(v) as binop_a_source, dot(b) as binop_b_source, dot(vxm(v, b)) as bin
 --     <td style="font-size: 30px; vertical-align: middle;">=</td>
 --     <td style="width: 30%;">
 --         <!-- Diagram C -->
-\set dot_source :binop_c_source
-\i sql/dot.sql
-\setenv dot_source :dot_source
-\! echo $dot_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
+\set draw_source :binop_c_source
+\i sql/draw.sql
+\setenv draw_source :draw_source
+\! echo $draw_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
 -- <div>
 -- <!-- Title: vector Pages: 1 -->
 -- <svg width="76pt" height="190pt"
@@ -2482,16 +2481,16 @@ select print(a) as a, indexunaryop, print(selection(a, indexunaryop, 1)) as sele
 └────────────────────┴───────────────┴────────────────────┘
 (1 row)
 
-select dot(a) as uop_a_source, dot(selection(a, indexunaryop, 1)) as uop_b_source from test_fixture \gset
+select draw(a) as uop_a_source, draw(selection(a, indexunaryop, 1)) as uop_b_source from test_fixture \gset
 \i sql/uop.sql
 -- <table style="width: 100%; table-layout: fixed;">
 --   <tr>
 --     <td style="width: 30%;">
 --         <!-- Diagram A -->
-\set dot_source :uop_a_source
-\i sql/dot.sql
-\setenv dot_source :dot_source
-\! echo $dot_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
+\set draw_source :uop_a_source
+\i sql/draw.sql
+\setenv draw_source :draw_source
+\! echo $draw_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
 -- <div>
 -- <!-- Title: %3 Pages: 1 -->
 -- <svg width="153pt" height="239pt"
@@ -2594,10 +2593,10 @@ select dot(a) as uop_a_source, dot(selection(a, indexunaryop, 1)) as uop_b_sourc
 --     <td style="font-size: 30px; vertical-align: middle;">op</td>
 --     <td style="width: 30%;">
 --         <!-- Diagram B -->
-\set dot_source :uop_b_source
-\i sql/dot.sql
-\setenv dot_source :dot_source
-\! echo $dot_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
+\set draw_source :uop_b_source
+\i sql/draw.sql
+\setenv draw_source :draw_source
+\! echo $draw_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
 -- <div>
 -- <!-- Title: %3 Pages: 1 -->
 -- <svg width="63pt" height="239pt"
@@ -2686,6 +2685,56 @@ select print(a) as a, unaryop, print(apply(a, unaryop)) as applied from test_fix
 │  3│  2     1      ↵│            │  3│ -2    -1      ↵│
 │                    │            │                    │
 └────────────────────┴────────────┴────────────────────┘
+(1 row)
+
+-- All the elements in a matrix can be iterated with the `elements()`
+-- function:
+select * from elements((select a from test_fixture));
+┌───┬───┬─────────┐
+│ i │ j │    v    │
+├───┼───┼─────────┤
+│ 0 │ 2 │ int32:0 │
+│ 0 │ 3 │ int32:3 │
+│ 1 │ 0 │ int32:2 │
+│ 1 │ 2 │ int32:1 │
+│ 1 │ 3 │ int32:0 │
+│ 2 │ 0 │ int32:2 │
+│ 2 │ 1 │ int32:2 │
+│ 3 │ 0 │ int32:2 │
+│ 3 │ 2 │ int32:1 │
+└───┴───┴─────────┘
+(9 rows)
+
+-- The inverse operation of constructing matrices from rows can be
+-- done with `matrix_agg()`:
+select matrix_agg(i, i, i) as unbound_matrix from generate_series(0, 10) as i;
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                               unbound_matrix                                │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ int32[0:0:0 1:1:1 2:2:2 3:3:3 4:4:4 5:5:5 6:6:6 7:7:7 8:8:8 9:9:9 10:10:10] │
+└─────────────────────────────────────────────────────────────────────────────┘
+(1 row)
+
+-- Aggregate matrices are always unbounded so use `resize()` to bound
+-- the matrix:
+select print(resize(matrix_agg(i, i, i), 10, 10)) as bound_matrix from generate_series(0, 10) as i;
+┌──────────────────────────────────────┐
+│             bound_matrix             │
+├──────────────────────────────────────┤
+│      0  1  2  3  4  5  6  7  8  9   ↵│
+│    ──────────────────────────────   ↵│
+│  0│  0                              ↵│
+│  1│     1                           ↵│
+│  2│        2                        ↵│
+│  3│           3                     ↵│
+│  4│              4                  ↵│
+│  5│                 5               ↵│
+│  6│                    6            ↵│
+│  7│                       7         ↵│
+│  8│                          8      ↵│
+│  9│                             9   ↵│
+│                                      │
+└──────────────────────────────────────┘
 (1 row)
 
 -- Elements can be set individually with `set_element`, the modified
