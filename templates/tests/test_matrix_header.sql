@@ -309,7 +309,8 @@ select draw(a) as uop_a_source, draw(selection(a, indexunaryop, 1)) as uop_b_sou
 -- values, this turns your graph into a direct acyclic graph (DAG) by
 -- removing all the links "back" from higher number nodes to lower.
 
-select print(selection(random_matrix(8, 8, 16, seed=>0.42, max=>42), 'triu', 0)) as tril from test_fixture;
+select print(random_matrix(8, 8, 16, seed=>0.42, max=>42)) as matrix,
+       print(selection(random_matrix(8, 8, 16, seed=>0.42, max=>42), 'triu', 0)) as triu from test_fixture;
 
 select draw(random_matrix(8, 8, 16, seed=>0.42, max=>42)) as uop_a_source, draw(selection(random_matrix(8, 8, 16, seed=>0.42, max=>42), 'triu', 0)) as uop_b_source from test_fixture \gset
 \i sql/uop.sql

@@ -2724,22 +2724,23 @@ A useful select operator is `triu`, it select only upper triangular
 values, this turns your graph into a direct acyclic graph (DAG) by
 removing all the links "back" from higher number nodes to lower.
 ``` postgres-console
-select print(selection(random_matrix(8, 8, 16, seed=>0.42, max=>42), 'triu', 0)) as tril from test_fixture;
-┌────────────────────────────────┐
-│              tril              │
-├────────────────────────────────┤
-│      0  1  2  3  4  5  6  7    │
-│    ────────────────────────    │
-│  0│              6 31          │
-│  1│                   12       │
-│  2│                            │
-│  3│                40          │
-│  4│                       7    │
-│  5│                    1       │
-│  6│                            │
-│  7│                            │
-│                                │
-└────────────────────────────────┘
+select print(random_matrix(8, 8, 16, seed=>0.42, max=>42)) as matrix,
+       print(selection(random_matrix(8, 8, 16, seed=>0.42, max=>42), 'triu', 0)) as triu from test_fixture;
+┌────────────────────────────────┬────────────────────────────────┐
+│             matrix             │              triu              │
+├────────────────────────────────┼────────────────────────────────┤
+│      0  1  2  3  4  5  6  7    │      0  1  2  3  4  5  6  7    │
+│    ────────────────────────    │    ────────────────────────    │
+│  0│              6 31          │  0│              6 31          │
+│  1│                   12       │  1│                   12       │
+│  2│    26                      │  2│                            │
+│  3│                40          │  3│                40          │
+│  4│    11    15           7    │  4│                       7    │
+│  5│ 20 12    22        1       │  5│                    1       │
+│  6│              1             │  6│                            │
+│  7│       17                   │  7│                            │
+│                                │                                │
+└────────────────────────────────┴────────────────────────────────┘
 (1 row)
 
 ```
