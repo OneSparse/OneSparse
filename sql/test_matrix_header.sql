@@ -73,7 +73,7 @@ select print('int32(4:4)'::matrix);
 -- trying to allocate `2^120` entries.
 --
 
--- # Drawing Some Objects
+-- # Drawing Matrices and Vectors
 --
 -- The `draw()` function turns a matrix into the Graphviz DOT language
 -- that is used to draw graph diagrams:
@@ -85,9 +85,15 @@ select draw('int32(4:4)[1:2:1 2:3:2 3:1:3]'::matrix) as draw;
 select draw('int32(4:4)[1:2:1 2:3:2 3:1:3]'::matrix) as draw_source \gset
 \i sql/draw.sql
 
--- Here are a couple of sparse matrices from the
--- `onesparse.test_fixture` table.  We'll call them `a` and `b` in
--- these docs:
+-- Let's look at our cast of test objects for the remaining examples.
+-- These objects from the `onesparse.test_fixture` table.
+
+\x
+select * from test_fixture;
+\x
+--
+-- Here are a couple of sparse matrices from the test_fixture table.
+-- We'll call them `a` and `b` in these docs:
 --
 
 select print(a) as a, print(b) as b from test_fixture;
@@ -108,6 +114,13 @@ select draw(u) as twocol_a_source, draw(v) as twocol_b_source from test_fixture 
 --
 
 select print(d) from test_fixture;
+
+-- One way of thinking about a "dense" matrix is a fully connected
+-- graph, these can be constructed with the `dense_matrix()` function:
+--
+
+select draw(d) as draw_source from test_fixture \gset
+\i sql/draw.sql
 
 -- And another matrix named 's' which is a Sierpinsky Graph, which
 -- we'll show off a bit later.
@@ -238,13 +251,6 @@ select print(random_matrix(8, 8, 16, seed=>0.42, max=>42)) as random_matrix;
 select draw(random_matrix(8, 8, 16, seed=>0.42, max=>42)) as draw_source \gset
 \i sql/draw.sql
 
--- One way of thinking about a "dense" matrix is a fully connected
--- graph, these can be constructed with the `dense_matrix()` function:
-
-select print(dense_matrix('int32', 4, 4, 42));
-select draw(dense_matrix('int32', 4, 4, 42)) as draw_source \gset
-\i sql/draw.sql
-
 -- # Elementwise Addition
 --
 -- The GraphBLAS API has elementwise operations on matrices that
@@ -345,6 +351,10 @@ select print(a) as a, '@' as "@", print(b) as b, print(a @ b) as mxm from test_f
 
 select print(a) as a, '@' as "@", semiring, print(u) as u, print(mxv(a, u)) as mxv from test_fixture;
 
+-- From a graph standpoint, matrix vector multiplication is used to
+-- "pull" back to adjacent nodes from their incoming edges.  When
+-- iterated, it forms the basis for working back along incoming links.
+
 select draw(a) as binop_a_source, draw(u) as binop_b_source, draw(mxv(a, u)) as binop_c_source from test_fixture \gset
 \i sql/binop.sql
 
@@ -359,6 +369,11 @@ select print(a) as a, '@' as "@", print(u) as u, print(a @ u) as mxv from test_f
 -- coefficients:
 
 select print(v) as v, semiring, print(b) as b, print(vxm(v, b, semiring)) as vxm from test_fixture;
+
+-- From a graph standpoint, vector matrix multiplication is used to
+-- "push" forward to adjacent nodes from their outgoing edges.  When
+-- iterated, it forms the basis for working forward along outgoing
+-- edges.
 
 select draw(v) as binop_a_source, draw(b) as binop_b_source, draw(vxm(v, b)) as binop_c_source from test_fixture \gset
 \i sql/binop.sql
@@ -401,7 +416,7 @@ select draw(random_matrix(8, 8, 16, seed=>0.42, max=>42)) as uop_a_source,
 -- for constructing synthetic graphs with specific power law
 -- distributions.
 --
---
+
 select print(s) as s, semiring, print(s) as s, print(kronecker(s, s, semiring)) as kronecker from test_fixture;
 
 select draw(s) as binop_a_source, draw(s) as binop_b_source, draw(kronecker(s, s, semiring)) as binop_c_source from test_fixture \gset

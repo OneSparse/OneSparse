@@ -78,7 +78,7 @@ select print('int32(4:4)'::matrix);
 -- unbounded row by unbounded column matrix without exhausting memory
 -- trying to allocate `2^120` entries.
 --
--- # Drawing Some Objects
+-- # Drawing Matrices and Vectors
 --
 -- The `draw()` function turns a matrix into the Graphviz DOT language
 -- that is used to draw graph diagrams:
@@ -150,9 +150,29 @@ select draw('int32(4:4)[1:2:1 2:3:2 3:1:3]'::matrix) as draw_source \gset
 -- </svg>
 -- </div>
 -- 
--- Here are a couple of sparse matrices from the
--- `onesparse.test_fixture` table.  We'll call them `a` and `b` in
--- these docs:
+-- Let's look at our cast of test objects for the remaining examples.
+-- These objects from the `onesparse.test_fixture` table.
+\x
+select * from test_fixture;
+┌─[ RECORD 1 ]─┬─────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ t            │ int32                                                                                                       │
+│ a            │ int32(4:4)[0:2:0 0:3:3 1:0:2 1:2:1 1:3:0 2:0:2 2:1:2 3:0:2 3:2:1]                                           │
+│ b            │ int32(4:4)[0:3:4 1:2:3 1:3:1 2:1:2 2:3:4 3:1:0 3:2:2]                                                       │
+│ d            │ int32(4:4)[0:0:1 0:1:1 0:2:1 0:3:1 1:0:1 1:1:1 1:2:1 1:3:1 2:0:1 2:1:1 2:2:1 2:3:1 3:0:1 3:1:1 3:2:1 3:3:1] │
+│ s            │ int32(2:2)[0:0:1 0:1:1 1:1:1]                                                                               │
+│ u            │ int32(4)[1:2]                                                                                               │
+│ v            │ int32(4)[2:3]                                                                                               │
+│ unaryop      │ ainv_int32                                                                                                  │
+│ indexunaryop │ valuegt_int32                                                                                               │
+│ binaryop     │ times_int32                                                                                                 │
+│ monoid       │ plus_monoid_int32                                                                                           │
+│ semiring     │ plus_times_int32                                                                                            │
+└──────────────┴─────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+\x
+--
+-- Here are a couple of sparse matrices from the test_fixture table.
+-- We'll call them `a` and `b` in these docs:
 --
 select print(a) as a, print(b) as b from test_fixture;
 ┌────────────────────┬────────────────────┐
@@ -501,6 +521,160 @@ select print(d) from test_fixture;
 └────────────────────┘
 (1 row)
 
+-- One way of thinking about a "dense" matrix is a fully connected
+-- graph, these can be constructed with the `dense_matrix()` function:
+--
+select draw(d) as draw_source from test_fixture \gset
+\i sql/draw.sql
+\setenv draw_source :draw_source
+\! echo $draw_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
+-- <div>
+-- <!-- Title: %3 Pages: 1 -->
+-- <svg width="197pt" height="239pt"
+--  viewBox="0.00 0.00 196.99 239.17" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+-- <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 235.17)">
+-- <title>%3</title>
+-- <polygon fill="white" stroke="transparent" points="-4,4 -4,-235.17 192.99,-235.17 192.99,4 -4,4"/>
+-- <!-- 0 -->
+-- <g id="node1" class="node">
+-- <title>0</title>
+-- <ellipse fill="none" stroke="black" cx="133.99" cy="-219.15" rx="15.61" ry="12.04"/>
+-- <text text-anchor="middle" x="133.99" y="-217.25" font-family="Times,serif" font-size="8.00">0</text>
+-- </g>
+-- <!-- 0&#45;&gt;0 -->
+-- <g id="edge1" class="edge">
+-- <title>0&#45;&gt;0</title>
+-- <path fill="none" stroke="black" d="M147.77,-224.83C157.68,-226.69 167.54,-224.79 167.54,-219.15 167.54,-215.53 163.49,-213.45 157.98,-212.91"/>
+-- <polygon fill="black" stroke="black" points="157.57,-209.43 147.77,-213.46 157.95,-216.42 157.57,-209.43"/>
+-- <text text-anchor="middle" x="170.54" y="-217.25" font-family="Times,serif" font-size="8.00">1</text>
+-- </g>
+-- <!-- 1 -->
+-- <g id="node2" class="node">
+-- <title>1</title>
+-- <ellipse fill="none" stroke="black" cx="36.99" cy="-150.1" rx="15.61" ry="12.04"/>
+-- <text text-anchor="middle" x="36.99" y="-148.2" font-family="Times,serif" font-size="8.00">1</text>
+-- </g>
+-- <!-- 0&#45;&gt;1 -->
+-- <g id="edge2" class="edge">
+-- <title>0&#45;&gt;1</title>
+-- <path fill="none" stroke="black" d="M118.97,-215.61C102.38,-212.14 75.68,-204.5 57.99,-189.12 52.53,-184.39 48.22,-177.87 44.96,-171.57"/>
+-- <polygon fill="black" stroke="black" points="48,-169.8 40.68,-162.13 41.62,-172.68 48,-169.8"/>
+-- <text text-anchor="middle" x="60.99" y="-182.72" font-family="Times,serif" font-size="8.00">1</text>
+-- </g>
+-- <!-- 2 -->
+-- <g id="node3" class="node">
+-- <title>2</title>
+-- <ellipse fill="none" stroke="black" cx="100.99" cy="-12.02" rx="15.61" ry="12.04"/>
+-- <text text-anchor="middle" x="100.99" y="-10.12" font-family="Times,serif" font-size="8.00">2</text>
+-- </g>
+-- <!-- 0&#45;&gt;2 -->
+-- <g id="edge3" class="edge">
+-- <title>0&#45;&gt;2</title>
+-- <path fill="none" stroke="black" d="M141.37,-208.53C145.04,-203.14 149.09,-196.11 150.99,-189.12 164.96,-137.62 170,-118.91 150.99,-69.04 144.71,-52.58 131.12,-37.88 119.69,-27.67"/>
+-- <polygon fill="black" stroke="black" points="121.78,-24.86 111.88,-21.07 117.26,-30.2 121.78,-24.86"/>
+-- <text text-anchor="middle" x="165.99" y="-113.68" font-family="Times,serif" font-size="8.00">1</text>
+-- </g>
+-- <!-- 3 -->
+-- <g id="node4" class="node">
+-- <title>3</title>
+-- <ellipse fill="none" stroke="black" cx="101.99" cy="-81.06" rx="15.61" ry="12.04"/>
+-- <text text-anchor="middle" x="101.99" y="-79.16" font-family="Times,serif" font-size="8.00">3</text>
+-- </g>
+-- <!-- 0&#45;&gt;3 -->
+-- <g id="edge4" class="edge">
+-- <title>0&#45;&gt;3</title>
+-- <path fill="none" stroke="black" d="M135.5,-207C137.75,-186.95 140.38,-143.84 126.99,-111.08 125.04,-106.33 122,-101.81 118.69,-97.81"/>
+-- <polygon fill="black" stroke="black" points="121.19,-95.35 111.82,-90.42 116.07,-100.12 121.19,-95.35"/>
+-- <text text-anchor="middle" x="139.99" y="-148.2" font-family="Times,serif" font-size="8.00">1</text>
+-- </g>
+-- <!-- 1&#45;&gt;0 -->
+-- <g id="edge5" class="edge">
+-- <title>1&#45;&gt;0</title>
+-- <path fill="none" stroke="black" d="M47.98,-158.7C64.13,-169.87 94.51,-190.86 114.5,-204.67"/>
+-- <polygon fill="black" stroke="black" points="112.64,-207.65 122.86,-210.46 116.62,-201.89 112.64,-207.65"/>
+-- <text text-anchor="middle" x="94.99" y="-182.72" font-family="Times,serif" font-size="8.00">1</text>
+-- </g>
+-- <!-- 1&#45;&gt;1 -->
+-- <g id="edge6" class="edge">
+-- <title>1&#45;&gt;1</title>
+-- <path fill="none" stroke="black" d="M50.77,-155.79C60.68,-157.64 70.54,-155.75 70.54,-150.1 70.54,-146.49 66.49,-144.41 60.98,-143.87"/>
+-- <polygon fill="black" stroke="black" points="60.57,-140.39 50.77,-144.42 60.95,-147.38 60.57,-140.39"/>
+-- <text text-anchor="middle" x="73.54" y="-148.2" font-family="Times,serif" font-size="8.00">1</text>
+-- </g>
+-- <!-- 1&#45;&gt;2 -->
+-- <g id="edge7" class="edge">
+-- <title>1&#45;&gt;2</title>
+-- <path fill="none" stroke="black" d="M29.42,-139.41C25.25,-133.89 20.1,-126.75 15.99,-120.08 3.64,-100.06 -3.59,-91.9 1.99,-69.04 5.19,-55.91 5.74,-50.86 15.99,-42.04 32.88,-27.5 57.41,-20.15 75.78,-16.49"/>
+-- <polygon fill="black" stroke="black" points="76.53,-19.91 85.78,-14.74 75.33,-13.02 76.53,-19.91"/>
+-- <text text-anchor="middle" x="4.99" y="-79.16" font-family="Times,serif" font-size="8.00">1</text>
+-- </g>
+-- <!-- 1&#45;&gt;3 -->
+-- <g id="edge8" class="edge">
+-- <title>1&#45;&gt;3</title>
+-- <path fill="none" stroke="black" d="M47.16,-140.84C53.87,-135.23 62.73,-127.5 69.99,-120.08 76.27,-113.67 82.73,-106.18 88.19,-99.56"/>
+-- <polygon fill="black" stroke="black" points="90.91,-101.76 94.47,-91.78 85.47,-97.36 90.91,-101.76"/>
+-- <text text-anchor="middle" x="81.99" y="-113.68" font-family="Times,serif" font-size="8.00">1</text>
+-- </g>
+-- <!-- 2&#45;&gt;0 -->
+-- <g id="edge9" class="edge">
+-- <title>2&#45;&gt;0</title>
+-- <path fill="none" stroke="black" d="M114.47,-18.65C125.25,-23.64 140.3,-31.73 150.99,-42.04 161.19,-51.89 163.26,-55.67 167.99,-69.04 185.79,-119.36 194.39,-143.93 165.99,-189.12 162.56,-194.58 157.83,-199.63 153.06,-203.95"/>
+-- <polygon fill="black" stroke="black" points="150.68,-201.38 145.22,-210.45 155.15,-206.77 150.68,-201.38"/>
+-- <text text-anchor="middle" x="185.99" y="-113.68" font-family="Times,serif" font-size="8.00">1</text>
+-- </g>
+-- <!-- 2&#45;&gt;1 -->
+-- <g id="edge10" class="edge">
+-- <title>2&#45;&gt;1</title>
+-- <path fill="none" stroke="black" d="M95.18,-23.2C88.92,-34.32 78.8,-52.72 70.99,-69.04 61.41,-89.04 51.63,-112.44 45.04,-128.75"/>
+-- <polygon fill="black" stroke="black" points="41.66,-127.76 41.19,-138.35 48.16,-130.37 41.66,-127.76"/>
+-- <text text-anchor="middle" x="73.99" y="-79.16" font-family="Times,serif" font-size="8.00">1</text>
+-- </g>
+-- <!-- 2&#45;&gt;2 -->
+-- <g id="edge11" class="edge">
+-- <title>2&#45;&gt;2</title>
+-- <path fill="none" stroke="black" d="M114.77,-17.71C124.68,-19.56 134.54,-17.67 134.54,-12.02 134.54,-8.4 130.49,-6.33 124.98,-5.79"/>
+-- <polygon fill="black" stroke="black" points="124.57,-2.3 114.77,-6.33 124.95,-9.29 124.57,-2.3"/>
+-- <text text-anchor="middle" x="137.54" y="-10.12" font-family="Times,serif" font-size="8.00">1</text>
+-- </g>
+-- <!-- 2&#45;&gt;3 -->
+-- <g id="edge12" class="edge">
+-- <title>2&#45;&gt;3</title>
+-- <path fill="none" stroke="black" d="M101.15,-24.33C101.3,-33.76 101.5,-47.46 101.67,-58.91"/>
+-- <polygon fill="black" stroke="black" points="98.17,-59.05 101.82,-68.99 105.17,-58.94 98.17,-59.05"/>
+-- <text text-anchor="middle" x="103.99" y="-44.64" font-family="Times,serif" font-size="8.00">1</text>
+-- </g>
+-- <!-- 3&#45;&gt;0 -->
+-- <g id="edge13" class="edge">
+-- <title>3&#45;&gt;0</title>
+-- <path fill="none" stroke="black" d="M104.55,-92.97C109.85,-115.52 122.1,-167.58 129.01,-196.97"/>
+-- <polygon fill="black" stroke="black" points="125.67,-198.08 131.37,-207.01 132.49,-196.47 125.67,-198.08"/>
+-- <text text-anchor="middle" x="122.99" y="-148.2" font-family="Times,serif" font-size="8.00">1</text>
+-- </g>
+-- <!-- 3&#45;&gt;1 -->
+-- <g id="edge14" class="edge">
+-- <title>3&#45;&gt;1</title>
+-- <path fill="none" stroke="black" d="M91.38,-89.91C84.17,-95.46 74.59,-103.29 66.99,-111.08 61.01,-117.21 55.05,-124.47 50.03,-131"/>
+-- <polygon fill="black" stroke="black" points="47.03,-129.16 43.86,-139.27 52.64,-133.34 47.03,-129.16"/>
+-- <text text-anchor="middle" x="69.99" y="-113.68" font-family="Times,serif" font-size="8.00">1</text>
+-- </g>
+-- <!-- 3&#45;&gt;2 -->
+-- <g id="edge15" class="edge">
+-- <title>3&#45;&gt;2</title>
+-- <path fill="none" stroke="black" d="M96.96,-69.58C94.64,-64.18 92.15,-57.4 90.99,-51.04 89.91,-45.17 90.74,-38.87 92.29,-33.12"/>
+-- <polygon fill="black" stroke="black" points="95.63,-34.17 95.63,-23.58 89.02,-31.86 95.63,-34.17"/>
+-- <text text-anchor="middle" x="93.99" y="-44.64" font-family="Times,serif" font-size="8.00">1</text>
+-- </g>
+-- <!-- 3&#45;&gt;3 -->
+-- <g id="edge16" class="edge">
+-- <title>3&#45;&gt;3</title>
+-- <path fill="none" stroke="black" d="M115.77,-86.75C125.68,-88.6 135.54,-86.71 135.54,-81.06 135.54,-77.45 131.49,-75.37 125.98,-74.83"/>
+-- <polygon fill="black" stroke="black" points="125.57,-71.35 115.77,-75.37 125.95,-78.34 125.57,-71.35"/>
+-- <text text-anchor="middle" x="138.54" y="-79.16" font-family="Times,serif" font-size="8.00">1</text>
+-- </g>
+-- </g>
+-- </svg>
+-- </div>
+-- 
 -- And another matrix named 's' which is a Sierpinsky Graph, which
 -- we'll show off a bit later.
 --
@@ -907,173 +1081,6 @@ select draw(random_matrix(8, 8, 16, seed=>0.42, max=>42)) as draw_source \gset
 -- <path fill="none" stroke="black" d="M179.24,-207.08C179.24,-197.72 179.24,-184.04 179.24,-172.55"/>
 -- <polygon fill="black" stroke="black" points="182.74,-172.42 179.24,-162.42 175.74,-172.42 182.74,-172.42"/>
 -- <text text-anchor="middle" x="184.74" y="-182.72" font-family="Times,serif" font-size="8.00">17</text>
--- </g>
--- </g>
--- </svg>
--- </div>
--- 
--- One way of thinking about a "dense" matrix is a fully connected
--- graph, these can be constructed with the `dense_matrix()` function:
-select print(dense_matrix('int32', 4, 4, 42));
-┌────────────────────┐
-│       print        │
-├────────────────────┤
-│      0  1  2  3   ↵│
-│    ────────────   ↵│
-│  0│ 42 42 42 42   ↵│
-│  1│ 42 42 42 42   ↵│
-│  2│ 42 42 42 42   ↵│
-│  3│ 42 42 42 42   ↵│
-│                    │
-└────────────────────┘
-(1 row)
-
-select draw(dense_matrix('int32', 4, 4, 42)) as draw_source \gset
-\i sql/draw.sql
-\setenv draw_source :draw_source
-\! echo $draw_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
--- <div>
--- <!-- Title: %3 Pages: 1 -->
--- <svg width="215pt" height="239pt"
---  viewBox="0.00 0.00 215.49 239.17" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
--- <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 235.17)">
--- <title>%3</title>
--- <polygon fill="white" stroke="transparent" points="-4,4 -4,-235.17 211.49,-235.17 211.49,4 -4,4"/>
--- <!-- 0 -->
--- <g id="node1" class="node">
--- <title>0</title>
--- <ellipse fill="none" stroke="black" cx="151.49" cy="-219.15" rx="15.61" ry="12.04"/>
--- <text text-anchor="middle" x="151.49" y="-217.25" font-family="Times,serif" font-size="8.00">0</text>
--- </g>
--- <!-- 0&#45;&gt;0 -->
--- <g id="edge1" class="edge">
--- <title>0&#45;&gt;0</title>
--- <path fill="none" stroke="black" d="M165.28,-224.83C175.19,-226.69 185.05,-224.79 185.05,-219.15 185.05,-215.53 181,-213.45 175.49,-212.91"/>
--- <polygon fill="black" stroke="black" points="175.08,-209.43 165.28,-213.46 175.45,-216.42 175.08,-209.43"/>
--- <text text-anchor="middle" x="190.55" y="-217.25" font-family="Times,serif" font-size="8.00">42</text>
--- </g>
--- <!-- 1 -->
--- <g id="node2" class="node">
--- <title>1</title>
--- <ellipse fill="none" stroke="black" cx="47.49" cy="-150.1" rx="15.61" ry="12.04"/>
--- <text text-anchor="middle" x="47.49" y="-148.2" font-family="Times,serif" font-size="8.00">1</text>
--- </g>
--- <!-- 0&#45;&gt;1 -->
--- <g id="edge2" class="edge">
--- <title>0&#45;&gt;1</title>
--- <path fill="none" stroke="black" d="M136.1,-216.76C117.09,-214.29 84.79,-207.51 64.49,-189.12 59.48,-184.58 55.86,-178.29 53.29,-172.12"/>
--- <polygon fill="black" stroke="black" points="56.44,-170.52 49.88,-162.2 49.82,-172.8 56.44,-170.52"/>
--- <text text-anchor="middle" x="69.99" y="-182.72" font-family="Times,serif" font-size="8.00">42</text>
--- </g>
--- <!-- 2 -->
--- <g id="node3" class="node">
--- <title>2</title>
--- <ellipse fill="none" stroke="black" cx="115.49" cy="-12.02" rx="15.61" ry="12.04"/>
--- <text text-anchor="middle" x="115.49" y="-10.12" font-family="Times,serif" font-size="8.00">2</text>
--- </g>
--- <!-- 0&#45;&gt;2 -->
--- <g id="edge3" class="edge">
--- <title>0&#45;&gt;2</title>
--- <path fill="none" stroke="black" d="M158.51,-208.18C161.9,-202.8 165.62,-195.89 167.49,-189.12 181.75,-137.69 189.47,-118.54 169.49,-69.04 162.51,-51.74 147.34,-36.8 134.86,-26.71"/>
--- <polygon fill="black" stroke="black" points="136.84,-23.82 126.77,-20.53 132.59,-29.38 136.84,-23.82"/>
--- <text text-anchor="middle" x="186.99" y="-113.68" font-family="Times,serif" font-size="8.00">42</text>
--- </g>
--- <!-- 3 -->
--- <g id="node4" class="node">
--- <title>3</title>
--- <ellipse fill="none" stroke="black" cx="115.49" cy="-81.06" rx="15.61" ry="12.04"/>
--- <text text-anchor="middle" x="115.49" y="-79.16" font-family="Times,serif" font-size="8.00">3</text>
--- </g>
--- <!-- 0&#45;&gt;3 -->
--- <g id="edge4" class="edge">
--- <title>0&#45;&gt;3</title>
--- <path fill="none" stroke="black" d="M152.87,-206.93C154.85,-186.77 156.84,-143.49 142.49,-111.08 140.29,-106.1 136.86,-101.42 133.18,-97.33"/>
--- <polygon fill="black" stroke="black" points="135.62,-94.82 126.05,-90.29 130.7,-99.8 135.62,-94.82"/>
--- <text text-anchor="middle" x="158.99" y="-148.2" font-family="Times,serif" font-size="8.00">42</text>
--- </g>
--- <!-- 1&#45;&gt;0 -->
--- <g id="edge5" class="edge">
--- <title>1&#45;&gt;0</title>
--- <path fill="none" stroke="black" d="M58.54,-158.85C69.75,-166.66 87.67,-178.98 103.49,-189.12 112.4,-194.84 122.4,-200.93 130.95,-206.05"/>
--- <polygon fill="black" stroke="black" points="129.17,-209.06 139.55,-211.16 132.74,-203.04 129.17,-209.06"/>
--- <text text-anchor="middle" x="108.99" y="-182.72" font-family="Times,serif" font-size="8.00">42</text>
--- </g>
--- <!-- 1&#45;&gt;1 -->
--- <g id="edge6" class="edge">
--- <title>1&#45;&gt;1</title>
--- <path fill="none" stroke="black" d="M61.28,-155.79C71.19,-157.64 81.05,-155.75 81.05,-150.1 81.05,-146.49 77,-144.41 71.49,-143.87"/>
--- <polygon fill="black" stroke="black" points="71.08,-140.39 61.28,-144.42 71.45,-147.38 71.08,-140.39"/>
--- <text text-anchor="middle" x="86.55" y="-148.2" font-family="Times,serif" font-size="8.00">42</text>
--- </g>
--- <!-- 1&#45;&gt;2 -->
--- <g id="edge7" class="edge">
--- <title>1&#45;&gt;2</title>
--- <path fill="none" stroke="black" d="M38.78,-139.94C33.59,-134.34 26.97,-126.97 21.49,-120.08 6.43,-101.14 -4.81,-92.12 2.49,-69.04 6.92,-55.05 9.62,-50.67 21.49,-42.04 41.87,-27.23 69.97,-19.85 90.13,-16.26"/>
--- <polygon fill="black" stroke="black" points="90.81,-19.7 100.14,-14.67 89.71,-12.78 90.81,-19.7"/>
--- <text text-anchor="middle" x="7.99" y="-79.16" font-family="Times,serif" font-size="8.00">42</text>
--- </g>
--- <!-- 1&#45;&gt;3 -->
--- <g id="edge8" class="edge">
--- <title>1&#45;&gt;3</title>
--- <path fill="none" stroke="black" d="M57.56,-140.73C64.22,-135.07 73.07,-127.34 80.49,-120.08 87.26,-113.47 94.39,-105.85 100.44,-99.18"/>
--- <polygon fill="black" stroke="black" points="103.36,-101.17 107.41,-91.38 98.14,-96.5 103.36,-101.17"/>
--- <text text-anchor="middle" x="93.99" y="-113.68" font-family="Times,serif" font-size="8.00">42</text>
--- </g>
--- <!-- 2&#45;&gt;0 -->
--- <g id="edge9" class="edge">
--- <title>2&#45;&gt;0</title>
--- <path fill="none" stroke="black" d="M129.19,-18.43C140.58,-23.4 156.76,-31.56 168.49,-42.04 193.18,-64.11 193.01,-78.15 196.49,-111.08 200.2,-146.13 201.51,-159.46 182.49,-189.12 179.08,-194.45 174.47,-199.47 169.85,-203.79"/>
--- <polygon fill="black" stroke="black" points="167.56,-201.14 162.27,-210.32 172.13,-206.44 167.56,-201.14"/>
--- <text text-anchor="middle" x="201.99" y="-113.68" font-family="Times,serif" font-size="8.00">42</text>
--- </g>
--- <!-- 2&#45;&gt;1 -->
--- <g id="edge10" class="edge">
--- <title>2&#45;&gt;1</title>
--- <path fill="none" stroke="black" d="M108.23,-22.76C95.91,-39.78 70.93,-76.41 57.49,-111.08 55.42,-116.44 53.63,-122.37 52.16,-127.94"/>
--- <polygon fill="black" stroke="black" points="48.7,-127.37 49.74,-137.91 55.5,-129.02 48.7,-127.37"/>
--- <text text-anchor="middle" x="83.99" y="-79.16" font-family="Times,serif" font-size="8.00">42</text>
--- </g>
--- <!-- 2&#45;&gt;2 -->
--- <g id="edge11" class="edge">
--- <title>2&#45;&gt;2</title>
--- <path fill="none" stroke="black" d="M129.28,-17.71C139.19,-19.56 149.05,-17.67 149.05,-12.02 149.05,-8.4 145,-6.33 139.49,-5.79"/>
--- <polygon fill="black" stroke="black" points="139.08,-2.3 129.28,-6.33 139.45,-9.29 139.08,-2.3"/>
--- <text text-anchor="middle" x="154.55" y="-10.12" font-family="Times,serif" font-size="8.00">42</text>
--- </g>
--- <!-- 2&#45;&gt;3 -->
--- <g id="edge12" class="edge">
--- <title>2&#45;&gt;3</title>
--- <path fill="none" stroke="black" d="M115.49,-24.33C115.49,-33.76 115.49,-47.46 115.49,-58.91"/>
--- <polygon fill="black" stroke="black" points="111.99,-58.99 115.49,-68.99 118.99,-58.99 111.99,-58.99"/>
--- <text text-anchor="middle" x="120.99" y="-44.64" font-family="Times,serif" font-size="8.00">42</text>
--- </g>
--- <!-- 3&#45;&gt;0 -->
--- <g id="edge13" class="edge">
--- <title>3&#45;&gt;0</title>
--- <path fill="none" stroke="black" d="M118.1,-92.97C121.81,-108.41 128.9,-137.49 135.49,-162.12 138.6,-173.73 142.27,-186.62 145.31,-197.11"/>
--- <polygon fill="black" stroke="black" points="142.04,-198.4 148.2,-207.02 148.76,-196.44 142.04,-198.4"/>
--- <text text-anchor="middle" x="140.99" y="-148.2" font-family="Times,serif" font-size="8.00">42</text>
--- </g>
--- <!-- 3&#45;&gt;1 -->
--- <g id="edge14" class="edge">
--- <title>3&#45;&gt;1</title>
--- <path fill="none" stroke="black" d="M102.35,-87.6C91.88,-92.53 77.38,-100.59 67.49,-111.08 62.66,-116.21 58.67,-122.74 55.56,-128.93"/>
--- <polygon fill="black" stroke="black" points="52.33,-127.57 51.4,-138.13 58.71,-130.46 52.33,-127.57"/>
--- <text text-anchor="middle" x="72.99" y="-113.68" font-family="Times,serif" font-size="8.00">42</text>
--- </g>
--- <!-- 3&#45;&gt;2 -->
--- <g id="edge15" class="edge">
--- <title>3&#45;&gt;2</title>
--- <path fill="none" stroke="black" d="M108.01,-70.3C103.13,-62.76 98.08,-51.97 100.49,-42.04 101.31,-38.68 102.59,-35.27 104.07,-32.03"/>
--- <polygon fill="black" stroke="black" points="107.25,-33.5 108.81,-23.02 101.05,-30.24 107.25,-33.5"/>
--- <text text-anchor="middle" x="105.99" y="-44.64" font-family="Times,serif" font-size="8.00">42</text>
--- </g>
--- <!-- 3&#45;&gt;3 -->
--- <g id="edge16" class="edge">
--- <title>3&#45;&gt;3</title>
--- <path fill="none" stroke="black" d="M129.28,-86.75C139.19,-88.6 149.05,-86.71 149.05,-81.06 149.05,-77.45 145,-75.37 139.49,-74.83"/>
--- <polygon fill="black" stroke="black" points="139.08,-71.35 129.28,-75.37 139.45,-78.34 139.08,-71.35"/>
--- <text text-anchor="middle" x="154.55" y="-79.16" font-family="Times,serif" font-size="8.00">42</text>
 -- </g>
 -- </g>
 -- </svg>
@@ -2503,6 +2510,9 @@ select print(a) as a, '@' as "@", semiring, print(u) as u, print(mxv(a, u)) as m
 └────────────────────┴───┴──────────────────┴───────────┴───────────┘
 (1 row)
 
+-- From a graph standpoint, matrix vector multiplication is used to
+-- "pull" back to adjacent nodes from their incoming edges.  When
+-- iterated, it forms the basis for working back along incoming links.
 select draw(a) as binop_a_source, draw(u) as binop_b_source, draw(mxv(a, u)) as binop_c_source from test_fixture \gset
 \i sql/binop.sql
 -- <table style="width: 100%; table-layout: fixed;" class="dot-table">
@@ -2742,6 +2752,10 @@ select print(v) as v, semiring, print(b) as b, print(vxm(v, b, semiring)) as vxm
 └───────────┴──────────────────┴────────────────────┴───────────┘
 (1 row)
 
+-- From a graph standpoint, vector matrix multiplication is used to
+-- "push" forward to adjacent nodes from their outgoing edges.  When
+-- iterated, it forms the basis for working forward along outgoing
+-- edges.
 select draw(v) as binop_a_source, draw(b) as binop_b_source, draw(vxm(v, b)) as binop_c_source from test_fixture \gset
 \i sql/binop.sql
 -- <table style="width: 100%; table-layout: fixed;" class="dot-table">
@@ -3465,7 +3479,6 @@ select draw(random_matrix(8, 8, 16, seed=>0.42, max=>42)) as uop_a_source,
 -- for constructing synthetic graphs with specific power law
 -- distributions.
 --
---
 select print(s) as s, semiring, print(s) as s, print(kronecker(s, s, semiring)) as kronecker from test_fixture;
 ┌──────────────┬──────────────────┬──────────────┬────────────────────┐
 │      s       │     semiring     │      s       │     kronecker      │
@@ -3746,7 +3759,7 @@ select nvals(kronpower(s, 4)) from test_fixture;
 └──────────┘
 (1 row)
 
-Time: 109.633 ms
+Time: 114.246 ms
 \timing
 -- # Transpose
 --
