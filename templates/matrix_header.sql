@@ -199,6 +199,17 @@ RETURNS matrix
 AS '$libdir/onesparse', 'matrix_select'
 LANGUAGE C STABLE;
 
+CREATE FUNCTION transpose(
+    a matrix,
+    inout c matrix default null,
+    mask matrix default null,
+    accum binaryop default null,
+    descriptor descriptor default null
+    )
+RETURNS matrix
+AS '$libdir/onesparse', 'matrix_transpose'
+LANGUAGE C STABLE;
+
 CREATE FUNCTION apply(
     a matrix,
     op unaryop,

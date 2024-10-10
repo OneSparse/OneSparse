@@ -34,6 +34,7 @@ PG_FUNCTION_INFO_V1(matrix_extract_matrix);
 PG_FUNCTION_INFO_V1(matrix_mxm);
 PG_FUNCTION_INFO_V1(matrix_mxv);
 PG_FUNCTION_INFO_V1(matrix_vxm);
+PG_FUNCTION_INFO_V1(matrix_transpose);
 PG_FUNCTION_INFO_V1(matrix_kron);
 PG_FUNCTION_INFO_V1(matrix_select);
 PG_FUNCTION_INFO_V1(matrix_apply);
@@ -1222,6 +1223,48 @@ Datum matrix_select(PG_FUNCTION_ARGS)
 		  "Error in GrB_select");
 
 	OS_RETURN_MATRIX(C);
+}
+
+Datum matrix_transpose(PG_FUNCTION_ARGS)
+{
+	GrB_Type type;
+	os_Matrix *a, *c;
+	GrB_Matrix mask;
+	GrB_Descriptor descriptor;
+	GrB_BinaryOp accum;
+	GrB_Index nrows, ncols;
+	int nargs;
+
+	LOGF();
+	ERRORNULL(0);
+
+	nargs = PG_NARGS();
+	a = OS_GETARG_MATRIX(0);
+
+	if (nargs > 1)
+	{
+		if (PG_ARGISNULL(1))
+		{
+			OS_MTYPE(type, a);
+			OS_MNROWS(nrows, a);
+			OS_MNCOLS(ncols, a);
+			c = new_matrix(type, nrows, ncols, CurrentMemoryContext, NULL);
+		}
+		else
+			c = OS_GETARG_MATRIX(2);
+	}
+	mask = OS_GETARG_MATRIX_HANDLE_OR_NULL(nargs, 2);
+	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 3);
+	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 4);
+
+	OS_CHECK(GrB_transpose(c->matrix,
+						   mask,
+						   accum,
+						   a->matrix,
+						   descriptor),
+		  c->matrix,
+		  "Error in transpose");
+	OS_RETURN_MATRIX(c);
 }
 
 Datum matrix_apply(PG_FUNCTION_ARGS)

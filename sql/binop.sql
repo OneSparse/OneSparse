@@ -1,4 +1,4 @@
--- <table style="width: 100%; table-layout: fixed;">
+-- <table style="width: 100%; table-layout: fixed;" class="dot-table">
 --   <tr>
 --     <td style="width: 30%;">
 --         <!-- Diagram A -->
