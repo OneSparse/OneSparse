@@ -49,27 +49,27 @@ LANGUAGE C;
 CREATE FUNCTION eadd(
     u vector,
     v vector,
-    op binaryop,
+    op binaryop default null,
     inout w vector default null,
     mask vector default null,
     accum binaryop default null,
     descriptor descriptor default null
     )
 RETURNS vector
-AS '$libdir/onesparse', 'vector_ewise_add'
+AS '$libdir/onesparse', 'vector_eadd'
 LANGUAGE C STABLE;
 
 CREATE FUNCTION emult(
     u vector,
     v vector,
-    op binaryop,
+    op binaryop default null,
     inout w vector default null,
     mask vector default null,
     accum binaryop default null,
     descriptor descriptor default null
     )
 RETURNS vector
-AS '$libdir/onesparse', 'vector_ewise_mult'
+AS '$libdir/onesparse', 'vector_emult'
 LANGUAGE C STABLE;
 
 CREATE FUNCTION eunion(
@@ -77,14 +77,14 @@ CREATE FUNCTION eunion(
     alpha scalar,
     v vector,
     beta scalar,
-    op binaryop,
+    op binaryop default null,
     inout w vector default null,
     mask vector default null,
     accum binaryop default null,
     descriptor descriptor default null
     )
 RETURNS vector
-AS '$libdir/onesparse', 'vector_ewise_union'
+AS '$libdir/onesparse', 'vector_eunion'
 LANGUAGE C STABLE;
 
 CREATE FUNCTION reduce_scalar(
@@ -134,6 +134,32 @@ RETURNS vector
 AS '$libdir/onesparse', 'vector_apply'
 LANGUAGE C STABLE;
 
+CREATE FUNCTION apply(
+    s scalar,
+    a vector,
+    op binaryop default null,
+    inout c vector default null,
+    mask vector default null,
+    accum binaryop default null,
+    descriptor descriptor default null
+    )
+RETURNS vector
+AS '$libdir/onesparse', 'vector_apply_first'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION apply(
+    a vector,
+    s scalar,
+    op binaryop default null,
+    inout c vector default null,
+    mask vector default null,
+    accum binaryop default null,
+    descriptor descriptor default null
+    )
+RETURNS vector
+AS '$libdir/onesparse', 'vector_apply_second'
+LANGUAGE C STABLE;
+
 CREATE FUNCTION set_element(a vector, i bigint, s scalar)
 RETURNS vector
 AS '$libdir/onesparse', 'vector_set_element'
@@ -170,9 +196,176 @@ AS '$libdir/onesparse', 'vector_dup'
 LANGUAGE C;
 
 CREATE FUNCTION clear(vector)
-RETURNS void
+RETURNS vector
 AS '$libdir/onesparse', 'vector_clear'
 LANGUAGE C;
+
+
+CREATE FUNCTION eadd_plus_op(a vector, b vector)
+RETURNS vector
+RETURN onesparse.eadd(a, b, ('plus_' || name(type(a)))::binaryop);
+
+CREATE FUNCTION eadd_minus_op(a vector, b vector)
+RETURNS vector
+RETURN onesparse.eadd(a, b, ('minus_' || name(type(a)))::binaryop);
+
+CREATE FUNCTION eadd_div_op(a vector, b vector)
+RETURNS vector
+RETURN onesparse.eadd(a, b, ('div_' || name(type(a)))::binaryop);
+
+CREATE FUNCTION eadd_times_op(a vector, b vector)
+RETURNS vector
+RETURN onesparse.eadd(a, b, ('times_' || name(type(a)))::binaryop);
+
+CREATE FUNCTION emult_times_op(a vector, b vector)
+RETURNS vector
+RETURN onesparse.emult(a, b, ('times_' || name(type(a)))::binaryop);
+
+CREATE FUNCTION emult_plus_op(a vector, b vector)
+RETURNS vector
+RETURN onesparse.emult(a, b, ('plus_' || name(type(a)))::binaryop);
+
+CREATE FUNCTION emult_minus_op(a vector, b vector)
+RETURNS vector
+RETURN onesparse.emult(a, b, ('minus_' || name(type(a)))::binaryop);
+
+CREATE FUNCTION emult_div_op(a vector, b vector)
+RETURNS vector
+RETURN onesparse.emult(a, b, ('div_' || name(type(a)))::binaryop);
+
+CREATE FUNCTION plus_first_op(s scalar, a vector)
+RETURNS vector
+RETURN onesparse.apply(s, a, ('plus_' || name(type(a)))::binaryop);
+
+CREATE FUNCTION plus_second_op(a vector, s scalar)
+RETURNS vector
+RETURN onesparse.apply(a, s, ('plus_' || name(type(a)))::binaryop);
+
+CREATE FUNCTION minus_first_op(s scalar, a vector)
+RETURNS vector
+RETURN onesparse.apply(s, a, ('minus_' || name(type(a)))::binaryop);
+
+CREATE FUNCTION minus_second_op(a vector, s scalar)
+RETURNS vector
+RETURN onesparse.apply(a, s, ('minus_' || name(type(a)))::binaryop);
+
+CREATE FUNCTION div_first_op(s scalar, a vector)
+RETURNS vector
+RETURN onesparse.apply(s, a, ('div_' || name(type(a)))::binaryop);
+
+CREATE FUNCTION div_second_op(a vector, s scalar)
+RETURNS vector
+RETURN onesparse.apply(a, s, ('div_' || name(type(a)))::binaryop);
+
+CREATE FUNCTION times_first_op(s scalar, a vector)
+RETURNS vector
+RETURN onesparse.apply(s, a, ('times_' || name(type(a)))::binaryop);
+
+CREATE FUNCTION times_second_op(a vector, s scalar)
+RETURNS vector
+RETURN onesparse.apply(a, s, ('times_' || name(type(a)))::binaryop);
+
+-- scalar apply ops
+
+CREATE OPERATOR + (
+    LEFTARG = scalar,
+    RIGHTARG = vector,
+    FUNCTION = plus_first_op
+    );
+
+CREATE OPERATOR + (
+    LEFTARG = vector,
+    RIGHTARG = scalar,
+    FUNCTION = plus_second_op
+    );
+
+CREATE OPERATOR - (
+    LEFTARG = scalar,
+    RIGHTARG = vector,
+    FUNCTION = minus_first_op
+    );
+
+CREATE OPERATOR - (
+    LEFTARG = vector,
+    RIGHTARG = scalar,
+    FUNCTION = minus_second_op
+    );
+
+CREATE OPERATOR / (
+    LEFTARG = scalar,
+    RIGHTARG = vector,
+    FUNCTION = div_first_op
+    );
+
+CREATE OPERATOR / (
+    LEFTARG = vector,
+    RIGHTARG = scalar,
+    FUNCTION = div_second_op
+    );
+
+CREATE OPERATOR * (
+    LEFTARG = scalar,
+    RIGHTARG = vector,
+    FUNCTION = times_first_op
+    );
+
+CREATE OPERATOR * (
+    LEFTARG = vector,
+    RIGHTARG = scalar,
+    FUNCTION = times_second_op
+    );
+
+-- ewise add "OR ops"
+
+CREATE OPERATOR |+ (
+    LEFTARG = vector,
+    RIGHTARG = vector,
+    FUNCTION = eadd_plus_op
+    );
+
+CREATE OPERATOR |- (
+    LEFTARG = vector,
+    RIGHTARG = vector,
+    FUNCTION = eadd_minus_op
+    );
+
+CREATE OPERATOR |/ (
+    LEFTARG = vector,
+    RIGHTARG = vector,
+    FUNCTION = eadd_div_op
+    );
+
+CREATE OPERATOR |* (
+    LEFTARG = vector,
+    RIGHTARG = vector,
+    FUNCTION = eadd_times_op
+    );
+
+-- ewise add "AND ops"
+
+CREATE OPERATOR &+ (
+    LEFTARG = vector,
+    RIGHTARG = vector,
+    FUNCTION = emult_plus_op
+    );
+
+CREATE OPERATOR &- (
+    LEFTARG = vector,
+    RIGHTARG = vector,
+    FUNCTION = emult_minus_op
+    );
+
+CREATE OPERATOR &/ (
+    LEFTARG = vector,
+    RIGHTARG = vector,
+    FUNCTION = emult_div_op
+    );
+
+CREATE OPERATOR &* (
+    LEFTARG = vector,
+    RIGHTARG = vector,
+    FUNCTION = emult_times_op
+    );
 
 create function print(a vector) returns text language plpgsql as
     $$

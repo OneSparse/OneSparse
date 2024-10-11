@@ -1,4 +1,4 @@
-# Vectors
+# Vector
 
 This documentation is also tests for the code, the examples below
 show the literal output of these statements from Postgres.
@@ -266,7 +266,7 @@ select clear('int32[0:1 1:2 2:3]'::vector);
 ┌───────┐
 │ clear │
 ├───────┤
-│       │
+│ int32 │
 └───────┘
 (1 row)
 

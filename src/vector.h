@@ -1,7 +1,7 @@
 #ifndef OS_VECTOR_H
 #define OS_VECTOR_H
 
-#define vector_MAGIC 689276813
+#define vector_MAGIC 689276814
 
 typedef struct os_FlatVector {
     int32 vl_len_;

@@ -1,7 +1,7 @@
 #ifndef OS_SEMIRING_H
 #define OS_SEMIRING_H
 
-#define semiring_MAGIC 689276813
+#define semiring_MAGIC 689276820
 
 typedef struct os_FlatSemiring {
     int32 vl_len_;

@@ -86,7 +86,7 @@ class Template:
     def test_write(self, part):
         typ = self.context.get('type')
         if typ is not None:
-            path = Path(self.test_dir, f'test_{self.name}_{part}_{typ.short}.sql')
+            path = Path(self.test_dir, f'test_{self.name}_{part}.sql')
         else:
             path = Path(self.test_dir, f'test_{self.name}_{part}.sql')
 

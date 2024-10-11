@@ -222,6 +222,32 @@ RETURNS matrix
 AS '$libdir/onesparse', 'matrix_apply'
 LANGUAGE C STABLE;
 
+CREATE FUNCTION apply(
+    s scalar,
+    a matrix,
+    op binaryop default null,
+    inout c matrix default null,
+    mask matrix default null,
+    accum binaryop default null,
+    descriptor descriptor default null
+    )
+RETURNS matrix
+AS '$libdir/onesparse', 'matrix_apply_first'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION apply(
+    a matrix,
+    s scalar,
+    op binaryop default null,
+    inout c matrix default null,
+    mask matrix default null,
+    accum binaryop default null,
+    descriptor descriptor default null
+    )
+RETURNS matrix
+AS '$libdir/onesparse', 'matrix_apply_second'
+LANGUAGE C STABLE;
+
 CREATE FUNCTION matrix_agg_final(state matrix)
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_agg_final'
@@ -272,13 +298,69 @@ RETURNS text
 AS '$libdir/onesparse', 'matrix_info'
 LANGUAGE C STABLE;
 
-CREATE FUNCTION eadd_op(a matrix, b matrix)
+CREATE FUNCTION eadd_plus_op(a matrix, b matrix)
 RETURNS matrix
-RETURN onesparse.eadd(a, b);
+RETURN onesparse.eadd(a, b, ('plus_' || name(type(a)))::binaryop);
 
-CREATE FUNCTION emult_op(a matrix, b matrix)
+CREATE FUNCTION eadd_minus_op(a matrix, b matrix)
 RETURNS matrix
-RETURN onesparse.emult(a, b);
+RETURN onesparse.eadd(a, b, ('minus_' || name(type(a)))::binaryop);
+
+CREATE FUNCTION eadd_div_op(a matrix, b matrix)
+RETURNS matrix
+RETURN onesparse.eadd(a, b, ('div_' || name(type(a)))::binaryop);
+
+CREATE FUNCTION eadd_times_op(a matrix, b matrix)
+RETURNS matrix
+RETURN onesparse.eadd(a, b, ('times_' || name(type(a)))::binaryop);
+
+CREATE FUNCTION emult_times_op(a matrix, b matrix)
+RETURNS matrix
+RETURN onesparse.emult(a, b, ('times_' || name(type(a)))::binaryop);
+
+CREATE FUNCTION emult_plus_op(a matrix, b matrix)
+RETURNS matrix
+RETURN onesparse.emult(a, b, ('plus_' || name(type(a)))::binaryop);
+
+CREATE FUNCTION emult_minus_op(a matrix, b matrix)
+RETURNS matrix
+RETURN onesparse.emult(a, b, ('minus_' || name(type(a)))::binaryop);
+
+CREATE FUNCTION emult_div_op(a matrix, b matrix)
+RETURNS matrix
+RETURN onesparse.emult(a, b, ('div_' || name(type(a)))::binaryop);
+
+CREATE FUNCTION plus_first_op(s scalar, a matrix)
+RETURNS matrix
+RETURN onesparse.apply(s, a, ('plus_' || name(type(a)))::binaryop);
+
+CREATE FUNCTION plus_second_op(a matrix, s scalar)
+RETURNS matrix
+RETURN onesparse.apply(a, s, ('plus_' || name(type(a)))::binaryop);
+
+CREATE FUNCTION minus_first_op(s scalar, a matrix)
+RETURNS matrix
+RETURN onesparse.apply(s, a, ('minus_' || name(type(a)))::binaryop);
+
+CREATE FUNCTION minus_second_op(a matrix, s scalar)
+RETURNS matrix
+RETURN onesparse.apply(a, s, ('minus_' || name(type(a)))::binaryop);
+
+CREATE FUNCTION div_first_op(s scalar, a matrix)
+RETURNS matrix
+RETURN onesparse.apply(s, a, ('div_' || name(type(a)))::binaryop);
+
+CREATE FUNCTION div_second_op(a matrix, s scalar)
+RETURNS matrix
+RETURN onesparse.apply(a, s, ('div_' || name(type(a)))::binaryop);
+
+CREATE FUNCTION times_first_op(s scalar, a matrix)
+RETURNS matrix
+RETURN onesparse.apply(s, a, ('times_' || name(type(a)))::binaryop);
+
+CREATE FUNCTION times_second_op(a matrix, s scalar)
+RETURNS matrix
+RETURN onesparse.apply(a, s, ('times_' || name(type(a)))::binaryop);
 
 CREATE FUNCTION mxm_op(a matrix, b matrix)
 RETURNS matrix
@@ -292,16 +374,106 @@ CREATE FUNCTION vxm_op(a vector, b matrix)
 RETURNS vector
 RETURN onesparse.vxm(a, b);
 
+-- scalar apply ops
+
+CREATE OPERATOR + (
+    LEFTARG = scalar,
+    RIGHTARG = matrix,
+    FUNCTION = plus_first_op
+    );
+
 CREATE OPERATOR + (
     LEFTARG = matrix,
+    RIGHTARG = scalar,
+    FUNCTION = plus_second_op
+    );
+
+CREATE OPERATOR - (
+    LEFTARG = scalar,
     RIGHTARG = matrix,
-    FUNCTION = eadd_op
+    FUNCTION = minus_first_op
+    );
+
+CREATE OPERATOR - (
+    LEFTARG = matrix,
+    RIGHTARG = scalar,
+    FUNCTION = minus_second_op
+    );
+
+CREATE OPERATOR / (
+    LEFTARG = scalar,
+    RIGHTARG = matrix,
+    FUNCTION = div_first_op
+    );
+
+CREATE OPERATOR / (
+    LEFTARG = matrix,
+    RIGHTARG = scalar,
+    FUNCTION = div_second_op
+    );
+
+CREATE OPERATOR * (
+    LEFTARG = scalar,
+    RIGHTARG = matrix,
+    FUNCTION = times_first_op
     );
 
 CREATE OPERATOR * (
     LEFTARG = matrix,
+    RIGHTARG = scalar,
+    FUNCTION = times_second_op
+    );
+
+-- ewise add "OR ops"
+
+CREATE OPERATOR |+ (
+    LEFTARG = matrix,
     RIGHTARG = matrix,
-    FUNCTION = emult_op
+    FUNCTION = eadd_plus_op
+    );
+
+CREATE OPERATOR |- (
+    LEFTARG = matrix,
+    RIGHTARG = matrix,
+    FUNCTION = eadd_minus_op
+    );
+
+CREATE OPERATOR |/ (
+    LEFTARG = matrix,
+    RIGHTARG = matrix,
+    FUNCTION = eadd_div_op
+    );
+
+CREATE OPERATOR |* (
+    LEFTARG = matrix,
+    RIGHTARG = matrix,
+    FUNCTION = eadd_times_op
+    );
+
+-- ewise add "AND ops"
+
+CREATE OPERATOR &+ (
+    LEFTARG = matrix,
+    RIGHTARG = matrix,
+    FUNCTION = emult_plus_op
+    );
+
+CREATE OPERATOR &- (
+    LEFTARG = matrix,
+    RIGHTARG = matrix,
+    FUNCTION = emult_minus_op
+    );
+
+CREATE OPERATOR &/ (
+    LEFTARG = matrix,
+    RIGHTARG = matrix,
+    FUNCTION = emult_div_op
+    );
+
+CREATE OPERATOR &* (
+    LEFTARG = matrix,
+    RIGHTARG = matrix,
+    FUNCTION = emult_times_op
     );
 
 CREATE OPERATOR @ (

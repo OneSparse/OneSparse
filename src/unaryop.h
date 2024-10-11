@@ -1,7 +1,7 @@
 #ifndef OS_UNARYOP_H
 #define OS_UNARYOP_H
 
-#define unaryop_MAGIC 689276813
+#define unaryop_MAGIC 689276822
 
 typedef struct os_FlatUnaryOp {
     int32 vl_len_;

@@ -1,7 +1,7 @@
 #ifndef OS_TYPE_H
 #define OS_TYPE_H
 
-#define type_MAGIC 689276813
+#define type_MAGIC 689276821
 
 typedef struct os_FlatType {
     int32 vl_len_;

@@ -1,51 +1,81 @@
 \do+ onesparse.*
-                                                List of operators
-  Schema   | Name |  Left arg type   |  Right arg type  |   Result type    |        Function        | Description 
------------+------+------------------+------------------+------------------+------------------------+-------------
- onesparse | *    | bigint           | scalar           | bigint           | onesparse.mult_scalar  | 
- onesparse | *    | double precision | scalar           | double precision | onesparse.mult_scalar  | 
- onesparse | *    | integer          | scalar           | integer          | onesparse.mult_scalar  | 
- onesparse | *    | matrix           | matrix           | matrix           | emult_op               | 
- onesparse | *    | real             | scalar           | real             | onesparse.mult_scalar  | 
- onesparse | *    | scalar           | bigint           | scalar           | onesparse.scalar_mult  | 
- onesparse | *    | scalar           | double precision | scalar           | onesparse.scalar_mult  | 
- onesparse | *    | scalar           | integer          | scalar           | onesparse.scalar_mult  | 
- onesparse | *    | scalar           | real             | scalar           | onesparse.scalar_mult  | 
- onesparse | *    | scalar           | smallint         | scalar           | onesparse.scalar_mult  | 
- onesparse | *    | smallint         | scalar           | smallint         | onesparse.mult_scalar  | 
- onesparse | +    | bigint           | scalar           | bigint           | onesparse.plus_scalar  | 
- onesparse | +    | double precision | scalar           | double precision | onesparse.plus_scalar  | 
- onesparse | +    | integer          | scalar           | integer          | onesparse.plus_scalar  | 
- onesparse | +    | matrix           | matrix           | matrix           | eadd_op                | 
- onesparse | +    | real             | scalar           | real             | onesparse.plus_scalar  | 
- onesparse | +    | scalar           | bigint           | scalar           | onesparse.scalar_plus  | 
- onesparse | +    | scalar           | double precision | scalar           | onesparse.scalar_plus  | 
- onesparse | +    | scalar           | integer          | scalar           | onesparse.scalar_plus  | 
- onesparse | +    | scalar           | real             | scalar           | onesparse.scalar_plus  | 
- onesparse | +    | scalar           | smallint         | scalar           | onesparse.scalar_plus  | 
- onesparse | +    | smallint         | scalar           | smallint         | onesparse.plus_scalar  | 
- onesparse | -    | bigint           | scalar           | bigint           | onesparse.minus_scalar | 
- onesparse | -    | double precision | scalar           | double precision | onesparse.minus_scalar | 
- onesparse | -    | integer          | scalar           | integer          | onesparse.minus_scalar | 
- onesparse | -    | real             | scalar           | real             | onesparse.minus_scalar | 
- onesparse | -    | scalar           | bigint           | scalar           | onesparse.scalar_minus | 
- onesparse | -    | scalar           | double precision | scalar           | onesparse.scalar_minus | 
- onesparse | -    | scalar           | integer          | scalar           | onesparse.scalar_minus | 
- onesparse | -    | scalar           | real             | scalar           | onesparse.scalar_minus | 
- onesparse | -    | scalar           | smallint         | scalar           | onesparse.scalar_minus | 
- onesparse | -    | smallint         | scalar           | smallint         | onesparse.minus_scalar | 
- onesparse | /    | bigint           | scalar           | bigint           | onesparse.div_scalar   | 
- onesparse | /    | double precision | scalar           | double precision | onesparse.div_scalar   | 
- onesparse | /    | integer          | scalar           | integer          | onesparse.div_scalar   | 
- onesparse | /    | real             | scalar           | real             | onesparse.div_scalar   | 
- onesparse | /    | scalar           | bigint           | scalar           | onesparse.scalar_div   | 
- onesparse | /    | scalar           | double precision | scalar           | onesparse.scalar_div   | 
- onesparse | /    | scalar           | integer          | scalar           | onesparse.scalar_div   | 
- onesparse | /    | scalar           | real             | scalar           | onesparse.scalar_div   | 
- onesparse | /    | scalar           | smallint         | scalar           | onesparse.scalar_div   | 
- onesparse | /    | smallint         | scalar           | smallint         | onesparse.div_scalar   | 
- onesparse | @    | matrix           | matrix           | matrix           | mxm_op                 | 
- onesparse | @    | matrix           | vector           | vector           | mxv_op                 | 
- onesparse | @    | vector           | matrix           | vector           | vxm_op                 | 
-(45 rows)
+                                                  List of operators
+  Schema   | Name |  Left arg type   |  Right arg type  |   Result type    |         Function          | Description 
+-----------+------+------------------+------------------+------------------+---------------------------+-------------
+ onesparse | &*   | matrix           | matrix           | matrix           | onesparse.emult_times_op  | 
+ onesparse | &*   | vector           | vector           | vector           | onesparse.emult_times_op  | 
+ onesparse | &+   | matrix           | matrix           | matrix           | onesparse.emult_plus_op   | 
+ onesparse | &+   | vector           | vector           | vector           | onesparse.emult_plus_op   | 
+ onesparse | &-   | matrix           | matrix           | matrix           | onesparse.emult_minus_op  | 
+ onesparse | &-   | vector           | vector           | vector           | onesparse.emult_minus_op  | 
+ onesparse | &/   | matrix           | matrix           | matrix           | onesparse.emult_div_op    | 
+ onesparse | &/   | vector           | vector           | vector           | onesparse.emult_div_op    | 
+ onesparse | *    | bigint           | scalar           | bigint           | onesparse.mult_scalar     | 
+ onesparse | *    | double precision | scalar           | double precision | onesparse.mult_scalar     | 
+ onesparse | *    | integer          | scalar           | integer          | onesparse.mult_scalar     | 
+ onesparse | *    | matrix           | scalar           | matrix           | onesparse.times_second_op | 
+ onesparse | *    | real             | scalar           | real             | onesparse.mult_scalar     | 
+ onesparse | *    | scalar           | bigint           | scalar           | onesparse.scalar_mult     | 
+ onesparse | *    | scalar           | double precision | scalar           | onesparse.scalar_mult     | 
+ onesparse | *    | scalar           | integer          | scalar           | onesparse.scalar_mult     | 
+ onesparse | *    | scalar           | matrix           | matrix           | onesparse.times_first_op  | 
+ onesparse | *    | scalar           | real             | scalar           | onesparse.scalar_mult     | 
+ onesparse | *    | scalar           | smallint         | scalar           | onesparse.scalar_mult     | 
+ onesparse | *    | scalar           | vector           | vector           | onesparse.times_first_op  | 
+ onesparse | *    | smallint         | scalar           | smallint         | onesparse.mult_scalar     | 
+ onesparse | *    | vector           | scalar           | vector           | onesparse.times_second_op | 
+ onesparse | +    | bigint           | scalar           | bigint           | onesparse.plus_scalar     | 
+ onesparse | +    | double precision | scalar           | double precision | onesparse.plus_scalar     | 
+ onesparse | +    | integer          | scalar           | integer          | onesparse.plus_scalar     | 
+ onesparse | +    | matrix           | scalar           | matrix           | onesparse.plus_second_op  | 
+ onesparse | +    | real             | scalar           | real             | onesparse.plus_scalar     | 
+ onesparse | +    | scalar           | bigint           | scalar           | onesparse.scalar_plus     | 
+ onesparse | +    | scalar           | double precision | scalar           | onesparse.scalar_plus     | 
+ onesparse | +    | scalar           | integer          | scalar           | onesparse.scalar_plus     | 
+ onesparse | +    | scalar           | matrix           | matrix           | onesparse.plus_first_op   | 
+ onesparse | +    | scalar           | real             | scalar           | onesparse.scalar_plus     | 
+ onesparse | +    | scalar           | smallint         | scalar           | onesparse.scalar_plus     | 
+ onesparse | +    | scalar           | vector           | vector           | onesparse.plus_first_op   | 
+ onesparse | +    | smallint         | scalar           | smallint         | onesparse.plus_scalar     | 
+ onesparse | +    | vector           | scalar           | vector           | onesparse.plus_second_op  | 
+ onesparse | -    | bigint           | scalar           | bigint           | onesparse.minus_scalar    | 
+ onesparse | -    | double precision | scalar           | double precision | onesparse.minus_scalar    | 
+ onesparse | -    | integer          | scalar           | integer          | onesparse.minus_scalar    | 
+ onesparse | -    | matrix           | scalar           | matrix           | onesparse.minus_second_op | 
+ onesparse | -    | real             | scalar           | real             | onesparse.minus_scalar    | 
+ onesparse | -    | scalar           | bigint           | scalar           | onesparse.scalar_minus    | 
+ onesparse | -    | scalar           | double precision | scalar           | onesparse.scalar_minus    | 
+ onesparse | -    | scalar           | integer          | scalar           | onesparse.scalar_minus    | 
+ onesparse | -    | scalar           | matrix           | matrix           | onesparse.minus_first_op  | 
+ onesparse | -    | scalar           | real             | scalar           | onesparse.scalar_minus    | 
+ onesparse | -    | scalar           | smallint         | scalar           | onesparse.scalar_minus    | 
+ onesparse | -    | scalar           | vector           | vector           | onesparse.minus_first_op  | 
+ onesparse | -    | smallint         | scalar           | smallint         | onesparse.minus_scalar    | 
+ onesparse | -    | vector           | scalar           | vector           | onesparse.minus_second_op | 
+ onesparse | /    | bigint           | scalar           | bigint           | onesparse.div_scalar      | 
+ onesparse | /    | double precision | scalar           | double precision | onesparse.div_scalar      | 
+ onesparse | /    | integer          | scalar           | integer          | onesparse.div_scalar      | 
+ onesparse | /    | matrix           | scalar           | matrix           | onesparse.div_second_op   | 
+ onesparse | /    | real             | scalar           | real             | onesparse.div_scalar      | 
+ onesparse | /    | scalar           | bigint           | scalar           | onesparse.scalar_div      | 
+ onesparse | /    | scalar           | double precision | scalar           | onesparse.scalar_div      | 
+ onesparse | /    | scalar           | integer          | scalar           | onesparse.scalar_div      | 
+ onesparse | /    | scalar           | matrix           | matrix           | onesparse.div_first_op    | 
+ onesparse | /    | scalar           | real             | scalar           | onesparse.scalar_div      | 
+ onesparse | /    | scalar           | smallint         | scalar           | onesparse.scalar_div      | 
+ onesparse | /    | scalar           | vector           | vector           | onesparse.div_first_op    | 
+ onesparse | /    | smallint         | scalar           | smallint         | onesparse.div_scalar      | 
+ onesparse | /    | vector           | scalar           | vector           | onesparse.div_second_op   | 
+ onesparse | @    | matrix           | matrix           | matrix           | mxm_op                    | 
+ onesparse | @    | matrix           | vector           | vector           | mxv_op                    | 
+ onesparse | @    | vector           | matrix           | vector           | vxm_op                    | 
+ onesparse | |*   | matrix           | matrix           | matrix           | onesparse.eadd_times_op   | 
+ onesparse | |*   | vector           | vector           | vector           | onesparse.eadd_times_op   | 
+ onesparse | |+   | matrix           | matrix           | matrix           | onesparse.eadd_plus_op    | 
+ onesparse | |+   | vector           | vector           | vector           | onesparse.eadd_plus_op    | 
+ onesparse | |-   | matrix           | matrix           | matrix           | onesparse.eadd_minus_op   | 
+ onesparse | |-   | vector           | vector           | vector           | onesparse.eadd_minus_op   | 
+ onesparse | |/   | matrix           | matrix           | matrix           | onesparse.eadd_div_op     | 
+ onesparse | |/   | vector           | vector           | vector           | onesparse.eadd_div_op     | 
+(75 rows)
 

@@ -1,4 +1,4 @@
-# Matrix Documentation
+# Matrix
 
 This documentation is also tests for the code, the examples below
 show the literal output of these statements from Postgres.
@@ -32,7 +32,7 @@ of actually useful elements in a Matrix.  They can be dense or
 sparse, the SuiteSparse library will adapt to choose the right
 backend format.
 
-# Matrices and Graphs
+## Matrices and Graphs
 
 Every matrix is a graph, whether you think of it that way or not.
 And every graph has a corresponding matrix.  The data that you put
@@ -76,7 +76,7 @@ given row or column position, no memory is consumed.  This is the
 unbounded row by unbounded column matrix without exhausting memory
 trying to allocate `2^120` entries.
 
-# Drawing Matrices and Vectors
+## Drawing Matrices and Vectors
 
 The `draw()` function turns a matrix into the Graphviz DOT language
 that is used to draw graph diagrams:
@@ -157,7 +157,7 @@ select * from test_fixture;
 │ d            │ int32(4:4)[0:0:1 0:1:1 0:2:1 0:3:1 1:0:1 1:1:1 1:2:1 1:3:1 2:0:1 2:1:1 2:2:1 2:3:1 3:0:1 3:1:1 3:2:1 3:3:1] │
 │ s            │ int32(2:2)[0:0:1 0:1:1 1:1:1]                                                                               │
 │ u            │ int32(4)[1:2]                                                                                               │
-│ v            │ int32(4)[2:3]                                                                                               │
+│ v            │ int32(4)[1:3 2:3]                                                                                           │
 │ unaryop      │ ainv_int32                                                                                                  │
 │ indexunaryop │ valuegt_int32                                                                                               │
 │ binaryop     │ times_int32                                                                                                 │
@@ -389,7 +389,7 @@ select print(u) as u, print(v) as v from test_fixture;
 │           │           │
 │    ───    │    ───    │
 │  0│       │  0│       │
-│  1│  2    │  1│       │
+│  1│  2    │  1│  3    │
 │  2│       │  2│  3    │
 │  3│       │  3│       │
 │           │           │
@@ -445,24 +445,25 @@ select print(u) as u, print(v) as v from test_fixture;
         <!-- Diagram B -->
 <div>
 <!-- Title: vector Pages: 1 -->
-<svg width="70pt" height="177pt"
- viewBox="0.00 0.00 70.00 177.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 173)">
+<svg width="70pt" height="190pt"
+ viewBox="0.00 0.00 70.00 190.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 186)">
 <title>vector</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-173 66,-173 66,4 -4,4"/>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-186 66,-186 66,4 -4,4"/>
 <g id="clust1" class="cluster">
 <title>cluster_vector</title>
-<polygon fill="lightgray" stroke="black" stroke-dasharray="5,2" points="8,-8 8,-161 54,-161 54,-8 8,-8"/>
+<polygon fill="lightgray" stroke="black" stroke-dasharray="5,2" points="8,-8 8,-174 54,-174 54,-8 8,-8"/>
 </g>
 <!-- node0 -->
 <g id="node1" class="node">
 <title>node0</title>
-<polygon fill="none" stroke="black" points="33,-153 29,-153 29,-149 33,-149 33,-153"/>
+<polygon fill="none" stroke="black" points="33,-166 29,-166 29,-162 33,-162 33,-166"/>
 </g>
 <!-- node1 -->
 <g id="node2" class="node">
 <title>node1</title>
-<polygon fill="none" stroke="black" points="33,-113 29,-113 29,-109 33,-109 33,-113"/>
+<polygon fill="none" stroke="black" points="46,-126 16,-126 16,-109 46,-109 46,-126"/>
+<text text-anchor="middle" x="31" y="-115.6" font-family="Times,serif" font-size="8.00">1:3</text>
 </g>
 <!-- node0&#45;&gt;node1 -->
 <!-- node2 -->
@@ -674,7 +675,7 @@ The `matrix` data type wraps a SuiteSparse GrB_Matrix handle and
 delegates functions from SQL to the library through instances of
 this type.
 
-# Empty Matrices
+## Empty Matrices
 
 An empty matrix can be constructed many ways, but one of the
 simplest is casting a type code to the matrix type.  In this case
@@ -701,7 +702,7 @@ select matrix('int32');
 (1 row)
 
 ```
-# Matrix dimensions
+## Matrix dimensions
 
 The above matrices are "unbounded", they do not have a fixed number
 of rows and/or columns.  The default possible number of rows and
@@ -810,7 +811,7 @@ select 'int32[1:2:1 2:3:2 3:1:3]'::matrix,
 (1 row)
 
 ```
-# Elements
+## Elements
 
 All the elements in a matrix can be iterated with the `elements()`
 function:
@@ -909,7 +910,7 @@ select get_element(a, 3, 3) as get_element from test_fixture;
 (1 row)
 
 ```
-# Random Matrices
+## Random Matrices
 
 `random_matrix` will generate a random matrix provided the type,
 number of rows, number of columns, and the number of (approximate)
@@ -1094,7 +1095,7 @@ This random matrix is also a random *graph*:
 </svg>
 </div>
 
-# Elementwise Addition
+## Elementwise Addition
 
 The GraphBLAS API has elementwise operations on matrices that
 operate pairs of matrices.  `eadd` computes the element-wise
@@ -1120,19 +1121,10 @@ select print(a) as a, binaryop, print(b) as b, print(eadd(a, b, binaryop)) as ea
 Eadd can also be accomplished with the '+' operator:
 ``` postgres-console
 select print(a) as a, binaryop, print(b) as b, print(a + b) as eadd from test_fixture;
-┌────────────────────┬─────────────┬────────────────────┬────────────────────┐
-│         a          │  binaryop   │         b          │        eadd        │
-├────────────────────┼─────────────┼────────────────────┼────────────────────┤
-│      0  1  2  3    │ times_int32 │      0  1  2  3    │      0  1  2  3    │
-│    ────────────    │             │    ────────────    │    ────────────    │
-│  0│        0  3    │             │  0│           4    │  0│        0 12    │
-│  1│  2     1  0    │             │  1│        3  1    │  1│  2     3  0    │
-│  2│  2  2          │             │  2│     2     4    │  2│  2  4     4    │
-│  3│  2     1       │             │  3│     0  2       │  3│  2  0  2       │
-│                    │             │                    │                    │
-└────────────────────┴─────────────┴────────────────────┴────────────────────┘
-(1 row)
-
+ERROR:  operator does not exist: matrix + matrix
+LINE 1: ...t print(a) as a, binaryop, print(b) as b, print(a + b) as ea...
+                                                             ^
+HINT:  No operator matches the given name and argument types. You might need to add explicit type casts.
 ```
 From a graph standpoint, elementwise addition can be seen as the
 merging ("union") of two graphs, such that the result has edges
@@ -1447,7 +1439,7 @@ with the provided binary operator.
     </td>
   </tr>
 </table>
-# Elementwise Multiplication
+## Elementwise Multiplication
 
 `emult` multiplies elements of two matrices, taking only the
 intersection of common elements in both matrices, if an element is
@@ -1472,19 +1464,10 @@ select print(a) as a, binaryop, print(b) as b, print(emult(a, b, binaryop)) as e
 Emult can also be accomplished with the '*' operator:
 ``` postgres-console
 select print(a) as a, binaryop, print(b) as b, print(a * b) as emult from test_fixture;
-┌────────────────────┬─────────────┬────────────────────┬────────────────────┐
-│         a          │  binaryop   │         b          │       emult        │
-├────────────────────┼─────────────┼────────────────────┼────────────────────┤
-│      0  1  2  3    │ times_int32 │      0  1  2  3    │      0  1  2  3    │
-│    ────────────    │             │    ────────────    │    ────────────    │
-│  0│        0  3    │             │  0│           4    │  0│          12    │
-│  1│  2     1  0    │             │  1│        3  1    │  1│        3  0    │
-│  2│  2  2          │             │  2│     2     4    │  2│     4          │
-│  3│  2     1       │             │  3│     0  2       │  3│        2       │
-│                    │             │                    │                    │
-└────────────────────┴─────────────┴────────────────────┴────────────────────┘
-(1 row)
-
+ERROR:  operator does not exist: matrix * matrix
+LINE 1: ...t print(a) as a, binaryop, print(b) as b, print(a * b) as em...
+                                                             ^
+HINT:  No operator matches the given name and argument types. You might need to add explicit type casts.
 ```
 From a graph standpoint, elementwise multiplication can be seen as
 the intersection of two graphs, such that the result has edges that
@@ -1757,7 +1740,7 @@ provided binary operator.
     </td>
   </tr>
 </table>
-# Elementwise Union
+## Elementwise Union
 
 `eunion` is like `eadd` but differs in how the binary op is
 applied. A pair of scalars, `alpha` and `beta` define the inputs to
@@ -2095,7 +2078,7 @@ the edge is combined with scalar `beta`.
     </td>
   </tr>
 </table>
-# Reduction
+## Reduction
 
 The entire matrix can be reduced to a scalar value:
 ``` postgres-console
@@ -2167,7 +2150,7 @@ select print(a) as a, 'plus_monoid_int32' as monoid, print(reduce_vector(a, desc
 (1 row)
 
 ```
-# Matrix Matrix Multiplication
+## Matrix Matrix Multiplication
 
 Matrix Multiplication is the heart of linear algebra.  All matrix
 multiplication happens over a semiring.  For the most common form
@@ -2511,7 +2494,7 @@ select print(a) as a, '@' as "@", print(b) as b, print(a @ b) as mxm from test_f
 (1 row)
 
 ```
-# Matrix Vector Multiplication
+## Matrix Vector Multiplication
 
 Matrices can be multipled by vectors on the right taking the linear
 combination of the matrices columns using the vectors elements as
@@ -2743,7 +2726,7 @@ select print(a) as a, '@' as "@", print(u) as u, print(a @ u) as mxv from test_f
 (1 row)
 
 ```
-# Vector Matrix Multiplication
+## Vector Matrix Multiplication
 
 Matrices can be multipled by vectors on the right taking the linear
 combination of the matrices rows using the vectors elements as
@@ -2756,9 +2739,9 @@ select print(v) as v, semiring, print(b) as b, print(vxm(v, b, semiring)) as vxm
 │           │ plus_times_int32 │      0  1  2  3    │           │
 │    ───    │                  │    ────────────    │    ───    │
 │  0│       │                  │  0│           4    │  0│       │
-│  1│       │                  │  1│        3  1    │  1│  6    │
-│  2│  3    │                  │  2│     2     4    │  2│       │
-│  3│       │                  │  3│     0  2       │  3│ 12    │
+│  1│  3    │                  │  1│        3  1    │  1│  6    │
+│  2│  3    │                  │  2│     2     4    │  2│  9    │
+│  3│       │                  │  3│     0  2       │  3│ 15    │
 │           │                  │                    │           │
 └───────────┴──────────────────┴────────────────────┴───────────┘
 (1 row)
@@ -2774,24 +2757,25 @@ edges.
         <!-- Diagram A -->
 <div>
 <!-- Title: vector Pages: 1 -->
-<svg width="70pt" height="177pt"
- viewBox="0.00 0.00 70.00 177.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 173)">
+<svg width="70pt" height="190pt"
+ viewBox="0.00 0.00 70.00 190.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 186)">
 <title>vector</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-173 66,-173 66,4 -4,4"/>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-186 66,-186 66,4 -4,4"/>
 <g id="clust1" class="cluster">
 <title>cluster_vector</title>
-<polygon fill="lightgray" stroke="black" stroke-dasharray="5,2" points="8,-8 8,-161 54,-161 54,-8 8,-8"/>
+<polygon fill="lightgray" stroke="black" stroke-dasharray="5,2" points="8,-8 8,-174 54,-174 54,-8 8,-8"/>
 </g>
 <!-- node0 -->
 <g id="node1" class="node">
 <title>node0</title>
-<polygon fill="none" stroke="black" points="33,-153 29,-153 29,-149 33,-149 33,-153"/>
+<polygon fill="none" stroke="black" points="33,-166 29,-166 29,-162 33,-162 33,-166"/>
 </g>
 <!-- node1 -->
 <g id="node2" class="node">
 <title>node1</title>
-<polygon fill="none" stroke="black" points="33,-113 29,-113 29,-109 33,-109 33,-113"/>
+<polygon fill="none" stroke="black" points="46,-126 16,-126 16,-109 46,-109 46,-126"/>
+<text text-anchor="middle" x="31" y="-115.6" font-family="Times,serif" font-size="8.00">1:3</text>
 </g>
 <!-- node0&#45;&gt;node1 -->
 <!-- node2 -->
@@ -2905,38 +2889,39 @@ edges.
         <!-- Diagram C -->
 <div>
 <!-- Title: vector Pages: 1 -->
-<svg width="76pt" height="190pt"
- viewBox="0.00 0.00 76.00 190.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 186)">
+<svg width="76pt" height="203pt"
+ viewBox="0.00 0.00 76.00 203.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 199)">
 <title>vector</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-186 72,-186 72,4 -4,4"/>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-199 72,-199 72,4 -4,4"/>
 <g id="clust1" class="cluster">
 <title>cluster_vector</title>
-<polygon fill="lightgray" stroke="black" stroke-dasharray="5,2" points="8,-8 8,-174 60,-174 60,-8 8,-8"/>
+<polygon fill="lightgray" stroke="black" stroke-dasharray="5,2" points="8,-8 8,-187 60,-187 60,-8 8,-8"/>
 </g>
 <!-- node0 -->
 <g id="node1" class="node">
 <title>node0</title>
-<polygon fill="none" stroke="black" points="36,-166 32,-166 32,-162 36,-162 36,-166"/>
+<polygon fill="none" stroke="black" points="36,-179 32,-179 32,-175 36,-175 36,-179"/>
 </g>
 <!-- node1 -->
 <g id="node2" class="node">
 <title>node1</title>
-<polygon fill="none" stroke="black" points="49,-126 19,-126 19,-109 49,-109 49,-126"/>
-<text text-anchor="middle" x="34" y="-115.6" font-family="Times,serif" font-size="8.00">1:6</text>
+<polygon fill="none" stroke="black" points="49,-139 19,-139 19,-122 49,-122 49,-139"/>
+<text text-anchor="middle" x="34" y="-128.6" font-family="Times,serif" font-size="8.00">1:6</text>
 </g>
 <!-- node0&#45;&gt;node1 -->
 <!-- node2 -->
 <g id="node3" class="node">
 <title>node2</title>
-<polygon fill="none" stroke="black" points="36,-73 32,-73 32,-69 36,-69 36,-73"/>
+<polygon fill="none" stroke="black" points="49,-86 19,-86 19,-69 49,-69 49,-86"/>
+<text text-anchor="middle" x="34" y="-75.6" font-family="Times,serif" font-size="8.00">2:9</text>
 </g>
 <!-- node1&#45;&gt;node2 -->
 <!-- node3 -->
 <g id="node4" class="node">
 <title>node3</title>
 <polygon fill="none" stroke="black" points="51.5,-33 16.5,-33 16.5,-16 51.5,-16 51.5,-33"/>
-<text text-anchor="middle" x="34" y="-22.6" font-family="Times,serif" font-size="8.00">3:12</text>
+<text text-anchor="middle" x="34" y="-22.6" font-family="Times,serif" font-size="8.00">3:15</text>
 </g>
 <!-- node2&#45;&gt;node3 -->
 </g>
@@ -2955,15 +2940,15 @@ select print(v) as v, '@' as "@", print(b) as b, print(v @ b) as vxm from test_f
 │           │ @ │      0  1  2  3    │           │
 │    ───    │   │    ────────────    │    ───    │
 │  0│       │   │  0│           4    │  0│       │
-│  1│       │   │  1│        3  1    │  1│  6    │
-│  2│  3    │   │  2│     2     4    │  2│       │
-│  3│       │   │  3│     0  2       │  3│ 12    │
+│  1│  3    │   │  1│        3  1    │  1│  6    │
+│  2│  3    │   │  2│     2     4    │  2│  9    │
+│  3│       │   │  3│     0  2       │  3│ 15    │
 │           │   │                    │           │
 └───────────┴───┴────────────────────┴───────────┘
 (1 row)
 
 ```
-# Element Selection
+## Element Selection
 
 The `selection` method calls the `GrB_select()` API function.  The
 name `selection` was chosen not to conflict with the SQL keyword
@@ -3455,7 +3440,7 @@ select draw(random_matrix(8, 8, 16, seed=>0.42, max=>42)) as uop_a_source,
     </td>
   </tr>
 </table>
-# Kronecker
+## Kronecker
 
 The `kronecker()` function takes two input matrices, and replaces
 every element in the second matrix with a new submatrix of the
@@ -3680,7 +3665,7 @@ select print(s) as s, semiring, print(s) as s, print(kronecker(s, s, semiring)) 
     </td>
   </tr>
 </table>
-# Kronecker Power
+## Kronecker Power
 
 here's a special function for exponentiating a matrix to itself
 a certain number of times, `kronpower`.:
@@ -3725,7 +3710,7 @@ select nvals(kronpower(s, 3)) from test_fixture;
 (1 row)
 
 ```
-# Transpose
+## Transpose
 
 A matrix can be transposed with the `transpose()` function:
 ``` postgres-console
@@ -3744,7 +3729,7 @@ select print(transpose(a)) from test_fixture;
 (1 row)
 
 ```
-# Apply
+## Apply
 
 `apply` takes an operator of type `unaryop` and applies it to every
 element of the matrix.  The 'ainv_int32' returned the additive
@@ -3765,7 +3750,7 @@ select print(a) as a, unaryop, print(apply(a, unaryop)) as applied from test_fix
 (1 row)
 
 ```
-# SuiteSparse Info
+## SuiteSparse Info
 
 The `info` function returns a descripton of the matrix from
 SuiteSparse.
@@ -3783,7 +3768,7 @@ select info(a) from test_fixture;
 (1 row)
 
 ```
-# Matrix Duplication
+## Matrix Duplication
 
 The `dup` function duplicates a matrix returning a new matrix
 object with the same values:
@@ -3797,7 +3782,7 @@ select dup(a) from test_fixture;
 (1 row)
 
 ```
-# Work Completion
+## Work Completion
 
 The `wait` method is used to "complete" a matrix, which may have
 pending operations waiting to be performed when using the default
@@ -3815,7 +3800,7 @@ select wait('int32[2:2:2 3:3:3 1:1:1]'::matrix);
 ```
 The `clear` function clears the matrix of all elements and returns
 the same object, but empty.  The dimensions do not change:
-# Clearing Matrices
+## Clearing Matrices
 
 ``` postgres-console
 select clear('int32[1:1:1 2:2:2 3:3:3]'::matrix);
@@ -3827,7 +3812,7 @@ select clear('int32[1:1:1 2:2:2 3:3:3]'::matrix);
 (1 row)
 
 ```
-# Extra tests
+## Extra tests
 
 This documentation also forms the basis for the onesparse tests,
 These tests run the documentation against a live server, all the

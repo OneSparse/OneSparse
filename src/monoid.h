@@ -1,7 +1,7 @@
 #ifndef OS_MONOID_H
 #define OS_MONOID_H
 
-#define monoid_MAGIC 689276813
+#define monoid_MAGIC 689276819
 
 typedef struct os_FlatMonoid {
     int32 vl_len_;

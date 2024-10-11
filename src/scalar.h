@@ -1,7 +1,7 @@
 #ifndef OS_SCALAR_H
 #define OS_SCALAR_H
 
-#define scalar_MAGIC 689276813
+#define scalar_MAGIC 689276815
 
 typedef struct os_FlatScalar {
     int32 vl_len_;

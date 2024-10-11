@@ -1,7 +1,7 @@
 #ifndef OS_BINARYOP_H
 #define OS_BINARYOP_H
 
-#define binaryop_MAGIC 689276813
+#define binaryop_MAGIC 689276816
 
 typedef struct os_FlatBinaryOp {
     int32 vl_len_;

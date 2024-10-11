@@ -1,7 +1,7 @@
 #ifndef OS_DESCRIPTOR_H
 #define OS_DESCRIPTOR_H
 
-#define descriptor_MAGIC 689276813
+#define descriptor_MAGIC 689276817
 
 typedef struct os_FlatDescriptor {
     int32 vl_len_;

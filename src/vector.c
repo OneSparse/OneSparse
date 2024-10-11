@@ -22,13 +22,15 @@ PG_FUNCTION_INFO_V1(vector_size);
 PG_FUNCTION_INFO_V1(vector_wait);
 PG_FUNCTION_INFO_V1(vector_dup);
 PG_FUNCTION_INFO_V1(vector_clear);
-PG_FUNCTION_INFO_V1(vector_ewise_add);
-PG_FUNCTION_INFO_V1(vector_ewise_mult);
-PG_FUNCTION_INFO_V1(vector_ewise_union);
+PG_FUNCTION_INFO_V1(vector_eadd);
+PG_FUNCTION_INFO_V1(vector_emult);
+PG_FUNCTION_INFO_V1(vector_eunion);
 PG_FUNCTION_INFO_V1(vector_reduce_scalar);
 PG_FUNCTION_INFO_V1(vector_assign);
 PG_FUNCTION_INFO_V1(vector_select);
 PG_FUNCTION_INFO_V1(vector_apply);
+PG_FUNCTION_INFO_V1(vector_apply_first);
+PG_FUNCTION_INFO_V1(vector_apply_second);
 PG_FUNCTION_INFO_V1(vector_get_element);
 PG_FUNCTION_INFO_V1(vector_set_element);
 PG_FUNCTION_INFO_V1(vector_remove_element);
@@ -77,7 +79,6 @@ static void flatten_vector(
 	os_Vector *vector;
 	os_FlatVector *flat;
 	void* data;
-//	void (*free_function)(void *p);
 
 	LOGF();
 
@@ -547,65 +548,68 @@ Datum vector_size(PG_FUNCTION_ARGS)
 	PG_RETURN_INT64(result);
 }
 
-Datum vector_ewise_add(PG_FUNCTION_ARGS)
+Datum vector_eadd(PG_FUNCTION_ARGS)
 {
-	GrB_Type type, utype, vtype;
-	os_Vector *u, *v, *w, *mask;
-	os_Descriptor *descriptor;
-	os_BinaryOp *op, *accum;
+	GrB_Type wtype, utype, vtype;
+	os_Vector *u, *v, *w;
+	GrB_Vector mask;
+	GrB_Descriptor descriptor;
+	GrB_BinaryOp op, accum;
 	GrB_Index usize;
 	int nargs;
 
 	LOGF();
 	ERRORNULL(0);
 	ERRORNULL(1);
-	ERRORNULL(2);
 
 	u = OS_GETARG_VECTOR(0);
 	v = OS_GETARG_VECTOR(1);
-	op = OS_GETARG_BINARYOP(2);
-
-	mask = NULL;
-	accum = NULL;
-	descriptor = NULL;
 	nargs = PG_NARGS();
+
+	OS_VTYPE(utype, u);
+	OS_VTYPE(vtype, v);
+	wtype = type_promote(utype, vtype);
+
+	op = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 2);
+	if (op == NULL)
+	{
+		op = default_binaryop(wtype);
+	}
 
 	if (nargs > 3)
 	{
 		if (PG_ARGISNULL(3))
 		{
-			OS_VTYPE(utype, u);
-			OS_VTYPE(vtype, v);
 			OS_VSIZE(usize, u);
-			type = type_promote(utype, vtype);
-			w = new_vector(type, usize, CurrentMemoryContext, NULL);
+			w = new_vector(wtype, usize, CurrentMemoryContext, NULL);
 		}
 		else
 			w = OS_GETARG_VECTOR(3);
 	}
-	mask = OS_GETARG_VECTOR_OR_NULL(nargs, 4);
-	accum = OS_GETARG_BINARYOP_OR_NULL(nargs, 5);
-	descriptor = OS_GETARG_DESCRIPTOR_OR_NULL(nargs, 6);
+	mask = OS_GETARG_VECTOR_HANDLE_OR_NULL(nargs, 4);
+	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 5);
+	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 6);
 
 	OS_CHECK(GrB_eWiseAdd(w->vector,
-					   mask ? mask->vector : NULL,
-					   accum ? accum->binaryop : NULL,
-					   op->binaryop,
-						 u->vector,
-					   v->vector,
-					   descriptor ? descriptor->descriptor : NULL),
-		  w->vector,
-		  "Error vector eWiseAdd.");
+						  mask,
+						  accum,
+						  op,
+						  u->vector,
+						  v->vector,
+						  descriptor),
+			 w->vector,
+			 "Error vector eWiseAdd.");
 
 	OS_RETURN_VECTOR(w);
 }
 
-Datum vector_ewise_mult(PG_FUNCTION_ARGS)
+Datum vector_emult(PG_FUNCTION_ARGS)
 {
-	GrB_Type type, utype, vtype;
-	os_Vector *u, *v, *w, *mask;
-	os_Descriptor *descriptor;
-	os_BinaryOp *op, *accum;
+	GrB_Type wtype, utype, vtype;
+	os_Vector *u, *v, *w;
+	GrB_Vector mask;
+	GrB_Descriptor descriptor;
+	GrB_BinaryOp op, accum;
 	GrB_Index usize;
 	int nargs;
 
@@ -613,54 +617,56 @@ Datum vector_ewise_mult(PG_FUNCTION_ARGS)
 
 	ERRORNULL(0);
 	ERRORNULL(1);
-	ERRORNULL(2);
 
 	u = OS_GETARG_VECTOR(0);
 	v = OS_GETARG_VECTOR(1);
-	op = OS_GETARG_BINARYOP(2);
-
-	mask = NULL;
-	accum = NULL;
-	descriptor = NULL;
 	nargs = PG_NARGS();
+
+	OS_VTYPE(utype, u);
+	OS_VTYPE(vtype, v);
+	wtype = type_promote(utype, vtype);
+
+	op = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 2);
+	if (op == NULL)
+	{
+		op = default_binaryop(wtype);
+	}
 
 	if (nargs > 3)
 	{
 		if (PG_ARGISNULL(3))
 		{
-			OS_VTYPE(utype, u);
-			OS_VTYPE(vtype, v);
 			OS_VSIZE(usize, u);
-			type = type_promote(utype, vtype);
-			w = new_vector(type, usize, CurrentMemoryContext, NULL);
+			w = new_vector(wtype, usize, CurrentMemoryContext, NULL);
 		}
 		else
 			w = OS_GETARG_VECTOR(3);
 	}
-	mask = OS_GETARG_VECTOR_OR_NULL(nargs, 4);
-	accum = OS_GETARG_BINARYOP_OR_NULL(nargs, 5);
-	descriptor = OS_GETARG_DESCRIPTOR_OR_NULL(nargs, 6);
+	mask = OS_GETARG_VECTOR_HANDLE_OR_NULL(nargs, 4);
+	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 5);
+	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 6);
 
 	OS_CHECK(GrB_eWiseMult(w->vector,
-						mask ? mask->vector : NULL,
-						accum ? accum->binaryop : NULL,
-						op->binaryop,
-						u->vector,
-						v->vector,
-						descriptor ? descriptor->descriptor : NULL),
-		  w->vector,
-		  "Error vector eWiseMult.");
+						   mask,
+						   accum,
+						   op,
+						   u->vector,
+						   v->vector,
+						   descriptor),
+			 w->vector,
+			 "Error vector eWiseMult.");
 
 	OS_RETURN_VECTOR(w);
 }
 
-Datum vector_ewise_union(PG_FUNCTION_ARGS)
+Datum vector_eunion(PG_FUNCTION_ARGS)
 {
-	GrB_Type type, utype, vtype;
-	os_Vector *u, *v, *w, *mask;
+	GrB_Type wtype, utype, vtype;
+	os_Vector *u, *v, *w;
+	GrB_Vector mask;
 	os_Scalar *a, *b;
-	os_Descriptor *descriptor;
-	os_BinaryOp *op, *accum;
+	GrB_Descriptor descriptor;
+	GrB_BinaryOp op, accum;
 	GrB_Index usize;
 	int nargs;
 
@@ -669,48 +675,48 @@ Datum vector_ewise_union(PG_FUNCTION_ARGS)
 	ERRORNULL(1);
 	ERRORNULL(2);
 	ERRORNULL(3);
-	ERRORNULL(4);
 
 	u = OS_GETARG_VECTOR(0);
 	a = OS_GETARG_SCALAR(1);
 	v = OS_GETARG_VECTOR(2);
 	b = OS_GETARG_SCALAR(3);
-	op = OS_GETARG_BINARYOP(4);
-
-	mask = NULL;
-	accum = NULL;
-	descriptor = NULL;
 	nargs = PG_NARGS();
+
+	OS_VTYPE(utype, u);
+	OS_VTYPE(vtype, v);
+	wtype = type_promote(utype, vtype);
+
+	op = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 4);
+	if (op == NULL)
+	{
+		op = default_binaryop(wtype);
+	}
 
 	if (nargs > 5)
 	{
 		if (PG_ARGISNULL(5))
 		{
-			OS_VTYPE(utype, u);
-			OS_VTYPE(vtype, v);
 			OS_VSIZE(usize, u);
-			type = type_promote(utype, vtype);
-			w = new_vector(type, usize, CurrentMemoryContext, NULL);
+			w = new_vector(wtype, usize, CurrentMemoryContext, NULL);
 		}
 		else
 			w = OS_GETARG_VECTOR(5);
 	}
-	mask = OS_GETARG_VECTOR_OR_NULL(nargs, 6);
-	accum = OS_GETARG_BINARYOP_OR_NULL(nargs, 7);
-	descriptor = OS_GETARG_DESCRIPTOR_OR_NULL(nargs, 8);
+	mask = OS_GETARG_VECTOR_HANDLE_OR_NULL(nargs, 6);
+	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 7);
+	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 8);
 
 	OS_CHECK(GxB_eWiseUnion(w->vector,
-						 mask ? mask->vector : NULL,
-						 accum ? accum->binaryop : NULL,
-						 op->binaryop,
-						 u->vector,
-						 a->scalar,
-						 v->vector,
-						 b->scalar,
-						 descriptor ? descriptor->descriptor : NULL),
-		  w->vector,
-		  "Error vector eWiseUnion.");
-
+							mask,
+							accum,
+							op,
+							u->vector,
+							a->scalar,
+							v->vector,
+							b->scalar,
+							descriptor),
+			 w->vector,
+			 "Error vector eWiseUnion.");
 	OS_RETURN_VECTOR(w);
 }
 
@@ -892,6 +898,112 @@ Datum vector_apply(PG_FUNCTION_ARGS)
 	OS_RETURN_VECTOR(w);
 }
 
+Datum vector_apply_first(PG_FUNCTION_ARGS)
+{
+	GrB_Type type;
+	os_Vector *u, *w;
+	os_Scalar *s;
+	GrB_Vector mask;
+	GrB_Descriptor descriptor;
+	GrB_BinaryOp accum;
+	GrB_BinaryOp binaryop;
+	GrB_Index usize;
+	int nargs;
+
+	LOGF();
+	ERRORNULL(0);
+	ERRORNULL(1);
+
+	nargs = PG_NARGS();
+	s = OS_GETARG_SCALAR(0);
+	u = OS_GETARG_VECTOR(1);
+
+	OS_VTYPE(type, u);
+	binaryop = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 2);
+	if (binaryop == NULL)
+	{
+		binaryop = default_binaryop(type);
+	}
+
+	if (nargs > 3)
+	{
+		if (PG_ARGISNULL(3))
+		{
+			OS_VSIZE(usize, u);
+			w = new_vector(type, usize, CurrentMemoryContext, NULL);
+		}
+		else
+			w = OS_GETARG_VECTOR(3);
+	}
+	mask = OS_GETARG_VECTOR_HANDLE_OR_NULL(nargs, 4);
+	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 5);
+	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 6);
+
+	OS_CHECK(GrB_apply(w->vector,
+					   mask,
+					   accum,
+					   binaryop,
+					   s->scalar,
+					   u->vector,
+					   descriptor),
+			 w->vector,
+			 "Error in grb_vector_apply_binaryop1st");
+	OS_RETURN_VECTOR(w);
+}
+
+Datum vector_apply_second(PG_FUNCTION_ARGS)
+{
+	GrB_Type type;
+	os_Vector *u, *w;
+	os_Scalar *s;
+	GrB_Vector mask;
+	GrB_Descriptor descriptor;
+	GrB_BinaryOp accum;
+	GrB_BinaryOp binaryop;
+	GrB_Index usize;
+	int nargs;
+
+	LOGF();
+	ERRORNULL(0);
+	ERRORNULL(1);
+
+	nargs = PG_NARGS();
+	u = OS_GETARG_VECTOR(0);
+	s = OS_GETARG_SCALAR(1);
+
+	OS_VTYPE(type, u);
+	binaryop = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 2);
+	if (binaryop == NULL)
+	{
+		binaryop = default_binaryop(type);
+	}
+
+	if (nargs > 3)
+	{
+		if (PG_ARGISNULL(3))
+		{
+			OS_VSIZE(usize, u);
+			w = new_vector(type, usize, CurrentMemoryContext, NULL);
+		}
+		else
+			w = OS_GETARG_VECTOR(3);
+	}
+	mask = OS_GETARG_VECTOR_HANDLE_OR_NULL(nargs, 4);
+	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 5);
+	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 6);
+
+	OS_CHECK(GrB_apply(w->vector,
+					   mask,
+					   accum,
+					   binaryop,
+					   u->vector,
+					   s->scalar,
+					   descriptor),
+			 w->vector,
+			 "Error in grb_vector_apply_binaryop1st");
+	OS_RETURN_VECTOR(w);
+}
+
 Datum vector_set_element(PG_FUNCTION_ARGS)
 {
 	os_Vector *vector;
@@ -1037,7 +1149,7 @@ Datum vector_clear(PG_FUNCTION_ARGS)
 	OS_CHECK(GrB_Vector_clear(vector->vector),
 		  vector->vector,
 		  "Error clearing vector.");
-	PG_RETURN_VOID();
+	OS_RETURN_VECTOR(vector);
 }
 
 Datum vector_info(PG_FUNCTION_ARGS) {

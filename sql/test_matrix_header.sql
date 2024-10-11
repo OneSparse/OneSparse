@@ -1,6 +1,6 @@
 \pset linestyle unicode
 \pset border 2
--- # Matrix Documentation
+-- # Matrix
 --
 -- This documentation is also tests for the code, the examples below
 -- show the literal output of these statements from Postgres.
@@ -41,7 +41,7 @@ create extension if not exists onesparse;
 -- sparse, the SuiteSparse library will adapt to choose the right
 -- backend format.
 --
--- # Matrices and Graphs
+-- ## Matrices and Graphs
 --
 -- Every matrix is a graph, whether you think of it that way or not.
 -- And every graph has a corresponding matrix.  The data that you put
@@ -73,7 +73,7 @@ select print('int32(4:4)'::matrix);
 -- trying to allocate `2^120` entries.
 --
 
--- # Drawing Matrices and Vectors
+-- ## Drawing Matrices and Vectors
 --
 -- The `draw()` function turns a matrix into the Graphviz DOT language
 -- that is used to draw graph diagrams:
@@ -132,7 +132,7 @@ select print(s) from test_fixture;
 -- delegates functions from SQL to the library through instances of
 -- this type.
 --
--- # Empty Matrices
+-- ## Empty Matrices
 --
 -- An empty matrix can be constructed many ways, but one of the
 -- simplest is casting a type code to the matrix type.  In this case
@@ -145,7 +145,7 @@ select 'int32'::matrix;
 
 select matrix('int32');
 
--- # Matrix dimensions
+-- ## Matrix dimensions
 --
 -- The above matrices are "unbounded", they do not have a fixed number
 -- of rows and/or columns.  The default possible number of rows and
@@ -205,7 +205,7 @@ select 'int32[1:2:1 2:3:2 3:1:3]'::matrix,
        'int32(4:)[1:2:1 2:3:2 3:1:3]'::matrix,
        'int32(:4)[1:2:1 2:3:2 3:3:1]'::matrix;
 
--- # Elements
+-- ## Elements
 --
 -- All the elements in a matrix can be iterated with the `elements()`
 -- function:
@@ -236,7 +236,7 @@ select get_element(a, 3, 2) as get_element from test_fixture;
 
 select get_element(a, 3, 3) as get_element from test_fixture;
 
--- # Random Matrices
+-- ## Random Matrices
 --
 -- `random_matrix` will generate a random matrix provided the type,
 -- number of rows, number of columns, and the number of (approximate)
@@ -251,7 +251,7 @@ select print(random_matrix(8, 8, 16, seed=>0.42, max=>42)) as random_matrix;
 select draw(random_matrix(8, 8, 16, seed=>0.42, max=>42)) as draw_source \gset
 \i sql/draw.sql
 
--- # Elementwise Addition
+-- ## Elementwise Addition
 --
 -- The GraphBLAS API has elementwise operations on matrices that
 -- operate pairs of matrices.  `eadd` computes the element-wise
@@ -274,7 +274,7 @@ select draw(a) as binop_a_source, draw(b) as binop_b_source, draw(eadd(a, b, bin
 
 \i sql/binop.sql
 
--- # Elementwise Multiplication
+-- ## Elementwise Multiplication
 --
 -- `emult` multiplies elements of two matrices, taking only the
 -- intersection of common elements in both matrices, if an element is
@@ -296,7 +296,7 @@ select draw(a) as binop_a_source, draw(b) as binop_b_source, draw(emult(a, b, bi
 
 \i sql/binop.sql
 
--- # Elementwise Union
+-- ## Elementwise Union
 --
 -- `eunion` is like `eadd` but differs in how the binary op is
 -- applied. A pair of scalars, `alpha` and `beta` define the inputs to
@@ -317,7 +317,7 @@ select draw(a) as binop_a_source, draw(b) as binop_b_source, draw(eunion(a, 3::s
 
 \i sql/binop.sql
 
--- # Reduction
+-- ## Reduction
 --
 -- The entire matrix can be reduced to a scalar value:
 
@@ -337,7 +337,7 @@ select print(a) as a, 'plus_monoid_int32' as monoid, print(reduce_vector(a)) as 
 
 select print(a) as a, 'plus_monoid_int32' as monoid, print(reduce_vector(a, descriptor=>'t0')) as transpose_reduce_vector from test_fixture;
 
--- # Matrix Matrix Multiplication
+-- ## Matrix Matrix Multiplication
 --
 -- Matrix Multiplication is the heart of linear algebra.  All matrix
 -- multiplication happens over a semiring.  For the most common form
@@ -356,7 +356,7 @@ select draw(a) as binop_a_source, draw(b) as binop_b_source, draw(mxm(a, b)) as 
 
 select print(a) as a, '@' as "@", print(b) as b, print(a @ b) as mxm from test_fixture;
 
--- # Matrix Vector Multiplication
+-- ## Matrix Vector Multiplication
 --
 -- Matrices can be multipled by vectors on the right taking the linear
 -- combination of the matrices columns using the vectors elements as
@@ -375,7 +375,7 @@ select draw(a) as binop_a_source, draw(u) as binop_b_source, draw(mxv(a, u)) as 
 
 select print(a) as a, '@' as "@", print(u) as u, print(a @ u) as mxv from test_fixture;
 
--- # Vector Matrix Multiplication
+-- ## Vector Matrix Multiplication
 --
 -- Matrices can be multipled by vectors on the right taking the linear
 -- combination of the matrices rows using the vectors elements as
@@ -395,7 +395,7 @@ select draw(v) as binop_a_source, draw(b) as binop_b_source, draw(vxm(v, b)) as 
 
 select print(v) as v, '@' as "@", print(b) as b, print(v @ b) as vxm from test_fixture;
 
--- # Element Selection
+-- ## Element Selection
 --
 -- The `selection` method calls the `GrB_select()` API function.  The
 -- name `selection` was chosen not to conflict with the SQL keyword
@@ -421,7 +421,7 @@ select draw(random_matrix(8, 8, 16, seed=>0.42, max=>42)) as uop_a_source,
        from test_fixture \gset
 \i sql/uop.sql
 
--- # Kronecker
+-- ## Kronecker
 --
 -- The `kronecker()` function takes two input matrices, and replaces
 -- every element in the second matrix with a new submatrix of the
@@ -435,7 +435,7 @@ select print(s) as s, semiring, print(s) as s, print(kronecker(s, s, semiring)) 
 select draw(s) as binop_a_source, draw(s) as binop_b_source, draw(kronecker(s, s, semiring)) as binop_c_source from test_fixture \gset
 \i sql/binop.sql
 
--- # Kronecker Power
+-- ## Kronecker Power
 --
 --There's a special function for exponentiating a matrix to itself
 -- a certain number of times, `kronpower`.:
@@ -448,13 +448,13 @@ select print(kronpower(s, 2)) from test_fixture;
 
 select nvals(kronpower(s, 3)) from test_fixture;
 
--- # Transpose
+-- ## Transpose
 --
 -- A matrix can be transposed with the `transpose()` function:
 
 select print(transpose(a)) from test_fixture;
 
--- # Apply
+-- ## Apply
 --
 -- `apply` takes an operator of type `unaryop` and applies it to every
 -- element of the matrix.  The 'ainv_int32' returned the additive
@@ -462,21 +462,21 @@ select print(transpose(a)) from test_fixture;
 
 select print(a) as a, unaryop, print(apply(a, unaryop)) as applied from test_fixture;
 
--- # SuiteSparse Info
+-- ## SuiteSparse Info
 --
 -- The `info` function returns a descripton of the matrix from
 -- SuiteSparse.
 
 select info(a) from test_fixture;
 
--- # Matrix Duplication
+-- ## Matrix Duplication
 --
 -- The `dup` function duplicates a matrix returning a new matrix
 -- object with the same values:
 
 select dup(a) from test_fixture;
 
--- # Work Completion
+-- ## Work Completion
 --
 -- The `wait` method is used to "complete" a matrix, which may have
 -- pending operations waiting to be performed when using the default
@@ -488,11 +488,11 @@ select wait('int32[2:2:2 3:3:3 1:1:1]'::matrix);
 -- The `clear` function clears the matrix of all elements and returns
 -- the same object, but empty.  The dimensions do not change:
 
--- # Clearing Matrices
+-- ## Clearing Matrices
 --
 select clear('int32[1:1:1 2:2:2 3:3:3]'::matrix);
 
--- # Extra tests
+-- ## Extra tests
 --
 -- This documentation also forms the basis for the onesparse tests,
 -- These tests run the documentation against a live server, all the

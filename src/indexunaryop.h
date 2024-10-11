@@ -1,7 +1,7 @@
 #ifndef OS_INDEXUNARYOP_H
 #define OS_INDEXUNARYOP_H
 
-#define indexunaryop_MAGIC 689276813
+#define indexunaryop_MAGIC 689276818
 
 typedef struct os_FlatIndexUnaryOp {
     int32 vl_len_;
