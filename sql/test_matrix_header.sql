@@ -261,6 +261,10 @@ select draw(random_matrix(8, 8, 16, seed=>0.42, max=>42)) as draw_source \gset
 
 select print(a) as a, binaryop, print(b) as b, print(eadd(a, b, binaryop)) as eadd from test_fixture;
 
+-- Eadd can also be accomplished with the '+' operator:
+
+select print(a) as a, binaryop, print(b) as b, print(a + b) as eadd from test_fixture;
+
 -- From a graph standpoint, elementwise addition can be seen as the
 -- merging ("union") of two graphs, such that the result has edges
 -- from both graphs.  Any edges that occur in both graphs are merged
@@ -278,6 +282,10 @@ select draw(a) as binop_a_source, draw(b) as binop_b_source, draw(eadd(a, b, bin
 -- result:
 
 select print(a) as a, binaryop, print(b) as b, print(emult(a, b, binaryop)) as emult from test_fixture;
+
+-- Emult can also be accomplished with the '*' operator:
+
+select print(a) as a, binaryop, print(b) as b, print(a * b) as emult from test_fixture;
 
 -- From a graph standpoint, elementwise multiplication can be seen as
 -- the intersection of two graphs, such that the result has edges that
@@ -313,16 +321,21 @@ select draw(a) as binop_a_source, draw(b) as binop_b_source, draw(eunion(a, 3::s
 --
 -- The entire matrix can be reduced to a scalar value:
 
-select print(a) as a, monoid, reduce_scalar(a, monoid) from test_fixture;
+select print(a) as a, 'plus_monoid_int32' as monoid, reduce_scalar(a) from test_fixture;
+
+-- The entire matrix can be reduced to a scalar value with a provided
+-- monoid that changes the reduction operation:
+
+select print(a) as a, 'min_monoid_int32' as monoid, reduce_scalar(a, 'min_monoid_int32') from test_fixture;
 
 -- The matrix can also be reduced to a column vector:
 
-select print(a) as a, monoid, print(reduce_vector(a, monoid)) as reduce_vector from test_fixture;
+select print(a) as a, 'plus_monoid_int32' as monoid, print(reduce_vector(a)) as reduce_vector from test_fixture;
 
 -- To reduce a row vector, specify that the input should be transposed
 -- with the descriptor `t0`:
 
-select print(a) as a, monoid, print(reduce_vector(a, monoid, descriptor=>'t0')) as transpose_reduce_vector from test_fixture;
+select print(a) as a, 'plus_monoid_int32' as monoid, print(reduce_vector(a, descriptor=>'t0')) as transpose_reduce_vector from test_fixture;
 
 -- # Matrix Matrix Multiplication
 --
@@ -435,12 +448,6 @@ select print(kronpower(s, 2)) from test_fixture;
 
 select nvals(kronpower(s, 3)) from test_fixture;
 
--- Let's time how long it takes to make a huge kronecker product:
-
-\timing
-select nvals(kronpower(s, 4)) from test_fixture;
-
-\timing
 -- # Transpose
 --
 -- A matrix can be transposed with the `transpose()` function:

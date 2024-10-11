@@ -5,6 +5,7 @@
  onesparse | *    | bigint           | scalar           | bigint           | onesparse.mult_scalar  | 
  onesparse | *    | double precision | scalar           | double precision | onesparse.mult_scalar  | 
  onesparse | *    | integer          | scalar           | integer          | onesparse.mult_scalar  | 
+ onesparse | *    | matrix           | matrix           | matrix           | emult_op               | 
  onesparse | *    | real             | scalar           | real             | onesparse.mult_scalar  | 
  onesparse | *    | scalar           | bigint           | scalar           | onesparse.scalar_mult  | 
  onesparse | *    | scalar           | double precision | scalar           | onesparse.scalar_mult  | 
@@ -15,6 +16,7 @@
  onesparse | +    | bigint           | scalar           | bigint           | onesparse.plus_scalar  | 
  onesparse | +    | double precision | scalar           | double precision | onesparse.plus_scalar  | 
  onesparse | +    | integer          | scalar           | integer          | onesparse.plus_scalar  | 
+ onesparse | +    | matrix           | matrix           | matrix           | eadd_op                | 
  onesparse | +    | real             | scalar           | real             | onesparse.plus_scalar  | 
  onesparse | +    | scalar           | bigint           | scalar           | onesparse.scalar_plus  | 
  onesparse | +    | scalar           | double precision | scalar           | onesparse.scalar_plus  | 
@@ -45,5 +47,5 @@
  onesparse | @    | matrix           | matrix           | matrix           | mxm_op                 | 
  onesparse | @    | matrix           | vector           | vector           | mxv_op                 | 
  onesparse | @    | vector           | matrix           | vector           | vxm_op                 | 
-(43 rows)
+(45 rows)
 

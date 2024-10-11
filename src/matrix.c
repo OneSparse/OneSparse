@@ -24,9 +24,9 @@ PG_FUNCTION_INFO_V1(matrix_ncols);
 PG_FUNCTION_INFO_V1(matrix_wait);
 PG_FUNCTION_INFO_V1(matrix_dup);
 PG_FUNCTION_INFO_V1(matrix_clear);
-PG_FUNCTION_INFO_V1(matrix_ewise_add);
-PG_FUNCTION_INFO_V1(matrix_ewise_mult);
-PG_FUNCTION_INFO_V1(matrix_ewise_union);
+PG_FUNCTION_INFO_V1(matrix_eadd);
+PG_FUNCTION_INFO_V1(matrix_emult);
+PG_FUNCTION_INFO_V1(matrix_eunion);
 PG_FUNCTION_INFO_V1(matrix_reduce_vector);
 PG_FUNCTION_INFO_V1(matrix_reduce_scalar);
 PG_FUNCTION_INFO_V1(matrix_assign_matrix);
@@ -620,113 +620,126 @@ Datum matrix_ncols(PG_FUNCTION_ARGS)
 	PG_RETURN_INT64(result);
 }
 
-Datum matrix_ewise_add(PG_FUNCTION_ARGS)
+Datum matrix_eadd(PG_FUNCTION_ARGS)
 {
-	GrB_Type utype, vtype, type;
-	os_Matrix *u, *v, *w, *mask;
-	os_Descriptor *descriptor;
-	os_BinaryOp *op, *accum;
+	GrB_Type utype, vtype, wtype;
+	os_Matrix *u, *v, *w;
+	GrB_Matrix mask;
+	GrB_Descriptor descriptor;
+	GrB_BinaryOp op, accum;
 	GrB_Index nrows, ncols;
 	int nargs;
 
 	LOGF();
 	ERRORNULL(0);
 	ERRORNULL(1);
-	ERRORNULL(2);
 
 	nargs = PG_NARGS();
 	u = OS_GETARG_MATRIX(0);
 	v = OS_GETARG_MATRIX(1);
-	op = OS_GETARG_BINARYOP(2);
+
+	OS_MTYPE(utype, u);
+	OS_MTYPE(vtype, v);
+	wtype = type_promote(utype, vtype);
+
+	op = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 2);
+	if (op == NULL)
+	{
+		op = default_binaryop(wtype);
+	}
 
 	if (nargs > 3)
 	{
 		if (PG_ARGISNULL(3))
 		{
-			OS_MTYPE(utype, u);
-			OS_MTYPE(vtype, v);
 			OS_MNROWS(nrows, u);
 			OS_MNCOLS(ncols, u);
-			type = type_promote(utype, vtype);
-			w = new_matrix(type, nrows, ncols, CurrentMemoryContext, NULL);
+			w = new_matrix(wtype, nrows, ncols, CurrentMemoryContext, NULL);
 		}
 		else
 			w = OS_GETARG_MATRIX(3);
 	}
-	mask = OS_GETARG_MATRIX_OR_NULL(nargs, 4);
-	accum = OS_GETARG_BINARYOP_OR_NULL(nargs, 5);
-	descriptor = OS_GETARG_DESCRIPTOR_OR_NULL(nargs, 6);
+	mask = OS_GETARG_MATRIX_HANDLE_OR_NULL(nargs, 4);
+	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 5);
+	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 6);
 
 	OS_CHECK(GrB_eWiseAdd(w->matrix,
-					   mask ? mask->matrix : NULL,
-					   accum ? accum->binaryop : NULL,
-					   op->binaryop,
-					   u->matrix,
-					   v->matrix,
-					   descriptor ? descriptor->descriptor : NULL),
+						  mask,
+						  accum,
+						  op,
+						  u->matrix,
+						  v->matrix,
+						  descriptor),
 		  w->matrix,
 		  "Error matrix eWiseAdd.");
 
 	OS_RETURN_MATRIX(w);
 }
 
-Datum matrix_ewise_mult(PG_FUNCTION_ARGS)
+Datum matrix_emult(PG_FUNCTION_ARGS)
 {
-	GrB_Type utype, vtype, type;
-	os_Matrix *u, *v, *w, *mask;
-	os_Descriptor *descriptor;
-	os_BinaryOp *op, *accum;
+	GrB_Type utype, vtype, wtype;
+	os_Matrix *u, *v, *w;
+	GrB_Matrix mask;
+	GrB_Descriptor descriptor;
+	GrB_BinaryOp op, accum;
 	GrB_Index nrows, ncols;
 	int nargs;
 
 	LOGF();
 	ERRORNULL(0);
 	ERRORNULL(1);
-	ERRORNULL(2);
 
 	nargs = PG_NARGS();
 	u = OS_GETARG_MATRIX(0);
 	v = OS_GETARG_MATRIX(1);
-	op = OS_GETARG_BINARYOP(2);
+	OS_MTYPE(utype, u);
+	OS_MTYPE(vtype, v);
+	wtype = type_promote(utype, vtype);
+
+	op = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 2);
+	if (op == NULL)
+	{
+		op = default_binaryop(wtype);
+	}
 
 	if (nargs > 3)
 	{
 		if (PG_ARGISNULL(3))
 		{
-			OS_MTYPE(utype, u);
-			OS_MTYPE(vtype, v);
 			OS_MNROWS(nrows, u);
 			OS_MNCOLS(ncols, u);
-			type = type_promote(utype, vtype);
-			w = new_matrix(type, nrows, ncols, CurrentMemoryContext, NULL);
+			w = new_matrix(wtype, nrows, ncols, CurrentMemoryContext, NULL);
 		}
 		else
 			w = OS_GETARG_MATRIX(3);
 	}
-	mask = OS_GETARG_MATRIX_OR_NULL(nargs, 4);
-	accum = OS_GETARG_BINARYOP_OR_NULL(nargs, 5);
-	descriptor = OS_GETARG_DESCRIPTOR_OR_NULL(nargs, 6);
+	mask = OS_GETARG_MATRIX_HANDLE_OR_NULL(nargs, 4);
+	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 5);
+	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 6);
 
 	OS_CHECK(GrB_eWiseMult(w->matrix,
-						mask ? mask->matrix : NULL,
-						accum ? accum->binaryop : NULL,
-						  op->binaryop,
-						u->matrix,
-						v->matrix,
-						descriptor ? descriptor->descriptor : NULL),
-		  w->matrix,
-		  "Error matrix eWiseMult.");
+						   mask,
+						   accum,
+						   op,
+						   u->matrix,
+						   v->matrix,
+						   descriptor),
+			 w->matrix,
+			 "Error matrix eWiseMult.");
 
 	OS_RETURN_MATRIX(w);
 }
 
-Datum matrix_ewise_union(PG_FUNCTION_ARGS)
+Datum matrix_eunion(PG_FUNCTION_ARGS)
 {
-	GrB_Type type;
-	os_Matrix *u, *v, *w, *mask;
+	GrB_Type utype, vtype, wtype;
+	os_Matrix *u, *v, *w;
+	GrB_Matrix mask;
 	os_Scalar *a, *b;
-	os_Descriptor *descriptor;
-	os_BinaryOp *op, *accum;
+	GrB_Descriptor descriptor;
+	GrB_BinaryOp op;
+	GrB_BinaryOp accum;
 	GrB_Index nrows, ncols;
 	int nargs;
 
@@ -735,42 +748,48 @@ Datum matrix_ewise_union(PG_FUNCTION_ARGS)
 	ERRORNULL(1);
 	ERRORNULL(2);
 	ERRORNULL(3);
-	ERRORNULL(4);
 
 	nargs = PG_NARGS();
 	u = OS_GETARG_MATRIX(0);
 	a = OS_GETARG_SCALAR(1);
 	v = OS_GETARG_MATRIX(2);
 	b = OS_GETARG_SCALAR(3);
-	op = OS_GETARG_BINARYOP(4);
 
+	OS_MTYPE(utype, u);
+	OS_MTYPE(vtype, v);
+	wtype = type_promote(utype, vtype);
+
+	op = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 4);
+	if (op == NULL)
+	{
+		op = default_binaryop(wtype);
+	}
 	if (nargs > 5)
 	{
 		if (PG_ARGISNULL(5))
 		{
-			OS_MTYPE(type, u);
 			OS_MNROWS(nrows, u);
 			OS_MNCOLS(ncols, u);
-			w = new_matrix(type, nrows, ncols, CurrentMemoryContext, NULL);
+			w = new_matrix(wtype, nrows, ncols, CurrentMemoryContext, NULL);
 		}
 		else
 			w = OS_GETARG_MATRIX(5);
 	}
-	mask = OS_GETARG_MATRIX_OR_NULL(nargs, 6);
-	accum = OS_GETARG_BINARYOP_OR_NULL(nargs, 7);
-	descriptor = OS_GETARG_DESCRIPTOR_OR_NULL(nargs, 8);
+	mask = OS_GETARG_MATRIX_HANDLE_OR_NULL(nargs, 6);
+	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 7);
+	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 8);
 
 	OS_CHECK(GxB_eWiseUnion(w->matrix,
-						 mask ? mask->matrix : NULL,
-						 accum ? accum->binaryop : NULL,
-						 op->binaryop,
-						 u->matrix,
-						 a->scalar,
-						 v->matrix,
-						 b->scalar,
-						 descriptor ? descriptor->descriptor : NULL),
-		  w->matrix,
-		  "Error matrix eWiseUnion.");
+							mask,
+							accum,
+							op,
+							u->matrix,
+							a->scalar,
+							v->matrix,
+							b->scalar,
+							descriptor),
+			 w->matrix,
+			 "Error matrix eWiseUnion.");
 	OS_RETURN_MATRIX(w);
 }
 
@@ -1007,46 +1026,52 @@ Datum matrix_kron(PG_FUNCTION_ARGS)
 Datum matrix_reduce_vector(PG_FUNCTION_ARGS)
 {
 	GrB_Type type;
-	os_Matrix *u;
-	os_Vector *w, *mask;
-	os_Descriptor *descriptor;
-	os_Monoid *op;
-	os_BinaryOp *accum;
+	os_Matrix *a;
+	os_Vector *w;
+	GrB_Vector mask;
+	GrB_Descriptor descriptor;
+	GrB_Monoid monoid;
+	GrB_BinaryOp accum;
 	GrB_Index vsize;
 	int nargs;
 
 	LOGF();
 	ERRORNULL(0);
-	ERRORNULL(1);
 
 	nargs = PG_NARGS();
-	u = OS_GETARG_MATRIX(0);
-	op = OS_GETARG_MONOID(1);
+	a = OS_GETARG_MATRIX(0);
+
+	OS_MTYPE(type, a);
+
+	monoid = OS_GETARG_MONOID_HANDLE_OR_NULL(nargs, 1);
+	if (monoid == NULL)
+	{
+		monoid = default_monoid(type);
+	}
 
 	if (nargs > 2)
 	{
 		if (PG_ARGISNULL(2))
 		{
-			OS_MTYPE(type, u);
-			OS_MNROWS(vsize, u);
+			OS_MNROWS(vsize, a);
 			w = new_vector(type, vsize, CurrentMemoryContext, NULL);
 		}
 		else
 			w = OS_GETARG_VECTOR(2);
 	}
-	mask = OS_GETARG_VECTOR_OR_NULL(nargs, 3);
-	accum = OS_GETARG_BINARYOP_OR_NULL(nargs, 4);
-	descriptor = OS_GETARG_DESCRIPTOR_OR_NULL(nargs, 5);
+	mask = OS_GETARG_VECTOR_HANDLE_OR_NULL(nargs, 3);
+	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 4);
+	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 5);
 
 	OS_CHECK(GrB_Matrix_reduce_Monoid(
-			  w->vector,
-			  mask ? mask->vector : NULL,
-			  accum ? accum->binaryop : NULL,
-			  op->monoid,
-			  u->matrix,
-			  descriptor ? descriptor->descriptor : NULL),
-		  w->vector,
-		  "Error matrix vector reduce.");
+				 w->vector,
+				 mask,
+				 accum,
+				 monoid,
+				 a->matrix,
+				 descriptor),
+			 w->vector,
+			 "Error matrix vector reduce.");
 
 	OS_RETURN_VECTOR(w);
 }
@@ -1054,32 +1079,37 @@ Datum matrix_reduce_vector(PG_FUNCTION_ARGS)
 Datum
 matrix_reduce_scalar(PG_FUNCTION_ARGS)
 {
-	os_Matrix *A;
-	os_Monoid *monoid;
-	os_BinaryOp *accum;
-	os_Descriptor *descriptor;
-	os_Scalar *result;
 	GrB_Type type;
+	os_Matrix *A;
+	GrB_Monoid monoid;
+	GrB_BinaryOp accum;
+	GrB_Descriptor descriptor;
+	os_Scalar *result;
 	int nargs;
 
 	nargs = PG_NARGS();
 	A = OS_GETARG_MATRIX(0);
-	monoid = OS_GETARG_MONOID(1);
-
-	accum = OS_GETARG_BINARYOP_OR_NULL(nargs, 2);
-	descriptor = OS_GETARG_DESCRIPTOR_OR_NULL(nargs, 3);
-
 	OS_MTYPE(type, A);
+
+	monoid = OS_GETARG_MONOID_HANDLE_OR_NULL(nargs, 1);
+	if (monoid == NULL)
+	{
+		monoid = default_monoid(type);
+	}
+
+	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 2);
+	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 3);
+
 	result = new_scalar(type, CurrentMemoryContext, NULL);
 
 	OS_CHECK(GrB_Matrix_reduce_Monoid_Scalar(
-			  result->scalar,
-			  accum ? accum->binaryop : NULL,
-			  monoid->monoid,
-			  A->matrix,
-			  descriptor ? descriptor->descriptor : NULL),
-		  result->scalar,
-		  "Cannot reduce matrix to scalar");
+				 result->scalar,
+				 accum,
+				 monoid,
+				 A->matrix,
+				 descriptor),
+			 result->scalar,
+			 "Cannot reduce matrix to scalar");
 
 	OS_RETURN_SCALAR(result);
 }

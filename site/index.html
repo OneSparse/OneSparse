@@ -109,6 +109,9 @@
 <a href="http://faculty.cse.tamu.edu/davis/GraphBLAS.html">SuiteSparse:GraphBLAS</a>
 Linear Algebra library, exposing it's functionality and new types,
 functions and operators in Postgres.</p>
+<p>Join us in the <a href="https://github.com/OneSparse/OneSparse/discussions">OneSparse Discussions
+Board</a> and say
+hi!.</p>
 <h1 id="tldr-docker-demo">TLDR; Docker Demo</h1>
 <p>Start the onesparse demo docker container, substitute suitable
 password and container name:</p>
@@ -129,8 +132,9 @@ the container:</p>
 </span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>
 </span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>postgres=# 
 </span></code></pre></div>
-<p>See the doctests for some examples for creating matrices and vectors.
-You can verify the doctests with docker using:</p>
+<p>See the <a href="https://onesparse.github.io/OneSparse/">Documentation</a> for
+some examples for creating matrices and vectors.  You can verify the
+doctests with docker using:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>$ docker exec -u postgres -it onesparse-demo-container make installcheck
 </span></code></pre></div>
 <h1 id="summary">Summary</h1>
@@ -145,6 +149,145 @@ hardware architectures, including GPUs, with no changes to your code.</p>
 <p>Join us in the <a href="https://github.com/OneSparse/OneSparse/discussions">OneSparse Discussions
 Board</a> and say
 hi!.</p>
+<p>Like the JSON/JSONB types did for unstructured data, OneSparse makes
+dense and sparse matrices and vectors fully native Postgres
+types. OneSparse supports optimized, parallel matrix multiplication
+and other operations like reduction, selection, assignment,
+extraction, elementwise union, and intersection.  These methods can be
+used for both traditional numeric algebraic computing, or sparse graph
+analytics over adjacency and incidence matrices.</p>
+<p>Like numpy and scipy did for Python, OneSparse transforms Postgres
+into a powerful framework for linear algebra and its infinite industry
+application: mathematics, engineering, economics, machine learning,
+bioinformatics and graph science. Matrix multiplication is as simple
+as 'A @ B', just as in Python.  Leverage SQL for it's power of
+filtering, viewing and aggregating, and use linear algebra for its
+power of abstract reasoning, numeric analytical power, and parallel
+graph analytics.</p>
+<p>GraphBLAS is a sparse linear algebra API optimized for processing
+dense and sparse matrices and in particular graphs encoded as sparse
+matrices and vectors.  In addition to common real/integer matrix
+algebra operations "plus" and "times", GraphBLAS supports many
+different "semiring" algebra operations, that can be used as basic
+building blocks to implement a wide variety of algebraic and graph
+solutions.</p>
+<p>OneSparse Postgres aims to unify the three algebraic paradigms of
+relational, procedural, and algebraic style approaches.  In the image
+below, all three visualization are presenting the same information:
+the tabular form shows rows a relational indicating edge
+relationships, the graphical form shows the procedural approach, and
+the sparse matrix form shows the algebraic approach.</p>
+<p>The diagram below shows the three paradigms of sparse graph
+computation, relational, procedural and algebraic.  Each approach
+contains the exact same information, each edge is represented as an
+element of a table, graph, or matrix.  With OneSparse, programmers can
+choose which approach best fits their needs, and move seamlessly
+between them:</p>
+<p><img alt="Tables, Graphs, and Matrices" src="table_graph_matrix.png" /></p>
+<p>The algebraic approach offers a powerful abstraction over the
+underlying compute architecture used to do the actual work.  Using
+SuiteSparse's powerful built-in JIT compiler, any hardware
+architecture can be targeted with no code changes to the algorithm.
+This cannot be said for the common procedural approach taken by most
+graph libraries and frameworks.</p>
+<p><img alt="The GraphBLAS can be run anywhere" src="run_anywhere.png" /></p>
+<p>OneSparse's goal is to enable and encourage the multi-architecture
+future, where the right hardware is used for the right phase of any
+particularly complex algorithm or data pipeine. By abstracting away
+the specific and highly optimzation sensitive hardware details,
+problem solvers can focus on the problems, and allow hardware
+specialists to optimize for any given architecture:</p>
+<p><img alt="The GraphBLAS abstracts away the hardware" src="algebra_ven.png" /></p>
+<h1 id="why-linear-algebra">Why Linear Algebra?</h1>
+<p>OneSparse brings the power of <a href="https://en.wikipedia.org/wiki/Linear_algebra">Linear
+Algebra</a> to Postgres.
+In languages like Python, similar roles are fulfilled with packages
+like numpy and scipy.  OneSparse goes beyond dense matrix
+multiplication and is highly optimized not only for dense and sparse
+matrices, but also optimizes for an unlimited number of powerful and
+and useful algebras by supporting JIT compilation of both built-in and
+user defined <a href="https://en.wikipedia.org/wiki/Semiring">Semirings</a>.</p>
+<p>Semirings can be thought of as an abstraction of the "additive" and
+"multiplicative" operations typically used in <a href="https://en.wikipedia.org/wiki/Matrix_multiplication">Matrix
+Multiplication</a>.
+They are particularly useful when implementing graph algorithms across
+an adjacency matrix:</p>
+<p><img alt="A Graph and An Adjacency" src="AisA.png" /></p>
+<p>For example, to compute the shortest path between rows and columns of
+a sparse matrix, instead of multiplying elements they are added, and
+instead of adding to reduce to the final value, the minimum is taken.
+This form of <a href="https://en.wikipedia.org/wiki/Tropical_geometry">Tropical
+Algebra</a> is a very
+powerful mathematical technique used in solving optimization and other
+minimization and maximization problems.</p>
+<p>Another exotic form of Semiring is the <a href="https://en.wikipedia.org/wiki/Log_semiring">Log
+Semiring</a> which is a
+powerful tool for traversing graphs whose edges represent
+probabilities by leveraging <a href="https://en.wikipedia.org/wiki/Log_probability">Log
+probability</a> algebra
+for speed and better numeric stability.</p>
+<p>Other GraphBLAS Semirings are used to optimize algebraic operations to
+minimize data movement.  For example, the "any_pair" semiring is used
+instead of "plus_times" in many Breadth-First Search Algorithms to
+avoid any mathematical operations and unnecessary data movement
+Instead of adding results, "any" value is used, thus allowing the JIT
+compiler to optimize as it sees fit.  Instead of loading element
+values and multiplying them, the "pair" operator is used to simply
+proceed only if both edges in a multiplication are present, without
+ever loading or multiplying their values.</p>
+<p>OneSparse leverages the expertise in the field of sparse matrix
+programming by <a href="http://graphblas.org">The GraphBLAS Forum</a> and uses
+the
+<a href="http://faculty.cse.tamu.edu/davis/GraphBLAS.html">SuiteSparse:GraphBLAS</a>
+API implementation. SuiteSparse:GraphBLAS is brought to us by the work
+of <a href="http://faculty.cse.tamu.edu/davis/welcome.html">Dr. Tim Davis</a>,
+professor in the Department of Computer Science and Engineering at
+Texas A&amp;M University.  <a href="http://faculty.cse.tamu.edu/davis/news.html">News and
+information</a> can provide
+you with a lot more background information, in addition to the
+references below.</p>
+<h1 id="todo">TODO</h1>
+<ul>
+<li>
+<p>Test harness matrix for all supported pg versions</p>
+</li>
+<li>
+<p>A few missing ops, concat/split/kron</p>
+</li>
+<li>
+<p>Large Object support up to 4TB</p>
+</li>
+<li>
+<p>subscripting syntax support</p>
+</li>
+<li>
+<p>add type[] array casting to vectors and matrices</p>
+</li>
+<li>
+<p>add type[] operators for extract, containment, etc.</p>
+</li>
+<li>
+<p>add type[] constructors and tuple iterators</p>
+</li>
+<li>
+<p>select ops: A &lt; 42</p>
+</li>
+<li>
+<p>lookup semirings with base name and object "lookup('any_pair', A)" for type specific semiring</p>
+</li>
+<li>
+<p>semiring functions? "plus_times(A, B)"</p>
+</li>
+<li>
+<p>Wrap LAGraph</p>
+</li>
+<li>
+<p>Zero-copy into python-graphblas objects in plpythonu</p>
+</li>
+<li>
+<p>psycopg2 packed binary adapters to python-graphblas</p>
+</li>
+</ul>
               
             </div>
           </div><footer>
@@ -193,5 +336,5 @@ hi!.</p>
 
 <!--
 MkDocs version : 1.6.1
-Build Date UTC : 2024-10-10 22:20:43.979994+00:00
+Build Date UTC : 2024-10-11 02:48:24.633861+00:00
 -->

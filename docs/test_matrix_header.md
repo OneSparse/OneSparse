@@ -1117,6 +1117,23 @@ select print(a) as a, binaryop, print(b) as b, print(eadd(a, b, binaryop)) as ea
 (1 row)
 
 ```
+Eadd can also be accomplished with the '+' operator:
+``` postgres-console
+select print(a) as a, binaryop, print(b) as b, print(a + b) as eadd from test_fixture;
+┌────────────────────┬─────────────┬────────────────────┬────────────────────┐
+│         a          │  binaryop   │         b          │        eadd        │
+├────────────────────┼─────────────┼────────────────────┼────────────────────┤
+│      0  1  2  3    │ times_int32 │      0  1  2  3    │      0  1  2  3    │
+│    ────────────    │             │    ────────────    │    ────────────    │
+│  0│        0  3    │             │  0│           4    │  0│        0 12    │
+│  1│  2     1  0    │             │  1│        3  1    │  1│  2     3  0    │
+│  2│  2  2          │             │  2│     2     4    │  2│  2  4     4    │
+│  3│  2     1       │             │  3│     0  2       │  3│  2  0  2       │
+│                    │             │                    │                    │
+└────────────────────┴─────────────┴────────────────────┴────────────────────┘
+(1 row)
+
+```
 From a graph standpoint, elementwise addition can be seen as the
 merging ("union") of two graphs, such that the result has edges
 from both graphs.  Any edges that occur in both graphs are merged
@@ -1438,6 +1455,23 @@ missing from either the left or right side, it is ommited from the
 result:
 ``` postgres-console
 select print(a) as a, binaryop, print(b) as b, print(emult(a, b, binaryop)) as emult from test_fixture;
+┌────────────────────┬─────────────┬────────────────────┬────────────────────┐
+│         a          │  binaryop   │         b          │       emult        │
+├────────────────────┼─────────────┼────────────────────┼────────────────────┤
+│      0  1  2  3    │ times_int32 │      0  1  2  3    │      0  1  2  3    │
+│    ────────────    │             │    ────────────    │    ────────────    │
+│  0│        0  3    │             │  0│           4    │  0│          12    │
+│  1│  2     1  0    │             │  1│        3  1    │  1│        3  0    │
+│  2│  2  2          │             │  2│     2     4    │  2│     4          │
+│  3│  2     1       │             │  3│     0  2       │  3│        2       │
+│                    │             │                    │                    │
+└────────────────────┴─────────────┴────────────────────┴────────────────────┘
+(1 row)
+
+```
+Emult can also be accomplished with the '*' operator:
+``` postgres-console
+select print(a) as a, binaryop, print(b) as b, print(a * b) as emult from test_fixture;
 ┌────────────────────┬─────────────┬────────────────────┬────────────────────┐
 │         a          │  binaryop   │         b          │       emult        │
 ├────────────────────┼─────────────┼────────────────────┼────────────────────┤
@@ -2065,7 +2099,7 @@ the edge is combined with scalar `beta`.
 
 The entire matrix can be reduced to a scalar value:
 ``` postgres-console
-select print(a) as a, monoid, reduce_scalar(a, monoid) from test_fixture;
+select print(a) as a, 'plus_monoid_int32' as monoid, reduce_scalar(a) from test_fixture;
 ┌────────────────────┬───────────────────┬───────────────┐
 │         a          │      monoid       │ reduce_scalar │
 ├────────────────────┼───────────────────┼───────────────┤
@@ -2080,9 +2114,27 @@ select print(a) as a, monoid, reduce_scalar(a, monoid) from test_fixture;
 (1 row)
 
 ```
+The entire matrix can be reduced to a scalar value with a provided
+monoid that changes the reduction operation:
+``` postgres-console
+select print(a) as a, 'min_monoid_int32' as monoid, reduce_scalar(a, 'min_monoid_int32') from test_fixture;
+┌────────────────────┬──────────────────┬───────────────┐
+│         a          │      monoid      │ reduce_scalar │
+├────────────────────┼──────────────────┼───────────────┤
+│      0  1  2  3    │ min_monoid_int32 │ int32:0       │
+│    ────────────    │                  │               │
+│  0│        0  3    │                  │               │
+│  1│  2     1  0    │                  │               │
+│  2│  2  2          │                  │               │
+│  3│  2     1       │                  │               │
+│                    │                  │               │
+└────────────────────┴──────────────────┴───────────────┘
+(1 row)
+
+```
 The matrix can also be reduced to a column vector:
 ``` postgres-console
-select print(a) as a, monoid, print(reduce_vector(a, monoid)) as reduce_vector from test_fixture;
+select print(a) as a, 'plus_monoid_int32' as monoid, print(reduce_vector(a)) as reduce_vector from test_fixture;
 ┌────────────────────┬───────────────────┬───────────────┐
 │         a          │      monoid       │ reduce_vector │
 ├────────────────────┼───────────────────┼───────────────┤
@@ -2100,7 +2152,7 @@ select print(a) as a, monoid, print(reduce_vector(a, monoid)) as reduce_vector f
 To reduce a row vector, specify that the input should be transposed
 with the descriptor `t0`:
 ``` postgres-console
-select print(a) as a, monoid, print(reduce_vector(a, monoid, descriptor=>'t0')) as transpose_reduce_vector from test_fixture;
+select print(a) as a, 'plus_monoid_int32' as monoid, print(reduce_vector(a, descriptor=>'t0')) as transpose_reduce_vector from test_fixture;
 ┌────────────────────┬───────────────────┬─────────────────────────┐
 │         a          │      monoid       │ transpose_reduce_vector │
 ├────────────────────┼───────────────────┼─────────────────────────┤
@@ -3672,18 +3724,6 @@ select nvals(kronpower(s, 3)) from test_fixture;
 └───────┘
 (1 row)
 
-```
-Let's time how long it takes to make a huge kronecker product:
-``` postgres-console
-select nvals(kronpower(s, 4)) from test_fixture;
-┌──────────┐
-│  nvals   │
-├──────────┤
-│ 43046721 │
-└──────────┘
-(1 row)
-
-Time: 114.246 ms
 ```
 # Transpose
 

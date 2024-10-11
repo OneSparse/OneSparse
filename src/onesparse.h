@@ -99,6 +99,9 @@ char* short_code(GrB_Type_Code code);
 GrB_Type short_type(char *name);
 const char* error_name(GrB_Info info);
 GrB_Type type_promote(GrB_Type left, GrB_Type right);
+
+GrB_BinaryOp default_binaryop(GrB_Type type);
+GrB_Monoid default_monoid(GrB_Type type);
 GrB_Semiring default_semiring(GrB_Type type);
 
 void *malloc_function(size_t);

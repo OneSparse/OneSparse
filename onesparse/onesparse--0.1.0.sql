@@ -1150,25 +1150,25 @@ LANGUAGE C;
 CREATE FUNCTION eadd(
     a matrix,
     b matrix,
-    op binaryop,
+    op binaryop default null,
     mask matrix default null,
     accum binaryop default null,
     descriptor descriptor default null
     )
 RETURNS matrix
-AS '$libdir/onesparse', 'matrix_ewise_add'
+AS '$libdir/onesparse', 'matrix_eadd'
 LANGUAGE C STABLE;
 
 CREATE FUNCTION emult(
     a matrix,
     b matrix,
-    op binaryop,
+    op binaryop default null,
     mask matrix default null,
     accum binaryop default null,
     descriptor descriptor default null
     )
 RETURNS matrix
-AS '$libdir/onesparse', 'matrix_ewise_mult'
+AS '$libdir/onesparse', 'matrix_emult'
 LANGUAGE C STABLE;
 
 CREATE FUNCTION eunion(
@@ -1176,17 +1176,17 @@ CREATE FUNCTION eunion(
     alpha scalar,
     b matrix,
     beta scalar,
-    op binaryop,
+    op binaryop default null,
     mask matrix default null,
     descriptor descriptor default null
     )
 RETURNS matrix
-AS '$libdir/onesparse', 'matrix_ewise_union'
+AS '$libdir/onesparse', 'matrix_eunion'
 LANGUAGE C STABLE;
 
 CREATE FUNCTION reduce_vector(
     a matrix,
-    op monoid,
+    op monoid default null,
     w vector default null,
     mask vector default null,
     accum binaryop default null,
@@ -1198,7 +1198,7 @@ LANGUAGE C STABLE;
 
 CREATE FUNCTION reduce_scalar(
     a matrix,
-    op monoid,
+    op monoid default null,
     accum binaryop default null,
     descriptor descriptor default null
     )
@@ -1368,6 +1368,14 @@ RETURNS text
 AS '$libdir/onesparse', 'matrix_info'
 LANGUAGE C STABLE;
 
+CREATE FUNCTION eadd_op(a matrix, b matrix)
+RETURNS matrix
+RETURN onesparse.eadd(a, b);
+
+CREATE FUNCTION emult_op(a matrix, b matrix)
+RETURNS matrix
+RETURN onesparse.emult(a, b);
+
 CREATE FUNCTION mxm_op(a matrix, b matrix)
 RETURNS matrix
 RETURN onesparse.mxm(a, b);
@@ -1379,6 +1387,18 @@ RETURN onesparse.mxv(a, b);
 CREATE FUNCTION vxm_op(a vector, b matrix)
 RETURNS vector
 RETURN onesparse.vxm(a, b);
+
+CREATE OPERATOR + (
+    LEFTARG = matrix,
+    RIGHTARG = matrix,
+    FUNCTION = eadd_op
+    );
+
+CREATE OPERATOR * (
+    LEFTARG = matrix,
+    RIGHTARG = matrix,
+    FUNCTION = emult_op
+    );
 
 CREATE OPERATOR @ (
     LEFTARG = matrix,

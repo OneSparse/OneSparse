@@ -130,6 +130,60 @@ GrB_Type type_promote(GrB_Type left, GrB_Type right)
     return (i1 > i2) ? left : right;
 }
 
+GrB_BinaryOp default_binaryop(GrB_Type type)
+{
+	if (type == GrB_INT64)
+		return GrB_TIMES_INT64;
+	else if (type == GrB_INT32)
+		return GrB_TIMES_INT32;
+	else if (type == GrB_INT16)
+		return GrB_TIMES_INT16;
+	else if (type == GrB_INT8)
+		return GrB_TIMES_INT8;
+	if (type == GrB_UINT64)
+		return GrB_TIMES_UINT64;
+	else if (type == GrB_UINT32)
+		return GrB_TIMES_UINT32;
+	else if (type == GrB_UINT16)
+		return GrB_TIMES_UINT16;
+	else if (type == GrB_UINT8)
+		return GrB_TIMES_UINT8;
+	if (type == GrB_FP64)
+		return GrB_TIMES_FP64;
+	else if (type == GrB_FP32)
+		return GrB_TIMES_FP32;
+	else if (type == GrB_BOOL)
+		return GxB_PAIR_BOOL;
+	return NULL;
+}
+
+GrB_Monoid default_monoid(GrB_Type type)
+{
+	if (type == GrB_INT64)
+		return GrB_PLUS_MONOID_INT64;
+	else if (type == GrB_INT32)
+		return GrB_PLUS_MONOID_INT32;
+	else if (type == GrB_INT16)
+		return GrB_PLUS_MONOID_INT16;
+	else if (type == GrB_INT8)
+		return GrB_PLUS_MONOID_INT8;
+	if (type == GrB_UINT64)
+		return GrB_PLUS_MONOID_UINT64;
+	else if (type == GrB_UINT32)
+		return GrB_PLUS_MONOID_UINT32;
+	else if (type == GrB_UINT16)
+		return GrB_PLUS_MONOID_UINT16;
+	else if (type == GrB_UINT8)
+		return GrB_PLUS_MONOID_UINT8;
+	if (type == GrB_FP64)
+		return GrB_PLUS_MONOID_FP64;
+	else if (type == GrB_FP32)
+		return GrB_PLUS_MONOID_FP32;
+	else if (type == GrB_BOOL)
+		return GxB_ANY_BOOL_MONOID;
+	return NULL;
+}
+
 GrB_Semiring default_semiring(GrB_Type type)
 {
 	if (type == GrB_INT64)
