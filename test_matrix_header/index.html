@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <link rel="shortcut icon" href="../img/favicon.ico" />
-    <title>Matrix Documentation - OneSparse Postgres</title>
+    <title>Matrix - OneSparse Postgres</title>
     <link rel="stylesheet" href="../css/theme.css" />
     <link rel="stylesheet" href="../css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
@@ -13,7 +13,7 @@
     
       <script>
         // Current page data
-        var mkdocs_page_name = "Matrix Documentation";
+        var mkdocs_page_name = "Matrix";
         var mkdocs_page_input_path = "test_matrix_header.md";
         var mkdocs_page_url = null;
       </script>
@@ -48,8 +48,54 @@
                 </li>
               </ul>
               <ul class="current">
-                <li class="toctree-l1 current"><a class="reference internal current" href="#">Matrix Documentation</a>
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Matrix</a>
     <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#matrices-and-graphs">Matrices and Graphs</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#drawing-matrices-and-vectors">Drawing Matrices and Vectors</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#empty-matrices">Empty Matrices</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#matrix-dimensions">Matrix dimensions</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#elements">Elements</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#random-matrices">Random Matrices</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#elementwise-addition">Elementwise Addition</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#elementwise-multiplication">Elementwise Multiplication</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#elementwise-union">Elementwise Union</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#reduction">Reduction</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#matrix-matrix-multiplication">Matrix Matrix Multiplication</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#matrix-vector-multiplication">Matrix Vector Multiplication</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#vector-matrix-multiplication">Vector Matrix Multiplication</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#element-selection">Element Selection</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#kronecker">Kronecker</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#kronecker-power">Kronecker Power</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#transpose">Transpose</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#apply">Apply</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#suitesparse-info">SuiteSparse Info</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#matrix-duplication">Matrix Duplication</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#work-completion">Work Completion</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#clearing-matrices">Clearing Matrices</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#extra-tests">Extra tests</a>
+    </li>
     </ul>
                 </li>
               </ul>
@@ -58,27 +104,27 @@
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../test_scalar_op_f4/">Scalar float4 Operations</a>
+                <li class="toctree-l1"><a class="reference internal" href="../test_scalar_op_f4/">Scalar float4</a>
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../test_scalar_op_f8/">Scalar float8 Operations</a>
+                <li class="toctree-l1"><a class="reference internal" href="../test_scalar_op_f8/">Scalar float8</a>
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../test_scalar_op_i2/">Scalar smallint Operations</a>
+                <li class="toctree-l1"><a class="reference internal" href="../test_scalar_op_i2/">Scalar smallint</a>
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../test_scalar_op_i4/">Scalar integer Operations</a>
+                <li class="toctree-l1"><a class="reference internal" href="../test_scalar_op_i4/">Scalar integer</a>
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../test_scalar_op_i8/">Scalar bigint Operations</a>
+                <li class="toctree-l1"><a class="reference internal" href="../test_scalar_op_i8/">Scalar bigint</a>
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../test_vector_header/">Vectors</a>
+                <li class="toctree-l1"><a class="reference internal" href="../test_vector_header/">Vector</a>
                 </li>
               </ul>
       </div>
@@ -95,7 +141,7 @@
         <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
-      <li class="breadcrumb-item active">Matrix Documentation</li>
+      <li class="breadcrumb-item active">Matrix</li>
     <li class="wy-breadcrumbs-aside">
     </li>
   </ul>
@@ -104,7 +150,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <h1 id="matrix-documentation">Matrix Documentation</h1>
+                <h1 id="matrix">Matrix</h1>
 <p>This documentation is also tests for the code, the examples below
 show the literal output of these statements from Postgres.</p>
 <p>Some setup to make sure the extension is installed.
@@ -131,7 +177,7 @@ end up being multiplied away, wasting energy.</p>
 of actually useful elements in a Matrix.  They can be dense or
 sparse, the SuiteSparse library will adapt to choose the right
 backend format.</p>
-<h1 id="matrices-and-graphs">Matrices and Graphs</h1>
+<h2 id="matrices-and-graphs">Matrices and Graphs</h2>
 <p>Every matrix is a graph, whether you think of it that way or not.
 And every graph has a corresponding matrix.  The data that you put
 into tables can also describe a graph, and thus a matrix.  These
@@ -167,7 +213,7 @@ given row or column position, no memory is consumed.  This is the
 "sparse" in sparse matrix.  This is how it's possible to create an
 unbounded row by unbounded column matrix without exhausting memory
 trying to allocate <code>2^120</code> entries.</p>
-<h1 id="drawing-matrices-and-vectors">Drawing Matrices and Vectors</h1>
+<h2 id="drawing-matrices-and-vectors">Drawing Matrices and Vectors</h2>
 <p>The <code>draw()</code> function turns a matrix into the Graphviz DOT language
 that is used to draw graph diagrams:
 <div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">select</span><span class="w"> </span><span class="n">draw</span><span class="p">(</span><span class="s1">&#39;int32(4:4)[1:2:1 2:3:2 3:1:3]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">draw</span><span class="p">;</span>
@@ -244,7 +290,7 @@ These objects from the <code>onesparse.test_fixture</code> table.
 </span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="go">│ d            │ int32(4:4)[0:0:1 0:1:1 0:2:1 0:3:1 1:0:1 1:1:1 1:2:1 1:3:1 2:0:1 2:1:1 2:2:1 2:3:1 3:0:1 3:1:1 3:2:1 3:3:1] │</span>
 </span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="go">│ s            │ int32(2:2)[0:0:1 0:1:1 1:1:1]                                                                               │</span>
 </span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="go">│ u            │ int32(4)[1:2]                                                                                               │</span>
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="go">│ v            │ int32(4)[2:3]                                                                                               │</span>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="go">│ v            │ int32(4)[1:3 2:3]                                                                                           │</span>
 </span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="go">│ unaryop      │ ainv_int32                                                                                                  │</span>
 </span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="go">│ indexunaryop │ valuegt_int32                                                                                               │</span>
 </span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="go">│ binaryop     │ times_int32                                                                                                 │</span>
@@ -469,7 +515,7 @@ the examples below:</p>
 </span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="go">│           │           │</span>
 </span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="go">│    ───    │    ───    │</span>
 </span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="go">│  0│       │  0│       │</span>
-</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="go">│  1│  2    │  1│       │</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="go">│  1│  2    │  1│  3    │</span>
 </span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="go">│  2│       │  2│  3    │</span>
 </span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="go">│  3│       │  3│       │</span>
 </span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="go">│           │           │</span>
@@ -524,24 +570,25 @@ the examples below:</p>
         <!-- Diagram B -->
 <div>
 <!-- Title: vector Pages: 1 -->
-<svg width="70pt" height="177pt"
- viewBox="0.00 0.00 70.00 177.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 173)">
+<svg width="70pt" height="190pt"
+ viewBox="0.00 0.00 70.00 190.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 186)">
 <title>vector</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-173 66,-173 66,4 -4,4"/>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-186 66,-186 66,4 -4,4"/>
 <g id="clust1" class="cluster">
 <title>cluster_vector</title>
-<polygon fill="lightgray" stroke="black" stroke-dasharray="5,2" points="8,-8 8,-161 54,-161 54,-8 8,-8"/>
+<polygon fill="lightgray" stroke="black" stroke-dasharray="5,2" points="8,-8 8,-174 54,-174 54,-8 8,-8"/>
 </g>
 <!-- node0 -->
 <g id="node1" class="node">
 <title>node0</title>
-<polygon fill="none" stroke="black" points="33,-153 29,-153 29,-149 33,-149 33,-153"/>
+<polygon fill="none" stroke="black" points="33,-166 29,-166 29,-162 33,-162 33,-166"/>
 </g>
 <!-- node1 -->
 <g id="node2" class="node">
 <title>node1</title>
-<polygon fill="none" stroke="black" points="33,-113 29,-113 29,-109 33,-109 33,-113"/>
+<polygon fill="none" stroke="black" points="46,-126 16,-126 16,-109 46,-109 46,-126"/>
+<text text-anchor="middle" x="31" y="-115.6" font-family="Times,serif" font-size="8.00">1:3</text>
 </g>
 <!-- node0&#45;&gt;node1 -->
 <!-- node2 -->
@@ -745,7 +792,7 @@ we'll show off a bit later.</p>
 The <code>matrix</code> data type wraps a SuiteSparse GrB_Matrix handle and
 delegates functions from SQL to the library through instances of
 this type.</p>
-<h1 id="empty-matrices">Empty Matrices</h1>
+<h2 id="empty-matrices">Empty Matrices</h2>
 <p>An empty matrix can be constructed many ways, but one of the
 simplest is casting a type code to the matrix type.  In this case
 <code>int32</code> means the SuiteSparse type <code>GrB_INT32</code>.
@@ -767,7 +814,7 @@ constructor function:
 </span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="go">└────────┘</span>
 </span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="go">(1 row)</span>
 </span></code></pre></div></p>
-<h1 id="matrix-dimensions">Matrix dimensions</h1>
+<h2 id="matrix-dimensions">Matrix dimensions</h2>
 <p>The above matrices are "unbounded", they do not have a fixed number
 of rows and/or columns.  The default possible number of rows and
 columns is defined by the SuiteSparse library to be <code>GrB_INDEX_MAX</code>
@@ -859,7 +906,7 @@ Elements are specified between square brackets are coordinates of
 </span><span id="__span-16-8"><a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a><span class="go">└──────────────────────────┴──────────────────────────────┴──────────────────────────────┘</span>
 </span><span id="__span-16-9"><a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a><span class="go">(1 row)</span>
 </span></code></pre></div></p>
-<h1 id="elements">Elements</h1>
+<h2 id="elements">Elements</h2>
 <p>All the elements in a matrix can be iterated with the <code>elements()</code>
 function:
 <div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="k">select</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">elements</span><span class="p">((</span><span class="k">select</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">test_fixture</span><span class="p">));</span>
@@ -945,7 +992,7 @@ scalar:
 </span><span id="__span-22-6"><a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a><span class="go">└─────────────┘</span>
 </span><span id="__span-22-7"><a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a><span class="go">(1 row)</span>
 </span></code></pre></div></p>
-<h1 id="random-matrices">Random Matrices</h1>
+<h2 id="random-matrices">Random Matrices</h2>
 <p><code>random_matrix</code> will generate a random matrix provided the type,
 number of rows, number of columns, and the number of (approximate)
 values, an optional max value, and an optional random seed for
@@ -1126,7 +1173,7 @@ This random matrix is also a random <em>graph</em>:</p>
 </svg>
 </div>
 
-<h1 id="elementwise-addition">Elementwise Addition</h1>
+<h2 id="elementwise-addition">Elementwise Addition</h2>
 <p>The GraphBLAS API has elementwise operations on matrices that
 operate pairs of matrices.  <code>eadd</code> computes the element-wise
 “addition” of two matrices a and b, element-wise using any binary
@@ -1148,18 +1195,10 @@ included in the result.
 </span></code></pre></div>
 Eadd can also be accomplished with the '+' operator:
 <div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="k">select</span><span class="w"> </span><span class="n">print</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">binaryop</span><span class="p">,</span><span class="w"> </span><span class="n">print</span><span class="p">(</span><span class="n">b</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="n">print</span><span class="p">(</span><span class="n">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">eadd</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">test_fixture</span><span class="p">;</span>
-</span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="go">┌────────────────────┬─────────────┬────────────────────┬────────────────────┐</span>
-</span><span id="__span-25-3"><a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a><span class="go">│         a          │  binaryop   │         b          │        eadd        │</span>
-</span><span id="__span-25-4"><a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="go">├────────────────────┼─────────────┼────────────────────┼────────────────────┤</span>
-</span><span id="__span-25-5"><a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a><span class="go">│      0  1  2  3    │ times_int32 │      0  1  2  3    │      0  1  2  3    │</span>
-</span><span id="__span-25-6"><a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a><span class="go">│    ────────────    │             │    ────────────    │    ────────────    │</span>
-</span><span id="__span-25-7"><a id="__codelineno-25-7" name="__codelineno-25-7" href="#__codelineno-25-7"></a><span class="go">│  0│        0  3    │             │  0│           4    │  0│        0 12    │</span>
-</span><span id="__span-25-8"><a id="__codelineno-25-8" name="__codelineno-25-8" href="#__codelineno-25-8"></a><span class="go">│  1│  2     1  0    │             │  1│        3  1    │  1│  2     3  0    │</span>
-</span><span id="__span-25-9"><a id="__codelineno-25-9" name="__codelineno-25-9" href="#__codelineno-25-9"></a><span class="go">│  2│  2  2          │             │  2│     2     4    │  2│  2  4     4    │</span>
-</span><span id="__span-25-10"><a id="__codelineno-25-10" name="__codelineno-25-10" href="#__codelineno-25-10"></a><span class="go">│  3│  2     1       │             │  3│     0  2       │  3│  2  0  2       │</span>
-</span><span id="__span-25-11"><a id="__codelineno-25-11" name="__codelineno-25-11" href="#__codelineno-25-11"></a><span class="go">│                    │             │                    │                    │</span>
-</span><span id="__span-25-12"><a id="__codelineno-25-12" name="__codelineno-25-12" href="#__codelineno-25-12"></a><span class="go">└────────────────────┴─────────────┴────────────────────┴────────────────────┘</span>
-</span><span id="__span-25-13"><a id="__codelineno-25-13" name="__codelineno-25-13" href="#__codelineno-25-13"></a><span class="go">(1 row)</span>
+</span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="gs">ERROR:</span><span class="gr">  operator does not exist: matrix + matrix</span>
+</span><span id="__span-25-3"><a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a><span class="gs">LINE 1:</span><span class="gr"> ...t print(a) as a, binaryop, print(b) as b, print(a + b) as ea...</span>
+</span><span id="__span-25-4"><a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="gr">                                                             ^</span>
+</span><span id="__span-25-5"><a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a><span class="gs">HINT:</span><span class="gr">  No operator matches the given name and argument types. You might need to add explicit type casts.</span>
 </span></code></pre></div>
 From a graph standpoint, elementwise addition can be seen as the
 merging ("union") of two graphs, such that the result has edges
@@ -1474,7 +1513,7 @@ with the provided binary operator.</p>
     </td>
   </tr>
 </table>
-<h1 id="elementwise-multiplication">Elementwise Multiplication</h1>
+<h2 id="elementwise-multiplication">Elementwise Multiplication</h2>
 <p><code>emult</code> multiplies elements of two matrices, taking only the
 intersection of common elements in both matrices, if an element is
 missing from either the left or right side, it is ommited from the
@@ -1495,18 +1534,10 @@ result:
 </span></code></pre></div>
 Emult can also be accomplished with the '*' operator:
 <div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="k">select</span><span class="w"> </span><span class="n">print</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">binaryop</span><span class="p">,</span><span class="w"> </span><span class="n">print</span><span class="p">(</span><span class="n">b</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="n">print</span><span class="p">(</span><span class="n">a</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">b</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">emult</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">test_fixture</span><span class="p">;</span>
-</span><span id="__span-27-2"><a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="go">┌────────────────────┬─────────────┬────────────────────┬────────────────────┐</span>
-</span><span id="__span-27-3"><a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="go">│         a          │  binaryop   │         b          │       emult        │</span>
-</span><span id="__span-27-4"><a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a><span class="go">├────────────────────┼─────────────┼────────────────────┼────────────────────┤</span>
-</span><span id="__span-27-5"><a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a><span class="go">│      0  1  2  3    │ times_int32 │      0  1  2  3    │      0  1  2  3    │</span>
-</span><span id="__span-27-6"><a id="__codelineno-27-6" name="__codelineno-27-6" href="#__codelineno-27-6"></a><span class="go">│    ────────────    │             │    ────────────    │    ────────────    │</span>
-</span><span id="__span-27-7"><a id="__codelineno-27-7" name="__codelineno-27-7" href="#__codelineno-27-7"></a><span class="go">│  0│        0  3    │             │  0│           4    │  0│          12    │</span>
-</span><span id="__span-27-8"><a id="__codelineno-27-8" name="__codelineno-27-8" href="#__codelineno-27-8"></a><span class="go">│  1│  2     1  0    │             │  1│        3  1    │  1│        3  0    │</span>
-</span><span id="__span-27-9"><a id="__codelineno-27-9" name="__codelineno-27-9" href="#__codelineno-27-9"></a><span class="go">│  2│  2  2          │             │  2│     2     4    │  2│     4          │</span>
-</span><span id="__span-27-10"><a id="__codelineno-27-10" name="__codelineno-27-10" href="#__codelineno-27-10"></a><span class="go">│  3│  2     1       │             │  3│     0  2       │  3│        2       │</span>
-</span><span id="__span-27-11"><a id="__codelineno-27-11" name="__codelineno-27-11" href="#__codelineno-27-11"></a><span class="go">│                    │             │                    │                    │</span>
-</span><span id="__span-27-12"><a id="__codelineno-27-12" name="__codelineno-27-12" href="#__codelineno-27-12"></a><span class="go">└────────────────────┴─────────────┴────────────────────┴────────────────────┘</span>
-</span><span id="__span-27-13"><a id="__codelineno-27-13" name="__codelineno-27-13" href="#__codelineno-27-13"></a><span class="go">(1 row)</span>
+</span><span id="__span-27-2"><a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="gs">ERROR:</span><span class="gr">  operator does not exist: matrix * matrix</span>
+</span><span id="__span-27-3"><a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="gs">LINE 1:</span><span class="gr"> ...t print(a) as a, binaryop, print(b) as b, print(a * b) as em...</span>
+</span><span id="__span-27-4"><a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a><span class="gr">                                                             ^</span>
+</span><span id="__span-27-5"><a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a><span class="gs">HINT:</span><span class="gr">  No operator matches the given name and argument types. You might need to add explicit type casts.</span>
 </span></code></pre></div>
 From a graph standpoint, elementwise multiplication can be seen as
 the intersection of two graphs, such that the result has edges that
@@ -1779,7 +1810,7 @@ provided binary operator.</p>
     </td>
   </tr>
 </table>
-<h1 id="elementwise-union">Elementwise Union</h1>
+<h2 id="elementwise-union">Elementwise Union</h2>
 <p><code>eunion</code> is like <code>eadd</code> but differs in how the binary op is
 applied. A pair of scalars, <code>alpha</code> and <code>beta</code> define the inputs to
 the operator when entries are present in one matrix but not the
@@ -2114,7 +2145,7 @@ the edge is combined with scalar <code>beta</code>.</p>
     </td>
   </tr>
 </table>
-<h1 id="reduction">Reduction</h1>
+<h2 id="reduction">Reduction</h2>
 <p>The entire matrix can be reduced to a scalar value:
 <div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="k">select</span><span class="w"> </span><span class="n">print</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;plus_monoid_int32&#39;</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">monoid</span><span class="p">,</span><span class="w"> </span><span class="n">reduce_scalar</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">test_fixture</span><span class="p">;</span>
 </span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="go">┌────────────────────┬───────────────────┬───────────────┐</span>
@@ -2177,7 +2208,7 @@ with the descriptor <code>t0</code>:
 </span><span id="__span-32-12"><a id="__codelineno-32-12" name="__codelineno-32-12" href="#__codelineno-32-12"></a><span class="go">└────────────────────┴───────────────────┴─────────────────────────┘</span>
 </span><span id="__span-32-13"><a id="__codelineno-32-13" name="__codelineno-32-13" href="#__codelineno-32-13"></a><span class="go">(1 row)</span>
 </span></code></pre></div></p>
-<h1 id="matrix-matrix-multiplication">Matrix Matrix Multiplication</h1>
+<h2 id="matrix-matrix-multiplication">Matrix Matrix Multiplication</h2>
 <p>Matrix Multiplication is the heart of linear algebra.  All matrix
 multiplication happens over a semiring.  For the most common form
 of matrix multiplication, the outer opperation is to multiply
@@ -2516,7 +2547,7 @@ syntax.  The default semiring for numeric types is <code>plus_times</code>.
 </span><span id="__span-34-12"><a id="__codelineno-34-12" name="__codelineno-34-12" href="#__codelineno-34-12"></a><span class="go">└────────────────────┴───┴────────────────────┴────────────────────┘</span>
 </span><span id="__span-34-13"><a id="__codelineno-34-13" name="__codelineno-34-13" href="#__codelineno-34-13"></a><span class="go">(1 row)</span>
 </span></code></pre></div></p>
-<h1 id="matrix-vector-multiplication">Matrix Vector Multiplication</h1>
+<h2 id="matrix-vector-multiplication">Matrix Vector Multiplication</h2>
 <p>Matrices can be multipled by vectors on the right taking the linear
 combination of the matrices columns using the vectors elements as
 coefficients:
@@ -2743,7 +2774,7 @@ iterated, it forms the basis for working back along incoming links.</p>
 </span><span id="__span-36-12"><a id="__codelineno-36-12" name="__codelineno-36-12" href="#__codelineno-36-12"></a><span class="go">└────────────────────┴───┴───────────┴───────────┘</span>
 </span><span id="__span-36-13"><a id="__codelineno-36-13" name="__codelineno-36-13" href="#__codelineno-36-13"></a><span class="go">(1 row)</span>
 </span></code></pre></div></p>
-<h1 id="vector-matrix-multiplication">Vector Matrix Multiplication</h1>
+<h2 id="vector-matrix-multiplication">Vector Matrix Multiplication</h2>
 <p>Matrices can be multipled by vectors on the right taking the linear
 combination of the matrices rows using the vectors elements as
 coefficients:
@@ -2754,9 +2785,9 @@ coefficients:
 </span><span id="__span-37-5"><a id="__codelineno-37-5" name="__codelineno-37-5" href="#__codelineno-37-5"></a><span class="go">│           │ plus_times_int32 │      0  1  2  3    │           │</span>
 </span><span id="__span-37-6"><a id="__codelineno-37-6" name="__codelineno-37-6" href="#__codelineno-37-6"></a><span class="go">│    ───    │                  │    ────────────    │    ───    │</span>
 </span><span id="__span-37-7"><a id="__codelineno-37-7" name="__codelineno-37-7" href="#__codelineno-37-7"></a><span class="go">│  0│       │                  │  0│           4    │  0│       │</span>
-</span><span id="__span-37-8"><a id="__codelineno-37-8" name="__codelineno-37-8" href="#__codelineno-37-8"></a><span class="go">│  1│       │                  │  1│        3  1    │  1│  6    │</span>
-</span><span id="__span-37-9"><a id="__codelineno-37-9" name="__codelineno-37-9" href="#__codelineno-37-9"></a><span class="go">│  2│  3    │                  │  2│     2     4    │  2│       │</span>
-</span><span id="__span-37-10"><a id="__codelineno-37-10" name="__codelineno-37-10" href="#__codelineno-37-10"></a><span class="go">│  3│       │                  │  3│     0  2       │  3│ 12    │</span>
+</span><span id="__span-37-8"><a id="__codelineno-37-8" name="__codelineno-37-8" href="#__codelineno-37-8"></a><span class="go">│  1│  3    │                  │  1│        3  1    │  1│  6    │</span>
+</span><span id="__span-37-9"><a id="__codelineno-37-9" name="__codelineno-37-9" href="#__codelineno-37-9"></a><span class="go">│  2│  3    │                  │  2│     2     4    │  2│  9    │</span>
+</span><span id="__span-37-10"><a id="__codelineno-37-10" name="__codelineno-37-10" href="#__codelineno-37-10"></a><span class="go">│  3│       │                  │  3│     0  2       │  3│ 15    │</span>
 </span><span id="__span-37-11"><a id="__codelineno-37-11" name="__codelineno-37-11" href="#__codelineno-37-11"></a><span class="go">│           │                  │                    │           │</span>
 </span><span id="__span-37-12"><a id="__codelineno-37-12" name="__codelineno-37-12" href="#__codelineno-37-12"></a><span class="go">└───────────┴──────────────────┴────────────────────┴───────────┘</span>
 </span><span id="__span-37-13"><a id="__codelineno-37-13" name="__codelineno-37-13" href="#__codelineno-37-13"></a><span class="go">(1 row)</span>
@@ -2771,24 +2802,25 @@ edges.</p>
         <!-- Diagram A -->
 <div>
 <!-- Title: vector Pages: 1 -->
-<svg width="70pt" height="177pt"
- viewBox="0.00 0.00 70.00 177.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 173)">
+<svg width="70pt" height="190pt"
+ viewBox="0.00 0.00 70.00 190.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 186)">
 <title>vector</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-173 66,-173 66,4 -4,4"/>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-186 66,-186 66,4 -4,4"/>
 <g id="clust1" class="cluster">
 <title>cluster_vector</title>
-<polygon fill="lightgray" stroke="black" stroke-dasharray="5,2" points="8,-8 8,-161 54,-161 54,-8 8,-8"/>
+<polygon fill="lightgray" stroke="black" stroke-dasharray="5,2" points="8,-8 8,-174 54,-174 54,-8 8,-8"/>
 </g>
 <!-- node0 -->
 <g id="node1" class="node">
 <title>node0</title>
-<polygon fill="none" stroke="black" points="33,-153 29,-153 29,-149 33,-149 33,-153"/>
+<polygon fill="none" stroke="black" points="33,-166 29,-166 29,-162 33,-162 33,-166"/>
 </g>
 <!-- node1 -->
 <g id="node2" class="node">
 <title>node1</title>
-<polygon fill="none" stroke="black" points="33,-113 29,-113 29,-109 33,-109 33,-113"/>
+<polygon fill="none" stroke="black" points="46,-126 16,-126 16,-109 46,-109 46,-126"/>
+<text text-anchor="middle" x="31" y="-115.6" font-family="Times,serif" font-size="8.00">1:3</text>
 </g>
 <!-- node0&#45;&gt;node1 -->
 <!-- node2 -->
@@ -2902,38 +2934,39 @@ edges.</p>
         <!-- Diagram C -->
 <div>
 <!-- Title: vector Pages: 1 -->
-<svg width="76pt" height="190pt"
- viewBox="0.00 0.00 76.00 190.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 186)">
+<svg width="76pt" height="203pt"
+ viewBox="0.00 0.00 76.00 203.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 199)">
 <title>vector</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-186 72,-186 72,4 -4,4"/>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-199 72,-199 72,4 -4,4"/>
 <g id="clust1" class="cluster">
 <title>cluster_vector</title>
-<polygon fill="lightgray" stroke="black" stroke-dasharray="5,2" points="8,-8 8,-174 60,-174 60,-8 8,-8"/>
+<polygon fill="lightgray" stroke="black" stroke-dasharray="5,2" points="8,-8 8,-187 60,-187 60,-8 8,-8"/>
 </g>
 <!-- node0 -->
 <g id="node1" class="node">
 <title>node0</title>
-<polygon fill="none" stroke="black" points="36,-166 32,-166 32,-162 36,-162 36,-166"/>
+<polygon fill="none" stroke="black" points="36,-179 32,-179 32,-175 36,-175 36,-179"/>
 </g>
 <!-- node1 -->
 <g id="node2" class="node">
 <title>node1</title>
-<polygon fill="none" stroke="black" points="49,-126 19,-126 19,-109 49,-109 49,-126"/>
-<text text-anchor="middle" x="34" y="-115.6" font-family="Times,serif" font-size="8.00">1:6</text>
+<polygon fill="none" stroke="black" points="49,-139 19,-139 19,-122 49,-122 49,-139"/>
+<text text-anchor="middle" x="34" y="-128.6" font-family="Times,serif" font-size="8.00">1:6</text>
 </g>
 <!-- node0&#45;&gt;node1 -->
 <!-- node2 -->
 <g id="node3" class="node">
 <title>node2</title>
-<polygon fill="none" stroke="black" points="36,-73 32,-73 32,-69 36,-69 36,-73"/>
+<polygon fill="none" stroke="black" points="49,-86 19,-86 19,-69 49,-69 49,-86"/>
+<text text-anchor="middle" x="34" y="-75.6" font-family="Times,serif" font-size="8.00">2:9</text>
 </g>
 <!-- node1&#45;&gt;node2 -->
 <!-- node3 -->
 <g id="node4" class="node">
 <title>node3</title>
 <polygon fill="none" stroke="black" points="51.5,-33 16.5,-33 16.5,-16 51.5,-16 51.5,-33"/>
-<text text-anchor="middle" x="34" y="-22.6" font-family="Times,serif" font-size="8.00">3:12</text>
+<text text-anchor="middle" x="34" y="-22.6" font-family="Times,serif" font-size="8.00">3:15</text>
 </g>
 <!-- node2&#45;&gt;node3 -->
 </g>
@@ -2951,14 +2984,14 @@ edges.</p>
 </span><span id="__span-38-5"><a id="__codelineno-38-5" name="__codelineno-38-5" href="#__codelineno-38-5"></a><span class="go">│           │ @ │      0  1  2  3    │           │</span>
 </span><span id="__span-38-6"><a id="__codelineno-38-6" name="__codelineno-38-6" href="#__codelineno-38-6"></a><span class="go">│    ───    │   │    ────────────    │    ───    │</span>
 </span><span id="__span-38-7"><a id="__codelineno-38-7" name="__codelineno-38-7" href="#__codelineno-38-7"></a><span class="go">│  0│       │   │  0│           4    │  0│       │</span>
-</span><span id="__span-38-8"><a id="__codelineno-38-8" name="__codelineno-38-8" href="#__codelineno-38-8"></a><span class="go">│  1│       │   │  1│        3  1    │  1│  6    │</span>
-</span><span id="__span-38-9"><a id="__codelineno-38-9" name="__codelineno-38-9" href="#__codelineno-38-9"></a><span class="go">│  2│  3    │   │  2│     2     4    │  2│       │</span>
-</span><span id="__span-38-10"><a id="__codelineno-38-10" name="__codelineno-38-10" href="#__codelineno-38-10"></a><span class="go">│  3│       │   │  3│     0  2       │  3│ 12    │</span>
+</span><span id="__span-38-8"><a id="__codelineno-38-8" name="__codelineno-38-8" href="#__codelineno-38-8"></a><span class="go">│  1│  3    │   │  1│        3  1    │  1│  6    │</span>
+</span><span id="__span-38-9"><a id="__codelineno-38-9" name="__codelineno-38-9" href="#__codelineno-38-9"></a><span class="go">│  2│  3    │   │  2│     2     4    │  2│  9    │</span>
+</span><span id="__span-38-10"><a id="__codelineno-38-10" name="__codelineno-38-10" href="#__codelineno-38-10"></a><span class="go">│  3│       │   │  3│     0  2       │  3│ 15    │</span>
 </span><span id="__span-38-11"><a id="__codelineno-38-11" name="__codelineno-38-11" href="#__codelineno-38-11"></a><span class="go">│           │   │                    │           │</span>
 </span><span id="__span-38-12"><a id="__codelineno-38-12" name="__codelineno-38-12" href="#__codelineno-38-12"></a><span class="go">└───────────┴───┴────────────────────┴───────────┘</span>
 </span><span id="__span-38-13"><a id="__codelineno-38-13" name="__codelineno-38-13" href="#__codelineno-38-13"></a><span class="go">(1 row)</span>
 </span></code></pre></div></p>
-<h1 id="element-selection">Element Selection</h1>
+<h2 id="element-selection">Element Selection</h2>
 <p>The <code>selection</code> method calls the <code>GrB_select()</code> API function.  The
 name <code>selection</code> was chosen not to conflict with the SQL keyword
 <code>select</code>.  Selection provides a conditional operator called an
@@ -3446,7 +3479,7 @@ removing all the links "back" from higher number nodes to lower.
     </td>
   </tr>
 </table>
-<h1 id="kronecker">Kronecker</h1>
+<h2 id="kronecker">Kronecker</h2>
 <p>The <code>kronecker()</code> function takes two input matrices, and replaces
 every element in the second matrix with a new submatrix of the
 first.  This "expands" the matrix exponentially.  This is useful
@@ -3667,7 +3700,7 @@ distributions.</p>
     </td>
   </tr>
 </table>
-<h1 id="kronecker-power">Kronecker Power</h1>
+<h2 id="kronecker-power">Kronecker Power</h2>
 <p>here's a special function for exponentiating a matrix to itself
 a certain number of times, <code>kronpower</code>.:
 <div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-42-1"><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a><span class="k">select</span><span class="w"> </span><span class="n">print</span><span class="p">(</span><span class="n">kronpower</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="w"> </span><span class="mf">2</span><span class="p">))</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">test_fixture</span><span class="p">;</span>
@@ -3707,7 +3740,7 @@ statistical edge distributions common in sparse graph problems:
 </span><span id="__span-43-6"><a id="__codelineno-43-6" name="__codelineno-43-6" href="#__codelineno-43-6"></a><span class="go">└───────┘</span>
 </span><span id="__span-43-7"><a id="__codelineno-43-7" name="__codelineno-43-7" href="#__codelineno-43-7"></a><span class="go">(1 row)</span>
 </span></code></pre></div></p>
-<h1 id="transpose">Transpose</h1>
+<h2 id="transpose">Transpose</h2>
 <p>A matrix can be transposed with the <code>transpose()</code> function:
 <div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-44-1"><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a><span class="k">select</span><span class="w"> </span><span class="n">print</span><span class="p">(</span><span class="n">transpose</span><span class="p">(</span><span class="n">a</span><span class="p">))</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">test_fixture</span><span class="p">;</span>
 </span><span id="__span-44-2"><a id="__codelineno-44-2" name="__codelineno-44-2" href="#__codelineno-44-2"></a><span class="go">┌────────────────────┐</span>
@@ -3723,7 +3756,7 @@ statistical edge distributions common in sparse graph problems:
 </span><span id="__span-44-12"><a id="__codelineno-44-12" name="__codelineno-44-12" href="#__codelineno-44-12"></a><span class="go">└────────────────────┘</span>
 </span><span id="__span-44-13"><a id="__codelineno-44-13" name="__codelineno-44-13" href="#__codelineno-44-13"></a><span class="go">(1 row)</span>
 </span></code></pre></div></p>
-<h1 id="apply">Apply</h1>
+<h2 id="apply">Apply</h2>
 <p><code>apply</code> takes an operator of type <code>unaryop</code> and applies it to every
 element of the matrix.  The 'ainv_int32' returned the additive
 inverse (the negative value for integers) of every element:
@@ -3741,7 +3774,7 @@ inverse (the negative value for integers) of every element:
 </span><span id="__span-45-12"><a id="__codelineno-45-12" name="__codelineno-45-12" href="#__codelineno-45-12"></a><span class="go">└────────────────────┴────────────┴────────────────────┘</span>
 </span><span id="__span-45-13"><a id="__codelineno-45-13" name="__codelineno-45-13" href="#__codelineno-45-13"></a><span class="go">(1 row)</span>
 </span></code></pre></div></p>
-<h1 id="suitesparse-info">SuiteSparse Info</h1>
+<h2 id="suitesparse-info">SuiteSparse Info</h2>
 <p>The <code>info</code> function returns a descripton of the matrix from
 SuiteSparse.
 <div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-46-1"><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a><span class="k">select</span><span class="w"> </span><span class="n">info</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">test_fixture</span><span class="p">;</span>
@@ -3756,7 +3789,7 @@ SuiteSparse.
 </span><span id="__span-46-10"><a id="__codelineno-46-10" name="__codelineno-46-10" href="#__codelineno-46-10"></a><span class="err">└───────────────────────────────────────────────┘</span>
 </span><span id="__span-46-11"><a id="__codelineno-46-11" name="__codelineno-46-11" href="#__codelineno-46-11"></a><span class="p">(</span><span class="mf">1</span><span class="w"> </span><span class="k">row</span><span class="p">)</span>
 </span></code></pre></div></p>
-<h1 id="matrix-duplication">Matrix Duplication</h1>
+<h2 id="matrix-duplication">Matrix Duplication</h2>
 <p>The <code>dup</code> function duplicates a matrix returning a new matrix
 object with the same values:
 <div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-47-1"><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a><span class="k">select</span><span class="w"> </span><span class="n">dup</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">test_fixture</span><span class="p">;</span>
@@ -3767,7 +3800,7 @@ object with the same values:
 </span><span id="__span-47-6"><a id="__codelineno-47-6" name="__codelineno-47-6" href="#__codelineno-47-6"></a><span class="go">└───────────────────────────────────────────────────────────────────┘</span>
 </span><span id="__span-47-7"><a id="__codelineno-47-7" name="__codelineno-47-7" href="#__codelineno-47-7"></a><span class="go">(1 row)</span>
 </span></code></pre></div></p>
-<h1 id="work-completion">Work Completion</h1>
+<h2 id="work-completion">Work Completion</h2>
 <p>The <code>wait</code> method is used to "complete" a matrix, which may have
 pending operations waiting to be performed when using the default
 SuiteSparse non-blocking mode.  As a side effect, wait will sort
@@ -3782,7 +3815,7 @@ the elements of the input:
 </span></code></pre></div>
 The <code>clear</code> function clears the matrix of all elements and returns
 the same object, but empty.  The dimensions do not change:</p>
-<h1 id="clearing-matrices">Clearing Matrices</h1>
+<h2 id="clearing-matrices">Clearing Matrices</h2>
 <div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-49-1"><a id="__codelineno-49-1" name="__codelineno-49-1" href="#__codelineno-49-1"></a><span class="k">select</span><span class="w"> </span><span class="n">clear</span><span class="p">(</span><span class="s1">&#39;int32[1:1:1 2:2:2 3:3:3]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">);</span>
 </span><span id="__span-49-2"><a id="__codelineno-49-2" name="__codelineno-49-2" href="#__codelineno-49-2"></a><span class="go">┌───────┐</span>
 </span><span id="__span-49-3"><a id="__codelineno-49-3" name="__codelineno-49-3" href="#__codelineno-49-3"></a><span class="go">│ clear │</span>
@@ -3791,7 +3824,7 @@ the same object, but empty.  The dimensions do not change:</p>
 </span><span id="__span-49-6"><a id="__codelineno-49-6" name="__codelineno-49-6" href="#__codelineno-49-6"></a><span class="go">└───────┘</span>
 </span><span id="__span-49-7"><a id="__codelineno-49-7" name="__codelineno-49-7" href="#__codelineno-49-7"></a><span class="go">(1 row)</span>
 </span></code></pre></div>
-<h1 id="extra-tests">Extra tests</h1>
+<h2 id="extra-tests">Extra tests</h2>
 <p>This documentation also forms the basis for the onesparse tests,
 These tests run the documentation against a live server, all the
 above results are automatically generated.
