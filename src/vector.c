@@ -576,16 +576,14 @@ Datum vector_eadd(PG_FUNCTION_ARGS)
 		op = default_binaryop(wtype);
 	}
 
-	if (nargs > 3)
+	if (PG_ARGISNULL(3))
 	{
-		if (PG_ARGISNULL(3))
-		{
-			OS_VSIZE(usize, u);
-			w = new_vector(wtype, usize, CurrentMemoryContext, NULL);
-		}
-		else
-			w = OS_GETARG_VECTOR(3);
+		OS_VSIZE(usize, u);
+		w = new_vector(wtype, usize, CurrentMemoryContext, NULL);
 	}
+	else
+		w = OS_GETARG_VECTOR(3);
+
 	mask = OS_GETARG_VECTOR_HANDLE_OR_NULL(nargs, 4);
 	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 5);
 	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 6);
@@ -632,16 +630,14 @@ Datum vector_emult(PG_FUNCTION_ARGS)
 		op = default_binaryop(wtype);
 	}
 
-	if (nargs > 3)
+	if (PG_ARGISNULL(3))
 	{
-		if (PG_ARGISNULL(3))
-		{
-			OS_VSIZE(usize, u);
-			w = new_vector(wtype, usize, CurrentMemoryContext, NULL);
-		}
-		else
-			w = OS_GETARG_VECTOR(3);
+		OS_VSIZE(usize, u);
+		w = new_vector(wtype, usize, CurrentMemoryContext, NULL);
 	}
+	else
+		w = OS_GETARG_VECTOR(3);
+
 	mask = OS_GETARG_VECTOR_HANDLE_OR_NULL(nargs, 4);
 	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 5);
 	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 6);
@@ -692,16 +688,14 @@ Datum vector_eunion(PG_FUNCTION_ARGS)
 		op = default_binaryop(wtype);
 	}
 
-	if (nargs > 5)
+	if (PG_ARGISNULL(5))
 	{
-		if (PG_ARGISNULL(5))
-		{
-			OS_VSIZE(usize, u);
-			w = new_vector(wtype, usize, CurrentMemoryContext, NULL);
-		}
-		else
-			w = OS_GETARG_VECTOR(5);
+		OS_VSIZE(usize, u);
+		w = new_vector(wtype, usize, CurrentMemoryContext, NULL);
 	}
+	else
+		w = OS_GETARG_VECTOR(5);
+
 	mask = OS_GETARG_VECTOR_HANDLE_OR_NULL(nargs, 6);
 	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 7);
 	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 8);
@@ -821,17 +815,15 @@ Datum vector_select(PG_FUNCTION_ARGS)
 	descriptor = NULL;
 	nargs = PG_NARGS();
 
-	if (nargs > 3)
+	if (PG_ARGISNULL(3))
 	{
-		if (PG_ARGISNULL(3))
-		{
-			OS_VTYPE(type, u);
-			OS_VSIZE(usize, u);
-			w = new_vector(type, usize, CurrentMemoryContext, NULL);
-		}
-		else
-			w = OS_GETARG_VECTOR(3);
+		OS_VTYPE(type, u);
+		OS_VSIZE(usize, u);
+		w = new_vector(type, usize, CurrentMemoryContext, NULL);
 	}
+	else
+		w = OS_GETARG_VECTOR(3);
+
 	mask = OS_GETARG_VECTOR_OR_NULL(nargs, 4);
 	accum = OS_GETARG_BINARYOP_OR_NULL(nargs, 5);
 	descriptor = OS_GETARG_DESCRIPTOR_OR_NULL(nargs, 6);
@@ -871,17 +863,15 @@ Datum vector_apply(PG_FUNCTION_ARGS)
 	descriptor = NULL;
 	nargs = PG_NARGS();
 
-	if (nargs > 2)
+	if (PG_ARGISNULL(2))
 	{
-		if (PG_ARGISNULL(2))
-		{
-			OS_VTYPE(type, u);
-			OS_VSIZE(usize, u);
-			w = new_vector(type, usize, CurrentMemoryContext, NULL);
-		}
-		else
-			w = OS_GETARG_VECTOR(2);
+		OS_VTYPE(type, u);
+		OS_VSIZE(usize, u);
+		w = new_vector(type, usize, CurrentMemoryContext, NULL);
 	}
+	else
+		w = OS_GETARG_VECTOR(2);
+
 	mask = OS_GETARG_VECTOR_OR_NULL(nargs, 3);
 	accum = OS_GETARG_BINARYOP_OR_NULL(nargs, 4);
 	descriptor = OS_GETARG_DESCRIPTOR_OR_NULL(nargs, 5);
@@ -925,16 +915,14 @@ Datum vector_apply_first(PG_FUNCTION_ARGS)
 		binaryop = default_binaryop(type);
 	}
 
-	if (nargs > 3)
+	if (PG_ARGISNULL(3))
 	{
-		if (PG_ARGISNULL(3))
-		{
-			OS_VSIZE(usize, u);
-			w = new_vector(type, usize, CurrentMemoryContext, NULL);
-		}
-		else
-			w = OS_GETARG_VECTOR(3);
+		OS_VSIZE(usize, u);
+		w = new_vector(type, usize, CurrentMemoryContext, NULL);
 	}
+	else
+		w = OS_GETARG_VECTOR(3);
+
 	mask = OS_GETARG_VECTOR_HANDLE_OR_NULL(nargs, 4);
 	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 5);
 	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 6);
@@ -978,16 +966,14 @@ Datum vector_apply_second(PG_FUNCTION_ARGS)
 		binaryop = default_binaryop(type);
 	}
 
-	if (nargs > 3)
+	if (PG_ARGISNULL(3))
 	{
-		if (PG_ARGISNULL(3))
-		{
-			OS_VSIZE(usize, u);
-			w = new_vector(type, usize, CurrentMemoryContext, NULL);
-		}
-		else
-			w = OS_GETARG_VECTOR(3);
+		OS_VSIZE(usize, u);
+		w = new_vector(type, usize, CurrentMemoryContext, NULL);
 	}
+	else
+		w = OS_GETARG_VECTOR(3);
+
 	mask = OS_GETARG_VECTOR_HANDLE_OR_NULL(nargs, 4);
 	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 5);
 	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 6);

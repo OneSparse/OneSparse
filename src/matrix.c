@@ -650,17 +650,15 @@ Datum matrix_eadd(PG_FUNCTION_ARGS)
 		op = default_binaryop(wtype);
 	}
 
-	if (nargs > 3)
+	if (PG_ARGISNULL(3))
 	{
-		if (PG_ARGISNULL(3))
-		{
-			OS_MNROWS(nrows, u);
-			OS_MNCOLS(ncols, u);
-			w = new_matrix(wtype, nrows, ncols, CurrentMemoryContext, NULL);
-		}
-		else
-			w = OS_GETARG_MATRIX(3);
+		OS_MNROWS(nrows, u);
+		OS_MNCOLS(ncols, u);
+		w = new_matrix(wtype, nrows, ncols, CurrentMemoryContext, NULL);
 	}
+	else
+		w = OS_GETARG_MATRIX(3);
+
 	mask = OS_GETARG_MATRIX_HANDLE_OR_NULL(nargs, 4);
 	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 5);
 	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 6);
@@ -705,17 +703,15 @@ Datum matrix_emult(PG_FUNCTION_ARGS)
 		op = default_binaryop(wtype);
 	}
 
-	if (nargs > 3)
+	if (PG_ARGISNULL(3))
 	{
-		if (PG_ARGISNULL(3))
-		{
-			OS_MNROWS(nrows, u);
-			OS_MNCOLS(ncols, u);
-			w = new_matrix(wtype, nrows, ncols, CurrentMemoryContext, NULL);
-		}
-		else
-			w = OS_GETARG_MATRIX(3);
+		OS_MNROWS(nrows, u);
+		OS_MNCOLS(ncols, u);
+		w = new_matrix(wtype, nrows, ncols, CurrentMemoryContext, NULL);
 	}
+	else
+		w = OS_GETARG_MATRIX(3);
+
 	mask = OS_GETARG_MATRIX_HANDLE_OR_NULL(nargs, 4);
 	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 5);
 	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 6);
@@ -766,17 +762,15 @@ Datum matrix_eunion(PG_FUNCTION_ARGS)
 	{
 		op = default_binaryop(wtype);
 	}
-	if (nargs > 5)
+	if (PG_ARGISNULL(5))
 	{
-		if (PG_ARGISNULL(5))
-		{
-			OS_MNROWS(nrows, u);
-			OS_MNCOLS(ncols, u);
-			w = new_matrix(wtype, nrows, ncols, CurrentMemoryContext, NULL);
-		}
-		else
-			w = OS_GETARG_MATRIX(5);
+		OS_MNROWS(nrows, u);
+		OS_MNCOLS(ncols, u);
+		w = new_matrix(wtype, nrows, ncols, CurrentMemoryContext, NULL);
 	}
+	else
+		w = OS_GETARG_MATRIX(5);
+
 	mask = OS_GETARG_MATRIX_HANDLE_OR_NULL(nargs, 6);
 	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 7);
 	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 8);
@@ -824,17 +818,15 @@ Datum matrix_mxm(PG_FUNCTION_ARGS)
 		semiring = default_semiring(ctype);
 	}
 
-	if (nargs > 3)
+	if (PG_ARGISNULL(3))
 	{
-		if (PG_ARGISNULL(3))
-		{
-			OS_MNROWS(nrows, a);
-			OS_MNCOLS(ncols, b);
-			c = new_matrix(ctype, nrows, ncols, CurrentMemoryContext, NULL);
-		}
-		else
-			c = OS_GETARG_MATRIX(3);
+		OS_MNROWS(nrows, a);
+		OS_MNCOLS(ncols, b);
+		c = new_matrix(ctype, nrows, ncols, CurrentMemoryContext, NULL);
 	}
+	else
+		c = OS_GETARG_MATRIX(3);
+
 	mask = OS_GETARG_MATRIX_HANDLE_OR_NULL(nargs, 4);
 	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 5);
 	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 6);
@@ -882,16 +874,14 @@ Datum matrix_mxv(PG_FUNCTION_ARGS)
 		semiring = default_semiring(ctype);
 	}
 
-	if (nargs > 3)
+	if (PG_ARGISNULL(3))
 	{
-		if (PG_ARGISNULL(3))
-		{
-			OS_VSIZE(bsize, b);
-			c = new_vector(ctype, bsize, CurrentMemoryContext, NULL);
-		}
-		else
-			c = OS_GETARG_VECTOR(3);
+		OS_VSIZE(bsize, b);
+		c = new_vector(ctype, bsize, CurrentMemoryContext, NULL);
 	}
+	else
+		c = OS_GETARG_VECTOR(3);
+
 	mask = OS_GETARG_VECTOR_HANDLE_OR_NULL(nargs, 4);
 	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 5);
 	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 6);
@@ -939,16 +929,14 @@ Datum matrix_vxm(PG_FUNCTION_ARGS)
 		semiring = default_semiring(ctype);
 	}
 
-	if (nargs > 3)
+	if (PG_ARGISNULL(3))
 	{
-		if (PG_ARGISNULL(3))
-		{
-			OS_VSIZE(asize, a);
-			c = new_vector(ctype, asize, CurrentMemoryContext, NULL);
-		}
-		else
-			c = OS_GETARG_VECTOR(3);
+		OS_VSIZE(asize, a);
+		c = new_vector(ctype, asize, CurrentMemoryContext, NULL);
 	}
+	else
+		c = OS_GETARG_VECTOR(3);
+
 	mask = OS_GETARG_VECTOR_HANDLE_OR_NULL(nargs, 4);
 	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 5);
 	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 6);
@@ -995,20 +983,18 @@ Datum matrix_kron(PG_FUNCTION_ARGS)
 		semiring = default_semiring(ctype);
 	}
 
-	if (nargs > 3)
+	if (PG_ARGISNULL(3))
 	{
-		if (PG_ARGISNULL(3))
-		{
-			OS_MNROWS(anrows, a);
-			OS_MNROWS(bnrows, b);
-			OS_MNCOLS(ancols, a);
-			OS_MNCOLS(bncols, b);
-			ctype = type_promote(atype, btype);
-			c = new_matrix(ctype, anrows * bncols, ancols * bnrows, CurrentMemoryContext, NULL);
-		}
-		else
-			c = OS_GETARG_MATRIX(3);
+		OS_MNROWS(anrows, a);
+		OS_MNROWS(bnrows, b);
+		OS_MNCOLS(ancols, a);
+		OS_MNCOLS(bncols, b);
+		ctype = type_promote(atype, btype);
+		c = new_matrix(ctype, anrows * bncols, ancols * bnrows, CurrentMemoryContext, NULL);
 	}
+	else
+		c = OS_GETARG_MATRIX(3);
+
 	mask = OS_GETARG_MATRIX_HANDLE_OR_NULL(nargs, 4);
 	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 5);
 	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 6);
@@ -1051,16 +1037,14 @@ Datum matrix_reduce_vector(PG_FUNCTION_ARGS)
 		monoid = default_monoid(type);
 	}
 
-	if (nargs > 2)
+	if (PG_ARGISNULL(2))
 	{
-		if (PG_ARGISNULL(2))
-		{
-			OS_MNROWS(vsize, a);
-			w = new_vector(type, vsize, CurrentMemoryContext, NULL);
-		}
-		else
-			w = OS_GETARG_VECTOR(2);
+		OS_MNROWS(vsize, a);
+		w = new_vector(type, vsize, CurrentMemoryContext, NULL);
 	}
+	else
+		w = OS_GETARG_VECTOR(2);
+
 	mask = OS_GETARG_VECTOR_HANDLE_OR_NULL(nargs, 3);
 	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 4);
 	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 5);
@@ -1228,18 +1212,16 @@ Datum matrix_select(PG_FUNCTION_ARGS)
 	op = OS_GETARG_INDEXUNARYOP(1);
 	y = OS_GETARG_SCALAR(2);
 
-	if (nargs > 3)
+	if (PG_ARGISNULL(3))
 	{
-		if (PG_ARGISNULL(3))
-		{
-			OS_MTYPE(type, A);
-			OS_MNROWS(nrows, A);
-			OS_MNCOLS(ncols, A);
-			C = new_matrix(type, nrows, ncols, CurrentMemoryContext, NULL);
-		}
-		else
-			C = OS_GETARG_MATRIX(3);
+		OS_MTYPE(type, A);
+		OS_MNROWS(nrows, A);
+		OS_MNCOLS(ncols, A);
+		C = new_matrix(type, nrows, ncols, CurrentMemoryContext, NULL);
 	}
+	else
+		C = OS_GETARG_MATRIX(3);
+
 	mask = OS_GETARG_MATRIX_OR_NULL(nargs, 4);
 	accum = OS_GETARG_BINARYOP_OR_NULL(nargs, 5);
 	descriptor = OS_GETARG_DESCRIPTOR_OR_NULL(nargs, 6);
@@ -1273,18 +1255,16 @@ Datum matrix_transpose(PG_FUNCTION_ARGS)
 	nargs = PG_NARGS();
 	a = OS_GETARG_MATRIX(0);
 
-	if (nargs > 1)
+	if (PG_ARGISNULL(1))
 	{
-		if (PG_ARGISNULL(1))
-		{
-			OS_MTYPE(type, a);
-			OS_MNROWS(nrows, a);
-			OS_MNCOLS(ncols, a);
-			c = new_matrix(type, nrows, ncols, CurrentMemoryContext, NULL);
-		}
-		else
-			c = OS_GETARG_MATRIX(2);
+		OS_MTYPE(type, a);
+		OS_MNROWS(nrows, a);
+		OS_MNCOLS(ncols, a);
+		c = new_matrix(type, nrows, ncols, CurrentMemoryContext, NULL);
 	}
+	else
+		c = OS_GETARG_MATRIX(2);
+
 	mask = OS_GETARG_MATRIX_HANDLE_OR_NULL(nargs, 2);
 	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 3);
 	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 4);
@@ -1317,18 +1297,16 @@ Datum matrix_apply(PG_FUNCTION_ARGS)
 	A = OS_GETARG_MATRIX(0);
 	op = OS_GETARG_UNARYOP(1);
 
-	if (nargs > 2)
+	if (PG_ARGISNULL(2))
 	{
-		if (PG_ARGISNULL(2))
-		{
-			OS_MTYPE(type, A);
-			OS_MNROWS(nrows, A);
-			OS_MNCOLS(ncols, A);
-			C = new_matrix(type, nrows, ncols, CurrentMemoryContext, NULL);
-		}
-		else
-			C = OS_GETARG_MATRIX(2);
+		OS_MTYPE(type, A);
+		OS_MNROWS(nrows, A);
+		OS_MNCOLS(ncols, A);
+		C = new_matrix(type, nrows, ncols, CurrentMemoryContext, NULL);
 	}
+	else
+		C = OS_GETARG_MATRIX(2);
+
 	mask = OS_GETARG_MATRIX_OR_NULL(nargs, 3);
 	accum = OS_GETARG_BINARYOP_OR_NULL(nargs, 4);
 	descriptor = OS_GETARG_DESCRIPTOR_OR_NULL(nargs, 5);
@@ -1372,17 +1350,15 @@ Datum matrix_apply_first(PG_FUNCTION_ARGS)
 		binaryop = default_binaryop(type);
 	}
 
-	if (nargs > 3)
+	if (PG_ARGISNULL(3))
 	{
-		if (PG_ARGISNULL(3))
-		{
-			OS_MNROWS(nrows, a);
-			OS_MNCOLS(ncols, a);
-			c = new_matrix(type, nrows, ncols, CurrentMemoryContext, NULL);
-		}
-		else
-			c = OS_GETARG_MATRIX(3);
+		OS_MNROWS(nrows, a);
+		OS_MNCOLS(ncols, a);
+		c = new_matrix(type, nrows, ncols, CurrentMemoryContext, NULL);
 	}
+	else
+		c = OS_GETARG_MATRIX(3);
+
 	mask = OS_GETARG_MATRIX_HANDLE_OR_NULL(nargs, 4);
 	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 5);
 	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 6);
@@ -1426,17 +1402,15 @@ Datum matrix_apply_second(PG_FUNCTION_ARGS)
 		binaryop = default_binaryop(type);
 	}
 
-	if (nargs > 3)
+	if (PG_ARGISNULL(3))
 	{
-		if (PG_ARGISNULL(3))
-		{
-			OS_MNROWS(nrows, a);
-			OS_MNCOLS(ncols, a);
-			c = new_matrix(type, nrows, ncols, CurrentMemoryContext, NULL);
-		}
-		else
-			c = OS_GETARG_MATRIX(3);
+		OS_MNROWS(nrows, a);
+		OS_MNCOLS(ncols, a);
+		c = new_matrix(type, nrows, ncols, CurrentMemoryContext, NULL);
 	}
+	else
+		c = OS_GETARG_MATRIX(3);
+
 	mask = OS_GETARG_MATRIX_HANDLE_OR_NULL(nargs, 4);
 	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 5);
 	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 6);

@@ -1,4 +1,6 @@
 FROM ubuntu:latest
+ARG UID    
+ARG GID
    
 # install base dependences    
 RUN apt-get update && \
@@ -8,7 +10,7 @@ RUN apt-get update && \
 
 RUN deluser --remove-home ubuntu
 # add postgres user and make data dir        
-RUN groupadd -r postgres && useradd --no-log-init -r -m -s /bin/bash -g postgres -G sudo postgres
+RUN groupadd --gid ${GID} -r postgres && useradd --uid ${UID} --gid ${GID} --no-log-init -r -m -s /bin/bash -g postgres -G sudo postgres
 
 # make postgres a sudoer
 RUN echo "postgres ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/user && \
@@ -27,7 +29,7 @@ RUN git clone --branch REL_17_STABLE https://github.com/postgres/postgres.git --
     --without-icu \
     --enable-debug \
     --enable-depend --enable-cassert --enable-profiling \
-#    CFLAGS="-ggdb -Og -g3 -fno-omit-frame-pointer" \
+    CFLAGS="-ggdb -Og -g3 -fno-omit-frame-pointer" \
 #    CFLAGS="-O3" \
     && make -j 4 && sudo make install
 
@@ -44,8 +46,16 @@ RUN sudo ldconfig
 RUN mkdir "/home/postgres/onesparse"
 WORKDIR "/home/postgres/onesparse"
 COPY . .
+    
+RUN python3 -m venv .virt
+RUN . .virt/bin/activate    
+RUN .virt/bin/pip3 install pyclibrary
 
-RUN sudo make && sudo make install && sudo make clean
+RUN sudo chown -R postgres:postgres /home/postgres/onesparse
+
+# make the extension
+RUN .virt/bin/python3 generate.py onesparse/onesparse--0.1.0.sql
+RUN make && sudo make install && make clean
 
 # start the database            
 RUN initdb -D "$PGDATA" -c shared_preload_libraries='onesparse' -c search_path='onesparse' --encoding UTF8

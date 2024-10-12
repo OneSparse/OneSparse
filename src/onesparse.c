@@ -259,7 +259,6 @@ void _PG_init(void)
 	initialize_binaryops();
 	initialize_monoids();
 	initialize_semirings();
-    GrB_set (GrB_GLOBAL, true, GxB_BURBLE);
 }
 
 

@@ -4,6 +4,8 @@
 #include <string.h>
 #include <errno.h>
 #include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include "postgres.h"
 #include "common/fe_memutils.h"
 #include "utils/builtins.h"
