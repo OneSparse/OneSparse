@@ -20,6 +20,7 @@ RUN apt-get update -y && apt-get install -y \
     cmake \
     m4 \
     zlib1g-dev \
+    graphviz \
     postgresql-server-dev-17
 
 USER postgres
