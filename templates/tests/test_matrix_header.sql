@@ -16,25 +16,32 @@ create extension if not exists onesparse;
 \set ECHO all
 \o
 
--- OneSparse wraps the SuiteSparse:GraphBLAS library and extends
--- Postgres by adding new types and functions that allow you to do
--- sparse and dense linear algebra in Postgres.  This is similar to
--- functionality packages like `numpy` and `scipy.sparse` bring to
--- Python.
+-- OneSparse wraps the
+-- [SuiteSparse:GraphBLAS](http://faculty.cse.tamu.edu/davis/GraphBLAS.html)
+-- library and extends Postgres by adding new types and functions that
+-- allow you to do sparse and dense linear algebra in Postgres.  This
+-- is similar to functionality packages like `numpy` and
+-- `scipy.sparse` bring to Python.
 --
--- The most powerful object in OneSparse is a Matrix.  A Matrix is a
--- two dimensional array of data with a certain number of rows *m* and
--- columns *n*.  Typically matrices are very memory hungry data
+-- While a full grasp of the GraphBLAS API is not necessary to follow
+-- along with this guide there are many details that are not spelled
+-- out in great details here.  For complete details on the API and
+-- expected behaviors, see the [SuiteSparse:GraphBLAS User
+-- Guide](https://github.com/DrTimothyAldenDavis/SuiteSparse/blob/dev/GraphBLAS/Doc/GraphBLAS_UserGuide.pdf).
+--
+-- The most fundamenteal object in OneSparse is a Matrix.  A Matrix is
+-- a two dimensional array of data with a certain number of rows *m*
+-- and columns *n*.  Typically matrices are very memory hungry data
 -- structures, requiring `m * n` memory to hold all of the elements.
 --
 -- This limits traditional matrix libraries, because many problems in
 -- linear algebra are *sparse*.  Not every element is used in the
 -- problem or even definable.  Traditional linear algebra libraries
 -- usually encode sparse matrices into dense matrices by using the
--- number zero to indicate "nothing", but this does not aleviate the
--- memory problem.  For matrices with a large number of rows and
+-- number zero to indicate "nothing", but this approach does not solve
+-- the memory problem.  For matrices with a large number of rows and
 -- columns this means vast areas of memories filled with zeros that
--- end up being multiplied away, wasting energy.
+-- end up being multiplied away, which also wastes time and energy.
 --
 -- OneSparse matrices however are smart, and can adapt to the number
 -- of actually useful elements in a Matrix.  They can be dense or
@@ -44,10 +51,10 @@ create extension if not exists onesparse;
 -- ## Matrices and Graphs
 --
 -- Every matrix is a graph, whether you think of it that way or not.
--- And every graph has a corresponding matrix.  The data that you put
--- into tables can also describe a graph, and thus a matrix.  These
--- three different ways of thinking about tables, graphs, and matrices
--- is one of the core concepts of OneSparse:
+-- And every graph has a corresponding matrix.  A lot of data that you
+-- put into postgres tables can also describe a graph, and thus a
+-- matrix.  These three different ways of thinking about tables,
+-- graphs, and matrices is one of the core concepts of OneSparse:
 --
 -- ![Tables, Graphs, and Matrices](./table_graph_matrix.png)
 --
@@ -57,6 +64,16 @@ create extension if not exists onesparse;
 -- this case SuiteSparse will automatically store it in a dense
 -- optimal format and use CPUs or GPUs appropriately to process them.
 --
+-- ## Getting Started
+--
+-- The examples below are all what you would see typing the exact
+-- queries out in `psql`.  The GraphBLAS API is large, so onesparse is
+-- always contained in the `onesparse` postgres schema.  For the sake
+-- of brevity, let's set the `search_path` so that we can just type
+-- `matrix` instead of `onesparse.matrix` everywhere.
+
+SET search_path TO public,onesparse;
+
 -- If the matrix has bounds, it can be printed to the console if they
 -- are reasonable size, this is useful for debugging and
 -- experimentation:
@@ -128,11 +145,26 @@ select draw(d) as draw_source from test_fixture \gset
 
 select print(s) from test_fixture;
 
+-- ## Random Matrices
+--
+-- `random_matrix` will generate a random matrix provided the type,
+-- number of rows, number of columns, and the number of (approximate)
+-- values, an optional max value, and an optional random seed for
+-- deterministic generation:
+
+select print(random_matrix(8, 8, 16, seed=>0.42, max=>42)) as random_matrix;
+
+-- This random matrix is also a random *graph*:
+--
+
+select draw(random_matrix(8, 8, 16, seed=>0.42, max=>42)) as draw_source \gset
+\i sql/draw.sql
+
+-- ## Empty Matrices
+--
 -- The `matrix` data type wraps a SuiteSparse GrB_Matrix handle and
 -- delegates functions from SQL to the library through instances of
 -- this type.
---
--- ## Empty Matrices
 --
 -- An empty matrix can be constructed many ways, but one of the
 -- simplest is casting a type code to the matrix type.  In this case
@@ -235,21 +267,6 @@ select get_element(a, 3, 2) as get_element from test_fixture;
 -- scalar:
 
 select get_element(a, 3, 3) as get_element from test_fixture;
-
--- ## Random Matrices
---
--- `random_matrix` will generate a random matrix provided the type,
--- number of rows, number of columns, and the number of (approximate)
--- values, an optional max value, and an optional random seed for
--- deterministic generation:
-
-select print(random_matrix(8, 8, 16, seed=>0.42, max=>42)) as random_matrix;
-
--- This random matrix is also a random *graph*:
---
-
-select draw(random_matrix(8, 8, 16, seed=>0.42, max=>42)) as draw_source \gset
-\i sql/draw.sql
 
 -- ## Elementwise Addition
 --
@@ -442,8 +459,8 @@ select draw(s) as binop_a_source, draw(s) as binop_b_source, draw(kronecker(s, s
 
 -- ## Kronecker Power
 --
---There's a special function for exponentiating a matrix to itself
--- a certain number of times, `kronpower`.:
+-- There's a special function for exponentiating a matrix to itself a
+-- certain number of times, `kronpower`:
 
 select print(kronpower(s, 2)) from test_fixture;
 
@@ -451,7 +468,7 @@ select print(kronpower(s, 2)) from test_fixture;
 -- distributions.  These are handy synthetic graphs to mimic certain
 -- statistical edge distributions common in sparse graph problems:
 
-select nvals(kronpower(s, 3)) from test_fixture;
+select nvals(kronpower(s, 4)) from test_fixture;
 
 -- ## Transpose
 --

@@ -54,7 +54,7 @@ RUN .virt/bin/pip3 install pyclibrary
 RUN sudo chown -R postgres:postgres /home/postgres/onesparse
 
 # make the extension
-RUN .virt/bin/python3 generate.py onesparse/onesparse--0.1.0.sql
+# RUN .virt/bin/python3 generate.py onesparse/onesparse--0.1.0.sql
 RUN make && sudo make install && make clean
 
 # start the database            
