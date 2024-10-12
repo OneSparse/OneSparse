@@ -1,4 +1,5 @@
-# Scalar `float4`
+
+## Scalar `float4`
 
 Test various scalar math operations with native Postgres types
 ``` postgres-console

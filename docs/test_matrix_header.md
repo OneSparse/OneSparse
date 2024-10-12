@@ -1100,8 +1100,9 @@ This random matrix is also a random *graph*:
 The GraphBLAS API has elementwise operations on matrices that
 operate pairs of matrices.  `eadd` computes the element-wise
 “addition” of two matrices a and b, element-wise using any binary
-operator.  Elements present on both sides of the operation are
-included in the result.
+operator.  The "add" in the name means that the union of both
+graphs is taken; elements present on both sides of the operation
+are included in the result.
 ``` postgres-console
 select print(a) as a, binaryop, print(b) as b, print(eadd(a, b, binaryop)) as eadd from test_fixture;
 ┌────────────────────┬─────────────┬────────────────────┬────────────────────┐
@@ -1118,13 +1119,24 @@ select print(a) as a, binaryop, print(b) as b, print(eadd(a, b, binaryop)) as ea
 (1 row)
 
 ```
-Eadd can also be accomplished with the '+' operator:
+Eadd can also be accomplished with binary operators specific to
+OneSparse.  Different binaryops are passed to eadd to do different
+elementwise operations:
 ``` postgres-console
-select print(a) as a, binaryop, print(b) as b, print(a + b) as eadd from test_fixture;
-ERROR:  operator does not exist: matrix + matrix
-LINE 1: ...t print(a) as a, binaryop, print(b) as b, print(a + b) as ea...
-                                                             ^
-HINT:  No operator matches the given name and argument types. You might need to add explicit type casts.
+select print(a |+ b) as "a |+ b", print(a |- b) as "a |- b", print(a |* b) as "a |* b", print(a |/ b) as "a |/ b" from test_fixture;
+┌────────────────────┬────────────────────┬────────────────────┬────────────────────┐
+│       a |+ b       │       a |- b       │       a |* b       │       a |/ b       │
+├────────────────────┼────────────────────┼────────────────────┼────────────────────┤
+│      0  1  2  3    │      0  1  2  3    │      0  1  2  3    │      0  1  2  3    │
+│    ────────────    │    ────────────    │    ────────────    │    ────────────    │
+│  0│        0  7    │  0│        0 -1    │  0│        0 12    │  0│        0  0    │
+│  1│  2     4  1    │  1│  2    -2 -1    │  1│  2     3  0    │  1│  2     0  0    │
+│  2│  2  4     4    │  2│  2  0     4    │  2│  2  4     4    │  2│  2  1     4    │
+│  3│  2  0  3       │  3│  2  0 -1       │  3│  2  0  2       │  3│  2  0  0       │
+│                    │                    │                    │                    │
+└────────────────────┴────────────────────┴────────────────────┴────────────────────┘
+(1 row)
+
 ```
 From a graph standpoint, elementwise addition can be seen as the
 merging ("union") of two graphs, such that the result has edges
@@ -1461,13 +1473,24 @@ select print(a) as a, binaryop, print(b) as b, print(emult(a, b, binaryop)) as e
 (1 row)
 
 ```
-Emult can also be accomplished with the '*' operator:
+Eadd can also be accomplished with binary operators specific to
+OneSparse.  Different binaryops are passed to eadd to do different
+elementwise operations:
 ``` postgres-console
-select print(a) as a, binaryop, print(b) as b, print(a * b) as emult from test_fixture;
-ERROR:  operator does not exist: matrix * matrix
-LINE 1: ...t print(a) as a, binaryop, print(b) as b, print(a * b) as em...
-                                                             ^
-HINT:  No operator matches the given name and argument types. You might need to add explicit type casts.
+select print(a &+ b) as "a &+ b", print(a &- b) as "a &- b", print(a &* b) as "a &* b", print(a &/ b) as "a &/ b" from test_fixture;
+┌────────────────────┬────────────────────┬────────────────────┬────────────────────┐
+│       a &+ b       │       a &- b       │       a &* b       │       a &/ b       │
+├────────────────────┼────────────────────┼────────────────────┼────────────────────┤
+│      0  1  2  3    │      0  1  2  3    │      0  1  2  3    │      0  1  2  3    │
+│    ────────────    │    ────────────    │    ────────────    │    ────────────    │
+│  0│           7    │  0│          -1    │  0│          12    │  0│           0    │
+│  1│        4  1    │  1│       -2 -1    │  1│        3  0    │  1│        0  0    │
+│  2│     4          │  2│     0          │  2│     4          │  2│     1          │
+│  3│        3       │  3│       -1       │  3│        2       │  3│        0       │
+│                    │                    │                    │                    │
+└────────────────────┴────────────────────┴────────────────────┴────────────────────┘
+(1 row)
+
 ```
 From a graph standpoint, elementwise multiplication can be seen as
 the intersection of two graphs, such that the result has edges that

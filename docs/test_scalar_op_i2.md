@@ -1,4 +1,5 @@
-# Scalar `smallint`
+
+## Scalar `smallint`
 
 Test various scalar math operations with native Postgres types
 ``` postgres-console

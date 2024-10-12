@@ -256,14 +256,17 @@ select draw(random_matrix(8, 8, 16, seed=>0.42, max=>42)) as draw_source \gset
 -- The GraphBLAS API has elementwise operations on matrices that
 -- operate pairs of matrices.  `eadd` computes the element-wise
 -- “addition” of two matrices a and b, element-wise using any binary
--- operator.  Elements present on both sides of the operation are
--- included in the result.
+-- operator.  The "add" in the name means that the union of both
+-- graphs is taken; elements present on both sides of the operation
+-- are included in the result.
 
 select print(a) as a, binaryop, print(b) as b, print(eadd(a, b, binaryop)) as eadd from test_fixture;
 
--- Eadd can also be accomplished with the '+' operator:
+-- Eadd can also be accomplished with binary operators specific to
+-- OneSparse.  Different binaryops are passed to eadd to do different
+-- elementwise operations:
 
-select print(a) as a, binaryop, print(b) as b, print(a + b) as eadd from test_fixture;
+select print(a |+ b) as "a |+ b", print(a |- b) as "a |- b", print(a |* b) as "a |* b", print(a |/ b) as "a |/ b" from test_fixture;
 
 -- From a graph standpoint, elementwise addition can be seen as the
 -- merging ("union") of two graphs, such that the result has edges
@@ -283,9 +286,11 @@ select draw(a) as binop_a_source, draw(b) as binop_b_source, draw(eadd(a, b, bin
 
 select print(a) as a, binaryop, print(b) as b, print(emult(a, b, binaryop)) as emult from test_fixture;
 
--- Emult can also be accomplished with the '*' operator:
+-- Eadd can also be accomplished with binary operators specific to
+-- OneSparse.  Different binaryops are passed to eadd to do different
+-- elementwise operations:
 
-select print(a) as a, binaryop, print(b) as b, print(a * b) as emult from test_fixture;
+select print(a &+ b) as "a &+ b", print(a &- b) as "a &- b", print(a &* b) as "a &* b", print(a &/ b) as "a &/ b" from test_fixture;
 
 -- From a graph standpoint, elementwise multiplication can be seen as
 -- the intersection of two graphs, such that the result has edges that

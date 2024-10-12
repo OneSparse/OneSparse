@@ -1,4 +1,5 @@
--- # Scalar `integer`
+--
+-- ## Scalar `integer`
 --
 -- Test various scalar math operations with native Postgres types
 select (1::integer)::scalar + -1::integer;

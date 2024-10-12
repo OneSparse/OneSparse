@@ -1,4 +1,5 @@
-# Scalar `bigint`
+
+## Scalar `bigint`
 
 Test various scalar math operations with native Postgres types
 ``` postgres-console

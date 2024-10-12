@@ -1,4 +1,5 @@
--- # Scalar `smallint`
+--
+-- ## Scalar `smallint`
 --
 -- Test various scalar math operations with native Postgres types
 select (1::smallint)::scalar + -1::smallint;

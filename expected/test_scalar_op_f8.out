@@ -1,4 +1,5 @@
--- # Scalar `float8`
+--
+-- ## Scalar `float8`
 --
 -- Test various scalar math operations with native Postgres types
 select (1::float8)::scalar + -1::float8;

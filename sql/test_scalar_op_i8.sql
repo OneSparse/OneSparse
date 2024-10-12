@@ -1,4 +1,5 @@
--- # Scalar `bigint`
+--
+-- ## Scalar `bigint`
 --
 -- Test various scalar math operations with native Postgres types
 select (1::bigint)::scalar + -1::bigint;

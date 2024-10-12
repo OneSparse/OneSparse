@@ -1,4 +1,5 @@
--- # Scalar `{type.pgtype}`
+--
+-- ## Scalar `{type.pgtype}`
 --
 -- Test various scalar math operations with native Postgres types
 select ({type.max}::{type.pgtype})::scalar + {type.min}::{type.pgtype};
