@@ -17,9 +17,6 @@ PG_FUNCTION_INFO_V1(monoid_in);
 PG_FUNCTION_INFO_V1(monoid_out);
 PG_FUNCTION_INFO_V1(monoid_name);
 
-void initialize_monoids(void);
-GrB_Monoid lookup_monoid(char *name);
-
 #include "monoid_header.h"
 
 static Size monoid_get_flat_size(ExpandedObjectHeader *eohptr) {

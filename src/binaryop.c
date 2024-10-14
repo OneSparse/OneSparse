@@ -18,7 +18,6 @@ PG_FUNCTION_INFO_V1(binaryop_out);
 PG_FUNCTION_INFO_V1(binaryop_name);
 
 void initialize_binaryops(void);
-GrB_BinaryOp lookup_binaryop(char *name);
 
 #include "binaryop_header.h"
 

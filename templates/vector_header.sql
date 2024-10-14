@@ -109,7 +109,7 @@ RETURNS vector
 AS '$libdir/onesparse', 'vector_assign'
 LANGUAGE C STABLE;
 
-CREATE FUNCTION selection(
+CREATE FUNCTION choose(
     u vector,
     op indexunaryop,
     y scalar,
@@ -179,6 +179,15 @@ CREATE FUNCTION contains(a vector, i bigint)
 RETURNS bool
 AS '$libdir/onesparse', 'vector_contains'
 LANGUAGE C STABLE;
+
+CREATE FUNCTION eq(a vector, b vector)
+RETURNS bool
+AS '$libdir/onesparse', 'vector_eq'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION neq(a vector, b vector)
+RETURNS bool
+RETURN NOT eq(a, b);
 
 CREATE FUNCTION info(a vector, level int default 1)
 RETURNS text
@@ -264,6 +273,18 @@ RETURN onesparse.apply(s, a, ('times_' || name(type(a)))::binaryop);
 CREATE FUNCTION times_second_op(a vector, s scalar)
 RETURNS vector
 RETURN onesparse.apply(a, s, ('times_' || name(type(a)))::binaryop);
+
+CREATE OPERATOR = (
+    LEFTARG = vector,
+    RIGHTARG = vector,
+    FUNCTION = eq
+    );
+
+CREATE OPERATOR != (
+    LEFTARG = vector,
+    RIGHTARG = vector,
+    FUNCTION = neq
+    );
 
 -- scalar apply ops
 

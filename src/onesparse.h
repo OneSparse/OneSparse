@@ -112,14 +112,20 @@ void *realloc_function(void*, size_t);
 void free_function(void*);
 
 void initialize_types(void);
-void initialize_descriptors();
-void initialize_unaryops();
-void initialize_indexunaryops();
-void initialize_binaryops();
-void initialize_monoids();
-void initialize_semirings();
+void initialize_descriptors(void);
+void initialize_unaryops(void);
+void initialize_indexunaryops(void);
+void initialize_binaryops(void);
+void initialize_monoids(void);
+void initialize_semirings(void);
 
 GrB_Type lookup_type(char *name);
+GrB_Descriptor lookup_descriptor(char *name);
+GrB_UnaryOp lookup_unaryop(char *name);
+GrB_IndexUnaryOp lookup_indexunaryop(char *name);
+GrB_BinaryOp lookup_binaryop(char *name);
+GrB_Monoid lookup_monoid(char *name);
+GrB_Semiring lookup_semiring(char *name);
 
 void _PG_init(void);
 

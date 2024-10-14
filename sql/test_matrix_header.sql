@@ -254,6 +254,14 @@ select matrix_agg(i, i, i) as unbound_matrix from generate_series(0, 10) as i;
 
 select print(resize(matrix_agg(i, i, i), 10, 10)) as bound_matrix from generate_series(0, 10) as i;
 
+-- ## Equality
+--
+-- Two matrices can be compared for equality with the '=' and '!=' operators:
+
+select a != b as "a != b", a = b as "a = b", b = a as "b = a", b = b as "b = b" from test_fixture;
+
+-- ## Setting and Getting individual Elements
+
 -- Elements can be set individually with `set_element`, the modified
 -- input is returned:
 
@@ -417,29 +425,34 @@ select draw(v) as binop_a_source, draw(b) as binop_b_source, draw(vxm(v, b)) as 
 
 select print(v) as v, '@' as "@", print(b) as b, print(v @ b) as vxm from test_fixture;
 
--- ## Element Selection
+-- ## Choosing Elements
 --
--- The `selection` method calls the `GrB_select()` API function.  The
--- name `selection` was chosen not to conflict with the SQL keyword
+-- The `choose` method calls the `GrB_select()` API function.  The
+-- name `choose` was chosen not to conflict with the SQL keyword
 -- `select`.  Selection provides a conditional operator called an
 -- `indexunaryop` and a parameter for the operator to use to compare
 -- elements in the matrix.  Below, all elements with values greater
--- than 50 are returned:
+-- than 1 are returned:
 
-select print(a) as a, indexunaryop, print(selection(a, indexunaryop, 1)) as selected from test_fixture;
+select print(a) as a, indexunaryop, print(choose(a, indexunaryop, 1)) as selected from test_fixture;
 
-select draw(a) as uop_a_source, draw(selection(a, indexunaryop, 1)) as uop_b_source from test_fixture \gset
+select draw(a) as uop_a_source, draw(choose(a, indexunaryop, 1)) as uop_b_source from test_fixture \gset
 \i sql/uop.sql
+
+-- ## Choosing Operators
+-- Selection can also be done with scalars and operators:p
+
+select print(a > 1) as "a > 1", print(a >= 1) as "a >= 1", print(a < 1) as "a < 1", print(a <= 1) as "a <= 1" from test_fixture;
 
 -- A useful select operator is `triu`, it select only upper triangular
 -- values, this turns your graph into a direct acyclic graph (DAG) by
 -- removing all the links "back" from higher number nodes to lower.
 
 select print(random_matrix(8, 8, 16, seed=>0.42, max=>42)) as matrix,
-       print(selection(random_matrix(8, 8, 16, seed=>0.42, max=>42), 'triu', 0)) as triu from test_fixture;
+       print(choose(random_matrix(8, 8, 16, seed=>0.42, max=>42), 'triu', 0)) as triu from test_fixture;
 
 select draw(random_matrix(8, 8, 16, seed=>0.42, max=>42)) as uop_a_source,
-       draw(selection(random_matrix(8, 8, 16, seed=>0.42, max=>42), 'triu', 0)) as uop_b_source
+       draw(choose(random_matrix(8, 8, 16, seed=>0.42, max=>42), 'triu', 0)) as uop_b_source
        from test_fixture \gset
 \i sql/uop.sql
 

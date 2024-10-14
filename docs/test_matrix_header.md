@@ -1071,6 +1071,20 @@ select print(resize(matrix_agg(i, i, i), 10, 10)) as bound_matrix from generate_
 (1 row)
 
 ```
+## Equality
+
+Two matrices can be compared for equality with the '=' and '!=' operators:
+``` postgres-console
+select a != b as "a != b", a = b as "a = b", b = a as "b = a", b = b as "b = b" from test_fixture;
+┌────────┬───────┬───────┬───────┐
+│ a != b │ a = b │ b = a │ b = b │
+├────────┼───────┼───────┼───────┤
+│ t      │ f     │ f     │ t     │
+└────────┴───────┴───────┴───────┘
+(1 row)
+
+```
+## Setting and Getting individual Elements
 Elements can be set individually with `set_element`, the modified
 input is returned:
 ``` postgres-console
@@ -2988,16 +3002,16 @@ select print(v) as v, '@' as "@", print(b) as b, print(v @ b) as vxm from test_f
 (1 row)
 
 ```
-## Element Selection
+## Choosing Elements
 
-The `selection` method calls the `GrB_select()` API function.  The
-name `selection` was chosen not to conflict with the SQL keyword
+The `choose` method calls the `GrB_select()` API function.  The
+name `choose` was chosen not to conflict with the SQL keyword
 `select`.  Selection provides a conditional operator called an
 `indexunaryop` and a parameter for the operator to use to compare
 elements in the matrix.  Below, all elements with values greater
-than 50 are returned:
+than 1 are returned:
 ``` postgres-console
-select print(a) as a, indexunaryop, print(selection(a, indexunaryop, 1)) as selected from test_fixture;
+select print(a) as a, indexunaryop, print(choose(a, indexunaryop, 1)) as selected from test_fixture;
 ┌────────────────────┬───────────────┬────────────────────┐
 │         a          │ indexunaryop  │      selected      │
 ├────────────────────┼───────────────┼────────────────────┤
@@ -3191,12 +3205,30 @@ select print(a) as a, indexunaryop, print(selection(a, indexunaryop, 1)) as sele
     </td>
   </tr>
 </table>
+## Choosing Operators
+Selection can also be done with scalars and operators:p
+``` postgres-console
+select print(a > 1) as "a > 1", print(a >= 1) as "a >= 1", print(a < 1) as "a < 1", print(a <= 1) as "a <= 1" from test_fixture;
+┌────────────────────┬────────────────────┬────────────────────┬────────────────────┐
+│       a > 1        │       a >= 1       │       a < 1        │       a <= 1       │
+├────────────────────┼────────────────────┼────────────────────┼────────────────────┤
+│      0  1  2  3    │      0  1  2  3    │      0  1  2  3    │      0  1  2  3    │
+│    ────────────    │    ────────────    │    ────────────    │    ────────────    │
+│  0│           3    │  0│           3    │  0│        0       │  0│        0       │
+│  1│  2             │  1│  2     1       │  1│           0    │  1│        1  0    │
+│  2│  2  2          │  2│  2  2          │  2│                │  2│                │
+│  3│  2             │  3│  2     1       │  3│                │  3│        1       │
+│                    │                    │                    │                    │
+└────────────────────┴────────────────────┴────────────────────┴────────────────────┘
+(1 row)
+
+```
 A useful select operator is `triu`, it select only upper triangular
 values, this turns your graph into a direct acyclic graph (DAG) by
 removing all the links "back" from higher number nodes to lower.
 ``` postgres-console
 select print(random_matrix(8, 8, 16, seed=>0.42, max=>42)) as matrix,
-       print(selection(random_matrix(8, 8, 16, seed=>0.42, max=>42), 'triu', 0)) as triu from test_fixture;
+       print(choose(random_matrix(8, 8, 16, seed=>0.42, max=>42), 'triu', 0)) as triu from test_fixture;
 ┌────────────────────────────────┬────────────────────────────────┐
 │             matrix             │              triu              │
 ├────────────────────────────────┼────────────────────────────────┤
@@ -3215,7 +3247,7 @@ select print(random_matrix(8, 8, 16, seed=>0.42, max=>42)) as matrix,
 (1 row)
 
 select draw(random_matrix(8, 8, 16, seed=>0.42, max=>42)) as uop_a_source,
-       draw(selection(random_matrix(8, 8, 16, seed=>0.42, max=>42), 'triu', 0)) as uop_b_source
+       draw(choose(random_matrix(8, 8, 16, seed=>0.42, max=>42), 'triu', 0)) as uop_b_source
 ```
 <table style="width: 100%; table-layout: fixed;" class="dot-table">
   <tr>

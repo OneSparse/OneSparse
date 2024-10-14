@@ -17,9 +17,6 @@ PG_FUNCTION_INFO_V1(unaryop_in);
 PG_FUNCTION_INFO_V1(unaryop_out);
 PG_FUNCTION_INFO_V1(unaryop_name);
 
-void initialize_unaryops(void);
-GrB_UnaryOp lookup_unaryop(char *name);
-
 #include "unaryop_header.h"
 
 static Size unaryop_get_flat_size(ExpandedObjectHeader *eohptr) {

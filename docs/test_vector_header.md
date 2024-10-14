@@ -193,9 +193,9 @@ select reduce_scalar('int32[0:1 1:2 2:3]'::vector, 'plus_monoid_int32');
 └───────────────┘
 (1 row)
 
-select selection('int32[0:1 1:2 2:3]'::vector, 'valuegt_int32', 1);
+select choose('int32[0:1 1:2 2:3]'::vector, 'valuegt_int32', 1);
 ┌────────────────┐
-│   selection    │
+│     choose     │
 ├────────────────┤
 │ int32[1:2 2:3] │
 └────────────────┘

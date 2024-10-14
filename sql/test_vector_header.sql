@@ -64,7 +64,7 @@ select eunion('int32[0:1 1:2 2:3]'::vector, 42, 'int32[0:1 1:2 2:3]'::vector, 84
 
 select reduce_scalar('int32[0:1 1:2 2:3]'::vector, 'plus_monoid_int32');
 
-select selection('int32[0:1 1:2 2:3]'::vector, 'valuegt_int32', 1);
+select choose('int32[0:1 1:2 2:3]'::vector, 'valuegt_int32', 1);
 
 select apply('int32[1:1 2:2 3:3]'::vector, 'ainv_int32'::unaryop);
 

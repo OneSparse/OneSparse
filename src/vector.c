@@ -37,6 +37,7 @@ PG_FUNCTION_INFO_V1(vector_remove_element);
 PG_FUNCTION_INFO_V1(vector_contains);
 PG_FUNCTION_INFO_V1(vector_info);
 PG_FUNCTION_INFO_V1(vector_type);
+PG_FUNCTION_INFO_V1(vector_eq);
 
 static Size vector_get_flat_size(ExpandedObjectHeader *eohptr) {
 	os_Vector *vector;
@@ -1083,6 +1084,63 @@ Datum vector_get_element(PG_FUNCTION_ARGS)
 		  vector->vector,
 		  "Error extracting setting vector element.");
 	OS_RETURN_SCALAR(scalar);
+}
+
+Datum vector_eq(PG_FUNCTION_ARGS)
+{
+	GrB_Type utype, vtype;
+	os_Vector *u, *v, *w;
+	GrB_Index usize, vsize, unvals, vnvals;
+	bool result;
+
+	LOGF();
+	ERRORNULL(0);
+	ERRORNULL(1);
+
+	u = OS_GETARG_VECTOR(0);
+	v = OS_GETARG_VECTOR(1);
+
+	OS_VTYPE(utype, u);
+	OS_VTYPE(vtype, v);
+	if (utype != vtype)
+		PG_RETURN_BOOL(false);
+
+	OS_VSIZE(usize, u);
+	OS_VSIZE(vsize, v);
+	if (usize != vsize)
+		PG_RETURN_BOOL(false);
+
+	OS_VNVALS(unvals, u);
+	OS_VNVALS(vnvals, v);
+	if (unvals != vnvals)
+		PG_RETURN_BOOL(false);
+
+	w = new_vector(GrB_BOOL, usize, CurrentMemoryContext, NULL);
+	OS_CHECK(GrB_eWiseMult(w->vector,
+						  NULL,
+						  NULL,
+						  GrB_EQ_BOOL,
+						  u->vector,
+						  v->vector,
+						  NULL),
+			 w->vector,
+			 "Error vector eWiseAdd.");
+
+	OS_VNVALS(unvals, u);
+	OS_VNVALS(vnvals, w);
+	if (unvals != vnvals)
+		PG_RETURN_BOOL(false);
+
+	OS_CHECK(GrB_Vector_reduce_BOOL(
+			  &result,
+			  NULL,
+			  GrB_LAND_MONOID_BOOL,
+			  w->vector,
+			  NULL),
+			 w->vector,
+			 "Cannot reduce vector to scalar in eq");
+
+	PG_RETURN_BOOL(result);
 }
 
 Datum vector_wait(PG_FUNCTION_ARGS)

@@ -17,9 +17,6 @@ PG_FUNCTION_INFO_V1(indexunaryop_in);
 PG_FUNCTION_INFO_V1(indexunaryop_out);
 PG_FUNCTION_INFO_V1(indexunaryop_name);
 
-void initialize_indexunaryops(void);
-GrB_IndexUnaryOp lookup_indexunaryop(char *name);
-
 #include "indexunaryop_header.h"
 
 static Size indexunaryop_get_flat_size(ExpandedObjectHeader *eohptr) {

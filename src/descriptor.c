@@ -17,9 +17,6 @@ PG_FUNCTION_INFO_V1(descriptor_in);
 PG_FUNCTION_INFO_V1(descriptor_out);
 PG_FUNCTION_INFO_V1(descriptor_name);
 
-void initialize_descriptors(void);
-GrB_Descriptor lookup_descriptor(char *name);
-
 #include "descriptor_header.h"
 
 static Size descriptor_get_flat_size(ExpandedObjectHeader *eohptr) {

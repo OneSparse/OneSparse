@@ -17,9 +17,6 @@ PG_FUNCTION_INFO_V1(semiring_in);
 PG_FUNCTION_INFO_V1(semiring_out);
 PG_FUNCTION_INFO_V1(semiring_name);
 
-void initialize_semirings(void);
-GrB_Semiring lookup_semiring(char *name);
-
 #include "semiring_header.h"
 
 static Size semiring_get_flat_size(ExpandedObjectHeader *eohptr) {

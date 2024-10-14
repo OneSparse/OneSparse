@@ -186,7 +186,7 @@ RETURNS matrix
 AS '$libdir/onesparse', 'matrix_kron'
 LANGUAGE C STABLE;
 
-CREATE FUNCTION selection(
+CREATE FUNCTION choose(
     a matrix,
     op indexunaryop,
     y scalar,
@@ -373,6 +373,70 @@ RETURN onesparse.mxv(a, b);
 CREATE FUNCTION vxm_op(a vector, b matrix)
 RETURNS vector
 RETURN onesparse.vxm(a, b);
+
+-- comparison
+
+CREATE FUNCTION eq(a matrix, b matrix)
+RETURNS bool
+AS '$libdir/onesparse', 'matrix_eq'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION neq(a matrix, b matrix)
+RETURNS bool
+RETURN NOT eq(a, b);
+
+CREATE FUNCTION gt(a matrix, s scalar)
+RETURNS matrix
+RETURN onesparse.choose(a, ('valuegt_' || name(type(a)))::indexunaryop, s);
+
+CREATE FUNCTION lt(a matrix, s scalar)
+RETURNS matrix
+RETURN onesparse.choose(a, ('valuelt_' || name(type(a)))::indexunaryop, s);
+
+CREATE FUNCTION ge(a matrix, s scalar)
+RETURNS matrix
+RETURN onesparse.choose(a, ('valuege_' || name(type(a)))::indexunaryop, s);
+
+CREATE FUNCTION le(a matrix, s scalar)
+RETURNS matrix
+RETURN onesparse.choose(a, ('valuele_' || name(type(a)))::indexunaryop, s);
+
+
+CREATE OPERATOR = (
+    LEFTARG = matrix,
+    RIGHTARG = matrix,
+    FUNCTION = eq
+    );
+
+CREATE OPERATOR != (
+    LEFTARG = matrix,
+    RIGHTARG = matrix,
+    FUNCTION = neq
+    );
+
+CREATE OPERATOR > (
+    LEFTARG = matrix,
+    RIGHTARG = scalar,
+    FUNCTION = gt
+    );
+
+CREATE OPERATOR < (
+    LEFTARG = matrix,
+    RIGHTARG = scalar,
+    FUNCTION = lt
+    );
+
+CREATE OPERATOR >= (
+    LEFTARG = matrix,
+    RIGHTARG = scalar,
+    FUNCTION = ge
+    );
+
+CREATE OPERATOR <= (
+    LEFTARG = matrix,
+    RIGHTARG = scalar,
+    FUNCTION = le
+    );
 
 -- scalar apply ops
 
