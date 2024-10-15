@@ -6,9 +6,14 @@ Datum FN(matrix_agg)(PG_FUNCTION_ARGS)
 	GrB_Index i, j;
 	PG_TYPE value;
     os_Matrix *state;
+	MemoryContext aggcontext;
+
     if (PG_ARGISNULL(0))
     {
-        state = new_matrix(GB_TYPE, GxB_INDEX_MAX, GxB_INDEX_MAX, CurrentMemoryContext, NULL);
+        if (!AggCheckCallContext(fcinfo, &aggcontext)) {
+            elog(ERROR, "aggregate function called in non-aggregate context");
+        }
+		state = new_matrix(GB_TYPE, GxB_INDEX_MAX, GxB_INDEX_MAX, aggcontext, NULL);
     }
     else
     {

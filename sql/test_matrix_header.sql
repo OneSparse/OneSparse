@@ -311,8 +311,8 @@ select draw(a) as binop_a_source, draw(b) as binop_b_source, draw(eadd(a, b, bin
 
 select print(a) as a, binaryop, print(b) as b, print(emult(a, b, binaryop)) as emult from test_fixture;
 
--- Eadd can also be accomplished with binary operators specific to
--- OneSparse.  Different binaryops are passed to eadd to do different
+-- Emult can also be accomplished with binary operators specific to
+-- OneSparse.  Different binaryops are passed to emult to do different
 -- elementwise operations:
 
 select print(a &+ b) as "a &+ b", print(a &- b) as "a &- b", print(a &* b) as "a &* b", print(a &/ b) as "a &/ b" from test_fixture;

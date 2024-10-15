@@ -1504,8 +1504,8 @@ select print(a) as a, binaryop, print(b) as b, print(emult(a, b, binaryop)) as e
 (1 row)
 
 ```
-Eadd can also be accomplished with binary operators specific to
-OneSparse.  Different binaryops are passed to eadd to do different
+Emult can also be accomplished with binary operators specific to
+OneSparse.  Different binaryops are passed to emult to do different
 elementwise operations:
 ``` postgres-console
 select print(a &+ b) as "a &+ b", print(a &- b) as "a &- b", print(a &* b) as "a &* b", print(a &/ b) as "a &/ b" from test_fixture;

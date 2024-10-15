@@ -26,6 +26,11 @@ RETURNS vector
 AS '$libdir/onesparse', 'vector_new'
 LANGUAGE C STABLE;
 
+CREATE FUNCTION vector_agg_final(vector)
+RETURNS vector
+AS '$libdir/onesparse', 'vector_agg_final'
+LANGUAGE C STRICT;
+
 CREATE FUNCTION type(vector)
 RETURNS type
 AS '$libdir/onesparse', 'vector_type'
@@ -189,6 +194,22 @@ CREATE FUNCTION neq(a vector, b vector)
 RETURNS bool
 RETURN NOT eq(a, b);
 
+CREATE FUNCTION gt(a vector, s scalar)
+RETURNS vector
+RETURN onesparse.choose(a, ('valuegt_' || name(type(a)))::indexunaryop, s);
+
+CREATE FUNCTION lt(a vector, s scalar)
+RETURNS vector
+RETURN onesparse.choose(a, ('valuelt_' || name(type(a)))::indexunaryop, s);
+
+CREATE FUNCTION ge(a vector, s scalar)
+RETURNS vector
+RETURN onesparse.choose(a, ('valuege_' || name(type(a)))::indexunaryop, s);
+
+CREATE FUNCTION le(a vector, s scalar)
+RETURNS vector
+RETURN onesparse.choose(a, ('valuele_' || name(type(a)))::indexunaryop, s);
+
 CREATE FUNCTION info(a vector, level int default 1)
 RETURNS text
 AS '$libdir/onesparse', 'vector_info'
@@ -284,6 +305,30 @@ CREATE OPERATOR != (
     LEFTARG = vector,
     RIGHTARG = vector,
     FUNCTION = neq
+    );
+
+CREATE OPERATOR > (
+    LEFTARG = vector,
+    RIGHTARG = scalar,
+    FUNCTION = gt
+    );
+
+CREATE OPERATOR < (
+    LEFTARG = vector,
+    RIGHTARG = scalar,
+    FUNCTION = lt
+    );
+
+CREATE OPERATOR >= (
+    LEFTARG = vector,
+    RIGHTARG = scalar,
+    FUNCTION = ge
+    );
+
+CREATE OPERATOR <= (
+    LEFTARG = vector,
+    RIGHTARG = scalar,
+    FUNCTION = le
     );
 
 -- scalar apply ops

@@ -27,6 +27,11 @@ typedef struct os_Matrix_ExtractState {
 	GxB_Iterator iterator;
 } os_Matrix_ExtractState;
 
+typedef struct os_Matrix_BuildState {
+	MemoryContext context;
+	os_Matrix *matrix;
+} os_Matrix_BuildState;
+
 Datum expand_matrix(os_FlatMatrix *flat,	MemoryContext parentcontext);
 
 os_Matrix* new_matrix(

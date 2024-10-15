@@ -840,6 +840,11 @@ RETURNS vector
 AS '$libdir/onesparse', 'vector_new'
 LANGUAGE C STABLE;
 
+CREATE FUNCTION vector_agg_final(vector)
+RETURNS vector
+AS '$libdir/onesparse', 'vector_agg_final'
+LANGUAGE C STRICT;
+
 CREATE FUNCTION type(vector)
 RETURNS type
 AS '$libdir/onesparse', 'vector_type'
@@ -1003,6 +1008,22 @@ CREATE FUNCTION neq(a vector, b vector)
 RETURNS bool
 RETURN NOT eq(a, b);
 
+CREATE FUNCTION gt(a vector, s scalar)
+RETURNS vector
+RETURN onesparse.choose(a, ('valuegt_' || name(type(a)))::indexunaryop, s);
+
+CREATE FUNCTION lt(a vector, s scalar)
+RETURNS vector
+RETURN onesparse.choose(a, ('valuelt_' || name(type(a)))::indexunaryop, s);
+
+CREATE FUNCTION ge(a vector, s scalar)
+RETURNS vector
+RETURN onesparse.choose(a, ('valuege_' || name(type(a)))::indexunaryop, s);
+
+CREATE FUNCTION le(a vector, s scalar)
+RETURNS vector
+RETURN onesparse.choose(a, ('valuele_' || name(type(a)))::indexunaryop, s);
+
 CREATE FUNCTION info(a vector, level int default 1)
 RETURNS text
 AS '$libdir/onesparse', 'vector_info'
@@ -1098,6 +1119,30 @@ CREATE OPERATOR != (
     LEFTARG = vector,
     RIGHTARG = vector,
     FUNCTION = neq
+    );
+
+CREATE OPERATOR > (
+    LEFTARG = vector,
+    RIGHTARG = scalar,
+    FUNCTION = gt
+    );
+
+CREATE OPERATOR < (
+    LEFTARG = vector,
+    RIGHTARG = scalar,
+    FUNCTION = lt
+    );
+
+CREATE OPERATOR >= (
+    LEFTARG = vector,
+    RIGHTARG = scalar,
+    FUNCTION = ge
+    );
+
+CREATE OPERATOR <= (
+    LEFTARG = vector,
+    RIGHTARG = scalar,
+    FUNCTION = le
     );
 
 -- scalar apply ops
@@ -1288,23 +1333,73 @@ create or replace function draw(a vector) returns text language plpgsql as
 
 
 
+CREATE FUNCTION vector_agg_bigint (state vector, i bigint, v bigint)
+RETURNS vector
+AS '$libdir/onesparse', 'vector_agg_int64'
+LANGUAGE C STABLE;
+
+CREATE AGGREGATE vector_agg (i bigint, v bigint )
+    (
+    SFUNC=vector_agg_bigint,
+    STYPE=vector,
+    FINALFUNC=vector_agg_final
+    );
 
 
 
+CREATE FUNCTION vector_agg_integer (state vector, i bigint, v integer)
+RETURNS vector
+AS '$libdir/onesparse', 'vector_agg_int32'
+LANGUAGE C STABLE;
+
+CREATE AGGREGATE vector_agg (i bigint, v integer )
+    (
+    SFUNC=vector_agg_integer,
+    STYPE=vector,
+    FINALFUNC=vector_agg_final
+    );
 
 
 
+CREATE FUNCTION vector_agg_smallint (state vector, i bigint, v smallint)
+RETURNS vector
+AS '$libdir/onesparse', 'vector_agg_int16'
+LANGUAGE C STABLE;
+
+CREATE AGGREGATE vector_agg (i bigint, v smallint )
+    (
+    SFUNC=vector_agg_smallint,
+    STYPE=vector,
+    FINALFUNC=vector_agg_final
+    );
 
 
 
+CREATE FUNCTION vector_agg_float4 (state vector, i bigint, v float4)
+RETURNS vector
+AS '$libdir/onesparse', 'vector_agg_fp32'
+LANGUAGE C STABLE;
+
+CREATE AGGREGATE vector_agg (i bigint, v float4 )
+    (
+    SFUNC=vector_agg_float4,
+    STYPE=vector,
+    FINALFUNC=vector_agg_final
+    );
 
 
 
+CREATE FUNCTION vector_agg_float8 (state vector, i bigint, v float8)
+RETURNS vector
+AS '$libdir/onesparse', 'vector_agg_fp64'
+LANGUAGE C STABLE;
 
-
-
-
-
+CREATE AGGREGATE vector_agg (i bigint, v float8 )
+    (
+    SFUNC=vector_agg_float8,
+    STYPE=vector,
+    FINALFUNC=vector_agg_final
+    );
 
 
 
@@ -1558,10 +1653,10 @@ RETURNS matrix
 AS '$libdir/onesparse', 'matrix_apply_second'
 LANGUAGE C STABLE;
 
-CREATE FUNCTION matrix_agg_final(state matrix)
+CREATE FUNCTION matrix_agg_final(matrix)
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_agg_final'
-LANGUAGE C STABLE;
+LANGUAGE C STRICT;
 
 CREATE FUNCTION set_element(a matrix, i bigint, j bigint, s scalar)
 RETURNS matrix
@@ -1598,7 +1693,7 @@ RETURNS matrix
 AS '$libdir/onesparse', 'matrix_clear'
 LANGUAGE C;
 
-CREATE FUNCTION resize(a matrix, i bigint, j bigint)
+CREATE FUNCTION resize(a matrix, i bigint default -1, j bigint default -1)
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_resize'
 LANGUAGE C STABLE;

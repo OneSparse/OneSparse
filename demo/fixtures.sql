@@ -61,3 +61,10 @@ create table fs_183_1 (
     );
 
 \copy fs_183_1 from 'demo/Matrix/fs_183_1' with (delimiter ' ');
+
+create table livejournal_communites (
+    i integer,
+    j integer
+    );
+
+\copy livejournal_communites from 'demo/Matrix/com-LiveJournal_Communities_all.mtx' with (delimiter ' ');

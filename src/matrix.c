@@ -1658,6 +1658,12 @@ Datum matrix_resize(PG_FUNCTION_ARGS)
 	i = PG_GETARG_INT64(1);
 	j = PG_GETARG_INT64(2);
 
+	if (i == -1)
+		i = GxB_INDEX_MAX;
+
+	if (j == -1)
+		j = GxB_INDEX_MAX;
+
 	OS_CHECK(GrB_Matrix_resize(A->matrix, i, j),
 		  A->matrix,
 		  "Error resizing matrix.");
@@ -1725,9 +1731,10 @@ matrix_agg_final(PG_FUNCTION_ARGS)
 {
     os_Matrix *state = OS_GETARG_MATRIX(0);
 
-    // If no inputs were processed, return NULL
-    if (state == NULL)
+	if (state == NULL)
+	{
         PG_RETURN_NULL();
+    }
 
     OS_RETURN_MATRIX(state);
 }

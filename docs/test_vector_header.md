@@ -25,6 +25,14 @@ select 'int32'::vector;
 └────────┘
 (1 row)
 
+select vector('int32');
+┌────────┐
+│ vector │
+├────────┤
+│ int32  │
+└────────┘
+(1 row)
+
 select nvals('int32'::vector);
 ┌───────┐
 │ nvals │
@@ -161,6 +169,19 @@ function: GrB_Vector_setElement_INT64 (w, x, row)
 Row index 2 out of range; must be < 2: Error setting Vector Element
 LINE 1: select size('int32(2)[0:1 1:2 2:3]'::vector);
                     ^
+```
+## Equality
+
+Two matrices can be compared for equality with the '=' and '!=' operators:
+``` postgres-console
+select u != v as "u != v", u = v as "u = v", v = u as "v = u", v = u as "v = u" from test_fixture;
+┌────────┬───────┬───────┬───────┐
+│ u != v │ u = v │ v = u │ v = u │
+├────────┼───────┼───────┼───────┤
+│ t      │ f     │ f     │ f     │
+└────────┴───────┴───────┴───────┘
+(1 row)
+
 select eadd('int32[0:1 1:2 2:3]'::vector, 'int32[0:1 1:2 2:3]'::vector, 'plus_int32');
 ┌────────────────────┐
 │        eadd        │
@@ -169,12 +190,50 @@ select eadd('int32[0:1 1:2 2:3]'::vector, 'int32[0:1 1:2 2:3]'::vector, 'plus_in
 └────────────────────┘
 (1 row)
 
+```
+Eadd can also be accomplished with binary operators specific to
+OneSparse.  Different binaryops are passed to eadd to do different
+elementwise operations:
+``` postgres-console
+select print(u |+ v) as "u |+ v", print(u |- v) as "u |- v", print(u |* v) as "u |* v", print(u |/ v) as "u |/ v" from test_fixture;
+┌───────────┬───────────┬───────────┬───────────┐
+│  u |+ v   │  u |- v   │  u |* v   │  u |/ v   │
+├───────────┼───────────┼───────────┼───────────┤
+│           │           │           │           │
+│    ───    │    ───    │    ───    │    ───    │
+│  0│       │  0│       │  0│       │  0│       │
+│  1│  5    │  1│ -1    │  1│  6    │  1│  0    │
+│  2│  3    │  2│  3    │  2│  3    │  2│  3    │
+│  3│       │  3│       │  3│       │  3│       │
+│           │           │           │           │
+└───────────┴───────────┴───────────┴───────────┘
+(1 row)
+
 select emult('int32[0:1 1:2 2:3]'::vector, 'int32[0:1 1:2 2:3]'::vector, 'times_int32');
 ┌────────────────────┐
 │       emult        │
 ├────────────────────┤
 │ int32[0:1 1:4 2:9] │
 └────────────────────┘
+(1 row)
+
+```
+Emult can also be accomplished with binary operators specific to
+OneSparse.  Different binaryops are passed to emult to do different
+elementwise operations:
+``` postgres-console
+select print(u &+ v) as "u &+ v", print(u &- v) as "u &- v", print(u &* v) as "u &* v", print(u &/ v) as "u &/ v" from test_fixture;
+┌───────────┬───────────┬───────────┬───────────┐
+│  u &+ v   │  u &- v   │  u &* v   │  u &/ v   │
+├───────────┼───────────┼───────────┼───────────┤
+│           │           │           │           │
+│    ───    │    ───    │    ───    │    ───    │
+│  0│       │  0│       │  0│       │  0│       │
+│  1│  5    │  1│ -1    │  1│  6    │  1│  0    │
+│  2│       │  2│       │  2│       │  2│       │
+│  3│       │  3│       │  3│       │  3│       │
+│           │           │           │           │
+└───────────┴───────────┴───────────┴───────────┘
 (1 row)
 
 select eunion('int32[0:1 1:2 2:3]'::vector, 42, 'int32[0:1 1:2 2:3]'::vector, 84, 'plus_int32');

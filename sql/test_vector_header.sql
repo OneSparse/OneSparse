@@ -22,6 +22,8 @@ create extension if not exists onesparse;
 
 select 'int32'::vector;
 
+select vector('int32');
+
 select nvals('int32'::vector);
 
 select size('int32'::vector);
@@ -56,9 +58,27 @@ select size('int32(10)[0:1 1:2 2:3]'::vector);
 
 select size('int32(2)[0:1 1:2 2:3]'::vector);
 
+-- ## Equality
+--
+-- Two matrices can be compared for equality with the '=' and '!=' operators:
+
+select u != v as "u != v", u = v as "u = v", v = u as "v = u", v = u as "v = u" from test_fixture;
+
 select eadd('int32[0:1 1:2 2:3]'::vector, 'int32[0:1 1:2 2:3]'::vector, 'plus_int32');
 
+-- Eadd can also be accomplished with binary operators specific to
+-- OneSparse.  Different binaryops are passed to eadd to do different
+-- elementwise operations:
+
+select print(u |+ v) as "u |+ v", print(u |- v) as "u |- v", print(u |* v) as "u |* v", print(u |/ v) as "u |/ v" from test_fixture;
+
 select emult('int32[0:1 1:2 2:3]'::vector, 'int32[0:1 1:2 2:3]'::vector, 'times_int32');
+
+-- Emult can also be accomplished with binary operators specific to
+-- OneSparse.  Different binaryops are passed to emult to do different
+-- elementwise operations:
+
+select print(u &+ v) as "u &+ v", print(u &- v) as "u &- v", print(u &* v) as "u &* v", print(u &/ v) as "u &/ v" from test_fixture;
 
 select eunion('int32[0:1 1:2 2:3]'::vector, 42, 'int32[0:1 1:2 2:3]'::vector, 84, 'plus_int32');
 

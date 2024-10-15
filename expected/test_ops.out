@@ -66,14 +66,18 @@
  onesparse | /    | scalar           | vector           | vector           | onesparse.div_first_op    | 
  onesparse | /    | smallint         | scalar           | smallint         | onesparse.div_scalar      | 
  onesparse | /    | vector           | scalar           | vector           | onesparse.div_second_op   | 
- onesparse | <    | matrix           | scalar           | matrix           | lt                        | 
- onesparse | <=   | matrix           | scalar           | matrix           | le                        | 
+ onesparse | <    | matrix           | scalar           | matrix           | onesparse.lt              | 
+ onesparse | <    | vector           | scalar           | vector           | onesparse.lt              | 
+ onesparse | <=   | matrix           | scalar           | matrix           | onesparse.le              | 
+ onesparse | <=   | vector           | scalar           | vector           | onesparse.le              | 
  onesparse | <>   | matrix           | matrix           | boolean          | onesparse.neq             | 
  onesparse | <>   | vector           | vector           | boolean          | onesparse.neq             | 
  onesparse | =    | matrix           | matrix           | boolean          | onesparse.eq              | 
  onesparse | =    | vector           | vector           | boolean          | onesparse.eq              | 
- onesparse | >    | matrix           | scalar           | matrix           | gt                        | 
- onesparse | >=   | matrix           | scalar           | matrix           | ge                        | 
+ onesparse | >    | matrix           | scalar           | matrix           | onesparse.gt              | 
+ onesparse | >    | vector           | scalar           | vector           | onesparse.gt              | 
+ onesparse | >=   | matrix           | scalar           | matrix           | onesparse.ge              | 
+ onesparse | >=   | vector           | scalar           | vector           | onesparse.ge              | 
  onesparse | @    | matrix           | matrix           | matrix           | mxm_op                    | 
  onesparse | @    | matrix           | vector           | vector           | mxv_op                    | 
  onesparse | @    | vector           | matrix           | vector           | vxm_op                    | 
@@ -85,5 +89,5 @@
  onesparse | |-   | vector           | vector           | vector           | onesparse.eadd_minus_op   | 
  onesparse | |/   | matrix           | matrix           | matrix           | onesparse.eadd_div_op     | 
  onesparse | |/   | vector           | vector           | vector           | onesparse.eadd_div_op     | 
-(83 rows)
+(87 rows)
 
