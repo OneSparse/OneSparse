@@ -82,7 +82,7 @@ WITH
     triangulate AS (SELECT mxm(a, a, mask=>a, descriptor=>'st1') AS t FROM setup),
     reduce_graph AS (SELECT reduce_vector(t) as y FROM triangulate),
     compute_thresh AS (SELECT reduce_scalar(y) as k FROM reduce_graph)
-SELECT 3 * ((a @ y) |- 2 * (t @ y) |+ y) / k
+SELECT 3 * ((a @ y) |- 2 * (one(t) @ y) |+ y) / k
 FROM setup, triangulate, reduce_graph, compute_thresh;
 
 -- ## Page Rank TODO

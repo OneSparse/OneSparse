@@ -1476,7 +1476,7 @@ Datum matrix_transpose(PG_FUNCTION_ARGS)
 		c = new_matrix(type, nrows, ncols, CurrentMemoryContext, NULL);
 	}
 	else
-		c = OS_GETARG_MATRIX(2);
+		c = OS_GETARG_MATRIX(1);
 
 	mask = OS_GETARG_MATRIX_HANDLE_OR_NULL(nargs, 2);
 	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 3);
