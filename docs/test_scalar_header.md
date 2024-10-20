@@ -11,10 +11,10 @@ create extension if not exists onesparse;
 ```
 Describe the scalar type
 ``` postgres-console
-                                        List of data types
-  Schema   |  Name  | Internal name | Size | Elements |  Owner   | Access privileges | Description 
------------+--------+---------------+------+----------+----------+-------------------+-------------
- onesparse | scalar | scalar        | var  |          | postgres |                   | 
+                                                      List of data types
+  Schema   |  Name  | Internal name | Size | Elements |  Owner   | Access privileges |               Description               
+-----------+--------+---------------+------+----------+----------+-------------------+-----------------------------------------
+ onesparse | scalar | scalar        | var  |          | postgres |                   | Scalars hold individual element values.
 (1 row)
 
 ```

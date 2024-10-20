@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "postgres.h"
+#include "fmgr.h"
 #include "common/fe_memutils.h"
 #include "utils/builtins.h"
 #include "libpq/pqformat.h"
@@ -22,11 +23,16 @@
 #include "common/hashfn.h"
 #include "suitesparse/GraphBLAS.h"
 
+
 #undef OS_DEBUG
 
 #define CCAT2(x, y) x ## y
 #define CCAT(x, y) CCAT2(x, y)
 #define FN(x) CCAT(x, SUFFIX)
+
+#define ERRORIF(B, msg)                                                        \
+    if ((B))                                                                   \
+        ereport(ERROR, (errcode(ERRCODE_DATA_EXCEPTION), errmsg(msg, __func__)))
 
 #define ERRORNULL(_arg) \
 	do { \
@@ -97,6 +103,7 @@
 #define LOGF()
 #endif
 
+uint64_t* get_c_array_from_pg_array(FunctionCallInfo fcinfo, int arg_number, uint64_t *out_nelems);
 char* short_code(GrB_Type_Code code);
 GrB_Type short_type(char *name);
 const char* error_name(GrB_Info info);

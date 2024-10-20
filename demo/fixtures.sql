@@ -62,9 +62,13 @@ create table fs_183_1 (
 
 \copy fs_183_1 from 'demo/Matrix/fs_183_1' with (delimiter ' ');
 
-create table livejournal_communites (
-    i integer,
-    j integer
-    );
+-- create table livejournal (
+--     i integer,
+--     j integer
+--     );
 
-\copy livejournal_communites from 'demo/Matrix/com-LiveJournal_Communities_all.mtx' with (delimiter ' ');
+-- \copy livejournal from 'demo/Matrix/com-LiveJournal.mtx' with (delimiter ' ');
+
+create table test_graphs (name text primary key, graph matrix not null);
+
+insert into test_graphs values ('mbeacxc', (select matrix_agg(i, j, v) from mbeacxc));

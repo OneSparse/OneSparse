@@ -21,6 +21,8 @@ CREATE TYPE descriptor (
     internallength = VARIABLE
     );
 
+COMMENT ON TYPE descriptor IS 'Descriptors control specific details of GraphBLAS operations.';
+
 CREATE FUNCTION name(descriptor)
 RETURNS text
 AS '$libdir/onesparse', 'descriptor_name'

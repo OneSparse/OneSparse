@@ -21,6 +21,8 @@ CREATE TYPE indexunaryop (
     internallength = VARIABLE
     );
 
+COMMENT ON TYPE indexunaryop IS 'IndexUnaryOps apply a function to a positional element, returning an element.';
+
 CREATE FUNCTION name(indexunaryop)
 RETURNS text
 AS '$libdir/onesparse', 'indexunaryop_name'

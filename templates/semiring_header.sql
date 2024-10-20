@@ -21,6 +21,8 @@ CREATE TYPE semiring (
     internallength = VARIABLE
     );
 
+COMMENT ON TYPE semiring IS 'Semirings associate additive and multiplicative operators for matrix multiplication.';
+
 CREATE FUNCTION name(semiring)
 RETURNS text
 AS '$libdir/onesparse', 'semiring_name'

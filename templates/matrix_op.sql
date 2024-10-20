@@ -9,3 +9,10 @@ CREATE AGGREGATE matrix_agg (i bigint, j bigint, v {type.pgtype} )
     STYPE=matrix,
     FINALFUNC=matrix_agg_final
     );
+
+CREATE FUNCTION dense_matrix(
+    nrows integer,
+    ncols integer,
+    fill {type.pgtype})
+        RETURNS matrix
+        RETURN assign(matrix('{type.name}', nrows, ncols), fill);

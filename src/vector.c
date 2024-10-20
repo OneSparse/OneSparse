@@ -28,10 +28,12 @@ PG_FUNCTION_INFO_V1(vector_emult);
 PG_FUNCTION_INFO_V1(vector_eunion);
 PG_FUNCTION_INFO_V1(vector_reduce_scalar);
 PG_FUNCTION_INFO_V1(vector_assign);
+PG_FUNCTION_INFO_V1(vector_assign_scalar);
 PG_FUNCTION_INFO_V1(vector_select);
 PG_FUNCTION_INFO_V1(vector_apply);
 PG_FUNCTION_INFO_V1(vector_apply_first);
 PG_FUNCTION_INFO_V1(vector_apply_second);
+PG_FUNCTION_INFO_V1(vector_extract_vector);
 PG_FUNCTION_INFO_V1(vector_get_element);
 PG_FUNCTION_INFO_V1(vector_set_element);
 PG_FUNCTION_INFO_V1(vector_remove_element);
@@ -720,76 +722,120 @@ Datum
 vector_reduce_scalar(PG_FUNCTION_ARGS)
 {
 	os_Vector *A;
-	os_Monoid *monoid;
-	os_BinaryOp *accum;
-	os_Descriptor *descriptor;
+	GrB_Monoid monoid;
+	GrB_BinaryOp accum;
+	GrB_Descriptor descriptor;
 	os_Scalar *result;
 	GrB_Type type;
 	int nargs;
 
-	A = OS_GETARG_VECTOR(0);
-	monoid = OS_GETARG_MONOID(1);
 	nargs = PG_NARGS();
-
-	accum = OS_GETARG_BINARYOP_OR_NULL(nargs, 2);
-	descriptor = OS_GETARG_DESCRIPTOR_OR_NULL(nargs, 3);
-
+	A = OS_GETARG_VECTOR(0);
 	OS_VTYPE(type, A);
+
+	monoid = OS_GETARG_MONOID_HANDLE_OR_NULL(nargs, 1);
+	if (monoid == NULL)
+	{
+		monoid = default_monoid(type);
+	}
+
+	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 2);
+	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 3);
+
 	result = new_scalar(type, CurrentMemoryContext, NULL);
 
 	OS_CHECK(GrB_Vector_reduce_Monoid_Scalar(
 			  result->scalar,
-			  accum ? accum->binaryop : NULL,
-			  monoid->monoid,
+			  accum,
+			  monoid,
 			  A->vector,
-			  descriptor ? descriptor->descriptor : NULL),
+			  descriptor),
 		  result->scalar,
 		  "Cannot reduce vector to scalar");
-
 	OS_RETURN_SCALAR(result);
 }
 
 Datum
 vector_assign(PG_FUNCTION_ARGS)
 {
-	os_Vector *A, *B, *mask;
-	os_BinaryOp *accum;
-	os_Descriptor *descriptor;
-	GrB_Index nvals, *Ilist = NULL;
+	GrB_Type type;
+	os_Vector *u, *v;
+	GrB_Vector mask;
+	GrB_BinaryOp accum;
+	GrB_Descriptor descriptor;
+	GrB_Index size, ni = 0, *indexes = NULL;
 	int nargs;
 
-	A = OS_GETARG_VECTOR(0);
-	B = OS_GETARG_VECTOR(1);
 	nargs = PG_NARGS();
+	u = OS_GETARG_VECTOR(0);
+	v = OS_GETARG_VECTOR(1);
 
-	mask = OS_GETARG_VECTOR_OR_NULL(nargs, 2);
-	accum = OS_GETARG_BINARYOP_OR_NULL(nargs, 3);
-	descriptor = OS_GETARG_DESCRIPTOR_OR_NULL(nargs, 4);
+	OS_VTYPE(type, u);
+	OS_VSIZE(size, u);
 
-	if (B != NULL)
+	ni = size;
+	if (!PG_ARGISNULL(2))
 	{
-		OS_VNVALS(nvals, B);
-		Ilist = (GrB_Index*) palloc0(sizeof(GrB_Index) * nvals);
-
-		OS_CHECK(GrB_Vector_extractTuples(Ilist,
-									   NULL,
-									   &nvals,
-									   A->vector),
-			  A->vector,
-			  "Error extracting tuples.");
+		indexes = get_c_array_from_pg_array(fcinfo, 2, &ni);
 	}
 
-	OS_CHECK(GrB_assign(A->vector,
-					 mask ? mask->vector : NULL,
-					 accum ? accum->binaryop : NULL,
-					 B->vector,
-					 Ilist ? Ilist : GrB_ALL,
-					 nvals,
-					 descriptor ? descriptor->descriptor : NULL),
-		  A->vector,
-		  "Error in assign vector.");
+	mask = OS_GETARG_VECTOR_HANDLE_OR_NULL(nargs, 4);
+	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 5);
+	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 6);
 
-	OS_RETURN_VECTOR(A);
+	OS_CHECK(GrB_assign(u->vector,
+						mask,
+						accum,
+						v->vector,
+						indexes ? indexes : GrB_ALL,
+						ni,
+						descriptor),
+			 u->vector,
+			 "Error in assign vector.");
+
+	OS_RETURN_VECTOR(u);
+}
+
+Datum
+vector_assign_scalar(PG_FUNCTION_ARGS)
+{
+	GrB_Type type;
+	os_Vector *u;
+	os_Scalar *s;
+	GrB_Vector mask;
+	GrB_BinaryOp accum;
+	GrB_Descriptor descriptor;
+	GrB_Index size, ni = 0, *indexes = NULL;
+	int nargs;
+
+	nargs = PG_NARGS();
+	u = OS_GETARG_VECTOR(0);
+	s = OS_GETARG_SCALAR(1);
+
+	OS_VTYPE(type, u);
+	OS_VSIZE(size, u);
+
+	ni = size;
+	if (!PG_ARGISNULL(2))
+	{
+		indexes = get_c_array_from_pg_array(fcinfo, 2, &ni);
+	}
+
+	mask = OS_GETARG_VECTOR_HANDLE_OR_NULL(nargs, 3);
+	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 4);
+	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 5);
+
+	OS_CHECK(GrB_assign(u->vector,
+						mask,
+						accum,
+						s->scalar,
+						indexes ? indexes : GrB_ALL,
+						ni,
+						descriptor),
+			 u->vector,
+			 "Error in assign vector scalar.");
+
+	OS_RETURN_VECTOR(u);
 }
 
 Datum vector_select(PG_FUNCTION_ARGS)
@@ -989,6 +1035,53 @@ Datum vector_apply_second(PG_FUNCTION_ARGS)
 					   descriptor),
 			 w->vector,
 			 "Error in grb_vector_apply_binaryop1st");
+	OS_RETURN_VECTOR(w);
+}
+
+Datum
+vector_extract_vector(PG_FUNCTION_ARGS)
+{
+	GrB_Type type;
+	os_Vector *u, *w;
+	GrB_Vector mask;
+	GrB_BinaryOp accum;
+	GrB_Descriptor descriptor;
+	GrB_Index size, ni = 0, *indexes = NULL;
+	int nargs;
+
+	nargs = PG_NARGS();
+	u = OS_GETARG_VECTOR(0);
+	OS_VTYPE(type, u);
+	OS_VSIZE(size, u);
+	ni = size;
+
+	if (!PG_ARGISNULL(1))
+	{
+		indexes = get_c_array_from_pg_array(fcinfo, 1, &ni);
+	}
+
+	if (PG_ARGISNULL(2))
+	{
+		w = new_vector(type, ni, CurrentMemoryContext, NULL);
+	}
+	else
+	{
+		w = OS_GETARG_VECTOR(2);
+	}
+
+	mask = OS_GETARG_VECTOR_HANDLE_OR_NULL(nargs, 3);
+	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 4);
+	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 5);
+
+	OS_CHECK(GrB_extract(w->vector,
+						 mask,
+						 accum,
+						 u->vector,
+						 indexes ? indexes : GrB_ALL,
+						 ni,
+						 descriptor),
+			 w->vector,
+			 "Error in extract vector.");
 	OS_RETURN_VECTOR(w);
 }
 

@@ -136,11 +136,19 @@ binops = [i for i, j in variables if j[1].type_spec == 'GrB_BinaryOp']
 monoids = [i for i, j in variables if j[1].type_spec == 'GrB_Monoid']
 semirings = [i for i, j in variables if j[1].type_spec == 'GrB_Semiring']
 
-types_decls = '\n'.join([
+type_list = '\n'.join([
+    f'-- | {s.lower()[4:]} | {s} |'
+    for s in types])
+
+type_decls = '\n'.join([
     f'\n    entry = typehash_insert(typehash, "{s.lower()[4:]}", &found);\n'
     f'    entry->name = strdup("{s.lower()[4:]}");\n'
     f'    entry->type = {s};'
     for s in types])
+
+descriptor_list = '\n'.join([
+    f'-- | {s.lower()[9:]} | {s} |'
+    for s in descriptors])
 
 descriptor_decls = '\n'.join([
     f'\n    entry = descriptorhash_insert(descriptorhash, "{s.lower()[9:]}", &found);\n'
@@ -148,11 +156,19 @@ descriptor_decls = '\n'.join([
     f'    entry->descriptor = {s};'
     for s in descriptors])
 
+unaryop_list = '\n'.join([
+    f'-- | {s.lower()[4:]} | {s} |'
+    for s in unaries])
+
 unaryop_decls = '\n'.join([
     f'\n    entry = unaryophash_insert(unaryophash, "{s.lower()[4:]}", &found);\n'
     f'    entry->name = strdup("{s.lower()[4:]}");\n'
     f'    entry->unaryop = {s};'
     for s in unaries])
+
+indexunaryop_list = '\n'.join([
+    f'-- | {s.lower()[4:]} | {s} |'
+    for s in indexunaries])
 
 indexunaryop_decls = '\n'.join([
     f'\n    entry = indexunaryophash_insert(indexunaryophash, "{s.lower()[4:]}", &found);\n'
@@ -160,17 +176,29 @@ indexunaryop_decls = '\n'.join([
     f'    entry->indexunaryop = {s};'
     for s in indexunaries])
 
+binop_list = '\n'.join([
+    f'-- | {s.lower()[4:]} | {s} |'
+    for s in binops])
+
 binop_decls = '\n'.join([
     f'\n    entry = binaryophash_insert(binaryophash, "{s.lower()[4:]}", &found);\n'
     f'    entry->name = strdup("{s.lower()[4:]}");\n'
     f'    entry->binaryop = {s};'
     for s in binops])
 
+monoid_list = '\n'.join([
+    f'-- | {s.lower()[4:]} | {s} |'
+    for s in monoids])
+
 monoid_decls = '\n'.join([
     f'\n    entry = monoidhash_insert(monoidhash, "{s.lower()[4:]}", &found);\n'
     f'    entry->name = strdup("{s.lower()[4:]}");\n'
     f'    entry->monoid = {s};'
     for s in monoids])
+
+semiring_list = '\n'.join([
+    f'-- | {s.lower()[4:]} | {s} |'
+    for s in semirings])
 
 semiring_decls = '\n'.join([
     f'\n    entry = semiringhash_insert(semiringhash, "{s.lower()[4:]}", &found);\n'
@@ -190,13 +218,13 @@ def write_source(outfile):
     ]
 
     objects = [
-        Template('type', outfile, dict(decls=types_decls)),
-        Template('descriptor', outfile, dict(decls=descriptor_decls)),
-        Template('unaryop', outfile, dict(decls=unaryop_decls)),
-        Template('indexunaryop', outfile, dict(decls=indexunaryop_decls)),
-        Template('binaryop', outfile, dict(decls=binop_decls)),
-        Template('monoid', outfile, dict(decls=monoid_decls)),
-        Template('semiring', outfile, dict(decls=semiring_decls)),
+        Template('type', outfile, dict(decls=type_decls, names=type_list)),
+        Template('descriptor', outfile, dict(decls=descriptor_decls, names=descriptor_list)),
+        Template('unaryop', outfile, dict(decls=unaryop_decls, names=unaryop_list)),
+        Template('indexunaryop', outfile, dict(decls=indexunaryop_decls, names=indexunaryop_list)),
+        Template('binaryop', outfile, dict(decls=binop_decls, names=binop_list)),
+        Template('monoid', outfile, dict(decls=monoid_decls, names=monoid_list)),
+        Template('semiring', outfile, dict(decls=semiring_decls, names=semiring_list)),
         Template('scalar', outfile),
         Template('vector', outfile),
         Template('matrix', outfile),

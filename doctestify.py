@@ -11,7 +11,7 @@ def doctestify(test):
     in_code_block = False
 
     for line in lines:
-        if line.startswith("\\") or "\gset" in line or "-- pragma:hide" in line:
+        if line.startswith("\\") or "\\gset" in line or "-- pragma:hide" in line:
             continue
         if line.startswith("--") and not line.startswith("---"):
             if in_code_block:
@@ -78,6 +78,7 @@ def write_docs():
     ]
 
     objects = [
+        Template('type'),
         Template('descriptor'),
         Template('unaryop'),
         Template('indexunaryop'),
@@ -87,6 +88,7 @@ def write_docs():
         Template('scalar'),
         Template('vector'),
         Template('matrix'),
+        Template('examples'),
         ]
 
     for o in objects:

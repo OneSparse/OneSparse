@@ -2,6 +2,60 @@
 #include "onesparse.h"
 PG_MODULE_MAGIC;
 
+// Helper function to convert a PostgreSQL bigint[] to a C array of uint64_t
+uint64_t* get_c_array_from_pg_array(FunctionCallInfo fcinfo, int arg_number, uint64_t *out_nelems) {
+    ArrayType *input_array;
+    Datum *elements;
+    bool *nulls;
+    int nelems;           // Intermediate variable to store the int number of elements
+    uint64_t *c_array;
+    int i;
+    int64_t temp_value;
+
+    // Fetch the input argument as a PostgreSQL array
+    input_array = PG_GETARG_ARRAYTYPE_P(arg_number);
+
+    // Deconstruct the PostgreSQL array into its components
+    deconstruct_array(input_array,
+                      INT8OID,       // OID for int64
+                      8,             // size of int64 (8 bytes)
+                      true,          // it is passed by value
+                      'd',           // default alignment
+                      &elements,     // array of Datums to be filled
+                      &nulls,        // array of null flags to be filled
+                      &nelems);      // number of elements (stored as int initially)
+
+    // Allocate memory for the C array
+    c_array = (uint64_t *) palloc(nelems * sizeof(uint64_t));
+
+    // Convert each PostgreSQL Datum to uint64_t and store it in the C array
+    for (i = 0; i < nelems; i++) {
+        if (!nulls[i]) {
+            // Convert the datum to int64_t
+            temp_value = DatumGetInt64(elements[i]);
+
+            // Throw an error if the value is negative
+            if (temp_value < 0) {
+                ereport(ERROR,
+                        (errcode(ERRCODE_NUMERIC_VALUE_OUT_OF_RANGE),
+                         errmsg("Negative values are not allowed in uint64_t array")));
+            }
+
+            // Store the non-negative value as uint64_t
+            c_array[i] = (uint64_t) temp_value;
+        } else {
+            // Handle null values if needed (this example sets to 0)
+            c_array[i] = 0;
+        }
+    }
+
+    // Set the output parameter for the number of elements as uint64_t
+    *out_nelems = (uint64_t) nelems;
+
+    // Return the C array
+    return c_array;
+}
+
 char* short_code(GrB_Type_Code code)
 {
 	switch(code)

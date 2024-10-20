@@ -21,6 +21,8 @@ CREATE TYPE binaryop (
     internallength = VARIABLE
     );
 
+COMMENT ON TYPE binaryop IS 'BinaryOps apply a function to two elements and returning an element.';
+
 CREATE FUNCTION name(binaryop)
 RETURNS text
 AS '$libdir/onesparse', 'binaryop_name'

@@ -21,6 +21,8 @@ CREATE TYPE scalar (
     internallength = VARIABLE
     );
 
+COMMENT ON TYPE scalar IS 'Scalars hold individual element values.';
+
 CREATE FUNCTION type(scalar)
 RETURNS type
 AS '$libdir/onesparse', 'scalar_type'

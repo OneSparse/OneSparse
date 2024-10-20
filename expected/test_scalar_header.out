@@ -9,10 +9,10 @@ set client_min_messages = 'WARNING';
 create extension if not exists onesparse;
 -- Describe the scalar type
 \dT+ scalar
-                                        List of data types
-  Schema   |  Name  | Internal name | Size | Elements |  Owner   | Access privileges | Description 
------------+--------+---------------+------+----------+----------+-------------------+-------------
- onesparse | scalar | scalar        | var  |          | postgres |                   | 
+                                                      List of data types
+  Schema   |  Name  | Internal name | Size | Elements |  Owner   | Access privileges |               Description               
+-----------+--------+---------------+------+----------+----------+-------------------+-----------------------------------------
+ onesparse | scalar | scalar        | var  |          | postgres |                   | Scalars hold individual element values.
 (1 row)
 
 -- print a scalar, this renders the value with no prefix

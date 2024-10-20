@@ -21,6 +21,8 @@ CREATE TYPE monoid (
     internallength = VARIABLE
     );
 
+COMMENT ON TYPE monoid IS 'Monoids apply a BinaryOp and an identity value to two elements, returning an element.';
+
 CREATE FUNCTION name(monoid)
 RETURNS text
 AS '$libdir/onesparse', 'monoid_name'

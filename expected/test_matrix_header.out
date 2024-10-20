@@ -540,7 +540,7 @@ select print(d) from test_fixture;
 -- One way of thinking about a "dense" matrix is a fully connected
 -- graph, these can be constructed with the `dense_matrix()` function:
 --
-select draw(d) as draw_source from test_fixture \gset
+select draw(dense_matrix(4, 4, 1)) as draw_source from test_fixture \gset
 \i sql/draw.sql
 \setenv draw_source :draw_source
 \! echo $draw_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'

@@ -81,6 +81,8 @@
  onesparse | @    | matrix           | matrix           | matrix           | mxm_op                    | 
  onesparse | @    | matrix           | vector           | vector           | mxv_op                    | 
  onesparse | @    | vector           | matrix           | vector           | vxm_op                    | 
+ onesparse | @<+  | matrix           | matrix           | matrix           | min_plus_op               | 
+ onesparse | @<+< | vector           | matrix           | vector           | min_plus_min_op           | 
  onesparse | |*   | matrix           | matrix           | matrix           | onesparse.eadd_times_op   | 
  onesparse | |*   | vector           | vector           | vector           | onesparse.eadd_times_op   | 
  onesparse | |+   | matrix           | matrix           | matrix           | onesparse.eadd_plus_op    | 
@@ -89,5 +91,5 @@
  onesparse | |-   | vector           | vector           | vector           | onesparse.eadd_minus_op   | 
  onesparse | |/   | matrix           | matrix           | matrix           | onesparse.eadd_div_op     | 
  onesparse | |/   | vector           | vector           | vector           | onesparse.eadd_div_op     | 
-(87 rows)
+(89 rows)
 

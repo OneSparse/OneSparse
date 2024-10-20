@@ -21,6 +21,8 @@ CREATE TYPE unaryop (
     internallength = VARIABLE
     );
 
+COMMENT ON TYPE unaryop IS 'UnaryOps apply a function to an element, returning an element.';
+
 CREATE FUNCTION name(unaryop)
 RETURNS text
 AS '$libdir/onesparse', 'unaryop_name'

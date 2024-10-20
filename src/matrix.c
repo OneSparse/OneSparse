@@ -30,7 +30,11 @@ PG_FUNCTION_INFO_V1(matrix_eunion);
 PG_FUNCTION_INFO_V1(matrix_reduce_vector);
 PG_FUNCTION_INFO_V1(matrix_reduce_scalar);
 PG_FUNCTION_INFO_V1(matrix_assign_matrix);
+PG_FUNCTION_INFO_V1(matrix_assign_row_vector);
+PG_FUNCTION_INFO_V1(matrix_assign_col_vector);
+PG_FUNCTION_INFO_V1(matrix_assign_scalar);
 PG_FUNCTION_INFO_V1(matrix_extract_matrix);
+PG_FUNCTION_INFO_V1(matrix_extract_col_vector);
 PG_FUNCTION_INFO_V1(matrix_mxm);
 PG_FUNCTION_INFO_V1(matrix_mxv);
 PG_FUNCTION_INFO_V1(matrix_vxm);
@@ -1104,92 +1108,300 @@ matrix_reduce_scalar(PG_FUNCTION_ARGS)
 Datum
 matrix_assign_matrix(PG_FUNCTION_ARGS)
 {
-	os_Matrix *A, *B, *mask;
-	os_BinaryOp *accum;
-	os_Descriptor *descriptor;
-	GrB_Index nvals, *rows = NULL, *cols = NULL;
+	GrB_Type type;
+	os_Matrix *A, *C;
+	GrB_Matrix mask;
+	GrB_BinaryOp accum;
+	GrB_Descriptor descriptor;
+	GrB_Index nrows, ncols, ni = 0, nj = 0, *rows = NULL, *cols = NULL;
 	int nargs;
 
 	nargs = PG_NARGS();
-	A = OS_GETARG_MATRIX(0);
-	B = OS_GETARG_MATRIX(1);
+	C = OS_GETARG_MATRIX(0);
+	A = OS_GETARG_MATRIX(1);
 
-	accum = OS_GETARG_BINARYOP_OR_NULL(nargs, 2);
-	mask = OS_GETARG_MATRIX_OR_NULL(nargs, 3);
-	descriptor = OS_GETARG_DESCRIPTOR_OR_NULL(nargs, 4);
+	OS_MTYPE(type, A);
+	OS_MNROWS(nrows, A);
+	OS_MNCOLS(ncols, A);
 
-	OS_MNVALS(nvals, B);
-	rows = (GrB_Index*) palloc0(sizeof(GrB_Index) * nvals);
-	cols = (GrB_Index*) palloc0(sizeof(GrB_Index) * nvals);
+	ni = nrows;
+	nj = ncols;
+	if (!PG_ARGISNULL(2))
+	{
+		rows = get_c_array_from_pg_array(fcinfo, 2, &ni);
+	}
 
-	OS_CHECK(GrB_Matrix_extractTuples(rows,
-								   cols,
-								   NULL,
-								   &nvals,
-								   B->matrix),
-		  B->matrix,
-		  "Error extracting tuples.");
+	if (!PG_ARGISNULL(3))
+	{
+		cols = get_c_array_from_pg_array(fcinfo, 3, &nj);
+	}
 
-	OS_CHECK(GrB_assign(A->matrix,
-					 mask ? mask->matrix: NULL,
-					 accum ? accum->binaryop : NULL,
-					 B->matrix,
-					 rows,
-					 nvals,
-					 cols,
-					 nvals,
-					 descriptor ? descriptor->descriptor : NULL),
-		  A->matrix,
-		  "Error in assign matrix.");
+	mask = OS_GETARG_MATRIX_HANDLE_OR_NULL(nargs, 4);
+	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 5);
+	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 6);
 
-	OS_RETURN_MATRIX(A);
+	OS_CHECK(GrB_assign(C->matrix,
+						mask,
+						accum,
+						A->matrix,
+						rows ? rows : GrB_ALL,
+						ni,
+						cols ? cols : GrB_ALL,
+						nj,
+						descriptor),
+			 C->matrix,
+			 "Error in assign matrix.");
+
+	OS_RETURN_MATRIX(C);
+}
+
+Datum
+matrix_assign_row_vector(PG_FUNCTION_ARGS)
+{
+	GrB_Type type;
+	os_Matrix *C;
+	os_Vector *v;
+	GrB_Vector mask;
+	GrB_BinaryOp accum;
+	GrB_Descriptor descriptor;
+	GrB_Index nrows, ncols, nj = 0, i, *cols = NULL;
+	int nargs;
+
+	nargs = PG_NARGS();
+	C = OS_GETARG_MATRIX(0);
+	v = OS_GETARG_VECTOR(1);
+	i = PG_GETARG_INT64(2);
+
+	OS_MTYPE(type, C);
+	OS_MNROWS(nrows, C);
+	OS_MNCOLS(ncols, C);
+
+	nj = ncols;
+	if (!PG_ARGISNULL(3))
+	{
+		cols = get_c_array_from_pg_array(fcinfo, 3, &nj);
+	}
+
+	mask = OS_GETARG_VECTOR_HANDLE_OR_NULL(nargs, 4);
+	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 5);
+	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 6);
+
+	OS_CHECK(GrB_Row_assign(C->matrix,
+							mask,
+							accum,
+							v->vector,
+							i,
+							cols ? cols : GrB_ALL,
+							nj,
+							descriptor),
+			 C->matrix,
+			 "Error in assign row vector.");
+
+	OS_RETURN_MATRIX(C);
+}
+
+Datum
+matrix_assign_col_vector(PG_FUNCTION_ARGS)
+{
+	GrB_Type type;
+	os_Matrix *C;
+	os_Vector *v;
+	GrB_Vector mask;
+	GrB_BinaryOp accum;
+	GrB_Descriptor descriptor;
+	GrB_Index nrows, ncols, ni = 0, j, *rows = NULL;
+	int nargs;
+
+	nargs = PG_NARGS();
+	C = OS_GETARG_MATRIX(0);
+	v = OS_GETARG_VECTOR(1);
+	j = PG_GETARG_INT64(2);
+
+	OS_MTYPE(type, C);
+	OS_MNROWS(nrows, C);
+	OS_MNCOLS(ncols, C);
+
+	ni = ncols;
+	if (!PG_ARGISNULL(3))
+	{
+		rows = get_c_array_from_pg_array(fcinfo, 3, &ni);
+	}
+
+	mask = OS_GETARG_VECTOR_HANDLE_OR_NULL(nargs, 4);
+	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 5);
+	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 6);
+
+	OS_CHECK(GrB_Col_assign(C->matrix,
+							mask,
+							accum,
+							v->vector,
+							rows ? rows : GrB_ALL,
+							ni,
+							j,
+							descriptor),
+			 C->matrix,
+			 "Error in assign matrix col vector.");
+
+	OS_RETURN_MATRIX(C);
+}
+
+Datum
+matrix_assign_scalar(PG_FUNCTION_ARGS)
+{
+	GrB_Type type;
+	os_Matrix *C;
+	os_Scalar *s;
+	GrB_Matrix mask;
+	GrB_BinaryOp accum;
+	GrB_Descriptor descriptor;
+	GrB_Index nrows, ncols, ni = 0, nj = 0, *rows = NULL, *cols = NULL;
+	int nargs;
+
+	nargs = PG_NARGS();
+	C = OS_GETARG_MATRIX(0);
+	s = OS_GETARG_SCALAR(1);
+
+	OS_MTYPE(type, C);
+	OS_MNROWS(nrows, C);
+	OS_MNCOLS(ncols, C);
+
+	ni = nrows;
+	nj = ncols;
+	if (!PG_ARGISNULL(2))
+	{
+		rows = get_c_array_from_pg_array(fcinfo, 2, &ni);
+	}
+
+	if (!PG_ARGISNULL(3))
+	{
+		cols = get_c_array_from_pg_array(fcinfo, 3, &nj);
+	}
+
+	mask = OS_GETARG_MATRIX_HANDLE_OR_NULL(nargs, 4);
+	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 5);
+	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 6);
+
+	OS_CHECK(GrB_assign(C->matrix,
+						mask,
+						accum,
+						s->scalar,
+						rows ? rows : GrB_ALL,
+						ni,
+						cols ? cols : GrB_ALL,
+						nj,
+						descriptor),
+			 C->matrix,
+			 "Error in assign matrix scalar.");
+
+	OS_RETURN_MATRIX(C);
 }
 
 Datum
 matrix_extract_matrix(PG_FUNCTION_ARGS)
 {
-	os_Matrix *A, *B, *mask;
-	os_BinaryOp *accum;
-	os_Descriptor *descriptor;
-	GrB_Index nvals, *rows = NULL, *cols = NULL;
+	GrB_Type type;
+	os_Matrix *A, *C;
+	GrB_Matrix mask;
+	GrB_BinaryOp accum;
+	GrB_Descriptor descriptor;
+	GrB_Index nrows, ncols, ni = 0, nj = 0, *rows = NULL, *cols = NULL;
 	int nargs;
 
 	nargs = PG_NARGS();
 	A = OS_GETARG_MATRIX(0);
-	B = OS_GETARG_MATRIX(1);
+	OS_MTYPE(type, A);
+	OS_MNROWS(nrows, A);
+	OS_MNCOLS(ncols, A);
 
-	accum = OS_GETARG_BINARYOP_OR_NULL(nargs, 2);
-	mask = OS_GETARG_MATRIX_OR_NULL(nargs, 3);
-	descriptor = OS_GETARG_DESCRIPTOR_OR_NULL(nargs, 4);
-
-	if (B != NULL)
+	ni = nrows;
+	nj = ncols;
+	if (!PG_ARGISNULL(1))
 	{
-		OS_MNVALS(nvals, B);
-		rows = (GrB_Index*) palloc0(sizeof(GrB_Index) * nvals);
-		cols = (GrB_Index*) palloc0(sizeof(GrB_Index) * nvals);
-
-		OS_CHECK(GrB_Matrix_extractTuples(rows,
-									   cols,
-									   NULL,
-									   &nvals,
-									   A->matrix),
-			  A->matrix,
-			  "Error extracting tuples.");
+		rows = get_c_array_from_pg_array(fcinfo, 1, &ni);
 	}
 
-	OS_CHECK(GrB_extract(A->matrix,
-					  mask ? mask->matrix: NULL,
-					  accum ? accum->binaryop : NULL,
-					  B->matrix,
-					  rows ? rows : GrB_ALL,
-					  nvals,
-					  cols ? cols : GrB_ALL,
-					  nvals,
-					  descriptor ? descriptor->descriptor : NULL),
-		  A->matrix,
-		  "Error in assign matrix.");
+	if (!PG_ARGISNULL(2))
+	{
+		cols = get_c_array_from_pg_array(fcinfo, 2, &nj);
+	}
 
-	OS_RETURN_MATRIX(A);
+	if (PG_ARGISNULL(3))
+	{
+		C = new_matrix(type, ni, nj, CurrentMemoryContext, NULL);
+	}
+	else
+	{
+		C = OS_GETARG_MATRIX(3);
+	}
+
+	mask = OS_GETARG_MATRIX_HANDLE_OR_NULL(nargs, 4);
+	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 5);
+	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 6);
+
+	OS_CHECK(GrB_extract(C->matrix,
+						 mask,
+						 accum,
+						 A->matrix,
+						 rows ? rows : GrB_ALL,
+						 ni,
+						 cols ? cols : GrB_ALL,
+						 nj,
+						 descriptor),
+			 C->matrix,
+			 "Error in extract matrix.");
+
+	OS_RETURN_MATRIX(C);
+}
+
+Datum
+matrix_extract_col_vector(PG_FUNCTION_ARGS)
+{
+	GrB_Type type;
+	os_Matrix *A;
+	os_Vector *C;
+	GrB_Vector mask;
+	GrB_BinaryOp accum;
+	GrB_Descriptor descriptor;
+	GrB_Index size, col, nj, *indexes = NULL;
+	int nargs;
+
+	nargs = PG_NARGS();
+	A = OS_GETARG_MATRIX(0);
+	col = PG_GETARG_INT64(1);
+	OS_MTYPE(type, A);
+	OS_MNROWS(size, A);
+
+	nj = size;
+	if (!PG_ARGISNULL(2))
+	{
+		indexes = get_c_array_from_pg_array(fcinfo, 2, &nj);
+	}
+
+	if (PG_ARGISNULL(3))
+	{
+		C = new_vector(type, nj, CurrentMemoryContext, NULL);
+	}
+	else
+	{
+		C = OS_GETARG_VECTOR(3);
+	}
+
+	mask = OS_GETARG_VECTOR_HANDLE_OR_NULL(nargs, 4);
+	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 5);
+	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 6);
+
+	OS_CHECK(GrB_Col_extract(C->vector,
+							 mask,
+							 accum,
+							 A->matrix,
+							 indexes ? indexes : GrB_ALL,
+							 nj,
+							 col,
+							 descriptor),
+			 C->vector,
+			 "Error in column vector matrix.");
+
+	OS_RETURN_VECTOR(C);
 }
 
 Datum matrix_select(PG_FUNCTION_ARGS)

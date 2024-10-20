@@ -21,6 +21,8 @@ CREATE TYPE type (
     internallength = VARIABLE
     );
 
+COMMENT ON TYPE type IS 'Types define the structure and behavior of elements.';
+
 CREATE FUNCTION name(type)
 RETURNS text
 AS '$libdir/onesparse', 'type_name'

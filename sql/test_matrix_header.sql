@@ -136,7 +136,7 @@ select print(d) from test_fixture;
 -- graph, these can be constructed with the `dense_matrix()` function:
 --
 
-select draw(d) as draw_source from test_fixture \gset
+select draw(dense_matrix(4, 4, 1)) as draw_source from test_fixture \gset
 \i sql/draw.sql
 
 -- And another matrix named 's' which is a Sierpinsky Graph, which

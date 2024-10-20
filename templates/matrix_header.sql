@@ -21,6 +21,8 @@ CREATE TYPE matrix (
     internallength = VARIABLE
     );
 
+COMMENT ON TYPE matrix IS 'Matrices hold sparse rows and columns of elements.';
+
 CREATE FUNCTION matrix(t type, nrows bigint default -1, ncols bigint default -1)
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_new'
@@ -41,6 +43,14 @@ RETURNS int8
 AS '$libdir/onesparse', 'matrix_nvals'
 LANGUAGE C;
 
+CREATE FUNCTION matrix_bool(v matrix)
+RETURNS bool
+RETURN nvals(v) > 0;
+
+CREATE CAST (matrix AS bool)
+    WITH FUNCTION matrix_bool(matrix)
+    AS IMPLICIT;
+
 CREATE FUNCTION nrows(matrix)
 RETURNS int8
 AS '$libdir/onesparse', 'matrix_nrows'
@@ -55,6 +65,7 @@ CREATE FUNCTION eadd(
     a matrix,
     b matrix,
     op binaryop default null,
+    c matrix default null,
     mask matrix default null,
     accum binaryop default null,
     descriptor descriptor default null
@@ -67,6 +78,7 @@ CREATE FUNCTION emult(
     a matrix,
     b matrix,
     op binaryop default null,
+    c matrix default null,
     mask matrix default null,
     accum binaryop default null,
     descriptor descriptor default null
@@ -81,6 +93,7 @@ CREATE FUNCTION eunion(
     b matrix,
     beta scalar,
     op binaryop default null,
+    c matrix default null,
     mask matrix default null,
     descriptor descriptor default null
     )
@@ -110,10 +123,11 @@ RETURNS scalar
 AS '$libdir/onesparse', 'matrix_reduce_scalar'
 LANGUAGE C STABLE;
 
-CREATE FUNCTION matrix_assign(
+CREATE FUNCTION assign(
+    c matrix,
     a matrix,
-    b matrix,
-    op binaryop,
+    i bigint[] default null,
+    j bigint[] default null,
     mask matrix default null,
     accum binaryop default null,
     descriptor descriptor default null
@@ -122,10 +136,50 @@ RETURNS matrix
 AS '$libdir/onesparse', 'matrix_assign_matrix'
 LANGUAGE C STABLE;
 
-CREATE FUNCTION matrix_extract(
+CREATE FUNCTION assign_row(
+    c matrix,
+    v vector,
+    i bigint,
+    j bigint[] default null,
+    mask matrix default null,
+    accum binaryop default null,
+    descriptor descriptor default null
+    )
+RETURNS matrix
+AS '$libdir/onesparse', 'matrix_assign_row_vector'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION assign_col(
+    c matrix,
+    v vector,
+    j bigint,
+    i bigint[] default null,
+    mask matrix default null,
+    accum binaryop default null,
+    descriptor descriptor default null
+    )
+RETURNS matrix
+AS '$libdir/onesparse', 'matrix_assign_col_vector'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION assign(
+    c matrix,
+    s scalar,
+    i bigint[] default null,
+    j bigint[] default null,
+    mask matrix default null,
+    accum binaryop default null,
+    descriptor descriptor default null
+    )
+RETURNS matrix
+AS '$libdir/onesparse', 'matrix_assign_scalar'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION extract_matrix(
     a matrix,
-    b matrix,
-    op binaryop,
+    i bigint[] default null,
+    j bigint[] default null,
+    c matrix default null,
     mask matrix default null,
     accum binaryop default null,
     descriptor descriptor default null
@@ -133,6 +187,31 @@ CREATE FUNCTION matrix_extract(
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_extract_matrix'
 LANGUAGE C STABLE;
+
+CREATE FUNCTION extract_col(
+    a matrix,
+    j bigint,
+    i bigint[] default null,
+    c vector default null,
+    mask vector default null,
+    accum binaryop default null,
+    descriptor descriptor default null
+    )
+RETURNS vector
+AS '$libdir/onesparse', 'matrix_extract_col_vector'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION extract_row(
+    a matrix,
+    i bigint,
+    j bigint[] default null,
+    c vector default null,
+    mask vector default null,
+    accum binaryop default null,
+    descriptor descriptor default null
+    )
+RETURNS vector
+    RETURN extract_col(a, i, j, c, mask, accum, coalesce(descriptor, 't0'::descriptor));
 
 CREATE FUNCTION mxm(
     a matrix,
@@ -152,7 +231,7 @@ CREATE FUNCTION mxv(
     v vector,
     op semiring default null,
     inout w vector default null,
-    mask matrix default null,
+    mask vector default null,
     accum binaryop default null,
     descriptor descriptor default null
     )
@@ -165,7 +244,7 @@ CREATE FUNCTION vxm(
     b matrix,
     op semiring default null,
     inout w vector default null,
-    mask matrix default null,
+    mask vector default null,
     accum binaryop default null,
     descriptor descriptor default null
     )
@@ -298,6 +377,20 @@ RETURNS text
 AS '$libdir/onesparse', 'matrix_info'
 LANGUAGE C STABLE;
 
+CREATE FUNCTION eadd_min(
+    a matrix,
+    b matrix,
+    c matrix default null,
+    mask matrix default null,
+    accum binaryop default null,
+    descriptor descriptor default null)
+RETURNS matrix
+RETURN onesparse.eadd(a, b, ('min_' || name(type(a)))::binaryop, c, mask, accum, descriptor);
+
+CREATE FUNCTION eadd_min_op(a matrix, b matrix)
+RETURNS matrix
+RETURN onesparse.eadd_min(a, b);
+
 CREATE FUNCTION eadd_plus_op(a matrix, b matrix)
 RETURNS matrix
 RETURN onesparse.eadd(a, b, ('plus_' || name(type(a)))::binaryop);
@@ -401,6 +494,25 @@ CREATE FUNCTION le(a matrix, s scalar)
 RETURNS matrix
 RETURN onesparse.choose(a, ('valuele_' || name(type(a)))::indexunaryop, s);
 
+CREATE FUNCTION one(a matrix)
+RETURNS matrix
+RETURN onesparse.apply(a, ('one_' || name(type(a)))::unaryop);
+
+CREATE FUNCTION ainv(a matrix)
+RETURNS matrix
+RETURN onesparse.apply(a, ('ainv_' || name(type(a)))::unaryop);
+
+CREATE FUNCTION minv(a matrix)
+RETURNS matrix
+RETURN onesparse.apply(a, ('minv_' || name(type(a)))::unaryop);
+
+CREATE FUNCTION lnot(a matrix)
+RETURNS matrix
+RETURN onesparse.apply(a, ('lnot_' || name(type(a)))::unaryop);
+
+CREATE FUNCTION bnot(a matrix)
+RETURNS matrix
+RETURN onesparse.apply(a, ('bnot_' || name(type(a)))::unaryop);
 
 CREATE OPERATOR = (
     LEFTARG = matrix,
@@ -558,6 +670,86 @@ CREATE OPERATOR @ (
     FUNCTION = vxm_op
     );
 
+CREATE FUNCTION min_plus(
+        a matrix,
+        b matrix,
+        c matrix default null,
+        mask matrix default null,
+        accum binaryop default null,
+        descriptor descriptor default null)
+RETURNS matrix
+    RETURN mxm(a, b, ('min_plus_' || name(type(a)))::semiring, c, mask, accum, descriptor);
+
+CREATE FUNCTION min_plus(
+        a matrix,
+        b vector,
+        c vector default null,
+        mask vector default null,
+        accum binaryop default null,
+        descriptor descriptor default null)
+RETURNS vector
+    RETURN mxv(a, b, ('min_plus_' || name(type(a)))::semiring, c, mask, accum, descriptor);
+
+CREATE FUNCTION min_plus(
+        a vector,
+        b matrix,
+        c vector default null,
+        mask vector default null,
+        accum binaryop default null,
+        descriptor descriptor default null)
+RETURNS vector
+    RETURN vxm(a, b, ('min_plus_' || name(type(a)))::semiring, c, mask, accum, descriptor);
+
+CREATE FUNCTION min_plus_min(
+        a matrix,
+        b matrix,
+        c matrix default null,
+        mask matrix default null,
+        descriptor descriptor default null)
+RETURNS matrix
+    RETURN mxm(a, b, ('min_plus_' || name(type(a)))::semiring, c, mask,  ('min_' || name(type(a)))::binaryop, descriptor);
+
+CREATE FUNCTION min_plus_min(
+        a matrix,
+        b vector,
+        c vector default null,
+        mask vector default null,
+        descriptor descriptor default null)
+RETURNS vector
+    RETURN mxv(a, b, ('min_plus_' || name(type(a)))::semiring, c, mask,  ('min_' || name(type(a)))::binaryop, descriptor);
+
+CREATE FUNCTION min_plus_min(
+        a vector,
+        b matrix,
+        mask vector default null,
+        descriptor descriptor default null)
+RETURNS vector
+    RETURN vxm(a, b, ('min_plus_' || name(type(a)))::semiring, a, mask, ('min_' || name(type(a)))::binaryop, descriptor);
+
+CREATE FUNCTION min_plus_op(
+        a matrix,
+        b matrix)
+RETURNS matrix
+    RETURN min_plus(a, b);
+
+CREATE OPERATOR @<+ (
+    LEFTARG = matrix,
+    RIGHTARG = matrix,
+    FUNCTION = min_plus_op
+    );
+
+CREATE FUNCTION min_plus_min_op(
+        a vector,
+        b matrix)
+RETURNS vector
+    RETURN min_plus_min(a, b);
+
+CREATE OPERATOR @<+< (
+    LEFTARG = vector,
+    RIGHTARG = matrix,
+    FUNCTION = min_plus_min_op
+    );
+
 create function print(a matrix) returns text language plpgsql as
     $$
     declare
@@ -614,25 +806,6 @@ create function random_matrix(
         return m;
     end;
     $$;
-
-create function dense_matrix(
-    t type,
-    nrows integer,
-    ncols integer,
-    fill integer default 0)
-        returns matrix language plpgsql as
-    $$
-    declare m matrix = matrix(t, nrows, ncols);
-    begin
-        for i in 0..nrows-1 loop
-            for j in 0..ncols-1 loop
-                m = set_element(m, i, j, fill);
-            end loop;
-        end loop;
-        return m;
-    end;
-    $$;
-
 
 create or replace function draw(a matrix) returns text language plpgsql as
     $$

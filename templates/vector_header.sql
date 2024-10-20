@@ -21,6 +21,8 @@ CREATE TYPE vector (
     internallength = VARIABLE
     );
 
+COMMENT ON TYPE vector IS 'Vectors hold a sparse array of elements.';
+
 CREATE FUNCTION vector(t type, vsize bigint default -1)
 RETURNS vector
 AS '$libdir/onesparse', 'vector_new'
@@ -42,9 +44,17 @@ AS '$libdir/onesparse', 'vector_elements'
 LANGUAGE C STABLE STRICT;
 
 CREATE FUNCTION nvals(vector)
-RETURNS int8
+RETURNS bigint
 AS '$libdir/onesparse', 'vector_nvals'
 LANGUAGE C;
+
+CREATE FUNCTION vector_bool(v vector)
+RETURNS bool
+RETURN nvals(v) > 0;
+
+CREATE CAST (vector AS bool)
+    WITH FUNCTION vector_bool(vector)
+    AS IMPLICIT;
 
 CREATE FUNCTION size(vector)
 RETURNS int8
@@ -94,24 +104,12 @@ LANGUAGE C STABLE;
 
 CREATE FUNCTION reduce_scalar(
     a vector,
-    op monoid,
+    op monoid default null,
     accum binaryop default null,
     descriptor descriptor default null
     )
 RETURNS scalar
 AS '$libdir/onesparse', 'vector_reduce_scalar'
-LANGUAGE C STABLE;
-
-CREATE FUNCTION assign(
-    a vector,
-    b vector,
-    op monoid,
-    mask vector default null,
-    accum binaryop default null,
-    descriptor descriptor default null
-    )
-RETURNS vector
-AS '$libdir/onesparse', 'vector_assign'
 LANGUAGE C STABLE;
 
 CREATE FUNCTION choose(
@@ -165,10 +163,46 @@ RETURNS vector
 AS '$libdir/onesparse', 'vector_apply_second'
 LANGUAGE C STABLE;
 
-CREATE FUNCTION set_element(a vector, i bigint, s scalar)
+CREATE FUNCTION assign(
+    c vector,
+    a vector,
+    i bigint[] default null,
+    mask vector default null,
+    accum binaryop default null,
+    descriptor descriptor default null
+    )
+RETURNS vector
+AS '$libdir/onesparse', 'vector_assign'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION assign(
+    c vector,
+    s scalar,
+    i bigint[] default null,
+    mask vector default null,
+    accum binaryop default null,
+    descriptor descriptor default null
+    )
+RETURNS vector
+AS '$libdir/onesparse', 'vector_assign_scalar'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION xtract(
+    u vector,
+    i bigint[] default null,
+    w vector default null,
+    mask vector default null,
+    accum binaryop default null,
+    descriptor descriptor default null
+    )
+RETURNS vector
+AS '$libdir/onesparse', 'vector_extract_vector'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION set_element(inout a vector, i bigint, s scalar)
 RETURNS vector
 AS '$libdir/onesparse', 'vector_set_element'
-LANGUAGE C STABLE;
+LANGUAGE C VOLATILE;
 
 CREATE FUNCTION get_element(a vector, i bigint)
 RETURNS scalar
@@ -210,6 +244,26 @@ CREATE FUNCTION le(a vector, s scalar)
 RETURNS vector
 RETURN onesparse.choose(a, ('valuele_' || name(type(a)))::indexunaryop, s);
 
+CREATE FUNCTION one(a vector)
+RETURNS vector
+RETURN onesparse.apply(a, ('one_' || name(type(a)))::unaryop);
+
+CREATE FUNCTION ainv(a vector)
+RETURNS vector
+RETURN onesparse.apply(a, ('ainv_' || name(type(a)))::unaryop);
+
+CREATE FUNCTION minv(a vector)
+RETURNS vector
+RETURN onesparse.apply(a, ('minv_' || name(type(a)))::unaryop);
+
+CREATE FUNCTION lnot(a vector)
+RETURNS vector
+RETURN onesparse.apply(a, ('lnot_' || name(type(a)))::unaryop);
+
+CREATE FUNCTION bnot(a vector)
+RETURNS vector
+RETURN onesparse.apply(a, ('bnot_' || name(type(a)))::unaryop);
+
 CREATE FUNCTION info(a vector, level int default 1)
 RETURNS text
 AS '$libdir/onesparse', 'vector_info'
@@ -230,6 +284,19 @@ RETURNS vector
 AS '$libdir/onesparse', 'vector_clear'
 LANGUAGE C;
 
+CREATE FUNCTION eadd_min(
+    a vector,
+    b vector,
+    c vector default null,
+    mask vector default null,
+    accum binaryop default null,
+    descriptor descriptor default null)
+RETURNS vector
+RETURN onesparse.eadd(a, b, ('min_' || name(type(a)))::binaryop, c, mask, accum, descriptor);
+
+CREATE FUNCTION eadd_min_op(a vector, b vector)
+RETURNS vector
+RETURN onesparse.eadd_min(a, b);
 
 CREATE FUNCTION eadd_plus_op(a vector, b vector)
 RETURNS vector
