@@ -17,7 +17,7 @@ psql:demo/fixtures.sql:55: NOTICE:  table "fs_183_1" does not exist, skipping
 
 Min Parent BFS returns "node:min parent node" vector:
 ``` postgres-console
-CREATE OR REPLACE FUNCTION bfs(graph matrix, start_node bigint)
+CREATE OR REPLACE FUNCTION public.bfs(graph matrix, start_node bigint)
     RETURNS vector LANGUAGE plpgsql AS
     $$
     DECLARE
@@ -68,7 +68,7 @@ SELECT bfs_vector FROM vars;
 As a plpgsql function:
 
 ``` postgres-console
-CREATE OR REPLACE FUNCTION sssp(graph matrix, start_node bigint)
+CREATE OR REPLACE FUNCTION public.sssp(graph matrix, start_node bigint)
     RETURNS vector LANGUAGE plpgsql AS
     $$
     DECLARE
