@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../test_vector_header/">
+        <link rel="prev" href="../test_semiring_header/">
       
       
-        <link rel="next" href="../test_semiring_header/">
+        <link rel="next" href="../test_binaryop_header/">
       
       
       <link rel="icon" href="../assets/images/favicon.png">
@@ -20,7 +20,7 @@
     
     
       
-        <title>Scalar - OneSparse Postgres</title>
+        <title>Monoid - OneSparse Postgres</title>
       
     
     
@@ -64,7 +64,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#scalar" class="md-skip">
+        <a href="#monoid" class="md-skip">
           Skip to content
         </a>
       
@@ -100,7 +100,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Scalar
+              Monoid
             
           </span>
         </div>
@@ -270,19 +270,10 @@
       
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../test_scalar_header/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -291,7 +282,6 @@
   
 
       </a>
-      
     </li>
   
 
@@ -320,10 +310,19 @@
       
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../test_monoid_header/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
@@ -332,6 +331,7 @@
   
 
       </a>
+      
     </li>
   
 
@@ -469,49 +469,506 @@
                   
 
 
-<h1 id="scalar">Scalar</h1>
-<p>This documentation is also tests for the code, the examples below
-show the literal output of these statements from Postgres.</p>
-<p>Some setup to make sure warnings are shown, and that the extension
-is installed.
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">set</span><span class="w"> </span><span class="n">client_min_messages</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;WARNING&#39;</span><span class="p">;</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="go">create extension if not exists onesparse;</span>
-</span></code></pre></div>
-Describe the scalar type
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="w">                                                      </span><span class="n">List</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="k">data</span><span class="w"> </span><span class="k">types</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="k">Schema</span><span class="w">   </span><span class="o">|</span><span class="w">  </span><span class="k">Name</span><span class="w">  </span><span class="o">|</span><span class="w"> </span><span class="nb">Internal</span><span class="w"> </span><span class="k">name</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Size</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Elements</span><span class="w"> </span><span class="o">|</span><span class="w">  </span><span class="k">Owner</span><span class="w">   </span><span class="o">|</span><span class="w"> </span><span class="k">Access</span><span class="w"> </span><span class="k">privileges</span><span class="w"> </span><span class="o">|</span><span class="w">               </span><span class="n">Description</span><span class="w">               </span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="c1">-----------+--------+---------------+------+----------+----------+-------------------+-----------------------------------------</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w"> </span><span class="n">onesparse</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">scalar</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">scalar</span><span class="w">        </span><span class="o">|</span><span class="w"> </span><span class="n">var</span><span class="w">  </span><span class="o">|</span><span class="w">          </span><span class="o">|</span><span class="w"> </span><span class="n">postgres</span><span class="w"> </span><span class="o">|</span><span class="w">                   </span><span class="o">|</span><span class="w"> </span><span class="n">Scalars</span><span class="w"> </span><span class="k">hold</span><span class="w"> </span><span class="n">individual</span><span class="w"> </span><span class="n">element</span><span class="w"> </span><span class="k">values</span><span class="mf">.</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="p">(</span><span class="mf">1</span><span class="w"> </span><span class="k">row</span><span class="p">)</span>
-</span></code></pre></div>
-print a scalar, this renders the value with no prefix
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">select</span><span class="w"> </span><span class="n">print</span><span class="p">(</span><span class="s1">&#39;int32:42&#39;</span><span class="o">::</span><span class="n">scalar</span><span class="p">);</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="go"> print </span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="go">-------</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="go"> 42</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="go">(1 row)</span>
-</span></code></pre></div>
-Duplicate a scalar
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">select</span><span class="w"> </span><span class="n">dup</span><span class="p">(</span><span class="s1">&#39;int32:42&#39;</span><span class="o">::</span><span class="n">scalar</span><span class="p">);</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="go">   dup    </span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="go">----------</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="go"> int32:42</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="go">(1 row)</span>
-</span></code></pre></div>
-Wait for a scalar to complete in non-blocking mode
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">select</span><span class="w"> </span><span class="n">wait</span><span class="p">(</span><span class="s1">&#39;int32:42&#39;</span><span class="o">::</span><span class="n">scalar</span><span class="p">);</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="go">   wait   </span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="go">----------</span>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="go"> int32:42</span>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="go">(1 row)</span>
-</span></code></pre></div>
-Clear a scalar, deleting its stored element.
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">select</span><span class="w"> </span><span class="n">clear</span><span class="p">(</span><span class="s1">&#39;int32:42&#39;</span><span class="o">::</span><span class="n">scalar</span><span class="p">);</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="go"> clear </span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="go">-------</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="go"> int</span>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="go">(1 row)</span>
-</span></code></pre></div></p>
+<h1 id="monoid">Monoid</h1>
+<p>Monoids apply a BinaryOp and an identity value to two elements, returning an element.</p>
+<table>
+<thead>
+<tr>
+<th>OneSparse Name</th>
+<th>SuiteSparse Name</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>min_int8_monoid</td>
+<td>GxB_MIN_INT8_MONOID</td>
+</tr>
+<tr>
+<td>min_int16_monoid</td>
+<td>GxB_MIN_INT16_MONOID</td>
+</tr>
+<tr>
+<td>min_int32_monoid</td>
+<td>GxB_MIN_INT32_MONOID</td>
+</tr>
+<tr>
+<td>min_int64_monoid</td>
+<td>GxB_MIN_INT64_MONOID</td>
+</tr>
+<tr>
+<td>min_uint8_monoid</td>
+<td>GxB_MIN_UINT8_MONOID</td>
+</tr>
+<tr>
+<td>min_uint16_monoid</td>
+<td>GxB_MIN_UINT16_MONOID</td>
+</tr>
+<tr>
+<td>min_uint32_monoid</td>
+<td>GxB_MIN_UINT32_MONOID</td>
+</tr>
+<tr>
+<td>min_uint64_monoid</td>
+<td>GxB_MIN_UINT64_MONOID</td>
+</tr>
+<tr>
+<td>min_fp32_monoid</td>
+<td>GxB_MIN_FP32_MONOID</td>
+</tr>
+<tr>
+<td>min_fp64_monoid</td>
+<td>GxB_MIN_FP64_MONOID</td>
+</tr>
+<tr>
+<td>min_monoid_int8</td>
+<td>GrB_MIN_MONOID_INT8</td>
+</tr>
+<tr>
+<td>min_monoid_int16</td>
+<td>GrB_MIN_MONOID_INT16</td>
+</tr>
+<tr>
+<td>min_monoid_int32</td>
+<td>GrB_MIN_MONOID_INT32</td>
+</tr>
+<tr>
+<td>min_monoid_int64</td>
+<td>GrB_MIN_MONOID_INT64</td>
+</tr>
+<tr>
+<td>min_monoid_uint8</td>
+<td>GrB_MIN_MONOID_UINT8</td>
+</tr>
+<tr>
+<td>min_monoid_uint16</td>
+<td>GrB_MIN_MONOID_UINT16</td>
+</tr>
+<tr>
+<td>min_monoid_uint32</td>
+<td>GrB_MIN_MONOID_UINT32</td>
+</tr>
+<tr>
+<td>min_monoid_uint64</td>
+<td>GrB_MIN_MONOID_UINT64</td>
+</tr>
+<tr>
+<td>min_monoid_fp32</td>
+<td>GrB_MIN_MONOID_FP32</td>
+</tr>
+<tr>
+<td>min_monoid_fp64</td>
+<td>GrB_MIN_MONOID_FP64</td>
+</tr>
+<tr>
+<td>max_int8_monoid</td>
+<td>GxB_MAX_INT8_MONOID</td>
+</tr>
+<tr>
+<td>max_int16_monoid</td>
+<td>GxB_MAX_INT16_MONOID</td>
+</tr>
+<tr>
+<td>max_int32_monoid</td>
+<td>GxB_MAX_INT32_MONOID</td>
+</tr>
+<tr>
+<td>max_int64_monoid</td>
+<td>GxB_MAX_INT64_MONOID</td>
+</tr>
+<tr>
+<td>max_uint8_monoid</td>
+<td>GxB_MAX_UINT8_MONOID</td>
+</tr>
+<tr>
+<td>max_uint16_monoid</td>
+<td>GxB_MAX_UINT16_MONOID</td>
+</tr>
+<tr>
+<td>max_uint32_monoid</td>
+<td>GxB_MAX_UINT32_MONOID</td>
+</tr>
+<tr>
+<td>max_uint64_monoid</td>
+<td>GxB_MAX_UINT64_MONOID</td>
+</tr>
+<tr>
+<td>max_fp32_monoid</td>
+<td>GxB_MAX_FP32_MONOID</td>
+</tr>
+<tr>
+<td>max_fp64_monoid</td>
+<td>GxB_MAX_FP64_MONOID</td>
+</tr>
+<tr>
+<td>max_monoid_int8</td>
+<td>GrB_MAX_MONOID_INT8</td>
+</tr>
+<tr>
+<td>max_monoid_int16</td>
+<td>GrB_MAX_MONOID_INT16</td>
+</tr>
+<tr>
+<td>max_monoid_int32</td>
+<td>GrB_MAX_MONOID_INT32</td>
+</tr>
+<tr>
+<td>max_monoid_int64</td>
+<td>GrB_MAX_MONOID_INT64</td>
+</tr>
+<tr>
+<td>max_monoid_uint8</td>
+<td>GrB_MAX_MONOID_UINT8</td>
+</tr>
+<tr>
+<td>max_monoid_uint16</td>
+<td>GrB_MAX_MONOID_UINT16</td>
+</tr>
+<tr>
+<td>max_monoid_uint32</td>
+<td>GrB_MAX_MONOID_UINT32</td>
+</tr>
+<tr>
+<td>max_monoid_uint64</td>
+<td>GrB_MAX_MONOID_UINT64</td>
+</tr>
+<tr>
+<td>max_monoid_fp32</td>
+<td>GrB_MAX_MONOID_FP32</td>
+</tr>
+<tr>
+<td>max_monoid_fp64</td>
+<td>GrB_MAX_MONOID_FP64</td>
+</tr>
+<tr>
+<td>plus_int8_monoid</td>
+<td>GxB_PLUS_INT8_MONOID</td>
+</tr>
+<tr>
+<td>plus_int16_monoid</td>
+<td>GxB_PLUS_INT16_MONOID</td>
+</tr>
+<tr>
+<td>plus_int32_monoid</td>
+<td>GxB_PLUS_INT32_MONOID</td>
+</tr>
+<tr>
+<td>plus_int64_monoid</td>
+<td>GxB_PLUS_INT64_MONOID</td>
+</tr>
+<tr>
+<td>plus_uint8_monoid</td>
+<td>GxB_PLUS_UINT8_MONOID</td>
+</tr>
+<tr>
+<td>plus_uint16_monoid</td>
+<td>GxB_PLUS_UINT16_MONOID</td>
+</tr>
+<tr>
+<td>plus_uint32_monoid</td>
+<td>GxB_PLUS_UINT32_MONOID</td>
+</tr>
+<tr>
+<td>plus_uint64_monoid</td>
+<td>GxB_PLUS_UINT64_MONOID</td>
+</tr>
+<tr>
+<td>plus_fp32_monoid</td>
+<td>GxB_PLUS_FP32_MONOID</td>
+</tr>
+<tr>
+<td>plus_fp64_monoid</td>
+<td>GxB_PLUS_FP64_MONOID</td>
+</tr>
+<tr>
+<td>plus_monoid_int8</td>
+<td>GrB_PLUS_MONOID_INT8</td>
+</tr>
+<tr>
+<td>plus_monoid_int16</td>
+<td>GrB_PLUS_MONOID_INT16</td>
+</tr>
+<tr>
+<td>plus_monoid_int32</td>
+<td>GrB_PLUS_MONOID_INT32</td>
+</tr>
+<tr>
+<td>plus_monoid_int64</td>
+<td>GrB_PLUS_MONOID_INT64</td>
+</tr>
+<tr>
+<td>plus_monoid_uint8</td>
+<td>GrB_PLUS_MONOID_UINT8</td>
+</tr>
+<tr>
+<td>plus_monoid_uint16</td>
+<td>GrB_PLUS_MONOID_UINT16</td>
+</tr>
+<tr>
+<td>plus_monoid_uint32</td>
+<td>GrB_PLUS_MONOID_UINT32</td>
+</tr>
+<tr>
+<td>plus_monoid_uint64</td>
+<td>GrB_PLUS_MONOID_UINT64</td>
+</tr>
+<tr>
+<td>plus_monoid_fp32</td>
+<td>GrB_PLUS_MONOID_FP32</td>
+</tr>
+<tr>
+<td>plus_monoid_fp64</td>
+<td>GrB_PLUS_MONOID_FP64</td>
+</tr>
+<tr>
+<td>plus_fc32_monoid</td>
+<td>GxB_PLUS_FC32_MONOID</td>
+</tr>
+<tr>
+<td>plus_fc64_monoid</td>
+<td>GxB_PLUS_FC64_MONOID</td>
+</tr>
+<tr>
+<td>times_int8_monoid</td>
+<td>GxB_TIMES_INT8_MONOID</td>
+</tr>
+<tr>
+<td>times_int16_monoid</td>
+<td>GxB_TIMES_INT16_MONOID</td>
+</tr>
+<tr>
+<td>times_int32_monoid</td>
+<td>GxB_TIMES_INT32_MONOID</td>
+</tr>
+<tr>
+<td>times_int64_monoid</td>
+<td>GxB_TIMES_INT64_MONOID</td>
+</tr>
+<tr>
+<td>times_uint8_monoid</td>
+<td>GxB_TIMES_UINT8_MONOID</td>
+</tr>
+<tr>
+<td>times_uint16_monoid</td>
+<td>GxB_TIMES_UINT16_MONOID</td>
+</tr>
+<tr>
+<td>times_uint32_monoid</td>
+<td>GxB_TIMES_UINT32_MONOID</td>
+</tr>
+<tr>
+<td>times_uint64_monoid</td>
+<td>GxB_TIMES_UINT64_MONOID</td>
+</tr>
+<tr>
+<td>times_fp32_monoid</td>
+<td>GxB_TIMES_FP32_MONOID</td>
+</tr>
+<tr>
+<td>times_fp64_monoid</td>
+<td>GxB_TIMES_FP64_MONOID</td>
+</tr>
+<tr>
+<td>times_monoid_int8</td>
+<td>GrB_TIMES_MONOID_INT8</td>
+</tr>
+<tr>
+<td>times_monoid_int16</td>
+<td>GrB_TIMES_MONOID_INT16</td>
+</tr>
+<tr>
+<td>times_monoid_int32</td>
+<td>GrB_TIMES_MONOID_INT32</td>
+</tr>
+<tr>
+<td>times_monoid_int64</td>
+<td>GrB_TIMES_MONOID_INT64</td>
+</tr>
+<tr>
+<td>times_monoid_uint8</td>
+<td>GrB_TIMES_MONOID_UINT8</td>
+</tr>
+<tr>
+<td>times_monoid_uint16</td>
+<td>GrB_TIMES_MONOID_UINT16</td>
+</tr>
+<tr>
+<td>times_monoid_uint32</td>
+<td>GrB_TIMES_MONOID_UINT32</td>
+</tr>
+<tr>
+<td>times_monoid_uint64</td>
+<td>GrB_TIMES_MONOID_UINT64</td>
+</tr>
+<tr>
+<td>times_monoid_fp32</td>
+<td>GrB_TIMES_MONOID_FP32</td>
+</tr>
+<tr>
+<td>times_monoid_fp64</td>
+<td>GrB_TIMES_MONOID_FP64</td>
+</tr>
+<tr>
+<td>times_fc32_monoid</td>
+<td>GxB_TIMES_FC32_MONOID</td>
+</tr>
+<tr>
+<td>times_fc64_monoid</td>
+<td>GxB_TIMES_FC64_MONOID</td>
+</tr>
+<tr>
+<td>any_bool_monoid</td>
+<td>GxB_ANY_BOOL_MONOID</td>
+</tr>
+<tr>
+<td>any_int8_monoid</td>
+<td>GxB_ANY_INT8_MONOID</td>
+</tr>
+<tr>
+<td>any_int16_monoid</td>
+<td>GxB_ANY_INT16_MONOID</td>
+</tr>
+<tr>
+<td>any_int32_monoid</td>
+<td>GxB_ANY_INT32_MONOID</td>
+</tr>
+<tr>
+<td>any_int64_monoid</td>
+<td>GxB_ANY_INT64_MONOID</td>
+</tr>
+<tr>
+<td>any_uint8_monoid</td>
+<td>GxB_ANY_UINT8_MONOID</td>
+</tr>
+<tr>
+<td>any_uint16_monoid</td>
+<td>GxB_ANY_UINT16_MONOID</td>
+</tr>
+<tr>
+<td>any_uint32_monoid</td>
+<td>GxB_ANY_UINT32_MONOID</td>
+</tr>
+<tr>
+<td>any_uint64_monoid</td>
+<td>GxB_ANY_UINT64_MONOID</td>
+</tr>
+<tr>
+<td>any_fp32_monoid</td>
+<td>GxB_ANY_FP32_MONOID</td>
+</tr>
+<tr>
+<td>any_fp64_monoid</td>
+<td>GxB_ANY_FP64_MONOID</td>
+</tr>
+<tr>
+<td>any_fc32_monoid</td>
+<td>GxB_ANY_FC32_MONOID</td>
+</tr>
+<tr>
+<td>any_fc64_monoid</td>
+<td>GxB_ANY_FC64_MONOID</td>
+</tr>
+<tr>
+<td>lor_bool_monoid</td>
+<td>GxB_LOR_BOOL_MONOID</td>
+</tr>
+<tr>
+<td>land_bool_monoid</td>
+<td>GxB_LAND_BOOL_MONOID</td>
+</tr>
+<tr>
+<td>lxor_bool_monoid</td>
+<td>GxB_LXOR_BOOL_MONOID</td>
+</tr>
+<tr>
+<td>lxnor_bool_monoid</td>
+<td>GxB_LXNOR_BOOL_MONOID</td>
+</tr>
+<tr>
+<td>eq_bool_monoid</td>
+<td>GxB_EQ_BOOL_MONOID</td>
+</tr>
+<tr>
+<td>lor_monoid_bool</td>
+<td>GrB_LOR_MONOID_BOOL</td>
+</tr>
+<tr>
+<td>land_monoid_bool</td>
+<td>GrB_LAND_MONOID_BOOL</td>
+</tr>
+<tr>
+<td>lxor_monoid_bool</td>
+<td>GrB_LXOR_MONOID_BOOL</td>
+</tr>
+<tr>
+<td>lxnor_monoid_bool</td>
+<td>GrB_LXNOR_MONOID_BOOL</td>
+</tr>
+<tr>
+<td>bor_uint8_monoid</td>
+<td>GxB_BOR_UINT8_MONOID</td>
+</tr>
+<tr>
+<td>bor_uint16_monoid</td>
+<td>GxB_BOR_UINT16_MONOID</td>
+</tr>
+<tr>
+<td>bor_uint32_monoid</td>
+<td>GxB_BOR_UINT32_MONOID</td>
+</tr>
+<tr>
+<td>bor_uint64_monoid</td>
+<td>GxB_BOR_UINT64_MONOID</td>
+</tr>
+<tr>
+<td>band_uint8_monoid</td>
+<td>GxB_BAND_UINT8_MONOID</td>
+</tr>
+<tr>
+<td>band_uint16_monoid</td>
+<td>GxB_BAND_UINT16_MONOID</td>
+</tr>
+<tr>
+<td>band_uint32_monoid</td>
+<td>GxB_BAND_UINT32_MONOID</td>
+</tr>
+<tr>
+<td>band_uint64_monoid</td>
+<td>GxB_BAND_UINT64_MONOID</td>
+</tr>
+<tr>
+<td>bxor_uint8_monoid</td>
+<td>GxB_BXOR_UINT8_MONOID</td>
+</tr>
+<tr>
+<td>bxor_uint16_monoid</td>
+<td>GxB_BXOR_UINT16_MONOID</td>
+</tr>
+<tr>
+<td>bxor_uint32_monoid</td>
+<td>GxB_BXOR_UINT32_MONOID</td>
+</tr>
+<tr>
+<td>bxor_uint64_monoid</td>
+<td>GxB_BXOR_UINT64_MONOID</td>
+</tr>
+<tr>
+<td>bxnor_uint8_monoid</td>
+<td>GxB_BXNOR_UINT8_MONOID</td>
+</tr>
+<tr>
+<td>bxnor_uint16_monoid</td>
+<td>GxB_BXNOR_UINT16_MONOID</td>
+</tr>
+<tr>
+<td>bxnor_uint32_monoid</td>
+<td>GxB_BXNOR_UINT32_MONOID</td>
+</tr>
+<tr>
+<td>bxnor_uint64_monoid</td>
+<td>GxB_BXNOR_UINT64_MONOID</td>
+</tr>
+</tbody>
+</table>
 
 
 
