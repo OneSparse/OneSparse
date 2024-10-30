@@ -1122,18 +1122,18 @@ select get_element(a, 3, 3) as get_element from test_fixture;
 -- operator.  The "add" in the name means that the union of both
 -- graphs is taken; elements present on both sides of the operation
 -- are included in the result.
-select print(a) as a, binaryop, print(b) as b, print(eadd(a, b, binaryop)) as eadd from test_fixture;
-┌────────────────────┬─────────────┬────────────────────┬────────────────────┐
-│         a          │  binaryop   │         b          │        eadd        │
-├────────────────────┼─────────────┼────────────────────┼────────────────────┤
-│      0  1  2  3   ↵│ times_int32 │      0  1  2  3   ↵│      0  1  2  3   ↵│
-│    ────────────   ↵│             │    ────────────   ↵│    ────────────   ↵│
-│  0│        0  3   ↵│             │  0│           4   ↵│  0│        0 12   ↵│
-│  1│  2     1  0   ↵│             │  1│        3  1   ↵│  1│  2     3  0   ↵│
-│  2│  2  2         ↵│             │  2│     2     4   ↵│  2│  2  4     4   ↵│
-│  3│  2     1      ↵│             │  3│     0  2      ↵│  3│  2  0  2      ↵│
-│                    │             │                    │                    │
-└────────────────────┴─────────────┴────────────────────┴────────────────────┘
+select print(a) as a, binaryop, print(b) as b, print(eadd(a, b, binaryop)) as "eadd(a, b, binaryop)" from test_fixture;
+┌────────────────────┬─────────────┬────────────────────┬──────────────────────┐
+│         a          │  binaryop   │         b          │ eadd(a, b, binaryop) │
+├────────────────────┼─────────────┼────────────────────┼──────────────────────┤
+│      0  1  2  3   ↵│ times_int32 │      0  1  2  3   ↵│      0  1  2  3     ↵│
+│    ────────────   ↵│             │    ────────────   ↵│    ────────────     ↵│
+│  0│        0  3   ↵│             │  0│           4   ↵│  0│        0 12     ↵│
+│  1│  2     1  0   ↵│             │  1│        3  1   ↵│  1│  2     3  0     ↵│
+│  2│  2  2         ↵│             │  2│     2     4   ↵│  2│  2  4     4     ↵│
+│  3│  2     1      ↵│             │  3│     0  2      ↵│  3│  2  0  2        ↵│
+│                    │             │                    │                      │
+└────────────────────┴─────────────┴────────────────────┴──────────────────────┘
 (1 row)
 
 -- Eadd can also be accomplished with binary operators specific to
@@ -1486,18 +1486,18 @@ select draw(a) as binop_a_source, draw(b) as binop_b_source, draw(eadd(a, b, bin
 -- intersection of common elements in both matrices, if an element is
 -- missing from either the left or right side, it is ommited from the
 -- result:
-select print(a) as a, binaryop, print(b) as b, print(emult(a, b, binaryop)) as emult from test_fixture;
-┌────────────────────┬─────────────┬────────────────────┬────────────────────┐
-│         a          │  binaryop   │         b          │       emult        │
-├────────────────────┼─────────────┼────────────────────┼────────────────────┤
-│      0  1  2  3   ↵│ times_int32 │      0  1  2  3   ↵│      0  1  2  3   ↵│
-│    ────────────   ↵│             │    ────────────   ↵│    ────────────   ↵│
-│  0│        0  3   ↵│             │  0│           4   ↵│  0│          12   ↵│
-│  1│  2     1  0   ↵│             │  1│        3  1   ↵│  1│        3  0   ↵│
-│  2│  2  2         ↵│             │  2│     2     4   ↵│  2│     4         ↵│
-│  3│  2     1      ↵│             │  3│     0  2      ↵│  3│        2      ↵│
-│                    │             │                    │                    │
-└────────────────────┴─────────────┴────────────────────┴────────────────────┘
+select print(a) as a, binaryop, print(b) as b, print(emult(a, b, binaryop)) as "emult(a, b, binaryop)" from test_fixture;
+┌────────────────────┬─────────────┬────────────────────┬───────────────────────┐
+│         a          │  binaryop   │         b          │ emult(a, b, binaryop) │
+├────────────────────┼─────────────┼────────────────────┼───────────────────────┤
+│      0  1  2  3   ↵│ times_int32 │      0  1  2  3   ↵│      0  1  2  3      ↵│
+│    ────────────   ↵│             │    ────────────   ↵│    ────────────      ↵│
+│  0│        0  3   ↵│             │  0│           4   ↵│  0│          12      ↵│
+│  1│  2     1  0   ↵│             │  1│        3  1   ↵│  1│        3  0      ↵│
+│  2│  2  2         ↵│             │  2│     2     4   ↵│  2│     4            ↵│
+│  3│  2     1      ↵│             │  3│     0  2      ↵│  3│        2         ↵│
+│                    │             │                    │                       │
+└────────────────────┴─────────────┴────────────────────┴───────────────────────┘
 (1 row)
 
 -- Emult can also be accomplished with binary operators specific to
@@ -1808,18 +1808,18 @@ select draw(a) as binop_a_source, draw(b) as binop_b_source, draw(emult(a, b, bi
 -- applied. A pair of scalars, `alpha` and `beta` define the inputs to
 -- the operator when entries are present in one matrix but not the
 -- other.
-select print(a) as a, binaryop, print(b) as b, print(eunion(a, 3::scalar, b, 4::scalar, binaryop)) as eunion from test_fixture;
-┌────────────────────┬─────────────┬────────────────────┬────────────────────┐
-│         a          │  binaryop   │         b          │       eunion       │
-├────────────────────┼─────────────┼────────────────────┼────────────────────┤
-│      0  1  2  3   ↵│ times_int32 │      0  1  2  3   ↵│      0  1  2  3   ↵│
-│    ────────────   ↵│             │    ────────────   ↵│    ────────────   ↵│
-│  0│        0  3   ↵│             │  0│           4   ↵│  0│        0 12   ↵│
-│  1│  2     1  0   ↵│             │  1│        3  1   ↵│  1│  8     3  0   ↵│
-│  2│  2  2         ↵│             │  2│     2     4   ↵│  2│  8  4    12   ↵│
-│  3│  2     1      ↵│             │  3│     0  2      ↵│  3│  8  0  2      ↵│
-│                    │             │                    │                    │
-└────────────────────┴─────────────┴────────────────────┴────────────────────┘
+select print(a) as a, binaryop, print(b) as b, print(eunion(a, 3::scalar, b, 4::scalar, binaryop)) as "eunion(a, 3::scalar, b, 4::scalar, binaryop)" from test_fixture;
+┌────────────────────┬─────────────┬────────────────────┬──────────────────────────────────────────────┐
+│         a          │  binaryop   │         b          │ eunion(a, 3::scalar, b, 4::scalar, binaryop) │
+├────────────────────┼─────────────┼────────────────────┼──────────────────────────────────────────────┤
+│      0  1  2  3   ↵│ times_int32 │      0  1  2  3   ↵│      0  1  2  3                             ↵│
+│    ────────────   ↵│             │    ────────────   ↵│    ────────────                             ↵│
+│  0│        0  3   ↵│             │  0│           4   ↵│  0│        0 12                             ↵│
+│  1│  2     1  0   ↵│             │  1│        3  1   ↵│  1│  8     3  0                             ↵│
+│  2│  2  2         ↵│             │  2│     2     4   ↵│  2│  8  4    12                             ↵│
+│  3│  2     1      ↵│             │  3│     0  2      ↵│  3│  8  0  2                                ↵│
+│                    │             │                    │                                              │
+└────────────────────┴─────────────┴────────────────────┴──────────────────────────────────────────────┘
 (1 row)
 
 -- From a graph standpoint, elementwise union is very similar to
@@ -2186,34 +2186,33 @@ select print(a) as a, 'min_monoid_int32' as monoid, reduce_scalar(a, 'min_monoid
 (1 row)
 
 -- The matrix can also be reduced to a column vector:
-select print(a) as a, 'plus_monoid_int32' as monoid, print(reduce_vector(a)) as reduce_vector from test_fixture;
-┌────────────────────┬───────────────────┬───────────────┐
-│         a          │      monoid       │ reduce_vector │
-├────────────────────┼───────────────────┼───────────────┤
-│      0  1  2  3   ↵│ plus_monoid_int32 │              ↵│
-│    ────────────   ↵│                   │    ───       ↵│
-│  0│        0  3   ↵│                   │  0│  3       ↵│
-│  1│  2     1  0   ↵│                   │  1│  3       ↵│
-│  2│  2  2         ↵│                   │  2│  4       ↵│
-│  3│  2     1      ↵│                   │  3│  3       ↵│
-│                    │                   │               │
-└────────────────────┴───────────────────┴───────────────┘
+select print(a) as a, 'plus_monoid_int32' as monoid, print(reduce_cols(a)) as reduce_cols from test_fixture;
+┌────────────────────┬───────────────────┬─────────────┐
+│         a          │      monoid       │ reduce_cols │
+├────────────────────┼───────────────────┼─────────────┤
+│      0  1  2  3   ↵│ plus_monoid_int32 │            ↵│
+│    ────────────   ↵│                   │    ───     ↵│
+│  0│        0  3   ↵│                   │  0│  3     ↵│
+│  1│  2     1  0   ↵│                   │  1│  3     ↵│
+│  2│  2  2         ↵│                   │  2│  4     ↵│
+│  3│  2     1      ↵│                   │  3│  3     ↵│
+│                    │                   │             │
+└────────────────────┴───────────────────┴─────────────┘
 (1 row)
 
--- To reduce a row vector, specify that the input should be transposed
--- with the descriptor `t0`:
-select print(a) as a, 'plus_monoid_int32' as monoid, print(reduce_vector(a, descriptor=>'t0')) as transpose_reduce_vector from test_fixture;
-┌────────────────────┬───────────────────┬─────────────────────────┐
-│         a          │      monoid       │ transpose_reduce_vector │
-├────────────────────┼───────────────────┼─────────────────────────┤
-│      0  1  2  3   ↵│ plus_monoid_int32 │                        ↵│
-│    ────────────   ↵│                   │    ───                 ↵│
-│  0│        0  3   ↵│                   │  0│  6                 ↵│
-│  1│  2     1  0   ↵│                   │  1│  2                 ↵│
-│  2│  2  2         ↵│                   │  2│  2                 ↵│
-│  3│  2     1      ↵│                   │  3│  3                 ↵│
-│                    │                   │                         │
-└────────────────────┴───────────────────┴─────────────────────────┘
+-- To reduce a row vector:
+select print(a) as a, 'plus_monoid_int32' as monoid, print(reduce_rows(a)) as reduce_rows from test_fixture;
+┌────────────────────┬───────────────────┬─────────────┐
+│         a          │      monoid       │ reduce_rows │
+├────────────────────┼───────────────────┼─────────────┤
+│      0  1  2  3   ↵│ plus_monoid_int32 │            ↵│
+│    ────────────   ↵│                   │    ───     ↵│
+│  0│        0  3   ↵│                   │  0│  6     ↵│
+│  1│  2     1  0   ↵│                   │  1│  2     ↵│
+│  2│  2  2         ↵│                   │  2│  2     ↵│
+│  3│  2     1      ↵│                   │  3│  3     ↵│
+│                    │                   │             │
+└────────────────────┴───────────────────┴─────────────┘
 (1 row)
 
 -- ## Matrix Matrix Multiplication
@@ -2224,9 +2223,9 @@ select print(a) as a, 'plus_monoid_int32' as monoid, print(reduce_vector(a, desc
 -- coresponding elements with the "times" operator and then reduce
 -- those products with the "plus" operator.  This is called the
 -- `plus_times` semiring:
-select print(a) as a, semiring, print(b) as b, print(mxm(a, b)) as mxm from test_fixture;
+select print(a) as a, semiring, print(b) as b, print(mxm(a, b)) as "mxm(a, b)" from test_fixture;
 ┌────────────────────┬──────────────────┬────────────────────┬────────────────────┐
-│         a          │     semiring     │         b          │        mxm         │
+│         a          │     semiring     │         b          │     mxm(a, b)      │
 ├────────────────────┼──────────────────┼────────────────────┼────────────────────┤
 │      0  1  2  3   ↵│ plus_times_int32 │      0  1  2  3   ↵│      0  1  2  3   ↵│
 │    ────────────   ↵│                  │    ────────────   ↵│    ────────────   ↵│
@@ -2556,9 +2555,9 @@ select draw(a) as binop_a_source, draw(b) as binop_b_source, draw(mxm(a, b)) as 
 -- </table>
 -- AxB can also be done with the `@` operator, mimicking the Python
 -- syntax.  The default semiring for numeric types is `plus_times`.
-select print(a) as a, '@' as "@", print(b) as b, print(a @ b) as mxm from test_fixture;
+select print(a) as a, '@' as "@", print(b) as b, print(a @ b) as "a @ b" from test_fixture;
 ┌────────────────────┬───┬────────────────────┬────────────────────┐
-│         a          │ @ │         b          │        mxm         │
+│         a          │ @ │         b          │       a @ b        │
 ├────────────────────┼───┼────────────────────┼────────────────────┤
 │      0  1  2  3   ↵│ @ │      0  1  2  3   ↵│      0  1  2  3   ↵│
 │    ────────────   ↵│   │    ────────────   ↵│    ────────────   ↵│
@@ -2575,9 +2574,9 @@ select print(a) as a, '@' as "@", print(b) as b, print(a @ b) as mxm from test_f
 -- Matrices can be multipled by vectors on the right taking the linear
 -- combination of the matrices columns using the vectors elements as
 -- coefficients:
-select print(a) as a, '@' as "@", semiring, print(u) as u, print(mxv(a, u)) as mxv from test_fixture;
+select print(a) as a, '@' as "@", semiring, print(u) as u, print(mxv(a, u)) as "mxv(a, u)" from test_fixture;
 ┌────────────────────┬───┬──────────────────┬───────────┬───────────┐
-│         a          │ @ │     semiring     │     u     │    mxv    │
+│         a          │ @ │     semiring     │     u     │ mxv(a, u) │
 ├────────────────────┼───┼──────────────────┼───────────┼───────────┤
 │      0  1  2  3   ↵│ @ │ plus_times_int32 │          ↵│          ↵│
 │    ────────────   ↵│   │                  │    ───   ↵│    ───   ↵│
@@ -2798,9 +2797,9 @@ select draw(a) as binop_a_source, draw(u) as binop_b_source, draw(mxv(a, u)) as 
 --   </tr>
 -- </table>
 -- 'mxv' is also supported by the `@` operator:
-select print(a) as a, '@' as "@", print(u) as u, print(a @ u) as mxv from test_fixture;
+select print(a) as a, '@' as "@", print(u) as u, print(a @ u) as "a @ u" from test_fixture;
 ┌────────────────────┬───┬───────────┬───────────┐
-│         a          │ @ │     u     │    mxv    │
+│         a          │ @ │     u     │   a @ u   │
 ├────────────────────┼───┼───────────┼───────────┤
 │      0  1  2  3   ↵│ @ │          ↵│          ↵│
 │    ────────────   ↵│   │    ───   ↵│    ───   ↵│
@@ -2817,18 +2816,18 @@ select print(a) as a, '@' as "@", print(u) as u, print(a @ u) as mxv from test_f
 -- Matrices can be multipled by vectors on the right taking the linear
 -- combination of the matrices rows using the vectors elements as
 -- coefficients:
-select print(v) as v, semiring, print(b) as b, print(vxm(v, b, semiring)) as vxm from test_fixture;
-┌───────────┬──────────────────┬────────────────────┬───────────┐
-│     v     │     semiring     │         b          │    vxm    │
-├───────────┼──────────────────┼────────────────────┼───────────┤
-│          ↵│ plus_times_int32 │      0  1  2  3   ↵│          ↵│
-│    ───   ↵│                  │    ────────────   ↵│    ───   ↵│
-│  0│      ↵│                  │  0│           4   ↵│  0│      ↵│
-│  1│  3   ↵│                  │  1│        3  1   ↵│  1│  6   ↵│
-│  2│  3   ↵│                  │  2│     2     4   ↵│  2│  9   ↵│
-│  3│      ↵│                  │  3│     0  2      ↵│  3│ 15   ↵│
-│           │                  │                    │           │
-└───────────┴──────────────────┴────────────────────┴───────────┘
+select print(v) as v, semiring, print(b) as b, print(vxm(v, b, semiring)) as "vxm(v, b, semiring)" from test_fixture;
+┌───────────┬──────────────────┬────────────────────┬─────────────────────┐
+│     v     │     semiring     │         b          │ vxm(v, b, semiring) │
+├───────────┼──────────────────┼────────────────────┼─────────────────────┤
+│          ↵│ plus_times_int32 │      0  1  2  3   ↵│                    ↵│
+│    ───   ↵│                  │    ────────────   ↵│    ───             ↵│
+│  0│      ↵│                  │  0│           4   ↵│  0│                ↵│
+│  1│  3   ↵│                  │  1│        3  1   ↵│  1│  6             ↵│
+│  2│  3   ↵│                  │  2│     2     4   ↵│  2│  9             ↵│
+│  3│      ↵│                  │  3│     0  2      ↵│  3│ 15             ↵│
+│           │                  │                    │                     │
+└───────────┴──────────────────┴────────────────────┴─────────────────────┘
 (1 row)
 
 -- From a graph standpoint, vector matrix multiplication is used to
@@ -3030,9 +3029,9 @@ select draw(v) as binop_a_source, draw(b) as binop_b_source, draw(vxm(v, b)) as 
 --   </tr>
 -- </table>
 -- 'vxm' is also supported by the `@` operator:
-select print(v) as v, '@' as "@", print(b) as b, print(v @ b) as vxm from test_fixture;
+select print(v) as v, '@' as "@", print(b) as b, print(v @ b) as "v @ b" from test_fixture;
 ┌───────────┬───┬────────────────────┬───────────┐
-│     v     │ @ │         b          │    vxm    │
+│     v     │ @ │         b          │   v @ b   │
 ├───────────┼───┼────────────────────┼───────────┤
 │          ↵│ @ │      0  1  2  3   ↵│          ↵│
 │    ───   ↵│   │    ────────────   ↵│    ───   ↵│

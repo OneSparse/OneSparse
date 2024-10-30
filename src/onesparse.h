@@ -98,13 +98,14 @@
 
 
 #ifdef OS_DEBUG
-#define LOGF() elog(INFO, __func__)
+#define LOGF() elog(DEBUG1, __func__)
 #else
 #define LOGF()
 #endif
 
 uint64_t* get_c_array_from_pg_array(FunctionCallInfo fcinfo, int arg_number, uint64_t *out_nelems);
 char* short_code(GrB_Type_Code code);
+GrB_Type code_type(GrB_Type_Code code);
 GrB_Type short_type(char *name);
 const char* error_name(GrB_Info info);
 GrB_Type type_promote(GrB_Type left, GrB_Type right);

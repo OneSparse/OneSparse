@@ -18,6 +18,8 @@ PG_FUNCTION_INFO_V1(matrix_out);
 PG_FUNCTION_INFO_V1(matrix_new);
 PG_FUNCTION_INFO_V1(matrix_agg_final);
 PG_FUNCTION_INFO_V1(matrix_elements);
+PG_FUNCTION_INFO_V1(matrix_rows);
+PG_FUNCTION_INFO_V1(matrix_cols);
 PG_FUNCTION_INFO_V1(matrix_nvals);
 PG_FUNCTION_INFO_V1(matrix_nrows);
 PG_FUNCTION_INFO_V1(matrix_ncols);
@@ -192,33 +194,7 @@ Datum expand_matrix(os_FlatMatrix *flat, MemoryContext parentcontext)
 
 	LOGF();
 
-	if (flat->type_code == GrB_INT64_CODE)
-	{
-		type = GrB_INT64;
-	}
-	else if (flat->type_code == GrB_INT32_CODE)
-	{
-		type = GrB_INT32;
-	}
-	else if (flat->type_code == GrB_INT16_CODE)
-	{
-		type = GrB_INT16;
-	}
-	else if (flat->type_code == GrB_FP64_CODE)
-	{
-		type = GrB_FP64;
-	}
-	else if (flat->type_code == GrB_FP32_CODE)
-	{
-		type = GrB_FP32;
-	}
-	else if (flat->type_code == GrB_BOOL_CODE)
-	{
-		type = GrB_BOOL;
-	}
-	else
-		elog(ERROR, "Unknown type code.");
-
+	type = code_type(flat->type_code);
 	matrix = new_matrix(type, flat->nrows, flat->ncols, parentcontext, NULL);
 	data = OS_MATRIX_DATA(flat);
 
@@ -588,6 +564,92 @@ Datum matrix_elements(PG_FUNCTION_ARGS)
 		result = HeapTupleGetDatum(tuple);
 		state->info = GxB_Matrix_Iterator_next(state->iterator);
 		SRF_RETURN_NEXT(funcctx, result);
+	}
+}
+
+Datum matrix_rows(PG_FUNCTION_ARGS)
+{
+	FuncCallContext  *funcctx;
+	GrB_Index nvals, row;
+	os_Matrix *matrix;
+	os_Matrix_ExtractState *state;
+
+	if (SRF_IS_FIRSTCALL()) {
+		MemoryContext oldcontext;
+
+		funcctx = SRF_FIRSTCALL_INIT();
+		oldcontext = MemoryContextSwitchTo(funcctx->multi_call_memory_ctx);
+		matrix = OS_GETARG_MATRIX(0);
+
+		state = (os_Matrix_ExtractState*)palloc(sizeof(os_Matrix_ExtractState));
+		OS_MNVALS(nvals, matrix);
+
+		state->matrix = matrix;
+		GxB_Iterator_new(&(state->iterator));
+		OS_CHECK(GxB_rowIterator_attach(state->iterator, matrix->matrix, NULL),
+				 matrix->matrix,
+				 "Cannot attach matrix row iterator.");
+		OS_MTYPE(state->type, matrix);
+		state->info = GxB_rowIterator_seekRow(state->iterator, 0);
+		funcctx->max_calls = nvals;
+		funcctx->user_fctx = (void*)state;
+		MemoryContextSwitchTo(oldcontext);
+	}
+
+	funcctx = SRF_PERCALL_SETUP();
+	state = (os_Matrix_ExtractState*)funcctx->user_fctx;
+	if (state->info == GxB_EXHAUSTED || funcctx->call_cntr > funcctx->max_calls)
+	{
+		SRF_RETURN_DONE(funcctx);
+	}
+	else
+	{
+		row = GxB_rowIterator_getRowIndex(state->iterator);
+		state->info = GxB_rowIterator_nextRow(state->iterator);
+		SRF_RETURN_NEXT(funcctx, Int64GetDatum(row));
+	}
+}
+
+Datum matrix_cols(PG_FUNCTION_ARGS)
+{
+	FuncCallContext  *funcctx;
+	GrB_Index nvals, col;
+	os_Matrix *matrix;
+	os_Matrix_ExtractState *state;
+
+	if (SRF_IS_FIRSTCALL()) {
+		MemoryContext oldcontext;
+
+		funcctx = SRF_FIRSTCALL_INIT();
+		oldcontext = MemoryContextSwitchTo(funcctx->multi_call_memory_ctx);
+		matrix = OS_GETARG_MATRIX(0);
+
+		state = (os_Matrix_ExtractState*)palloc(sizeof(os_Matrix_ExtractState));
+		OS_MNVALS(nvals, matrix);
+
+		state->matrix = matrix;
+		GxB_Iterator_new(&(state->iterator));
+		OS_CHECK(GxB_colIterator_attach(state->iterator, matrix->matrix, NULL),
+				 matrix->matrix,
+				 "Cannot attach matrix col iterator.");
+		OS_MTYPE(state->type, matrix);
+		state->info = GxB_colIterator_seekCol(state->iterator, 0);
+		funcctx->max_calls = nvals;
+		funcctx->user_fctx = (void*)state;
+		MemoryContextSwitchTo(oldcontext);
+	}
+
+	funcctx = SRF_PERCALL_SETUP();
+	state = (os_Matrix_ExtractState*)funcctx->user_fctx;
+	if (state->info == GxB_EXHAUSTED || funcctx->call_cntr > funcctx->max_calls)
+	{
+		SRF_RETURN_DONE(funcctx);
+	}
+	else
+	{
+		col = GxB_colIterator_getRowIndex(state->iterator);
+		state->info = GxB_colIterator_nextCol(state->iterator);
+		SRF_RETURN_NEXT(funcctx, Int64GetDatum(col));
 	}
 }
 
@@ -1937,6 +1999,57 @@ Datum matrix_type(PG_FUNCTION_ARGS) {
 	result = new_type(type_name, CurrentMemoryContext);
 	OS_RETURN_TYPE(result);
 }
+
+PG_FUNCTION_INFO_V1(matrix_agg_matrix);
+
+Datum matrix_agg_matrix(PG_FUNCTION_ARGS)
+{
+	GrB_Type type;
+    os_Matrix *state, *A;
+	GrB_BinaryOp op;
+	MemoryContext aggcontext;
+	int nargs;
+
+    if (PG_ARGISNULL(1))
+    {
+		elog(ERROR, "Cannot aggregate a null value to a matrix");
+	}
+
+	A = OS_GETARG_MATRIX(1);
+	OS_MTYPE(type, A);
+
+    if (PG_ARGISNULL(0))
+    {
+        if (!AggCheckCallContext(fcinfo, &aggcontext)) {
+            elog(ERROR, "aggregate function called in non-aggregate context");
+        }
+		state = new_matrix(type, GxB_INDEX_MAX, GxB_INDEX_MAX, aggcontext, NULL);
+    }
+    else
+    {
+        state = OS_GETARG_MATRIX(0);
+    }
+
+	nargs = PG_NARGS();
+	op = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 2);
+	if (op == NULL)
+	{
+		op = default_binaryop(type);
+	}
+
+	OS_CHECK(GrB_eWiseAdd(state->matrix,
+						  NULL,
+						  NULL,
+						  op,
+						  state->matrix,
+						  A->matrix,
+						  NULL),
+		  state->matrix,
+		  "Error matrix eadd in matrix_agg_matrix.");
+
+    OS_RETURN_MATRIX(state);
+}
+
 
 Datum
 matrix_agg_final(PG_FUNCTION_ARGS)

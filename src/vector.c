@@ -173,33 +173,7 @@ Datum expand_vector(os_FlatVector *flat, MemoryContext parentcontext)
 
 	LOGF();
 
-	if (flat->type_code == GrB_INT64_CODE)
-	{
-		type = GrB_INT64;
-	}
-	else if (flat->type_code == GrB_INT32_CODE)
-	{
-		type = GrB_INT32;
-	}
-	else if (flat->type_code == GrB_INT16_CODE)
-	{
-		type = GrB_INT16;
-	}
-	else if (flat->type_code == GrB_FP64_CODE)
-	{
-		type = GrB_FP64;
-	}
-	else if (flat->type_code == GrB_FP32_CODE)
-	{
-		type = GrB_FP32;
-	}
-	else if (flat->type_code == GrB_BOOL_CODE)
-	{
-		type = GrB_BOOL;
-	}
-	else
-		elog(ERROR, "Unknown type code.");
-
+	type = code_type(flat->type_code);
 	vector = new_vector(type, flat->size, parentcontext, NULL);
 	data = OS_VECTOR_DATA(flat);
 	OS_CHECK(GxB_Vector_deserialize(&vector->vector, type, data, flat->serialized_size, NULL),
@@ -739,10 +713,16 @@ vector_reduce_scalar(PG_FUNCTION_ARGS)
 		monoid = default_monoid(type);
 	}
 
-	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 2);
-	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 3);
+	if (PG_ARGISNULL(2))
+	{
+		result = new_scalar(type, CurrentMemoryContext, NULL);
 
-	result = new_scalar(type, CurrentMemoryContext, NULL);
+	}
+	else
+		result = OS_GETARG_SCALAR(2);
+
+	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 3);
+	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 4);
 
 	OS_CHECK(GrB_Vector_reduce_Monoid_Scalar(
 			  result->scalar,

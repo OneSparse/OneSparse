@@ -22,9 +22,19 @@ ENV PGDATA /home/postgres/data
 RUN /bin/rm -Rf "$PGDATA" && mkdir "$PGDATA"
 WORKDIR "/home/postgres"
 
-# get postgres source and compile with debug and no optimization
-RUN git clone --branch REL_17_STABLE https://github.com/postgres/postgres.git --depth=1 && \
-    cd postgres && ./configure \
+# # get postgres source and compile with debug and no optimization
+# RUN git clone   --branch michelp-flatless https://github.com/michelp/postgres-upstream.git --depth=1 && \
+#     cd postgres-upstream && ./configure \
+#     --prefix=/usr/ \
+#     --without-icu \
+#     --enable-debug \
+#     --enable-depend --enable-cassert --enable-profiling \
+#     CFLAGS="-ggdb -Og -g3 -fno-omit-frame-pointer" \
+# #    CFLAGS="-O3" \
+#     && make -j 4 && sudo make install
+
+COPY --chown=postgres:postgres postgres-upstream postgres-upstream
+RUN cd postgres-upstream && ./configure \
     --prefix=/usr/ \
     --without-icu \
     --enable-debug \
@@ -33,11 +43,12 @@ RUN git clone --branch REL_17_STABLE https://github.com/postgres/postgres.git --
 #    CFLAGS="-O3" \
     && make -j 4 && sudo make install
 
+
 # get GraphBLAS, compile with debug symbols    
 RUN curl -s -L -J https://github.com/DrTimothyAldenDavis/GraphBLAS/archive/refs/tags/v9.2.0.tar.gz | \
     tar zxvf - && cd GraphBLAS-9.2.0 && \
     make library \
-#    CMAKE_OPTIONS='-DCMAKE_BUILD_TYPE=Debug -DGRAPHBLAS_COMPACT=1' \
+    CMAKE_OPTIONS='-DCMAKE_BUILD_TYPE=Debug -DGRAPHBLAS_COMPACT=1' \
     && sudo make install
 
 RUN sudo ldconfig
@@ -54,7 +65,7 @@ ENV EDITOR zile
 RUN sudo make && sudo make install && sudo make clean
 
 # start the database            
-RUN initdb -D "$PGDATA" -c shared_preload_libraries='onesparse' -c search_path='onesparse' --encoding UTF8
+RUN initdb -D "$PGDATA" -c shared_preload_libraries='onesparse' -c search_path='public,onesparse' --encoding UTF8
 EXPOSE 5432
 # wait forever
 

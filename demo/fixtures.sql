@@ -1,13 +1,12 @@
 create extension if not exists onesparse;
-drop table if exists test;
+drop table if exists ostest;
 
-create table test (
+create table ostest (
     i integer,
-    j integer,
-    v boolean default true
+    j integer
     );
 
-insert into test (i, j) values
+insert into ostest (i, j) values
     (1, 4),
     (1, 2),
     (2, 7),
@@ -19,12 +18,20 @@ insert into test (i, j) values
     (6, 3),
     (7, 3);
 
+drop table if exists karate;
+create table karate (
+    i integer,
+    j integer
+    );
+
+\copy karate from 'demo/Matrix/karate/karate.mtx' with (delimiter ' ');
+
 drop table if exists mbeacxc;
 
 create table mbeacxc (
     i bigint,
     j bigint,
-    v float
+    v numeric
     );
 
 create index on mbeacxc (i) include (j);
@@ -36,7 +43,7 @@ drop table if exists bcsstk01;
 create table bcsstk01 (
     i bigint,
     j bigint,
-    v float
+    v numeric
     );
 
 \copy bcsstk01 from 'demo/Matrix/bcsstk01' with (delimiter ' ');
@@ -69,6 +76,13 @@ create table fs_183_1 (
 
 -- \copy livejournal from 'demo/Matrix/com-LiveJournal.mtx' with (delimiter ' ');
 
+drop table if exists test_graphs cascade;
 create table test_graphs (name text primary key, graph matrix not null);
 
-insert into test_graphs values ('mbeacxc', (select matrix_agg(i, j, v) from mbeacxc));
+insert into test_graphs values
+    ('ostest', (select matrix_agg(i, j, 1) |+ matrix_agg(j, i, 1) from ostest)), -- make symmetric
+    ('karate', (select matrix_agg(i, j, 1) |+ matrix_agg(j, i, 1) from karate)), -- make symmetric
+    ('ash219', (select matrix_agg(i, j, v) from ash219)),
+    ('mbeacxc', (select matrix_agg(i, j, v) from mbeacxc));
+
+create view karateg as select graph from test_graphs where name = 'karate';

@@ -285,7 +285,7 @@ select get_element(a, 3, 3) as get_element from test_fixture;
 -- graphs is taken; elements present on both sides of the operation
 -- are included in the result.
 
-select print(a) as a, binaryop, print(b) as b, print(eadd(a, b, binaryop)) as eadd from test_fixture;
+select print(a) as a, binaryop, print(b) as b, print(eadd(a, b, binaryop)) as "eadd(a, b, binaryop)" from test_fixture;
 
 -- Eadd can also be accomplished with binary operators specific to
 -- OneSparse.  Different binaryops are passed to eadd to do different
@@ -309,7 +309,7 @@ select draw(a) as binop_a_source, draw(b) as binop_b_source, draw(eadd(a, b, bin
 -- missing from either the left or right side, it is ommited from the
 -- result:
 
-select print(a) as a, binaryop, print(b) as b, print(emult(a, b, binaryop)) as emult from test_fixture;
+select print(a) as a, binaryop, print(b) as b, print(emult(a, b, binaryop)) as "emult(a, b, binaryop)" from test_fixture;
 
 -- Emult can also be accomplished with binary operators specific to
 -- OneSparse.  Different binaryops are passed to emult to do different
@@ -333,7 +333,7 @@ select draw(a) as binop_a_source, draw(b) as binop_b_source, draw(emult(a, b, bi
 -- the operator when entries are present in one matrix but not the
 -- other.
 
-select print(a) as a, binaryop, print(b) as b, print(eunion(a, 3::scalar, b, 4::scalar, binaryop)) as eunion from test_fixture;
+select print(a) as a, binaryop, print(b) as b, print(eunion(a, 3::scalar, b, 4::scalar, binaryop)) as "eunion(a, 3::scalar, b, 4::scalar, binaryop)" from test_fixture;
 
 -- From a graph standpoint, elementwise union is very similar to
 -- `eadd()`, and can be seen as the merging ("union") of two graphs,
@@ -360,12 +360,11 @@ select print(a) as a, 'min_monoid_int32' as monoid, reduce_scalar(a, 'min_monoid
 
 -- The matrix can also be reduced to a column vector:
 
-select print(a) as a, 'plus_monoid_int32' as monoid, print(reduce_vector(a)) as reduce_vector from test_fixture;
+select print(a) as a, 'plus_monoid_int32' as monoid, print(reduce_cols(a)) as reduce_cols from test_fixture;
 
--- To reduce a row vector, specify that the input should be transposed
--- with the descriptor `t0`:
+-- To reduce a row vector:
 
-select print(a) as a, 'plus_monoid_int32' as monoid, print(reduce_vector(a, descriptor=>'t0')) as transpose_reduce_vector from test_fixture;
+select print(a) as a, 'plus_monoid_int32' as monoid, print(reduce_rows(a)) as reduce_rows from test_fixture;
 
 -- ## Matrix Matrix Multiplication
 --
@@ -376,7 +375,7 @@ select print(a) as a, 'plus_monoid_int32' as monoid, print(reduce_vector(a, desc
 -- those products with the "plus" operator.  This is called the
 -- `plus_times` semiring:
 
-select print(a) as a, semiring, print(b) as b, print(mxm(a, b)) as mxm from test_fixture;
+select print(a) as a, semiring, print(b) as b, print(mxm(a, b)) as "mxm(a, b)" from test_fixture;
 
 select draw(a) as binop_a_source, draw(b) as binop_b_source, draw(mxm(a, b)) as binop_c_source from test_fixture \gset
 \i sql/binop.sql
@@ -384,7 +383,7 @@ select draw(a) as binop_a_source, draw(b) as binop_b_source, draw(mxm(a, b)) as 
 -- AxB can also be done with the `@` operator, mimicking the Python
 -- syntax.  The default semiring for numeric types is `plus_times`.
 
-select print(a) as a, '@' as "@", print(b) as b, print(a @ b) as mxm from test_fixture;
+select print(a) as a, '@' as "@", print(b) as b, print(a @ b) as "a @ b" from test_fixture;
 
 -- ## Matrix Vector Multiplication
 --
@@ -392,7 +391,7 @@ select print(a) as a, '@' as "@", print(b) as b, print(a @ b) as mxm from test_f
 -- combination of the matrices columns using the vectors elements as
 -- coefficients:
 
-select print(a) as a, '@' as "@", semiring, print(u) as u, print(mxv(a, u)) as mxv from test_fixture;
+select print(a) as a, '@' as "@", semiring, print(u) as u, print(mxv(a, u)) as "mxv(a, u)" from test_fixture;
 
 -- From a graph standpoint, matrix vector multiplication is used to
 -- "pull" back to adjacent nodes from their incoming edges.  When
@@ -403,7 +402,7 @@ select draw(a) as binop_a_source, draw(u) as binop_b_source, draw(mxv(a, u)) as 
 
 -- 'mxv' is also supported by the `@` operator:
 
-select print(a) as a, '@' as "@", print(u) as u, print(a @ u) as mxv from test_fixture;
+select print(a) as a, '@' as "@", print(u) as u, print(a @ u) as "a @ u" from test_fixture;
 
 -- ## Vector Matrix Multiplication
 --
@@ -411,7 +410,7 @@ select print(a) as a, '@' as "@", print(u) as u, print(a @ u) as mxv from test_f
 -- combination of the matrices rows using the vectors elements as
 -- coefficients:
 
-select print(v) as v, semiring, print(b) as b, print(vxm(v, b, semiring)) as vxm from test_fixture;
+select print(v) as v, semiring, print(b) as b, print(vxm(v, b, semiring)) as "vxm(v, b, semiring)" from test_fixture;
 
 -- From a graph standpoint, vector matrix multiplication is used to
 -- "push" forward to adjacent nodes from their outgoing edges.  When
@@ -423,7 +422,7 @@ select draw(v) as binop_a_source, draw(b) as binop_b_source, draw(vxm(v, b)) as 
 
 -- 'vxm' is also supported by the `@` operator:
 
-select print(v) as v, '@' as "@", print(b) as b, print(v @ b) as vxm from test_fixture;
+select print(v) as v, '@' as "@", print(b) as b, print(v @ b) as "v @ b" from test_fixture;
 
 -- ## Choosing Elements
 --
