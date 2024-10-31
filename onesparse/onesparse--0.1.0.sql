@@ -1738,9 +1738,9 @@ LANGUAGE C STABLE;
 
 CREATE FUNCTION mxv(
     a matrix,
-    v vector,
+    b vector,
     op semiring default null,
-    inout w vector default null,
+    inout c vector default null,
     mask vector default null,
     accum binaryop default null,
     descr descriptor default null
@@ -1750,10 +1750,10 @@ AS '$libdir/onesparse', 'matrix_mxv'
 LANGUAGE C STABLE;
 
 CREATE FUNCTION vxm(
-    u vector,
+    a vector,
     b matrix,
     op semiring default null,
-    inout w vector default null,
+    inout c vector default null,
     mask vector default null,
     accum binaryop default null,
     descr descriptor default null

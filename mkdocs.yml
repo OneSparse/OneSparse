@@ -1,8 +1,9 @@
-site_name: OneSparse Postgres
+site_name: OneSparse
 
 nav:
   - Home: index.md
-  - Examples: test_examples_header.md
+  - Docker Demo: docker.md
+  - Getting Started: test_examples_header.md
   - Matrix: test_matrix_header.md
   - Vector: test_vector_header.md
   - Scalar: test_scalar_header.md
