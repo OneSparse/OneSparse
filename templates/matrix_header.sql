@@ -16,7 +16,6 @@ LANGUAGE C IMMUTABLE STRICT;
 CREATE TYPE matrix (
     input = matrix_in,
     output = matrix_out,
-    alignment = int4,
     storage = 'external',
     internallength = VARIABLE
     );
@@ -384,7 +383,7 @@ CREATE AGGREGATE matrix_agg (a matrix)
 CREATE FUNCTION set_element(a matrix, i bigint, j bigint, s scalar)
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_set_element'
-LANGUAGE C STABLE;
+LANGUAGE C VOLATILE;
 
 CREATE FUNCTION get_element(a matrix, i bigint, j bigint)
 RETURNS scalar
@@ -806,6 +805,20 @@ CREATE OPERATOR @<+< (
     RIGHTARG = matrix,
     FUNCTION = min_plus_min_op
     );
+
+CREATE FUNCTION serialize(a matrix)
+RETURNS bytea
+AS '$libdir/onesparse', 'matrix_serialize'
+LANGUAGE C STRICT;
+
+CREATE FUNCTION deserialize(a bytea)
+RETURNS matrix
+AS '$libdir/onesparse', 'matrix_deserialize'
+LANGUAGE C STRICT;
+
+CREATE FUNCTION deserialize_file(path text)
+RETURNS matrix
+    RETURN deserialize(pg_read_binary_file(path));
 
 create function print(a matrix) returns text language plpgsql as
     $$

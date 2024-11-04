@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include "postgres.h"
 #include "fmgr.h"
+#include "miscadmin.h"
 #include "common/fe_memutils.h"
 #include "utils/builtins.h"
 #include "libpq/pqformat.h"
@@ -24,7 +25,7 @@
 #include "suitesparse/GraphBLAS.h"
 
 
-#undef OS_DEBUG
+#define OS_DEBUG
 
 #define CCAT2(x, y) x ## y
 #define CCAT(x, y) CCAT2(x, y)

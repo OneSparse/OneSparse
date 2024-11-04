@@ -54,6 +54,8 @@ PG_FUNCTION_INFO_V1(matrix_contains);
 PG_FUNCTION_INFO_V1(matrix_resize);
 PG_FUNCTION_INFO_V1(matrix_info);
 PG_FUNCTION_INFO_V1(matrix_type);
+PG_FUNCTION_INFO_V1(matrix_serialize);
+PG_FUNCTION_INFO_V1(matrix_deserialize);
 
 static Size matrix_get_flat_size(ExpandedObjectHeader *eohptr) {
 	os_Matrix *matrix;
@@ -227,7 +229,6 @@ os_Matrix* DatumGetMatrix(Datum datum)
 {
 	os_Matrix *matrix;
 	os_FlatMatrix *flat;
-
 	LOGF();
 	if (VARATT_IS_EXTERNAL_EXPANDED_RW(DatumGetPointer(datum))) {
 		matrix = MatrixGetEOHP(datum);
@@ -2062,6 +2063,58 @@ matrix_agg_final(PG_FUNCTION_ARGS)
     }
 
     OS_RETURN_MATRIX(state);
+}
+
+Datum matrix_serialize(PG_FUNCTION_ARGS) {
+	os_Matrix *matrix;
+	void *data;
+	size_t size;
+	bytea *result;
+
+	LOGF();
+
+   matrix = OS_GETARG_MATRIX(0);
+
+    OS_CHECK(GrB_wait(matrix->matrix, GrB_MATERIALIZE),
+		  matrix->matrix,
+		  "Error waiting to materialize matrix.");
+
+	OS_CHECK(GxB_Matrix_serialize(
+			  &data,
+			  &size,
+			  matrix->matrix,
+			  NULL),
+		  matrix->matrix,
+		  "Error serializing matrix");
+
+	result = (bytea *) palloc(VARHDRSZ + size);
+	SET_VARSIZE(result, VARHDRSZ + size);
+	memcpy(VARDATA(result), data, size);
+	PG_RETURN_BYTEA_P(result);
+}
+
+/* Expand a flat matrix in to an Expanded one, return as Postgres Datum. */
+Datum matrix_deserialize(PG_FUNCTION_ARGS)
+{
+	os_Matrix *matrix;
+	GrB_Matrix m;
+	bytea *input;
+
+	LOGF();
+
+	input = PG_GETARG_BYTEA_P(0);
+
+	OS_CHECK(GxB_Matrix_deserialize(
+			  &m,
+			  NULL, // TODO, support udts
+			  VARDATA_ANY(input),
+			  VARSIZE_ANY_EXHDR(input),
+			  NULL),
+		  matrix->matrix,
+		  "Error deserializing matrix");
+
+	matrix = new_matrix(NULL, 0, 0, CurrentMemoryContext, m);
+	OS_RETURN_MATRIX(matrix);
 }
 
 #define SUFFIX _int64                // suffix for names
