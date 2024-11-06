@@ -25,7 +25,7 @@ jobs:
           docker push onesparse/onesparse:demo
 
       - name: Upload Test Artifacts on Failure
-          if: failure()
+          if: ${{ failure() }}
           uses: actions/upload-artifact@v3
           with:
             name: onesparse-regression-files
