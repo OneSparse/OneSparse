@@ -811,6 +811,11 @@ RETURNS bytea
 AS '$libdir/onesparse', 'matrix_serialize'
 LANGUAGE C STRICT;
 
+CREATE FUNCTION serialize_file(a matrix, path text)
+RETURNS void
+AS '$libdir/onesparse', 'matrix_serialize_file'
+LANGUAGE C STRICT;
+
 CREATE FUNCTION deserialize(a bytea)
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_deserialize'

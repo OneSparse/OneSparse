@@ -55,6 +55,7 @@ PG_FUNCTION_INFO_V1(matrix_resize);
 PG_FUNCTION_INFO_V1(matrix_info);
 PG_FUNCTION_INFO_V1(matrix_type);
 PG_FUNCTION_INFO_V1(matrix_serialize);
+PG_FUNCTION_INFO_V1(matrix_serialize_file);
 PG_FUNCTION_INFO_V1(matrix_deserialize);
 
 static Size matrix_get_flat_size(ExpandedObjectHeader *eohptr) {
@@ -2091,6 +2092,46 @@ Datum matrix_serialize(PG_FUNCTION_ARGS) {
 	SET_VARSIZE(result, VARHDRSZ + size);
 	memcpy(VARDATA(result), data, size);
 	PG_RETURN_BYTEA_P(result);
+}
+
+Datum matrix_serialize_file(PG_FUNCTION_ARGS) {
+	os_Matrix *matrix;
+	void *data;
+	size_t size;
+	text *path;
+	char *filepath;
+	FILE *file;
+
+	LOGF();
+
+	matrix = OS_GETARG_MATRIX(0);
+	path = PG_GETARG_TEXT_P(1);
+    filepath = text_to_cstring(path);
+
+	strncpy(filepath, VARDATA(path), VARSIZE(path) - VARHDRSZ);
+	file = fopen(filepath, "wb");
+
+	if (!file) ereport(ERROR, (errmsg("Failed to open file")));
+
+	OS_CHECK(GrB_wait(matrix->matrix, GrB_MATERIALIZE),
+			 matrix->matrix,
+			 "Error waiting to materialize matrix.");
+
+	OS_CHECK(GxB_Matrix_serialize(
+				 &data,
+				 &size,
+				 matrix->matrix,
+				 NULL),
+			 matrix->matrix,
+			 "Error serializing matrix");
+
+	if (fwrite(data, 1, size, file) != size) {
+		fclose(file);
+		ereport(ERROR, (errmsg("Failed to write data to file")));
+	}
+
+	fclose(file);
+	PG_RETURN_VOID();
 }
 
 /* Expand a flat matrix in to an Expanded one, return as Postgres Datum. */

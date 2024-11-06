@@ -1,4 +1,4 @@
-# Getting Started
+# Getting Started (Work In Progress)
 
 The GraphBLAS is is sparse linear algebra library with three core
 objects, Matrices, Vectors and Scalars.  OneSparse provides
@@ -10,6 +10,7 @@ library, which implements a Just-In-Time Compiler to target CPUs
 and CUDA GPUs without changing any of the algebraic code.  The same
 code that can be written and run on laptops with small datasets,
 can be run on powerful multi-core GPU systems with no changes.
+
 To get started, first we need some data.  Run the command `\i
 demo/fistures.sql` from a Docker Demo container to include the data
 used in this guide:
