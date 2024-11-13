@@ -1506,7 +1506,7 @@ CREATE TYPE matrix (
     input = matrix_in,
     output = matrix_out,
     storage = 'external',
-    internallength = VARIABLE
+    internallength = -1
     );
 
 COMMENT ON TYPE matrix IS 'Matrices hold sparse rows and columns of elements.';

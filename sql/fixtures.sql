@@ -30,3 +30,25 @@ insert into onesparse.test_fixture (T, a, b, d, s, u, v, unaryop, indexunaryop, 
         'times_int32',
         'plus_monoid_int32',
         'plus_times_int32');
+
+
+create or replace function test_expand(graph matrix) returns matrix language plpgsql as
+    $$
+    declare
+        nvals bigint = nvals(graph);
+    begin
+        raise notice 'expand';
+        return graph;
+    end;
+    $$;
+
+create or replace function test_expand_expand(graph matrix) returns matrix language plpgsql as
+    $$
+    declare
+        nvals bigint = nvals(graph);
+    begin
+        raise notice 'expand expand';
+        graph = test_expand(graph);
+        return test_expand(graph);
+    end;
+    $$;

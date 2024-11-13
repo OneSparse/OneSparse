@@ -6,7 +6,7 @@ ARG GID
 RUN apt-get update && \
     apt-get install -y make cmake git curl build-essential m4 sudo gdbserver python3-pip \
     gdb libreadline-dev bison flex zlib1g-dev libicu-dev icu-devtools tmux zile zip vim \
-    gawk wget python3-full python3-virtualenv graphviz
+    gawk wget python3-full python3-virtualenv graphviz python3-dev
 
 RUN deluser --remove-home ubuntu
 # add postgres user and make data dir        
@@ -36,6 +36,7 @@ WORKDIR "/home/postgres"
 COPY --chown=postgres:postgres postgres-upstream postgres-upstream
 RUN cd postgres-upstream && ./configure \
     --prefix=/usr/ \
+    --with-python \
     --without-icu \
     --enable-debug \
     --enable-depend --enable-cassert --enable-profiling \
