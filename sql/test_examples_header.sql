@@ -13,9 +13,9 @@
 -- code that can be written and run on laptops with small datasets,
 -- can be run on powerful multi-core GPU systems with no changes.
 --
--- To get started, first we need some data.  Run the command `\i
--- demo/fistures.sql` from a Docker Demo container to include the data
--- used in this guide:
+-- First we need some data.  Run the command `\i demo/fixtures.sql`
+-- from a Docker Demo container to include the data used in this
+-- guide:
 
 \o /dev/null
 \set ECHO none
@@ -23,8 +23,9 @@
 \set ECHO all
 \o
 
--- The examples below will use the `karate` graph the demo test
--- fixtures:
+-- The examples below will use the
+-- [Newman/Karate](https://sparse.tamu.edu/Newman/karate) graph the
+-- demo test fixtures:
 
 select draw(triu(graph), directed=>false, weights=>false) as draw_source from test_graphs where name = 'karate' \gset
 \i sql/draw_sfdp.sql
@@ -66,12 +67,29 @@ CREATE OR REPLACE FUNCTION bfs(
     end;
     $$;
 
+-- Now run the function passing a graph and a starting point:
+-- ```
+-- SELECT bfs(graph, 1) as node_labels from test_graphs where name = 'karate' \gset
+-- ```
+--
 SELECT bfs(graph, 1) as node_labels from test_graphs where name = 'karate' \gset
 select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as draw_source from test_graphs where name = 'karate' \gset
 \i sql/draw_sfdp.sql
 
 --
 -- ## SSSP
+--
+-- The Single Source [Shortest
+-- Path](https://en.wikipedia.org/wiki/Shortest_path_problem)
+-- algorithm is a varation on BFS with a different semiring called
+-- `min_plus`.  Instead of taking the minium parent id, the semiring
+-- takes the minimum path length from a single source to every node.
+-- This implies adding path lengths instead of multiplying them as
+-- would happen in the common `plus_times` semiring.  In this example
+-- we use one of OneSparse experimental operators `@<+<` to specify an
+-- in place matrix multiplication and accumulation with the `min_plus`
+-- semiring (`@<+`) and the minimum accumulator `<` combine to form
+-- `@<+<`.
 --
 
 CREATE OR REPLACE FUNCTION sssp(graph matrix, start_node bigint)
@@ -96,7 +114,12 @@ select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as dra
 
 -- ## Triangle Centrality
 --
--- https://arxiv.org/abs/2105.00110
+-- Based on the Algorithm from https://arxiv.org/abs/2105.00110
+--
+-- Triangle Centrality is a node ranking metric for finding nodes in
+-- the center of the most triangles.  Triangles represent strongly
+-- connected nodes and their centrality can convey more importance
+-- than node centrality.
 --
 
 CREATE OR REPLACE FUNCTION tc(a matrix)
