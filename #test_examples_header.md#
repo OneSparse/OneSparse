@@ -1,1273 +1,330 @@
 
-<!doctype html>
-<html lang="en" class="no-js">
-  <head>
-    
-      <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width,initial-scale=1">
-      
-      
-      
-      
-        <link rel="prev" href="../docker/">
-      
-      
-        <link rel="next" href="../test_matrix_header/">
-      
-      
-      <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.41">
-    
-    
-      
-        <title>Getting Started - OneSparse</title>
-      
-    
-    
-      <link rel="stylesheet" href="../assets/stylesheets/main.0253249f.min.css">
-      
-      
+# Getting Started  (Work In Progress)
 
-
-    
-    
-      
-    
-    
-      
-        
-        
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
-      
-    
-    
-      <link rel="stylesheet" href="../stylesheets/extra.css">
-    
-    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
-    
-      
-
-    
-    
-    
-  </head>
-  
-  
-    <body dir="ltr">
-  
-    
-    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
-    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
-    <label class="md-overlay" for="__drawer"></label>
-    <div data-md-component="skip">
-      
-        
-        <a href="#getting-started-work-in-progress" class="md-skip">
-          Skip to content
-        </a>
-      
-    </div>
-    <div data-md-component="announce">
-      
-    </div>
-    
-    
-      
-
-  
-
-<header class="md-header md-header--shadow" data-md-component="header">
-  <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href=".." title="OneSparse" class="md-header__button md-logo" aria-label="OneSparse" data-md-component="logo">
-      
-  
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
-
-    </a>
-    <label class="md-header__button md-icon" for="__drawer">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
-    </label>
-    <div class="md-header__title" data-md-component="header-title">
-      <div class="md-header__ellipsis">
-        <div class="md-header__topic">
-          <span class="md-ellipsis">
-            OneSparse
-          </span>
-        </div>
-        <div class="md-header__topic" data-md-component="header-topic">
-          <span class="md-ellipsis">
-            
-              Getting Started
-            
-          </span>
-        </div>
-      </div>
-    </div>
-    
-    
-      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
-    
-    
-    
-      <label class="md-header__button md-icon" for="__search">
-        
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
-      </label>
-      <div class="md-search" data-md-component="search" role="dialog">
-  <label class="md-search__overlay" for="__search"></label>
-  <div class="md-search__inner" role="search">
-    <form class="md-search__form" name="search">
-      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
-      <label class="md-search__icon md-icon" for="__search">
-        
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
-        
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
-      </label>
-      <nav class="md-search__options" aria-label="Search">
-        
-        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
-          
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-        </button>
-      </nav>
-      
-    </form>
-    <div class="md-search__output">
-      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
-        <div class="md-search-result" data-md-component="search-result">
-          <div class="md-search-result__meta">
-            Initializing search
-          </div>
-          <ol class="md-search-result__list" role="presentation"></ol>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-    
-    
-  </nav>
-  
-</header>
-    
-    <div class="md-container" data-md-component="container">
-      
-      
-        
-          
-        
-      
-      <main class="md-main" data-md-component="main">
-        <div class="md-main__inner md-grid">
-          
-            
-              
-              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
-                <div class="md-sidebar__scrollwrap">
-                  <div class="md-sidebar__inner">
-                    
-
-
-
-<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
-  <label class="md-nav__title" for="__drawer">
-    <a href=".." title="OneSparse" class="md-nav__button md-logo" aria-label="OneSparse" data-md-component="logo">
-      
-  
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
-
-    </a>
-    OneSparse
-  </label>
-  
-  <ul class="md-nav__list" data-md-scrollfix>
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href=".." class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Home
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../docker/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Docker Demo
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-    
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  <span class="md-ellipsis">
-    Getting Started
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
-        
-  
-  <span class="md-ellipsis">
-    Getting Started
-  </span>
-  
-
-      </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#bfs" class="md-nav__link">
-    <span class="md-ellipsis">
-      BFS
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#sssp" class="md-nav__link">
-    <span class="md-ellipsis">
-      SSSP
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#triangle-centrality" class="md-nav__link">
-    <span class="md-ellipsis">
-      Triangle Centrality
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#page-rank-todo" class="md-nav__link">
-    <span class="md-ellipsis">
-      Page Rank TODO
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../test_matrix_header/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Matrix
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../test_vector_header/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Vector
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../test_scalar_header/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Scalar
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../test_semiring_header/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Semiring
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../test_monoid_header/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Monoid
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../test_binaryop_header/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    BinaryOp
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../test_indexunaryop_header/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    IndexUnaryOp
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../test_unaryop_header/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    UnaryOp
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../test_descriptor_header/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Descriptor
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../test_type_header/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Type
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-    
-  </ul>
-</nav>
-                  </div>
-                </div>
-              </div>
-            
-            
-              
-              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
-                <div class="md-sidebar__scrollwrap">
-                  <div class="md-sidebar__inner">
-                    
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#bfs" class="md-nav__link">
-    <span class="md-ellipsis">
-      BFS
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#sssp" class="md-nav__link">
-    <span class="md-ellipsis">
-      SSSP
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#triangle-centrality" class="md-nav__link">
-    <span class="md-ellipsis">
-      Triangle Centrality
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#page-rank-todo" class="md-nav__link">
-    <span class="md-ellipsis">
-      Page Rank TODO
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-                  </div>
-                </div>
-              </div>
-            
-          
-          
-            <div class="md-content" data-md-component="content">
-              <article class="md-content__inner md-typeset">
-                
-                  
-
-
-<h1 id="getting-started-work-in-progress">Getting Started (Work In Progress)</h1>
-<p>The GraphBLAS is is sparse linear algebra library with three core
+The GraphBLAS is is sparse linear algebra library with three core
 objects, Matrices, Vectors and Scalars.  OneSparse provides
 Postgres types that let you do sparse algebraic and graph
 operations on these objects.  OneSparse is a binding to the
 powerful
-<a href="http://faculty.cse.tamu.edu/davis/GraphBLAS.html">SuiteSparse:GraphBLAS</a>
+[SuiteSparse:GraphBLAS](http://faculty.cse.tamu.edu/davis/GraphBLAS.html)
 library, which implements a Just-In-Time Compiler to target CPUs
-and CUDA GPUs without changing any of the algebraic code.  The same
-code that can be written and run on laptops with small datasets,
-can be run on powerful multi-core GPU systems with no changes.</p>
-<p>First we need some data.  Run the command <code>\i demo/fixtures.sql</code>
-from a Docker Demo container to include the data used in this
-guide:
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">psql</span><span class="nv">:demo</span><span class="o">/</span><span class="n">fixtures</span><span class="mf">.</span><span class="k">sql</span><span class="p">:</span><span class="mf">1</span><span class="p">:</span><span class="w"> </span><span class="n">NOTICE</span><span class="p">:</span><span class="w">  </span><span class="k">extension</span><span class="w"> </span><span class="s s-Name">&quot;onesparse&quot;</span><span class="w"> </span><span class="n">already</span><span class="w"> </span><span class="k">exists</span><span class="p">,</span><span class="w"> </span><span class="n">skipping</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">psql</span><span class="nv">:demo</span><span class="o">/</span><span class="n">fixtures</span><span class="mf">.</span><span class="k">sql</span><span class="p">:</span><span class="mf">2</span><span class="p">:</span><span class="w"> </span><span class="n">NOTICE</span><span class="p">:</span><span class="w">  </span><span class="k">table</span><span class="w"> </span><span class="s s-Name">&quot;ostest&quot;</span><span class="w"> </span><span class="n">does</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="n">exist</span><span class="p">,</span><span class="w"> </span><span class="n">skipping</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">psql</span><span class="nv">:demo</span><span class="o">/</span><span class="n">fixtures</span><span class="mf">.</span><span class="k">sql</span><span class="p">:</span><span class="mf">21</span><span class="p">:</span><span class="w"> </span><span class="n">NOTICE</span><span class="p">:</span><span class="w">  </span><span class="k">table</span><span class="w"> </span><span class="s s-Name">&quot;karate&quot;</span><span class="w"> </span><span class="n">does</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="n">exist</span><span class="p">,</span><span class="w"> </span><span class="n">skipping</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">psql</span><span class="nv">:demo</span><span class="o">/</span><span class="n">fixtures</span><span class="mf">.</span><span class="k">sql</span><span class="p">:</span><span class="mf">29</span><span class="p">:</span><span class="w"> </span><span class="n">NOTICE</span><span class="p">:</span><span class="w">  </span><span class="k">table</span><span class="w"> </span><span class="s s-Name">&quot;mbeacxc&quot;</span><span class="w"> </span><span class="n">does</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="n">exist</span><span class="p">,</span><span class="w"> </span><span class="n">skipping</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">psql</span><span class="nv">:demo</span><span class="o">/</span><span class="n">fixtures</span><span class="mf">.</span><span class="k">sql</span><span class="p">:</span><span class="mf">41</span><span class="p">:</span><span class="w"> </span><span class="n">NOTICE</span><span class="p">:</span><span class="w">  </span><span class="k">table</span><span class="w"> </span><span class="s s-Name">&quot;bcsstk01&quot;</span><span class="w"> </span><span class="n">does</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="n">exist</span><span class="p">,</span><span class="w"> </span><span class="n">skipping</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="n">psql</span><span class="nv">:demo</span><span class="o">/</span><span class="n">fixtures</span><span class="mf">.</span><span class="k">sql</span><span class="p">:</span><span class="mf">49</span><span class="p">:</span><span class="w"> </span><span class="n">ERROR</span><span class="p">:</span><span class="w">  </span><span class="n">extra</span><span class="w"> </span><span class="k">data</span><span class="w"> </span><span class="k">after</span><span class="w"> </span><span class="k">last</span><span class="w"> </span><span class="n">expected</span><span class="w"> </span><span class="k">column</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="n">CONTEXT</span><span class="p">:</span><span class="w">  </span><span class="k">COPY</span><span class="w"> </span><span class="n">bcsstk01</span><span class="p">,</span><span class="w"> </span><span class="nb">line</span><span class="w"> </span><span class="mf">1</span><span class="p">:</span><span class="w"> </span><span class="s s-Name">&quot;0 0  2.83226851852e+06&quot;</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="n">psql</span><span class="nv">:demo</span><span class="o">/</span><span class="n">fixtures</span><span class="mf">.</span><span class="k">sql</span><span class="p">:</span><span class="mf">51</span><span class="p">:</span><span class="w"> </span><span class="n">NOTICE</span><span class="p">:</span><span class="w">  </span><span class="k">table</span><span class="w"> </span><span class="s s-Name">&quot;ash219&quot;</span><span class="w"> </span><span class="n">does</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="n">exist</span><span class="p">,</span><span class="w"> </span><span class="n">skipping</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="n">psql</span><span class="nv">:demo</span><span class="o">/</span><span class="n">fixtures</span><span class="mf">.</span><span class="k">sql</span><span class="p">:</span><span class="mf">62</span><span class="p">:</span><span class="w"> </span><span class="n">NOTICE</span><span class="p">:</span><span class="w">  </span><span class="k">table</span><span class="w"> </span><span class="s s-Name">&quot;fs_183_1&quot;</span><span class="w"> </span><span class="n">does</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="n">exist</span><span class="p">,</span><span class="w"> </span><span class="n">skipping</span>
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="n">psql</span><span class="nv">:demo</span><span class="o">/</span><span class="n">fixtures</span><span class="mf">.</span><span class="k">sql</span><span class="p">:</span><span class="mf">79</span><span class="p">:</span><span class="w"> </span><span class="n">NOTICE</span><span class="p">:</span><span class="w">  </span><span class="k">table</span><span class="w"> </span><span class="s s-Name">&quot;test_graphs&quot;</span><span class="w"> </span><span class="n">does</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="n">exist</span><span class="p">,</span><span class="w"> </span><span class="n">skipping</span>
-</span></code></pre></div>
-The examples below will use the
-<a href="https://sparse.tamu.edu/Newman/karate">Newman/Karate</a> graph the
-demo test fixtures:</p>
-<div>
-<!-- Title: %3 Pages: 1 -->
-<svg width="660pt" height="323pt"
- viewBox="0.00 0.00 659.57 323.43" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 319.43)">
-<title>%3</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-319.43 655.57,-319.43 655.57,4 -4,4"/>
-<!-- 1 -->
-<g id="node1" class="node">
-<title>1</title>
-<ellipse fill="none" stroke="black" cx="398.72" cy="-189.73" rx="15.61" ry="12.04"/>
-<text text-anchor="middle" x="398.72" y="-187.83" font-family="Times,serif" font-size="8.00">1</text>
-</g>
-<!-- 2 -->
-<g id="node2" class="node">
-<title>2</title>
-<ellipse fill="none" stroke="black" cx="340.95" cy="-245.99" rx="15.61" ry="12.04"/>
-<text text-anchor="middle" x="340.95" y="-244.09" font-family="Times,serif" font-size="8.00">2</text>
-</g>
-<!-- 1&#45;&#45;2 -->
-<g id="edge1" class="edge">
-<title>1&#45;&#45;2</title>
-<path fill="none" stroke="black" d="M388.92,-199.27C378.36,-209.55 361.65,-225.84 350.99,-236.21"/>
-</g>
-<!-- 3 -->
-<g id="node3" class="node">
-<title>3</title>
-<ellipse fill="none" stroke="black" cx="268.07" cy="-184.74" rx="15.61" ry="12.04"/>
-<text text-anchor="middle" x="268.07" y="-182.84" font-family="Times,serif" font-size="8.00">3</text>
-</g>
-<!-- 1&#45;&#45;3 -->
-<g id="edge2" class="edge">
-<title>1&#45;&#45;3</title>
-<path fill="none" stroke="black" d="M382.96,-189.12C357.85,-188.16 309.03,-186.3 283.89,-185.34"/>
-</g>
-<!-- 4 -->
-<g id="node4" class="node">
-<title>4</title>
-<ellipse fill="none" stroke="black" cx="368.97" cy="-209.79" rx="15.61" ry="12.04"/>
-<text text-anchor="middle" x="368.97" y="-207.89" font-family="Times,serif" font-size="8.00">4</text>
-</g>
-<!-- 1&#45;&#45;4 -->
-<g id="edge3" class="edge">
-<title>1&#45;&#45;4</title>
-<path fill="none" stroke="black" d="M386.96,-197.65C385.02,-198.97 382.99,-200.33 381.04,-201.65"/>
-</g>
-<!-- 5 -->
-<g id="node5" class="node">
-<title>5</title>
-<ellipse fill="none" stroke="black" cx="486.88" cy="-103.87" rx="15.61" ry="12.04"/>
-<text text-anchor="middle" x="486.88" y="-101.97" font-family="Times,serif" font-size="8.00">5</text>
-</g>
-<!-- 1&#45;&#45;5 -->
-<g id="edge4" class="edge">
-<title>1&#45;&#45;5</title>
-<path fill="none" stroke="black" d="M408.49,-180.21C425.44,-163.71 460.09,-129.96 477.07,-113.43"/>
-</g>
-<!-- 6 -->
-<g id="node6" class="node">
-<title>6</title>
-<ellipse fill="none" stroke="black" cx="549.31" cy="-162.92" rx="15.61" ry="12.04"/>
-<text text-anchor="middle" x="549.31" y="-161.02" font-family="Times,serif" font-size="8.00">6</text>
-</g>
-<!-- 1&#45;&#45;6 -->
-<g id="edge5" class="edge">
-<title>1&#45;&#45;6</title>
-<path fill="none" stroke="black" d="M413.99,-187.01C442.85,-181.87 505.11,-170.79 534,-165.65"/>
-</g>
-<!-- 7 -->
-<g id="node7" class="node">
-<title>7</title>
-<ellipse fill="none" stroke="black" cx="539.86" cy="-123.66" rx="15.61" ry="12.04"/>
-<text text-anchor="middle" x="539.86" y="-121.76" font-family="Times,serif" font-size="8.00">7</text>
-</g>
-<!-- 1&#45;&#45;7 -->
-<g id="edge6" class="edge">
-<title>1&#45;&#45;7</title>
-<path fill="none" stroke="black" d="M412.25,-183.39C439.16,-170.79 499.12,-142.73 526.16,-130.07"/>
-</g>
-<!-- 8 -->
-<g id="node8" class="node">
-<title>8</title>
-<ellipse fill="none" stroke="black" cx="355.47" cy="-165.44" rx="15.61" ry="12.04"/>
-<text text-anchor="middle" x="355.47" y="-163.54" font-family="Times,serif" font-size="8.00">8</text>
-</g>
-<!-- 1&#45;&#45;8 -->
-<g id="edge7" class="edge">
-<title>1&#45;&#45;8</title>
-<path fill="none" stroke="black" d="M385.98,-182.57C380.39,-179.44 373.86,-175.77 368.27,-172.63"/>
-</g>
-<!-- 9 -->
-<g id="node9" class="node">
-<title>9</title>
-<ellipse fill="none" stroke="black" cx="242.49" cy="-207.47" rx="15.61" ry="12.04"/>
-<text text-anchor="middle" x="242.49" y="-205.57" font-family="Times,serif" font-size="8.00">9</text>
-</g>
-<!-- 1&#45;&#45;9 -->
-<g id="edge8" class="edge">
-<title>1&#45;&#45;9</title>
-<path fill="none" stroke="black" d="M383.17,-191.49C353.22,-194.89 287.87,-202.32 257.98,-205.71"/>
-</g>
-<!-- 11 -->
-<g id="node10" class="node">
-<title>11</title>
-<ellipse fill="none" stroke="black" cx="500.45" cy="-149.67" rx="19.18" ry="12.04"/>
-<text text-anchor="middle" x="500.45" y="-147.77" font-family="Times,serif" font-size="8.00">11</text>
-</g>
-<!-- 1&#45;&#45;11 -->
-<g id="edge9" class="edge">
-<title>1&#45;&#45;11</title>
-<path fill="none" stroke="black" d="M412.87,-184.16C431.54,-176.8 464.35,-163.89 484.07,-156.12"/>
-</g>
-<!-- 12 -->
-<g id="node11" class="node">
-<title>12</title>
-<ellipse fill="none" stroke="black" cx="517.61" cy="-256.44" rx="19.18" ry="12.04"/>
-<text text-anchor="middle" x="517.61" y="-254.54" font-family="Times,serif" font-size="8.00">12</text>
-</g>
-<!-- 1&#45;&#45;12 -->
-<g id="edge10" class="edge">
-<title>1&#45;&#45;12</title>
-<path fill="none" stroke="black" d="M411.45,-196.86C433.73,-209.37 479.68,-235.15 503.14,-248.32"/>
-</g>
-<!-- 13 -->
-<g id="node12" class="node">
-<title>13</title>
-<ellipse fill="none" stroke="black" cx="460.75" cy="-221.81" rx="19.18" ry="12.04"/>
-<text text-anchor="middle" x="460.75" y="-219.91" font-family="Times,serif" font-size="8.00">13</text>
-</g>
-<!-- 1&#45;&#45;13 -->
-<g id="edge11" class="edge">
-<title>1&#45;&#45;13</title>
-<path fill="none" stroke="black" d="M411.88,-196.53C421.84,-201.68 435.52,-208.76 445.88,-214.12"/>
-</g>
-<!-- 14 -->
-<g id="node13" class="node">
-<title>14</title>
-<ellipse fill="none" stroke="black" cx="300.38" cy="-201.43" rx="19.18" ry="12.04"/>
-<text text-anchor="middle" x="300.38" y="-199.53" font-family="Times,serif" font-size="8.00">14</text>
-</g>
-<!-- 1&#45;&#45;14 -->
-<g id="edge12" class="edge">
-<title>1&#45;&#45;14</title>
-<path fill="none" stroke="black" d="M382.92,-191.61C365.55,-193.67 337.65,-196.99 319.17,-199.19"/>
-</g>
-<!-- 18 -->
-<g id="node14" class="node">
-<title>18</title>
-<ellipse fill="none" stroke="black" cx="433.89" cy="-279.03" rx="19.18" ry="12.04"/>
-<text text-anchor="middle" x="433.89" y="-277.13" font-family="Times,serif" font-size="8.00">18</text>
-</g>
-<!-- 1&#45;&#45;18 -->
-<g id="edge13" class="edge">
-<title>1&#45;&#45;18</title>
-<path fill="none" stroke="black" d="M403.32,-201.4C410.06,-218.52 422.55,-250.24 429.29,-267.35"/>
-</g>
-<!-- 20 -->
-<g id="node15" class="node">
-<title>20</title>
-<ellipse fill="none" stroke="black" cx="285.55" cy="-246.75" rx="19.18" ry="12.04"/>
-<text text-anchor="middle" x="285.55" y="-244.85" font-family="Times,serif" font-size="8.00">20</text>
-</g>
-<!-- 1&#45;&#45;20 -->
-<g id="edge14" class="edge">
-<title>1&#45;&#45;20</title>
-<path fill="none" stroke="black" d="M385.29,-196.49C364.1,-207.17 323.01,-227.87 300.76,-239.09"/>
-</g>
-<!-- 22 -->
-<g id="node16" class="node">
-<title>22</title>
-<ellipse fill="none" stroke="black" cx="403.14" cy="-303.41" rx="19.18" ry="12.04"/>
-<text text-anchor="middle" x="403.14" y="-301.51" font-family="Times,serif" font-size="8.00">22</text>
-</g>
-<!-- 1&#45;&#45;22 -->
-<g id="edge15" class="edge">
-<title>1&#45;&#45;22</title>
-<path fill="none" stroke="black" d="M399.19,-201.89C400.05,-223.77 401.82,-269.51 402.67,-291.33"/>
-</g>
-<!-- 32 -->
-<g id="node17" class="node">
-<title>32</title>
-<ellipse fill="none" stroke="black" cx="230.46" cy="-114.73" rx="19.18" ry="12.04"/>
-<text text-anchor="middle" x="230.46" y="-112.83" font-family="Times,serif" font-size="8.00">32</text>
-</g>
-<!-- 1&#45;&#45;32 -->
-<g id="edge16" class="edge">
-<title>1&#45;&#45;32</title>
-<path fill="none" stroke="black" d="M385.24,-183.72C354.51,-170.02 279.42,-136.55 246.44,-121.85"/>
-</g>
-<!-- 2&#45;&#45;3 -->
-<g id="edge17" class="edge">
-<title>2&#45;&#45;3</title>
-<path fill="none" stroke="black" d="M330.2,-236.95C316.42,-225.37 292.67,-205.41 278.87,-193.81"/>
-</g>
-<!-- 2&#45;&#45;4 -->
-<g id="edge18" class="edge">
-<title>2&#45;&#45;4</title>
-<path fill="none" stroke="black" d="M349.21,-235.32C352.82,-230.65 357.06,-225.18 360.68,-220.5"/>
-</g>
-<!-- 2&#45;&#45;8 -->
-<g id="edge19" class="edge">
-<title>2&#45;&#45;8</title>
-<path fill="none" stroke="black" d="M343.16,-233.76C345.9,-218.53 350.56,-192.69 353.29,-177.53"/>
-</g>
-<!-- 2&#45;&#45;14 -->
-<g id="edge20" class="edge">
-<title>2&#45;&#45;14</title>
-<path fill="none" stroke="black" d="M331.95,-236.1C325.41,-228.92 316.58,-219.23 309.92,-211.91"/>
-</g>
-<!-- 2&#45;&#45;18 -->
-<g id="edge21" class="edge">
-<title>2&#45;&#45;18</title>
-<path fill="none" stroke="black" d="M355.47,-251.15C372.12,-257.07 399.36,-266.76 416.95,-273.01"/>
-</g>
-<!-- 2&#45;&#45;20 -->
-<g id="edge22" class="edge">
-<title>2&#45;&#45;20</title>
-<path fill="none" stroke="black" d="M325.22,-246.21C318.83,-246.29 311.37,-246.4 304.67,-246.49"/>
-</g>
-<!-- 2&#45;&#45;22 -->
-<g id="edge23" class="edge">
-<title>2&#45;&#45;22</title>
-<path fill="none" stroke="black" d="M350.94,-255.22C362.21,-265.62 380.46,-282.47 392.13,-293.24"/>
-</g>
-<!-- 31 -->
-<g id="node18" class="node">
-<title>31</title>
-<ellipse fill="none" stroke="black" cx="217.97" cy="-249.98" rx="19.18" ry="12.04"/>
-<text text-anchor="middle" x="217.97" y="-248.08" font-family="Times,serif" font-size="8.00">31</text>
-</g>
-<!-- 2&#45;&#45;31 -->
-<g id="edge24" class="edge">
-<title>2&#45;&#45;31</title>
-<path fill="none" stroke="black" d="M325.38,-246.5C302.88,-247.23 261.35,-248.58 237.05,-249.37"/>
-</g>
-<!-- 3&#45;&#45;4 -->
-<g id="edge25" class="edge">
-<title>3&#45;&#45;4</title>
-<path fill="none" stroke="black" d="M282.96,-188.43C302.04,-193.17 334.92,-201.33 354.02,-206.08"/>
-</g>
-<!-- 3&#45;&#45;8 -->
-<g id="edge26" class="edge">
-<title>3&#45;&#45;8</title>
-<path fill="none" stroke="black" d="M283.29,-181.38C299.33,-177.83 324.44,-172.29 340.42,-168.77"/>
-</g>
-<!-- 3&#45;&#45;9 -->
-<g id="edge27" class="edge">
-<title>3&#45;&#45;9</title>
-<path fill="none" stroke="black" d="M257.67,-193.98C256.12,-195.36 254.52,-196.78 252.97,-198.16"/>
-</g>
-<!-- 3&#45;&#45;14 -->
-<g id="edge29" class="edge">
-<title>3&#45;&#45;14</title>
-<path fill="none" stroke="black" d="M281.21,-191.53C282.61,-192.25 284.04,-192.99 285.46,-193.72"/>
-</g>
-<!-- 10 -->
-<g id="node19" class="node">
-<title>10</title>
-<ellipse fill="none" stroke="black" cx="189.48" cy="-274.64" rx="19.18" ry="12.04"/>
-<text text-anchor="middle" x="189.48" y="-272.74" font-family="Times,serif" font-size="8.00">10</text>
-</g>
-<!-- 3&#45;&#45;10 -->
-<g id="edge28" class="edge">
-<title>3&#45;&#45;10</title>
-<path fill="none" stroke="black" d="M259.36,-194.7C244.41,-211.8 214.01,-246.57 198.71,-264.07"/>
-</g>
-<!-- 28 -->
-<g id="node20" class="node">
-<title>28</title>
-<ellipse fill="none" stroke="black" cx="181.58" cy="-95.61" rx="19.18" ry="12.04"/>
-<text text-anchor="middle" x="181.58" y="-93.71" font-family="Times,serif" font-size="8.00">28</text>
-</g>
-<!-- 3&#45;&#45;28 -->
-<g id="edge30" class="edge">
-<title>3&#45;&#45;28</title>
-<path fill="none" stroke="black" d="M258.48,-174.86C242.03,-157.91 208.58,-123.43 191.74,-106.08"/>
-</g>
-<!-- 29 -->
-<g id="node21" class="node">
-<title>29</title>
-<ellipse fill="none" stroke="black" cx="198.35" cy="-143.6" rx="19.18" ry="12.04"/>
-<text text-anchor="middle" x="198.35" y="-141.7" font-family="Times,serif" font-size="8.00">29</text>
-</g>
-<!-- 3&#45;&#45;29 -->
-<g id="edge31" class="edge">
-<title>3&#45;&#45;29</title>
-<path fill="none" stroke="black" d="M255.61,-177.38C243.54,-170.26 225.28,-159.49 212.63,-152.03"/>
-</g>
-<!-- 33 -->
-<g id="node22" class="node">
-<title>33</title>
-<ellipse fill="none" stroke="black" cx="132.64" cy="-201.32" rx="19.18" ry="12.04"/>
-<text text-anchor="middle" x="132.64" y="-199.42" font-family="Times,serif" font-size="8.00">33</text>
-</g>
-<!-- 3&#45;&#45;33 -->
-<g id="edge32" class="edge">
-<title>3&#45;&#45;33</title>
-<path fill="none" stroke="black" d="M252.53,-186.64C227.52,-189.7 178.41,-195.72 151.45,-199.02"/>
-</g>
-<!-- 4&#45;&#45;8 -->
-<g id="edge33" class="edge">
-<title>4&#45;&#45;8</title>
-<path fill="none" stroke="black" d="M365.28,-197.67C363.35,-191.31 360.98,-183.55 359.06,-177.24"/>
-</g>
-<!-- 4&#45;&#45;13 -->
-<g id="edge34" class="edge">
-<title>4&#45;&#45;13</title>
-<path fill="none" stroke="black" d="M384.54,-211.83C400.4,-213.9 424.99,-217.13 441.93,-219.35"/>
-</g>
-<!-- 4&#45;&#45;14 -->
-<g id="edge35" class="edge">
-<title>4&#45;&#45;14</title>
-<path fill="none" stroke="black" d="M353.41,-207.89C343.29,-206.66 330.03,-205.04 319.31,-203.74"/>
-</g>
-<!-- 5&#45;&#45;7 -->
-<g id="edge36" class="edge">
-<title>5&#45;&#45;7</title>
-<path fill="none" stroke="black" d="M501.08,-109.17C508.68,-112.01 518.02,-115.5 525.63,-118.34"/>
-</g>
-<!-- 5&#45;&#45;11 -->
-<g id="edge37" class="edge">
-<title>5&#45;&#45;11</title>
-<path fill="none" stroke="black" d="M490.45,-115.9C492.43,-122.58 494.88,-130.87 496.86,-137.56"/>
-</g>
-<!-- 6&#45;&#45;7 -->
-<g id="edge38" class="edge">
-<title>6&#45;&#45;7</title>
-<path fill="none" stroke="black" d="M546.42,-150.93C545.25,-146.06 543.9,-140.44 542.73,-135.58"/>
-</g>
-<!-- 6&#45;&#45;11 -->
-<g id="edge39" class="edge">
-<title>6&#45;&#45;11</title>
-<path fill="none" stroke="black" d="M534.39,-158.88C529.22,-157.47 523.39,-155.89 518.03,-154.44"/>
-</g>
-<!-- 17 -->
-<g id="node23" class="node">
-<title>17</title>
-<ellipse fill="none" stroke="black" cx="632.47" cy="-121.34" rx="19.18" ry="12.04"/>
-<text text-anchor="middle" x="632.47" y="-119.44" font-family="Times,serif" font-size="8.00">17</text>
-</g>
-<!-- 6&#45;&#45;17 -->
-<g id="edge40" class="edge">
-<title>6&#45;&#45;17</title>
-<path fill="none" stroke="black" d="M562.67,-156.24C577.64,-148.76 601.85,-136.65 617.46,-128.85"/>
-</g>
-<!-- 7&#45;&#45;17 -->
-<g id="edge41" class="edge">
-<title>7&#45;&#45;17</title>
-<path fill="none" stroke="black" d="M555.57,-123.26C571.47,-122.87 596.07,-122.25 613.15,-121.82"/>
-</g>
-<!-- 9&#45;&#45;31 -->
-<g id="edge42" class="edge">
-<title>9&#45;&#45;31</title>
-<path fill="none" stroke="black" d="M236.05,-218.64C232.53,-224.74 228.18,-232.29 224.63,-238.45"/>
-</g>
-<!-- 9&#45;&#45;33 -->
-<g id="edge43" class="edge">
-<title>9&#45;&#45;33</title>
-<path fill="none" stroke="black" d="M226.75,-206.59C206.93,-205.48 172.92,-203.58 151.67,-202.39"/>
-</g>
-<!-- 34 -->
-<g id="node24" class="node">
-<title>34</title>
-<ellipse fill="none" stroke="black" cx="149.8" cy="-195.11" rx="19.18" ry="12.04"/>
-<text text-anchor="middle" x="149.8" y="-193.21" font-family="Times,serif" font-size="8.00">34</text>
-</g>
-<!-- 9&#45;&#45;34 -->
-<g id="edge44" class="edge">
-<title>9&#45;&#45;34</title>
-<path fill="none" stroke="black" d="M226.77,-205.38C210.65,-203.23 185.6,-199.88 168.48,-197.6"/>
-</g>
-<!-- 14&#45;&#45;34 -->
-<g id="edge46" class="edge">
-<title>14&#45;&#45;34</title>
-<path fill="none" stroke="black" d="M281.31,-200.63C252.5,-199.42 198.19,-197.14 169.2,-195.92"/>
-</g>
-<!-- 20&#45;&#45;34 -->
-<g id="edge53" class="edge">
-<title>20&#45;&#45;34</title>
-<path fill="none" stroke="black" d="M269.18,-240.52C243.09,-230.6 192.36,-211.3 166.24,-201.36"/>
-</g>
-<!-- 32&#45;&#45;33 -->
-<g id="edge76" class="edge">
-<title>32&#45;&#45;33</title>
-<path fill="none" stroke="black" d="M219.24,-124.67C200.37,-141.37 162.51,-174.88 143.73,-191.51"/>
-</g>
-<!-- 32&#45;&#45;34 -->
-<g id="edge77" class="edge">
-<title>32&#45;&#45;34</title>
-<path fill="none" stroke="black" d="M220.24,-124.91C204.82,-140.29 175.72,-169.28 160.19,-184.76"/>
-</g>
-<!-- 31&#45;&#45;33 -->
-<g id="edge74" class="edge">
-<title>31&#45;&#45;33</title>
-<path fill="none" stroke="black" d="M203.49,-241.73C187.71,-232.73 162.6,-218.41 146.9,-209.46"/>
-</g>
-<!-- 31&#45;&#45;34 -->
-<g id="edge75" class="edge">
-<title>31&#45;&#45;34</title>
-<path fill="none" stroke="black" d="M206.1,-240.43C193.74,-230.48 174.48,-214.97 162,-204.93"/>
-</g>
-<!-- 10&#45;&#45;34 -->
-<g id="edge45" class="edge">
-<title>10&#45;&#45;34</title>
-<path fill="none" stroke="black" d="M183.62,-262.9C176.08,-247.78 163.04,-221.65 155.55,-206.63"/>
-</g>
-<!-- 28&#45;&#45;34 -->
-<g id="edge69" class="edge">
-<title>28&#45;&#45;34</title>
-<path fill="none" stroke="black" d="M177.81,-107.41C171.69,-126.56 159.68,-164.18 153.57,-183.32"/>
-</g>
-<!-- 29&#45;&#45;32 -->
-<g id="edge70" class="edge">
-<title>29&#45;&#45;32</title>
-<path fill="none" stroke="black" d="M209.58,-133.5C212.77,-130.64 216.23,-127.53 219.4,-124.68"/>
-</g>
-<!-- 29&#45;&#45;34 -->
-<g id="edge71" class="edge">
-<title>29&#45;&#45;34</title>
-<path fill="none" stroke="black" d="M188.53,-154.02C180.11,-162.96 168.03,-175.77 159.61,-184.7"/>
-</g>
-<!-- 33&#45;&#45;34 -->
-<g id="edge78" class="edge">
-<title>33&#45;&#45;34</title>
-<path fill="none" stroke="black" d="M149.38,-195.26C149.52,-195.21 149.62,-195.17 149.69,-195.15"/>
-</g>
-<!-- 15 -->
-<g id="node25" class="node">
-<title>15</title>
-<ellipse fill="none" stroke="black" cx="108.56" cy="-288.27" rx="19.18" ry="12.04"/>
-<text text-anchor="middle" x="108.56" y="-286.37" font-family="Times,serif" font-size="8.00">15</text>
-</g>
-<!-- 15&#45;&#45;33 -->
-<g id="edge47" class="edge">
-<title>15&#45;&#45;33</title>
-<path fill="none" stroke="black" d="M111.91,-276.18C116.51,-259.57 124.73,-229.87 129.32,-213.31"/>
-</g>
-<!-- 15&#45;&#45;34 -->
-<g id="edge48" class="edge">
-<title>15&#45;&#45;34</title>
-<path fill="none" stroke="black" d="M113.78,-276.47C121.72,-258.55 136.71,-224.67 144.62,-206.81"/>
-</g>
-<!-- 16 -->
-<g id="node26" class="node">
-<title>16</title>
-<ellipse fill="none" stroke="black" cx="35.85" cy="-220.46" rx="19.18" ry="12.04"/>
-<text text-anchor="middle" x="35.85" y="-218.56" font-family="Times,serif" font-size="8.00">16</text>
-</g>
-<!-- 16&#45;&#45;33 -->
-<g id="edge49" class="edge">
-<title>16&#45;&#45;33</title>
-<path fill="none" stroke="black" d="M54.51,-216.77C71.76,-213.36 97.23,-208.32 114.36,-204.94"/>
-</g>
-<!-- 16&#45;&#45;34 -->
-<g id="edge50" class="edge">
-<title>16&#45;&#45;34</title>
-<path fill="none" stroke="black" d="M53.9,-216.45C75.12,-211.73 110.12,-203.94 131.45,-199.19"/>
-</g>
-<!-- 19 -->
-<g id="node27" class="node">
-<title>19</title>
-<ellipse fill="none" stroke="black" cx="70.93" cy="-277.41" rx="19.18" ry="12.04"/>
-<text text-anchor="middle" x="70.93" y="-275.51" font-family="Times,serif" font-size="8.00">19</text>
-</g>
-<!-- 19&#45;&#45;33 -->
-<g id="edge51" class="edge">
-<title>19&#45;&#45;33</title>
-<path fill="none" stroke="black" d="M79.77,-266.51C91.5,-252.05 112.09,-226.66 123.81,-212.21"/>
-</g>
-<!-- 19&#45;&#45;34 -->
-<g id="edge52" class="edge">
-<title>19&#45;&#45;34</title>
-<path fill="none" stroke="black" d="M80.92,-266.99C96.09,-251.16 124.77,-221.23 139.89,-205.45"/>
-</g>
-<!-- 21 -->
-<g id="node28" class="node">
-<title>21</title>
-<ellipse fill="none" stroke="black" cx="62.73" cy="-242.96" rx="19.18" ry="12.04"/>
-<text text-anchor="middle" x="62.73" y="-241.06" font-family="Times,serif" font-size="8.00">21</text>
-</g>
-<!-- 21&#45;&#45;33 -->
-<g id="edge54" class="edge">
-<title>21&#45;&#45;33</title>
-<path fill="none" stroke="black" d="M76.87,-234.54C89,-227.31 106.39,-216.96 118.51,-209.74"/>
-</g>
-<!-- 21&#45;&#45;34 -->
-<g id="edge55" class="edge">
-<title>21&#45;&#45;34</title>
-<path fill="none" stroke="black" d="M77.5,-234.85C93.61,-225.99 119.23,-211.91 135.25,-203.1"/>
-</g>
-<!-- 23 -->
-<g id="node29" class="node">
-<title>23</title>
-<ellipse fill="none" stroke="black" cx="50.98" cy="-185.13" rx="19.18" ry="12.04"/>
-<text text-anchor="middle" x="50.98" y="-183.23" font-family="Times,serif" font-size="8.00">23</text>
-</g>
-<!-- 23&#45;&#45;33 -->
-<g id="edge56" class="edge">
-<title>23&#45;&#45;33</title>
-<path fill="none" stroke="black" d="M69.51,-188.81C82.87,-191.46 100.83,-195.02 114.18,-197.67"/>
-</g>
-<!-- 23&#45;&#45;34 -->
-<g id="edge57" class="edge">
-<title>23&#45;&#45;34</title>
-<path fill="none" stroke="black" d="M70.04,-187.06C87.53,-188.82 113.33,-191.43 130.81,-193.19"/>
-</g>
-<!-- 24 -->
-<g id="node30" class="node">
-<title>24</title>
-<ellipse fill="none" stroke="black" cx="114.75" cy="-103.62" rx="19.18" ry="12.04"/>
-<text text-anchor="middle" x="114.75" y="-101.72" font-family="Times,serif" font-size="8.00">24</text>
-</g>
-<!-- 24&#45;&#45;28 -->
-<g id="edge59" class="edge">
-<title>24&#45;&#45;28</title>
-<path fill="none" stroke="black" d="M133.72,-101.34C142.83,-100.25 153.7,-98.95 162.79,-97.86"/>
-</g>
-<!-- 24&#45;&#45;33 -->
-<g id="edge61" class="edge">
-<title>24&#45;&#45;33</title>
-<path fill="none" stroke="black" d="M116.94,-115.6C120.37,-134.35 126.98,-170.43 130.42,-189.25"/>
-</g>
-<!-- 24&#45;&#45;34 -->
-<g id="edge62" class="edge">
-<title>24&#45;&#45;34</title>
-<path fill="none" stroke="black" d="M119.33,-115.58C126.05,-133.11 138.5,-165.61 145.22,-183.14"/>
-</g>
-<!-- 26 -->
-<g id="node31" class="node">
-<title>26</title>
-<ellipse fill="none" stroke="black" cx="153.98" cy="-23.11" rx="19.18" ry="12.04"/>
-<text text-anchor="middle" x="153.98" y="-21.21" font-family="Times,serif" font-size="8.00">26</text>
-</g>
-<!-- 24&#45;&#45;26 -->
-<g id="edge58" class="edge">
-<title>24&#45;&#45;26</title>
-<path fill="none" stroke="black" d="M120.37,-92.08C127.82,-76.78 140.91,-49.92 148.37,-34.63"/>
-</g>
-<!-- 30 -->
-<g id="node32" class="node">
-<title>30</title>
-<ellipse fill="none" stroke="black" cx="69.77" cy="-137.42" rx="19.18" ry="12.04"/>
-<text text-anchor="middle" x="69.77" y="-135.52" font-family="Times,serif" font-size="8.00">30</text>
-</g>
-<!-- 24&#45;&#45;30 -->
-<g id="edge60" class="edge">
-<title>24&#45;&#45;30</title>
-<path fill="none" stroke="black" d="M102.46,-112.85C96.11,-117.62 88.39,-123.43 82.05,-128.2"/>
-</g>
-<!-- 26&#45;&#45;32 -->
-<g id="edge66" class="edge">
-<title>26&#45;&#45;32</title>
-<path fill="none" stroke="black" d="M163.05,-33.98C177.77,-51.62 206.69,-86.25 221.4,-103.88"/>
-</g>
-<!-- 30&#45;&#45;33 -->
-<g id="edge72" class="edge">
-<title>30&#45;&#45;33</title>
-<path fill="none" stroke="black" d="M79.87,-147.69C91.53,-159.54 110.61,-178.94 122.35,-190.87"/>
-</g>
-<!-- 30&#45;&#45;34 -->
-<g id="edge73" class="edge">
-<title>30&#45;&#45;34</title>
-<path fill="none" stroke="black" d="M82.63,-146.69C97.65,-157.52 122.35,-175.32 137.24,-186.05"/>
-</g>
-<!-- 25 -->
-<g id="node33" class="node">
-<title>25</title>
-<ellipse fill="none" stroke="black" cx="202.68" cy="-12.02" rx="19.18" ry="12.04"/>
-<text text-anchor="middle" x="202.68" y="-10.12" font-family="Times,serif" font-size="8.00">25</text>
-</g>
-<!-- 25&#45;&#45;32 -->
-<g id="edge65" class="edge">
-<title>25&#45;&#45;32</title>
-<path fill="none" stroke="black" d="M205.98,-24.21C211.35,-44.08 221.94,-83.22 227.25,-102.88"/>
-</g>
-<!-- 25&#45;&#45;28 -->
-<g id="edge64" class="edge">
-<title>25&#45;&#45;28</title>
-<path fill="none" stroke="black" d="M199.66,-24C195.65,-39.89 188.6,-67.78 184.59,-83.66"/>
-</g>
-<!-- 25&#45;&#45;26 -->
-<g id="edge63" class="edge">
-<title>25&#45;&#45;26</title>
-<path fill="none" stroke="black" d="M184.55,-16.15C180.44,-17.09 176.07,-18.08 171.97,-19.02"/>
-</g>
-<!-- 27 -->
-<g id="node34" class="node">
-<title>27</title>
-<ellipse fill="none" stroke="black" cx="19.09" cy="-136.06" rx="19.18" ry="12.04"/>
-<text text-anchor="middle" x="19.09" y="-134.16" font-family="Times,serif" font-size="8.00">27</text>
-</g>
-<!-- 27&#45;&#45;34 -->
-<g id="edge68" class="edge">
-<title>27&#45;&#45;34</title>
-<path fill="none" stroke="black" d="M34.86,-143.18C59.98,-154.53 108.82,-176.59 133.98,-187.96"/>
-</g>
-<!-- 27&#45;&#45;30 -->
-<g id="edge67" class="edge">
-<title>27&#45;&#45;30</title>
-<path fill="none" stroke="black" d="M38.25,-136.57C42.29,-136.68 46.55,-136.8 50.58,-136.91"/>
-</g>
-</g>
-</svg>
-</div>
+and CUDA GPUs without changing any of the algebraic code.  
 
-<h2 id="bfs">BFS</h2>
-<p>The core operation of Graph Algorithms is Breadth First Search, or
+The same code that can be written and run on laptops with small
+datasets, can be run on powerful multi-core GPU systems with no
+changes.  To get started, first we need some data.  Run the command
+`\i demo/fistures.sql` from a Docker Demo container to include the
+data used in this guide: ``` postgres-console
+psql:demo/fixtures.sql:1: NOTICE: extension "onesparse" already
+exists, skipping psql:demo/fixtures.sql:2: NOTICE: table "ostest" does
+not exist, skipping psql:demo/fixtures.sql:21: NOTICE: table "karate"
+does not exist, skipping psql:demo/fixtures.sql:29: NOTICE: table
+"mbeacxc" does not exist, skipping psql:demo/fixtures.sql:41: NOTICE:
+table "bcsstk01" does not exist, skipping psql:demo/fixtures.sql:49:
+ERROR: extra data after last expected column CONTEXT: COPY bcsstk01,
+line 1: "0 0 2.83226851852e+06" psql:demo/fixtures.sql:51: NOTICE:
+table "ash219" does not exist, skipping psql:demo/fixtures.sql:62:
+NOTICE: table "fs_183_1" does not exist, skipping
+psql:demo/fixtures.sql:79: NOTICE: table "test_graphs" does not exist,
+skipping ``` The examples below will use the `karate` graph the demo
+test fixtures: <div> <!-- Title: %3 Pages: 1 --> <svg width="660pt"
+height="323pt" viewBox="0.00 0.00 659.57 323.43"
+xmlns="http://www.w3.org/2000/svg"
+xmlns:xlink="http://www.w3.org/1999/xlink"> <g id="graph0"
+class="graph" transform="scale(1 1) rotate(0) translate(4 319.43)">
+<title>%3</title> <polygon fill="white" stroke="transparent"
+points="-4,4 -4,-319.43 655.57,-319.43 655.57,4 -4,4"/> <!-- 1 --> <g
+id="node1" class="node"> <title>1</title> <ellipse fill="none"
+stroke="black" cx="398.72" cy="-189.73" rx="15.61" ry="12.04"/> <text
+text-anchor="middle" x="398.72" y="-187.83" font-family="Times,serif"
+font-size="8.00">1</text> </g> <!-- 2 --> <g id="node2" class="node">
+<title>2</title> <ellipse fill="none" stroke="black" cx="340.95"
+cy="-245.99" rx="15.61" ry="12.04"/> <text text-anchor="middle"
+x="340.95" y="-244.09" font-family="Times,serif"
+font-size="8.00">2</text> </g> <!-- 1&#45;&#45;2 --> <g id="edge1"
+class="edge"> <title>1&#45;&#45;2</title> <path fill="none"
+stroke="black" d="M388.92,-199.27C378.36,-209.55 361.65,-225.84
+350.99,-236.21"/> </g> <!-- 3 --> <g id="node3" class="node">
+<title>3</title> <ellipse fill="none" stroke="black" cx="268.07"
+cy="-184.74" rx="15.61" ry="12.04"/> <text text-anchor="middle"
+x="268.07" y="-182.84" font-family="Times,serif"
+font-size="8.00">3</text> </g> <!-- 1&#45;&#45;3 --> <g id="edge2"
+class="edge"> <title>1&#45;&#45;3</title> <path fill="none"
+stroke="black" d="M382.96,-189.12C357.85,-188.16 309.03,-186.3
+283.89,-185.34"/> </g> <!-- 4 --> <g id="node4" class="node">
+<title>4</title> <ellipse fill="none" stroke="black" cx="368.97"
+cy="-209.79" rx="15.61" ry="12.04"/> <text text-anchor="middle"
+x="368.97" y="-207.89" font-family="Times,serif"
+font-size="8.00">4</text> </g> <!-- 1&#45;&#45;4 --> <g id="edge3"
+class="edge"> <title>1&#45;&#45;4</title> <path fill="none"
+stroke="black" d="M386.96,-197.65C385.02,-198.97 382.99,-200.33
+381.04,-201.65"/> </g> <!-- 5 --> <g id="node5" class="node">
+<title>5</title> <ellipse fill="none" stroke="black" cx="486.88"
+cy="-103.87" rx="15.61" ry="12.04"/> <text text-anchor="middle"
+x="486.88" y="-101.97" font-family="Times,serif"
+font-size="8.00">5</text> </g> <!-- 1&#45;&#45;5 --> <g id="edge4"
+class="edge"> <title>1&#45;&#45;5</title> <path fill="none"
+stroke="black" d="M408.49,-180.21C425.44,-163.71 460.09,-129.96
+477.07,-113.43"/> </g> <!-- 6 --> <g id="node6" class="node">
+<title>6</title> <ellipse fill="none" stroke="black" cx="549.31"
+cy="-162.92" rx="15.61" ry="12.04"/> <text text-anchor="middle"
+x="549.31" y="-161.02" font-family="Times,serif"
+font-size="8.00">6</text> </g> <!-- 1&#45;&#45;6 --> <g id="edge5"
+class="edge"> <title>1&#45;&#45;6</title> <path fill="none"
+stroke="black" d="M413.99,-187.01C442.85,-181.87 505.11,-170.79
+534,-165.65"/> </g> <!-- 7 --> <g id="node7" class="node">
+<title>7</title> <ellipse fill="none" stroke="black" cx="539.86"
+cy="-123.66" rx="15.61" ry="12.04"/> <text text-anchor="middle"
+x="539.86" y="-121.76" font-family="Times,serif"
+font-size="8.00">7</text> </g> <!-- 1&#45;&#45;7 --> <g id="edge6"
+class="edge"> <title>1&#45;&#45;7</title> <path fill="none"
+stroke="black" d="M412.25,-183.39C439.16,-170.79 499.12,-142.73
+526.16,-130.07"/> </g> <!-- 8 --> <g id="node8" class="node">
+<title>8</title> <ellipse fill="none" stroke="black" cx="355.47"
+cy="-165.44" rx="15.61" ry="12.04"/> <text text-anchor="middle"
+x="355.47" y="-163.54" font-family="Times,serif"
+font-size="8.00">8</text> </g> <!-- 1&#45;&#45;8 --> <g id="edge7"
+class="edge"> <title>1&#45;&#45;8</title> <path fill="none"
+stroke="black" d="M385.98,-182.57C380.39,-179.44 373.86,-175.77
+368.27,-172.63"/> </g> <!-- 9 --> <g id="node9" class="node">
+<title>9</title> <ellipse fill="none" stroke="black" cx="242.49"
+cy="-207.47" rx="15.61" ry="12.04"/> <text text-anchor="middle"
+x="242.49" y="-205.57" font-family="Times,serif"
+font-size="8.00">9</text> </g> <!-- 1&#45;&#45;9 --> <g id="edge8"
+class="edge"> <title>1&#45;&#45;9</title> <path fill="none"
+stroke="black" d="M383.17,-191.49C353.22,-194.89 287.87,-202.32
+257.98,-205.71"/> </g> <!-- 11 --> <g id="node10" class="node">
+<title>11</title> <ellipse fill="none" stroke="black" cx="500.45"
+cy="-149.67" rx="19.18" ry="12.04"/> <text text-anchor="middle"
+x="500.45" y="-147.77" font-family="Times,serif"
+font-size="8.00">11</text> </g> <!-- 1&#45;&#45;11 --> <g id="edge9"
+class="edge"> <title>1&#45;&#45;11</title> <path fill="none"
+stroke="black" d="M412.87,-184.16C431.54,-176.8 464.35,-163.89
+484.07,-156.12"/> </g> <!-- 12 --> <g id="node11" class="node">
+<title>12</title> <ellipse fill="none" stroke="black" cx="517.61"
+cy="-256.44" rx="19.18" ry="12.04"/> <text text-anchor="middle"
+x="517.61" y="-254.54" font-family="Times,serif"
+font-size="8.00">12</text> </g> <!-- 1&#45;&#45;12 --> <g id="edge10"
+class="edge"> <title>1&#45;&#45;12</title> <path fill="none"
+stroke="black" d="M411.45,-196.86C433.73,-209.37 479.68,-235.15
+503.14,-248.32"/> </g> <!-- 13 --> <g id="node12" class="node">
+<title>13</title> <ellipse fill="none" stroke="black" cx="460.75"
+cy="-221.81" rx="19.18" ry="12.04"/> <text text-anchor="middle"
+x="460.75" y="-219.91" font-family="Times,serif"
+font-size="8.00">13</text> </g> <!-- 1&#45;&#45;13 --> <g id="edge11"
+class="edge"> <title>1&#45;&#45;13</title> <path fill="none"
+stroke="black" d="M411.88,-196.53C421.84,-201.68 435.52,-208.76
+445.88,-214.12"/> </g> <!-- 14 --> <g id="node13" class="node">
+<title>14</title> <ellipse fill="none" stroke="black" cx="300.38"
+cy="-201.43" rx="19.18" ry="12.04"/> <text text-anchor="middle"
+x="300.38" y="-199.53" font-family="Times,serif"
+font-size="8.00">14</text> </g> <!-- 1&#45;&#45;14 --> <g id="edge12"
+class="edge"> <title>1&#45;&#45;14</title> <path fill="none"
+stroke="black" d="M382.92,-191.61C365.55,-193.67 337.65,-196.99
+319.17,-199.19"/> </g> <!-- 18 --> <g id="node14" class="node">
+<title>18</title> <ellipse fill="none" stroke="black" cx="433.89"
+cy="-279.03" rx="19.18" ry="12.04"/> <text text-anchor="middle"
+x="433.89" y="-277.13" font-family="Times,serif"
+font-size="8.00">18</text> </g> <!-- 1&#45;&#45;18 --> <g id="edge13"
+class="edge"> <title>1&#45;&#45;18</title> <path fill="none"
+stroke="black" d="M403.32,-201.4C410.06,-218.52 422.55,-250.24
+429.29,-267.35"/> </g> <!-- 20 --> <g id="node15" class="node">
+<title>20</title> <ellipse fill="none" stroke="black" cx="285.55"
+cy="-246.75" rx="19.18" ry="12.04"/> <text text-anchor="middle"
+x="285.55" y="-244.85" font-family="Times,serif"
+font-size="8.00">20</text> </g> <!-- 1&#45;&#45;20 --> <g id="edge14"
+class="edge"> <title>1&#45;&#45;20</title> <path fill="none"
+stroke="black" d="M385.29,-196.49C364.1,-207.17 323.01,-227.87
+300.76,-239.09"/> </g> <!-- 22 --> <g id="node16" class="node">
+<title>22</title> <ellipse fill="none" stroke="black" cx="403.14"
+cy="-303.41" rx="19.18" ry="12.04"/> <text text-anchor="middle"
+x="403.14" y="-301.51" font-family="Times,serif"
+font-size="8.00">22</text> </g> <!-- 1&#45;&#45;22 --> <g id="edge15"
+class="edge"> <title>1&#45;&#45;22</title> <path fill="none"
+stroke="black" d="M399.19,-201.89C400.05,-223.77 401.82,-269.51
+402.67,-291.33"/> </g> <!-- 32 --> <g id="node17" class="node">
+<title>32</title> <ellipse fill="none" stroke="black" cx="230.46"
+cy="-114.73" rx="19.18" ry="12.04"/> <text text-anchor="middle"
+x="230.46" y="-112.83" font-family="Times,serif"
+font-size="8.00">32</text> </g> <!-- 1&#45;&#45;32 --> <g id="edge16"
+class="edge"> <title>1&#45;&#45;32</title> <path fill="none"
+stroke="black" d="M385.24,-183.72C354.51,-170.02 279.42,-136.55
+246.44,-121.85"/> </g> <!-- 2&#45;&#45;3 --> <g id="edge17"
+class="edge"> <title>2&#45;&#45;3</title> <path fill="none"
+stroke="black" d="M330.2,-236.95C316.42,-225.37 292.67,-205.41
+278.87,-193.81"/> </g> <!-- 2&#45;&#45;4 --> <g id="edge18"
+class="edge"> <title>2&#45;&#45;4</title> <path fill="none"
+stroke="black" d="M349.21,-235.32C352.82,-230.65 357.06,-225.18
+360.68,-220.5"/> </g> <!-- 2&#45;&#45;8 --> <g id="edge19"
+class="edge"> <title>2&#45;&#45;8</title> <path fill="none"
+stroke="black" d="M343.16,-233.76C345.9,-218.53 350.56,-192.69
+353.29,-177.53"/> </g> <!-- 2&#45;&#45;14 --> <g id="edge20"
+class="edge"> <title>2&#45;&#45;14</title> <path fill="none"
+stroke="black" d="M331.95,-236.1C325.41,-228.92 316.58,-219.23
+309.92,-211.91"/> </g> <!-- 2&#45;&#45;18 --> <g id="edge21"
+class="edge"> <title>2&#45;&#45;18</title> <path fill="none"
+stroke="black" d="M355.47,-251.15C372.12,-257.07 399.36,-266.76
+416.95,-273.01"/> </g> <!-- 2&#45;&#45;20 --> <g id="edge22"
+class="edge"> <title>2&#45;&#45;20</title> <path fill="none"
+stroke="black" d="M325.22,-246.21C318.83,-246.29 311.37,-246.4
+304.67,-246.49"/> </g> <!-- 2&#45;&#45;22 --> <g id="edge23"
+class="edge"> <title>2&#45;&#45;22</title> <path fill="none"
+stroke="black" d="M350.94,-255.22C362.21,-265.62 380.46,-282.47
+392.13,-293.24"/> </g> <!-- 31 --> <g id="node18" class="node">
+<title>31</title> <ellipse fill="none" stroke="black" cx="217.97"
+cy="-249.98" rx="19.18" ry="12.04"/> <text text-anchor="middle"
+x="217.97" y="-248.08" font-family="Times,serif"
+font-size="8.00">31</text> </g> <!-- 2&#45;&#45;31 --> <g id="edge24"
+class="edge"> <title>2&#45;&#45;31</title> <path fill="none"
+stroke="black" d="M325.38,-246.5C302.88,-247.23 261.35,-248.58
+237.05,-249.37"/> </g> <!-- 3&#45;&#45;4 --> <g id="edge25"
+class="edge"> <title>3&#45;&#45;4</title> <path fill="none"
+stroke="black" d="M282.96,-188.43C302.04,-193.17 334.92,-201.33
+354.02,-206.08"/> </g> <!-- 3&#45;&#45;8 --> <g id="edge26"
+class="edge"> <title>3&#45;&#45;8</title> <path fill="none"
+stroke="black" d="M283.29,-181.38C299.33,-177.83 324.44,-172.29
+340.42,-168.77"/> </g> <!-- 3&#45;&#45;9 --> <g id="edge27"
+class="edge"> <title>3&#45;&#45;9</title> <path fill="none"
+stroke="black" d="M257.67,-193.98C256.12,-195.36 254.52,-196.78
+252.97,-198.16"/> </g> <!-- 3&#45;&#45;14 --> <g id="edge29"
+class="edge"> <title>3&#45;&#45;14</title> <path fill="none"
+stroke="black" d="M281.21,-191.53C282.61,-192.25 284.04,-192.99
+285.46,-193.72"/> </g> <!-- 10 --> <g id="node19" class="node">
+<title>10</title> <ellipse fill="none" stroke="black" cx="189.48"
+cy="-274.64" rx="19.18" ry="12.04"/> <text text-anchor="middle"
+x="189.48" y="-272.74" font-family="Times,serif"
+font-size="8.00">10</text> </g> <!-- 3&#45;&#45;10 --> <g id="edge28"
+class="edge"> <title>3&#45;&#45;10</title> <path fill="none"
+stroke="black" d="M259.36,-194.7C244.41,-211.8 214.01,-246.57
+198.71,-264.07"/> </g> <!-- 28 --> <g id="node20" class="node">
+<title>28</title> <ellipse fill="none" stroke="black" cx="181.58"
+cy="-95.61" rx="19.18" ry="12.04"/> <text text-anchor="middle"
+x="181.58" y="-93.71" font-family="Times,serif"
+font-size="8.00">28</text> </g> <!-- 3&#45;&#45;28 --> <g id="edge30"
+class="edge"> <title>3&#45;&#45;28</title> <path fill="none"
+stroke="black" d="M258.48,-174.86C242.03,-157.91 208.58,-123.43
+191.74,-106.08"/> </g> <!-- 29 --> <g id="node21" class="node">
+<title>29</title> <ellipse fill="none" stroke="black" cx="198.35"
+cy="-143.6" rx="19.18" ry="12.04"/> <text text-anchor="middle"
+x="198.35" y="-141.7" font-family="Times,serif"
+font-size="8.00">29</text> </g> <!-- 3&#45;&#45;29 --> <g id="edge31"
+class="edge"> <title>3&#45;&#45;29</title> <path fill="none"
+stroke="black" d="M255.61,-177.38C243.54,-170.26 225.28,-159.49
+212.63,-152.03"/> </g> <!-- 33 --> <g id="node22" class="node">
+<title>33</title> <ellipse fill="none" stroke="black" cx="132.64"
+cy="-201.32" rx="19.18" ry="12.04"/> <text text-anchor="middle"
+x="132.64" y="-199.42" font-family="Times,serif"
+font-size="8.00">33</text> </g> <!-- 3&#45;&#45;33 --> <g id="edge32"
+class="edge"> <title>3&#45;&#45;33</title> <path fill="none"
+stroke="black" d="M252.53,-186.64C227.52,-189.7 178.41,-195.72
+151.45,-199.02"/> </g> <!-- 4&#45;&#45;8 --> <g id="edge33"
+class="edge"> <title>4&#45;&#45;8</title> <path fill="none"
+stroke="black" d="M365.28,-197.67C363.35,-191.31 360.98,-183.55
+359.06,-177.24"/> </g> <!-- 4&#45;&#45;13 --> <g id="edge34"
+class="edge"> <title>4&#45;&#45;13</title> <path fill="none"
+stroke="black" d="M384.54,-211.83C400.4,-213.9 424.99,-217.13
+441.93,-219.35"/> </g> <!-- 4&#45;&#45;14 --> <g id="edge35"
+class="edge"> <title>4&#45;&#45;14</title> <path fill="none"
+stroke="black" d="M353.41,-207.89C343.29,-206.66 330.03,-205.04
+319.31,-203.74"/> </g> <!-- 5&#45;&#45;7 --> <g id="edge36"
+class="edge"> <title>5&#45;&#45;7</title> <path fill="none"
+stroke="black" d="M501.08,-109.17C508.68,-112.01 518.02,-115.5
+525.63,-118.34"/> </g> <!-- 5&#45;&#45;11 --> <g id="edge37"
+class="edge"> <title>5&#45;&#45;11</title> <path fill="none"
+stroke="black" d="M490.45,-115.9C492.43,-122.58 494.88,-130.87
+496.86,-137.56"/> </g> <!-- 6&#45;&#45;7 --> <g id="edge38"
+class="edge"> <title>6&#45;&#45;7</title> <path fill="none"
+stroke="black" d="M546.42,-150.93C545.25,-146.06 543.9,-140.44
+542.73,-135.58"/> </g> <!-- 6&#45;&#45;11 --> <g id="edge39"
+class="edge"> <title>6&#45;&#45;11</title> <path fill="none"
+stroke="black" d="M534.39,-158.88C529.22,-157.47 523.39,-155.89
+518.03,-154.44"/> </g> <!-- 17 --> <g id="node23" class="node">
+<title>17</title> <ellipse fill="none" stroke="black" cx="632.47"
+cy="-121.34" rx="19.18" ry="12.04"/> <text text-anchor="middle"
+x="632.47" y="-119.44" font-family="Times,serif"
+font-size="8.00">17</text> </g> <!-- 6&#45;&#45;17 --> <g id="edge40"
+class="edge"> <title>6&#45;&#45;17</title> <path fill="none"
+stroke="black" d="M562.67,-156.24C577.64,-148.76 601.85,-136.65
+617.46,-128.85"/> </g> <!-- 7&#45;&#45;17 --> <g id="edge41"
+class="edge"> <title>7&#45;&#45;17</title> <path fill="none"
+stroke="black" d="M555.57,-123.26C571.47,-122.87 596.07,-122.25
+613.15,-121.82"/> </g> <!-- 9&#45;&#45;31 --> <g id="edge42"
+class="edge"> <title>9&#45;&#45;31</title> <path fill="none"
+stroke="black" d="M236.05,-218.64C232.53,-224.74 228.18,-232.29
+224.63,-238.45"/> </g> <!-- 9&#45;&#45;33 --> <g id="edge43"
+class="edge"> <title>9&#45;&#45;33</title> <path fill="none"
+stroke="black" d="M226.75,-206.59C206.93,-205.48 172.92,-203.58
+151.67,-202.39"/> </g> <!-- 34 --> <g id="node24" class="node">
+<title>34</title> <ellipse fill="none" stroke="black" cx="149.8"
+cy="-195.11" rx="19.18" ry="12.04"/> <text text-anchor="middle"
+x="149.8" y="-193.21" font-family="Times,serif"
+font-size="8.00">34</text> </g> <!-- 9&#45;&#45;34 --> <g id="edge44"
+class="edge"> <title>9&#45;&#45;34</title> <path fill="none"
+stroke="black" d="M226.77,-205.38C210.65,-203.23 185.6,-199.88
+168.48,-197.6"/> </g> <!-- 14&#45;&#45;34 --> <g id="edge46"
+class="edge"> <title>14&#45;&#45;34</title> <path fill="none"
+stroke="black" d="M281.31,-200.63C252.5,-199.42 198.19,-197.14
+169.2,-195.92"/> </g> <!-- 20&#45;&#45;34 --> <g id="edge53"
+class="edge"> <title>20&#45;&#45;34</title> <path fill="none"
+stroke="black" d="M269.18,-240.52C243.09,-230.6 192.36,-211.3
+166.24,-201.36"/> </g> <!-- 32&#45;&#45;33 --> <g id="edge76"
+class="edge"> <title>32&#45;&#45;33</title> <path fill="none"
+stroke="black" d="M219.24,-124.67C200.37,-141.37 162.51,-174.88
+143.73,-191.51"/> </g> <!-- 32&#45;&#45;34 --> <g id="edge77"
+class="edge"> <title>32&#45;&#45;34</title> <path fill="none"
+stroke="black" d="M220.24,-124.91C204.82,-140.29 175.72,-169.28
+160.19,-184.76"/> </g> <!-- 31&#45;&#45;33 --> <g id="edge74"
+class="edge"> <title>31&#45;&#45;33</title> <path fill="none"
+stroke="black" d="M203.49,-241.73C187.71,-232.73 162.6,-218.41
+146.9,-209.46"/> </g> <!-- 31&#45;&#45;34 --> <g id="edge75"
+class="edge"> <title>31&#45;&#45;34</title> <path fill="none"
+stroke="black" d="M206.1,-240.43C193.74,-230.48 174.48,-214.97
+162,-204.93"/> </g> <!-- 10&#45;&#45;34 --> <g id="edge45"
+class="edge"> <title>10&#45;&#45;34</title> <path fill="none"
+stroke="black" d="M183.62,-262.9C176.08,-247.78 163.04,-221.65
+155.55,-206.63"/> </g> <!-- 28&#45;&#45;34 --> <g id="edge69"
+class="edge"> <title>28&#45;&#45;34</title> <path fill="none"
+stroke="black" d="M177.81,-107.41C171.69,-126.56 159.68,-164.18
+153.57,-183.32"/> </g> <!-- 29&#45;&#45;32 --> <g id="edge70"
+ class="edge"> <title>29&#45;&#45;32</title> <path fill="none" stroke="black" d="M209.58,-133.5C212.77,-130.64 216.23,-127.53 219.4,-124.68"/> </g> <!-- 29&#45;&#45;34 --> <g id="edge71" class="edge"> <title>29&#45;&#45;34</title> <path fill="none" stroke="black" d="M188.53,-154.02C180.11,-162.96 168.03,-175.77 159.61,-184.7"/> </g> <!-- 33&#45;&#45;34 --> <g id="edge78" class="edge"> <title>33&#45;&#45;34</title> <path fill="none" stroke="black" d="M149.38,-195.26C149.52,-195.21 149.62,-195.17 149.69,-195.15"/> </g> <!-- 15 --> <g id="node25" class="node"> <title>15</title> <ellipse fill="none" stroke="black" cx="108.56" cy="-288.27" rx="19.18" ry="12.04"/> <text text-anchor="middle" x="108.56" y="-286.37" font-family="Times,serif" font-size="8.00">15</text> </g> <!-- 15&#45;&#45;33 --> <g id="edge47" class="edge"> <title>15&#45;&#45;33</title> <path fill="none" stroke="black" d="M111.91,-276.18C116.51,-259.57 124.73,-229.87 129.32,-213.31"/> </g> <!-- 15&#45;&#45;34 --> <g id="edge48" class="edge"> <title>15&#45;&#45;34</title> <path fill="none" stroke="black" d="M113.78,-276.47C121.72,-258.55 136.71,-224.67 144.62,-206.81"/> </g> <!-- 16 --> <g id="node26" class="node"> <title>16</title> <ellipse fill="none" stroke="black" cx="35.85" cy="-220.46" rx="19.18" ry="12.04"/> <text text-anchor="middle" x="35.85" y="-218.56" font-family="Times,serif" font-size="8.00">16</text> </g> <!-- 16&#45;&#45;33 --> <g id="edge49" class="edge"> <title>16&#45;&#45;33</title> <path fill="none" stroke="black" d="M54.51,-216.77C71.76,-213.36 97.23,-208.32 114.36,-204.94"/> </g> <!-- 16&#45;&#45;34 --> <g id="edge50" class="edge"> <title>16&#45;&#45;34</title> <path fill="none" stroke="black" d="M53.9,-216.45C75.12,-211.73 110.12,-203.94 131.45,-199.19"/> </g> <!-- 19 --> <g id="node27" class="node"> <title>19</title> <ellipse fill="none" stroke="black" cx="70.93" cy="-277.41" rx="19.18" ry="12.04"/> <text text-anchor="middle" x="70.93" y="-275.51" font-family="Times,serif" font-size="8.00">19</text> </g> <!-- 19&#45;&#45;33 --> <g id="edge51" class="edge"> <title>19&#45;&#45;33</title> <path fill="none" stroke="black" d="M79.77,-266.51C91.5,-252.05 112.09,-226.66 123.81,-212.21"/> </g> <!-- 19&#45;&#45;34 --> <g id="edge52" class="edge"> <title>19&#45;&#45;34</title> <path fill="none" stroke="black" d="M80.92,-266.99C96.09,-251.16 124.77,-221.23 139.89,-205.45"/> </g> <!-- 21 --> <g id="node28" class="node"> <title>21</title> <ellipse fill="none" stroke="black" cx="62.73" cy="-242.96" rx="19.18" ry="12.04"/> <text text-anchor="middle" x="62.73" y="-241.06" font-family="Times,serif" font-size="8.00">21</text> </g> <!-- 21&#45;&#45;33 --> <g id="edge54" class="edge"> <title>21&#45;&#45;33</title> <path fill="none" stroke="black" d="M76.87,-234.54C89,-227.31 106.39,-216.96 118.51,-209.74"/> </g> <!-- 21&#45;&#45;34 --> <g id="edge55" class="edge"> <title>21&#45;&#45;34</title> <path fill="none" stroke="black" d="M77.5,-234.85C93.61,-225.99 119.23,-211.91 135.25,-203.1"/> </g> <!-- 23 --> <g id="node29" class="node"> <title>23</title> <ellipse fill="none" stroke="black" cx="50.98" cy="-185.13" rx="19.18" ry="12.04"/> <text text-anchor="middle" x="50.98" y="-183.23" font-family="Times,serif" font-size="8.00">23</text> </g> <!-- 23&#45;&#45;33 --> <g id="edge56" class="edge"> <title>23&#45;&#45;33</title> <path fill="none" stroke="black" d="M69.51,-188.81C82.87,-191.46 100.83,-195.02 114.18,-197.67"/> </g> <!-- 23&#45;&#45;34 --> <g id="edge57" class="edge"> <title>23&#45;&#45;34</title> <path fill="none" stroke="black" d="M70.04,-187.06C87.53,-188.82 113.33,-191.43 130.81,-193.19"/> </g> <!-- 24 --> <g id="node30" class="node"> <title>24</title> <ellipse fill="none" stroke="black" cx="114.75" cy="-103.62" rx="19.18" ry="12.04"/> <text text-anchor="middle" x="114.75" y="-101.72" font-family="Times,serif" font-size="8.00">24</text> </g> <!-- 24&#45;&#45;28 --> <g id="edge59" class="edge"> <title>24&#45;&#45;28</title> <path fill="none" stroke="black" d="M133.72,-101.34C142.83,-100.25 153.7,-98.95 162.79,-97.86"/> </g> <!-- 24&#45;&#45;33 --> <g id="edge61" class="edge"> <title>24&#45;&#45;33</title> <path fill="none" stroke="black" d="M116.94,-115.6C120.37,-134.35 126.98,-170.43 130.42,-189.25"/> </g> <!-- 24&#45;&#45;34 --> <g id="edge62" class="edge"> <title>24&#45;&#45;34</title> <path fill="none" stroke="black" d="M119.33,-115.58C126.05,-133.11 138.5,-165.61 145.22,-183.14"/> </g> <!-- 26 --> <g id="node31" class="node"> <title>26</title> <ellipse fill="none" stroke="black" cx="153.98" cy="-23.11" rx="19.18" ry="12.04"/> <text text-anchor="middle" x="153.98" y="-21.21" font-family="Times,serif" font-size="8.00">26</text> </g> <!-- 24&#45;&#45;26 --> <g id="edge58" class="edge"> <title>24&#45;&#45;26</title> <path fill="none" stroke="black" d="M120.37,-92.08C127.82,-76.78 140.91,-49.92 148.37,-34.63"/> </g> <!-- 30 --> <g id="node32" class="node"> <title>30</title> <ellipse fill="none" stroke="black" cx="69.77" cy="-137.42" rx="19.18" ry="12.04"/> <text text-anchor="middle" x="69.77" y="-135.52" font-family="Times,serif" font-size="8.00">30</text> </g> <!-- 24&#45;&#45;30 --> <g id="edge60" class="edge"> <title>24&#45;&#45;30</title> <path fill="none" stroke="black" d="M102.46,-112.85C96.11,-117.62 88.39,-123.43 82.05,-128.2"/> </g> <!-- 26&#45;&#45;32 --> <g id="edge66" class="edge"> <title>26&#45;&#45;32</title> <path fill="none" stroke="black" d="M163.05,-33.98C177.77,-51.62 206.69,-86.25 221.4,-103.88"/> </g> <!-- 30&#45;&#45;33 --> <g id="edge72" class="edge"> <title>30&#45;&#45;33</title> <path fill="none" stroke="black" d="M79.87,-147.69C91.53,-159.54 110.61,-178.94 122.35,-190.87"/> </g> <!-- 30&#45;&#45;34 --> <g id="edge73" class="edge"> <title>30&#45;&#45;34</title> <path fill="none" stroke="black" d="M82.63,-146.69C97.65,-157.52 122.35,-175.32 137.24,-186.05"/> </g> <!-- 25 --> <g id="node33" class="node"> <title>25</title> <ellipse fill="none" stroke="black" cx="202.68" cy="-12.02" rx="19.18" ry="12.04"/> <text text-anchor="middle" x="202.68" y="-10.12" font-family="Times,serif" font-size="8.00">25</text> </g> <!-- 25&#45;&#45;32 --> <g id="edge65" class="edge"> <title>25&#45;&#45;32</title> <path fill="none" stroke="black" d="M205.98,-24.21C211.35,-44.08 221.94,-83.22 227.25,-102.88"/> </g> <!-- 25&#45;&#45;28 --> <g id="edge64" class="edge"> <title>25&#45;&#45;28</title> <path fill="none" stroke="black" d="M199.66,-24C195.65,-39.89 188.6,-67.78 184.59,-83.66"/> </g> <!-- 25&#45;&#45;26 --> <g id="edge63" class="edge"> <title>25&#45;&#45;26</title> <path fill="none" stroke="black" d="M184.55,-16.15C180.44,-17.09 176.07,-18.08 171.97,-19.02"/> </g> <!-- 27 --> <g id="node34" class="node"> <title>27</title> <ellipse fill="none" stroke="black" cx="19.09" cy="-136.06" rx="19.18" ry="12.04"/> <text text-anchor="middle" x="19.09" y="-134.16" font-family="Times,serif" font-size="8.00">27</text> </g> <!-- 27&#45;&#45;34 --> <g id="edge68" class="edge"> <title>27&#45;&#45;34</title> <path fill="none" stroke="black" d="M34.86,-143.18C59.98,-154.53 108.82,-176.59 133.98,-187.96"/> </g> <!-- 27&#45;&#45;30 --> <g id="edge67" class="edge"> <title>27&#45;&#45;30</title> <path fill="none" stroke="black" d="M38.25,-136.57C42.29,-136.68 46.55,-136.8 50.58,-136.91"/> </g> </g> </svg> </div>
+
+
+## BFS
+
+The core operation of Graph Algorithms is Breadth First Search, or
 BFS.  In the GraphBLAS, this pattern usually consists of vector
 matrix multiplication in a loop until some terminal condition is
-reached.</p>
-<p>Min Parent BFS returns a sparse vector of nodes containing the
+reached.
+
+Min Parent BFS returns a sparse vector of nodes containing the
 minimum parent id:
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">OR</span><span class="w"> </span><span class="k">REPLACE</span><span class="w"> </span><span class="k">FUNCTION</span><span class="w"> </span><span class="n">bfs</span><span class="p">(</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">        </span><span class="n">graph</span><span class="w"> </span><span class="n">matrix</span><span class="p">,</span><span class="w">          </span><span class="c1">-- This is the input graph</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">        </span><span class="n">start_node</span><span class="w"> </span><span class="nb">bigint</span><span class="w">      </span><span class="c1">-- This is the node id to start the BFS</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span><span class="p">)</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span><span class="k">RETURNS</span><span class="w"> </span><span class="n">vector</span><span class="w">             </span><span class="c1">-- will return a vector of (node:minparent)</span>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">    </span><span class="k">LANGUAGE</span><span class="w"> </span><span class="n">plpgsql</span><span class="w"> </span><span class="k">AS</span>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">    </span><span class="err">$$</span>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">    </span><span class="k">DECLARE</span>
-</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">    </span><span class="n">bfs_vector</span><span class="w"> </span><span class="n">vector</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">vector</span><span class="p">(</span><span class="s1">&#39;int64&#39;</span><span class="p">);</span><span class="w">  </span><span class="c1">-- The result vector to accumulate ids</span>
-</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="go">    prev_vector vector = vector(&#39;int64&#39;); -- temp vector to detect termination</span>
-</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="go">    BEGIN</span>
-</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="go">        bfs_vector = set_element(bfs_vector, start_node, 1); -- set the start node value to 1</span>
-</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="go">        WHILE bfs_vector != prev_vector LOOP  -- keep looping when the result changes</span>
-</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="go">            prev_vector = dup(bfs_vector);    -- dup bfs and assign to previous</span>
-</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="go">            bfs_vector = vxm(</span>
-</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="go">                bfs_vector,          -- Starting from the current frontier</span>
-</span><span id="__span-1-17"><a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="go">                graph,               -- traverse this graph.</span>
-</span><span id="__span-1-18"><a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="go">                &#39;any_secondi_int64&#39;, -- At any edge value, store the parent node id</span>
-</span><span id="__span-1-19"><a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a><span class="go">                c=&gt;bfs_vector,       -- assign back into bfs_vector</span>
-</span><span id="__span-1-20"><a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a><span class="go">                accum=&gt;&#39;min_int64&#39;   -- accumulate the minimum parent id for collisions</span>
-</span><span id="__span-1-21"><a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a><span class="go">            );</span>
-</span><span id="__span-1-22"><a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a><span class="go">        END LOOP;</span>
-</span><span id="__span-1-23"><a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a><span class="go">    RETURN bfs_vector;</span>
-</span><span id="__span-1-24"><a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a><span class="go">    end;</span>
-</span><span id="__span-1-25"><a id="__codelineno-1-25" name="__codelineno-1-25" href="#__codelineno-1-25"></a><span class="go">    $$;</span>
-</span></code></pre></div>
-Now run the function passing a graph and a starting point:
-<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>
-</span></code></pre></div></p>
+``` postgres-console
+CREATE OR REPLACE FUNCTION bfs(
+        graph matrix,          -- This is the input graph
+        start_node bigint      -- This is the node id to start the BFS
+    )
+    RETURNS vector             -- will return a vector of (node:minparent)
+    LANGUAGE plpgsql AS
+    $$
+    DECLARE
+    bfs_vector vector = vector('int64');  -- The result vector to accumulate ids
+    prev_vector vector = vector('int64'); -- temp vector to detect termination
+    BEGIN
+        bfs_vector = set_element(bfs_vector, start_node, 1); -- set the start node value to 1
+        WHILE bfs_vector != prev_vector LOOP  -- keep looping when the result changes
+            prev_vector = dup(bfs_vector);    -- dup bfs and assign to previous
+            bfs_vector = vxm(
+                bfs_vector,          -- Starting from the current frontier
+                graph,               -- traverse this graph.
+                'any_secondi_int64', -- At any edge value, store the parent node id
+                c=>bfs_vector,       -- assign back into bfs_vector
+                accum=>'min_int64'   -- accumulate the minimum parent id for collisions
+            );
+        END LOOP;
+    RETURN bfs_vector;
+    end;
+    $$;
+```
 <div>
 <!-- Title: %3 Pages: 1 -->
 <svg width="638pt" height="305pt"
@@ -1873,34 +930,26 @@ Now run the function passing a graph and a starting point:
 </svg>
 </div>
 
-<h2 id="sssp">SSSP</h2>
-<p>The Single Source <a href="https://en.wikipedia.org/wiki/Shortest_path_problem">Shortest
-Path</a>
-algorithm is a varation on BFS with a different semiring called
-<code>min_plus</code>.  Instead of taking the minium parent id, the semiring
-takes the minimum path length from a single source to every node.
-This implies adding path lengths instead of multiplying them as
-would happen in the common <code>plus_times</code> semiring.  In this example
-we use one of OneSparse experimental operators <code>@&lt;+&lt;</code> to specify an
-in place matrix multiplication and accumulation with the <code>min_plus</code>
-semiring (<code>@&lt;+</code>) and the minimum accumulator <code>&lt;</code> combine to form
-<code>@&lt;+&lt;</code>.</p>
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">OR</span><span class="w"> </span><span class="k">REPLACE</span><span class="w"> </span><span class="k">FUNCTION</span><span class="w"> </span><span class="n">sssp</span><span class="p">(</span><span class="n">graph</span><span class="w"> </span><span class="n">matrix</span><span class="p">,</span><span class="w"> </span><span class="n">start_node</span><span class="w"> </span><span class="nb">bigint</span><span class="p">)</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="k">RETURNS</span><span class="w"> </span><span class="n">vector</span><span class="w"> </span><span class="k">LANGUAGE</span><span class="w"> </span><span class="n">plpgsql</span><span class="w"> </span><span class="k">AS</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="err">$$</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span><span class="k">DECLARE</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">    </span><span class="n">sssp_vector</span><span class="w"> </span><span class="n">vector</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">vector</span><span class="p">(</span><span class="k">type</span><span class="p">(</span><span class="n">graph</span><span class="p">));</span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="go">    next_vector vector = vector(type(graph));</span>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="go">    BEGIN</span>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="go">        sssp_vector = set_element(sssp_vector, start_node, 1);</span>
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="go">        WHILE sssp_vector != next_vector LOOP</span>
-</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="go">            next_vector = dup(sssp_vector);</span>
-</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="go">            sssp_vector = sssp_vector @&lt;+&lt; graph;</span>
-</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="go">        END LOOP;</span>
-</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="go">    RETURN sssp_vector;</span>
-</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="go">    end;</span>
-</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="go">    $$;</span>
-</span></code></pre></div>
+
+## SSSP
+
+``` postgres-console
+CREATE OR REPLACE FUNCTION sssp(graph matrix, start_node bigint)
+    RETURNS vector LANGUAGE plpgsql AS
+    $$
+    DECLARE
+    sssp_vector vector = vector(type(graph));
+    next_vector vector = vector(type(graph));
+    BEGIN
+        sssp_vector = set_element(sssp_vector, start_node, 1);
+        WHILE sssp_vector != next_vector LOOP
+            next_vector = dup(sssp_vector);
+            sssp_vector = sssp_vector @<+< graph;
+        END LOOP;
+    RETURN sssp_vector;
+    end;
+    $$;
+```
 <div>
 <!-- Title: %3 Pages: 1 -->
 <svg width="638pt" height="305pt"
@@ -2506,29 +1555,28 @@ semiring (<code>@&lt;+</code>) and the minimum accumulator <code>&lt;</code> com
 </svg>
 </div>
 
-<h2 id="triangle-centrality">Triangle Centrality</h2>
-<p>Based on the Algorithm from https://arxiv.org/abs/2105.00110</p>
-<p>Triangle Centrality is a node ranking metric for finding nodes in
-the center of the most triangles.  Triangles represent strongly
-connected nodes and their centrality can convey more importance
-than node centrality.</p>
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">OR</span><span class="w"> </span><span class="k">REPLACE</span><span class="w"> </span><span class="k">FUNCTION</span><span class="w"> </span><span class="n">tc</span><span class="p">(</span><span class="n">a</span><span class="w"> </span><span class="n">matrix</span><span class="p">)</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span><span class="k">RETURNS</span><span class="w"> </span><span class="n">vector</span><span class="w"> </span><span class="k">LANGUAGE</span><span class="w"> </span><span class="n">plpgsql</span><span class="w"> </span><span class="k">AS</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="err">$$</span>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span><span class="k">DECLARE</span>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span><span class="n">m</span><span class="w"> </span><span class="n">matrix</span><span class="p">;</span>
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="go">    t matrix;</span>
-</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="go">    y vector;</span>
-</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="go">    k scalar;</span>
-</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="go">    BEGIN</span>
-</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="go">        m = tril(a, -1);</span>
-</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="go">        t = mxm(a, a, &#39;plus_pair_int32&#39;, mask=&gt;m, descr=&gt;&#39;st1&#39;);</span>
-</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="go">        y = reduce_cols(t) |+ reduce_rows(t);</span>
-</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="go">        k = reduce_scalar(y);</span>
-</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="go">        RETURN 3 * ((a @ y) |- 2 * (one(t) @ y) |+ y) / k;</span>
-</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="go">    END;</span>
-</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="go">    $$;</span>
-</span></code></pre></div>
+## Triangle Centrality
+
+https://arxiv.org/abs/2105.00110
+
+``` postgres-console
+CREATE OR REPLACE FUNCTION tc(a matrix)
+    RETURNS vector LANGUAGE plpgsql AS
+    $$
+    DECLARE
+    m matrix;
+    t matrix;
+    y vector;
+    k scalar;
+    BEGIN
+        m = tril(a, -1);
+        t = mxm(a, a, 'plus_pair_int32', mask=>m, descr=>'st1');
+        y = reduce_cols(t) |+ reduce_rows(t);
+        k = reduce_scalar(y);
+        RETURN 3 * ((a @ y) |- 2 * (one(t) @ y) |+ y) / k;
+    END;
+    $$;
+```
 <div>
 <!-- Title: %3 Pages: 1 -->
 <svg width="970pt" height="446pt"
@@ -3134,58 +2182,4 @@ than node centrality.</p>
 </svg>
 </div>
 
-<h2 id="page-rank-todo">Page Rank TODO</h2>
-
-
-
-
-
-
-
-
-
-
-
-
-                
-              </article>
-            </div>
-          
-          
-<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
-        </div>
-        
-      </main>
-      
-        <footer class="md-footer">
-  
-  <div class="md-footer-meta md-typeset">
-    <div class="md-footer-meta__inner md-grid">
-      <div class="md-copyright">
-  
-  
-    Made with
-    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
-      Material for MkDocs
-    </a>
-  
-</div>
-      
-    </div>
-  </div>
-</footer>
-      
-    </div>
-    <div class="md-dialog" data-md-component="dialog">
-      <div class="md-dialog__inner md-typeset"></div>
-    </div>
-    
-    
-    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
-    
-    
-      <script src="../assets/javascripts/bundle.83f73b43.min.js"></script>
-      
-    
-  </body>
-</html>
+## Page Rank TODO
