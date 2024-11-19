@@ -1,7 +1,7 @@
 site_name: OneSparse
 
 nav:
-  - Home: index.md
+  - Intro: docs.md
   - Docker Demo: docker.md
   - Getting Started: test_examples_header.md
   - Matrix: test_matrix_header.md
@@ -14,7 +14,12 @@ nav:
   - UnaryOp: test_unaryop_header.md
   - Descriptor: test_descriptor_header.md
   - Type: test_type_header.md
-  
+
+use_directory_urls: false
+
+extra:
+  static_dir: landing_page
+
 theme:
   name: material
   highlightjs: true
@@ -29,8 +34,7 @@ markdown_extensions:
       pygments_lang_class: true
   - pymdownx.inlinehilite
   - pymdownx.snippets
-  - pymdownx.superfences    
+  - pymdownx.superfences
 
 extra_css:
   - stylesheets/extra.css
-
