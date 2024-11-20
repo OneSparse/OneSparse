@@ -329,10 +329,26 @@ Datum matrix_in(PG_FUNCTION_ARGS)
 				  matrix->matrix,
 				  "Error setting Matrix Element");
 		}
+		else if (typ == GrB_UINT64) {
+			uint64_t num = strtoull(number_token, &endptr, 10);
+			if (errno != 0 || *endptr != '\0')
+				elog(ERROR, "Invalid UINT64 %s", number_token);
+			OS_CHECK(GrB_Matrix_setElement(matrix->matrix, num, row, col),
+				  matrix->matrix,
+				  "Error setting Matrix Element");
+		}
 		else if (typ == GrB_INT32) {
-			long num = strtol(number_token, &endptr, 10);
+			int32_t num = strtol(number_token, &endptr, 10);
 			if (errno != 0 || *endptr != '\0')
 				elog(ERROR, "Invalid INT32 %s", number_token);
+			OS_CHECK(GrB_Matrix_setElement(matrix->matrix, num, row, col),
+				  matrix->matrix,
+				  "Error setting Matrix Element");
+		}
+		else if (typ == GrB_UINT32) {
+			uint32_t num = strtoul(number_token, &endptr, 10);
+			if (errno != 0 || *endptr != '\0')
+				elog(ERROR, "Invalid UINT32 %s", number_token);
 			OS_CHECK(GrB_Matrix_setElement(matrix->matrix, num, row, col),
 				  matrix->matrix,
 				  "Error setting Matrix Element");
@@ -341,6 +357,14 @@ Datum matrix_in(PG_FUNCTION_ARGS)
 			int num = (int)strtol(number_token, &endptr, 10);
 			if (errno != 0 || *endptr != '\0')
 				elog(ERROR, "Invalid INT16 %s", number_token);
+			OS_CHECK(GrB_Matrix_setElement(matrix->matrix, num, row, col),
+				  matrix->matrix,
+				  "Error setting Matrix Element");
+		}
+		else if (typ == GrB_UINT16) {
+			unsigned int num = (unsigned int)strtol(number_token, &endptr, 10);
+			if (errno != 0 || *endptr != '\0')
+				elog(ERROR, "Invalid UINT16 %s", number_token);
 			OS_CHECK(GrB_Matrix_setElement(matrix->matrix, num, row, col),
 				  matrix->matrix,
 				  "Error setting Matrix Element");
@@ -441,16 +465,34 @@ Datum matrix_out(PG_FUNCTION_ARGS)
 				appendStringInfo(&buf, "%lu:%lu:%ld", row, col, vi64);
 				break;
 				}
+			case GrB_UINT64_CODE:
+				{
+				uint64_t vu64 = GxB_Iterator_get_UINT64(iterator);
+				appendStringInfo(&buf, "%lu:%lu:%lu", row, col, vu64);
+				break;
+				}
 			case GrB_INT32_CODE:
 				{
 				int32_t vi32 = GxB_Iterator_get_INT32(iterator);
 				appendStringInfo(&buf, "%lu:%lu:%d", row, col, vi32);
 				break;
 				}
+			case GrB_UINT32_CODE:
+				{
+				uint32_t vu32 = GxB_Iterator_get_UINT32(iterator);
+				appendStringInfo(&buf, "%lu:%lu:%u", row, col, vu32);
+				break;
+				}
 			case GrB_INT16_CODE:
 				{
 				int16_t vi16 = GxB_Iterator_get_INT16(iterator);
 				appendStringInfo(&buf, "%lu:%lu:%d", row, col, vi16);
+				break;
+				}
+			case GrB_UINT16_CODE:
+				{
+				uint16_t vu16 = GxB_Iterator_get_UINT16(iterator);
+				appendStringInfo(&buf, "%lu:%lu:%u", row, col, vu16);
 				break;
 				}
 			case GrB_FP64_CODE:

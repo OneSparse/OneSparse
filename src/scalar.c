@@ -37,8 +37,6 @@ static Size scalar_get_flat_size(ExpandedObjectHeader *eohptr) {
 	if (scalar->flat_size)
 		return scalar->flat_size;
 
-	data_size = 0;
-
 	OS_CHECK(GrB_get(scalar->scalar, &type_code, GrB_EL_TYPE_CODE),
 		  scalar->scalar,
 		  "Cannot get Scalar Type code.");
@@ -47,35 +45,9 @@ static Size scalar_get_flat_size(ExpandedObjectHeader *eohptr) {
 		  scalar->scalar,
 		  "Error extracting scalar nvals.");
 
+	data_size = 0;
 	if (nvals)
-	{
-		if (type_code == GrB_INT64_CODE)
-		{
-			data_size = sizeof(int64_t);
-		}
-		else if (type_code == GrB_INT32_CODE)
-		{
-			data_size = sizeof(int32_t);
-		}
-		else if (type_code == GrB_INT16_CODE)
-		{
-			data_size = sizeof(int16_t);
-		}
-		else if (type_code == GrB_FP64_CODE)
-		{
-			data_size = sizeof(double);
-		}
-		else if (type_code == GrB_FP32_CODE)
-		{
-			data_size = sizeof(float);
-		}
-		else if (type_code == GrB_BOOL_CODE)
-		{
-			data_size = sizeof(bool);
-		}
-		else
-			elog(ERROR, "Unknown Type Code");
-	}
+		data_size = code_size(type_code);
 
 	scalar->flat_size = OS_SCALAR_FLATSIZE() + data_size;
 	return scalar->flat_size;
@@ -120,15 +92,45 @@ static void flatten_scalar(
 				  scalar->scalar,
 				  "Cannot extract Scalar element.");
 		}
+		else if (flat->type_code == GrB_UINT64_CODE)
+		{
+			OS_CHECK(GrB_Scalar_extractElement((uint64_t*)data, scalar->scalar),
+				  scalar->scalar,
+				  "Cannot extract Scalar element.");
+		}
 		else if (flat->type_code == GrB_INT32_CODE)
 		{
 			OS_CHECK(GrB_Scalar_extractElement((int32_t*)data, scalar->scalar),
 				  scalar->scalar,
 				  "Cannot extract Scalar element.");
 		}
+		else if (flat->type_code == GrB_UINT32_CODE)
+		{
+			OS_CHECK(GrB_Scalar_extractElement((uint32_t*)data, scalar->scalar),
+				  scalar->scalar,
+				  "Cannot extract Scalar element.");
+		}
 		else if (flat->type_code == GrB_INT16_CODE)
 		{
 			OS_CHECK(GrB_Scalar_extractElement((int16_t*)data, scalar->scalar),
+				  scalar->scalar,
+				  "Cannot extract Scalar element.");
+		}
+		else if (flat->type_code == GrB_UINT16_CODE)
+		{
+			OS_CHECK(GrB_Scalar_extractElement((uint16_t*)data, scalar->scalar),
+				  scalar->scalar,
+				  "Cannot extract Scalar element.");
+		}
+		else if (flat->type_code == GrB_INT8_CODE)
+		{
+			OS_CHECK(GrB_Scalar_extractElement((int8_t*)data, scalar->scalar),
+				  scalar->scalar,
+				  "Cannot extract Scalar element.");
+		}
+		else if (flat->type_code == GrB_UINT8_CODE)
+		{
+			OS_CHECK(GrB_Scalar_extractElement((uint8_t*)data, scalar->scalar),
 				  scalar->scalar,
 				  "Cannot extract Scalar element.");
 		}
@@ -212,40 +214,27 @@ Datum expand_scalar(os_FlatScalar *flat, MemoryContext parentcontext)
 
 	LOGF();
 
-	if (flat->type_code == GrB_INT64_CODE)
-	{
-		type = GrB_INT64;
-	}
-	else if (flat->type_code == GrB_INT32_CODE)
-	{
-		type = GrB_INT32;
-	}
-	else if (flat->type_code == GrB_INT16_CODE)
-	{
-		type = GrB_INT16;
-	}
-	else if (flat->type_code == GrB_FP64_CODE)
-	{
-		type = GrB_FP64;
-	}
-	else if (flat->type_code == GrB_FP32_CODE)
-	{
-		type = GrB_FP32;
-	}
-	else if (flat->type_code == GrB_BOOL_CODE)
-	{
-		type = GrB_BOOL;
-	}
-	else
-		elog(ERROR, "Unknown type code.");
+	type = code_type(flat->type_code);
 
 	scalar = new_scalar(type, parentcontext, NULL);
 	if (flat->nvals)
 	{
 		data = OS_SCALAR_DATA(flat);
-		if (type == GrB_INT64)
+		if (type == GrB_UINT64)
+		{
+			OS_CHECK(GrB_Scalar_setElement(scalar->scalar, *(uint64_t*)data),
+				  scalar->scalar,
+				  "Cannot set scalar element in expand.");
+		}
+		else if (type == GrB_INT64)
 		{
 			OS_CHECK(GrB_Scalar_setElement(scalar->scalar, *(int64_t*)data),
+				  scalar->scalar,
+				  "Cannot set scalar element in expand.");
+		}
+		else if (type == GrB_UINT32)
+		{
+			OS_CHECK(GrB_Scalar_setElement(scalar->scalar, *(uint32_t*)data),
 				  scalar->scalar,
 				  "Cannot set scalar element in expand.");
 		}
@@ -255,9 +244,27 @@ Datum expand_scalar(os_FlatScalar *flat, MemoryContext parentcontext)
 				  scalar->scalar,
 				  "Cannot set scalar element in expand.");
 		}
+		else if (type == GrB_UINT16)
+		{
+			OS_CHECK(GrB_Scalar_setElement(scalar->scalar, *(uint16_t*)data),
+				  scalar->scalar,
+				  "Cannot set scalar element in expand.");
+		}
 		else if (type == GrB_INT16)
 		{
 			OS_CHECK(GrB_Scalar_setElement(scalar->scalar, *(int16_t*)data),
+				  scalar->scalar,
+				  "Cannot set scalar element in expand.");
+		}
+		else if (type == GrB_UINT8)
+		{
+			OS_CHECK(GrB_Scalar_setElement(scalar->scalar, *(uint8_t*)data),
+				  scalar->scalar,
+				  "Cannot set scalar element in expand.");
+		}
+		else if (type == GrB_INT8)
+		{
+			OS_CHECK(GrB_Scalar_setElement(scalar->scalar, *(int8_t*)data),
 				  scalar->scalar,
 				  "Cannot set scalar element in expand.");
 		}
@@ -346,6 +353,24 @@ Datum _scalar_in(char *input)
 				elog(ERROR, "Invalid format for %s %s", fmt, str_val);
 		}
 	}
+	else if (strcmp(str_type, "uint64") == 0)
+	{
+		uint64_t value;
+		typ = GrB_UINT64;
+		fmt = "%llu";
+		scalar = new_scalar(typ, CurrentMemoryContext, NULL);
+		if (len)
+		{
+			if (sscanf(str_val, fmt, &value) == 1)
+			{
+				OS_CHECK(GrB_Scalar_setElement(scalar->scalar, value),
+					  scalar->scalar,
+					  "Cannot set scalar element in expand.");
+			}
+			else
+				elog(ERROR, "Invalid format for %s %s", fmt, str_val);
+		}
+	}
 	else if (strcmp(str_type, "int32") == 0)
 	{
 		int32_t value;
@@ -364,11 +389,47 @@ Datum _scalar_in(char *input)
 				elog(ERROR, "Invalid format for %s %s", fmt, str_val);
 		}
 	}
+	else if (strcmp(str_type, "uint32") == 0)
+	{
+		uint32_t value;
+		typ = GrB_UINT32;
+		fmt = "%u";
+		scalar = new_scalar(typ, CurrentMemoryContext, NULL);
+		if (len)
+		{
+			if (sscanf(str_val, fmt, &value) == 1)
+			{
+				OS_CHECK(GrB_Scalar_setElement(scalar->scalar, value),
+					  scalar->scalar,
+					  "Cannot set scalar element in expand.");
+			}
+			else
+				elog(ERROR, "Invalid format for %s %s", fmt, str_val);
+		}
+	}
 	else if (strcmp(str_type, "int16") == 0)
 	{
 		int16_t value;
 		typ = GrB_INT16;
 		fmt = "%i";
+		scalar = new_scalar(typ, CurrentMemoryContext, NULL);
+		if (len)
+		{
+			if (sscanf(str_val, fmt, &value) == 1)
+			{
+				OS_CHECK(GrB_Scalar_setElement(scalar->scalar, value),
+					  scalar->scalar,
+					  "Cannot set scalar element in expand.");
+			}
+			else
+				elog(ERROR, "Invalid format for %s %s", fmt, str_val);
+		}
+	}
+	else if (strcmp(str_type, "uint16") == 0)
+	{
+		uint16_t value;
+		typ = GrB_UINT16;
+		fmt = "%hu";
 		scalar = new_scalar(typ, CurrentMemoryContext, NULL);
 		if (len)
 		{
@@ -487,6 +548,15 @@ Datum scalar_out(PG_FUNCTION_ARGS)
 			result = palloc(GxB_MAX_NAME_LEN);
 			snprintf(result, GxB_MAX_NAME_LEN, "%s:" "%" PRIi64, sname, value);
 		}
+		else if (type_code == GrB_UINT64_CODE)
+		{
+			uint64_t value;
+			OS_CHECK(GrB_Scalar_extractElement(&value, scalar->scalar),
+				  scalar->scalar,
+				  "Error extracting scalar element.");
+			result = palloc(GxB_MAX_NAME_LEN);
+			snprintf(result, GxB_MAX_NAME_LEN, "%s:" "%" PRIu64, sname, value);
+		}
 		else if (type_code == GrB_INT32_CODE)
 		{
 			int32_t value;
@@ -496,6 +566,15 @@ Datum scalar_out(PG_FUNCTION_ARGS)
 			result = palloc(GxB_MAX_NAME_LEN);
 			snprintf(result, GxB_MAX_NAME_LEN, "%s:" "%" PRIi32, sname, value);
 		}
+		else if (type_code == GrB_UINT32_CODE)
+		{
+			uint32_t value;
+			OS_CHECK(GrB_Scalar_extractElement(&value, scalar->scalar),
+				  scalar->scalar,
+				  "Error extracting scalar element.");
+			result = palloc(GxB_MAX_NAME_LEN);
+			snprintf(result, GxB_MAX_NAME_LEN, "%s:" "%" PRIu32, sname, value);
+		}
 		else if (type_code == GrB_INT16_CODE)
 		{
 			int16_t value;
@@ -504,6 +583,15 @@ Datum scalar_out(PG_FUNCTION_ARGS)
 				  "Error extracting scalar element.");
 			result = palloc(GxB_MAX_NAME_LEN);
 			snprintf(result, GxB_MAX_NAME_LEN, "%s:" "%" PRIi16, sname, value);
+		}
+		else if (type_code == GrB_UINT16_CODE)
+		{
+			uint16_t value;
+			OS_CHECK(GrB_Scalar_extractElement(&value, scalar->scalar),
+				  scalar->scalar,
+				  "Error extracting scalar element.");
+			result = palloc(GxB_MAX_NAME_LEN);
+			snprintf(result, GxB_MAX_NAME_LEN, "%s:" "%" PRIu16, sname, value);
 		}
 		else if (type_code == GrB_FP64_CODE)
 		{
@@ -637,6 +725,15 @@ Datum scalar_print(PG_FUNCTION_ARGS) {
 				appendStringInfo(&buf, "%ld", vi64);
 				break;
 			}
+		case GrB_UINT64_CODE:
+			{
+				uint64_t vu64;
+				OS_CHECK(GrB_Scalar_extractElement(&vu64, s->scalar),
+					  s->scalar,
+					  "Error extracting scalar value.");
+				appendStringInfo(&buf, "%lu", vu64);
+				break;
+			}
 		case GrB_INT32_CODE:
 			{
 				int32_t vi32;
@@ -646,6 +743,15 @@ Datum scalar_print(PG_FUNCTION_ARGS) {
 				appendStringInfo(&buf, "%d", vi32);
 				break;
 			}
+		case GrB_UINT32_CODE:
+			{
+				uint32_t vu32;
+				OS_CHECK(GrB_Scalar_extractElement(&vu32, s->scalar),
+					  s->scalar,
+					  "Error extracting scalar value.");
+				appendStringInfo(&buf, "%u", vu32);
+				break;
+			}
 		case GrB_INT16_CODE:
 			{
 				int32_t vi16;
@@ -653,6 +759,15 @@ Datum scalar_print(PG_FUNCTION_ARGS) {
 					  s->scalar,
 					  "Error extracting scalar value.");
 				appendStringInfo(&buf, "%d", vi16);
+				break;
+			}
+		case GrB_UINT16_CODE:
+			{
+				uint32_t vu16;
+				OS_CHECK(GrB_Scalar_extractElement(&vu16, s->scalar),
+					  s->scalar,
+					  "Error extracting scalar value.");
+				appendStringInfo(&buf, "%hu", vu16);
 				break;
 			}
 		case GrB_FP64_CODE:

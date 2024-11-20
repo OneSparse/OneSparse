@@ -277,6 +277,15 @@ Datum vector_in(PG_FUNCTION_ARGS)
 				  vector->vector,
 				  "Error setting Vector Element");
         }
+        else if (typ == GrB_UINT64) {
+            uint64_t num;
+			matched = strtoull(number_token, &endptr, 10);
+            if (errno != 0 || *endptr != '\0')
+				elog(ERROR, "Invalid UINT64 %s", number_token);
+			OS_CHECK(GrB_Vector_setElement(vector->vector, num, index),
+				  vector->vector,
+				  "Error setting Vector Element");
+        }
         else if (typ == GrB_INT32) {
             long num = strtol(number_token, &endptr, 10);
             if (errno != 0 || *endptr != '\0')
@@ -285,10 +294,26 @@ Datum vector_in(PG_FUNCTION_ARGS)
 				  vector->vector,
 				  "Error setting Vector Element");
         }
+        else if (typ == GrB_UINT32) {
+            unsigned long num = strtoul(number_token, &endptr, 10);
+            if (errno != 0 || *endptr != '\0')
+				elog(ERROR, "Invalid UINT32 %s", number_token);
+			OS_CHECK(GrB_Vector_setElement(vector->vector, num, index),
+				  vector->vector,
+				  "Error setting Vector Element");
+        }
         else if (typ == GrB_INT16) {
             int num = (int)strtol(number_token, &endptr, 10);
             if (errno != 0 || *endptr != '\0')
 				elog(ERROR, "Invalid INT16 %s", number_token);
+			OS_CHECK(GrB_Vector_setElement(vector->vector, num, index),
+				  vector->vector,
+				  "Error setting Vector Element");
+        }
+        else if (typ == GrB_UINT16) {
+            unsigned int num = (int)strtoul(number_token, &endptr, 10);
+            if (errno != 0 || *endptr != '\0')
+				elog(ERROR, "Invalid UINT16 %s", number_token);
 			OS_CHECK(GrB_Vector_setElement(vector->vector, num, index),
 				  vector->vector,
 				  "Error setting Vector Element");
@@ -378,16 +403,34 @@ Datum vector_out(PG_FUNCTION_ARGS)
 				appendStringInfo(&buf, "%lu:%ld", i, vi64);
 				break;
 				}
+			case GrB_UINT64_CODE:
+				{
+				uint64_t vu64 = GxB_Iterator_get_UINT64(iterator);
+				appendStringInfo(&buf, "%lu:%ld", i, vu64);
+				break;
+				}
 			case GrB_INT32_CODE:
 				{
 				int32_t vi32 = GxB_Iterator_get_INT32(iterator);
 				appendStringInfo(&buf, "%lu:%d", i, vi32);
 				break;
 				}
+			case GrB_UINT32_CODE:
+				{
+				uint32_t vu32 = GxB_Iterator_get_UINT32(iterator);
+				appendStringInfo(&buf, "%lu:%d", i, vu32);
+				break;
+				}
 			case GrB_INT16_CODE:
 				{
 				int16_t vi16 = GxB_Iterator_get_INT16(iterator);
 				appendStringInfo(&buf, "%lu:%d", i, vi16);
+				break;
+				}
+			case GrB_UINT16_CODE:
+				{
+				uint16_t vu16 = GxB_Iterator_get_UINT16(iterator);
+				appendStringInfo(&buf, "%lu:%d", i, vu16);
 				break;
 				}
 			case GrB_FP64_CODE:

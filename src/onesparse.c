@@ -116,6 +116,38 @@ GrB_Type code_type(GrB_Type_Code code)
 	elog(ERROR, "Unknown type code");
 }
 
+size_t code_size(GrB_Type_Code code)
+{
+	switch(code)
+	{
+		case GrB_BOOL_CODE:
+			return sizeof(bool);
+		case GrB_INT64_CODE:
+			return sizeof(int64_t);
+		case GrB_UINT64_CODE:
+			return sizeof(uint64_t);
+		case GrB_INT32_CODE:
+			return sizeof(int32_t);
+		case GrB_UINT32_CODE:
+			return sizeof(uint32_t);
+		case GrB_INT16_CODE:
+			return sizeof(int16_t);
+		case GrB_UINT16_CODE:
+			return sizeof(uint16_t);
+		case GrB_INT8_CODE:
+			return sizeof(int8_t);
+		case GrB_UINT8_CODE:
+			return sizeof(uint8_t);
+		case GrB_FP64_CODE:
+			return sizeof(double);
+		case GrB_FP32_CODE:
+			return sizeof(float);
+		default:
+			elog(ERROR, "Type not yet supported");
+	}
+	elog(ERROR, "Unknown type code");
+}
+
 GrB_Type short_type(char *name)
 {
 	if (strcmp(name, "bool") == 0)
