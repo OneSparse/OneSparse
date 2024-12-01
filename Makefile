@@ -5,7 +5,8 @@ PG_CONFIG ?= pg_config
 DATA = $(wildcard onesparse/*--*.sql)
 PGXS := $(shell $(PG_CONFIG) --pgxs)
 MODULE_big = onesparse
-OBJS = $(patsubst %.c,%.o,$(wildcard src/*.c))
+OBJS = $(patsubst %.c,%.o,$(shell find src -name '*.c'))
+# OBJS = $(patsubst %.c,%.o,$(wildcard src/*.c))
 SHLIB_LINK = -lc -lgraphblas -lpq
 CFLAGS = -Wfatal-errors -std=c11
 
