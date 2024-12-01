@@ -1,4 +1,4 @@
-#include "onesparse.h"
+#include "../onesparse.h"
 
 static void context_callback_semiring_free(void*);
 static Size semiring_get_flat_size(ExpandedObjectHeader *eohptr);

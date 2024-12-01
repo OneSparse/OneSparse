@@ -1,4 +1,4 @@
-#include "onesparse.h"
+#include "../onesparse.h"
 
 static void context_callback_monoid_free(void*);
 static Size monoid_get_flat_size(ExpandedObjectHeader *eohptr);

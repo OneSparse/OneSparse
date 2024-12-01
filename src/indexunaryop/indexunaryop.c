@@ -1,4 +1,4 @@
-#include "onesparse.h"
+#include "../onesparse.h"
 
 static void context_callback_indexunaryop_free(void*);
 static Size indexunaryop_get_flat_size(ExpandedObjectHeader *eohptr);

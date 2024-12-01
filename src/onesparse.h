@@ -139,16 +139,16 @@ GrB_Semiring lookup_semiring(char *name);
 
 void _PG_init(void);
 
-#include "type.h"
-#include "descriptor.h"
-#include "unaryop.h"
-#include "indexunaryop.h"
-#include "binaryop.h"
-#include "monoid.h"
-#include "semiring.h"
-#include "scalar.h"
-#include "vector.h"
-#include "matrix.h"
+#include "type/type.h"
+#include "descriptor/descriptor.h"
+#include "unaryop/unaryop.h"
+#include "indexunaryop/indexunaryop.h"
+#include "binaryop/binaryop.h"
+#include "monoid/monoid.h"
+#include "semiring/semiring.h"
+#include "scalar/scalar.h"
+#include "vector/vector.h"
+#include "matrix/matrix.h"
 
 #endif /* OS_H */
 
