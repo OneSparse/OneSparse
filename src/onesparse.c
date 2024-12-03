@@ -215,6 +215,8 @@ const char* error_name(GrB_Info info)
 			return "INDEX_OUT_OF_BOUNDS";
 		case GrB_EMPTY_OBJECT:
 			return "EMPTY_OBJECT";
+		case GxB_JIT_ERROR:
+			return "JIT_ERROR";
 	}
 	return "Unknown Info enum value";
 }

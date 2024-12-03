@@ -32,8 +32,8 @@ RUN git clone --branch REL_17_STABLE https://github.com/postgres/postgres.git --
     && make -j 4 && sudo make install
 
 # get GraphBLAS, compile with debug symbols    
-RUN curl -s -L -J https://github.com/DrTimothyAldenDavis/GraphBLAS/archive/refs/tags/v9.2.0.tar.gz | \
-    tar zxvf - && cd GraphBLAS-9.2.0 && \
+RUN curl -s -L -J https://github.com/DrTimothyAldenDavis/GraphBLAS/archive/refs/tags/v9.4.2.tar.gz | \
+    tar zxvf - && cd GraphBLAS-9.4.2 && \
     make library \
     CMAKE_OPTIONS='-DCMAKE_BUILD_TYPE=Debug -DGRAPHBLAS_COMPACT=1' \
     && sudo make install
