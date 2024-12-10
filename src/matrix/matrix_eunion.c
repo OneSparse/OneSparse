@@ -61,6 +61,10 @@ Datum matrix_eunion(PG_FUNCTION_ARGS)
 	OS_RETURN_MATRIX(w);
 }
 
+#define lsixth(l) lfirst(list_nth_cell(l, 5))
+SUPPORT_FN(matrix_eunion, lsixth);
+#undef lsixth
+
 /* Local Variables: */
 /* mode: c */
 /* c-file-style: "postgresql" */

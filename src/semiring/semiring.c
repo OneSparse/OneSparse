@@ -22,8 +22,6 @@ PG_FUNCTION_INFO_V1(semiring_name);
 static Size semiring_get_flat_size(ExpandedObjectHeader *eohptr) {
 	os_Semiring *semiring;
 
-	LOGF();
-
 	semiring = (os_Semiring*) eohptr;
 	Assert(semiring->em_magic == semiring_MAGIC);
 
@@ -115,8 +113,6 @@ static void
 context_callback_semiring_free(void* ptr)
 {
 	os_Semiring *semiring = (os_Semiring *) ptr;
-	LOGF();
-
 	OS_CHECK(GrB_Semiring_free(&semiring->semiring),
 		  semiring->semiring,
 		  "Cannot GrB_Free Semiring");
@@ -129,9 +125,7 @@ os_Semiring* DatumGetSemiring(Datum datum)
 {
 	os_Semiring *semiring;
 	os_FlatSemiring *flat;
-
-	LOGF();
-	if (VARATT_IS_EXTERNAL_EXPANDED_RW(DatumGetPointer(datum))) {
+	if (VARATT_IS_EXTERNAL_EXPANDED(DatumGetPointer(datum))) {
 		semiring = SemiringGetEOHP(datum);
 		Assert(semiring->em_magic == semiring_MAGIC);
 		return semiring;
@@ -155,8 +149,6 @@ Datum semiring_out(PG_FUNCTION_ARGS)
 {
 	char *result;
 	os_Semiring *semiring;
-
-	LOGF();
 	semiring = OS_GETARG_SEMIRING(0);
 
 	result = palloc(strlen(semiring->name)+1);

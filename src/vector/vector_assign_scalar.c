@@ -13,6 +13,7 @@ vector_assign_scalar(PG_FUNCTION_ARGS)
 	GrB_Index size, ni = 0, *indexes = NULL;
 	int nargs;
 
+	LOGF();
 	nargs = PG_NARGS();
 	u = OS_GETARG_VECTOR(0);
 	s = OS_GETARG_SCALAR(1);
@@ -42,6 +43,8 @@ vector_assign_scalar(PG_FUNCTION_ARGS)
 
 	OS_RETURN_VECTOR(u);
 }
+
+SUPPORT_FN(vector_assign_scalar, linitial);
 
 /* Local Variables: */
 /* mode: c */

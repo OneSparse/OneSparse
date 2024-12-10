@@ -12,6 +12,7 @@ vector_extract_vector(PG_FUNCTION_ARGS)
 	GrB_Index size, ni = 0, *indexes = NULL;
 	int nargs;
 
+	LOGF();
 	nargs = PG_NARGS();
 	u = OS_GETARG_VECTOR(0);
 	OS_VTYPE(type, u);
@@ -47,6 +48,8 @@ vector_extract_vector(PG_FUNCTION_ARGS)
 			 "Error in extract vector.");
 	OS_RETURN_VECTOR(w);
 }
+
+SUPPORT_FN(vector_extract_vector, lthird);
 
 /* Local Variables: */
 /* mode: c */

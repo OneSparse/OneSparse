@@ -55,6 +55,8 @@ Datum matrix_eadd(PG_FUNCTION_ARGS)
 	OS_RETURN_MATRIX(w);
 }
 
+SUPPORT_FN(matrix_eadd, lfourth);
+
 /* Local Variables: */
 /* mode: c */
 /* c-file-style: "postgresql" */

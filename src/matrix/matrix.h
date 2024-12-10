@@ -9,6 +9,7 @@ typedef struct os_FlatMatrix {
 	GrB_Index nrows;
 	GrB_Index ncols;
 	GrB_Index serialized_size;
+	Oid loid;
 } os_FlatMatrix;
 
 typedef struct os_Matrix  {
@@ -18,6 +19,7 @@ typedef struct os_Matrix  {
     Size flat_size;
     void* serialized_data;
     GrB_Index serialized_size;
+	Oid loid;
 } os_Matrix;
 
 typedef struct os_Matrix_ExtractState {

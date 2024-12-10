@@ -18,8 +18,6 @@ static Size matrix_get_flat_size(ExpandedObjectHeader *eohptr) {
 	void *serialized_data;
 	GrB_Index serialized_size;
 
-	LOGF();
-
 	matrix = (os_Matrix*) eohptr;
 	Assert(matrix->em_magic == matrix_MAGIC);
 
@@ -171,8 +169,6 @@ static void
 context_callback_matrix_free(void* ptr)
 {
 	os_Matrix *matrix = (os_Matrix *) ptr;
-	LOGF();
-
 	OS_CHECK(GrB_Matrix_free(&matrix->matrix),
 		  matrix->matrix,
 		  "Cannot GrB_Free Matrix");
@@ -185,8 +181,7 @@ os_Matrix* DatumGetMatrix(Datum datum)
 {
 	os_Matrix *matrix;
 	os_FlatMatrix *flat;
-	LOGF();
-	if (VARATT_IS_EXTERNAL_EXPANDED_RW(DatumGetPointer(datum))) {
+	if (VARATT_IS_EXTERNAL_EXPANDED(DatumGetPointer(datum))) {
 		matrix = MatrixGetEOHP(datum);
 		Assert(matrix->em_magic == matrix_MAGIC);
 		return matrix;

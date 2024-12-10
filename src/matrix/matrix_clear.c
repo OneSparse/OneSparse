@@ -16,6 +16,7 @@ Datum matrix_clear(PG_FUNCTION_ARGS)
 	OS_RETURN_MATRIX(A);
 }
 
+SUPPORT_FN(matrix_clear, linitial);
 
 /* Local Variables: */
 /* mode: c */

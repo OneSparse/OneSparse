@@ -54,6 +54,8 @@ Datum matrix_emult(PG_FUNCTION_ARGS)
 	OS_RETURN_MATRIX(w);
 }
 
+SUPPORT_FN(matrix_emult, lfourth);
+
 /* Local Variables: */
 /* mode: c */
 /* c-file-style: "postgresql" */

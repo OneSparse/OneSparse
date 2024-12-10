@@ -8,7 +8,6 @@ Datum vector_get_element(PG_FUNCTION_ARGS)
 	GrB_Index i;
 	GrB_Type type;
 
-
 	LOGF();
 	ERRORNULL(0);
 	ERRORNULL(1);

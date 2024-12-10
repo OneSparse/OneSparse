@@ -56,6 +56,7 @@ Datum matrix_mxm(PG_FUNCTION_ARGS)
 	OS_RETURN_MATRIX(c);
 }
 
+SUPPORT_FN(matrix_mxm, lfourth);
 
 /* Local Variables: */
 /* mode: c */

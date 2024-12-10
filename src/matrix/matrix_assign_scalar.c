@@ -51,6 +51,8 @@ matrix_assign_scalar(PG_FUNCTION_ARGS)
 
 	OS_RETURN_MATRIX(C);
 }
+SUPPORT_FN(matrix_assign_scalar, linitial);
+
 /* Local Variables: */
 /* mode: c */
 /* c-file-style: "postgresql" */

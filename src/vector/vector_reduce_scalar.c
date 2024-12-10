@@ -12,6 +12,7 @@ vector_reduce_scalar(PG_FUNCTION_ARGS)
 	GrB_Type type;
 	int nargs;
 
+	LOGF();
 	nargs = PG_NARGS();
 	A = OS_GETARG_VECTOR(0);
 	OS_VTYPE(type, A);
@@ -43,6 +44,8 @@ vector_reduce_scalar(PG_FUNCTION_ARGS)
 		  "Cannot reduce vector to scalar");
 	OS_RETURN_SCALAR(result);
 }
+
+SUPPORT_FN(vector_reduce_scalar, lthird);
 
 /* Local Variables: */
 /* mode: c */

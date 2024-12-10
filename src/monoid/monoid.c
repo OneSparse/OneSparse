@@ -22,7 +22,6 @@ PG_FUNCTION_INFO_V1(monoid_name);
 static Size monoid_get_flat_size(ExpandedObjectHeader *eohptr) {
 	os_Monoid *monoid;
 
-	LOGF();
 
 	monoid = (os_Monoid*) eohptr;
 	Assert(monoid->em_magic == monoid_MAGIC);
@@ -115,8 +114,6 @@ static void
 context_callback_monoid_free(void* ptr)
 {
 	os_Monoid *monoid = (os_Monoid *) ptr;
-	LOGF();
-
 	OS_CHECK(GrB_Monoid_free(&monoid->monoid),
 		  monoid->monoid,
 		  "Cannot GrB_Free Monoid");
@@ -130,8 +127,7 @@ os_Monoid* DatumGetMonoid(Datum datum)
 	os_Monoid *monoid;
 	os_FlatMonoid *flat;
 
-	LOGF();
-	if (VARATT_IS_EXTERNAL_EXPANDED_RW(DatumGetPointer(datum))) {
+	if (VARATT_IS_EXTERNAL_EXPANDED(DatumGetPointer(datum))) {
 		monoid = MonoidGetEOHP(datum);
 		Assert(monoid->em_magic == monoid_MAGIC);
 		return monoid;
@@ -156,7 +152,6 @@ Datum monoid_out(PG_FUNCTION_ARGS)
 	char *result;
 	os_Monoid *monoid;
 
-	LOGF();
 	monoid = OS_GETARG_MONOID(0);
 
 	result = palloc(strlen(monoid->name)+1);

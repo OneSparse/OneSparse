@@ -58,6 +58,8 @@ Datum matrix_kron(PG_FUNCTION_ARGS)
 	OS_RETURN_MATRIX(c);
 }
 
+SUPPORT_FN(matrix_kron, lfourth);
+
 /* Local Variables: */
 /* mode: c */
 /* c-file-style: "postgresql" */

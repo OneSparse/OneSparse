@@ -24,8 +24,6 @@ void initialize_binaryops(void);
 static Size binaryop_get_flat_size(ExpandedObjectHeader *eohptr) {
 	os_BinaryOp *binaryop;
 
-	LOGF();
-
 	binaryop = (os_BinaryOp*) eohptr;
 	Assert(binaryop->em_magic == binaryop_MAGIC);
 
@@ -117,7 +115,6 @@ static void
 context_callback_binaryop_free(void* ptr)
 {
 	os_BinaryOp *binaryop = (os_BinaryOp *) ptr;
-	LOGF();
 
 	OS_CHECK(GrB_BinaryOp_free(&binaryop->binaryop),
 		  binaryop->binaryop,
@@ -132,8 +129,7 @@ os_BinaryOp* DatumGetBinaryOp(Datum datum)
 	os_BinaryOp *binaryop;
 	os_FlatBinaryOp *flat;
 
-	LOGF();
-	if (VARATT_IS_EXTERNAL_EXPANDED_RW(DatumGetPointer(datum))) {
+	if (VARATT_IS_EXTERNAL_EXPANDED(DatumGetPointer(datum))) {
 		binaryop = BinaryOpGetEOHP(datum);
 		Assert(binaryop->em_magic == binaryop_MAGIC);
 		return binaryop;
@@ -158,7 +154,6 @@ Datum binaryop_out(PG_FUNCTION_ARGS)
 	char *result;
 	os_BinaryOp *binaryop;
 
-	LOGF();
 	binaryop = OS_GETARG_BINARYOP(0);
 
 	result = palloc(strlen(binaryop->name)+1);

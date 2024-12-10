@@ -57,35 +57,50 @@ CREATE CAST (vector AS bool)
     AS IMPLICIT;
 
 CREATE FUNCTION size(vector)
-RETURNS int8
+RETURNS bigint
 AS '$libdir/onesparse', 'vector_size'
+LANGUAGE C;
+
+CREATE FUNCTION vector_eadd_support(internal)
+RETURNS internal
+AS '$libdir/onesparse', 'vector_eadd_support'
 LANGUAGE C;
 
 CREATE FUNCTION eadd(
     a vector,
     b vector,
     op binaryop default null,
-    inout c vector default null,
+    c vector default null,
     mask vector default null,
     accum binaryop default null,
     descr descriptor default null
     )
 RETURNS vector
 AS '$libdir/onesparse', 'vector_eadd'
-LANGUAGE C STABLE;
+LANGUAGE C SUPPORT vector_eadd_support;
+
+CREATE FUNCTION vector_emult_support(internal)
+RETURNS internal
+AS '$libdir/onesparse', 'vector_emult_support'
+LANGUAGE C;
 
 CREATE FUNCTION emult(
     a vector,
     b vector,
     op binaryop default null,
-    inout c vector default null,
+    c vector default null,
     mask vector default null,
     accum binaryop default null,
     descr descriptor default null
     )
 RETURNS vector
 AS '$libdir/onesparse', 'vector_emult'
-LANGUAGE C STABLE;
+LANGUAGE C SUPPORT vector_emult_support;
+
+CREATE FUNCTION vector_eunion_support(internal)
+RETURNS internal
+AS '$libdir/onesparse', 'vector_eunion_support'
+LANGUAGE C;
 
 CREATE FUNCTION eunion(
     a vector,
@@ -93,14 +108,14 @@ CREATE FUNCTION eunion(
     b vector,
     beta scalar,
     op binaryop default null,
-    inout c vector default null,
+    c vector default null,
     mask vector default null,
     accum binaryop default null,
     descr descriptor default null
     )
 RETURNS vector
 AS '$libdir/onesparse', 'vector_eunion'
-LANGUAGE C STABLE;
+LANGUAGE C SUPPORT vector_eunion_support;
 
 CREATE FUNCTION reduce_scalar(
     a vector,
@@ -113,56 +128,81 @@ RETURNS scalar
 AS '$libdir/onesparse', 'vector_reduce_scalar'
 LANGUAGE C STABLE;
 
+CREATE FUNCTION vector_select_support(internal)
+RETURNS internal
+AS '$libdir/onesparse', 'vector_select_support'
+LANGUAGE C;
+
 CREATE FUNCTION choose(
     a vector,
     op indexunaryop,
     y scalar,
-    inout c vector default null,
+    c vector default null,
     mask vector default null,
     accum binaryop default null,
     descr descriptor default null
     )
 RETURNS vector
 AS '$libdir/onesparse', 'vector_select'
-LANGUAGE C STABLE;
+LANGUAGE C SUPPORT vector_select_support;
+
+CREATE FUNCTION vector_apply_support(internal)
+RETURNS internal
+AS '$libdir/onesparse', 'vector_apply_support'
+LANGUAGE C;
 
 CREATE FUNCTION apply(
     a vector,
     op unaryop,
-    inout c vector default null,
+    c vector default null,
     mask vector default null,
     accum binaryop default null,
     descr descriptor default null
     )
 RETURNS vector
 AS '$libdir/onesparse', 'vector_apply'
-LANGUAGE C STABLE;
+LANGUAGE C SUPPORT vector_apply_support;
+
+CREATE FUNCTION vector_apply_first_support(internal)
+RETURNS internal
+AS '$libdir/onesparse', 'vector_apply_first_support'
+LANGUAGE C;
 
 CREATE FUNCTION apply(
     s scalar,
     a vector,
     op binaryop default null,
-    inout c vector default null,
+    c vector default null,
     mask vector default null,
     accum binaryop default null,
     descr descriptor default null
     )
 RETURNS vector
 AS '$libdir/onesparse', 'vector_apply_first'
-LANGUAGE C STABLE;
+LANGUAGE C SUPPORT vector_apply_first_support;
+
+CREATE FUNCTION vector_apply_second_support(internal)
+RETURNS internal
+AS '$libdir/onesparse', 'vector_apply_second_support'
+LANGUAGE C;
 
 CREATE FUNCTION apply(
     a vector,
     s scalar,
     op binaryop default null,
-    inout c vector default null,
+    c vector default null,
     mask vector default null,
     accum binaryop default null,
     descr descriptor default null
     )
 RETURNS vector
 AS '$libdir/onesparse', 'vector_apply_second'
-LANGUAGE C STABLE;
+LANGUAGE C SUPPORT vector_apply_second_support;
+
+CREATE FUNCTION vector_assign_support(internal)
+RETURNS internal
+AS '$libdir/onesparse', 'vector_assign_support'
+LANGUAGE C;
 
 CREATE FUNCTION assign(
     c vector,
@@ -174,7 +214,12 @@ CREATE FUNCTION assign(
     )
 RETURNS vector
 AS '$libdir/onesparse', 'vector_assign'
-LANGUAGE C STABLE;
+LANGUAGE C SUPPORT vector_assign_support;
+
+CREATE FUNCTION vector_assign_scalar_support(internal)
+RETURNS internal
+AS '$libdir/onesparse', 'vector_assign_scalar_support'
+LANGUAGE C;
 
 CREATE FUNCTION assign(
     c vector,
@@ -186,7 +231,12 @@ CREATE FUNCTION assign(
     )
 RETURNS vector
 AS '$libdir/onesparse', 'vector_assign_scalar'
-LANGUAGE C STABLE;
+LANGUAGE C SUPPORT vector_assign_scalar_support;
+
+CREATE FUNCTION vector_extract_vector_support(internal)
+RETURNS internal
+AS '$libdir/onesparse', 'vector_extract_vector_support'
+LANGUAGE C;
 
 CREATE FUNCTION xtract(
     a vector,
@@ -198,22 +248,36 @@ CREATE FUNCTION xtract(
     )
 RETURNS vector
 AS '$libdir/onesparse', 'vector_extract_vector'
-LANGUAGE C STABLE;
+LANGUAGE C SUPPORT vector_extract_vector_support;
 
-CREATE FUNCTION set_element(inout a vector, i bigint, s scalar)
+CREATE FUNCTION cast_to(a vector, t type)
+RETURNS vector
+    RETURN apply(a, ('identity_' || name(t))::unaryop, c=>vector(t, size(a)));
+
+CREATE FUNCTION vector_set_element_support(internal)
+RETURNS internal
+AS '$libdir/onesparse', 'vector_set_element_support'
+LANGUAGE C;
+
+CREATE FUNCTION set_element(a vector, i bigint, s scalar)
 RETURNS vector
 AS '$libdir/onesparse', 'vector_set_element'
-LANGUAGE C VOLATILE;
+LANGUAGE C SUPPORT vector_set_element_support;
 
 CREATE FUNCTION get_element(a vector, i bigint)
 RETURNS scalar
 AS '$libdir/onesparse', 'vector_get_element'
 LANGUAGE C STABLE;
 
+CREATE FUNCTION vector_remove_element_support(internal)
+RETURNS internal
+AS '$libdir/onesparse', 'vector_remove_element_support'
+LANGUAGE C;
+
 CREATE FUNCTION remove_element(a vector, i bigint)
 RETURNS vector
 AS '$libdir/onesparse', 'vector_remove_element'
-LANGUAGE C STABLE;
+LANGUAGE C SUPPORT vector_remove_element_support;
 
 CREATE FUNCTION contains(a vector, i bigint)
 RETURNS bool
@@ -270,20 +334,30 @@ RETURNS text
 AS '$libdir/onesparse', 'vector_info'
 LANGUAGE C STABLE;
 
-CREATE FUNCTION wait(vector, waitmode integer default 0)
-RETURNS void
-AS '$libdir/onesparse', 'vector_wait'
+CREATE FUNCTION vector_wait_support(internal)
+RETURNS internal
+AS '$libdir/onesparse', 'vector_wait_support'
 LANGUAGE C;
+
+CREATE FUNCTION wait(vector, waitmode integer default 0)
+RETURNS vector
+AS '$libdir/onesparse', 'vector_wait'
+LANGUAGE C SUPPORT vector_wait_support;
 
 CREATE FUNCTION dup(vector)
 RETURNS vector
 AS '$libdir/onesparse', 'vector_dup'
 LANGUAGE C;
 
+CREATE FUNCTION vector_clear_support(internal)
+RETURNS internal
+AS '$libdir/onesparse', 'vector_clear_support'
+LANGUAGE C;
+
 CREATE FUNCTION clear(vector)
 RETURNS vector
 AS '$libdir/onesparse', 'vector_clear'
-LANGUAGE C;
+LANGUAGE C SUPPORT vector_clear_support;
 
 CREATE FUNCTION eadd_min(
     a vector,

@@ -22,8 +22,6 @@ PG_FUNCTION_INFO_V1(unaryop_name);
 static Size unaryop_get_flat_size(ExpandedObjectHeader *eohptr) {
 	os_UnaryOp *unaryop;
 
-	LOGF();
-
 	unaryop = (os_UnaryOp*) eohptr;
 	Assert(unaryop->em_magic == unaryop_MAGIC);
 
@@ -115,8 +113,6 @@ static void
 context_callback_unaryop_free(void* ptr)
 {
 	os_UnaryOp *unaryop = (os_UnaryOp *) ptr;
-	LOGF();
-
 	OS_CHECK(GrB_UnaryOp_free(&unaryop->unaryop),
 		  unaryop->unaryop,
 		  "Cannot GrB_Free UnaryOp");
@@ -129,9 +125,7 @@ os_UnaryOp* DatumGetUnaryOp(Datum datum)
 {
 	os_UnaryOp *unaryop;
 	os_FlatUnaryOp *flat;
-
-	LOGF();
-	if (VARATT_IS_EXTERNAL_EXPANDED_RW(DatumGetPointer(datum))) {
+	if (VARATT_IS_EXTERNAL_EXPANDED(DatumGetPointer(datum))) {
 		unaryop = UnaryOpGetEOHP(datum);
 		Assert(unaryop->em_magic == unaryop_MAGIC);
 		return unaryop;
@@ -155,8 +149,6 @@ Datum unaryop_out(PG_FUNCTION_ARGS)
 {
 	char *result;
 	os_UnaryOp *unaryop;
-
-	LOGF();
 	unaryop = OS_GETARG_UNARYOP(0);
 
 	result = palloc(strlen(unaryop->name)+1);

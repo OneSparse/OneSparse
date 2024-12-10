@@ -18,8 +18,6 @@ static Size vector_get_flat_size(ExpandedObjectHeader *eohptr) {
 	void *serialized_data;
 	GrB_Index serialized_size;
 
-	LOGF();
-
 	vector = (os_Vector*) eohptr;
 	Assert(vector->em_magic == vector_MAGIC);
 
@@ -157,8 +155,6 @@ static void
 context_callback_vector_free(void* ptr)
 {
 	os_Vector *vector = (os_Vector *) ptr;
-	LOGF();
-
 	OS_CHECK(GrB_Vector_free(&vector->vector),
 		  vector->vector,
 		  "Cannot GrB_Free Vector");
@@ -172,8 +168,7 @@ os_Vector* DatumGetVector(Datum datum)
 	os_Vector *vector;
 	os_FlatVector *flat;
 
-	LOGF();
-	if (VARATT_IS_EXTERNAL_EXPANDED_RW(DatumGetPointer(datum))) {
+	if (VARATT_IS_EXTERNAL_EXPANDED(DatumGetPointer(datum))) {
 		vector = VectorGetEOHP(datum);
 		Assert(vector->em_magic == vector_MAGIC);
 		return vector;
