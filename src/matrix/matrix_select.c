@@ -4,11 +4,12 @@ PG_FUNCTION_INFO_V1(matrix_select);
 Datum matrix_select(PG_FUNCTION_ARGS)
 {
 	GrB_Type type;
-	os_Matrix *A, *C, *mask;
-	os_Scalar *y;
-	os_Descriptor *descriptor;
-	os_BinaryOp *accum;
+	os_Matrix *A, *C;
 	os_IndexUnaryOp *op;
+	os_Scalar *y;
+	GrB_Matrix mask;
+	GrB_Descriptor descriptor;
+	GrB_BinaryOp accum;
 	GrB_Index nrows, ncols;
 	int nargs;
 
@@ -32,17 +33,17 @@ Datum matrix_select(PG_FUNCTION_ARGS)
 	else
 		C = OS_GETARG_MATRIX(3);
 
-	mask = OS_GETARG_MATRIX_OR_NULL(nargs, 4);
-	accum = OS_GETARG_BINARYOP_OR_NULL(nargs, 5);
-	descriptor = OS_GETARG_DESCRIPTOR_OR_NULL(nargs, 6);
+	mask = OS_GETARG_MATRIX_HANDLE_OR_NULL(nargs, 4);
+	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 5);
+	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 6);
 
 	OS_CHECK(GrB_select(C->matrix,
-					 mask ? mask->matrix : NULL,
-					 accum ? accum->binaryop : NULL,
-					 op->indexunaryop,
-					 A->matrix,
-					 y ? y->scalar : NULL,
-					 descriptor ? descriptor->descriptor : NULL),
+						mask,
+						accum,
+						op->indexunaryop,
+						A->matrix,
+						y ? y->scalar : NULL,
+						descriptor),
 		  C->matrix,
 		  "Error in GrB_select");
 

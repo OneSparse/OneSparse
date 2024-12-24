@@ -4,11 +4,12 @@ PG_FUNCTION_INFO_V1(vector_select);
 Datum vector_select(PG_FUNCTION_ARGS)
 {
 	GrB_Type type;
-	os_Vector *u, *w, *mask;
+	os_Vector *u, *w;
 	os_Scalar *y;
-	os_Descriptor *descriptor;
-	os_BinaryOp *accum;
 	os_IndexUnaryOp *op;
+	GrB_Vector mask;
+	GrB_BinaryOp accum;
+	GrB_Descriptor descriptor;
 	GrB_Index usize;
 	int nargs;
 
@@ -35,19 +36,19 @@ Datum vector_select(PG_FUNCTION_ARGS)
 	else
 		w = OS_GETARG_VECTOR(3);
 
-	mask = OS_GETARG_VECTOR_OR_NULL(nargs, 4);
-	accum = OS_GETARG_BINARYOP_OR_NULL(nargs, 5);
-	descriptor = OS_GETARG_DESCRIPTOR_OR_NULL(nargs, 6);
+	mask = OS_GETARG_VECTOR_HANDLE_OR_NULL(nargs, 4);
+	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 5);
+	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 6);
 
 	OS_CHECK(GrB_select(w->vector,
-					 mask ? mask->vector : NULL,
-					 accum ? accum->binaryop : NULL,
-					 op->indexunaryop,
-					 u->vector,
-					 y ? y->scalar : NULL,
-					 descriptor ? descriptor->descriptor : NULL),
-		  w->vector,
-		  "Error in GrB_select");
+						mask,
+						accum,
+						op->indexunaryop,
+						u->vector,
+						y ? y->scalar : NULL,
+						descriptor),
+			 w->vector,
+			 "Error in GrB_select");
 
 	OS_RETURN_VECTOR(w);
 }

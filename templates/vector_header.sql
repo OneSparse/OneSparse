@@ -359,6 +359,16 @@ RETURNS vector
 AS '$libdir/onesparse', 'vector_clear'
 LANGUAGE C SUPPORT vector_clear_support;
 
+CREATE FUNCTION vector_resize_support(internal)
+RETURNS internal
+AS '$libdir/onesparse', 'vector_resize_support'
+LANGUAGE C;
+
+CREATE FUNCTION resize(a vector, i bigint default -1)
+RETURNS vector
+AS '$libdir/onesparse', 'vector_resize'
+LANGUAGE C SUPPORT vector_resize_support;
+
 CREATE FUNCTION eadd_min(
     a vector,
     b vector,

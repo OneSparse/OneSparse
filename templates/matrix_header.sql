@@ -442,6 +442,11 @@ RETURNS matrix
 AS '$libdir/onesparse', 'matrix_apply_second'
 LANGUAGE C SUPPORT matrix_apply_second_support;
 
+CREATE FUNCTION diag(a vector)
+RETURNS matrix
+AS '$libdir/onesparse', 'matrix_diag'
+LANGUAGE C;
+
 CREATE FUNCTION nnz(a matrix)
 RETURNS scalar
     RETURN reduce_scalar(apply(a, 'one_bool'::unaryop, c=>'int64'::matrix));

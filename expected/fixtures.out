@@ -47,3 +47,49 @@ create or replace function test_expand_expand(graph matrix) returns matrix langu
         return test_expand(graph);
     end;
     $$;
+create or replace function test_se(graph matrix) returns matrix language plpgsql as
+    $$
+    declare
+        nvals bigint;
+    begin
+        graph = wait(graph);
+        nvals = nvals(graph);
+        raise notice 'nvals: %', nvals;
+        graph = set_element(graph, 4, 2, 42);
+        graph = set_element(graph, 4, 3, 43);
+        graph = set_element(graph, 4, 4, 44);
+        return graph;
+    end;
+    $$;
+create or replace function tcount_b(graph matrix) returns bigint language plpgsql as
+    $$
+    begin
+        graph = wait(graph);
+        graph = mxm(graph, graph, 'plus_pair_int32', mask=>graph, descr=>'s');
+        return reduce_scalar(graph) / 6;
+    end;
+    $$;
+create or replace function tcount_b(graph matrix) returns bigint language plpgsql as
+    $$
+    begin
+        graph = wait(graph);
+        graph = mxm(graph, graph, 'plus_pair_int32', mask=>graph, descr=>'s');
+        return reduce_scalar(graph) / 6;
+    end;
+    $$;
+create or replace function te(a matrix)
+    returns vector language plpgsql as
+    $$
+    declare
+        v vector;
+        w vector;
+        t matrix;
+    begin
+        v = wait('int32'::vector);
+        t = wait('int32'::matrix);
+        w = one(v) @ t;
+        w = w |+ v;
+        v = apply(2, w, 'times_int32');
+        return v;
+    end;
+    $$;

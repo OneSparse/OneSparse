@@ -38,9 +38,6 @@ os_Vector* DatumGetVector(Datum d);
 
 #define OS_DETOAST_VECTOR(_datum) (os_FlatVector*)PG_DETOAST_DATUM(datum)
 #define OS_GETARG_VECTOR(_arg_num)  DatumGetVector(PG_GETARG_DATUM(_arg_num))
-#define OS_GETARG_VECTOR_HANDLE(_arg_num)  DatumGetVector(PG_GETARG_DATUM(_arg_num))->vector;
-#define OS_GETARG_VECTOR_OR_NULL(_nargs, _arg_num) \
-	_nargs > _arg_num ? PG_ARGISNULL(_arg_num) ? NULL : OS_GETARG_VECTOR(_arg_num) : NULL;
 #define OS_GETARG_VECTOR_HANDLE_OR_NULL(_nargs, _arg_num) \
 	_nargs > _arg_num ? PG_ARGISNULL(_arg_num) ? NULL : OS_GETARG_VECTOR(_arg_num)->vector : NULL;
 #define OS_RETURN_VECTOR(_vector) return EOHPGetRWDatum(&(_vector)->hdr)
