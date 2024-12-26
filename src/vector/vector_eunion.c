@@ -20,7 +20,7 @@ Datum vector_eunion(PG_FUNCTION_ARGS)
 
 	u = OS_GETARG_VECTOR(0);
 	a = OS_GETARG_SCALAR(1);
-	v = OS_GETARG_VECTOR(2);
+	v = OS_GETARG_VECTOR_A(2, u);
 	b = OS_GETARG_SCALAR(3);
 	nargs = PG_NARGS();
 
@@ -40,9 +40,9 @@ Datum vector_eunion(PG_FUNCTION_ARGS)
 		w = new_vector(wtype, usize, CurrentMemoryContext, NULL);
 	}
 	else
-		w = OS_GETARG_VECTOR(5);
+		w = OS_GETARG_VECTOR_AB(5, u, v);
 
-	mask = OS_GETARG_VECTOR_HANDLE_OR_NULL(nargs, 6);
+	mask = OS_GETARG_VECTOR_HANDLE_OR_NULL_ABC(nargs, 6, u, v, w);
 	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 7);
 	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 8);
 

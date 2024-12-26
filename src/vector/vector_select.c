@@ -34,9 +34,9 @@ Datum vector_select(PG_FUNCTION_ARGS)
 		w = new_vector(type, usize, CurrentMemoryContext, NULL);
 	}
 	else
-		w = OS_GETARG_VECTOR(3);
+		w = OS_GETARG_VECTOR_A(3, u);
 
-	mask = OS_GETARG_VECTOR_HANDLE_OR_NULL(nargs, 4);
+	mask = OS_GETARG_VECTOR_HANDLE_OR_NULL_AB(nargs, 4, u, w);
 	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 5);
 	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 6);
 

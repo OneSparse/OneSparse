@@ -3,8 +3,8 @@
 PG_FUNCTION_INFO_V1(matrix_emult);
 Datum matrix_emult(PG_FUNCTION_ARGS)
 {
-	GrB_Type utype, vtype, wtype;
-	os_Matrix *u, *v, *w;
+	GrB_Type atype, btype, ctype;
+	os_Matrix *a, *b, *c;
 	GrB_Matrix mask;
 	GrB_Descriptor descriptor;
 	GrB_BinaryOp op, accum;
@@ -16,42 +16,42 @@ Datum matrix_emult(PG_FUNCTION_ARGS)
 	ERRORNULL(1);
 
 	nargs = PG_NARGS();
-	u = OS_GETARG_MATRIX(0);
-	v = OS_GETARG_MATRIX(1);
-	OS_MTYPE(utype, u);
-	OS_MTYPE(vtype, v);
-	wtype = type_promote(utype, vtype);
+	a = OS_GETARG_MATRIX(0);
+	b = OS_GETARG_MATRIX_A(1, a);
+	OS_MTYPE(atype, a);
+	OS_MTYPE(btype, b);
+	ctype = type_promote(atype, btype);
 
 	op = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 2);
 	if (op == NULL)
 	{
-		op = default_binaryop(wtype);
+		op = default_binaryop(ctype);
 	}
 
 	if (PG_ARGISNULL(3))
 	{
-		OS_MNROWS(nrows, u);
-		OS_MNCOLS(ncols, u);
-		w = new_matrix(wtype, nrows, ncols, CurrentMemoryContext, NULL);
+		OS_MNROWS(nrows, a);
+		OS_MNCOLS(ncols, a);
+		c = new_matrix(ctype, nrows, ncols, CurrentMemoryContext, NULL);
 	}
 	else
-		w = OS_GETARG_MATRIX(3);
+		c = OS_GETARG_MATRIX_AB(3, a, b);
 
-	mask = OS_GETARG_MATRIX_HANDLE_OR_NULL(nargs, 4);
+	mask = OS_GETARG_MATRIX_HANDLE_OR_NULL_ABC(nargs, 4, a, b, c);
 	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 5);
 	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 6);
 
-	OS_CHECK(GrB_eWiseMult(w->matrix,
+	OS_CHECK(GrB_eWiseMult(c->matrix,
 						   mask,
 						   accum,
 						   op,
-						   u->matrix,
-						   v->matrix,
+						   a->matrix,
+						   b->matrix,
 						   descriptor),
-			 w->matrix,
+			 c->matrix,
 			 "Error matrix eWiseMult.");
 
-	OS_RETURN_MATRIX(w);
+	OS_RETURN_MATRIX(c);
 }
 
 SUPPORT_FN(matrix_emult, lfourth);

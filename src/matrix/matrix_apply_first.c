@@ -35,9 +35,9 @@ Datum matrix_apply_first(PG_FUNCTION_ARGS)
 		c = new_matrix(type, nrows, ncols, CurrentMemoryContext, NULL);
 	}
 	else
-		c = OS_GETARG_MATRIX(3);
+		c = OS_GETARG_MATRIX_A(3, a);
 
-	mask = OS_GETARG_MATRIX_HANDLE_OR_NULL(nargs, 4);
+	mask = OS_GETARG_MATRIX_HANDLE_OR_NULL_AB(nargs, 4, a, c);
 	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 5);
 	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 6);
 

@@ -182,6 +182,7 @@ create or replace function pagerank(
     a matrix,
     damping real default 0.85,
     itermax integer default 100,
+    itermin integer default 50,
     tol real default 1e-4
     )
     returns vector language plpgsql as
@@ -219,17 +220,10 @@ create or replace function pagerank(
         r = assign(r, 1::real / n);
         d_out = assign(d_out, damping::scalar, accum=>div);
         for i in 0..itermax loop
-            -- temp = wait(w);
-            -- t = wait(r);
-            -- r = wait(temp);
             t = dup(r);
             r = assign(r, teleport);
             w = eadd(t, d_out, div, c=>w);
             r = mxv(a, w, plus_second, c=>r, accum=>plus, descr=>t0);
-            t = assign(t, r, accum=>minus);
-            t = apply(t, abs, c=>t);
-            rdiff = reduce_scalar(t);
-            exit when rdiff < tol;
         end loop;
         end_time = clock_timestamp();
         raise notice 'PageRank: %', end_time - start_time;

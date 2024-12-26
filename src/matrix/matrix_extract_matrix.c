@@ -35,10 +35,10 @@ Datum matrix_extract_matrix(PG_FUNCTION_ARGS)
 	}
 	else
 	{
-		C = OS_GETARG_MATRIX(3);
+		C = OS_GETARG_MATRIX_A(3, A);
 	}
 
-	mask = OS_GETARG_MATRIX_HANDLE_OR_NULL(nargs, 4);
+	mask = OS_GETARG_MATRIX_HANDLE_OR_NULL_AB(nargs, 4, A, C);
 	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 5);
 	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 6);
 

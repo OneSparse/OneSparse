@@ -178,6 +178,94 @@ os_Vector* DatumGetVector(Datum datum)
 	return VectorGetEOHP(datum);
 }
 
+os_Vector* DatumGetVectorMaybeA(Datum datum, os_Vector *A)
+{
+	os_Vector *vector;
+	os_FlatVector *flat;
+	Pointer flat_datum_pointer;
+	LOGF();
+
+	if (VARATT_IS_EXTERNAL_EXPANDED(DatumGetPointer(datum))) {
+		vector = VectorGetEOHP(datum);
+		Assert(vector->em_magic == vector_MAGIC);
+		return vector;
+	}
+
+	else if (DatumGetPointer(datum) == A->flat_datum_pointer)
+	{
+		return A;
+	}
+
+	flat_datum_pointer = DatumGetPointer(datum);
+	flat = OS_DETOAST_VECTOR(datum);
+	datum = expand_vector(flat, CurrentMemoryContext);
+	vector = VectorGetEOHP(datum);
+	vector->flat_datum_pointer = flat_datum_pointer;
+	return vector;
+}
+
+os_Vector* DatumGetVectorMaybeAB(Datum datum, os_Vector *A, os_Vector *B)
+{
+	os_Vector *vector;
+	os_FlatVector *flat;
+	Pointer flat_datum_pointer;
+	LOGF();
+
+	if (VARATT_IS_EXTERNAL_EXPANDED(DatumGetPointer(datum))) {
+		vector = VectorGetEOHP(datum);
+		Assert(vector->em_magic == vector_MAGIC);
+		return vector;
+	}
+	else if (DatumGetPointer(datum) == A->flat_datum_pointer)
+	{
+		return A;
+	}
+	else if (DatumGetPointer(datum) == B->flat_datum_pointer)
+	{
+		return B;
+	}
+
+	flat_datum_pointer = DatumGetPointer(datum);
+	flat = OS_DETOAST_VECTOR(datum);
+	datum = expand_vector(flat, CurrentMemoryContext);
+	vector = VectorGetEOHP(datum);
+	vector->flat_datum_pointer = flat_datum_pointer;
+	return vector;
+}
+
+os_Vector* DatumGetVectorMaybeABC(Datum datum, os_Vector *A, os_Vector *B, os_Vector *C)
+{
+	os_Vector *vector;
+	os_FlatVector *flat;
+	Pointer flat_datum_pointer;
+	LOGF();
+
+	if (VARATT_IS_EXTERNAL_EXPANDED(DatumGetPointer(datum))) {
+		vector = VectorGetEOHP(datum);
+		Assert(vector->em_magic == vector_MAGIC);
+		return vector;
+	}
+	else if (DatumGetPointer(datum) == A->flat_datum_pointer)
+	{
+		return A;
+	}
+	else if (DatumGetPointer(datum) == B->flat_datum_pointer)
+	{
+		return B;
+	}
+	else if (DatumGetPointer(datum) == C->flat_datum_pointer)
+	{
+		return C;
+	}
+
+	flat_datum_pointer = DatumGetPointer(datum);
+	flat = OS_DETOAST_VECTOR(datum);
+	datum = expand_vector(flat, CurrentMemoryContext);
+	vector = VectorGetEOHP(datum);
+	vector->flat_datum_pointer = flat_datum_pointer;
+	return vector;
+}
+
 /* Local Variables: */
 /* mode: c */
 /* c-file-style: "postgresql" */

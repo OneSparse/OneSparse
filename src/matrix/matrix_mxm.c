@@ -18,7 +18,7 @@ Datum matrix_mxm(PG_FUNCTION_ARGS)
 
 	nargs = PG_NARGS();
 	a = OS_GETARG_MATRIX(0);
-	b = OS_GETARG_MATRIX(1);
+	b = OS_GETARG_MATRIX_A(1, a);
 
 	OS_MTYPE(atype, a);
 	OS_MTYPE(btype, b);
@@ -37,9 +37,9 @@ Datum matrix_mxm(PG_FUNCTION_ARGS)
 		c = new_matrix(ctype, nrows, ncols, CurrentMemoryContext, NULL);
 	}
 	else
-		c = OS_GETARG_MATRIX(3);
+		c = OS_GETARG_MATRIX_AB(3, a, b);
 
-	mask = OS_GETARG_MATRIX_HANDLE_OR_NULL(nargs, 4);
+	mask = OS_GETARG_MATRIX_HANDLE_OR_NULL_ABC(nargs, 4, a, b, c);
 	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 5);
 	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 6);
 

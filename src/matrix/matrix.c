@@ -181,14 +181,108 @@ os_Matrix* DatumGetMatrix(Datum datum)
 {
 	os_Matrix *matrix;
 	os_FlatMatrix *flat;
+	Pointer flat_datum_pointer;
+	LOGF();
+
 	if (VARATT_IS_EXTERNAL_EXPANDED(DatumGetPointer(datum))) {
 		matrix = MatrixGetEOHP(datum);
 		Assert(matrix->em_magic == matrix_MAGIC);
 		return matrix;
 	}
+	flat_datum_pointer = DatumGetPointer(datum);
 	flat = OS_DETOAST_MATRIX(datum);
 	datum = expand_matrix(flat, CurrentMemoryContext);
-	return MatrixGetEOHP(datum);
+	matrix = MatrixGetEOHP(datum);
+	matrix->flat_datum_pointer = flat_datum_pointer;
+	return matrix;
+}
+
+os_Matrix* DatumGetMatrixMaybeA(Datum datum, os_Matrix *A)
+{
+	os_Matrix *matrix;
+	os_FlatMatrix *flat;
+	Pointer flat_datum_pointer;
+	LOGF();
+
+	if (VARATT_IS_EXTERNAL_EXPANDED(DatumGetPointer(datum))) {
+		matrix = MatrixGetEOHP(datum);
+		Assert(matrix->em_magic == matrix_MAGIC);
+		return matrix;
+	}
+
+	else if (DatumGetPointer(datum) == A->flat_datum_pointer)
+	{
+		return A;
+	}
+
+	flat_datum_pointer = DatumGetPointer(datum);
+	flat = OS_DETOAST_MATRIX(datum);
+	datum = expand_matrix(flat, CurrentMemoryContext);
+	matrix = MatrixGetEOHP(datum);
+	matrix->flat_datum_pointer = flat_datum_pointer;
+	return matrix;
+}
+
+os_Matrix* DatumGetMatrixMaybeAB(Datum datum, os_Matrix *A, os_Matrix *B)
+{
+	os_Matrix *matrix;
+	os_FlatMatrix *flat;
+	Pointer flat_datum_pointer;
+	LOGF();
+
+	if (VARATT_IS_EXTERNAL_EXPANDED(DatumGetPointer(datum))) {
+		matrix = MatrixGetEOHP(datum);
+		Assert(matrix->em_magic == matrix_MAGIC);
+		return matrix;
+	}
+	else if (DatumGetPointer(datum) == A->flat_datum_pointer)
+	{
+		return A;
+	}
+	else if (DatumGetPointer(datum) == B->flat_datum_pointer)
+	{
+		return B;
+	}
+
+	flat_datum_pointer = DatumGetPointer(datum);
+	flat = OS_DETOAST_MATRIX(datum);
+	datum = expand_matrix(flat, CurrentMemoryContext);
+	matrix = MatrixGetEOHP(datum);
+	matrix->flat_datum_pointer = flat_datum_pointer;
+	return matrix;
+}
+
+os_Matrix* DatumGetMatrixMaybeABC(Datum datum, os_Matrix *A, os_Matrix *B, os_Matrix *C)
+{
+	os_Matrix *matrix;
+	os_FlatMatrix *flat;
+	Pointer flat_datum_pointer;
+	LOGF();
+
+	if (VARATT_IS_EXTERNAL_EXPANDED(DatumGetPointer(datum))) {
+		matrix = MatrixGetEOHP(datum);
+		Assert(matrix->em_magic == matrix_MAGIC);
+		return matrix;
+	}
+	else if (DatumGetPointer(datum) == A->flat_datum_pointer)
+	{
+		return A;
+	}
+	else if (DatumGetPointer(datum) == B->flat_datum_pointer)
+	{
+		return B;
+	}
+	else if (DatumGetPointer(datum) == C->flat_datum_pointer)
+	{
+		return C;
+	}
+
+	flat_datum_pointer = DatumGetPointer(datum);
+	flat = OS_DETOAST_MATRIX(datum);
+	datum = expand_matrix(flat, CurrentMemoryContext);
+	matrix = MatrixGetEOHP(datum);
+	matrix->flat_datum_pointer = flat_datum_pointer;
+	return matrix;
 }
 
 /* Local Variables: */

@@ -16,6 +16,7 @@ typedef struct os_Matrix  {
     ExpandedObjectHeader hdr;
     int em_magic;
     GrB_Matrix matrix;
+	Pointer flat_datum_pointer;
     Size flat_size;
     void* serialized_data;
     GrB_Index serialized_size;
@@ -45,10 +46,26 @@ os_Matrix* new_matrix(
 
 os_Matrix* DatumGetMatrix(Datum d);
 
+os_Matrix* DatumGetMatrixMaybeA(Datum d, os_Matrix *A);
+os_Matrix* DatumGetMatrixMaybeAB(Datum d, os_Matrix *A, os_Matrix *B);
+os_Matrix* DatumGetMatrixMaybeABC(Datum d, os_Matrix *A, os_Matrix *B, os_Matrix *C);
+
 #define OS_DETOAST_MATRIX(_datum) (os_FlatMatrix*)PG_DETOAST_DATUM(datum)
+
 #define OS_GETARG_MATRIX(_arg_num)  DatumGetMatrix(PG_GETARG_DATUM(_arg_num))
+#define OS_GETARG_MATRIX_A(_arg_num, _A)  DatumGetMatrixMaybeA(PG_GETARG_DATUM(_arg_num), _A)
+#define OS_GETARG_MATRIX_AB(_arg_num, _A, _B)  DatumGetMatrixMaybeAB(PG_GETARG_DATUM(_arg_num), _A, _B)
+#define OS_GETARG_MATRIX_ABC(_arg_num, _A, _B, _C)  DatumGetMatrixMaybeABC(PG_GETARG_DATUM(_arg_num), _A, _B, _C)
+
 #define OS_GETARG_MATRIX_HANDLE_OR_NULL(_nargs, _arg_num) \
 	_nargs > _arg_num ? PG_ARGISNULL(_arg_num) ? NULL : OS_GETARG_MATRIX(_arg_num)->matrix : NULL;
+#define OS_GETARG_MATRIX_HANDLE_OR_NULL_A(_nargs, _arg_num, _A) \
+	_nargs > _arg_num ? PG_ARGISNULL(_arg_num) ? NULL : OS_GETARG_MATRIX_A(_arg_num, _A)->matrix : NULL;
+#define OS_GETARG_MATRIX_HANDLE_OR_NULL_AB(_nargs, _arg_num, _A, _B) \
+	_nargs > _arg_num ? PG_ARGISNULL(_arg_num) ? NULL : OS_GETARG_MATRIX_AB(_arg_num, _A, _B)->matrix : NULL;
+#define OS_GETARG_MATRIX_HANDLE_OR_NULL_ABC(_nargs, _arg_num, _A, _B, _C) \
+	_nargs > _arg_num ? PG_ARGISNULL(_arg_num) ? NULL : OS_GETARG_MATRIX_ABC(_arg_num, _A, _B, _C)->matrix : NULL;
+
 #define OS_RETURN_MATRIX(_matrix) return EOHPGetRWDatum(&(_matrix)->hdr)
 #define OS_MATRIX_FLATSIZE() MAXALIGN(sizeof(os_FlatMatrix))
 
