@@ -7,6 +7,7 @@ Datum matrix_info(PG_FUNCTION_ARGS) {
 	size_t size;
 	FILE *fp;
 	int level;
+	LOGF();
 	A = OS_GETARG_MATRIX(0);
 	level = PG_GETARG_INT32(1);
 	if (level > 5)

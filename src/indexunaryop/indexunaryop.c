@@ -75,7 +75,7 @@ os_IndexUnaryOp* new_indexunaryop(
 								   "expanded indexunaryop",
 								   ALLOCSET_DEFAULT_SIZES);
 
-	indexunaryop = MemoryContextAlloc(objcxt, sizeof(os_IndexUnaryOp));
+	indexunaryop = MemoryContextAllocZero(objcxt, sizeof(os_IndexUnaryOp));
 
 	EOH_init_header(&indexunaryop->hdr, &indexunaryop_methods, objcxt);
 

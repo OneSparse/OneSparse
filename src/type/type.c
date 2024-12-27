@@ -75,7 +75,7 @@ os_Type* new_type(
 								   "expanded type",
 								   ALLOCSET_DEFAULT_SIZES);
 
-	type = MemoryContextAlloc(objcxt, sizeof(os_Type));
+	type = MemoryContextAllocZero(objcxt, sizeof(os_Type));
 
 	EOH_init_header(&type->hdr, &type_methods, objcxt);
 

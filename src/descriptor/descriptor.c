@@ -75,7 +75,7 @@ os_Descriptor* new_descriptor(
 								   "expanded descriptor",
 								   ALLOCSET_DEFAULT_SIZES);
 
-	descriptor = MemoryContextAlloc(objcxt, sizeof(os_Descriptor));
+	descriptor = MemoryContextAllocZero(objcxt, sizeof(os_Descriptor));
 
 	EOH_init_header(&descriptor->hdr, &descriptor_methods, objcxt);
 

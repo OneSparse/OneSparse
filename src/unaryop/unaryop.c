@@ -75,7 +75,7 @@ os_UnaryOp* new_unaryop(
 								   "expanded unaryop",
 								   ALLOCSET_DEFAULT_SIZES);
 
-	unaryop = MemoryContextAlloc(objcxt, sizeof(os_UnaryOp));
+	unaryop = MemoryContextAllocZero(objcxt, sizeof(os_UnaryOp));
 
 	EOH_init_header(&unaryop->hdr, &unaryop_methods, objcxt);
 

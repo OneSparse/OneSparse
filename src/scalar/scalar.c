@@ -162,7 +162,7 @@ os_Scalar* new_scalar(
 								   "expanded scalar",
 								   ALLOCSET_DEFAULT_SIZES);
 
-	scalar = MemoryContextAlloc(objcxt,	sizeof(os_Scalar));
+	scalar = MemoryContextAllocZero(objcxt,	sizeof(os_Scalar));
 
 	EOH_init_header(&scalar->hdr, &scalar_methods, objcxt);
 

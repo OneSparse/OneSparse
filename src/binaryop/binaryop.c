@@ -77,7 +77,7 @@ os_BinaryOp* new_binaryop(
 								   "expanded binaryop",
 								   ALLOCSET_DEFAULT_SIZES);
 
-	binaryop = MemoryContextAlloc(objcxt, sizeof(os_BinaryOp));
+	binaryop = MemoryContextAllocZero(objcxt, sizeof(os_BinaryOp));
 
 	EOH_init_header(&binaryop->hdr, &binaryop_methods, objcxt);
 

@@ -76,7 +76,7 @@ os_Monoid* new_monoid(
 								   "expanded monoid",
 								   ALLOCSET_DEFAULT_SIZES);
 
-	monoid = MemoryContextAlloc(objcxt, sizeof(os_Monoid));
+	monoid = MemoryContextAllocZero(objcxt, sizeof(os_Monoid));
 
 	EOH_init_header(&monoid->hdr, &monoid_methods, objcxt);
 

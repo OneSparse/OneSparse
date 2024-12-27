@@ -75,7 +75,7 @@ os_Semiring* new_semiring(
 								   "expanded semiring",
 								   ALLOCSET_DEFAULT_SIZES);
 
-	semiring = MemoryContextAlloc(objcxt, sizeof(os_Semiring));
+	semiring = MemoryContextAllocZero(objcxt, sizeof(os_Semiring));
 
 	EOH_init_header(&semiring->hdr, &semiring_methods, objcxt);
 

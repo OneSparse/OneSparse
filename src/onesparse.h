@@ -16,12 +16,13 @@
 #include "access/htup_details.h"
 #include "utils/array.h"
 #include "utils/arrayaccess.h"
+#include "utils/guc.h"
+#include "utils/varlena.h"
 #include "catalog/pg_type_d.h"
 #include "catalog/pg_type.h"
 #include "utils/lsyscache.h"
 #include "nodes/pg_list.h"
 #include "nodes/supportnodes.h"
-#include "utils/varlena.h"
 #include "common/hashfn.h"
 #include "suitesparse/GraphBLAS.h"
 #include "access/xact.h"
@@ -50,6 +51,16 @@
                 const char *emsg;                             \
                 GrB_error(&emsg, obj);                        \
                 elog(ERROR, "%s %s: %s", ename, emsg, msg);   \
+            }                                                 \
+    } while (0)                                               \
+
+#define OK_CHECK(method, msg)                               \
+    do {                                                      \
+        GrB_Info __info = method ;                            \
+        if (__info != GrB_SUCCESS)  \
+            {                                                 \
+				const char *ename = error_name(__info);         \
+                elog(ERROR, "%s: %s", ename, msg);   \
             }                                                 \
     } while (0)                                               \
 
@@ -155,6 +166,8 @@ GrB_IndexUnaryOp lookup_indexunaryop(char *name);
 GrB_BinaryOp lookup_binaryop(char *name);
 GrB_Monoid lookup_monoid(char *name);
 GrB_Semiring lookup_semiring(char *name);
+
+void burble_notice_func(const char *fmt, ...);
 
 void _PG_init(void);
 
