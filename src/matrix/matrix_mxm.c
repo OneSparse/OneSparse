@@ -50,8 +50,8 @@ Datum matrix_mxm(PG_FUNCTION_ARGS)
 					 a->matrix,
 					 b->matrix,
 					 descriptor),
-		  c->matrix,
-		  "Error matrix mxm.");
+			 c->matrix,
+			 "Error matrix mxm.");
 
 	OS_RETURN_MATRIX(c);
 }

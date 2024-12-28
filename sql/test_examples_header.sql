@@ -197,7 +197,6 @@ create or replace function pagerank(
         t vector;
         w vector;
         r vector;
-        temp vector;
         plus_second semiring = 'plus_second_fp32';
         abs unaryop = 'abs_fp32';
         plus binaryop = 'plus_fp32';
@@ -216,7 +215,6 @@ create or replace function pagerank(
         t = vector(rtype, n);
         w = vector(rtype, n);
         r = vector(rtype, n);
-        temp = vector(rtype, n);
         r = assign(r, 1::real / n);
         d_out = assign(d_out, damping::scalar, accum=>div);
         for i in 0..itermax loop
@@ -224,6 +222,12 @@ create or replace function pagerank(
             r = assign(r, teleport);
             w = eadd(t, d_out, div, c=>w);
             r = mxv(a, w, plus_second, c=>r, accum=>plus, descr=>t0);
+            if i >= itermin then
+                t = assign(t, r, accum=>minus);
+                t = apply(t, abs, c=>t);
+                rdiff = reduce_scalar(t);
+                exit when rdiff < tol;
+            end if;
         end loop;
         end_time = clock_timestamp();
         raise notice 'PageRank: %', end_time - start_time;
