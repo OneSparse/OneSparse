@@ -5,8 +5,8 @@ ARG GID
 # install base dependences    
 RUN apt-get update && \
     apt-get install -y make cmake git curl build-essential m4 sudo gdbserver python3-pip \
-    gdb libreadline-dev bison flex zlib1g-dev libicu-dev icu-devtools tmux zile zip vim \
-    gawk wget python3-full python3-virtualenv graphviz python3-dev
+    gdb libreadline-dev bison flex zlib1g-dev libicu-dev icu-devtools tmux zile zip \
+    gawk wget python3-full python3-virtualenv graphviz python3-dev libpq-dev python3-psycopg2 libssl-dev
 
 RUN deluser --remove-home ubuntu
 # add postgres user and make data dir        
@@ -37,19 +37,23 @@ COPY --chown=postgres:postgres postgres-upstream postgres-upstream
 RUN cd postgres-upstream && ./configure \
     --prefix=/usr/ \
     --with-python \
+    --with-openssl \
     --without-icu \
     --enable-debug \
 #    --enable-depend --enable-cassert --enable-profiling \
 #    CFLAGS="-ggdb -Og -g3 -fno-omit-frame-pointer" \
     CFLAGS="-O3" \
-    && make -j 4 && sudo make install
+    && make -j 4 && sudo make install \
+    && cd contrib/postgres_fdw && make && sudo make install \
+    && cd .. && /bin/rm -Rf postgres-upstream
 
 # get GraphBLAS, compile with debug symbols    
-RUN curl -s -L -J https://github.com/DrTimothyAldenDavis/GraphBLAS/archive/refs/tags/v9.4.2.tar.gz | \
-    tar zxvf - && cd GraphBLAS-9.4.2 && \
+RUN curl -s -L -J https://github.com/DrTimothyAldenDavis/GraphBLAS/archive/refs/tags/v10.0.2.tar.gz | \
+    tar zxvf - && cd GraphBLAS-10.0.2 && \
     make library \
 #    CMAKE_OPTIONS='-DCMAKE_BUILD_TYPE=Debug -DGRAPHBLAS_COMPACT=1' \
-    && sudo make install
+    && sudo make install \
+    && /bin/rm -Rf GraphBLAS-10.0.2
 
 RUN sudo ldconfig
 
@@ -61,7 +65,7 @@ COPY . .
 ENV EDITOR zile    
 
 # make the extension
-# RUN .virt/bin/python3 generate.py onesparse/onesparse--0.1.0.sql
+#RUN .virt/bin/python3 generate.py onesparse/onesparse--0.1.0.sql
 RUN sudo make && sudo make install && sudo make clean
 
 # start the database            

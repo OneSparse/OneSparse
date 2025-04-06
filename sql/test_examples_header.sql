@@ -166,7 +166,6 @@ CREATE OR REPLACE FUNCTION tcentrality(a matrix)
         c = apply(3, u, times, c=>c);
         c = eadd(w, y, plus, accum=>plus, c=>c);
         c = apply(c, k, div, c=>c);
-        raise notice 'Tri Centrality: %', clock_timestamp() - start_time;
         return c;
     END;
     $$;
@@ -230,7 +229,6 @@ create or replace function pagerank(
             end if;
         end loop;
         end_time = clock_timestamp();
-        raise notice 'PageRank: %', end_time - start_time;
         return r;
     end;
     $$;

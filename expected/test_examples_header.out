@@ -1343,7 +1343,7 @@ select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as dra
 -- <g id="node2" class="node">
 -- <title>2</title>
 -- <ellipse fill="none" stroke="black" cx="308.2" cy="-63.55" rx="15.61" ry="12.04"/>
--- <text text-anchor="middle" x="308.2" y="-61.65" font-family="Times,serif" font-size="8.00">3</text>
+-- <text text-anchor="middle" x="308.2" y="-61.65" font-family="Times,serif" font-size="8.00">2</text>
 -- </g>
 -- <!-- 1&#45;&#45;2 -->
 -- <g id="edge1" class="edge">
@@ -1354,7 +1354,7 @@ select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as dra
 -- <g id="node3" class="node">
 -- <title>3</title>
 -- <ellipse fill="none" stroke="black" cx="374.5" cy="-104.01" rx="15.61" ry="12.04"/>
--- <text text-anchor="middle" x="374.5" y="-102.11" font-family="Times,serif" font-size="8.00">3</text>
+-- <text text-anchor="middle" x="374.5" y="-102.11" font-family="Times,serif" font-size="8.00">2</text>
 -- </g>
 -- <!-- 1&#45;&#45;3 -->
 -- <g id="edge2" class="edge">
@@ -1365,7 +1365,7 @@ select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as dra
 -- <g id="node4" class="node">
 -- <title>4</title>
 -- <ellipse fill="none" stroke="black" cx="274.77" cy="-58.97" rx="15.61" ry="12.04"/>
--- <text text-anchor="middle" x="274.77" y="-57.07" font-family="Times,serif" font-size="8.00">3</text>
+-- <text text-anchor="middle" x="274.77" y="-57.07" font-family="Times,serif" font-size="8.00">2</text>
 -- </g>
 -- <!-- 1&#45;&#45;4 -->
 -- <g id="edge3" class="edge">
@@ -1376,7 +1376,7 @@ select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as dra
 -- <g id="node5" class="node">
 -- <title>5</title>
 -- <ellipse fill="none" stroke="black" cx="145.96" cy="-128.93" rx="15.61" ry="12.04"/>
--- <text text-anchor="middle" x="145.96" y="-127.03" font-family="Times,serif" font-size="8.00">3</text>
+-- <text text-anchor="middle" x="145.96" y="-127.03" font-family="Times,serif" font-size="8.00">2</text>
 -- </g>
 -- <!-- 1&#45;&#45;5 -->
 -- <g id="edge4" class="edge">
@@ -1387,7 +1387,7 @@ select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as dra
 -- <g id="node6" class="node">
 -- <title>6</title>
 -- <ellipse fill="none" stroke="black" cx="103.58" cy="-133.99" rx="15.61" ry="12.04"/>
--- <text text-anchor="middle" x="103.58" y="-132.09" font-family="Times,serif" font-size="8.00">3</text>
+-- <text text-anchor="middle" x="103.58" y="-132.09" font-family="Times,serif" font-size="8.00">2</text>
 -- </g>
 -- <!-- 1&#45;&#45;6 -->
 -- <g id="edge5" class="edge">
@@ -1398,7 +1398,7 @@ select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as dra
 -- <g id="node7" class="node">
 -- <title>7</title>
 -- <ellipse fill="none" stroke="black" cx="107.49" cy="-163.71" rx="15.61" ry="12.04"/>
--- <text text-anchor="middle" x="107.49" y="-161.81" font-family="Times,serif" font-size="8.00">3</text>
+-- <text text-anchor="middle" x="107.49" y="-161.81" font-family="Times,serif" font-size="8.00">2</text>
 -- </g>
 -- <!-- 1&#45;&#45;7 -->
 -- <g id="edge6" class="edge">
@@ -1409,7 +1409,7 @@ select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as dra
 -- <g id="node8" class="node">
 -- <title>9</title>
 -- <ellipse fill="none" stroke="black" cx="403.2" cy="-102.9" rx="15.61" ry="12.04"/>
--- <text text-anchor="middle" x="403.2" y="-101" font-family="Times,serif" font-size="8.00">3</text>
+-- <text text-anchor="middle" x="403.2" y="-101" font-family="Times,serif" font-size="8.00">2</text>
 -- </g>
 -- <!-- 1&#45;&#45;9 -->
 -- <g id="edge8" class="edge">
@@ -1420,7 +1420,7 @@ select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as dra
 -- <g id="node10" class="node">
 -- <title>14</title>
 -- <ellipse fill="none" stroke="black" cx="350.93" cy="-74.04" rx="15.61" ry="12.04"/>
--- <text text-anchor="middle" x="350.93" y="-72.14" font-family="Times,serif" font-size="8.00">3</text>
+-- <text text-anchor="middle" x="350.93" y="-72.14" font-family="Times,serif" font-size="8.00">2</text>
 -- </g>
 -- <!-- 1&#45;&#45;14 -->
 -- <g id="edge12" class="edge">
@@ -1431,7 +1431,7 @@ select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as dra
 -- <g id="node14" class="node">
 -- <title>20</title>
 -- <ellipse fill="none" stroke="black" cx="350.76" cy="-133.23" rx="15.61" ry="12.04"/>
--- <text text-anchor="middle" x="350.76" y="-131.33" font-family="Times,serif" font-size="8.00">3</text>
+-- <text text-anchor="middle" x="350.76" y="-131.33" font-family="Times,serif" font-size="8.00">2</text>
 -- </g>
 -- <!-- 1&#45;&#45;20 -->
 -- <g id="edge14" class="edge">
@@ -1442,7 +1442,7 @@ select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as dra
 -- <g id="node25" class="node">
 -- <title>32</title>
 -- <ellipse fill="none" stroke="black" cx="412.89" cy="-189.67" rx="15.61" ry="12.04"/>
--- <text text-anchor="middle" x="412.89" y="-187.77" font-family="Times,serif" font-size="8.00">3</text>
+-- <text text-anchor="middle" x="412.89" y="-187.77" font-family="Times,serif" font-size="8.00">2</text>
 -- </g>
 -- <!-- 1&#45;&#45;32 -->
 -- <g id="edge16" class="edge">
@@ -1539,7 +1539,7 @@ select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as dra
 -- <g id="node24" class="node">
 -- <title>31</title>
 -- <ellipse fill="none" stroke="black" cx="426.18" cy="-59.54" rx="15.61" ry="12.04"/>
--- <text text-anchor="middle" x="426.18" y="-57.64" font-family="Times,serif" font-size="8.00">5</text>
+-- <text text-anchor="middle" x="426.18" y="-57.64" font-family="Times,serif" font-size="8.00">3</text>
 -- </g>
 -- <!-- 2&#45;&#45;31 -->
 -- <g id="edge24" class="edge">
@@ -1575,7 +1575,7 @@ select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as dra
 -- <g id="node9" class="node">
 -- <title>10</title>
 -- <ellipse fill="none" stroke="black" cx="449.79" cy="-25.51" rx="15.61" ry="12.04"/>
--- <text text-anchor="middle" x="449.79" y="-23.61" font-family="Times,serif" font-size="8.00">5</text>
+-- <text text-anchor="middle" x="449.79" y="-23.61" font-family="Times,serif" font-size="8.00">3</text>
 -- </g>
 -- <!-- 3&#45;&#45;10 -->
 -- <g id="edge28" class="edge">
@@ -1591,7 +1591,7 @@ select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as dra
 -- <g id="node21" class="node">
 -- <title>28</title>
 -- <ellipse fill="none" stroke="black" cx="457.01" cy="-200.43" rx="15.61" ry="12.04"/>
--- <text text-anchor="middle" x="457.01" y="-198.53" font-family="Times,serif" font-size="8.00">5</text>
+-- <text text-anchor="middle" x="457.01" y="-198.53" font-family="Times,serif" font-size="8.00">3</text>
 -- </g>
 -- <!-- 3&#45;&#45;28 -->
 -- <g id="edge30" class="edge">
@@ -1602,7 +1602,7 @@ select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as dra
 -- <g id="node22" class="node">
 -- <title>29</title>
 -- <ellipse fill="none" stroke="black" cx="438.35" cy="-152.94" rx="15.61" ry="12.04"/>
--- <text text-anchor="middle" x="438.35" y="-151.04" font-family="Times,serif" font-size="8.00">5</text>
+-- <text text-anchor="middle" x="438.35" y="-151.04" font-family="Times,serif" font-size="8.00">3</text>
 -- </g>
 -- <!-- 3&#45;&#45;29 -->
 -- <g id="edge31" class="edge">
@@ -1613,7 +1613,7 @@ select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as dra
 -- <g id="node26" class="node">
 -- <title>33</title>
 -- <ellipse fill="none" stroke="black" cx="506.38" cy="-104.21" rx="15.61" ry="12.04"/>
--- <text text-anchor="middle" x="506.38" y="-102.31" font-family="Times,serif" font-size="8.00">5</text>
+-- <text text-anchor="middle" x="506.38" y="-102.31" font-family="Times,serif" font-size="8.00">3</text>
 -- </g>
 -- <!-- 3&#45;&#45;33 -->
 -- <g id="edge32" class="edge">
@@ -1711,7 +1711,7 @@ select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as dra
 -- <g id="node11" class="node">
 -- <title>15</title>
 -- <ellipse fill="none" stroke="black" cx="530.08" cy="-23.47" rx="15.61" ry="12.04"/>
--- <text text-anchor="middle" x="530.08" y="-21.57" font-family="Times,serif" font-size="8.00">7</text>
+-- <text text-anchor="middle" x="530.08" y="-21.57" font-family="Times,serif" font-size="8.00">4</text>
 -- </g>
 -- <!-- 15&#45;&#45;33 -->
 -- <g id="edge47" class="edge">
@@ -1727,7 +1727,7 @@ select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as dra
 -- <g id="node12" class="node">
 -- <title>16</title>
 -- <ellipse fill="none" stroke="black" cx="599.63" cy="-89.53" rx="15.61" ry="12.04"/>
--- <text text-anchor="middle" x="599.63" y="-87.63" font-family="Times,serif" font-size="8.00">7</text>
+-- <text text-anchor="middle" x="599.63" y="-87.63" font-family="Times,serif" font-size="8.00">4</text>
 -- </g>
 -- <!-- 16&#45;&#45;33 -->
 -- <g id="edge49" class="edge">
@@ -1743,7 +1743,7 @@ select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as dra
 -- <g id="node13" class="node">
 -- <title>19</title>
 -- <ellipse fill="none" stroke="black" cx="565.94" cy="-34.12" rx="15.61" ry="12.04"/>
--- <text text-anchor="middle" x="565.94" y="-32.22" font-family="Times,serif" font-size="8.00">7</text>
+-- <text text-anchor="middle" x="565.94" y="-32.22" font-family="Times,serif" font-size="8.00">4</text>
 -- </g>
 -- <!-- 19&#45;&#45;33 -->
 -- <g id="edge51" class="edge">
@@ -1764,7 +1764,7 @@ select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as dra
 -- <g id="node15" class="node">
 -- <title>21</title>
 -- <ellipse fill="none" stroke="black" cx="574.77" cy="-67" rx="15.61" ry="12.04"/>
--- <text text-anchor="middle" x="574.77" y="-65.1" font-family="Times,serif" font-size="8.00">7</text>
+-- <text text-anchor="middle" x="574.77" y="-65.1" font-family="Times,serif" font-size="8.00">4</text>
 -- </g>
 -- <!-- 21&#45;&#45;33 -->
 -- <g id="edge54" class="edge">
@@ -1780,7 +1780,7 @@ select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as dra
 -- <g id="node16" class="node">
 -- <title>23</title>
 -- <ellipse fill="none" stroke="black" cx="584.88" cy="-122.94" rx="15.61" ry="12.04"/>
--- <text text-anchor="middle" x="584.88" y="-121.04" font-family="Times,serif" font-size="8.00">7</text>
+-- <text text-anchor="middle" x="584.88" y="-121.04" font-family="Times,serif" font-size="8.00">4</text>
 -- </g>
 -- <!-- 23&#45;&#45;33 -->
 -- <g id="edge56" class="edge">
@@ -1796,13 +1796,13 @@ select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as dra
 -- <g id="node17" class="node">
 -- <title>24</title>
 -- <ellipse fill="none" stroke="black" cx="522.57" cy="-199.5" rx="15.61" ry="12.04"/>
--- <text text-anchor="middle" x="522.57" y="-197.6" font-family="Times,serif" font-size="8.00">7</text>
+-- <text text-anchor="middle" x="522.57" y="-197.6" font-family="Times,serif" font-size="8.00">4</text>
 -- </g>
 -- <!-- 26 -->
 -- <g id="node19" class="node">
 -- <title>26</title>
 -- <ellipse fill="none" stroke="black" cx="485.91" cy="-276.78" rx="15.61" ry="12.04"/>
--- <text text-anchor="middle" x="485.91" y="-274.88" font-family="Times,serif" font-size="8.00">5</text>
+-- <text text-anchor="middle" x="485.91" y="-274.88" font-family="Times,serif" font-size="8.00">3</text>
 -- </g>
 -- <!-- 24&#45;&#45;26 -->
 -- <g id="edge58" class="edge">
@@ -1818,7 +1818,7 @@ select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as dra
 -- <g id="node23" class="node">
 -- <title>30</title>
 -- <ellipse fill="none" stroke="black" cx="566.47" cy="-167.87" rx="15.61" ry="12.04"/>
--- <text text-anchor="middle" x="566.47" y="-165.97" font-family="Times,serif" font-size="8.00">7</text>
+-- <text text-anchor="middle" x="566.47" y="-165.97" font-family="Times,serif" font-size="8.00">4</text>
 -- </g>
 -- <!-- 24&#45;&#45;30 -->
 -- <g id="edge60" class="edge">
@@ -1839,7 +1839,7 @@ select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as dra
 -- <g id="node18" class="node">
 -- <title>25</title>
 -- <ellipse fill="none" stroke="black" cx="439.36" cy="-284.82" rx="15.61" ry="12.04"/>
--- <text text-anchor="middle" x="439.36" y="-282.92" font-family="Times,serif" font-size="8.00">5</text>
+-- <text text-anchor="middle" x="439.36" y="-282.92" font-family="Times,serif" font-size="8.00">3</text>
 -- </g>
 -- <!-- 25&#45;&#45;26 -->
 -- <g id="edge63" class="edge">
@@ -1865,7 +1865,7 @@ select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as dra
 -- <g id="node20" class="node">
 -- <title>27</title>
 -- <ellipse fill="none" stroke="black" cx="614.32" cy="-172.85" rx="15.61" ry="12.04"/>
--- <text text-anchor="middle" x="614.32" y="-170.95" font-family="Times,serif" font-size="8.00">7</text>
+-- <text text-anchor="middle" x="614.32" y="-170.95" font-family="Times,serif" font-size="8.00">4</text>
 -- </g>
 -- <!-- 27&#45;&#45;30 -->
 -- <g id="edge67" class="edge">
@@ -1961,8 +1961,10 @@ CREATE OR REPLACE FUNCTION tcentrality(a matrix)
         st1 descriptor = 'st1';
         t0 descriptor = 't0';
         rtype type = 'fp32';
+        start_time timestamp;
     BEGIN
         a = wait(a);
+        start_time = clock_timestamp();
         n = nrows(a);
         y = vector(rtype, n);
         w = vector(rtype, n);
@@ -1975,7 +1977,6 @@ CREATE OR REPLACE FUNCTION tcentrality(a matrix)
         y = reduce_cols(t, plus_monoid, accum=>plus, descr=>t0);
         y = reduce_cols(t, plus_monoid, accum=>plus);
         k = reduce_scalar(y);
-        --        RETURN 3 * ((a @ y) |- 2 * (one(t) @ y) |+ y) / k;
         w = mxv(t, y, plus_second, c=>w);
         w = mxv(t, y, plus_second, accum=>plus, c=>w, descr=>t0);
         w = apply(w, -2, times, c=>w);
@@ -2599,17 +2600,19 @@ select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as dra
 -- ## Page Rank TODO
 create or replace function pagerank(
     a matrix,
-    damping float default 0.85,
+    damping real default 0.85,
     itermax integer default 100,
-    tol float default 1e-4
+    itermin integer default 50,
+    tol real default 1e-4
     )
     returns vector language plpgsql as
     $$
     declare
         rtype type = 'fp32';
         n bigint;
-        teleport float;
-        rdiff float = 1.0;
+        teleport scalar;
+        rdiff real = 1.0;
+        b matrix;
         d_out vector;
         t vector;
         w vector;
@@ -2618,27 +2621,35 @@ create or replace function pagerank(
         abs unaryop = 'abs_fp32';
         plus binaryop = 'plus_fp32';
         div binaryop = 'div_fp32';
+        minus binaryop = 'minus_fp32';
         t0 descriptor = 't0';
+        start_time timestamp;
+        end_time timestamp;
     begin
         a = wait(a);
+        start_time = clock_timestamp();
         n = nrows(a);
-        teleport = (1 - damping) / n;
-        d_out = cast_to(reduce_rows(one(a)), rtype);
+        teleport = ((1 - damping) / n)::real;
+        b = apply(a, 'one_int32'::unaryop, c=>b);
+        d_out = apply(reduce_rows(a), 'identity_fp32'::unaryop, c=>d_out);
         t = vector(rtype, n);
         w = vector(rtype, n);
         r = vector(rtype, n);
-        r = assign(r, 1::float / n);
+        r = assign(r, 1::real / n);
         d_out = assign(d_out, damping::scalar, accum=>div);
         for i in 0..itermax loop
-            -- select r, t into t, r;
             t = dup(r);
             r = assign(r, teleport);
             w = eadd(t, d_out, div, c=>w);
             r = mxv(a, w, plus_second, c=>r, accum=>plus, descr=>t0);
-            t = apply(t, abs, c=>t);
-            rdiff = reduce_scalar(t);
-            exit when rdiff < tol;
+            if i >= itermin then
+                t = assign(t, r, accum=>minus);
+                t = apply(t, abs, c=>t);
+                rdiff = reduce_scalar(t);
+                exit when rdiff < tol;
+            end if;
         end loop;
+        end_time = clock_timestamp();
         return r;
     end;
     $$;
@@ -2658,13 +2669,13 @@ select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as dra
 -- <g id="node1" class="node">
 -- <title>1</title>
 -- <ellipse fill="none" stroke="black" cx="369.78" cy="-177.86" rx="39.7" ry="12.04"/>
--- <text text-anchor="middle" x="369.78" y="-175.96" font-family="Times,serif" font-size="8.00">0.109104</text>
+-- <text text-anchor="middle" x="369.78" y="-175.96" font-family="Times,serif" font-size="8.00">0.421285</text>
 -- </g>
 -- <!-- 2 -->
 -- <g id="node2" class="node">
 -- <title>2</title>
 -- <ellipse fill="none" stroke="black" cx="454.61" cy="-89.64" rx="39.7" ry="12.04"/>
--- <text text-anchor="middle" x="454.61" y="-87.74" font-family="Times,serif" font-size="8.00">0.060958</text>
+-- <text text-anchor="middle" x="454.61" y="-87.74" font-family="Times,serif" font-size="8.00">0.223911</text>
 -- </g>
 -- <!-- 1&#45;&#45;2 -->
 -- <g id="edge1" class="edge">
@@ -2675,7 +2686,7 @@ select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as dra
 -- <g id="node3" class="node">
 -- <title>3</title>
 -- <ellipse fill="none" stroke="black" cx="554.48" cy="-150.6" rx="39.7" ry="12.04"/>
--- <text text-anchor="middle" x="554.48" y="-148.7" font-family="Times,serif" font-size="8.00">0.070775</text>
+-- <text text-anchor="middle" x="554.48" y="-148.7" font-family="Times,serif" font-size="8.00">0.267163</text>
 -- </g>
 -- <!-- 1&#45;&#45;3 -->
 -- <g id="edge2" class="edge">
@@ -2686,7 +2697,7 @@ select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as dra
 -- <g id="node4" class="node">
 -- <title>4</title>
 -- <ellipse fill="none" stroke="black" cx="404.24" cy="-82.74" rx="39.7" ry="12.04"/>
--- <text text-anchor="middle" x="404.24" y="-80.84" font-family="Times,serif" font-size="8.00">0.040543</text>
+-- <text text-anchor="middle" x="404.24" y="-80.84" font-family="Times,serif" font-size="8.00">0.146487</text>
 -- </g>
 -- <!-- 1&#45;&#45;4 -->
 -- <g id="edge3" class="edge">
@@ -2697,7 +2708,7 @@ select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as dra
 -- <g id="node5" class="node">
 -- <title>5</title>
 -- <ellipse fill="none" stroke="black" cx="210.2" cy="-188.14" rx="39.7" ry="12.04"/>
--- <text text-anchor="middle" x="210.2" y="-186.24" font-family="Times,serif" font-size="8.00">0.023384</text>
+-- <text text-anchor="middle" x="210.2" y="-186.24" font-family="Times,serif" font-size="8.00">0.085526</text>
 -- </g>
 -- <!-- 1&#45;&#45;5 -->
 -- <g id="edge4" class="edge">
@@ -2708,7 +2719,7 @@ select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as dra
 -- <g id="node6" class="node">
 -- <title>6</title>
 -- <ellipse fill="none" stroke="black" cx="146.37" cy="-195.75" rx="39.7" ry="12.04"/>
--- <text text-anchor="middle" x="146.37" y="-193.85" font-family="Times,serif" font-size="8.00">0.030828</text>
+-- <text text-anchor="middle" x="146.37" y="-193.85" font-family="Times,serif" font-size="8.00">0.116942</text>
 -- </g>
 -- <!-- 1&#45;&#45;6 -->
 -- <g id="edge5" class="edge">
@@ -2719,7 +2730,7 @@ select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as dra
 -- <g id="node7" class="node">
 -- <title>7</title>
 -- <ellipse fill="none" stroke="black" cx="152.25" cy="-240.52" rx="39.7" ry="12.04"/>
--- <text text-anchor="middle" x="152.25" y="-238.62" font-family="Times,serif" font-size="8.00">0.030828</text>
+-- <text text-anchor="middle" x="152.25" y="-238.62" font-family="Times,serif" font-size="8.00">0.116942</text>
 -- </g>
 -- <!-- 1&#45;&#45;7 -->
 -- <g id="edge6" class="edge">
@@ -2730,7 +2741,7 @@ select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as dra
 -- <g id="node8" class="node">
 -- <title>9</title>
 -- <ellipse fill="none" stroke="black" cx="597.72" cy="-148.92" rx="39.7" ry="12.04"/>
--- <text text-anchor="middle" x="597.72" y="-147.02" font-family="Times,serif" font-size="8.00">0.030591</text>
+-- <text text-anchor="middle" x="597.72" y="-147.02" font-family="Times,serif" font-size="8.00">0.109832</text>
 -- </g>
 -- <!-- 1&#45;&#45;9 -->
 -- <g id="edge8" class="edge">
@@ -2741,7 +2752,7 @@ select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as dra
 -- <g id="node10" class="node">
 -- <title>14</title>
 -- <ellipse fill="none" stroke="black" cx="518.97" cy="-105.45" rx="39.7" ry="12.04"/>
--- <text text-anchor="middle" x="518.97" y="-103.55" font-family="Times,serif" font-size="8.00">0.027725</text>
+-- <text text-anchor="middle" x="518.97" y="-103.55" font-family="Times,serif" font-size="8.00">0.095383</text>
 -- </g>
 -- <!-- 1&#45;&#45;14 -->
 -- <g id="edge12" class="edge">
@@ -2752,7 +2763,7 @@ select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as dra
 -- <g id="node14" class="node">
 -- <title>20</title>
 -- <ellipse fill="none" stroke="black" cx="518.72" cy="-194.62" rx="39.7" ry="12.04"/>
--- <text text-anchor="middle" x="518.72" y="-192.72" font-family="Times,serif" font-size="8.00">0.015965</text>
+-- <text text-anchor="middle" x="518.72" y="-192.72" font-family="Times,serif" font-size="8.00">0.050188</text>
 -- </g>
 -- <!-- 1&#45;&#45;20 -->
 -- <g id="edge14" class="edge">
@@ -2763,7 +2774,7 @@ select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as dra
 -- <g id="node25" class="node">
 -- <title>32</title>
 -- <ellipse fill="none" stroke="black" cx="612.31" cy="-279.63" rx="39.7" ry="12.04"/>
--- <text text-anchor="middle" x="612.31" y="-277.73" font-family="Times,serif" font-size="8.00">0.039572</text>
+-- <text text-anchor="middle" x="612.31" y="-277.73" font-family="Times,serif" font-size="8.00">0.156776</text>
 -- </g>
 -- <!-- 1&#45;&#45;32 -->
 -- <g id="edge16" class="edge">
@@ -2860,7 +2871,7 @@ select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as dra
 -- <g id="node24" class="node">
 -- <title>31</title>
 -- <ellipse fill="none" stroke="black" cx="632.33" cy="-83.6" rx="39.7" ry="12.04"/>
--- <text text-anchor="middle" x="632.33" y="-81.7" font-family="Times,serif" font-size="8.00">0.024185</text>
+-- <text text-anchor="middle" x="632.33" y="-81.7" font-family="Times,serif" font-size="8.00">0.084000</text>
 -- </g>
 -- <!-- 2&#45;&#45;31 -->
 -- <g id="edge24" class="edge">
@@ -2896,7 +2907,7 @@ select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as dra
 -- <g id="node9" class="node">
 -- <title>10</title>
 -- <ellipse fill="none" stroke="black" cx="667.89" cy="-32.34" rx="39.7" ry="12.04"/>
--- <text text-anchor="middle" x="667.89" y="-30.44" font-family="Times,serif" font-size="8.00">0.010428</text>
+-- <text text-anchor="middle" x="667.89" y="-30.44" font-family="Times,serif" font-size="8.00">0.028689</text>
 -- </g>
 -- <!-- 3&#45;&#45;10 -->
 -- <g id="edge28" class="edge">
@@ -2912,7 +2923,7 @@ select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as dra
 -- <g id="node21" class="node">
 -- <title>28</title>
 -- <ellipse fill="none" stroke="black" cx="678.77" cy="-295.85" rx="39.7" ry="12.04"/>
--- <text text-anchor="middle" x="678.77" y="-293.95" font-family="Times,serif" font-size="8.00">0.025105</text>
+-- <text text-anchor="middle" x="678.77" y="-293.95" font-family="Times,serif" font-size="8.00">0.097537</text>
 -- </g>
 -- <!-- 3&#45;&#45;28 -->
 -- <g id="edge30" class="edge">
@@ -2923,7 +2934,7 @@ select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as dra
 -- <g id="node22" class="node">
 -- <title>29</title>
 -- <ellipse fill="none" stroke="black" cx="650.65" cy="-224.3" rx="39.7" ry="12.04"/>
--- <text text-anchor="middle" x="650.65" y="-222.4" font-family="Times,serif" font-size="8.00">0.017155</text>
+-- <text text-anchor="middle" x="650.65" y="-222.4" font-family="Times,serif" font-size="8.00">0.060031</text>
 -- </g>
 -- <!-- 3&#45;&#45;29 -->
 -- <g id="edge31" class="edge">
@@ -2934,7 +2945,7 @@ select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as dra
 -- <g id="node26" class="node">
 -- <title>33</title>
 -- <ellipse fill="none" stroke="black" cx="753.15" cy="-150.89" rx="39.7" ry="12.04"/>
--- <text text-anchor="middle" x="753.15" y="-148.99" font-family="Times,serif" font-size="8.00">0.097256</text>
+-- <text text-anchor="middle" x="753.15" y="-148.99" font-family="Times,serif" font-size="8.00">0.357268</text>
 -- </g>
 -- <!-- 3&#45;&#45;33 -->
 -- <g id="edge32" class="edge">
@@ -3032,7 +3043,7 @@ select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as dra
 -- <g id="node11" class="node">
 -- <title>15</title>
 -- <ellipse fill="none" stroke="black" cx="788.84" cy="-29.27" rx="39.7" ry="12.04"/>
--- <text text-anchor="middle" x="788.84" y="-27.37" font-family="Times,serif" font-size="8.00">0.011927</text>
+-- <text text-anchor="middle" x="788.84" y="-27.37" font-family="Times,serif" font-size="8.00">0.034172</text>
 -- </g>
 -- <!-- 15&#45;&#45;33 -->
 -- <g id="edge47" class="edge">
@@ -3048,7 +3059,7 @@ select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as dra
 -- <g id="node12" class="node">
 -- <title>16</title>
 -- <ellipse fill="none" stroke="black" cx="893.62" cy="-128.77" rx="39.7" ry="12.04"/>
--- <text text-anchor="middle" x="893.62" y="-126.87" font-family="Times,serif" font-size="8.00">0.011927</text>
+-- <text text-anchor="middle" x="893.62" y="-126.87" font-family="Times,serif" font-size="8.00">0.034172</text>
 -- </g>
 -- <!-- 16&#45;&#45;33 -->
 -- <g id="edge49" class="edge">
@@ -3064,7 +3075,7 @@ select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as dra
 -- <g id="node13" class="node">
 -- <title>19</title>
 -- <ellipse fill="none" stroke="black" cx="842.86" cy="-45.31" rx="39.7" ry="12.04"/>
--- <text text-anchor="middle" x="842.86" y="-43.41" font-family="Times,serif" font-size="8.00">0.011927</text>
+-- <text text-anchor="middle" x="842.86" y="-43.41" font-family="Times,serif" font-size="8.00">0.034172</text>
 -- </g>
 -- <!-- 19&#45;&#45;33 -->
 -- <g id="edge51" class="edge">
@@ -3085,7 +3096,7 @@ select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as dra
 -- <g id="node15" class="node">
 -- <title>21</title>
 -- <ellipse fill="none" stroke="black" cx="856.16" cy="-94.83" rx="39.7" ry="12.04"/>
--- <text text-anchor="middle" x="856.16" y="-92.93" font-family="Times,serif" font-size="8.00">0.011927</text>
+-- <text text-anchor="middle" x="856.16" y="-92.93" font-family="Times,serif" font-size="8.00">0.034172</text>
 -- </g>
 -- <!-- 21&#45;&#45;33 -->
 -- <g id="edge54" class="edge">
@@ -3101,7 +3112,7 @@ select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as dra
 -- <g id="node16" class="node">
 -- <title>23</title>
 -- <ellipse fill="none" stroke="black" cx="871.39" cy="-179.11" rx="39.7" ry="12.04"/>
--- <text text-anchor="middle" x="871.39" y="-177.21" font-family="Times,serif" font-size="8.00">0.011927</text>
+-- <text text-anchor="middle" x="871.39" y="-177.21" font-family="Times,serif" font-size="8.00">0.034172</text>
 -- </g>
 -- <!-- 23&#45;&#45;33 -->
 -- <g id="edge56" class="edge">
@@ -3117,13 +3128,13 @@ select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as dra
 -- <g id="node17" class="node">
 -- <title>24</title>
 -- <ellipse fill="none" stroke="black" cx="777.53" cy="-294.45" rx="39.7" ry="12.04"/>
--- <text text-anchor="middle" x="777.53" y="-292.55" font-family="Times,serif" font-size="8.00">0.034980</text>
+-- <text text-anchor="middle" x="777.53" y="-292.55" font-family="Times,serif" font-size="8.00">0.138034</text>
 -- </g>
 -- <!-- 26 -->
 -- <g id="node19" class="node">
 -- <title>26</title>
 -- <ellipse fill="none" stroke="black" cx="722.31" cy="-410.86" rx="39.7" ry="12.04"/>
--- <text text-anchor="middle" x="722.31" y="-408.96" font-family="Times,serif" font-size="8.00">0.025816</text>
+-- <text text-anchor="middle" x="722.31" y="-408.96" font-family="Times,serif" font-size="8.00">0.104602</text>
 -- </g>
 -- <!-- 24&#45;&#45;26 -->
 -- <g id="edge58" class="edge">
@@ -3139,7 +3150,7 @@ select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as dra
 -- <g id="node23" class="node">
 -- <title>30</title>
 -- <ellipse fill="none" stroke="black" cx="843.66" cy="-246.79" rx="39.7" ry="12.04"/>
--- <text text-anchor="middle" x="843.66" y="-244.89" font-family="Times,serif" font-size="8.00">0.030442</text>
+-- <text text-anchor="middle" x="843.66" y="-244.89" font-family="Times,serif" font-size="8.00">0.109573</text>
 -- </g>
 -- <!-- 24&#45;&#45;30 -->
 -- <g id="edge60" class="edge">
@@ -3160,7 +3171,7 @@ select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as dra
 -- <g id="node18" class="node">
 -- <title>25</title>
 -- <ellipse fill="none" stroke="black" cx="652.18" cy="-422.96" rx="39.7" ry="12.04"/>
--- <text text-anchor="middle" x="652.18" y="-421.06" font-family="Times,serif" font-size="8.00">0.025567</text>
+-- <text text-anchor="middle" x="652.18" y="-421.06" font-family="Times,serif" font-size="8.00">0.103105</text>
 -- </g>
 -- <!-- 25&#45;&#45;26 -->
 -- <g id="edge63" class="edge">
@@ -3186,7 +3197,7 @@ select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as dra
 -- <g id="node20" class="node">
 -- <title>27</title>
 -- <ellipse fill="none" stroke="black" cx="915.73" cy="-254.29" rx="39.7" ry="12.04"/>
--- <text text-anchor="middle" x="915.73" y="-252.39" font-family="Times,serif" font-size="8.00">0.013037</text>
+-- <text text-anchor="middle" x="915.73" y="-252.39" font-family="Times,serif" font-size="8.00">0.040922</text>
 -- </g>
 -- <!-- 27&#45;&#45;30 -->
 -- <g id="edge67" class="edge">
