@@ -13,7 +13,9 @@ Datum matrix_eq(PG_FUNCTION_ARGS)
 	ERRORNULL(1);
 
 	a = OS_GETARG_MATRIX(0);
-	b = OS_GETARG_MATRIX(1);
+	b = OS_GETARG_MATRIX_A(1, a);
+	if (a == b)
+		PG_RETURN_BOOL(true);
 
 	OS_MTYPE(atype, a);
 	OS_MTYPE(btype, b);

@@ -23,6 +23,8 @@ Datum vector_set_element(PG_FUNCTION_ARGS)
 	OS_RETURN_VECTOR(vector);
 }
 
+SUPPORT_FN(vector_set_element, linitial);
+
 /* Local Variables: */
 /* mode: c */
 /* c-file-style: "postgresql" */

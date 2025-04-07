@@ -8,6 +8,7 @@ Datum vector_type(PG_FUNCTION_ARGS) {
 	size_t type_name_len;
 	os_Type *result;
 
+	LOGF();
 	ERRORNULL(0);
 
 	A = OS_GETARG_VECTOR(0);

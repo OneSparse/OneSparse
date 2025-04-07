@@ -22,8 +22,6 @@ PG_FUNCTION_INFO_V1(type_name);
 static Size type_get_flat_size(ExpandedObjectHeader *eohptr) {
 	os_Type *type;
 
-	LOGF();
-
 	type = (os_Type*) eohptr;
 	Assert(type->em_magic == type_MAGIC);
 
@@ -77,7 +75,7 @@ os_Type* new_type(
 								   "expanded type",
 								   ALLOCSET_DEFAULT_SIZES);
 
-	type = MemoryContextAlloc(objcxt, sizeof(os_Type));
+	type = MemoryContextAllocZero(objcxt, sizeof(os_Type));
 
 	EOH_init_header(&type->hdr, &type_methods, objcxt);
 
@@ -115,8 +113,6 @@ static void
 context_callback_type_free(void* ptr)
 {
 	os_Type *type = (os_Type *) ptr;
-	LOGF();
-
 	OS_CHECK(GrB_Type_free(&type->type),
 		  type->type,
 		  "Cannot GrB_Free Type");
@@ -129,9 +125,7 @@ os_Type* DatumGetType(Datum datum)
 {
 	os_Type *type;
 	os_FlatType *flat;
-
-	LOGF();
-	if (VARATT_IS_EXTERNAL_EXPANDED_RW(DatumGetPointer(datum))) {
+	if (VARATT_IS_EXTERNAL_EXPANDED(DatumGetPointer(datum))) {
 		type = TypeGetEOHP(datum);
 		Assert(type->em_magic == type_MAGIC);
 		return type;
@@ -155,8 +149,6 @@ Datum type_out(PG_FUNCTION_ARGS)
 {
 	char *result;
 	os_Type *type;
-
-	LOGF();
 	type = OS_GETARG_TYPE(0);
 
 	result = palloc(strlen(type->name)+1);

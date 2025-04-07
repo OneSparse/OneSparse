@@ -66,9 +66,9 @@ class Template:
     def source_write(self, part):
         typ = self.context.get('type')
         if typ is not None:
-            path = Path(self.source_dir, f'{self.name}_{part}_{typ.short}.h')
+            path = Path(self.source_dir, f'{self.name}/{self.name}_{part}_{typ.short}.h')
         else:
-            path = Path(self.source_dir, f'{self.name}_{part}.h')
+            path = Path(self.source_dir, f'{self.name}/{self.name}_{part}.h')
 
         if self.source_path(part).exists():
             outfile = open(path, 'w+')

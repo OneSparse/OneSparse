@@ -2,6 +2,24 @@
 #include "onesparse.h"
 PG_MODULE_MAGIC;
 
+void burble_notice_func(const char *format, ...)
+{
+	char buffer[1024*8];
+	size_t bsize = sizeof(buffer);
+	va_list args;
+    int result;
+
+    va_start(args, format);
+    result = vsnprintf(buffer, bsize, format, args); // Call vsnprintf
+	va_end(args);
+
+	if (result >= 0) {
+         ereport(NOTICE, (errmsg("%s", buffer)));
+    } else {
+		elog(ERROR, "Could not format burble message.");
+    }
+}
+
 uint64_t* get_c_array_from_pg_array(FunctionCallInfo fcinfo, int arg_number, uint64_t *out_nelems) {
     ArrayType *input_array;
     Datum *elements;
@@ -359,10 +377,19 @@ void free_function(void *p) {
   //  MemoryContextSwitchTo(oldcxt);
 }
 
+static void burble_assign_hook(bool newvalue, void *extra);
+static bool os_burble = false;
+
+static void burble_assign_hook(bool newvalue, void *extra)
+{
+	OK_CHECK(GrB_set (GrB_GLOBAL, (int32_t) newvalue, GxB_BURBLE),
+			 "Cannot set burble function");
+}
+
 void _PG_init(void)
 {
-	if (GrB_init(GrB_NONBLOCKING) != GrB_SUCCESS)
-		elog(ERROR, "Cannot initialize GraphBLAS");
+	OK_CHECK(GrB_init(GrB_NONBLOCKING),
+			 "Cannot initialize GraphBLAS");
 
 	initialize_types();
 	initialize_descriptors();
@@ -371,8 +398,21 @@ void _PG_init(void)
 	initialize_binaryops();
 	initialize_monoids();
 	initialize_semirings();
-}
 
+	OK_CHECK(GrB_set (GrB_GLOBAL, (void*) burble_notice_func, GxB_PRINTF, sizeof(void*)),
+			 "Cannot set burble print function");
+
+	DefineCustomBoolVariable("onesparse.burble",
+                             "Enable or disable the SuiteSparse burble feature.",
+                             "Session-level parameter to control burble behavior.",
+                             &os_burble,
+                             false,
+                             PGC_USERSET,
+                             0,
+                             NULL,
+                             burble_assign_hook,
+                             NULL);
+}
 
 /* Local Variables: */
 /* mode: c */

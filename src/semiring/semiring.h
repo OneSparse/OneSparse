@@ -26,9 +26,6 @@ os_Semiring* DatumGetSemiring(Datum d);
 
 #define OS_DETOAST_SEMIRING(_datum) (os_FlatSemiring*)PG_DETOAST_DATUM(datum)
 #define OS_GETARG_SEMIRING(_arg_num)  DatumGetSemiring(PG_GETARG_DATUM(_arg_num))
-#define OS_GETARG_SEMIRING_HANDLE(_arg_num)  DatumGetSemiring(PG_GETARG_DATUM(_arg_num))->semiring;
-#define OS_GETARG_SEMIRING_OR_NULL(_nargs, _arg_num) \
-	_nargs > _arg_num ? PG_ARGISNULL(_arg_num) ? NULL : OS_GETARG_SEMIRING(_arg_num) : NULL;
 #define OS_GETARG_SEMIRING_HANDLE_OR_NULL(_nargs, _arg_num) \
 	_nargs > _arg_num ? PG_ARGISNULL(_arg_num) ? NULL : OS_GETARG_SEMIRING(_arg_num)->semiring : NULL;
 #define OS_RETURN_SEMIRING(_semiring) return EOHPGetRWDatum(&(_semiring)->hdr)

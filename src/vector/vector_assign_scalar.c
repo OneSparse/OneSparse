@@ -13,6 +13,7 @@ vector_assign_scalar(PG_FUNCTION_ARGS)
 	GrB_Index size, ni = 0, *indexes = NULL;
 	int nargs;
 
+	LOGF();
 	nargs = PG_NARGS();
 	u = OS_GETARG_VECTOR(0);
 	s = OS_GETARG_SCALAR(1);
@@ -26,7 +27,7 @@ vector_assign_scalar(PG_FUNCTION_ARGS)
 		indexes = get_c_array_from_pg_array(fcinfo, 2, &ni);
 	}
 
-	mask = OS_GETARG_VECTOR_HANDLE_OR_NULL(nargs, 3);
+	mask = OS_GETARG_VECTOR_HANDLE_OR_NULL_A(nargs, 3, u);
 	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 4);
 	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 5);
 
@@ -42,6 +43,8 @@ vector_assign_scalar(PG_FUNCTION_ARGS)
 
 	OS_RETURN_VECTOR(u);
 }
+
+SUPPORT_FN(vector_assign_scalar, linitial);
 
 /* Local Variables: */
 /* mode: c */

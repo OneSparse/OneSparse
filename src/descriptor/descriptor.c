@@ -22,8 +22,6 @@ PG_FUNCTION_INFO_V1(descriptor_name);
 static Size descriptor_get_flat_size(ExpandedObjectHeader *eohptr) {
 	os_Descriptor *descriptor;
 
-	LOGF();
-
 	descriptor = (os_Descriptor*) eohptr;
 	Assert(descriptor->em_magic == descriptor_MAGIC);
 
@@ -77,7 +75,7 @@ os_Descriptor* new_descriptor(
 								   "expanded descriptor",
 								   ALLOCSET_DEFAULT_SIZES);
 
-	descriptor = MemoryContextAlloc(objcxt, sizeof(os_Descriptor));
+	descriptor = MemoryContextAllocZero(objcxt, sizeof(os_Descriptor));
 
 	EOH_init_header(&descriptor->hdr, &descriptor_methods, objcxt);
 
@@ -115,8 +113,6 @@ static void
 context_callback_descriptor_free(void* ptr)
 {
 	os_Descriptor *descriptor = (os_Descriptor *) ptr;
-	LOGF();
-
 	OS_CHECK(GrB_Descriptor_free(&descriptor->descriptor),
 		  descriptor->descriptor,
 		  "Cannot GrB_Free Descriptor");
@@ -130,8 +126,7 @@ os_Descriptor* DatumGetDescriptor(Datum datum)
 	os_Descriptor *descriptor;
 	os_FlatDescriptor *flat;
 
-	LOGF();
-	if (VARATT_IS_EXTERNAL_EXPANDED_RW(DatumGetPointer(datum))) {
+	if (VARATT_IS_EXTERNAL_EXPANDED(DatumGetPointer(datum))) {
 		descriptor = DescriptorGetEOHP(datum);
 		Assert(descriptor->em_magic == descriptor_MAGIC);
 		return descriptor;
@@ -156,7 +151,6 @@ Datum descriptor_out(PG_FUNCTION_ARGS)
 	char *result;
 	os_Descriptor *descriptor;
 
-	LOGF();
 	descriptor = OS_GETARG_DESCRIPTOR(0);
 
 	result = palloc(strlen(descriptor->name)+1);

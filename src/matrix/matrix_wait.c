@@ -18,6 +18,7 @@ Datum matrix_wait(PG_FUNCTION_ARGS)
 	OS_RETURN_MATRIX(A);
 }
 
+SUPPORT_FN(matrix_wait, linitial);
 
 /* Local Variables: */
 /* mode: c */

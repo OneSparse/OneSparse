@@ -12,6 +12,7 @@ matrix_reduce_scalar(PG_FUNCTION_ARGS)
 	os_Scalar *result;
 	int nargs;
 
+	LOGF();
 	nargs = PG_NARGS();
 	A = OS_GETARG_MATRIX(0);
 	OS_MTYPE(type, A);

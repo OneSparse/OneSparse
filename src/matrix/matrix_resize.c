@@ -27,6 +27,8 @@ Datum matrix_resize(PG_FUNCTION_ARGS)
 	OS_RETURN_MATRIX(A);
 }
 
+SUPPORT_FN(matrix_resize, linitial);
+
 /* Local Variables: */
 /* mode: c */
 /* c-file-style: "postgresql" */

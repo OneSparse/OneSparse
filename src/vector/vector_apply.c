@@ -4,10 +4,11 @@ PG_FUNCTION_INFO_V1(vector_apply);
 Datum vector_apply(PG_FUNCTION_ARGS)
 {
 	GrB_Type type;
-	os_Vector *u, *w, *mask;
-	os_Descriptor *descriptor;
-	os_BinaryOp *accum;
+	os_Vector *u, *w;
 	os_UnaryOp *op;
+	GrB_Vector mask;
+	GrB_Descriptor descriptor;
+	GrB_BinaryOp accum;
 	GrB_Index usize;
 	int nargs;
 
@@ -30,23 +31,25 @@ Datum vector_apply(PG_FUNCTION_ARGS)
 		w = new_vector(type, usize, CurrentMemoryContext, NULL);
 	}
 	else
-		w = OS_GETARG_VECTOR(2);
+		w = OS_GETARG_VECTOR_A(2, u);
 
-	mask = OS_GETARG_VECTOR_OR_NULL(nargs, 3);
-	accum = OS_GETARG_BINARYOP_OR_NULL(nargs, 4);
-	descriptor = OS_GETARG_DESCRIPTOR_OR_NULL(nargs, 5);
+	mask = OS_GETARG_VECTOR_HANDLE_OR_NULL_AB(nargs, 3, u, w);
+	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 4);
+	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 5);
 
 	OS_CHECK(GrB_apply(w->vector,
-					mask ? mask->vector : NULL,
-					accum ? accum->binaryop : NULL,
-					op->unaryop,
-					u->vector,
-					descriptor ? descriptor->descriptor : NULL),
-		  w->vector,
-		  "Error in GrB_Vector_apply");
+					   mask,
+					   accum,
+					   op->unaryop,
+					   u->vector,
+					   descriptor),
+			 w->vector,
+			 "Error in GrB_Vector_apply");
 
 	OS_RETURN_VECTOR(w);
 }
+
+SUPPORT_FN(vector_apply, lthird);
 
 /* Local Variables: */
 /* mode: c */

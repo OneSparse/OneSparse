@@ -15,8 +15,10 @@ Datum vector_wait(PG_FUNCTION_ARGS)
 	OS_CHECK(GrB_Vector_wait(vector->vector, waitmode),
 		  vector->vector,
 		  "Error waiting for vector.");
-	PG_RETURN_VOID();
+	OS_RETURN_VECTOR(vector);
 }
+
+SUPPORT_FN(vector_wait, linitial);
 
 /* Local Variables: */
 /* mode: c */

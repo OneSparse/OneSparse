@@ -46,6 +46,8 @@ matrix_assign_row_vector(PG_FUNCTION_ARGS)
 	OS_RETURN_MATRIX(C);
 }
 
+SUPPORT_FN(matrix_assign_row_vector, linitial);
+
 /* Local Variables: */
 /* mode: c */
 /* c-file-style: "postgresql" */

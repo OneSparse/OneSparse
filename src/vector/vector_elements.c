@@ -18,6 +18,7 @@ Datum vector_elements(PG_FUNCTION_ARGS)
 	if (SRF_IS_FIRSTCALL()) {
 		MemoryContext oldcontext;
 
+		LOGF();
 		funcctx = SRF_FIRSTCALL_INIT();
 		oldcontext = MemoryContextSwitchTo(funcctx->multi_call_memory_ctx);
 		vector = OS_GETARG_VECTOR(0);

@@ -56,6 +56,8 @@ Datum matrix_vxm(PG_FUNCTION_ARGS)
 	OS_RETURN_VECTOR(c);
 }
 
+SUPPORT_FN(matrix_vxm, lfourth);
+
 /* Local Variables: */
 /* mode: c */
 /* c-file-style: "postgresql" */

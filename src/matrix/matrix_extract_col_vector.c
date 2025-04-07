@@ -52,6 +52,8 @@ matrix_extract_col_vector(PG_FUNCTION_ARGS)
 	OS_RETURN_VECTOR(C);
 }
 
+SUPPORT_FN(matrix_extract_col_vector, lfourth);
+
 /* Local Variables: */
 /* mode: c */
 /* c-file-style: "postgresql" */

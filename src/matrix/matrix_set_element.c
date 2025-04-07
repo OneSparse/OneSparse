@@ -25,6 +25,8 @@ Datum matrix_set_element(PG_FUNCTION_ARGS)
 	OS_RETURN_MATRIX(matrix);
 }
 
+SUPPORT_FN(matrix_set_element, linitial);
+
 /* Local Variables: */
 /* mode: c */
 /* c-file-style: "postgresql" */

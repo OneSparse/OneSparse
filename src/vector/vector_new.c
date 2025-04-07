@@ -7,6 +7,7 @@ Datum vector_new(PG_FUNCTION_ARGS)
 	GrB_Index size;
 	os_Vector *A;
 
+	LOGF();
 	type = OS_GETARG_TYPE(0);
 	size = PG_GETARG_INT64(1);
 	if (size == -1)

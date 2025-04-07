@@ -18,6 +18,8 @@ Datum scalar_wait(PG_FUNCTION_ARGS)
 	OS_RETURN_SCALAR(scalar);
 }
 
+SUPPORT_FN(scalar_wait, linitial);
+
 /* Local Variables: */
 /* mode: c */
 /* c-file-style: "postgresql" */

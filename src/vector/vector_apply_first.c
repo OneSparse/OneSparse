@@ -34,9 +34,9 @@ Datum vector_apply_first(PG_FUNCTION_ARGS)
 		w = new_vector(type, usize, CurrentMemoryContext, NULL);
 	}
 	else
-		w = OS_GETARG_VECTOR(3);
+		w = OS_GETARG_VECTOR_A(3, u);
 
-	mask = OS_GETARG_VECTOR_HANDLE_OR_NULL(nargs, 4);
+	mask = OS_GETARG_VECTOR_HANDLE_OR_NULL_AB(nargs, 4, u, w);
 	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 5);
 	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 6);
 
@@ -51,6 +51,8 @@ Datum vector_apply_first(PG_FUNCTION_ARGS)
 			 "Error in grb_vector_apply_binaryop1st");
 	OS_RETURN_VECTOR(w);
 }
+
+SUPPORT_FN(vector_apply_first, lfourth);
 
 /* Local Variables: */
 /* mode: c */
