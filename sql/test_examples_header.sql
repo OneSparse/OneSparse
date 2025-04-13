@@ -233,6 +233,6 @@ create or replace function pagerank(
     end;
     $$;
 
-SELECT pagerank(resize(graph, 34, 34)) as node_labels from test_graphs where name = 'karate' \gset
-select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as draw_source from test_graphs where name = 'karate' \gset
-\i sql/draw_sfdp.sql
+-- SELECT pagerank(resize(graph, 34, 34)) as node_labels from test_graphs where name = 'karate' \gset
+-- select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as draw_source from test_graphs where name = 'karate' \gset
+-- \i sql/draw_sfdp.sql
