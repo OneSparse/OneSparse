@@ -17,7 +17,7 @@ jobs:
 
       - name: Run tests
         run: |
-          docker build --progress=plain -t onesparse/onesparse:demo -f Dockerfile-debug .
+          docker build --progress=plain -t onesparse/onesparse:demo -f Dockerfile-tests .
           docker run -d -e POSTGRES_PASSWORD=password -it --name onesparse-test onesparse/onesparse:demo
           sleep 5
           docker exec -u postgres onesparse-test make installcheck
