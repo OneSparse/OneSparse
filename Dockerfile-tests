@@ -1,6 +1,4 @@
 FROM ubuntu:latest
-ARG UID    
-ARG GID
    
 # install base dependences    
 RUN apt-get update && \
@@ -10,7 +8,7 @@ RUN apt-get update && \
 
 RUN deluser --remove-home ubuntu
 # add postgres user and make data dir        
-RUN groupadd --gid ${GID} -r postgres && useradd --uid ${UID} --gid ${GID} --no-log-init -r -m -s /bin/bash -g postgres -G sudo postgres
+RUN groupadd -r postgres && useradd --no-log-init -r -m -s /bin/bash -g postgres -G sudo postgres
 
 # make postgres a sudoer
 RUN echo "postgres ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/user && \
