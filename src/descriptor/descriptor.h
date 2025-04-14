@@ -26,9 +26,6 @@ os_Descriptor* DatumGetDescriptor(Datum d);
 
 #define OS_DETOAST_DESCRIPTOR(_datum) (os_FlatDescriptor*)PG_DETOAST_DATUM(datum)
 #define OS_GETARG_DESCRIPTOR(_arg_num)  DatumGetDescriptor(PG_GETARG_DATUM(_arg_num))
-#define OS_GETARG_DESCRIPTOR_HANDLE(_arg_num)  DatumGetDescriptor(PG_GETARG_DATUM(_arg_num))->descriptor;
-#define OS_GETARG_DESCRIPTOR_OR_NULL(_nargs, _arg_num) \
-	_nargs > _arg_num ? PG_ARGISNULL(_arg_num) ? NULL : OS_GETARG_DESCRIPTOR(_arg_num) : NULL;
 #define OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(_nargs, _arg_num) \
 	_nargs > _arg_num ? PG_ARGISNULL(_arg_num) ? NULL : OS_GETARG_DESCRIPTOR(_arg_num)->descriptor : NULL;
 #define OS_RETURN_DESCRIPTOR(_descriptor) return EOHPGetRWDatum(&(_descriptor)->hdr)

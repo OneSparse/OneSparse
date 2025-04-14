@@ -3,10 +3,10 @@
 PG_FUNCTION_INFO_V1(matrix_eunion);
 Datum matrix_eunion(PG_FUNCTION_ARGS)
 {
-	GrB_Type utype, vtype, wtype;
-	os_Matrix *u, *v, *w;
+	GrB_Type atype, btype, ctype;
+	os_Matrix *a, *b, *c;
 	GrB_Matrix mask;
-	os_Scalar *a, *b;
+	os_Scalar *alpha, *beta;
 	GrB_Descriptor descriptor;
 	GrB_BinaryOp op;
 	GrB_BinaryOp accum;
@@ -20,46 +20,50 @@ Datum matrix_eunion(PG_FUNCTION_ARGS)
 	ERRORNULL(3);
 
 	nargs = PG_NARGS();
-	u = OS_GETARG_MATRIX(0);
-	a = OS_GETARG_SCALAR(1);
-	v = OS_GETARG_MATRIX(2);
-	b = OS_GETARG_SCALAR(3);
+	a = OS_GETARG_MATRIX(0);
+	alpha = OS_GETARG_SCALAR(1);
+	b = OS_GETARG_MATRIX_A(2, a);
+	beta = OS_GETARG_SCALAR(3);
 
-	OS_MTYPE(utype, u);
-	OS_MTYPE(vtype, v);
-	wtype = type_promote(utype, vtype);
+	OS_MTYPE(atype, a);
+	OS_MTYPE(btype, b);
+	ctype = type_promote(atype, btype);
 
 	op = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 4);
 	if (op == NULL)
 	{
-		op = default_binaryop(wtype);
+		op = default_binaryop(ctype);
 	}
 	if (PG_ARGISNULL(5))
 	{
-		OS_MNROWS(nrows, u);
-		OS_MNCOLS(ncols, u);
-		w = new_matrix(wtype, nrows, ncols, CurrentMemoryContext, NULL);
+		OS_MNROWS(nrows, a);
+		OS_MNCOLS(ncols, a);
+		c = new_matrix(ctype, nrows, ncols, CurrentMemoryContext, NULL);
 	}
 	else
-		w = OS_GETARG_MATRIX(5);
+		c = OS_GETARG_MATRIX(5);
 
-	mask = OS_GETARG_MATRIX_HANDLE_OR_NULL(nargs, 6);
+	mask = OS_GETARG_MATRIX_HANDLE_OR_NULL_ABC(nargs, 6, a, b, c);
 	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 7);
 	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 8);
 
-	OS_CHECK(GxB_eWiseUnion(w->matrix,
+	OS_CHECK(GxB_eWiseUnion(c->matrix,
 							mask,
 							accum,
 							op,
-							u->matrix,
-							a->scalar,
-							v->matrix,
-							b->scalar,
+							a->matrix,
+							alpha->scalar,
+							b->matrix,
+							beta->scalar,
 							descriptor),
-			 w->matrix,
+			 c->matrix,
 			 "Error matrix eWiseUnion.");
-	OS_RETURN_MATRIX(w);
+	OS_RETURN_MATRIX(c);
 }
+
+#define lsixth(l) lfirst(list_nth_cell(l, 5))
+SUPPORT_FN(matrix_eunion, lsixth);
+#undef lsixth
 
 /* Local Variables: */
 /* mode: c */

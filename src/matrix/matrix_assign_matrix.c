@@ -13,7 +13,7 @@ Datum matrix_assign_matrix(PG_FUNCTION_ARGS)
 
 	nargs = PG_NARGS();
 	C = OS_GETARG_MATRIX(0);
-	A = OS_GETARG_MATRIX(1);
+	A = OS_GETARG_MATRIX_A(1, C);
 
 	OS_MTYPE(type, A);
 	OS_MNROWS(nrows, A);
@@ -31,7 +31,7 @@ Datum matrix_assign_matrix(PG_FUNCTION_ARGS)
 		cols = get_c_array_from_pg_array(fcinfo, 3, &nj);
 	}
 
-	mask = OS_GETARG_MATRIX_HANDLE_OR_NULL(nargs, 4);
+	mask = OS_GETARG_MATRIX_HANDLE_OR_NULL_AB(nargs, 4, C, A);
 	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 5);
 	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 6);
 
@@ -49,6 +49,8 @@ Datum matrix_assign_matrix(PG_FUNCTION_ARGS)
 
 	OS_RETURN_MATRIX(C);
 }
+
+SUPPORT_FN(matrix_assign_matrix, linitial);
 
 /* Local Variables: */
 /* mode: c */

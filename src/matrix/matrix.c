@@ -18,8 +18,6 @@ static Size matrix_get_flat_size(ExpandedObjectHeader *eohptr) {
 	void *serialized_data;
 	GrB_Index serialized_size;
 
-	LOGF();
-
 	matrix = (os_Matrix*) eohptr;
 	Assert(matrix->em_magic == matrix_MAGIC);
 
@@ -110,7 +108,7 @@ os_Matrix* new_matrix(
 								   "expanded matrix",
 								   ALLOCSET_DEFAULT_SIZES);
 
-	matrix = MemoryContextAlloc(objcxt,	sizeof(os_Matrix));
+	matrix = MemoryContextAllocZero(objcxt,	sizeof(os_Matrix));
 
 	EOH_init_header(&matrix->hdr, &matrix_methods, objcxt);
 
@@ -171,8 +169,6 @@ static void
 context_callback_matrix_free(void* ptr)
 {
 	os_Matrix *matrix = (os_Matrix *) ptr;
-	LOGF();
-
 	OS_CHECK(GrB_Matrix_free(&matrix->matrix),
 		  matrix->matrix,
 		  "Cannot GrB_Free Matrix");
@@ -185,15 +181,108 @@ os_Matrix* DatumGetMatrix(Datum datum)
 {
 	os_Matrix *matrix;
 	os_FlatMatrix *flat;
-	LOGF();
-	if (VARATT_IS_EXTERNAL_EXPANDED_RW(DatumGetPointer(datum))) {
+	Pointer flat_datum_pointer;
+
+	flat_datum_pointer = DatumGetPointer(datum);
+
+	if (VARATT_IS_EXTERNAL_EXPANDED(flat_datum_pointer)) {
 		matrix = MatrixGetEOHP(datum);
 		Assert(matrix->em_magic == matrix_MAGIC);
 		return matrix;
 	}
 	flat = OS_DETOAST_MATRIX(datum);
 	datum = expand_matrix(flat, CurrentMemoryContext);
-	return MatrixGetEOHP(datum);
+	matrix = MatrixGetEOHP(datum);
+	matrix->flat_datum_pointer = flat_datum_pointer;
+	return matrix;
+}
+
+os_Matrix* DatumGetMatrixMaybeA(Datum datum, os_Matrix *A)
+{
+	os_Matrix *matrix;
+	os_FlatMatrix *flat;
+	Pointer flat_datum_pointer;
+
+	flat_datum_pointer = DatumGetPointer(datum);
+
+	if (VARATT_IS_EXTERNAL_EXPANDED(flat_datum_pointer)) {
+		matrix = MatrixGetEOHP(datum);
+		Assert(matrix->em_magic == matrix_MAGIC);
+		return matrix;
+	}
+
+	else if (flat_datum_pointer == A->flat_datum_pointer)
+	{
+		return A;
+	}
+
+	flat = OS_DETOAST_MATRIX(datum);
+	datum = expand_matrix(flat, CurrentMemoryContext);
+	matrix = MatrixGetEOHP(datum);
+	matrix->flat_datum_pointer = flat_datum_pointer;
+	return matrix;
+}
+
+os_Matrix* DatumGetMatrixMaybeAB(Datum datum, os_Matrix *A, os_Matrix *B)
+{
+	os_Matrix *matrix;
+	os_FlatMatrix *flat;
+	Pointer flat_datum_pointer;
+
+	flat_datum_pointer = DatumGetPointer(datum);
+
+	if (VARATT_IS_EXTERNAL_EXPANDED(flat_datum_pointer)) {
+		matrix = MatrixGetEOHP(datum);
+		Assert(matrix->em_magic == matrix_MAGIC);
+		return matrix;
+	}
+	else if (flat_datum_pointer == A->flat_datum_pointer)
+	{
+		return A;
+	}
+	else if (flat_datum_pointer == B->flat_datum_pointer)
+	{
+		return B;
+	}
+
+	flat = OS_DETOAST_MATRIX(datum);
+	datum = expand_matrix(flat, CurrentMemoryContext);
+	matrix = MatrixGetEOHP(datum);
+	matrix->flat_datum_pointer = flat_datum_pointer;
+	return matrix;
+}
+
+os_Matrix* DatumGetMatrixMaybeABC(Datum datum, os_Matrix *A, os_Matrix *B, os_Matrix *C)
+{
+	os_Matrix *matrix;
+	os_FlatMatrix *flat;
+	Pointer flat_datum_pointer;
+
+	flat_datum_pointer = DatumGetPointer(datum);
+
+	if (VARATT_IS_EXTERNAL_EXPANDED(flat_datum_pointer)) {
+		matrix = MatrixGetEOHP(datum);
+		Assert(matrix->em_magic == matrix_MAGIC);
+		return matrix;
+	}
+	else if (flat_datum_pointer == A->flat_datum_pointer)
+	{
+		return A;
+	}
+	else if (flat_datum_pointer == B->flat_datum_pointer)
+	{
+		return B;
+	}
+	else if (flat_datum_pointer == C->flat_datum_pointer)
+	{
+		return C;
+	}
+
+	flat = OS_DETOAST_MATRIX(datum);
+	datum = expand_matrix(flat, CurrentMemoryContext);
+	matrix = MatrixGetEOHP(datum);
+	matrix->flat_datum_pointer = flat_datum_pointer;
+	return matrix;
 }
 
 /* Local Variables: */

@@ -27,9 +27,6 @@ os_Scalar* DatumGetScalar(Datum d);
 
 #define OS_DETOAST_SCALAR(_datum) (os_FlatScalar*)PG_DETOAST_DATUM(datum)
 #define OS_GETARG_SCALAR(_arg_num)  DatumGetScalar(PG_GETARG_DATUM(_arg_num))
-#define OS_GETARG_SCALAR_HANDLE(_arg_num)  DatumGetScalar(PG_GETARG_DATUM(_arg_num))->scalar;
-#define OS_GETARG_SCALAR_OR_NULL(_nargs, _arg_num) \
-	_nargs > _arg_num ? PG_ARGISNULL(_arg_num) ? NULL : OS_GETARG_SCALAR(_arg_num) : NULL;
 #define OS_GETARG_SCALAR_HANDLE_OR_NULL(_nargs, _arg_num) \
 	_nargs > _arg_num ? PG_ARGISNULL(_arg_num) ? NULL : OS_GETARG_SCALAR(_arg_num)->scalar : NULL;
 #define OS_RETURN_SCALAR(_scalar) return EOHPGetRWDatum(&(_scalar)->hdr)

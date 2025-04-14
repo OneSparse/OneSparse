@@ -122,25 +122,117 @@ select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as dra
 -- than node centrality.
 --
 
-CREATE OR REPLACE FUNCTION tc(a matrix)
+CREATE OR REPLACE FUNCTION tcentrality(a matrix)
     RETURNS vector LANGUAGE plpgsql AS
     $$
     DECLARE
-    m matrix;
-    t matrix;
-    y vector;
-    k scalar;
+        n bigint;  -- number of rows in a
+        l matrix;  -- lower triangle of a
+        t matrix;  -- triangle count
+        c vector;
+        y vector;
+        w vector;
+        u vector;
+        k scalar;
+        plus_monoid monoid = 'plus_monoid_fp32';
+        plus_pair semiring = 'plus_pair_fp32';
+        plus_second semiring = 'plus_second_fp32';
+        times binaryop = 'times_fp32';
+        div binaryop = 'div_fp32';
+        plus binaryop = 'plus_fp32';
+        st1 descriptor = 'st1';
+        t0 descriptor = 't0';
+        rtype type = 'fp32';
+        start_time timestamp;
     BEGIN
-        m = tril(a, -1);
-        t = mxm(a, a, 'plus_pair_int32', mask=>m, descr=>'st1');
-        y = reduce_cols(t) |+ reduce_rows(t);
+        a = wait(a);
+        start_time = clock_timestamp();
+        n = nrows(a);
+        y = vector(rtype, n);
+        w = vector(rtype, n);
+        u = vector(rtype, n);
+        c = vector(rtype, n);
+        l = tril(a, -1);
+        t = matrix(rtype, n, n);
+        t = mxm(a, a, plus_pair, mask=>l, c=>t, descr=>st1);
+        y = assign(y, 0);
+        y = reduce_cols(t, plus_monoid, accum=>plus, descr=>t0);
+        y = reduce_cols(t, plus_monoid, accum=>plus);
         k = reduce_scalar(y);
-        RETURN 3 * ((a @ y) |- 2 * (one(t) @ y) |+ y) / k;
+        w = mxv(t, y, plus_second, c=>w);
+        w = mxv(t, y, plus_second, accum=>plus, c=>w, descr=>t0);
+        w = apply(w, -2, times, c=>w);
+        u = mxv(a, y, plus_second, c=>u);
+        c = apply(3, u, times, c=>c);
+        c = eadd(w, y, plus, accum=>plus, c=>c);
+        c = apply(c, k, div, c=>c);
+        return c;
     END;
     $$;
 
-SELECT tc(cast_to(graph, 'fp64')) as node_labels from test_graphs where name = 'karate' \gset
+
+SELECT tcentrality(resize(graph, 34, 34)) as node_labels from test_graphs where name = 'karate' \gset
 select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as draw_source from test_graphs where name = 'karate' \gset
 \i sql/draw_sfdp.sql
 
 -- ## Page Rank TODO
+
+create or replace function pagerank(
+    a matrix,
+    damping real default 0.85,
+    itermax integer default 100,
+    itermin integer default 50,
+    tol real default 1e-4
+    )
+    returns vector language plpgsql as
+    $$
+    declare
+        rtype type = 'fp32';
+        n bigint;
+        teleport scalar;
+        rdiff real = 1.0;
+        b matrix;
+        d_out vector;
+        t vector;
+        w vector;
+        r vector;
+        plus_second semiring = 'plus_second_fp32';
+        abs unaryop = 'abs_fp32';
+        plus binaryop = 'plus_fp32';
+        div binaryop = 'div_fp32';
+        minus binaryop = 'minus_fp32';
+        t0 descriptor = 't0';
+        start_time timestamp;
+        end_time timestamp;
+    begin
+        a = wait(a);
+        start_time = clock_timestamp();
+        n = nrows(a);
+        teleport = ((1 - damping) / n)::real;
+        b = apply(a, 'one_int32'::unaryop, c=>b);
+        d_out = apply(reduce_rows(a), 'identity_fp32'::unaryop, c=>d_out);
+        t = vector(rtype, n);
+        w = vector(rtype, n);
+        r = vector(rtype, n);
+        r = assign(r, 1::real / n);
+        d_out = assign(d_out, damping::scalar, accum=>div);
+        for i in 0..itermax loop
+            t = dup(r);
+            r = assign(r, teleport);
+            w = eadd(t, d_out, div, c=>w);
+            r = mxv(a, w, plus_second, c=>r, accum=>plus, descr=>t0);
+            if i >= itermin then
+                t = assign(t, r, accum=>minus);
+                t = apply(t, abs, c=>t);
+                rdiff = reduce_scalar(t);
+                exit when rdiff < tol;
+            end if;
+        end loop;
+        end_time = clock_timestamp();
+        return r;
+    end;
+    $$;
+
+-- SELECT pagerank(resize(graph, 34, 34)) as node_labels from test_graphs where name = 'karate' \gset
+-- select draw(triu(graph), :'node_labels', directed=>false, weights=>false) as draw_source from test_graphs where name = 'karate' \gset
+-- \i sql/draw_sfdp.sql

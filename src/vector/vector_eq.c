@@ -13,7 +13,9 @@ Datum vector_eq(PG_FUNCTION_ARGS)
 	ERRORNULL(1);
 
 	u = OS_GETARG_VECTOR(0);
-	v = OS_GETARG_VECTOR(1);
+	v = OS_GETARG_VECTOR_A(1, u);
+	if (u == v)
+		PG_RETURN_BOOL(true);
 
 	OS_VTYPE(utype, u);
 	OS_VTYPE(vtype, v);

@@ -25,9 +25,9 @@ Datum matrix_transpose(PG_FUNCTION_ARGS)
 		c = new_matrix(type, nrows, ncols, CurrentMemoryContext, NULL);
 	}
 	else
-		c = OS_GETARG_MATRIX(1);
+		c = OS_GETARG_MATRIX_A(1, a);
 
-	mask = OS_GETARG_MATRIX_HANDLE_OR_NULL(nargs, 2);
+	mask = OS_GETARG_MATRIX_HANDLE_OR_NULL_AB(nargs, 2, a, c);
 	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 3);
 	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 4);
 
@@ -36,10 +36,12 @@ Datum matrix_transpose(PG_FUNCTION_ARGS)
 						   accum,
 						   a->matrix,
 						   descriptor),
-		  c->matrix,
-		  "Error in transpose");
+			 c->matrix,
+			 "Error in transpose");
 	OS_RETURN_MATRIX(c);
 }
+
+SUPPORT_FN(matrix_transpose, lsecond);
 
 /* Local Variables: */
 /* mode: c */

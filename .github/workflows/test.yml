@@ -16,11 +16,5 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Run tests
-        run: |
-          docker build --progress=plain -t onesparse/onesparse:demo -f Dockerfile-debug .
-          docker run -d -e POSTGRES_PASSWORD=password -it --name onesparse-test onesparse/onesparse:demo
-          sleep 5
-          docker exec -u postgres onesparse-test make installcheck
-          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-          docker push onesparse/onesparse:demo
+        run: ./test.sh
 

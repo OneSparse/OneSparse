@@ -26,9 +26,6 @@ os_Type* DatumGetType(Datum d);
 
 #define OS_DETOAST_TYPE(_datum) (os_FlatType*)PG_DETOAST_DATUM(datum)
 #define OS_GETARG_TYPE(_arg_num)  DatumGetType(PG_GETARG_DATUM(_arg_num))
-#define OS_GETARG_TYPE_HANDLE(_arg_num)  DatumGetType(PG_GETARG_DATUM(_arg_num))->type;
-#define OS_GETARG_TYPE_OR_NULL(_nargs, _arg_num) \
-	_nargs > _arg_num ? PG_ARGISNULL(_arg_num) ? NULL : OS_GETARG_TYPE(_arg_num) : NULL;
 #define OS_GETARG_TYPE_HANDLE_OR_NULL(_nargs, _arg_num) \
 	_nargs > _arg_num ? PG_ARGISNULL(_arg_num) ? NULL : OS_GETARG_TYPE(_arg_num)->type : NULL;
 #define OS_RETURN_TYPE(_type) return EOHPGetRWDatum(&(_type)->hdr)

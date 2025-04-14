@@ -33,7 +33,7 @@ matrix_assign_scalar(PG_FUNCTION_ARGS)
 		cols = get_c_array_from_pg_array(fcinfo, 3, &nj);
 	}
 
-	mask = OS_GETARG_MATRIX_HANDLE_OR_NULL(nargs, 4);
+	mask = OS_GETARG_MATRIX_HANDLE_OR_NULL_A(nargs, 4, C);
 	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 5);
 	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 6);
 
@@ -51,6 +51,8 @@ matrix_assign_scalar(PG_FUNCTION_ARGS)
 
 	OS_RETURN_MATRIX(C);
 }
+SUPPORT_FN(matrix_assign_scalar, linitial);
+
 /* Local Variables: */
 /* mode: c */
 /* c-file-style: "postgresql" */

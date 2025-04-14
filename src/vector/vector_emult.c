@@ -17,7 +17,7 @@ Datum vector_emult(PG_FUNCTION_ARGS)
 	ERRORNULL(1);
 
 	u = OS_GETARG_VECTOR(0);
-	v = OS_GETARG_VECTOR(1);
+	v = OS_GETARG_VECTOR_A(1, u);
 	nargs = PG_NARGS();
 
 	OS_VTYPE(utype, u);
@@ -36,9 +36,9 @@ Datum vector_emult(PG_FUNCTION_ARGS)
 		w = new_vector(wtype, usize, CurrentMemoryContext, NULL);
 	}
 	else
-		w = OS_GETARG_VECTOR(3);
+		w = OS_GETARG_VECTOR_AB(3, u, v);
 
-	mask = OS_GETARG_VECTOR_HANDLE_OR_NULL(nargs, 4);
+	mask = OS_GETARG_VECTOR_HANDLE_OR_NULL_ABC(nargs, 4, u, v, w);
 	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 5);
 	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 6);
 
@@ -54,6 +54,8 @@ Datum vector_emult(PG_FUNCTION_ARGS)
 
 	OS_RETURN_VECTOR(w);
 }
+
+SUPPORT_FN(vector_emult, lfourth);
 
 /* Local Variables: */
 /* mode: c */

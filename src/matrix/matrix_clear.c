@@ -11,11 +11,12 @@ Datum matrix_clear(PG_FUNCTION_ARGS)
 	A = OS_GETARG_MATRIX(0);
 
 	OS_CHECK(GrB_Matrix_clear(A->matrix),
-		  A->matrix,
-		  "Error clearing matrix.");
+			 A->matrix,
+			 "Error clearing matrix.");
 	OS_RETURN_MATRIX(A);
 }
 
+SUPPORT_FN(matrix_clear, linitial);
 
 /* Local Variables: */
 /* mode: c */

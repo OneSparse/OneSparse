@@ -45,6 +45,8 @@ Datum FN(set_scalar)(PG_FUNCTION_ARGS)
 	OS_RETURN_SCALAR(scalar);
 }
 
+// SUPPORT_FN(FN(set_scalar_support), linitial);
+
 Datum FN(cast_scalar)(PG_FUNCTION_ARGS)
 {
 	os_Scalar* scalar;

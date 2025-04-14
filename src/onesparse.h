@@ -16,11 +16,13 @@
 #include "access/htup_details.h"
 #include "utils/array.h"
 #include "utils/arrayaccess.h"
+#include "utils/guc.h"
+#include "utils/varlena.h"
 #include "catalog/pg_type_d.h"
 #include "catalog/pg_type.h"
 #include "utils/lsyscache.h"
 #include "nodes/pg_list.h"
-#include "utils/varlena.h"
+#include "nodes/supportnodes.h"
 #include "common/hashfn.h"
 #include "suitesparse/GraphBLAS.h"
 #include "access/xact.h"
@@ -49,6 +51,16 @@
                 const char *emsg;                             \
                 GrB_error(&emsg, obj);                        \
                 elog(ERROR, "%s %s: %s", ename, emsg, msg);   \
+            }                                                 \
+    } while (0)                                               \
+
+#define OK_CHECK(method, msg)                               \
+    do {                                                      \
+        GrB_Info __info = method ;                            \
+        if (__info != GrB_SUCCESS)  \
+            {                                                 \
+				const char *ename = error_name(__info);         \
+                elog(ERROR, "%s: %s", ename, msg);   \
             }                                                 \
     } while (0)                                               \
 
@@ -97,6 +109,24 @@
 			 _s->scalar,\
 			 "Error extracting scalar nvals.");
 
+#define SUPPORT_FN(name, getter)\
+	PG_FUNCTION_INFO_V1(CCAT(name, _support));\
+	Datum CCAT(name, _support)(PG_FUNCTION_ARGS)\
+	{\
+	Node *rawreq = (Node *) PG_GETARG_POINTER(0);\
+	Node *ret = NULL;\
+	if (IsA(rawreq, SupportRequestModifyInPlace))\
+	{\
+	SupportRequestModifyInPlace *req = (SupportRequestModifyInPlace *) rawreq;\
+	Param *arg = (Param *) getter(req->args);\
+	\
+	if (arg && IsA(arg, Param) &&\
+		arg->paramkind == PARAM_EXTERN &&\
+		arg->paramid == req->paramid)\
+		ret = (Node *) arg;\
+	}\
+	PG_RETURN_POINTER(ret);\
+	}
 
 #ifdef OS_DEBUG
 #define LOGF() elog(DEBUG1, __func__)
@@ -136,6 +166,8 @@ GrB_IndexUnaryOp lookup_indexunaryop(char *name);
 GrB_BinaryOp lookup_binaryop(char *name);
 GrB_Monoid lookup_monoid(char *name);
 GrB_Semiring lookup_semiring(char *name);
+
+void burble_notice_func(const char *fmt, ...);
 
 void _PG_init(void);
 

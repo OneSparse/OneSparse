@@ -19,8 +19,6 @@ static Size scalar_get_flat_size(ExpandedObjectHeader *eohptr) {
 	GrB_Index nvals;
 	Size data_size;
 
-	LOGF();
-
 	scalar = (os_Scalar*) eohptr;
 	Assert(scalar->em_magic == scalar_MAGIC);
 
@@ -164,7 +162,7 @@ os_Scalar* new_scalar(
 								   "expanded scalar",
 								   ALLOCSET_DEFAULT_SIZES);
 
-	scalar = MemoryContextAlloc(objcxt,	sizeof(os_Scalar));
+	scalar = MemoryContextAllocZero(objcxt,	sizeof(os_Scalar));
 
 	EOH_init_header(&scalar->hdr, &scalar_methods, objcxt);
 
@@ -286,8 +284,6 @@ static void
 context_callback_scalar_free(void* ptr)
 {
 	os_Scalar *scalar = (os_Scalar *) ptr;
-	LOGF();
-
 	OS_CHECK(GrB_Scalar_free(&scalar->scalar),
 		  scalar->scalar,
 		  "Cannot GrB_Free Scalar");
@@ -301,8 +297,7 @@ os_Scalar* DatumGetScalar(Datum datum)
 	os_Scalar *scalar;
 	os_FlatScalar *flat;
 
-	LOGF();
-	if (VARATT_IS_EXTERNAL_EXPANDED_RW(DatumGetPointer(datum))) {
+	if (VARATT_IS_EXTERNAL_EXPANDED(DatumGetPointer(datum))) {
 		scalar = ScalarGetEOHP(datum);
 		Assert(scalar->em_magic == scalar_MAGIC);
 		return scalar;

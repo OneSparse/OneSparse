@@ -3891,7 +3891,7 @@ select info(a) from test_fixture;
 ├───────────────────────────────────────────────┤
 │                                              ↵│
 │   4x4 GraphBLAS int32_t matrix, bitmap by row↵│
-│   A->matrix, 9 entries, memory: 312 bytes    ↵│
+│   A->matrix, 9 entries, memory: 320 bytes    ↵│
 │                                              ↵│
 │                                               │
 └───────────────────────────────────────────────┘

@@ -8,6 +8,7 @@ Datum FN(vector_agg)(PG_FUNCTION_ARGS)
     os_Vector *state;
 	MemoryContext aggcontext;
 
+	LOGF();
     if (PG_ARGISNULL(0))
     {
         if (!AggCheckCallContext(fcinfo, &aggcontext)) {

@@ -22,8 +22,6 @@ PG_FUNCTION_INFO_V1(indexunaryop_name);
 static Size indexunaryop_get_flat_size(ExpandedObjectHeader *eohptr) {
 	os_IndexUnaryOp *indexunaryop;
 
-	LOGF();
-
 	indexunaryop = (os_IndexUnaryOp*) eohptr;
 	Assert(indexunaryop->em_magic == indexunaryop_MAGIC);
 
@@ -77,7 +75,7 @@ os_IndexUnaryOp* new_indexunaryop(
 								   "expanded indexunaryop",
 								   ALLOCSET_DEFAULT_SIZES);
 
-	indexunaryop = MemoryContextAlloc(objcxt, sizeof(os_IndexUnaryOp));
+	indexunaryop = MemoryContextAllocZero(objcxt, sizeof(os_IndexUnaryOp));
 
 	EOH_init_header(&indexunaryop->hdr, &indexunaryop_methods, objcxt);
 
@@ -115,8 +113,6 @@ static void
 context_callback_indexunaryop_free(void* ptr)
 {
 	os_IndexUnaryOp *indexunaryop = (os_IndexUnaryOp *) ptr;
-	LOGF();
-
 	OS_CHECK(GrB_IndexUnaryOp_free(&indexunaryop->indexunaryop),
 		  indexunaryop->indexunaryop,
 		  "Cannot GrB_Free IndexUnaryOp");
@@ -130,8 +126,7 @@ os_IndexUnaryOp* DatumGetIndexUnaryOp(Datum datum)
 	os_IndexUnaryOp *indexunaryop;
 	os_FlatIndexUnaryOp *flat;
 
-	LOGF();
-	if (VARATT_IS_EXTERNAL_EXPANDED_RW(DatumGetPointer(datum))) {
+	if (VARATT_IS_EXTERNAL_EXPANDED(DatumGetPointer(datum))) {
 		indexunaryop = IndexUnaryOpGetEOHP(datum);
 		Assert(indexunaryop->em_magic == indexunaryop_MAGIC);
 		return indexunaryop;
@@ -156,7 +151,6 @@ Datum indexunaryop_out(PG_FUNCTION_ARGS)
 	char *result;
 	os_IndexUnaryOp *indexunaryop;
 
-	LOGF();
 	indexunaryop = OS_GETARG_INDEXUNARYOP(0);
 
 	result = palloc(strlen(indexunaryop->name)+1);

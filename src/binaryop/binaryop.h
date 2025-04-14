@@ -26,9 +26,6 @@ os_BinaryOp* DatumGetBinaryOp(Datum d);
 
 #define OS_DETOAST_BINARYOP(_datum) (os_FlatBinaryOp*)PG_DETOAST_DATUM(datum)
 #define OS_GETARG_BINARYOP(_arg_num)  DatumGetBinaryOp(PG_GETARG_DATUM(_arg_num))
-#define OS_GETARG_BINARYOP_HANDLE(_arg_num)  DatumGetBinaryOp(PG_GETARG_DATUM(_arg_num))->binaryop;
-#define OS_GETARG_BINARYOP_OR_NULL(_nargs, _arg_num) \
-	_nargs > _arg_num ? PG_ARGISNULL(_arg_num) ? NULL : OS_GETARG_BINARYOP(_arg_num) : NULL;
 #define OS_GETARG_BINARYOP_HANDLE_OR_NULL(_nargs, _arg_num) \
 	_nargs > _arg_num ? PG_ARGISNULL(_arg_num) ? NULL : OS_GETARG_BINARYOP(_arg_num)->binaryop : NULL;
 #define OS_RETURN_BINARYOP(_binaryop) return EOHPGetRWDatum(&(_binaryop)->hdr)

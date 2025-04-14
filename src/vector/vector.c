@@ -18,8 +18,6 @@ static Size vector_get_flat_size(ExpandedObjectHeader *eohptr) {
 	void *serialized_data;
 	GrB_Index serialized_size;
 
-	LOGF();
-
 	vector = (os_Vector*) eohptr;
 	Assert(vector->em_magic == vector_MAGIC);
 
@@ -102,7 +100,7 @@ os_Vector* new_vector(
 								   "expanded vector",
 								   ALLOCSET_DEFAULT_SIZES);
 
-	vector = MemoryContextAlloc(objcxt,	sizeof(os_Vector));
+	vector = MemoryContextAllocZero(objcxt,	sizeof(os_Vector));
 
 	EOH_init_header(&vector->hdr, &vector_methods, objcxt);
 
@@ -157,8 +155,6 @@ static void
 context_callback_vector_free(void* ptr)
 {
 	os_Vector *vector = (os_Vector *) ptr;
-	LOGF();
-
 	OS_CHECK(GrB_Vector_free(&vector->vector),
 		  vector->vector,
 		  "Cannot GrB_Free Vector");
@@ -171,16 +167,104 @@ os_Vector* DatumGetVector(Datum datum)
 {
 	os_Vector *vector;
 	os_FlatVector *flat;
+	Pointer flat_datum_pointer;
 
-	LOGF();
-	if (VARATT_IS_EXTERNAL_EXPANDED_RW(DatumGetPointer(datum))) {
+	flat_datum_pointer = DatumGetPointer(datum);
+	if (VARATT_IS_EXTERNAL_EXPANDED(flat_datum_pointer)) {
 		vector = VectorGetEOHP(datum);
 		Assert(vector->em_magic == vector_MAGIC);
 		return vector;
 	}
 	flat = OS_DETOAST_VECTOR(datum);
 	datum = expand_vector(flat, CurrentMemoryContext);
-	return VectorGetEOHP(datum);
+	vector = VectorGetEOHP(datum);
+	vector->flat_datum_pointer = flat_datum_pointer;
+	return vector;
+}
+
+os_Vector* DatumGetVectorMaybeA(Datum datum, os_Vector *A)
+{
+	os_Vector *vector;
+	os_FlatVector *flat;
+	Pointer flat_datum_pointer;
+
+	flat_datum_pointer = DatumGetPointer(datum);
+	if (VARATT_IS_EXTERNAL_EXPANDED(flat_datum_pointer)) {
+		vector = VectorGetEOHP(datum);
+		Assert(vector->em_magic == vector_MAGIC);
+		return vector;
+	}
+
+	else if (flat_datum_pointer == A->flat_datum_pointer)
+	{
+		return A;
+	}
+
+	flat = OS_DETOAST_VECTOR(datum);
+	datum = expand_vector(flat, CurrentMemoryContext);
+	vector = VectorGetEOHP(datum);
+	vector->flat_datum_pointer = flat_datum_pointer;
+	return vector;
+}
+
+os_Vector* DatumGetVectorMaybeAB(Datum datum, os_Vector *A, os_Vector *B)
+{
+	os_Vector *vector;
+	os_FlatVector *flat;
+	Pointer flat_datum_pointer;
+
+	flat_datum_pointer = DatumGetPointer(datum);
+	if (VARATT_IS_EXTERNAL_EXPANDED(flat_datum_pointer)) {
+		vector = VectorGetEOHP(datum);
+		Assert(vector->em_magic == vector_MAGIC);
+		return vector;
+	}
+	else if (flat_datum_pointer == A->flat_datum_pointer)
+	{
+		return A;
+	}
+	else if (flat_datum_pointer == B->flat_datum_pointer)
+	{
+		return B;
+	}
+
+	flat = OS_DETOAST_VECTOR(datum);
+	datum = expand_vector(flat, CurrentMemoryContext);
+	vector = VectorGetEOHP(datum);
+	vector->flat_datum_pointer = flat_datum_pointer;
+	return vector;
+}
+
+os_Vector* DatumGetVectorMaybeABC(Datum datum, os_Vector *A, os_Vector *B, os_Vector *C)
+{
+	os_Vector *vector;
+	os_FlatVector *flat;
+	Pointer flat_datum_pointer;
+
+	flat_datum_pointer = DatumGetPointer(datum);
+	if (VARATT_IS_EXTERNAL_EXPANDED(flat_datum_pointer)) {
+		vector = VectorGetEOHP(datum);
+		Assert(vector->em_magic == vector_MAGIC);
+		return vector;
+	}
+	else if (flat_datum_pointer == A->flat_datum_pointer)
+	{
+		return A;
+	}
+	else if (flat_datum_pointer == B->flat_datum_pointer)
+	{
+		return B;
+	}
+	else if (flat_datum_pointer == C->flat_datum_pointer)
+	{
+		return C;
+	}
+
+	flat = OS_DETOAST_VECTOR(datum);
+	datum = expand_vector(flat, CurrentMemoryContext);
+	vector = VectorGetEOHP(datum);
+	vector->flat_datum_pointer = flat_datum_pointer;
+	return vector;
 }
 
 /* Local Variables: */
