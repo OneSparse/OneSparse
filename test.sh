@@ -17,7 +17,7 @@ docker build -f Dockerfile-debug --build-arg UID=$(id -u) --build-arg GID=$(id -
 
 docker run --user $(id -u):$(id -g) --mount type=bind,source=$(pwd),target=/home/postgres/onesparse,bind-propagation=rshared --cap-add=SYS_PTRACE --security-opt seccomp=unconfined -d --name "$DB_HOST" onesparse/test
 
-$EXECIT pg_ctl start
+$EXEC pg_ctl start
 # $EXEC make clean
 # $EXEC make install
 
