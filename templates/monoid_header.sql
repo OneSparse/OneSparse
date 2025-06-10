@@ -27,3 +27,8 @@ CREATE FUNCTION name(monoid)
 RETURNS text
 AS '$libdir/onesparse', 'monoid_name'
 LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION identity(monoid)
+RETURNS scalar
+AS '$libdir/onesparse', 'monoid_identity'
+LANGUAGE C IMMUTABLE STRICT;

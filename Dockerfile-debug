@@ -23,8 +23,9 @@ RUN /bin/rm -Rf "$PGDATA" && mkdir "$PGDATA"
 WORKDIR "/home/postgres"
 
 # get postgres source and compile with debug and no optimization
-RUN git clone  https://github.com/michelp/postgres-upstream.git --depth=1 && \
-    cd postgres-upstream && CFLAGS="-DTOAST_MAX_CHUNK_SIZE=8192" ./configure \
+RUN git clone https://github.com/postgres/postgres.git --depth=1 && \
+#    git checkout REL_18_BETA1 && \
+    cd postgres && ./configure \
     --prefix=/usr/ \
     --without-icu \
     --enable-debug \

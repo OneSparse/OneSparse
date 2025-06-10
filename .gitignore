@@ -52,5 +52,6 @@ Mkfile.old
 dkms.conf
 
 /results
+/site    
 regression.*
 *~
