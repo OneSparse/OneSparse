@@ -2803,7 +2803,7 @@ CREATE TYPE graph (
 
 COMMENT ON TYPE graph IS 'Graphs wrap the LAGraph library functions.';
 
-CREATE FUNCTION graph(matrix, integer)
+CREATE FUNCTION graph(matrix, text)
 RETURNS graph
 AS '$libdir/onesparse', 'graph_new'
 LANGUAGE C STABLE;
@@ -2812,7 +2812,7 @@ CREATE OR REPLACE FUNCTION graph(matrix)
 RETURNS graph
 LANGUAGE sql STABLE
 BEGIN ATOMIC
-    select graph($1, 0);
+    select graph($1, 'u');
 END;
 
 CREATE FUNCTION sssp(graph, bigint, scalar)

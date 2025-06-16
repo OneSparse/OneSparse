@@ -7,6 +7,7 @@ Datum graph_new(PG_FUNCTION_ARGS)
 	os_Matrix *matrix;
 	text *kind_char;
 	LAGraph_Kind kind;
+	char c;
 
 	matrix = OS_GETARG_MATRIX(0);
 	kind_char = PG_GETARG_TEXT_PP(1);
