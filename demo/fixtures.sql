@@ -86,7 +86,7 @@ insert into test_graphs values
     ('mbeacxc', (select matrix_agg(i, j, v) from mbeacxc));
 
 create view karateg as select graph from test_graphs where name = 'karate';
-
+update karateg set graph = resize(graph, 34, 34);
 
 CREATE OR REPLACE FUNCTION sssp(graph matrix, start_node bigint)
     RETURNS vector LANGUAGE plpgsql AS

@@ -388,8 +388,9 @@ static void burble_assign_hook(bool newvalue, void *extra)
 
 void _PG_init(void)
 {
-	OK_CHECK(GrB_init(GrB_NONBLOCKING),
-			 "Cannot initialize GraphBLAS");
+	char msg [LAGRAPH_MSG_LEN];
+
+	LAGraph_Init(msg);
 
 	initialize_types();
 	initialize_descriptors();

@@ -228,6 +228,7 @@ def write_source(outfile):
         Template('scalar', outfile),
         Template('vector', outfile),
         Template('matrix', outfile),
+        Template('graph', outfile),
         ]
 
     for o in objects:

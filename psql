@@ -13,7 +13,7 @@ docker rm -f onesparse-test
 set -e
 
 echo building test image
-docker build -f Dockerfile-pgrouting --build-arg UID=$(id -u) --build-arg GID=$(id -g)  . -t onesparse/test
+docker build -f Dockerfile-debug --build-arg UID=$(id -u) --build-arg GID=$(id -g)  . -t onesparse/test
 
 echo running test container
 docker run --user $(id -u):$(id -g) --mount type=bind,source=$(pwd),target=/home/postgres/onesparse,bind-propagation=rshared --cap-add=SYS_PTRACE --security-opt seccomp=unconfined -d --name "$DB_HOST" onesparse/test

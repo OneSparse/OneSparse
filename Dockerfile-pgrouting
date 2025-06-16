@@ -1,12 +1,14 @@
 FROM ubuntu:latest
 ARG UID    
 ARG GID
+ENV POSTGIS_VERSION=3.4.1
    
 # install base dependences    
 RUN apt-get update && \
     apt-get install -y make cmake git curl build-essential m4 sudo gdbserver python3-pip \
     gdb libreadline-dev bison flex zlib1g-dev libicu-dev icu-devtools tmux zile zip \
-    gawk wget python3-full python3-virtualenv graphviz python3-dev libpq-dev python3-psycopg2 libssl-dev
+    gawk wget python3-full python3-virtualenv graphviz python3-dev libpq-dev python3-psycopg2 libssl-dev \
+    libproj-dev libgeos-dev libgeos++-dev libxml2-dev libjson-c-dev libgdal-dev gdal-bin
 
 RUN deluser --remove-home ubuntu
 # add postgres user and make data dir        
@@ -23,9 +25,9 @@ RUN /bin/rm -Rf "$PGDATA" && mkdir "$PGDATA"
 WORKDIR "/home/postgres"
 
 # get postgres source and compile with debug and no optimization
-RUN git clone https://github.com/postgres/postgres.git --depth=1 && \
-#    git checkout REL_18_BETA1 && \
-    cd postgres && ./configure \
+RUN git clone --single-branch --branch REL_18_BETA1 https://github.com/postgres/postgres.git && \
+    cd postgres && \
+    ./configure \
     --prefix=/usr/ \
     --without-icu \
     --enable-debug \
@@ -44,24 +46,52 @@ RUN git clone https://github.com/postgres/postgres.git --depth=1 && \
 # #    --enable-depend --enable-cassert --enable-profiling \
 # #    CFLAGS="-ggdb -Og -g3 -fno-omit-frame-pointer" \
 #     CFLAGS="-O3" \
-#     && make -j 4 && sudo make install \
+#     && make -j$(nproc) && sudo make install \
 #     && cd contrib/postgres_fdw && make && sudo make install \
 #     && cd .. && /bin/rm -Rf postgres-upstream
 
-# get GraphBLAS, compile with debug symbols    
-RUN curl -s -L -J https://github.com/DrTimothyAldenDavis/GraphBLAS/archive/refs/tags/v10.1.0.tar.gz | \
-    tar zxvf - && cd GraphBLAS-10.1.0 && \
-    make library \
+WORKDIR /build
+
+RUN git clone --depth 1 https://github.com/postgis/postgis.git
+
+WORKDIR /build/postgis
+
+RUN ./autogen.sh \
+    && ./configure \
+    --without-protobuf \
+    && make -j$(nproc) \
+    && sudo make install
+
+WORKDIR /build
+
+RUN git clone --depth 1 --branch main https://github.com/pgRouting/pgrouting.git
+
+WORKDIR /build/pgrouting
+
+RUN cmake -S . -B build \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    && cmake --build build -- -j$(nproc) \
+    && sudo cmake --install build    
+
+WORKDIR /build/graphblas
+
+# get GraphBLAS
+RUN curl -s -L -J https://github.com/DrTimothyAldenDavis/GraphBLAS/archive/refs/tags/v10.0.2.tar.gz | \
+    tar zxvf - && cd GraphBLAS-10.0.2 && \
+    make -j$(nproc) library \
 #    CMAKE_OPTIONS='-DCMAKE_BUILD_TYPE=Debug -DGRAPHBLAS_COMPACT=1' \
     && sudo make install \
-    && /bin/rm -Rf GraphBLAS-10.1.0
+    && /bin/rm -Rf GraphBLAS-10.0.2
 
+# get LAGraph
 RUN curl -s -L -J https://github.com/GraphBLAS/LAGraph/archive/refs/tags/v1.1.5.tar.gz | \
     tar zxvf - && cd LAGraph-1.1.5 && \
-    make library \
+    make -j$(nproc) library \
+#    CMAKE_OPTIONS='-DCMAKE_BUILD_TYPE=Debug -DGRAPHBLAS_COMPACT=1' \
     && sudo make install \
-    && /bin/rm -Rf LAGraph-1.1.5
-    
+    && /bin/rm -Rf LAGraph-1-1.1.5
+
 RUN sudo ldconfig
 
 # put test stuff into pg home        

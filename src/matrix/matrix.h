@@ -72,6 +72,9 @@ os_Matrix* DatumGetMatrixMaybeABC(Datum d, os_Matrix *A, os_Matrix *B, os_Matrix
 #define OS_MATRIX_DATA(_flat) ((char*)(_flat) + OS_MATRIX_FLATSIZE())
 #define MatrixGetEOHP(_datum) (os_Matrix *) DatumGetEOHP(_datum)
 
+os_Matrix* _parse_matrix(char *input);
+char* _print_matrix(GrB_Matrix matrix);
+
 #endif /* OS_MATRIX_H */
 
 /* Local Variables: */

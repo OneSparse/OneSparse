@@ -24,7 +24,8 @@
 #include "nodes/pg_list.h"
 #include "nodes/supportnodes.h"
 #include "common/hashfn.h"
-#include "suitesparse/GraphBLAS.h"
+#include <GraphBLAS.h>
+#include <LAGraph.h>
 #include "access/xact.h"
 
 #define OS_DEBUG
@@ -52,6 +53,14 @@
                 GrB_error(&emsg, obj);                        \
                 elog(ERROR, "%s %s: %s", ename, emsg, msg);   \
             }                                                 \
+    } while (0)                                               \
+
+#define LA_CHECK(method)                            \
+    do {                                                      \
+		if (method != GrB_SUCCESS && (method < 1000 || method >= 2000)) \
+		{                                                 \
+			elog(ERROR, "%i: %s", method, msg);   \
+		}                                                 \
     } while (0)                                               \
 
 #define OK_CHECK(method, msg)                               \
@@ -181,6 +190,7 @@ void _PG_init(void);
 #include "scalar/scalar.h"
 #include "vector/vector.h"
 #include "matrix/matrix.h"
+#include "graph/graph.h"
 
 #endif /* OS_H */
 
