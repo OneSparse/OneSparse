@@ -13,6 +13,7 @@ Datum graph_pagerank(PG_FUNCTION_ARGS)
 	int iters;
 
 	char msg [LAGRAPH_MSG_LEN];
+	struct timeval start, end;
 
 	LOGF();
 	graph = OS_GETARG_GRAPH(0);
@@ -23,6 +24,7 @@ Datum graph_pagerank(PG_FUNCTION_ARGS)
 	LA_CHECK(LAGraph_Cached_OutDegree(graph->graph, msg));
 	LA_CHECK(LAGraph_Cached_AT(graph->graph, msg));
 
+    gettimeofday(&start, NULL);
 	LA_CHECK(LAGr_PageRank(&output,
 						   &iters,
 						   graph->graph,
@@ -30,6 +32,12 @@ Datum graph_pagerank(PG_FUNCTION_ARGS)
 						   tol,
 						   itermax,
 						   msg));
+
+    gettimeofday(&end, NULL);
+    double elapsed = (end.tv_sec - start.tv_sec) +
+                     (end.tv_usec - start.tv_usec) / 1000000.0;
+    ereport(NOTICE,
+        (errmsg("A() took %.6f seconds", elapsed)));
 
 	OS_CHECK(GxB_Vector_type(&type, output),
 			 output,
