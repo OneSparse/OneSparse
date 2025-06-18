@@ -937,7 +937,7 @@ AS '$libdir/onesparse', 'matrix_serialize'
 LANGUAGE C STRICT;
 
 CREATE FUNCTION serialize_file(a matrix, path text)
-RETURNS void
+RETURNS bool
 AS '$libdir/onesparse', 'matrix_serialize_file'
 LANGUAGE C STRICT;
 

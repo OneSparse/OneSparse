@@ -38,7 +38,7 @@ Datum matrix_serialize_file(PG_FUNCTION_ARGS) {
 	}
 
 	fclose(file);
-	PG_RETURN_VOID();
+	PG_RETURN_BOOL(true);
 }
 
 
