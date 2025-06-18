@@ -36,8 +36,8 @@ Datum graph_pagerank(PG_FUNCTION_ARGS)
     gettimeofday(&end, NULL);
     double elapsed = (end.tv_sec - start.tv_sec) +
                      (end.tv_usec - start.tv_usec) / 1000000.0;
-    ereport(NOTICE,
-        (errmsg("A() took %.6f seconds", elapsed)));
+    ereport(DEBUG1,
+			(errmsg("%s() took %.6f seconds", __func__, elapsed)));
 
 	OS_CHECK(GxB_Vector_type(&type, output),
 			 output,
