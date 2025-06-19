@@ -34,23 +34,18 @@ Datum matrix_query(PG_FUNCTION_ARGS)
         elog(ERROR, "SPI_connect failed: %s", SPI_result_code_string(ret));
 	}
 
-	elog(DEBUG1, "line: %d", __LINE__);
-
 	plan = SPI_prepare(query, 0, NULL);
 	if (plan == NULL)
 	{
 		elog(ERROR, "SPI_prepare failed: %s", SPI_result_code_string(SPI_result));
 	}
     portal = SPI_cursor_open(NULL, plan, NULL, NULL, true);
-	elog(DEBUG1, "line: %d", __LINE__);
     if (!portal)
 	{
         elog(ERROR, "SPI_cursor_open failed");
 	}
 
-	elog(DEBUG1, "line: %d", __LINE__);
 	SPI_cursor_fetch(portal, true, 0);
-	elog(DEBUG1, "line: %d", __LINE__);
 
     tupdesc = SPI_tuptable->tupdesc;
     if (tupdesc->natts != 3)
@@ -96,7 +91,6 @@ Datum matrix_query(PG_FUNCTION_ARGS)
 
     while (true)
     {
-		elog(DEBUG1, "line: %d", __LINE__);
         SPI_cursor_fetch(portal, true, 100);
         if (SPI_processed == 0)
             break;
