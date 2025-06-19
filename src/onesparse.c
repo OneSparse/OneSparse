@@ -95,7 +95,7 @@ char* short_code(GrB_Type_Code code)
 		case GrB_UDT_CODE:
 			return "utd";
 	}
-	elog(ERROR, "Unknown type code");
+	elog(ERROR, "Unknown type to code");
 }
 
 GrB_Type code_type(GrB_Type_Code code)
@@ -131,7 +131,7 @@ GrB_Type code_type(GrB_Type_Code code)
 		case GrB_UDT_CODE:
 			elog(ERROR, "UDT Types not yet supported");
 	}
-	elog(ERROR, "Unknown type code");
+	elog(ERROR, "Unknown code to type");
 }
 
 size_t code_size(GrB_Type_Code code)
@@ -163,7 +163,7 @@ size_t code_size(GrB_Type_Code code)
 		default:
 			elog(ERROR, "Type not yet supported");
 	}
-	elog(ERROR, "Unknown type code");
+	elog(ERROR, "Unknown type code size");
 }
 
 GrB_Type short_type(char *name)

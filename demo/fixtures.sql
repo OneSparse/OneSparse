@@ -104,27 +104,3 @@ CREATE OR REPLACE FUNCTION sssp(graph matrix, start_node bigint)
     END;
     $$;
 
-CREATE OR REPLACE FUNCTION bcentrality(
-    A matrix,
-    sources bigint[]
-)
-RETURNS vector
-LANGUAGE plpgsql
-AS $$
-DECLARE
-    i int;
-    n bigint = nrows(A);
-    ns bigint = array_length(sources, 1);
-
-    centrality vector = vector('fp64', n);
-    A_T matrix = transpose(A);
-    paths matrix = matrix('fp64', ns, n);
-    frontier matrix = matrix('fp64', ns, n);
-BEGIN
-    FOR i IN 0..array_upper(sources, 1) LOOP
-        paths = set_element(paths, i-1, sources[i], 1);
-        frontier = set_element(frontier, i-1, sources[i], 1);
-    END LOOP;
-    RETURN centrality;
-END;
-$$;

@@ -1641,6 +1641,11 @@ RETURNS matrix
 AS '$libdir/onesparse', 'matrix_new'
 LANGUAGE C STABLE;
 
+CREATE FUNCTION matrix_query(text, nrows bigint default -1, ncols bigint default -1, batch_size integer default 1000)
+RETURNS matrix
+AS '$libdir/onesparse', 'matrix_query'
+LANGUAGE C STABLE;
+
 CREATE FUNCTION elements(a matrix)
 RETURNS TABLE (i bigint, j bigint, v scalar)
 AS '$libdir/onesparse', 'matrix_elements'

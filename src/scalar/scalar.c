@@ -275,7 +275,7 @@ Datum expand_scalar(os_FlatScalar *flat, MemoryContext parentcontext)
 				  "Cannot set scalar element in expand.");
 		}
 		else
-			elog(ERROR, "Unknown type code.");
+			elog(ERROR, "Unknown type code creating scalar.");
 	}
 	OS_RETURN_SCALAR(scalar);
 }
