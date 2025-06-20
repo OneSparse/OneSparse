@@ -14,7 +14,7 @@ delete from test_graphs where name in ('lj', 'ljs');
 
 insert into test_graphs (name, graph)
     values ('lj', (select resize(matrix_agg(i::bigint, j::bigint, 1),
-                    greatest(max(i), max(j)), greatest(max(i), max(j))) from livejournal));
+                    greatest(max(i)+1, max(j)+1), greatest(max(i)+1, max(j)+1)) from livejournal));
 
 insert into test_graphs (name, graph)
     values ('ljs', (select eadd(graph, graph, descr=>'t1') from test_graphs where name = 'lj'));

@@ -13,7 +13,9 @@ Datum matrix_query(PG_FUNCTION_ARGS)
     Oid       t0, t1, t2;
     uint64    i;
 	uint32    batch_size;
+	GrB_Matrix tmp;
 	GrB_Type type;
+	GrB_BinaryOp accum;
 	GrB_Index nrows, ncols;
 	os_Matrix *A;
 	MemoryContext oldctx = CurrentMemoryContext;
@@ -69,18 +71,23 @@ Datum matrix_query(PG_FUNCTION_ARGS)
 	{
         case BOOLOID:
             type = GrB_BOOL;
+			accum = GrB_SECOND_BOOL;
             break;
         case INT4OID:
             type = GrB_INT32;
+			accum = GrB_SECOND_INT32;
             break;
         case INT8OID:
             type = GrB_INT64;
+			accum = GrB_SECOND_INT64;
             break;
         case FLOAT4OID:
             type = GrB_FP32;
+			accum = GrB_SECOND_FP32;
             break;
         case FLOAT8OID:
             type = GrB_FP64;
+			accum = GrB_SECOND_FP64;
             break;
         default:
 			elog(ERROR, "third column must be bool, integer, bigint, float4 or float8");
@@ -91,9 +98,13 @@ Datum matrix_query(PG_FUNCTION_ARGS)
 
     while (true)
     {
-        SPI_cursor_fetch(portal, true, 100);
+        SPI_cursor_fetch(portal, true, batch_size);
         if (SPI_processed == 0)
             break;
+
+		OS_CHECK(GrB_Matrix_new(&tmp, type, nrows, ncols),
+			  tmp,
+			  "Cannot create new Matrix.");
 
 		for (i = 0; i < SPI_processed; i++)
 		{
@@ -112,34 +123,42 @@ Datum matrix_query(PG_FUNCTION_ARGS)
 				switch (t2)
 				{
 					case BOOLOID:
-						OS_CHECK(GrB_Matrix_setElement(A->matrix, DatumGetBool(d2), i, j),
-								 A->matrix,
+						OS_CHECK(GrB_Matrix_setElement(tmp, DatumGetBool(d2), i, j),
+								 tmp,
 								 "Error setting matrix element.");
 						break;
 					case INT4OID:
-						OS_CHECK(GrB_Matrix_setElement(A->matrix, DatumGetInt32(d2), i, j),
-								 A->matrix,
+						OS_CHECK(GrB_Matrix_setElement(tmp, DatumGetInt32(d2), i, j),
+								 tmp,
 								 "Error setting matrix element.");
 						break;
 					case INT8OID:
-						OS_CHECK(GrB_Matrix_setElement(A->matrix, DatumGetInt64(d2), i, j),
-								 A->matrix,
+						OS_CHECK(GrB_Matrix_setElement(tmp, DatumGetInt64(d2), i, j),
+								 tmp,
 								 "Error setting matrix element.");
 						break;
 					case FLOAT4OID:
-						OS_CHECK(GrB_Matrix_setElement(A->matrix, DatumGetFloat4(d2), i, j),
-								 A->matrix,
+						OS_CHECK(GrB_Matrix_setElement(tmp, DatumGetFloat4(d2), i, j),
+								 tmp,
 								 "Error setting matrix element.");
 						break;
 					case FLOAT8OID:
-						OS_CHECK(GrB_Matrix_setElement(A->matrix, DatumGetFloat8(d2), i, j),
-								 A->matrix,
+						OS_CHECK(GrB_Matrix_setElement(tmp, DatumGetFloat8(d2), i, j),
+								 tmp,
 								 "Error setting matrix element.");
 						break;
 					default: /* unreachable */ break;
 				}
 			}
 		}
+		OS_CHECK(GrB_assign(A->matrix, NULL, accum, tmp, GrB_ALL, 0, GrB_ALL, 0, NULL),
+				 A->matrix,
+				 "cannot assign batch to matrix.");
+
+		OS_CHECK(GrB_Matrix_free(&tmp),
+				 tmp,
+				 "Cannot GrB_Free batch Matrix");
+
 	}
     SPI_cursor_close(portal);
     SPI_finish();
