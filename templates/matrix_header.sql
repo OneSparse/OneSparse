@@ -27,11 +27,6 @@ RETURNS matrix
 AS '$libdir/onesparse', 'matrix_new'
 LANGUAGE C STABLE;
 
-CREATE FUNCTION matrix_query(text, nrows bigint default -1, ncols bigint default -1, batch_size integer default 1000)
-RETURNS matrix
-AS '$libdir/onesparse', 'matrix_query'
-LANGUAGE C STABLE;
-
 CREATE FUNCTION elements(a matrix)
 RETURNS TABLE (i bigint, j bigint, v scalar)
 AS '$libdir/onesparse', 'matrix_elements'
@@ -75,11 +70,6 @@ RETURNS int8
 AS '$libdir/onesparse', 'matrix_ncols'
 LANGUAGE C;
 
-CREATE FUNCTION matrix_eadd_support(internal)
-RETURNS internal
-AS '$libdir/onesparse', 'matrix_eadd_support'
-LANGUAGE C;
-
 CREATE FUNCTION eadd(
     a matrix,
     b matrix,
@@ -91,12 +81,7 @@ CREATE FUNCTION eadd(
     )
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_eadd'
-LANGUAGE C SUPPORT matrix_eadd_support;
-
-CREATE FUNCTION matrix_emult_support(internal)
-RETURNS internal
-AS '$libdir/onesparse', 'matrix_emult_support'
-LANGUAGE C;
+LANGUAGE C STABLE;
 
 CREATE FUNCTION emult(
     a matrix,
@@ -109,12 +94,7 @@ CREATE FUNCTION emult(
     )
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_emult'
-LANGUAGE C SUPPORT matrix_emult_support;
-
-CREATE FUNCTION matrix_eunion_support(internal)
-RETURNS internal
-AS '$libdir/onesparse', 'matrix_eunion_support'
-LANGUAGE C;
+LANGUAGE C STABLE;
 
 CREATE FUNCTION eunion(
     a matrix,
@@ -128,12 +108,7 @@ CREATE FUNCTION eunion(
     )
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_eunion'
-LANGUAGE C SUPPORT matrix_eunion_support;
-
-CREATE FUNCTION matrix_reduce_vector_support(internal)
-RETURNS internal
-AS '$libdir/onesparse', 'matrix_reduce_vector_support'
-LANGUAGE C;
+LANGUAGE C STABLE;
 
 CREATE FUNCTION reduce_cols(
     a matrix,
@@ -145,7 +120,7 @@ CREATE FUNCTION reduce_cols(
     )
 RETURNS vector
 AS '$libdir/onesparse', 'matrix_reduce_vector'
-LANGUAGE C SUPPORT matrix_reduce_vector_support;
+LANGUAGE C STABLE;
 
 CREATE FUNCTION reduce_rows(
     a matrix,
@@ -168,12 +143,6 @@ RETURNS scalar
 AS '$libdir/onesparse', 'matrix_reduce_scalar'
 LANGUAGE C STABLE;
 
-
-CREATE FUNCTION matrix_assign_matrix_support(internal)
-RETURNS internal
-AS '$libdir/onesparse', 'matrix_assign_matrix_support'
-LANGUAGE C;
-
 CREATE FUNCTION assign(
     c matrix,
     a matrix,
@@ -185,13 +154,7 @@ CREATE FUNCTION assign(
     )
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_assign_matrix'
-LANGUAGE C SUPPORT matrix_assign_matrix_support;
-
-
-CREATE FUNCTION matrix_assign_row_vector_support(internal)
-RETURNS internal
-AS '$libdir/onesparse', 'matrix_assign_row_vector_support'
-LANGUAGE C;
+LANGUAGE C STABLE;
 
 CREATE FUNCTION assign_row(
     c matrix,
@@ -204,13 +167,7 @@ CREATE FUNCTION assign_row(
     )
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_assign_row_vector'
-LANGUAGE C SUPPORT matrix_assign_row_vector_support;
-
-
-CREATE FUNCTION matrix_assign_col_vector_support(internal)
-RETURNS internal
-AS '$libdir/onesparse', 'matrix_assign_col_vector_support'
-LANGUAGE C;
+LANGUAGE C STABLE;
 
 CREATE FUNCTION assign_col(
     c matrix,
@@ -223,13 +180,7 @@ CREATE FUNCTION assign_col(
     )
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_assign_col_vector'
-LANGUAGE C SUPPORT matrix_assign_col_vector_support;
-
-
-CREATE FUNCTION matrix_assign_scalar_support(internal)
-RETURNS internal
-AS '$libdir/onesparse', 'matrix_assign_scalar_support'
-LANGUAGE C;
+LANGUAGE C STABLE;
 
 CREATE FUNCTION assign(
     c matrix,
@@ -242,13 +193,7 @@ CREATE FUNCTION assign(
     )
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_assign_scalar'
-LANGUAGE C SUPPORT matrix_assign_scalar_support;
-
-
-CREATE FUNCTION matrix_extract_matrix_support(internal)
-RETURNS internal
-AS '$libdir/onesparse', 'matrix_extract_matrix_support'
-LANGUAGE C;
+LANGUAGE C STABLE;
 
 CREATE FUNCTION extract_matrix(
     a matrix,
@@ -261,7 +206,7 @@ CREATE FUNCTION extract_matrix(
     )
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_extract_matrix'
-LANGUAGE C SUPPORT matrix_extract_matrix_support;
+LANGUAGE C STABLE;
 
 CREATE FUNCTION extract_col(
     a matrix,
@@ -288,11 +233,6 @@ CREATE FUNCTION extract_row(
 RETURNS vector
     RETURN extract_col(a, i, j, c, mask, accum, coalesce(descr, 't0'::descriptor));
 
-CREATE FUNCTION matrix_mxm_support(internal)
-RETURNS internal
-AS '$libdir/onesparse', 'matrix_mxm_support'
-LANGUAGE C;
-
 CREATE FUNCTION mxm(
     a matrix,
     b matrix,
@@ -304,12 +244,7 @@ CREATE FUNCTION mxm(
     )
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_mxm'
-LANGUAGE C SUPPORT matrix_mxm_support;
-
-CREATE FUNCTION matrix_mxv_support(internal)
-RETURNS internal
-AS '$libdir/onesparse', 'matrix_mxv_support'
-LANGUAGE C;
+LANGUAGE C STABLE;
 
 CREATE FUNCTION mxv(
     a matrix,
@@ -322,12 +257,7 @@ CREATE FUNCTION mxv(
     )
 RETURNS vector
 AS '$libdir/onesparse', 'matrix_mxv'
-LANGUAGE C SUPPORT matrix_mxv_support;
-
-CREATE FUNCTION matrix_vxm_support(internal)
-RETURNS internal
-AS '$libdir/onesparse', 'matrix_vxm_support'
-LANGUAGE C;
+LANGUAGE C STABLE;
 
 CREATE FUNCTION vxm(
     a vector,
@@ -340,12 +270,7 @@ CREATE FUNCTION vxm(
     )
 RETURNS vector
 AS '$libdir/onesparse', 'matrix_vxm'
-LANGUAGE C SUPPORT matrix_vxm_support;
-
-CREATE FUNCTION matrix_kron_support(internal)
-RETURNS internal
-AS '$libdir/onesparse', 'matrix_kron_support'
-LANGUAGE C;
+LANGUAGE C STABLE;
 
 CREATE FUNCTION kronecker(
     a matrix,
@@ -358,12 +283,7 @@ CREATE FUNCTION kronecker(
     )
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_kron'
-LANGUAGE C SUPPORT matrix_kron_support;
-
-CREATE FUNCTION matrix_select_support(internal)
-RETURNS internal
-AS '$libdir/onesparse', 'matrix_select_support'
-LANGUAGE C;
+LANGUAGE C STABLE;
 
 CREATE FUNCTION choose(
     a matrix,
@@ -376,12 +296,7 @@ CREATE FUNCTION choose(
     )
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_select'
-LANGUAGE C SUPPORT matrix_select_support;
-
-CREATE FUNCTION matrix_transpose_support(internal)
-RETURNS internal
-AS '$libdir/onesparse', 'matrix_transpose_support'
-LANGUAGE C;
+LANGUAGE C STABLE;
 
 CREATE FUNCTION transpose(
     a matrix,
@@ -392,12 +307,7 @@ CREATE FUNCTION transpose(
     )
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_transpose'
-LANGUAGE C SUPPORT matrix_transpose_support;
-
-CREATE FUNCTION matrix_apply_support(internal)
-RETURNS internal
-AS '$libdir/onesparse', 'matrix_apply_support'
-LANGUAGE C;
+LANGUAGE C STABLE;
 
 CREATE FUNCTION apply(
     a matrix,
@@ -409,12 +319,7 @@ CREATE FUNCTION apply(
     )
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_apply'
-LANGUAGE C SUPPORT matrix_apply_support;
-
-CREATE FUNCTION matrix_apply_first_support(internal)
-RETURNS internal
-AS '$libdir/onesparse', 'matrix_apply_first_support'
-LANGUAGE C;
+LANGUAGE C STABLE;
 
 CREATE FUNCTION apply(
     s scalar,
@@ -427,12 +332,7 @@ CREATE FUNCTION apply(
     )
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_apply_first'
-LANGUAGE C SUPPORT matrix_apply_first_support;
-
-CREATE FUNCTION matrix_apply_second_support(internal)
-RETURNS internal
-AS '$libdir/onesparse', 'matrix_apply_second_support'
-LANGUAGE C;
+LANGUAGE C STABLE;
 
 CREATE FUNCTION apply(
     a matrix,
@@ -445,12 +345,7 @@ CREATE FUNCTION apply(
     )
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_apply_second'
-LANGUAGE C SUPPORT matrix_apply_second_support;
-
-CREATE FUNCTION diag(a vector)
-RETURNS matrix
-AS '$libdir/onesparse', 'matrix_diag'
-LANGUAGE C;
+LANGUAGE C STABLE;
 
 CREATE FUNCTION nnz(a matrix)
 RETURNS scalar
@@ -466,7 +361,7 @@ RETURNS vector
 
 CREATE FUNCTION cast_to(a matrix, t type)
 RETURNS matrix
-    RETURN apply(a, ('identity_' || name(t))::unaryop, c=>matrix(t, nrows(a), ncols(a)));
+    RETURN apply(a, ('identity_' || name(t))::unaryop, c=>matrix(t));
 
 CREATE FUNCTION matrix_agg_matrix(state matrix, a matrix)
 RETURNS matrix
@@ -485,70 +380,45 @@ CREATE AGGREGATE matrix_agg (a matrix)
     FINALFUNC=matrix_agg_final
     );
 
-CREATE FUNCTION matrix_set_element_support(internal)
-RETURNS internal
-AS '$libdir/onesparse', 'matrix_set_element_support'
-LANGUAGE C;
-
 CREATE FUNCTION set_element(a matrix, i bigint, j bigint, s scalar)
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_set_element'
-LANGUAGE C SUPPORT matrix_set_element_support;
+LANGUAGE C VOLATILE;
 
 CREATE FUNCTION get_element(a matrix, i bigint, j bigint)
 RETURNS scalar
 AS '$libdir/onesparse', 'matrix_get_element'
 LANGUAGE C STABLE;
 
-CREATE FUNCTION matrix_remove_element_support(internal)
-RETURNS internal
-AS '$libdir/onesparse', 'matrix_remove_element_support'
-LANGUAGE C;
-
 CREATE FUNCTION remove_element(a matrix, i bigint, j bigint)
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_remove_element'
-LANGUAGE C SUPPORT matrix_remove_element_support;
+LANGUAGE C STABLE;
 
 CREATE FUNCTION contains(a matrix, i bigint, j bigint)
 RETURNS bool
 AS '$libdir/onesparse', 'matrix_contains'
 LANGUAGE C STABLE;
 
-CREATE FUNCTION matrix_wait_support(internal)
-RETURNS internal
-AS '$libdir/onesparse', 'matrix_wait_support'
-LANGUAGE C;
-
 CREATE FUNCTION wait(matrix, waitmode integer default 0)
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_wait'
-LANGUAGE C SUPPORT matrix_wait_support;
+LANGUAGE C;
 
 CREATE FUNCTION dup(matrix)
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_dup'
 LANGUAGE C;
 
-CREATE FUNCTION matrix_clear_support(internal)
-RETURNS internal
-AS '$libdir/onesparse', 'matrix_clear_support'
-LANGUAGE C;
-
 CREATE FUNCTION clear(matrix)
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_clear'
-LANGUAGE C SUPPORT matrix_clear_support;
-
-CREATE FUNCTION matrix_resize_support(internal)
-RETURNS internal
-AS '$libdir/onesparse', 'matrix_resize_support'
 LANGUAGE C;
 
 CREATE FUNCTION resize(a matrix, i bigint default -1, j bigint default -1)
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_resize'
-LANGUAGE C SUPPORT matrix_resize_support;
+LANGUAGE C STABLE;
 
 CREATE FUNCTION info(a matrix, level int default 1)
 RETURNS text
@@ -942,7 +812,7 @@ AS '$libdir/onesparse', 'matrix_serialize'
 LANGUAGE C STRICT;
 
 CREATE FUNCTION serialize_file(a matrix, path text)
-RETURNS bool
+RETURNS void
 AS '$libdir/onesparse', 'matrix_serialize_file'
 LANGUAGE C STRICT;
 
@@ -954,6 +824,16 @@ LANGUAGE C STRICT;
 CREATE FUNCTION deserialize_file(path text)
 RETURNS matrix
     RETURN deserialize(pg_read_binary_file(path));
+
+CREATE FUNCTION save(a matrix, lo_oid oid default 0)
+RETURNS oid
+AS '$libdir/onesparse', 'matrix_save'
+LANGUAGE C STRICT;
+
+CREATE FUNCTION load(oid)
+RETURNS matrix
+AS '$libdir/onesparse', 'matrix_load'
+LANGUAGE C STRICT;
 
 create function print(a matrix) returns text language plpgsql as
     $$
@@ -994,7 +874,7 @@ create function random_matrix(
     seed double precision default null)
     returns matrix language plpgsql as
     $$
-    declare m matrix = wait(matrix('int32', nrows, ncols));
+    declare m matrix = matrix('int32', nrows, ncols);
     prob double precision = nvals::double precision / (nrows * ncols);
     begin
         if (seed is not null) then
@@ -1025,7 +905,6 @@ create or replace function draw(
         result text;
         edge text;
     begin
-        a = wait(a);
         if directed then
             result = E'digraph {{\n';
             edge = '->';
@@ -1058,7 +937,6 @@ create or replace function kronpower(m matrix, k integer, s semiring default 'pl
     declare
     i integer;
     begin
-        m = wait(m);
         for i in select generate_series(0, k-1) loop
             m = kronecker(m, m, s);
         end loop;

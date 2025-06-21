@@ -17,8 +17,8 @@ Datum matrix_deserialize(PG_FUNCTION_ARGS)
 			  VARDATA_ANY(input),
 			  VARSIZE_ANY_EXHDR(input),
 			  NULL),
-		  matrix->matrix,
-		  "Error deserializing matrix");
+			 m,
+			 "Error deserializing matrix");
 
 	matrix = new_matrix(NULL, 0, 0, CurrentMemoryContext, m);
 	OS_RETURN_MATRIX(matrix);
