@@ -7,23 +7,24 @@ create extension if not exists onesparse;
 -- OneSparse exposes SuiteSparse:GraphBLAS objects as native Postgres
 -- types.  These types are:
 \dT onesparse.*
-                                                 List of data types
-┌───────────┬──────────────┬───────────────────────────────────────────────────────────────────────────────────────┐
-│  Schema   │     Name     │                                      Description                                      │
-├───────────┼──────────────┼───────────────────────────────────────────────────────────────────────────────────────┤
-│ onesparse │ binaryop     │ BinaryOps apply a function to two elements and returning an element.                  │
-│ onesparse │ descriptor   │ Descriptors control specific details of GraphBLAS operations.                         │
-│ onesparse │ graph        │ Graphs wrap the LAGraph library functions.                                            │
-│ onesparse │ indexunaryop │ IndexUnaryOps apply a function to a positional element, returning an element.         │
-│ onesparse │ matrix       │ Matrices hold sparse rows and columns of elements.                                    │
-│ onesparse │ monoid       │ Monoids apply a BinaryOp and an identity value to two elements, returning an element. │
-│ onesparse │ scalar       │ Scalars hold individual element values.                                               │
-│ onesparse │ semiring     │ Semirings associate additive and multiplicative operators for matrix multiplication.  │
-│ onesparse │ type         │ Types define the structure and behavior of elements.                                  │
-│ onesparse │ unaryop      │ UnaryOps apply a function to an element, returning an element.                        │
-│ onesparse │ vector       │ Vectors hold a sparse array of elements.                                              │
-└───────────┴──────────────┴───────────────────────────────────────────────────────────────────────────────────────┘
-(11 rows)
+                                                   List of data types
+┌───────────┬──────────────────┬───────────────────────────────────────────────────────────────────────────────────────┐
+│  Schema   │       Name       │                                      Description                                      │
+├───────────┼──────────────────┼───────────────────────────────────────────────────────────────────────────────────────┤
+│ onesparse │ bfs_level_parent │ Return type for bfs with level and parent vectors.                                    │
+│ onesparse │ binaryop         │ BinaryOps apply a function to two elements and returning an element.                  │
+│ onesparse │ descriptor       │ Descriptors control specific details of GraphBLAS operations.                         │
+│ onesparse │ graph            │ Graphs wrap the LAGraph library functions.                                            │
+│ onesparse │ indexunaryop     │ IndexUnaryOps apply a function to a positional element, returning an element.         │
+│ onesparse │ matrix           │ Matrices hold sparse rows and columns of elements.                                    │
+│ onesparse │ monoid           │ Monoids apply a BinaryOp and an identity value to two elements, returning an element. │
+│ onesparse │ scalar           │ Scalars hold individual element values.                                               │
+│ onesparse │ semiring         │ Semirings associate additive and multiplicative operators for matrix multiplication.  │
+│ onesparse │ type             │ Types define the structure and behavior of elements.                                  │
+│ onesparse │ unaryop          │ UnaryOps apply a function to an element, returning an element.                        │
+│ onesparse │ vector           │ Vectors hold a sparse array of elements.                                              │
+└───────────┴──────────────────┴───────────────────────────────────────────────────────────────────────────────────────┘
+(12 rows)
 
 -- ## Element Types
 --

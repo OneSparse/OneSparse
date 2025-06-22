@@ -108,6 +108,8 @@ LANGUAGE C STABLE;
 
 CREATE TYPE bfs_level_parent AS (level vector, parent vector);
 
+COMMENT ON TYPE bfs_level_parent IS 'Return type for bfs with level and parent vectors.';
+
 CREATE FUNCTION bfs(graph, bigint)
 RETURNS bfs_level_parent
 AS '$libdir/onesparse', 'graph_bfs'
