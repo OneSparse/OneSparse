@@ -2769,3 +2769,10 @@ CREATE FUNCTION connected_components(graph)
 RETURNS vector
 AS '$libdir/onesparse', 'graph_connected_components'
 LANGUAGE C STABLE;
+
+CREATE TYPE bfs_level_parent AS (level vector, parent vector);
+
+CREATE FUNCTION bfs(graph, bigint)
+RETURNS bfs_level_parent
+AS '$libdir/onesparse', 'graph_bfs'
+LANGUAGE C STABLE;
