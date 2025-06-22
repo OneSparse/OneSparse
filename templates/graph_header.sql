@@ -40,7 +40,7 @@ AS '$libdir/onesparse', 'graph_sssp'
 LANGUAGE C STABLE;
 
 CREATE OR REPLACE FUNCTION sssp(matrix, bigint, scalar)
-RETURNS graph
+RETURNS vector
 LANGUAGE sql STABLE
 BEGIN ATOMIC
     select sssp(graph($1), $2, $3);
@@ -50,7 +50,6 @@ CREATE FUNCTION pagerank(graph, float, float, integer)
 RETURNS vector
 AS '$libdir/onesparse', 'graph_pagerank'
 LANGUAGE C STABLE;
-
 
 CREATE FUNCTION pagerank(graph)
 RETURNS vector
@@ -91,6 +90,11 @@ LANGUAGE sql STABLE
 BEGIN ATOMIC
   SELECT triangle_count(graph($1));
 END;
+
+CREATE FUNCTION triangle_centrality(graph)
+RETURNS vector
+AS '$libdir/onesparse', 'graph_triangle_centrality'
+LANGUAGE C STABLE;
 
 CREATE FUNCTION betweenness(graph, bigint[])
 RETURNS vector

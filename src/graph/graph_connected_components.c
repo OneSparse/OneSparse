@@ -7,15 +7,18 @@ Datum graph_connected_components(PG_FUNCTION_ARGS)
 	os_Graph *graph;
 	GrB_Vector output;
 	GrB_Index vsize;
+    struct timeval start, end;
 
 	char msg [LAGRAPH_MSG_LEN];
 
 	LOGF();
 	graph = OS_GETARG_GRAPH(0);
 
+	OS_START_BENCH();
 	LA_CHECK(LAGr_ConnectedComponents(&output,
 									  graph->graph,
 									  msg));
+	OS_END_BENCH();
 
 	OS_CHECK(GxB_Vector_type(&type, output),
 			 output,

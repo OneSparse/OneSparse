@@ -10,6 +10,7 @@ Datum graph_sssp(PG_FUNCTION_ARGS)
 	GrB_Vector output;
 	GrB_Index vsize;
 	char msg [LAGRAPH_MSG_LEN];
+    struct timeval start, end;
 
 	LOGF();
 	graph = OS_GETARG_GRAPH(0);
@@ -24,14 +25,17 @@ Datum graph_sssp(PG_FUNCTION_ARGS)
 			 graph->graph->A,
 			 "Error extracting matrix nrows.");
 
-	LAGraph_Cached_EMin(graph->graph, msg);
-	LAGr_SingleSourceShortestPath(
-		&output,
-		graph->graph,
-		source,
-		delta->scalar,
-		msg
-		);
+	LA_CHECK(LAGraph_Cached_EMin(graph->graph, msg));
+
+	OS_START_BENCH();
+	LA_CHECK(LAGr_SingleSourceShortestPath(
+				 &output,
+				 graph->graph,
+				 source,
+				 delta->scalar,
+				 msg
+				 ));
+	OS_END_BENCH();
 
 	OS_RETURN_VECTOR(new_vector(type, vsize, CurrentMemoryContext, output));
 }

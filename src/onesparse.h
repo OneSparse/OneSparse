@@ -6,6 +6,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/time.h>
 #include "postgres.h"
 #include "fmgr.h"
 #include "miscadmin.h"
@@ -30,6 +31,7 @@
 #include "common/hashfn.h"
 #include <GraphBLAS.h>
 #include <LAGraph.h>
+#include <LAGraphX.h>
 #include "access/xact.h"
 
 #define OS_DEBUG
@@ -143,8 +145,20 @@
 
 #ifdef OS_DEBUG
 #define LOGF() elog(DEBUG1, __func__)
+#define OS_START_BENCH()                        \
+    gettimeofday(&start, NULL);
+
+#define OS_END_BENCH()                                                      \
+    gettimeofday(&end, NULL);                                               \
+    do {                                                                    \
+        double elapsed = (end.tv_sec - start.tv_sec) +                      \
+                         (end.tv_usec - start.tv_usec) / 1000000.0;         \
+        ereport(DEBUG1, (errmsg("%s() took %.6f seconds", __func__, elapsed))); \
+    } while (0)
 #else
 #define LOGF()
+#define OS_START_BENCH()
+#define OS_END_BENCH()
 #endif
 
 uint64_t* get_c_array_from_pg_array(FunctionCallInfo fcinfo, int arg_number, uint64_t *out_nelems);

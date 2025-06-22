@@ -6,7 +6,7 @@ DATA = $(wildcard onesparse/*--*.sql)
 PGXS := $(shell $(PG_CONFIG) --pgxs)
 MODULE_big = onesparse
 OBJS = $(patsubst %.c,%.o,$(shell find src -name '*.c'))
-SHLIB_LINK = -lc -lgraphblas -llagraph -lpq
+SHLIB_LINK = -lc -lgraphblas -llagraph -llagraphx -lpq
 PG_CPPFLAGS = -Wfatal-errors -std=c11 -I/usr/local/include/suitesparse/
 
 TESTS        = $(wildcard sql/*.sql)

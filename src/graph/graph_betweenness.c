@@ -12,6 +12,7 @@ Datum graph_betweenness(PG_FUNCTION_ARGS)
 	GrB_Vector output;
 	GrB_Index vsize;
 	char msg [LAGRAPH_MSG_LEN];
+    struct timeval start, end;
 
 	LOGF();
 	graph = OS_GETARG_GRAPH(0);
@@ -26,7 +27,7 @@ Datum graph_betweenness(PG_FUNCTION_ARGS)
         &datums,
         &nulls,
         &nelems
-    );
+		);
 
     values = palloc(sizeof(int64_t) * nelems);
 
@@ -38,13 +39,15 @@ Datum graph_betweenness(PG_FUNCTION_ARGS)
     }
 
 	LAGraph_Cached_AT(graph->graph, msg);
-	LAGr_Betweenness(
-		&output,
-		graph->graph,
-		(GrB_Index*)values,
-		nelems,
-		msg
-		);
+	OS_START_BENCH();
+	LA_CHECK(LAGr_Betweenness(
+				 &output,
+				 graph->graph,
+				 (GrB_Index*)values,
+				 nelems,
+				 msg
+				 ));
+	OS_END_BENCH();
 
 	OS_CHECK(GrB_Matrix_nrows(&vsize, graph->graph->A),
 			 graph->graph->A,
