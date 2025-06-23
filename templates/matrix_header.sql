@@ -826,9 +826,10 @@ RETURNS matrix
 AS '$libdir/onesparse', 'matrix_deserialize'
 LANGUAGE C STRICT;
 
-CREATE FUNCTION deserialize_file(path text)
+CREATE FUNCTION deserialize_file(text)
 RETURNS matrix
-    RETURN deserialize(pg_read_binary_file(path));
+AS '$libdir/onesparse', 'matrix_deserialize_file'
+LANGUAGE C STRICT;
 
 CREATE FUNCTION mmread(path text)
 RETURNS matrix
