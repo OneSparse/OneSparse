@@ -114,3 +114,13 @@ CREATE FUNCTION bfs(graph, bigint)
 RETURNS bfs_level_parent
 AS '$libdir/onesparse', 'graph_bfs'
 LANGUAGE C STABLE;
+
+CREATE FUNCTION square_clustering(graph)
+RETURNS vector
+AS '$libdir/onesparse', 'graph_square_clustering'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION fglt(graph)
+RETURNS matrix
+AS '$libdir/onesparse', 'graph_fglt'
+LANGUAGE C STABLE;

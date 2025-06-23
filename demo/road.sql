@@ -13,8 +13,8 @@ create table road (
 delete from test_graphs where name in ('road', 'roads');
 
 insert into test_graphs (name, graph)
-    values ('road', (select resize(matrix_agg(source::bigint, target::bigint, cost),
-                    greatest(max(source), max(target)), greatest(max(source), max(target))) from road));
+    values ('road', (select matrix_query('select source::bigint, target::bigint, cost from road',
+                    greatest(max(source)+1, max(target)+1), greatest(max(source)+1, max(target)+1)) from road));
 
 create or replace view vroad as select graph from test_graphs where name = 'road';
 

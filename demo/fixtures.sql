@@ -1,3 +1,5 @@
+\ir ../sql/fixtures.sql
+
 create extension if not exists onesparse;
 drop table if exists ostest;
 
