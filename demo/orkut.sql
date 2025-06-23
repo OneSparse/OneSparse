@@ -1,19 +1,16 @@
-
 drop table if exists orkut;
 
-create unlogged table orkut (
+create table orkut (
     i integer,
     j integer
     );
 
 \copy orkut (i, j) FROM 'demo/Matrix/com-Orkut/com-Orkut2.mtx' DELIMITER ' ';
 
-ALTER TABLE orkut ADD CONSTRAINT orkut_i_j_pk PRIMARY KEY (i, j);
-
 delete from test_graphs where name in ('orkut', 'orkuts');
 
 insert into test_graphs (name, graph)
-    values ('orkut', (select resize(matrix_agg(i::bigint, j::bigint, 1),
+    values ('orkut', (select matrix_query('select (i::bigint - 1), (j::bigint - 1), 1 from orkut',
                     greatest(max(i), max(j)), greatest(max(i), max(j))) from orkut));
 
 insert into test_graphs (name, graph)

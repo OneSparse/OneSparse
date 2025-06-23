@@ -2444,6 +2444,11 @@ CREATE FUNCTION deserialize_file(path text)
 RETURNS matrix
     RETURN deserialize(pg_read_binary_file(path));
 
+CREATE FUNCTION mmread(path text)
+RETURNS matrix
+AS '$libdir/onesparse', 'matrix_mmread'
+LANGUAGE C STRICT;
+
 CREATE FUNCTION save(a matrix, lo_oid oid default 0)
 RETURNS oid
 AS '$libdir/onesparse', 'matrix_save'
