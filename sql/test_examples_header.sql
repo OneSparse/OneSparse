@@ -5,8 +5,7 @@
 -- OneSparse leverages the LAGraph suite of graph algorithms
 -- implemented with the GraphBLAS API.
 --
-create materialized view karate as select mmread('/home/postgres/onesparse/demo/Matrix/karate/karate.mtx') as graph;
-create materialized view bcsstk01 as select mmread('/home/postgres/onesparse/demo/Matrix/bcsstk01/bcsstk01.mtx') as graph;
+create materialized view karate as select mmread('/home/postgres/onesparse/demo/karate.mtx') as graph;
 --
 -- ## Level BFS
 --
