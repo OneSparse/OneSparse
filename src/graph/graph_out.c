@@ -7,8 +7,10 @@ Datum graph_out(PG_FUNCTION_ARGS)
 	size_t len;
 	char *printed;
 	char *output;
-	LOGF();
+    struct timeval start, end;
+
 	graph = OS_GETARG_GRAPH(0);
+	OS_START_BENCH();
 	printed = _print_matrix(graph->graph->A);
 	len = strlen(printed);
 	output = palloc(len + 3);
@@ -25,6 +27,7 @@ Datum graph_out(PG_FUNCTION_ARGS)
 		elog(ERROR, "Unsupported Graph kind must be directed or undirected");
 	}
 	strcat(output, printed);
+	OS_END_BENCH();
 	PG_RETURN_CSTRING(output);
 }
 

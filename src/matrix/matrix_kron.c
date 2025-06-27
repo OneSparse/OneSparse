@@ -11,8 +11,9 @@ Datum matrix_kron(PG_FUNCTION_ARGS)
 	GrB_Semiring semiring;
 	GrB_Index anrows, ancols, bnrows, bncols;
 	int nargs;
+    struct timeval start, end;
 
-	LOGF();
+	OS_START_BENCH();
 	ERRORNULL(0);
 	ERRORNULL(1);
 
@@ -55,6 +56,8 @@ Datum matrix_kron(PG_FUNCTION_ARGS)
 						   descriptor),
 			 c->matrix,
 			 "Error matrix kron.");
+
+	OS_END_BENCH();
 	OS_RETURN_MATRIX(c);
 }
 

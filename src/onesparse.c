@@ -243,13 +243,15 @@ GrB_Type type_promote(GrB_Type left, GrB_Type right)
 {
 	int i, i1, i2;
 	GrB_Type types[] =
-		{GrB_INT16, GrB_UINT16,
+		{GrB_BOOL,
+		 GrB_INT8, GrB_UINT8,
+		 GrB_INT16, GrB_UINT16,
 		 GrB_INT32, GrB_UINT32,
 		 GrB_INT64, GrB_UINT64,
 		 GrB_FP32, GrB_FP64};
 
 	i1 = i2 = -1;
-	for (i = 0; i < 8; i++)
+	for (i = 0; i < 11; i++)
 	{
         if (left == types[i]) i1 = i;
         if (right == types[i]) i2 = i;

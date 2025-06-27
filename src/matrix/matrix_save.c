@@ -7,9 +7,9 @@ Datum matrix_save(PG_FUNCTION_ARGS) {
     size_t size;
     Oid lo_oid, lo_func_oid;
     int fd;
+    struct timeval start, end;
 
-    LOGF();
-
+	OS_START_BENCH();
     matrix = OS_GETARG_MATRIX(0);
     lo_oid = PG_GETARG_OID(1);
 
@@ -34,6 +34,7 @@ Datum matrix_save(PG_FUNCTION_ARGS) {
     lo_func_oid = LookupFuncName(list_make1(makeString("lo_close")), 1, (Oid[]){INT4OID}, false);
     OidFunctionCall1(lo_func_oid, Int32GetDatum(fd));
 
+	OS_END_BENCH();
     PG_RETURN_OID(lo_oid);
 }
 

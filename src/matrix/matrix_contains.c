@@ -6,12 +6,13 @@ Datum matrix_contains(PG_FUNCTION_ARGS)
 	os_Matrix *matrix;
 	GrB_Index i, j;
 	GrB_Info info;
+    struct timeval start, end;
 
-	LOGF();
 	ERRORNULL(0);
 	ERRORNULL(1);
 	ERRORNULL(2);
 
+	OS_START_BENCH();
 	matrix = OS_GETARG_MATRIX(0);
 	i = PG_GETARG_INT64(1);
 	j = PG_GETARG_INT64(2);
@@ -23,6 +24,8 @@ Datum matrix_contains(PG_FUNCTION_ARGS)
 		PG_RETURN_BOOL(false);
 	else
 		elog(ERROR, "Error checking stored element.");
+
+	OS_END_BENCH();
 	PG_RETURN_BOOL(false);
 }
 

@@ -18,9 +18,10 @@ Datum matrix_query(PG_FUNCTION_ARGS)
 	GrB_BinaryOp accum;
 	GrB_Index nrows, ncols;
 	os_Matrix *A;
+    struct timeval start, end;
 	MemoryContext oldctx = CurrentMemoryContext;
 
-	LOGF();
+	OS_START_BENCH();
 	nrows = PG_GETARG_INT64(1);
 	ncols = PG_GETARG_INT64(2);
 	batch_size = PG_GETARG_INT32(3);
@@ -162,6 +163,7 @@ Datum matrix_query(PG_FUNCTION_ARGS)
 	}
     SPI_cursor_close(portal);
     SPI_finish();
+	OS_END_BENCH();
 	OS_RETURN_MATRIX(A);
 }
 

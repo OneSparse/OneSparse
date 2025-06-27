@@ -15,7 +15,6 @@ Datum graph_pagerank(PG_FUNCTION_ARGS)
 
 	char msg [LAGRAPH_MSG_LEN];
 
-	LOGF();
 	graph = OS_GETARG_GRAPH(0);
 	damping = PG_GETARG_FLOAT8(1);
 	tol = PG_GETARG_FLOAT8(2);

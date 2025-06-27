@@ -11,8 +11,10 @@ matrix_reduce_scalar(PG_FUNCTION_ARGS)
 	GrB_Descriptor descriptor;
 	os_Scalar *result;
 	int nargs;
+    struct timeval start, end;
 
-	LOGF();
+	OS_START_BENCH();
+
 	nargs = PG_NARGS();
 	A = OS_GETARG_MATRIX(0);
 	OS_MTYPE(type, A);
@@ -37,6 +39,7 @@ matrix_reduce_scalar(PG_FUNCTION_ARGS)
 			 result->scalar,
 			 "Cannot reduce matrix to scalar");
 
+	OS_END_BENCH();
 	OS_RETURN_SCALAR(result);
 }
 

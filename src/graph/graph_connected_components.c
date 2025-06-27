@@ -11,7 +11,6 @@ Datum graph_connected_components(PG_FUNCTION_ARGS)
 
 	char msg [LAGRAPH_MSG_LEN];
 
-	LOGF();
 	graph = OS_GETARG_GRAPH(0);
 
 	OS_START_BENCH();

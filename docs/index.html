@@ -10,7 +10,7 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<link rel="stylesheet" href="assets/css/main.css" />
-		<link rel="stylesheet" href="assets/css/extra.css" />
+		<!-- <link rel="stylesheet" href="assets/css/extra.css" /> -->
 		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
 	</head>
 	<body class="is-preload">
@@ -65,9 +65,51 @@
 							are stored in relational databases, but
 							SQL does not have the analytical power to
 							  bring insight from existing data.</p>
+                            <p>OneSparse brings high-performance,
+                            multi-core graph analytics to Postgres.
+                            By leveraging the SuiteSparse GraphBLAS
+                            library OneSparse can traverse billions of
+                            edges per second on immense graphs using
+                            all available cpu resources on readily
+                              available commodity cloud hardware. </p>
+
+                            <h2>Highest Performance Graph Processing</h2>
+
+                            <p>Below are benchmarks on a 48-core AMD
+                            EPYC cloud server using a variety of
+                            graphs from
+                            the <a href="http://gap.cs.berkeley.edu/benchmark.html">GAP
+                            Graph Benchmarks</a>.  GAP is the industry
+                            standard benchmark for measuring the
+                            performance of various popular graph
+                            algorithms on public graph data available
+                            from <a href="https://sparse.tamu.edu/">The
+                            SuiteSparse Collection.</a></p>
+
                             <div class="image-container">
-                              <img src="images/OneSparseScale.svg"/>
+                              <figure>
+                                <img src="images/BFS.svg"/>
+                                <figcaption>Edges per second running
+                                LAGraph BFS on GAP graphs.
+                                </figcaption>
+                              </figure>
+                              <figure>
+                                <img src="images/GAP.svg"/>
+                                <figcaption>
+                                  <a href="https://en.wikipedia.org/wiki/PageRank">PageRank</a>,
+                                  <a href="https://en.wikipedia.org/wiki/Parallel_single-source_shortest_path_algorithm">Single
+                                    Source Shorest Path</a> and
+                                  <a href="https://en.wikipedia.org/wiki/Component_(graph_theory)">Connected
+                                Components</a>. </figcaption>
+                              </figure>
                             </div>
+                            <h2>GPU Optimized, Blackwell Ready</h2>
+                            <p>By utilizing the powerful JIT compiler
+                            built into the SuiteSparse library,
+                            OneSparse is able to target high
+                            performance code onto a variety of
+                            architectures, including NVIDIA CUDA.</p>
+
 							<div class="features">
 								<section>
 									<span class="icon solid major fa-code"></span>
@@ -81,31 +123,6 @@
                                     </p>
                                     <a href="https://github.com/OneSparse/OneSparse" class="button">GitHub</a>
                                     <a href="/docs.html" class="button">Docs</a>
-								</section>
-								<section>
-									<span class="icon solid major fa-lock"></span>
-									<h3>OneSparse Graphony (Coming Soon)</h3>
-									<p>OneSparse Graphony provides
-									high level graph abstractions on
-									top of python-graphblas, including
-									Python Postgres stored procedures
-									and native integration with
-									Python's psycopg2 database
-									driver.</p>
-                                    <a href="https://github.com/OneSparse/Graphony" class="button">GitHub</a>
-								</section>
-								<section>
-									<span class="icon solid major fa-cog"></span>
-									<h3>The GraphBLAS Forum</h3>
-									<p>OneSparse's team are all core
-									contributors and innovators to the
-									GraphBLAS C API and key members of
-									the GraphBLAS Forum.  We drive the
-									innovation and community
-									engagement in this industry wide
-									standardization of Sparse Linear
-									Algebra.</p>
-                                    <a href="https://graphblas.org" class="button">Website</a>
 								</section>
 								<section>
 									<span class="icon solid major fa-desktop"></span>
@@ -127,7 +144,6 @@
 
 					<section id="one" class="wrapper style2 spotlights">
 						<section>
-							<a href="#" class="image"><img src="images/michelp.jpg" alt="" data-position="center center" /></a>
 							<div class="content">
 								<div class="inner">
 									<h2>Michel Pelletier</h2>
@@ -150,7 +166,6 @@
 							</div>
 						</section>
 						<section>
-							<a href="#" class="image"><img src="images/davidbader.jpg" alt="" data-position="top center" /></a>
 							<div class="content">
 								<div class="inner">
 									<h2>Dr. David Bader</h2>
@@ -162,7 +177,6 @@
 							</div>
 						</section>
 						<section>
-							<a href="#" class="image"><img src="images/timdavis.jpg" alt="" data-position="25% 25%" /></a>
 							<div class="content">
 								<div class="inner">
 									<h2>Dr. Tim Davis</h2>

@@ -39,6 +39,7 @@ Datum graph_betweenness(PG_FUNCTION_ARGS)
     }
 
 	LAGraph_Cached_AT(graph->graph, msg);
+
 	OS_START_BENCH();
 	LA_CHECK(LAGr_Betweenness(
 				 &output,

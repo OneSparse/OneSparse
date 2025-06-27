@@ -8,12 +8,12 @@ Datum matrix_deserialize_file(PG_FUNCTION_ARGS) {
 	text *path;
 	char *filepath;
 	FILE *file;
-
-	LOGF();
+    struct timeval start, end;
 
 	path = PG_GETARG_TEXT_P(0);
     filepath = text_to_cstring(path);
 
+	OS_START_BENCH();
 	file = fopen(filepath, "rb");
 
 	if (!file) ereport(ERROR, (errmsg("Failed to open file")));
@@ -40,6 +40,7 @@ Datum matrix_deserialize_file(PG_FUNCTION_ARGS) {
 			 m,
 			 "Error deserializing matrix");
 
+	OS_END_BENCH();
 	OS_RETURN_MATRIX(new_matrix(NULL, 0, 0, CurrentMemoryContext, m));
 }
 

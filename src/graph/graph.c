@@ -55,8 +55,9 @@ static void flatten_graph(
 	os_Graph *graph;
 	os_FlatGraph *flat;
 	void* data;
+    struct timeval start, end;
 
-	LOGF();
+	OS_START_BENCH();
 
 	graph = (os_Graph *) eohptr;
 	flat = (os_FlatGraph *) result;
@@ -94,6 +95,7 @@ static void flatten_graph(
 
 	/* free_function(graph->serialized_data); */
 	SET_VARSIZE(flat, allocated_size);
+	OS_END_BENCH();
 }
 
 /* Construct an empty expanded graph. */
@@ -144,8 +146,9 @@ Datum expand_graph(os_FlatGraph *flat, MemoryContext parentcontext)
 	GrB_Matrix matrix;
 	os_Graph *graph;
 	void* data;
+    struct timeval start, end;
 
-	LOGF();
+	OS_START_BENCH();
 
 	type = code_type(flat->type_code);
 	data = OS_GRAPH_DATA(flat);
@@ -159,6 +162,7 @@ Datum expand_graph(os_FlatGraph *flat, MemoryContext parentcontext)
 			 "Error deserializing graph");
 
 	graph = new_graph(matrix, flat->kind, parentcontext);
+	OS_END_BENCH();
 	OS_RETURN_GRAPH(graph);
 }
 

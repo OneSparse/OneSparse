@@ -55,9 +55,9 @@ static void flatten_matrix(
 	os_Matrix *matrix;
 	os_FlatMatrix *flat;
 	void* data;
+    struct timeval start, end;
 
-	LOGF();
-
+	OS_START_BENCH();
 	matrix = (os_Matrix *) eohptr;
 	flat = (os_FlatMatrix *) result;
 
@@ -88,6 +88,7 @@ static void flatten_matrix(
 
 	/* free_function(matrix->serialized_data); */
 	SET_VARSIZE(flat, allocated_size);
+	OS_END_BENCH();
 }
 
 /* Construct an empty expanded matrix. */
@@ -147,9 +148,9 @@ Datum expand_matrix(os_FlatMatrix *flat, MemoryContext parentcontext)
 	GrB_Type type;
 	os_Matrix *matrix;
 	void* data;
+    struct timeval start, end;
 
-	LOGF();
-
+	OS_START_BENCH();
 	type = code_type(flat->type_code);
 	matrix = new_matrix(type, flat->nrows, flat->ncols, parentcontext, NULL);
 	data = OS_MATRIX_DATA(flat);
@@ -162,6 +163,7 @@ Datum expand_matrix(os_FlatMatrix *flat, MemoryContext parentcontext)
 		  matrix->matrix,
 		  "Error deserializing matrix");
 
+	OS_END_BENCH();
 	OS_RETURN_MATRIX(matrix);
 }
 

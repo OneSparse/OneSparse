@@ -366,7 +366,7 @@ RETURNS vector
 
 CREATE FUNCTION cast_to(a matrix, t type)
 RETURNS matrix
-    RETURN apply(a, ('identity_' || name(t))::unaryop, c=>matrix(t));
+    RETURN apply(a, ('identity_' || name(t))::unaryop, c=>matrix(t, nrows(a), ncols(a)));
 
 CREATE FUNCTION matrix_agg_matrix(state matrix, a matrix)
 RETURNS matrix

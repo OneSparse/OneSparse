@@ -5,8 +5,9 @@ Datum matrix_wait(PG_FUNCTION_ARGS)
 {
 	os_Matrix *A;
 	int waitmode;
+    struct timeval start, end;
 
-	LOGF();
+	OS_START_BENCH();
 	ERRORNULL(0);
 
 	A = OS_GETARG_MATRIX(0);
@@ -15,6 +16,8 @@ Datum matrix_wait(PG_FUNCTION_ARGS)
 	OS_CHECK(GrB_Matrix_wait(A->matrix, waitmode),
 		  A->matrix,
 		  "Error waiting for matrix.");
+
+	OS_END_BENCH();
 	OS_RETURN_MATRIX(A);
 }
 

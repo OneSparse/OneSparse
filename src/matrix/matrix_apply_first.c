@@ -12,8 +12,9 @@ Datum matrix_apply_first(PG_FUNCTION_ARGS)
 	GrB_BinaryOp binaryop;
 	GrB_Index nrows, ncols;
 	int nargs;
+    struct timeval start, end;
 
-	LOGF();
+	OS_START_BENCH();
 	ERRORNULL(0);
 	ERRORNULL(1);
 
@@ -50,6 +51,7 @@ Datum matrix_apply_first(PG_FUNCTION_ARGS)
 					   descriptor),
 			 c->matrix,
 			 "Error in grb_matrix_apply_binaryop1st");
+	OS_END_BENCH();
 	OS_RETURN_MATRIX(c);
 }
 

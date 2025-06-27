@@ -1980,7 +1980,7 @@ RETURNS vector
 
 CREATE FUNCTION cast_to(a matrix, t type)
 RETURNS matrix
-    RETURN apply(a, ('identity_' || name(t))::unaryop, c=>matrix(t));
+    RETURN apply(a, ('identity_' || name(t))::unaryop, c=>matrix(t, nrows(a), ncols(a)));
 
 CREATE FUNCTION matrix_agg_matrix(state matrix, a matrix)
 RETURNS matrix
@@ -2771,15 +2771,36 @@ RETURNS vector
 AS '$libdir/onesparse', 'graph_triangle_centrality'
 LANGUAGE C STABLE;
 
+CREATE FUNCTION triangle_centrality(matrix)
+RETURNS vector
+LANGUAGE sql STABLE
+BEGIN ATOMIC
+  SELECT triangle_centrality(graph($1));
+END;
+
 CREATE FUNCTION betweenness(graph, bigint[])
 RETURNS vector
 AS '$libdir/onesparse', 'graph_betweenness'
 LANGUAGE C STABLE;
 
+CREATE FUNCTION betweenness(matrix, bigint[])
+RETURNS vector
+LANGUAGE sql STABLE
+BEGIN ATOMIC
+  SELECT betweenness(graph($1), $2);
+END;
+
 CREATE FUNCTION connected_components(graph)
 RETURNS vector
 AS '$libdir/onesparse', 'graph_connected_components'
 LANGUAGE C STABLE;
+
+CREATE FUNCTION connected_components(matrix)
+RETURNS vector
+LANGUAGE sql STABLE
+BEGIN ATOMIC
+  SELECT connected_components(graph($1));
+END;
 
 CREATE TYPE bfs_level_parent AS (level vector, parent vector);
 
@@ -2790,12 +2811,33 @@ RETURNS bfs_level_parent
 AS '$libdir/onesparse', 'graph_bfs'
 LANGUAGE C STABLE;
 
+CREATE FUNCTION bfs(matrix, bigint)
+RETURNS bfs_level_parent
+LANGUAGE sql STABLE
+BEGIN ATOMIC
+  SELECT bfs(graph($1), $2);
+END;
+
 CREATE FUNCTION square_clustering(graph)
 RETURNS vector
 AS '$libdir/onesparse', 'graph_square_clustering'
 LANGUAGE C STABLE;
 
+CREATE FUNCTION square_clustering(matrix)
+RETURNS vector
+LANGUAGE sql STABLE
+BEGIN ATOMIC
+  SELECT square_clustering(graph($1));
+END;
+
 CREATE FUNCTION fglt(graph)
 RETURNS matrix
 AS '$libdir/onesparse', 'graph_fglt'
 LANGUAGE C STABLE;
+
+CREATE FUNCTION fglt(matrix)
+RETURNS matrix
+LANGUAGE sql STABLE
+BEGIN ATOMIC
+  SELECT fglt(graph($1));
+END;

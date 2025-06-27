@@ -12,8 +12,9 @@ Datum matrix_select(PG_FUNCTION_ARGS)
 	GrB_BinaryOp accum;
 	GrB_Index nrows, ncols;
 	int nargs;
+    struct timeval start, end;
 
-	LOGF();
+	OS_START_BENCH();
 	ERRORNULL(0);
 	ERRORNULL(1);
 	ERRORNULL(2);
@@ -47,6 +48,7 @@ Datum matrix_select(PG_FUNCTION_ARGS)
 			 C->matrix,
 			 "Error in GrB_select");
 
+	OS_END_BENCH();
 	OS_RETURN_MATRIX(C);
 }
 

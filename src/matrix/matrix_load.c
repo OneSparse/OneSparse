@@ -9,9 +9,9 @@ Datum matrix_load(PG_FUNCTION_ARGS) {
 	char *buffer;
 	GrB_Matrix matrix;
 	os_Matrix *result;
+    struct timeval start, end;
 
-	LOGF();
-
+	OS_START_BENCH();
 	lo_func_oid = LookupFuncName(list_make1(makeString("lo_open")), 2, (Oid[]){OIDOID, INT4OID}, false);
 	fd = DatumGetInt32(OidFunctionCall2(lo_func_oid, ObjectIdGetDatum(lo_oid), Int32GetDatum(INV_READ)));
 
@@ -36,6 +36,7 @@ Datum matrix_load(PG_FUNCTION_ARGS) {
 
 	lo_func_oid = LookupFuncName(list_make1(makeString("lo_close")), 1, (Oid[]){INT4OID}, false);
 	(void)OidFunctionCall1(lo_func_oid, Int32GetDatum(fd));
+	OS_END_BENCH();
 
 	result = new_matrix(NULL, 0, 0, CurrentMemoryContext, matrix);
 	OS_RETURN_MATRIX(result);

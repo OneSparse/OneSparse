@@ -115,7 +115,7 @@ input, select, textarea {
 /* Type */
 
 	body, input, select, textarea {
-		color: rgba(255, 255, 255, 0.55);
+		color: rgba(255, 255, 255, 0.90);
 		font-family: Arial, Helvetica, sans-serif;
 		font-size: 16.5pt;
 		font-weight: normal;
@@ -1832,8 +1832,8 @@ input, select, textarea {
 		-ms-transition: border-color 0.2s ease;
 		transition: border-color 0.2s ease;
 		background-color: transparent;
-		border: solid 1px !important;
-		border-color: rgba(255, 255, 255, 0.15) !important;
+		border: solid 2px !important;
+		border-color: rgba(255, 255, 255, 1) !important;
 		border-radius: 3em;
 		color: #ffffff !important;
 		cursor: pointer;
@@ -3874,7 +3874,7 @@ input, select, textarea {
 
 	#intro {
 		background-attachment: fixed;
-		background-image: url("images/8graphs.png");
+		background-image: url("images/6graphs.png");
 		background-position: top right;
 		background-repeat: no-repeat;
 		background-size: 100% 100%;
@@ -3911,8 +3911,48 @@ input, select, textarea {
 .image-container {
   text-align: center;
 }
-.image-container img {
-  display: inline-block;
+.image-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 1em;
+}
+.image-container figure {
+  margin: 0;
+  text-align: center;
+}
+.image-container figure img {
+  display: block;
   max-width: 100%;
   height: auto;
 }
+.image-container figcaption {
+  justify-content: center;
+  margin-top: 0.5em;
+  bottom-top: 1em;
+  text-align: center;
+  max-width: 80%;
+  color: var(--text-color);
+  font-size: 0.9em;
+}
+/* .image-container img { */
+/*   display: inline-block; */
+/*   max-width: 100%; */
+/*   height: auto; */
+/* } */
+
+/* /\* Figures & captions inside .image-container *\/ */
+/* .image-container figure { */
+/*   display: inline-block; */
+/*   margin: 1em; */
+/*   text-align: center; */
+/* } */
+/* .image-container figure img { */
+/*   display: block; */
+/*   margin: 0 auto; */
+/* } */
+/* .image-container figcaption { */
+/*   margin-top: 0.5em; */
+/*   color: var(--text-color); */
+/*   font-size: 0.9em; */
+/* } */

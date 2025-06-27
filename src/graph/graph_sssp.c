@@ -12,7 +12,6 @@ Datum graph_sssp(PG_FUNCTION_ARGS)
 	char msg [LAGRAPH_MSG_LEN];
     struct timeval start, end;
 
-	LOGF();
 	graph = OS_GETARG_GRAPH(0);
 	source = PG_GETARG_INT64(1);
 	delta = OS_GETARG_SCALAR(2);

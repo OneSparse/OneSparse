@@ -7,7 +7,9 @@ Datum matrix_info(PG_FUNCTION_ARGS) {
 	size_t size;
 	FILE *fp;
 	int level;
-	LOGF();
+    struct timeval start, end;
+
+	OS_START_BENCH();
 	A = OS_GETARG_MATRIX(0);
 	level = PG_GETARG_INT32(1);
 	if (level > 5)
@@ -23,6 +25,7 @@ Datum matrix_info(PG_FUNCTION_ARGS) {
 	result = palloc(size + 1);
 	memcpy(result, buf, size+1);
 	free(buf);
+	OS_END_BENCH();
 	PG_RETURN_TEXT_P(cstring_to_text_with_len(result, size+1));
 }
 

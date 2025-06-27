@@ -146,6 +146,7 @@
 #ifdef OS_DEBUG
 #define LOGF() elog(DEBUG1, __func__)
 #define OS_START_BENCH()                        \
+	ereport(DEBUG1, (errmsg("%s()", __func__))); \
     gettimeofday(&start, NULL);
 
 #define OS_END_BENCH()                                                      \

@@ -8,8 +8,9 @@ Datum matrix_serialize_file(PG_FUNCTION_ARGS) {
 	text *path;
 	char *filepath;
 	FILE *file;
+    struct timeval start, end;
 
-	LOGF();
+	OS_START_BENCH();
 
 	matrix = OS_GETARG_MATRIX(0);
 	path = PG_GETARG_TEXT_P(1);
@@ -38,6 +39,7 @@ Datum matrix_serialize_file(PG_FUNCTION_ARGS) {
 	}
 
 	fclose(file);
+	OS_END_BENCH();
 	PG_RETURN_BOOL(true);
 }
 

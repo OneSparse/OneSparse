@@ -9,7 +9,6 @@ Datum graph_fglt(PG_FUNCTION_ARGS)
 	char msg [LAGRAPH_MSG_LEN];
     struct timeval start, end;
 
-	LOGF();
 	graph = OS_GETARG_GRAPH(0);
 
 	LA_CHECK(LAGraph_Cached_NSelfEdges(graph->graph, msg));

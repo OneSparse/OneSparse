@@ -12,8 +12,9 @@ Datum matrix_reduce_vector(PG_FUNCTION_ARGS)
 	GrB_BinaryOp accum;
 	GrB_Index vsize;
 	int nargs;
+    struct timeval start, end;
 
-	LOGF();
+	OS_START_BENCH();
 	ERRORNULL(0);
 
 	nargs = PG_NARGS();
@@ -49,6 +50,7 @@ Datum matrix_reduce_vector(PG_FUNCTION_ARGS)
 			 w->vector,
 			 "Error matrix vector reduce.");
 
+	OS_END_BENCH();
 	OS_RETURN_VECTOR(w);
 }
 

@@ -7,6 +7,7 @@ Datum graph_in(PG_FUNCTION_ARGS)
 	LAGraph_Kind kind;
 	os_Matrix *matrix;
 	os_Graph *graph;
+    struct timeval start, end;
 
 	input = PG_GETARG_CSTRING(0);
 
@@ -23,8 +24,10 @@ Datum graph_in(PG_FUNCTION_ARGS)
 		elog(ERROR, "Graph must begin with u: or d:");
 	}
 
+	OS_START_BENCH();
 	matrix = _parse_matrix(pstrdup(input+2));
 	graph = new_graph(matrix->matrix, kind, CurrentMemoryContext);
+	OS_END_BENCH();
 	OS_RETURN_GRAPH(graph);
 }
 

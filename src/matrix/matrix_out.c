@@ -128,9 +128,14 @@ PG_FUNCTION_INFO_V1(matrix_out);
 Datum matrix_out(PG_FUNCTION_ARGS)
 {
 	os_Matrix *matrix;
-	LOGF();
+	char *result;
+    struct timeval start, end;
+
+	OS_START_BENCH();
 	matrix = OS_GETARG_MATRIX(0);
-	PG_RETURN_CSTRING(_print_matrix(matrix->matrix));
+	result = _print_matrix(matrix->matrix);
+	OS_START_BENCH();
+	PG_RETURN_CSTRING(result);
 }
 
 /* Local Variables: */

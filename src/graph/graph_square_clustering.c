@@ -10,7 +10,6 @@ Datum graph_square_clustering(PG_FUNCTION_ARGS)
 	char msg [LAGRAPH_MSG_LEN];
     struct timeval start, end;
 
-	LOGF();
 	graph = OS_GETARG_GRAPH(0);
 
 	OS_CHECK(GrB_Matrix_nrows(&vsize, graph->graph->A),
