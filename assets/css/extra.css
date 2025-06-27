@@ -1,0 +1,59 @@
+@import url(fontawesome-all.min.css);
+
+/* Color overrides only — keep original CSS intact */
+:root {
+  --bg-default: #f5f5f5;
+  --bg-alt: #ffffff;
+  --text-color: #222222;
+  --link-color: #1a73e8;
+  --link-hover: #1558b0;
+  --border-light: rgba(0,0,0,0.1);
+}
+
+body {
+  background-color: var(--bg-default) !important;
+  color: var(--text-color) !important;
+}
+
+a, a:visited {
+  color: var(--link-color) !important;
+  border-bottom-color: rgba(0,0,0,0.35) !important;
+}
+a:hover, a:focus {
+  color: var(--link-hover) !important;
+  border-bottom-color: transparent !important;
+}
+
+/* Sidebar, header, footer backgrounds */
+#sidebar, #header {
+  background-color: var(--bg-alt) !important;
+}
+#footer, .wrapper.alt {
+  background-color: var(--bg-alt) !important;
+}
+
+/* Text color overrides */
+h1, h2, h3, h4, h5, h6,
+label, input, select, textarea,
+#sidebar nav a, #header .title, #header nav a,
+#footer a {
+  color: var(--text-color) !important;
+}
+
+/* Borders and accents */
+* { border-color: var(--border-light) !important; }
+
+/* Buttons */
+.button, button,
+input[type="submit"],
+input[type="reset"],
+input[type="button"] {
+  color: var(--text-color) !important;
+  border-color: var(--border-light) !important;
+}
+.button.primary, button.primary,
+input.primary {
+  background-color: var(--link-color) !important;
+  border-color: var(--link-color) !important;
+  color: #ffffff !important;
+}
