@@ -2517,17 +2517,47 @@ create function random_matrix(
     end;
     $$;
 
+CREATE OR REPLACE FUNCTION norm_vec(val vector) returns vector AS $$
+declare
+    min double precision = greatest(reduce_scalar(val, 'min_monoid_fp32')::double precision, 0.001);
+    max double precision = reduce_scalar(val, 'max_monoid_fp32')::double precision;
+begin
+    return (val - min) / (max - min);
+end;
+$$ language plpgsql immutable strict;;
+
+CREATE OR REPLACE FUNCTION jet_color(val double precision, alpha double precision DEFAULT 1.0) RETURNS text AS $$
+DECLARE
+  r double precision; g double precision; b double precision;
+BEGIN
+  val   := greatest(0, least(1, val));
+  alpha := greatest(0, least(1, alpha));
+  r := greatest(0, least(1, 1.5 - abs(4*val - 3)));
+  g := greatest(0, least(1, 1.5 - abs(4*val - 2)));
+  b := greatest(0, least(1, 1.5 - abs(4*val - 1)));
+  RETURN '#'
+    || lpad(to_hex(floor(r*255)::int),2,'0')
+    || lpad(to_hex(floor(g*255)::int),2,'0')
+    || lpad(to_hex(floor(b*255)::int),2,'0')
+    || lpad(to_hex(floor(alpha*255)::int),2,'0');
+END;
+$$ LANGUAGE plpgsql IMMUTABLE STRICT;
+
 create or replace function draw(
     a matrix,
     node_labels vector default null,
     weights bool default true,
-    directed bool default true ) returns text language plpgsql as
+    directed bool default true,
+    color_nodes bool default false,
+    alpha double precision default 1.0 ) returns text language plpgsql as
     $$
     declare
         row bigint;
         col bigint;
         value scalar;
+        norm vector;
         result text;
+        color_style text;
         edge text;
     begin
         if directed then
@@ -2538,15 +2568,28 @@ create or replace function draw(
             edge = '--';
         end if;
         if node_labels is not null then
-            for row in select * from irows(a) loop
+            if color_nodes then
+                norm = norm_vec(node_labels);
+            else
+                norm = dup(node_labels);
+            end if;
+            for row, value in select * from elements(norm) loop
+                color_style = '';
+                if color_nodes then
+                    color_style = format(E'style=filled fillcolor="%s"', jet_color(value::double precision, alpha));
+                end if;
                 value = get_element(node_labels, row);
-                result = result || format(E'%s [label="%s"]\n', row, print(value));
+                result = result || format(E'%s [label="%s" %s]\n', row, left(print(value), 4), color_style);
             end loop;
         end if;
         for row, col, value in select * from elements(a) loop
+            color_style = '';
             result = result || format(E'%s %s %s', row, edge, col);
             if weights then
-                result = result || format(E' [label="%s"]\n', print(value));
+                if color_nodes then
+                    color_style = format(E'style=filled fillcolor="%s"', jet_color(value::double precision, alpha));
+                end if;
+                result = result || format(E' [label="%s" %s]\n', left(print(value), 4), color_style);
             else
                 result = result || E'\n';
             end if;

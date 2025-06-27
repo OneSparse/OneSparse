@@ -75,14 +75,6 @@ drop table if exists test_graphs cascade;
 create table test_graphs (name text primary key, graph matrix not null);
 
 insert into test_graphs values
-    ('ostest', (select matrix_agg(i, j, 1) |+ matrix_agg(j, i, 1) from ostest)), -- make symmetric
-    ('karate', (select mmread('/home/postgres/onesparse/demo/Matrix/karate/karate.mtx'))),
-    ('ash219', (select matrix_agg(i, j, v) from ash219)),
-    ('mbeacxc', (select matrix_agg(i, j, v) from mbeacxc));
+    ('karate', (select mmread('/home/postgres/onesparse/demo/karate.mtx')));
 
-create view vkarate as select graph from test_graphs where name = 'karate';
 
-insert into test_graphs values
-    ('karates', (select eadd(graph, graph, descr:='t1') from vkarate));
-
-create view vkarates as select graph from test_graphs where name = 'karates';
