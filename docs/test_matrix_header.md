@@ -99,16 +99,16 @@ The `draw()` function turns a matrix into the Graphviz DOT language
 that is used to draw graph diagrams:
 ``` postgres-console
 select draw('int32(4:4)[1:2:1 2:3:2 3:1:3]'::matrix) as draw;
-┌────────────────────┐
-│        draw        │
-├────────────────────┤
-│ digraph {          │
-│ 1 -> 2 [label="1"] │
-│ 2 -> 3 [label="2"] │
-│ 3 -> 1 [label="3"] │
-│ }                  │
-│                    │
-└────────────────────┘
+┌─────────────────────┐
+│        draw         │
+├─────────────────────┤
+│ digraph {           │
+│ 1 -> 2 [label="1" ] │
+│ 2 -> 3 [label="2" ] │
+│ 3 -> 1 [label="3" ] │
+│ }                   │
+│                     │
+└─────────────────────┘
 (1 row)
 
 ```
