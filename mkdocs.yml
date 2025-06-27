@@ -3,7 +3,7 @@ site_name: OneSparse
 nav:
   - Intro: docs.md
   - Docker Demo: docker.md
-  - Getting Started: test_examples_header.md
+  - Algorithms: test_examples_header.md
   - Matrix: test_matrix_header.md
   - Vector: test_vector_header.md
   - Scalar: test_scalar_header.md
@@ -22,11 +22,18 @@ extra:
 
 theme:
   name: material
+  features:
+    - toc.integrate
+    - toc.follow
   highlightjs: true
   hljs_languages:
     - C
     - python
     - pgsql
+    - toc:
+        toc_depth: 2     # how many levels deep to include
+        permalink: true  # adds a link icon next to each heading
+      
 markdown_extensions:
   - pymdownx.highlight:
       anchor_linenums: true

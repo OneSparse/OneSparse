@@ -95,7 +95,7 @@ char* short_code(GrB_Type_Code code)
 		case GrB_UDT_CODE:
 			return "utd";
 	}
-	elog(ERROR, "Unknown type code");
+	elog(ERROR, "Unknown type to code");
 }
 
 GrB_Type code_type(GrB_Type_Code code)
@@ -131,7 +131,7 @@ GrB_Type code_type(GrB_Type_Code code)
 		case GrB_UDT_CODE:
 			elog(ERROR, "UDT Types not yet supported");
 	}
-	elog(ERROR, "Unknown type code");
+	elog(ERROR, "Unknown code to type");
 }
 
 size_t code_size(GrB_Type_Code code)
@@ -163,7 +163,7 @@ size_t code_size(GrB_Type_Code code)
 		default:
 			elog(ERROR, "Type not yet supported");
 	}
-	elog(ERROR, "Unknown type code");
+	elog(ERROR, "Unknown type code size");
 }
 
 GrB_Type short_type(char *name)
@@ -243,13 +243,15 @@ GrB_Type type_promote(GrB_Type left, GrB_Type right)
 {
 	int i, i1, i2;
 	GrB_Type types[] =
-		{GrB_INT16, GrB_UINT16,
+		{GrB_BOOL,
+		 GrB_INT8, GrB_UINT8,
+		 GrB_INT16, GrB_UINT16,
 		 GrB_INT32, GrB_UINT32,
 		 GrB_INT64, GrB_UINT64,
 		 GrB_FP32, GrB_FP64};
 
 	i1 = i2 = -1;
-	for (i = 0; i < 8; i++)
+	for (i = 0; i < 11; i++)
 	{
         if (left == types[i]) i1 = i;
         if (right == types[i]) i2 = i;
@@ -388,8 +390,9 @@ static void burble_assign_hook(bool newvalue, void *extra)
 
 void _PG_init(void)
 {
-	OK_CHECK(GrB_init(GrB_NONBLOCKING),
-			 "Cannot initialize GraphBLAS");
+	char msg [LAGRAPH_MSG_LEN];
+
+	LAGraph_Init(msg);
 
 	initialize_types();
 	initialize_descriptors();

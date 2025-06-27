@@ -1,32 +1,33 @@
 #include "../onesparse.h"
 
-PG_FUNCTION_INFO_V1(matrix_out);
-Datum matrix_out(PG_FUNCTION_ARGS)
+char *_print_matrix(GrB_Matrix matrix)
 {
 	GrB_Info info;
 	GrB_Index row, col, nrows, ncols, nvals;
 	GxB_Iterator iterator;
-	os_Matrix *matrix;
 	StringInfoData buf;
 	int32_t type_code;
 
-	LOGF();
-	matrix = OS_GETARG_MATRIX(0);
-
 	GxB_Iterator_new(&iterator);
-	OS_CHECK(GxB_Matrix_Iterator_attach(iterator, matrix->matrix, NULL),
-		  matrix->matrix,
+	OS_CHECK(GxB_Matrix_Iterator_attach(iterator, matrix, NULL),
+		  matrix,
 		  "Cannot attach matrix iterator.");
 
 	initStringInfo(&buf);
-	OS_CHECK(GrB_get(matrix->matrix, &type_code, GrB_EL_TYPE_CODE),
-		  matrix->matrix,
+	OS_CHECK(GrB_get(matrix, &type_code, GrB_EL_TYPE_CODE),
+		  matrix,
 		  "Cannot get Matrix Type code.");
 
 	appendStringInfo(&buf, "%s", short_code(type_code));
 
-	OS_MNROWS(nrows, matrix);
-	OS_MNCOLS(ncols, matrix);
+	OS_CHECK(GrB_Matrix_nrows(&nrows, matrix),
+			 matrix,
+			 "Error extracting matrix nrows.");
+
+	OS_CHECK(GrB_Matrix_ncols(&ncols, matrix),
+			 matrix,
+			 "Error extracting matrix ncols.");
+
 	if (nrows < GrB_INDEX_MAX+1 || ncols < GrB_INDEX_MAX+1)
 	{
 		appendStringInfo(&buf, "(");
@@ -41,11 +42,13 @@ Datum matrix_out(PG_FUNCTION_ARGS)
 		}
 		appendStringInfo(&buf, ")");
 	}
-	OS_MNVALS(nvals, matrix);
+	OS_CHECK(GrB_Matrix_nvals(&nvals, matrix),
+			 matrix,
+			 "Error extracting matrix nvals.");
 
 	if (nvals == 0)
 	{
-		PG_RETURN_CSTRING(buf.data);
+		return buf.data;
 	}
 
 	appendStringInfo(&buf, "[");
@@ -118,7 +121,21 @@ Datum matrix_out(PG_FUNCTION_ARGS)
 	GrB_free(&iterator);
 
 	appendStringInfo(&buf, "]");
-	PG_RETURN_CSTRING(buf.data);
+	return buf.data;
+}
+
+PG_FUNCTION_INFO_V1(matrix_out);
+Datum matrix_out(PG_FUNCTION_ARGS)
+{
+	os_Matrix *matrix;
+	char *result;
+    struct timeval start, end;
+
+	OS_START_BENCH();
+	matrix = OS_GETARG_MATRIX(0);
+	result = _print_matrix(matrix->matrix);
+	OS_START_BENCH();
+	PG_RETURN_CSTRING(result);
 }
 
 /* Local Variables: */

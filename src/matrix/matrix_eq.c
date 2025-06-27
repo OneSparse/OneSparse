@@ -7,8 +7,9 @@ Datum matrix_eq(PG_FUNCTION_ARGS)
 	os_Matrix *a, *b, *c;
 	GrB_Index anrows, ancols, anvals, bnrows, bncols, bnvals;
 	bool result;
+    struct timeval start, end;
 
-	LOGF();
+	OS_START_BENCH();
 	ERRORNULL(0);
 	ERRORNULL(1);
 
@@ -61,7 +62,7 @@ Datum matrix_eq(PG_FUNCTION_ARGS)
 			  NULL),
 			 c->matrix,
 			 "Cannot reduce matrix to scalar in eq");
-
+	OS_END_BENCH();
 	PG_RETURN_BOOL(result);
 }
 

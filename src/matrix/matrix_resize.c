@@ -5,8 +5,9 @@ Datum matrix_resize(PG_FUNCTION_ARGS)
 {
 	os_Matrix *A;
 	GrB_Index i, j;
+    struct timeval start, end;
 
-	LOGF();
+	OS_START_BENCH();
 	ERRORNULL(0);
 	ERRORNULL(1);
 	ERRORNULL(2);
@@ -24,6 +25,8 @@ Datum matrix_resize(PG_FUNCTION_ARGS)
 	OS_CHECK(GrB_Matrix_resize(A->matrix, i, j),
 		  A->matrix,
 		  "Error resizing matrix.");
+
+	OS_END_BENCH();
 	OS_RETURN_MATRIX(A);
 }
 

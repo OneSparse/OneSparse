@@ -6,10 +6,10 @@ Datum matrix_serialize(PG_FUNCTION_ARGS) {
 	void *data;
 	size_t size;
 	bytea *result;
+    struct timeval start, end;
 
-	LOGF();
-
-   matrix = OS_GETARG_MATRIX(0);
+	OS_START_BENCH();
+	matrix = OS_GETARG_MATRIX(0);
 
     OS_CHECK(GrB_wait(matrix->matrix, GrB_MATERIALIZE),
 		  matrix->matrix,
@@ -26,6 +26,8 @@ Datum matrix_serialize(PG_FUNCTION_ARGS) {
 	result = (bytea *) palloc(VARHDRSZ + size);
 	SET_VARSIZE(result, VARHDRSZ + size);
 	memcpy(VARDATA(result), data, size);
+
+	OS_END_BENCH();
 	PG_RETURN_BYTEA_P(result);
 }
 

@@ -12,8 +12,9 @@ Datum matrix_eunion(PG_FUNCTION_ARGS)
 	GrB_BinaryOp accum;
 	GrB_Index nrows, ncols;
 	int nargs;
+    struct timeval start, end;
 
-	LOGF();
+	OS_START_BENCH();
 	ERRORNULL(0);
 	ERRORNULL(1);
 	ERRORNULL(2);
@@ -58,6 +59,7 @@ Datum matrix_eunion(PG_FUNCTION_ARGS)
 							descriptor),
 			 c->matrix,
 			 "Error matrix eWiseUnion.");
+	OS_END_BENCH();
 	OS_RETURN_MATRIX(c);
 }
 

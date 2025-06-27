@@ -6,8 +6,9 @@ Datum matrix_set_element(PG_FUNCTION_ARGS)
 	os_Matrix *matrix;
 	os_Scalar *scalar;
 	GrB_Index i, j;
+    struct timeval start, end;
 
-	LOGF();
+	OS_START_BENCH();
 	ERRORNULL(0);
 	ERRORNULL(1);
 	ERRORNULL(2);
@@ -22,6 +23,7 @@ Datum matrix_set_element(PG_FUNCTION_ARGS)
 		  matrix->matrix,
 		  "Error setting matrix element.");
 
+	OS_END_BENCH();
 	OS_RETURN_MATRIX(matrix);
 }
 

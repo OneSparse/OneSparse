@@ -6,8 +6,8 @@ DATA = $(wildcard onesparse/*--*.sql)
 PGXS := $(shell $(PG_CONFIG) --pgxs)
 MODULE_big = onesparse
 OBJS = $(patsubst %.c,%.o,$(shell find src -name '*.c'))
-SHLIB_LINK = -lc -lgraphblas -lpq
-CFLAGS = -Wfatal-errors -std=c11
+SHLIB_LINK = -lc -lgraphblas -llagraph -llagraphx -lpq
+PG_CPPFLAGS = -Wfatal-errors -std=c11 -I/usr/local/include/suitesparse/
 
 TESTS        = $(wildcard sql/*.sql)
 REGRESS      = $(patsubst sql/%.sql,%,$(TESTS))

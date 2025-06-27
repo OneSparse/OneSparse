@@ -7,9 +7,9 @@ Datum matrix_get_element(PG_FUNCTION_ARGS)
 	os_Scalar *scalar;
 	GrB_Index i, j;
 	GrB_Type type;
+    struct timeval start, end;
 
-
-	LOGF();
+	OS_START_BENCH();
 	ERRORNULL(0);
 	ERRORNULL(1);
 	ERRORNULL(2);
@@ -24,6 +24,8 @@ Datum matrix_get_element(PG_FUNCTION_ARGS)
 	OS_CHECK(GrB_Matrix_extractElement(scalar->scalar, matrix->matrix, i, j),
 		  matrix->matrix,
 		  "Error extracting setting matrix element.");
+
+	OS_END_BENCH();
 	OS_RETURN_SCALAR(scalar);
 }
 

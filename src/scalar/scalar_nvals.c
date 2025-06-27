@@ -12,8 +12,9 @@ Datum scalar_nvals(PG_FUNCTION_ARGS)
 	scalar = OS_GETARG_SCALAR(0);
 
 	OS_CHECK(GrB_Scalar_nvals(&result, scalar->scalar),
-		  scalar->scalar,
-		  "Error extracting scalar nvals.");
+			 scalar->scalar,
+			 "Error extracting scalar nvals.");
+
 	PG_RETURN_INT16(result ? 1 : 0);
 }
 

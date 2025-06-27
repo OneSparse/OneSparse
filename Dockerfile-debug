@@ -23,8 +23,9 @@ RUN /bin/rm -Rf "$PGDATA" && mkdir "$PGDATA"
 WORKDIR "/home/postgres"
 
 # get postgres source and compile with debug and no optimization
-RUN git clone  https://github.com/michelp/postgres-upstream.git --depth=1 && \
-    cd postgres-upstream && CFLAGS="-DTOAST_MAX_CHUNK_SIZE=8192" ./configure \
+RUN git clone https://github.com/postgres/postgres.git --depth=1 && \
+#    git checkout REL_18_BETA1 && \
+    cd postgres && ./configure \
     --prefix=/usr/ \
     --without-icu \
     --enable-debug \
@@ -48,13 +49,19 @@ RUN git clone  https://github.com/michelp/postgres-upstream.git --depth=1 && \
 #     && cd .. && /bin/rm -Rf postgres-upstream
 
 # get GraphBLAS, compile with debug symbols    
-RUN curl -s -L -J https://github.com/DrTimothyAldenDavis/GraphBLAS/archive/refs/tags/v10.0.2.tar.gz | \
-    tar zxvf - && cd GraphBLAS-10.0.2 && \
+RUN curl -s -L -J https://github.com/DrTimothyAldenDavis/GraphBLAS/archive/refs/tags/v10.1.0.tar.gz | \
+    tar zxvf - && cd GraphBLAS-10.1.0 && \
     make library \
 #    CMAKE_OPTIONS='-DCMAKE_BUILD_TYPE=Debug -DGRAPHBLAS_COMPACT=1' \
     && sudo make install \
-    && /bin/rm -Rf GraphBLAS-10.0.2
+    && /bin/rm -Rf GraphBLAS-10.1.0
 
+RUN curl -s -L -J https://github.com/GraphBLAS/LAGraph/archive/refs/tags/v1.1.5.tar.gz | \
+    tar zxvf - && cd LAGraph-1.1.5 && \
+    make library \
+    && sudo make install \
+    && /bin/rm -Rf LAGraph-1.1.5
+    
 RUN sudo ldconfig
 
 # put test stuff into pg home        

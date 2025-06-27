@@ -12,7 +12,7 @@ select deserialize(:'matrixbytes') = random_matrix(10, 10, 10, seed=>0.42, max=>
 select serialize_file(random_matrix(10, 10, 10, seed=>0.42, max=>99), :'grbfile');
  serialize_file 
 ----------------
- 
+ t
 (1 row)
 
 select deserialize_file(:'grbfile') = random_matrix(10, 10, 10, seed=>0.42, max=>99);

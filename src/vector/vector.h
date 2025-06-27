@@ -57,6 +57,7 @@ os_Vector* DatumGetVectorMaybeABC(Datum d, os_Vector *A, os_Vector *B, os_Vector
 #define OS_GETARG_VECTOR_HANDLE_OR_NULL_ABC(_nargs, _arg_num, _A, _B, _C) \
 	_nargs > _arg_num ? PG_ARGISNULL(_arg_num) ? NULL : OS_GETARG_VECTOR_ABC(_arg_num, _A, _B, _C)->vector : NULL;
 
+#define OS_VECTOR_DATUM(_vector) EOHPGetRWDatum(&(_vector)->hdr)
 #define OS_RETURN_VECTOR(_vector) return EOHPGetRWDatum(&(_vector)->hdr)
 #define OS_VECTOR_FLATSIZE() MAXALIGN(sizeof(os_FlatVector))
 

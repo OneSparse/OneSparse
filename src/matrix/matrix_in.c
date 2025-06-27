@@ -1,13 +1,11 @@
 #include "../onesparse.h"
 
-PG_FUNCTION_INFO_V1(matrix_in);
-Datum matrix_in(PG_FUNCTION_ARGS)
+os_Matrix* _parse_matrix(char *input_copy)
 {
 	os_Matrix *matrix;
 	char *input;
 	GrB_Type typ;
 	char *short_name;
-	char *input_copy;
 	char *token;
 	char *saveptr;
 	char *endptr;
@@ -17,8 +15,7 @@ Datum matrix_in(PG_FUNCTION_ARGS)
 	GrB_Index nrows, ncols;
 	int matched;
 
-	input = PG_GETARG_CSTRING(0);
-	input_copy = strdup(input);
+	input = pstrdup(input_copy);
 	token = strtok_r(input_copy, "[", &saveptr);
 
 	if (token == NULL)
@@ -67,7 +64,7 @@ Datum matrix_in(PG_FUNCTION_ARGS)
 	token = strtok_r(NULL, "]", &saveptr);
 	if (token == NULL)
 	{
-		OS_RETURN_MATRIX(matrix);
+		return matrix;
 	}
 
 	row = 0;
@@ -161,6 +158,17 @@ Datum matrix_in(PG_FUNCTION_ARGS)
 				  "Error setting Matrix Element");
 		}
 	}
+	return matrix;
+}
+
+PG_FUNCTION_INFO_V1(matrix_in);
+Datum matrix_in(PG_FUNCTION_ARGS)
+{
+	os_Matrix *matrix;
+	char *input;
+
+	input = PG_GETARG_CSTRING(0);
+	matrix = _parse_matrix(input);
 	OS_RETURN_MATRIX(matrix);
 }
 

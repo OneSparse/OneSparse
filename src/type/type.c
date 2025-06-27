@@ -15,7 +15,6 @@ static const ExpandedObjectMethods type_methods = {
 
 PG_FUNCTION_INFO_V1(type_in);
 PG_FUNCTION_INFO_V1(type_out);
-PG_FUNCTION_INFO_V1(type_name);
 
 #include "type_header.h"
 
@@ -156,12 +155,6 @@ Datum type_out(PG_FUNCTION_ARGS)
 	PG_RETURN_CSTRING(result);
 }
 
-Datum type_name(PG_FUNCTION_ARGS)
-{
-	os_Type *type;
-	type = OS_GETARG_TYPE(0);
-	PG_RETURN_TEXT_P(cstring_to_text(type->name));
-}
 /* Local Variables: */
 /* mode: c */
 /* c-file-style: "postgresql" */

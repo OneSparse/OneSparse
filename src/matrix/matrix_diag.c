@@ -8,8 +8,9 @@ Datum matrix_diag(PG_FUNCTION_ARGS)
     GrB_Matrix c;
 	os_Matrix *result;
     GrB_Index nrows, ncols;
+    struct timeval start, end;
 
-	LOGF();
+	OS_START_BENCH();
 	ERRORNULL(0);
 	a = OS_GETARG_VECTOR(0);
 
@@ -25,6 +26,7 @@ Datum matrix_diag(PG_FUNCTION_ARGS)
 
     OS_VTYPE(type, a);
     result = new_matrix(type, nrows, ncols, CurrentMemoryContext, c);
+	OS_END_BENCH();
 	OS_RETURN_MATRIX(result);
 }
 

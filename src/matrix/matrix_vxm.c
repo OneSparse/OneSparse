@@ -12,8 +12,9 @@ Datum matrix_vxm(PG_FUNCTION_ARGS)
 	GrB_Semiring semiring;
 	GrB_Index asize;
 	int nargs;
+    struct timeval start, end;
 
-	LOGF();
+	OS_START_BENCH();
 	ERRORNULL(0);
 	ERRORNULL(1);
 
@@ -53,6 +54,7 @@ Datum matrix_vxm(PG_FUNCTION_ARGS)
 		  c->vector,
 		  "Error matrix mxv.");
 
+	OS_END_BENCH();
 	OS_RETURN_VECTOR(c);
 }
 

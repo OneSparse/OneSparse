@@ -6,25 +6,32 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/time.h>
 #include "postgres.h"
 #include "fmgr.h"
 #include "miscadmin.h"
 #include "common/fe_memutils.h"
-#include "utils/builtins.h"
 #include "libpq/pqformat.h"
+#include "libpq/libpq-fs.h"
+#include "libpq/be-fsstubs.h"
 #include "funcapi.h"
 #include "access/htup_details.h"
+#include "utils/builtins.h"
+#include "utils/memutils.h"
 #include "utils/array.h"
 #include "utils/arrayaccess.h"
 #include "utils/guc.h"
 #include "utils/varlena.h"
 #include "catalog/pg_type_d.h"
 #include "catalog/pg_type.h"
+#include "parser/parse_func.h"
 #include "utils/lsyscache.h"
 #include "nodes/pg_list.h"
 #include "nodes/supportnodes.h"
 #include "common/hashfn.h"
-#include "suitesparse/GraphBLAS.h"
+#include <GraphBLAS.h>
+#include <LAGraph.h>
+#include <LAGraphX.h>
 #include "access/xact.h"
 
 #define OS_DEBUG
@@ -52,6 +59,14 @@
                 GrB_error(&emsg, obj);                        \
                 elog(ERROR, "%s %s: %s", ename, emsg, msg);   \
             }                                                 \
+    } while (0)                                               \
+
+#define LA_CHECK(method)                            \
+    do {                                                      \
+		if (method != GrB_SUCCESS && (method < 1000 || method >= 2000)) \
+		{                                                 \
+			elog(ERROR, "%i: %s", method, msg);   \
+		}                                                 \
     } while (0)                                               \
 
 #define OK_CHECK(method, msg)                               \
@@ -130,8 +145,21 @@
 
 #ifdef OS_DEBUG
 #define LOGF() elog(DEBUG1, __func__)
+#define OS_START_BENCH()                        \
+	ereport(DEBUG1, (errmsg("%s()", __func__))); \
+    gettimeofday(&start, NULL);
+
+#define OS_END_BENCH()                                                      \
+    gettimeofday(&end, NULL);                                               \
+    do {                                                                    \
+        double elapsed = (end.tv_sec - start.tv_sec) +                      \
+                         (end.tv_usec - start.tv_usec) / 1000000.0;         \
+        ereport(DEBUG1, (errmsg("%s() took %.6f seconds", __func__, elapsed))); \
+    } while (0)
 #else
 #define LOGF()
+#define OS_START_BENCH()
+#define OS_END_BENCH()
 #endif
 
 uint64_t* get_c_array_from_pg_array(FunctionCallInfo fcinfo, int arg_number, uint64_t *out_nelems);
@@ -181,6 +209,7 @@ void _PG_init(void);
 #include "scalar/scalar.h"
 #include "vector/vector.h"
 #include "matrix/matrix.h"
+#include "graph/graph.h"
 
 #endif /* OS_H */
 

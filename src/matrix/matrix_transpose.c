@@ -10,8 +10,9 @@ Datum matrix_transpose(PG_FUNCTION_ARGS)
 	GrB_BinaryOp accum;
 	GrB_Index nrows, ncols;
 	int nargs;
+    struct timeval start, end;
 
-	LOGF();
+	OS_START_BENCH();
 	ERRORNULL(0);
 
 	nargs = PG_NARGS();
@@ -38,6 +39,8 @@ Datum matrix_transpose(PG_FUNCTION_ARGS)
 						   descriptor),
 			 c->matrix,
 			 "Error in transpose");
+
+	OS_END_BENCH();
 	OS_RETURN_MATRIX(c);
 }
 

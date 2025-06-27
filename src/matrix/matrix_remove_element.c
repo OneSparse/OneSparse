@@ -5,8 +5,9 @@ Datum matrix_remove_element(PG_FUNCTION_ARGS)
 {
 	os_Matrix *matrix;
 	GrB_Index i, j;
+    struct timeval start, end;
 
-	LOGF();
+	OS_START_BENCH();
 	ERRORNULL(0);
 	ERRORNULL(1);
 	ERRORNULL(2);
@@ -23,6 +24,7 @@ Datum matrix_remove_element(PG_FUNCTION_ARGS)
 		  matrix->matrix,
 		  "Error waiting to materialize matrix.");
 
+	OS_END_BENCH();
 	OS_RETURN_MATRIX(matrix);
 }
 

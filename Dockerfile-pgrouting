@@ -1,0 +1,113 @@
+FROM ubuntu:latest
+ARG UID    
+ARG GID
+ENV POSTGIS_VERSION=3.4.1
+   
+# install base dependences    
+RUN apt-get update && \
+    apt-get install -y make cmake git curl build-essential m4 sudo gdbserver python3-pip \
+    gdb libreadline-dev bison flex zlib1g-dev libicu-dev icu-devtools tmux zile zip \
+    gawk wget python3-full python3-virtualenv graphviz python3-dev libpq-dev python3-psycopg2 libssl-dev \
+    libproj-dev libgeos-dev libgeos++-dev libxml2-dev libjson-c-dev libgdal-dev gdal-bin
+
+RUN deluser --remove-home ubuntu
+# add postgres user and make data dir        
+RUN groupadd --gid ${GID} -r postgres && useradd --uid ${UID} --gid ${GID} --no-log-init -r -m -s /bin/bash -g postgres -G sudo postgres
+
+# make postgres a sudoer
+RUN echo "postgres ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/user && \
+    chmod 0440 /etc/sudoers.d/user
+
+USER postgres
+    
+ENV PGDATA /home/postgres/data
+RUN /bin/rm -Rf "$PGDATA" && mkdir "$PGDATA"
+WORKDIR "/home/postgres"
+
+# get postgres source and compile with debug and no optimization
+RUN git clone --single-branch --branch REL_18_BETA1 https://github.com/postgres/postgres.git && \
+    cd postgres && \
+    ./configure \
+    --prefix=/usr/ \
+    --without-icu \
+    --enable-debug \
+    --enable-depend --enable-cassert --enable-profiling \
+    CFLAGS="-ggdb -Og -g3 -fno-omit-frame-pointer" \
+#    CFLAGS="-O3" \
+    && make -j 4 && sudo make install
+
+# COPY --chown=postgres:postgres postgres-upstream postgres-upstream
+# RUN cd postgres-upstream && ./configure \
+#     --prefix=/usr/ \
+#     --with-python \
+#     --with-openssl \
+#     --without-icu \
+#     --enable-debug \
+# #    --enable-depend --enable-cassert --enable-profiling \
+# #    CFLAGS="-ggdb -Og -g3 -fno-omit-frame-pointer" \
+#     CFLAGS="-O3" \
+#     && make -j$(nproc) && sudo make install \
+#     && cd contrib/postgres_fdw && make && sudo make install \
+#     && cd .. && /bin/rm -Rf postgres-upstream
+
+WORKDIR /build
+
+RUN git clone --depth 1 https://github.com/postgis/postgis.git
+
+WORKDIR /build/postgis
+
+RUN ./autogen.sh \
+    && ./configure \
+    --without-protobuf \
+    && make -j$(nproc) \
+    && sudo make install
+
+WORKDIR /build
+
+RUN git clone --depth 1 --branch main https://github.com/pgRouting/pgrouting.git
+
+WORKDIR /build/pgrouting
+
+RUN cmake -S . -B build \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    && cmake --build build -- -j$(nproc) \
+    && sudo cmake --install build    
+
+WORKDIR /build/graphblas
+
+# get GraphBLAS
+RUN curl -s -L -J https://github.com/DrTimothyAldenDavis/GraphBLAS/archive/refs/tags/v10.0.2.tar.gz | \
+    tar zxvf - && cd GraphBLAS-10.0.2 && \
+    make -j$(nproc) library \
+#    CMAKE_OPTIONS='-DCMAKE_BUILD_TYPE=Debug -DGRAPHBLAS_COMPACT=1' \
+    && sudo make install \
+    && /bin/rm -Rf GraphBLAS-10.0.2
+
+# get LAGraph
+RUN curl -s -L -J https://github.com/GraphBLAS/LAGraph/archive/refs/tags/v1.1.5.tar.gz | \
+    tar zxvf - && cd LAGraph-1.1.5 && \
+    make -j$(nproc) library \
+#    CMAKE_OPTIONS='-DCMAKE_BUILD_TYPE=Debug -DGRAPHBLAS_COMPACT=1' \
+    && sudo make install \
+    && /bin/rm -Rf LAGraph-1-1.1.5
+
+RUN sudo ldconfig
+
+# put test stuff into pg home        
+RUN mkdir "/home/postgres/onesparse"
+WORKDIR "/home/postgres/onesparse"
+COPY . .
+    
+ENV EDITOR zile    
+
+# make the extension
+#RUN .virt/bin/python3 generate.py onesparse/onesparse--0.1.0.sql
+RUN sudo make && sudo make install && sudo make clean
+
+# start the database            
+RUN initdb -D "$PGDATA" -c shared_preload_libraries='onesparse' -c search_path='public,onesparse' --encoding UTF8
+EXPOSE 5432
+# wait forever
+
+CMD tail -f /dev/null
