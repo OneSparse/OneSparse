@@ -34,6 +34,8 @@ select draw(tril(graph), (select parent from bfs(graph, 1)), false, false, true,
 select draw(tril(graph), pagerank(graph)*100, false, false, true, 0.5)::text as draw_source from karate \gset
 \i sql/draw_sfdp.sql
 --
+-- ### PageRank Benchmarks
+-- ![PageRank Benchmarks](images/PageRank.svg)
 --
 -- ## Triangle Centrality
 -- Triangle centrality counts the number of triangles incident to each vertex.
@@ -49,7 +51,6 @@ select draw(tril(graph), triangle_centrality(graph)*10, false, false, true, 0.5)
 --
 select draw(tril(graph), betweenness(graph, ARRAY[1,32]::bigint[]), false, false, true, 0.5)::text as draw_source from karate \gset
 \i sql/draw_sfdp.sql
---
 --
 -- ## Square Clustering
 -- Calculates the square clustering coefficient for each vertex.

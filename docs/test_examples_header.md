@@ -1852,6 +1852,8 @@ select draw(tril(graph), pagerank(graph)*100, false, false, true, 0.5)::text as 
 </div>
 
 
+### PageRank Benchmarks
+![PageRank Benchmarks](images/PageRank.svg)
 
 ## Triangle Centrality
 Triangle centrality counts the number of triangles incident to each vertex.
@@ -3078,7 +3080,6 @@ select draw(tril(graph), betweenness(graph, ARRAY[1,32]::bigint[]), false, false
 </g>
 </svg>
 </div>
-
 
 
 ## Square Clustering
