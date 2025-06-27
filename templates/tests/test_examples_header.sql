@@ -40,7 +40,3 @@ select draw(tril(graph), betweenness(graph, ARRAY[1,32]::bigint[]), false, false
 --
 select draw(tril(graph), square_clustering(graph), false, false)::text as draw_source from karate \gset
 \i sql/draw_sfdp.sql
---
---
--- ## Connected Components
---
