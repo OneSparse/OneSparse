@@ -18,3 +18,12 @@ code, pre {
     font-family: 'Fira Code', monospace;
 }
 
+/* remove max-width so content spans full viewport */
+:root {
+  --md-container-max-width: 100%;
+}
+/* optional: tweak horizontal padding */
+.md-container {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
