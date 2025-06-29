@@ -2460,7 +2460,7 @@ RETURNS matrix
 AS '$libdir/onesparse', 'matrix_load'
 LANGUAGE C STRICT;
 
-create function print(a matrix) returns text language plpgsql as
+create function print(a matrix) returns text language plpgsql set search_path = onesparse,public as
     $$
     declare
         imax int = nrows(a) - 1;
@@ -2491,16 +2491,20 @@ create function print(a matrix) returns text language plpgsql as
     end;
     $$;
 
-create function random_matrix(
+create or replace function random_matrix(
     nrows integer,
     ncols integer,
     nvals integer,
+    min integer default -(2^31 - 1),
     max integer default 2^31 - 1,
+    sym bool default true,
     seed double precision default null)
-    returns matrix language plpgsql as
+    returns matrix language plpgsql set search_path = onesparse,public as
     $$
-    declare m matrix = matrix('int32', nrows, ncols);
+    declare
+    m matrix = matrix('int32', nrows, ncols);
     prob double precision = nvals::double precision / (nrows * ncols);
+    val double precision;
     begin
         if (seed is not null) then
             perform setseed(seed);
@@ -2509,7 +2513,11 @@ create function random_matrix(
             for j in 0..ncols-1 loop
                 if i = j then continue; end if;
                 if random() < prob then
-                    m = set_element(m, i, j, random(0, max));
+                    val = random(min, max);
+                    m = set_element(m, i, j, val);
+                    if sym then
+                        m = set_element(m, j, i, val);
+                    end if;
                 end if;
             end loop;
         end loop;
@@ -2525,7 +2533,7 @@ declare
 begin
     return (val - min) / (max - min);
 end;
-$$ language plpgsql immutable strict;;
+$$ language plpgsql set search_path = onesparse,public immutable strict;;
 
 CREATE OR REPLACE FUNCTION jet_color(val double precision, alpha double precision DEFAULT 1.0) RETURNS text AS $$
 DECLARE
@@ -2542,7 +2550,7 @@ BEGIN
     || lpad(to_hex(floor(b*255)::int),2,'0')
     || lpad(to_hex(floor(alpha*255)::int),2,'0');
 END;
-$$ LANGUAGE plpgsql IMMUTABLE STRICT;
+$$ LANGUAGE plpgsql set search_path = onesparse,public IMMUTABLE STRICT;
 
 create or replace function draw(
     a matrix,
@@ -2550,7 +2558,8 @@ create or replace function draw(
     weights bool default true,
     directed bool default true,
     color_nodes bool default false,
-    alpha double precision default 1.0 ) returns text language plpgsql as
+    alpha double precision default 1.0,
+    label text default null) returns text language plpgsql set search_path = onesparse,public as
     $$
     declare
         row bigint;
@@ -2595,13 +2604,16 @@ create or replace function draw(
                 result = result || E'\n';
             end if;
         end loop;
+        if label is not null then
+            result = result || format(E'graph [label="%s", labelloc="b", labeljust="c", fontsize=12]\n', label);
+        end if;
         result = result || E'}\n';
         return result;
     end;
     $$;
 
 create or replace function kronpower(m matrix, k integer, s semiring default 'plus_times_int32')
-    returns matrix language plpgsql as
+    returns matrix language plpgsql set search_path = onesparse,public as
     $$
     declare
     i integer;

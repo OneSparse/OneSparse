@@ -1,0 +1,25 @@
+-- <table style="width: 100%; table-layout: fixed;" class="dot-table">
+--   <tr>
+--     <td style="width: 30%;">
+\set draw_source :col_a_source
+\i sql/draw_sfdp.sql
+\setenv draw_source :draw_source
+\! echo $draw_source | dot -Ksfdp -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
+Error: <stdin>: syntax error in line 1 near ':'
+--     </td>
+--     <td style="width: 30%;">
+\set draw_source :col_b_source
+\i sql/draw_sfdp.sql
+\setenv draw_source :draw_source
+\! echo $draw_source | dot -Ksfdp -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
+Error: <stdin>: syntax error in line 1 near ':'
+--     </td>
+--     <td style="width: 30%;">
+\set draw_source :col_c_source
+\i sql/draw_sfdp.sql
+\setenv draw_source :draw_source
+\! echo $draw_source | dot -Ksfdp -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
+Error: <stdin>: syntax error in line 1 near ':'
+--     </td>
+--   </tr>
+-- </table>
