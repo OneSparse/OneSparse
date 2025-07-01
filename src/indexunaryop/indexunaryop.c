@@ -59,16 +59,16 @@ os_IndexUnaryOp* new_indexunaryop(
 	char* name,
 	MemoryContext parentcontext)
 {
-	GrB_IndexUnaryOp binop;
+	GrB_IndexUnaryOp iuop;
 	os_IndexUnaryOp *indexunaryop;
 
 	MemoryContext objcxt, oldcxt;
 	MemoryContextCallback *ctxcb;
 
 	LOGF();
-	binop = lookup_indexunaryop(name);
+	iuop = lookup_indexunaryop(name);
 
-	if (binop == NULL)
+	if (iuop == NULL)
 		elog(ERROR, "Unknown indexunaryop %s", name);
 
 	objcxt = AllocSetContextCreate(parentcontext,
@@ -85,7 +85,7 @@ os_IndexUnaryOp* new_indexunaryop(
 	indexunaryop->flat_size = 0;
 	indexunaryop->name = palloc(strlen(name)+1);
 	strncpy(indexunaryop->name, name, strlen(name)+1);
-	indexunaryop->indexunaryop = binop;
+	indexunaryop->indexunaryop = iuop;
 
 	ctxcb = MemoryContextAlloc(objcxt, sizeof(MemoryContextCallback));
 

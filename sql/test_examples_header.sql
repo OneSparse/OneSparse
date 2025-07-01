@@ -35,22 +35,45 @@ create materialized view karate as select mmread('/home/postgres/onesparse/demo/
 -- here it's drawn with colors to indicate the "out-degree" of each
 -- node:
 
-select draw(tril(graph),
+select draw(triu(graph),
             reduce_cols(cast_to(graph, 'int32')),
             false, false, true, 0.5, 'The Karate Graph')
     as draw_source from karate \gset
 \i sql/draw_sfdp.sql
+
+-- ### Matrix Aggregation
+--
+-- Graph an be constructed by aggregating an adjacency matrix with
+-- `matrix_agg`:
+create table edge_data (
+    i bigint,
+    j bigint,
+    v integer
+    );
+
+insert into edge_data (i, j, v) values (1, 2, 3), (1, 3, 4), (2, 3, 1), (3, 1, 8);
+
+create materialized view edge_data_view as
+    select matrix_agg(i, j, v) as graph from edge_data;
+
+select draw(triu(graph),
+            reduce_cols(one(graph)),
+            false, true, true, 0.5)
+    as draw_source from edge_data_view \gset
+\i sql/draw_sfdp.sql
+
+-- ### SQL Queries
 
 -- ### Random Graphs
 --
 -- We'll use some random weighted graphs for demonstration purposes as
 -- well, one directed and one undirected.
 
-create materialized view rgraph as select random_matrix(16, 16, 128, 1, 10, false, 0.22) > 0 as graph;
-create materialized view srgraph as select random_matrix(16, 16, 64, 1, 10, true, 0.22) > 0 as graph;
+create materialized view rgraph as select triu(random_matrix(8, 8, 28, 1, 10, false, 0.22), 1) > 0 as graph;
+create materialized view urgraph as select random_matrix(8, 8, 28, 1, 10, true, 0.22) > 0 as graph;
 
-select draw(tril(graph), reduce_cols(graph), true, true, true, 0.5, 'Random Weighted Directed Graph')::text as col_a_source from rgraph \gset
-select draw(tril(graph), reduce_cols(graph), true, false, true, 0.5, 'Random Weighted Undirected Graph')::text as col_b_source from srgraph \gset
+select draw(triu(graph), reduce_cols(one(graph)), true, true, true, 0.5, 'Random Weighted Directed Graph') as col_a_source from rgraph \gset
+select draw(triu(graph), reduce_cols(one(graph)), true, false, true, 0.5, 'Random Weighted Undirected Graph') as col_b_source from urgraph \gset
 \i sql/draw_2col.sql
 --
 -- ## Level BFS
@@ -58,8 +81,8 @@ select draw(tril(graph), reduce_cols(graph), true, false, true, 0.5, 'Random Wei
 -- given source vertex using the breadth-first search algorithm.
 -- See [https://en.wikipedia.org/wiki/Breadth-first_search](https://en.wikipedia.org/wiki/Breadth-first_search) for details.
 --
-select draw(tril(graph), (select level from bfs(graph, 1)), false, false, true, 0.5)::text as col_a_source from karate \gset
-select draw(tril(graph), (select level from bfs(graph, 1)), false, false, true, 0.5)::text as col_b_source from srgraph \gset
+select draw(triu(graph), (select level from bfs(graph, 1)), false, false, true, 0.5) as col_a_source from karate \gset
+select draw(triu(graph), (select level from bfs(graph, 1)), false, false, true, 0.5) as col_b_source from urgraph \gset
 \i sql/draw_2col.sql
 --
 --
@@ -68,8 +91,8 @@ select draw(tril(graph), (select level from bfs(graph, 1)), false, false, true, 
 -- BFS tree rooted at the chosen source. It is also based on
 -- [https://en.wikipedia.org/wiki/Breadth-first_search](https://en.wikipedia.org/wiki/Breadth-first_search).
 --
-select draw(tril(graph), (select parent from bfs(graph, 1)), false, false, true, 0.5) as col_a_source from karate \gset
-select draw(tril(graph), (select parent from bfs(graph, 1)), false, false, true, 0.5) as col_b_source from srgraph \gset
+select draw(triu(graph), (select parent from bfs(graph, 1)), false, false, true, 0.5) as col_a_source from karate \gset
+select draw(triu(graph), (select parent from bfs(graph, 1)), false, false, true, 0.5) as col_b_source from urgraph \gset
 \i sql/draw_2col.sql
 --
 -- ### Benchmarks
@@ -78,7 +101,7 @@ select draw(tril(graph), (select parent from bfs(graph, 1)), false, false, true,
 -- ## Single Source Shortest Path
 --
 select draw(triu(graph), sssp(graph, 1::bigint, 1), true, true, true, 0.5) as col_a_source from rgraph \gset
-select draw(triu(graph), sssp(graph, 1::bigint, 1), true, false, true, 0.5) as col_b_source from srgraph \gset
+select draw(triu(graph), sssp(graph, 1::bigint, 1), true, false, true, 0.5) as col_b_source from urgraph \gset
 \i sql/draw_2col.sql
 --
 -- ### Benchmarks
@@ -88,7 +111,7 @@ select draw(triu(graph), sssp(graph, 1::bigint, 1), true, false, true, 0.5) as c
 -- PageRank assigns an importance score to each vertex based on link structure.
 -- For details see [https://en.wikipedia.org/wiki/PageRank](https://en.wikipedia.org/wiki/PageRank).
 --
-select draw(tril(graph), pagerank(graph)*100, false, false, true, 0.5)::text as draw_source from karate \gset
+select draw(triu(graph), pagerank(graph)*100, false, false, true, 0.5) as draw_source from karate \gset
 \i sql/draw_sfdp.sql
 --
 -- ### Benchmarks
@@ -99,7 +122,7 @@ select draw(tril(graph), pagerank(graph)*100, false, false, true, 0.5)::text as 
 -- This measure relates to the clustering coefficient
 -- [https://en.wikipedia.org/wiki/Clustering_coefficient](https://en.wikipedia.org/wiki/Clustering_coefficient).
 --
-select draw(tril(graph), triangle_centrality(graph)*10, false, false, true, 0.5)::text as draw_source from karate \gset
+select draw(triu(graph), triangle_centrality(graph)*10, false, false, true, 0.5) as draw_source from karate \gset
 \i sql/draw_sfdp.sql
 --
 -- ### Benchmarks
@@ -109,7 +132,7 @@ select draw(tril(graph), triangle_centrality(graph)*10, false, false, true, 0.5)
 -- Betweenness centrality measures how often a vertex appears on shortest paths between others.
 -- [https://en.wikipedia.org/wiki/Betweenness_centrality](https://en.wikipedia.org/wiki/Betweenness_centrality).
 --
-select draw(tril(graph), betweenness(graph, ARRAY[1,32]::bigint[]), false, false, true, 0.5)::text as draw_source from karate \gset
+select draw(triu(graph), betweenness(graph, ARRAY[1,32]::bigint[]), false, false, true, 0.5) as draw_source from karate \gset
 \i sql/draw_sfdp.sql
 --
 -- ### Benchmarks
@@ -119,6 +142,6 @@ select draw(tril(graph), betweenness(graph, ARRAY[1,32]::bigint[]), false, false
 -- Calculates the square clustering coefficient for each vertex.
 -- [https://en.wikipedia.org/wiki/Clustering_coefficient](https://en.wikipedia.org/wiki/Clustering_coefficient).
 --
-select draw(tril(graph), square_clustering(graph), false, false, true, 0.5)::text as draw_source from karate \gset
+select draw(triu(graph), square_clustering(graph), false, false, true, 0.5) as draw_source from karate \gset
 \i sql/draw_sfdp.sql
 

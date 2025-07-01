@@ -2589,7 +2589,7 @@ create or replace function draw(
                     color_style = format(E'style=filled fillcolor="%s"', jet_color(value::double precision, alpha));
                 end if;
                 value = get_element(node_labels, row);
-                result = result || format(E'%s [label="%s" %s]\n', row, left(print(value), 4), color_style);
+                result = result || format(E'%s [label="%s : %s" %s]\n', row, row, left(print(value), 4), color_style);
             end loop;
         end if;
         for row, col, value in select * from elements(a) loop
