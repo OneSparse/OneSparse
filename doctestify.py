@@ -34,6 +34,7 @@ def doctestify(test):
 class Template:
 
     name: str
+    dest: str = 'docs'
     context: defaultdict[dict] = field(default_factory=lambda: defaultdict(dict))
     expected_dir: str = 'expected/'
     version: str = VERSION
@@ -41,13 +42,13 @@ class Template:
     def write(self, part):
         typ = self.context.get('type')
         if typ is not None:
-            test = Path(self.expected_dir, f'test_{self.name}_{part}_{typ.short}.out')
+            test = Path(self.expected_dir, f'{self.name}_{part}_{typ.short}.out')
         else:
-            test = Path(self.expected_dir, f'test_{self.name}_{part}.out')
+            test = Path(self.expected_dir, f'{self.name}_{part}.out')
 
         if test.exists():
             infile = open(test, 'r')
-            doc = Path('docs', *test.with_suffix('.md').parts[1:])
+            doc = Path(self.dest, *test.with_suffix('.md').parts[1:])
             outfile = open(doc, 'w+')
             outfile.write(doctestify(infile.read()))
 
@@ -78,17 +79,17 @@ def write_docs():
     ]
 
     objects = [
-        Template('type'),
-        Template('descriptor'),
-        Template('unaryop'),
-        Template('indexunaryop'),
-        Template('binaryop'),
-        Template('monoid'),
-        Template('semiring'),
-        Template('scalar'),
-        Template('vector'),
-        Template('matrix'),
-        Template('examples'),
+        Template('test_type'),
+        Template('test_descriptor'),
+        Template('test_unaryop'),
+        Template('test_indexunaryop'),
+        Template('test_binaryop'),
+        Template('test_monoid'),
+        Template('test_semiring'),
+        Template('test_scalar'),
+        Template('test_vector'),
+        Template('test_matrix'),
+        Template('test_examples'),
         ]
 
     for o in objects:
@@ -102,5 +103,9 @@ def write_docs():
                 o.write('op')
         o.write('footer')
 
+def write_blog():
+    pass
+
 if __name__ == '__main__':
     write_docs()
+    write_blog()
