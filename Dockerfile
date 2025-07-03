@@ -35,7 +35,7 @@ RUN git clone --branch REL_17_STABLE https://github.com/postgres/postgres.git --
 RUN curl -s -L -J https://github.com/DrTimothyAldenDavis/GraphBLAS/archive/refs/tags/v9.4.2.tar.gz | \
     tar zxvf - && cd GraphBLAS-9.4.2 && \
     make library \
-    CMAKE_OPTIONS='-DCMAKE_BUILD_TYPE=Debug -DGRAPHBLAS_COMPACT=1' \
+    CMAKE_OPTIONS='-DGRAPHBLAS_COMPACT=1' \
     && sudo make install
 
 RUN sudo ldconfig

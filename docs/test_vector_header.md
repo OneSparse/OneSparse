@@ -9,6 +9,9 @@ is installed.
 set client_min_messages = 'WARNING';
 create extension if not exists onesparse;
 ```
+## Construction
+
+Examples of creating vectors and inspecting their properties.
 An empty vector can be constructed many ways, but one of the
 simplest is casting a type code to the matrix type.  In this case
 `int32` means GrB_INT32.  The type codes are intentionally compressed
@@ -16,6 +19,7 @@ to be as short as possible for smaller pg_dumps.
 
 Much of these functions are basically vector versions of the same
 functions for matrix.  See those docs for details:
+Cast a type name to make an empty vector
 ``` postgres-console
 select 'int32'::vector;
 ┌────────┐
@@ -25,6 +29,9 @@ select 'int32'::vector;
 └────────┘
 (1 row)
 
+```
+Use the constructor function
+``` postgres-console
 select vector('int32');
 ┌────────┐
 │ vector │
@@ -33,6 +40,9 @@ select vector('int32');
 └────────┘
 (1 row)
 
+```
+Count the stored elements
+``` postgres-console
 select nvals('int32'::vector);
 ┌───────┐
 │ nvals │
@@ -41,6 +51,9 @@ select nvals('int32'::vector);
 └───────┘
 (1 row)
 
+```
+Inspect the possible size of the vector
+``` postgres-console
 select size('int32'::vector);
 ┌─────────────────────┐
 │        size         │
@@ -49,6 +62,9 @@ select size('int32'::vector);
 └─────────────────────┘
 (1 row)
 
+```
+Cast from an empty array
+``` postgres-console
 select 'int32[]'::vector;
 ┌────────┐
 │ vector │
@@ -57,6 +73,9 @@ select 'int32[]'::vector;
 └────────┘
 (1 row)
 
+```
+Stored elements in the empty array
+``` postgres-console
 select nvals('int32[]'::vector);
 ┌───────┐
 │ nvals │
@@ -65,6 +84,9 @@ select nvals('int32[]'::vector);
 └───────┘
 (1 row)
 
+```
+Size of the unbounded empty array
+``` postgres-console
 select size('int32[]'::vector);
 ┌─────────────────────┐
 │        size         │
@@ -73,6 +95,9 @@ select size('int32[]'::vector);
 └─────────────────────┘
 (1 row)
 
+```
+Create a bounded but empty vector
+``` postgres-console
 select 'int32(10)'::vector;
 ┌───────────┐
 │  vector   │
@@ -81,6 +106,9 @@ select 'int32(10)'::vector;
 └───────────┘
 (1 row)
 
+```
+Bounded vectors start with zero elements
+``` postgres-console
 select nvals('int32(10)'::vector);
 ┌───────┐
 │ nvals │
@@ -89,6 +117,9 @@ select nvals('int32(10)'::vector);
 └───────┘
 (1 row)
 
+```
+Its size reflects the bound
+``` postgres-console
 select size('int32(10)'::vector);
 ┌──────┐
 │ size │
@@ -97,6 +128,9 @@ select size('int32(10)'::vector);
 └──────┘
 (1 row)
 
+```
+Alternate syntax for a bounded empty vector
+``` postgres-console
 select 'int32(10)[]'::vector;
 ┌───────────┐
 │  vector   │
@@ -105,6 +139,9 @@ select 'int32(10)[]'::vector;
 └───────────┘
 (1 row)
 
+```
+It also has zero stored elements
+``` postgres-console
 select nvals('int32(10)[]'::vector);
 ┌───────┐
 │ nvals │
@@ -113,6 +150,9 @@ select nvals('int32(10)[]'::vector);
 └───────┘
 (1 row)
 
+```
+And a fixed size
+``` postgres-console
 select size('int32(10)[]'::vector);
 ┌──────┐
 │ size │
@@ -121,6 +161,9 @@ select size('int32(10)[]'::vector);
 └──────┘
 (1 row)
 
+```
+Create a vector with some values
+``` postgres-console
 select 'int32[0:1 1:2 2:3]'::vector;
 ┌────────────────────┐
 │       vector       │
@@ -129,6 +172,9 @@ select 'int32[0:1 1:2 2:3]'::vector;
 └────────────────────┘
 (1 row)
 
+```
+Count those values
+``` postgres-console
 select nvals('int32[0:1 1:2 2:3]'::vector);
 ┌───────┐
 │ nvals │
@@ -137,6 +183,9 @@ select nvals('int32[0:1 1:2 2:3]'::vector);
 └───────┘
 (1 row)
 
+```
+Iterate over the index/value pairs
+``` postgres-console
 select * from elements('int32[0:1 1:2 2:3]'::vector);
 ┌───┬─────────┐
 │ i │    v    │
@@ -147,6 +196,9 @@ select * from elements('int32[0:1 1:2 2:3]'::vector);
 └───┴─────────┘
 (3 rows)
 
+```
+Combine bounds and elements
+``` postgres-console
 select 'int32(10)[0:1 1:2 2:3]'::vector;
 ┌────────────────────────┐
 │         vector         │
@@ -155,6 +207,9 @@ select 'int32(10)[0:1 1:2 2:3]'::vector;
 └────────────────────────┘
 (1 row)
 
+```
+Bounded size is retained
+``` postgres-console
 select size('int32(10)[0:1 1:2 2:3]'::vector);
 ┌──────┐
 │ size │
@@ -163,6 +218,9 @@ select size('int32(10)[0:1 1:2 2:3]'::vector);
 └──────┘
 (1 row)
 
+```
+Attempting to store outside the bounds raises an error
+``` postgres-console
 select size('int32(2)[0:1 1:2 2:3]'::vector);
 ERROR:  INVALID_INDEX GraphBLAS error: GrB_INVALID_INDEX
 function: GrB_Vector_setElement_INT64 (w, x, row)
@@ -182,6 +240,11 @@ select u != v as "u != v", u = v as "u = v", v = u as "v = u", v = u as "v = u" 
 └────────┴───────┴───────┴───────┘
 (1 row)
 
+```
+## Elementwise Addition
+
+Add two vectors element by element using a binary operator
+``` postgres-console
 select eadd('int32[0:1 1:2 2:3]'::vector, 'int32[0:1 1:2 2:3]'::vector, 'plus_int32');
 ┌────────────────────┐
 │        eadd        │
@@ -209,6 +272,11 @@ select print(u |+ v) as "u |+ v", print(u |- v) as "u |- v", print(u |* v) as "u
 └───────────┴───────────┴───────────┴───────────┘
 (1 row)
 
+```
+## Elementwise Multiplication
+
+Multiply corresponding elements of two vectors
+``` postgres-console
 select emult('int32[0:1 1:2 2:3]'::vector, 'int32[0:1 1:2 2:3]'::vector, 'times_int32');
 ┌────────────────────┐
 │       emult        │
@@ -236,6 +304,11 @@ select print(u &+ v) as "u &+ v", print(u &- v) as "u &- v", print(u &* v) as "u
 └───────────┴───────────┴───────────┴───────────┘
 (1 row)
 
+```
+## Elementwise Union
+
+Union of two vectors with scalars for missing values
+``` postgres-console
 select eunion('int32[0:1 1:2 2:3]'::vector, 42, 'int32[0:1 1:2 2:3]'::vector, 84, 'plus_int32');
 ┌────────────────────┐
 │       eunion       │
@@ -244,6 +317,11 @@ select eunion('int32[0:1 1:2 2:3]'::vector, 42, 'int32[0:1 1:2 2:3]'::vector, 84
 └────────────────────┘
 (1 row)
 
+```
+## Reduction
+
+Reduce a vector to a scalar value using a monoid
+``` postgres-console
 select reduce_scalar('int32[0:1 1:2 2:3]'::vector, 'plus_monoid_int32');
 ┌───────────────┐
 │ reduce_scalar │
@@ -252,6 +330,11 @@ select reduce_scalar('int32[0:1 1:2 2:3]'::vector, 'plus_monoid_int32');
 └───────────────┘
 (1 row)
 
+```
+## Selection and Apply
+
+Filter a vector and apply unary operators
+``` postgres-console
 select choose('int32[0:1 1:2 2:3]'::vector, 'valuegt_int32', 1);
 ┌────────────────┐
 │     choose     │
@@ -269,6 +352,7 @@ select apply('int32[1:1 2:2 3:3]'::vector, 'ainv_int32'::unaryop);
 (1 row)
 
 ```
+## Setting and Getting Elements
 Elements can be set individually with `set_element`, the modified
 input is returned:
 ``` postgres-console
@@ -291,6 +375,11 @@ select get_element('int32[1:1 2:2 3:3]'::vector, 3);
 └─────────────┘
 (1 row)
 
+```
+## Utility Operations
+
+Miscellaneous helpers for vectors
+``` postgres-console
 select print('int32(4)[1:1 2:2 3:3]'::vector);
 ┌───────────┐
 │   print   │

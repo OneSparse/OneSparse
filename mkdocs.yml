@@ -2,6 +2,7 @@ site_name: OneSparse
 
 nav:
   - Intro: docs.md
+  - Blog: blog/index.md
   - Docker Demo: docker.md
   - Algorithms: test_examples_header.md
   - Matrix: test_matrix_header.md
@@ -16,6 +17,10 @@ nav:
   - Type: test_type_header.md
 
 use_directory_urls: false
+
+plugins:
+  - search
+  - blog
 
 extra:
   static_dir: landing_page
