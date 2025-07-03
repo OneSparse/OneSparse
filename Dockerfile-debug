@@ -52,7 +52,7 @@ RUN git clone https://github.com/postgres/postgres.git --depth=1 && \
 RUN curl -s -L -J https://github.com/DrTimothyAldenDavis/GraphBLAS/archive/refs/tags/v10.1.0.tar.gz | \
     tar zxvf - && cd GraphBLAS-10.1.0 && \
     make library \
-#    CMAKE_OPTIONS='-DCMAKE_BUILD_TYPE=Debug -DGRAPHBLAS_COMPACT=1' \
+#    CMAKE_OPTIONS='-DGRAPHBLAS_COMPACT=1' \
     && sudo make install \
     && /bin/rm -Rf GraphBLAS-10.1.0
 

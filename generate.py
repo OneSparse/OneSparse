@@ -113,6 +113,18 @@ class Template:
         self.doc_write(part)
 
 @dataclass
+class Blog:
+    file: Path
+    test_dir: str = 'sql/'
+    version: str = VERSION
+    context: defaultdict[dict] = field(default_factory=lambda: defaultdict(dict))
+
+    def write(self):
+        doc = Path(self.test_dir, self.file.name)
+        outfile = open(doc, 'w+')
+        outfile.write(self.file.read_text().format(**self.context))
+
+@dataclass
 class Type:
     name: str
     short: str
@@ -242,6 +254,11 @@ def write_source(outfile):
                 o.write('math')
                 o.write('op')
         o.write('footer')
+
+    for p in Path('templates/blog/posts').rglob('*.sql'):
+        if p.is_file():
+            b = Blog(p)
+            b.write()
 
 if __name__ == '__main__':
     write_source(outfile=sys.stdout if sys.argv[1] == '-' else open(sys.argv[1], 'w+'))

@@ -53,6 +53,20 @@ class Template:
             outfile.write(doctestify(infile.read()))
 
 @dataclass
+class Blog:
+
+    file: Path
+    dest: str = 'docs/blog/posts'
+    expected_dir: str = 'expected/'
+    version: str = VERSION
+
+    def write(self):
+        post = Path(self.expected_dir, self.file.with_suffix('.out').name)
+        doc = Path(self.dest, self.file.with_suffix('.md').name)
+        outfile = open(doc, 'w+')
+        outfile.write(doctestify(post.read_text()))
+
+@dataclass
 class Type:
     name: str
     short: str
@@ -104,7 +118,10 @@ def write_docs():
         o.write('footer')
 
 def write_blog():
-    pass
+    for p in Path('templates/blog/posts').rglob('*.sql'):
+        if p.is_file():
+            b = Blog(p)
+            b.write()
 
 if __name__ == '__main__':
     write_docs()
