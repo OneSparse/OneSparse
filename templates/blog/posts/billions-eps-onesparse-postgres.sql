@@ -14,7 +14,7 @@
 --   - linear algebra
 -- ---
 
--- # Billions of Edges Per Second on Postgres Graphs
+-- # Billions of Edges Per Second with Postgres
 
 -- For years now those of us over at [The GraphBLAS Forum](graphblas.org)
 -- have been working hard to bring a standardized, state-of-the-art
@@ -46,27 +46,48 @@
 -- close-to-the-metal complexities that all new and coming families of
 -- parallel processors possess.
 --
--- By basing itself on math, the GraphBLAS leverages the rules and
--- objcets of linear algebra, and in particular Sparse [Matrix
+-- Other libraries use an "Actor" model where the algorithm defines
+-- the behavior of a node when it receives or sends messages to its
+-- adjacent actors.  This approach has good parallelism opportunities,
+-- but reasoning about complex algorithms and their data hazzards can
+-- be difficult.  Seeing the forest for the trees is hard from an
+-- all-tree perspective.
+--
+-- By basing itself on the abstractions of math, the GraphBLAS
+-- leverages the rules and objects of [Linear
+-- Algebra](https://en.wikipedia.org/wiki/Linear_algebra), and in
+-- particular Sparse [Matrix
 -- Multiplication](https://en.wikipedia.org/wiki/Matrix_multiplication),
--- to efficiently schedule graph operations in bulk across many cores,
--- or whatever other processing unit the particular architecture
--- employs.  The key idea is in mind is that graphs and matricies are
--- conceptuals reflections of each other, an idea understood now for
--- hundreds of years.  Creating a Graph in OneSparse is the same as
--- creating a matrix.
+-- over [Semirings](https://en.wikipedia.org/wiki/Semiring) to
+-- efficiently schedule graph operations in bulk across many cores, or
+-- whatever other processing unit the particular architecture employs.
 --
--- ![The Graph Matrix Duality](/images/GraphMatrix.png)
+-- The key idea is that graphs and matricies are conceptuals
+-- reflections of each other, an idea understood now for hundreds of
+-- years.  Creating a Graph in OneSparse is the same as creating a
+-- matrix.
 --
+
+create extension if not exists onesparse;
+
+with example as (select 'bool(7:7)[0:1:t 0:3:t 1:4:t 1:6:t 2:5:t 3:0:t 3:2:t 4:5:t 5:2:t 6:2:t 6:3:t 6:4:t]'::matrix as graph)
+    select draw(graph) as twocol_a_source, print(graph) as twocol_b_source from example \gset
+\i sql/twocol_drawtext.sql
+
+with a as (select random_matrix(4,8,48,sym:=false,seed:=0.41) as m),
+     b as (select random_matrix(4,8,48,sym:=false,seed:=0.42) as m)
+select hyperdraw(triu((select m from a)), triu((select m from b))) as draw_source \gset
+\i sql/draw.sql
+
 -- By specifying operations in a high level algebraic form, the
 -- library implementor can use [advanced sparse compression
 -- techniques](https://en.wikipedia.org/wiki/Sparse_matrix),
 -- statistical and structural knowledge of the data, and other
 -- optimizations to target the best approach for a given architecture
 -- on a per-operation basis.
-
+--
 -- ## OneSparse
-
+--
 -- OneSparse is a Postgres extension that brings the power of SuiteSparse
 -- to Postgres. Have you found yourself spending too much time
 -- extracting, transforming, and loading graphs into side databases that
@@ -93,9 +114,7 @@
 -- that is very commonly studied in graph theory called the
 -- [Newman/karate]() graph, which can be downloaded from the
 -- [SuiteSparse Matrix Collection]().
-
-create extension if not exists onesparse;
-
+--
 -- Now we can create graphs, a simple approach for small graphs that
 -- fit into the TOAST limit is to make a materialized view that loads
 -- the graph data from disk using the standard [Matrix Market]()
@@ -105,10 +124,11 @@ create materialized view if not exists karate as
     select mmread('/home/postgres/onesparse/demo/karate.mtx') as graph;
 
 select graph from karate;
+
 --
 -- Like all SQL types in Postgres, an object must have a literal
 -- input/output format that can recreate the object.  The default
--- format shown here shows a list of *edge coordinate*.  To see the
+-- format shown here shows a list of *edge coordinates*.  To see the
 -- matrix like representation, OneSparse provides a `print()` function:
 
 select print(graph) from karate;
@@ -140,7 +160,8 @@ select draw(triu(graph),
     as draw_source from karate \gset
 \i sql/draw_sfdp.sql
 --
--- !!! note The draw() function is part of the OneSparse doctest
+-- !!! note
+--     The draw() function is part of the OneSparse doctest
 --     infrastructure, it's used to generate these doctest diagrams
 --     in-line with this documentation, which is also a test.
 --
@@ -206,10 +227,10 @@ select draw(triu(graph),
 -- Level BFS exposes the depth of each vertex starting from a
 -- given source vertex using the breadth-first search algorithm.
 -- See [https://en.wikipedia.org/wiki/Breadth-first_search](https://en.wikipedia.org/wiki/Breadth-first_search) for details.
---
+
 select draw(triu(graph), (select level from bfs(graph, 1)), false, false, true, 0.5) as draw_source from karate \gset
 \i sql/draw_sfdp.sql
---
+
 --
 -- ## Parent BFS
 -- Parent BFS returns the predecessor of each vertex in the
@@ -236,7 +257,10 @@ select draw(triu(graph), (select parent from bfs(graph, 1)), false, false, true,
 -- can use to benchmark their performance.
 --
 -- ### Benchmarks
--- ![BFS Benchmarks](/images/BFS.svg)
+--
+-- <div style="text-align: center;">
+--   <img src="/images/BFS.svg" alt="BFS GAP Benchmarks with OneSparse"/>
+-- </div>
 --
 -- This chart displays BFS performance on several GAP graphs.  The
 -- smallest graph, `road`, has 57M edges.  The largest graph `urand`

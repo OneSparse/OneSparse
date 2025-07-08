@@ -998,6 +998,37 @@ create or replace function draw(
     end;
     $$;
 
+CREATE OR REPLACE FUNCTION hyperdraw(a matrix, b matrix)
+RETURNS text LANGUAGE plpgsql AS $$
+DECLARE
+    dot text := 'digraph G {{' || E'\n' ||
+                '  node [shape=circle];' || E'\n';
+    i bigint;
+    rec record;
+BEGIN
+    -- Emit edge nodes as boxes
+    FOR i IN (select * from irows(transpose(a)) union select * from irows(b) order by irows)
+    LOOP
+        dot := dot || format('  e%s [shape=box];%s', i::text, E'\n');
+    END LOOP;
+
+    -- Emit arcs from source nodes to edge nodes
+    FOR rec IN SELECT * FROM elements(a)
+    LOOP
+        dot := dot || format('  n%s -> e%s;%s', rec.i::text, rec.j::text, E'\n');
+    END LOOP;
+
+    -- Emit arcs from edge nodes to destination nodes
+    FOR rec IN SELECT * FROM elements(b)
+    LOOP
+        dot := dot || format('  e%s -> n%s;%s', rec.i::text, rec.j::text, E'\n');
+    END LOOP;
+
+    dot := dot || '}}';
+    RETURN dot;
+END;
+$$;
+
 create or replace function kronpower(m matrix, k integer, s semiring default 'plus_times_int32')
     returns matrix language plpgsql set search_path = onesparse,public as
     $$
