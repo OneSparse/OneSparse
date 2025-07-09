@@ -945,7 +945,9 @@ create or replace function draw(
     directed bool default true,
     color_nodes bool default false,
     alpha double precision default 1.0,
-    label text default null) returns text language plpgsql set search_path = onesparse,public as
+    label text default null,
+    shape text default 'circle')
+    returns text language plpgsql set search_path = onesparse,public as
     $$
     declare
         row bigint;
@@ -957,10 +959,10 @@ create or replace function draw(
         edge text;
     begin
         if directed then
-            result = E'digraph {{\n';
+            result = format(E'digraph {{\n node [shape=%s];\n rankdir=LR;\n', shape);
             edge = '->';
         else
-            result = E'graph {{\n';
+            result = format(E'graph {{\n  node [shape=%s];\n', shape);
             edge = '--';
         end if;
         if node_labels is not null then
@@ -975,7 +977,7 @@ create or replace function draw(
                     color_style = format(E'style=filled fillcolor="%s"', jet_color(value::double precision, alpha));
                 end if;
                 value = get_element(node_labels, row);
-                result = result || format(E'%s [label="%s : %s" %s]\n', row, row, left(print(value), 4), color_style);
+                result = result || format(E'%s [label="%s : %s" %s];\n', row, row, left(print(value), 4), color_style);
             end loop;
         end if;
         for row, col, value in select * from elements(a) loop
@@ -985,9 +987,9 @@ create or replace function draw(
                 if color_nodes then
                     color_style = format(E'style=filled fillcolor="%s"', jet_color(value::double precision, alpha));
                 end if;
-                result = result || format(E' [label="%s" %s]\n', left(print(value), 4), color_style);
+                result = result || format(E' [label="%s" %s];\n', left(print(value), 4), color_style);
             else
-                result = result || E'\n';
+                result = result || E';\n';
             end if;
         end loop;
         if label is not null then
@@ -998,30 +1000,43 @@ create or replace function draw(
     end;
     $$;
 
-CREATE OR REPLACE FUNCTION hyperdraw(a matrix, b matrix)
+CREATE OR REPLACE FUNCTION hyperdraw(
+    a matrix,
+    b matrix,
+    a_prefix text default 'a',
+    b_prefix text default 'b',
+    a_labels vector default null,
+    b_labels vector default null,
+    a_weights bool default true,
+    b_weights bool default true,
+    color_nodes bool default false,
+    alpha double precision default 1.0,
+    label text default null,
+    a_shape text default 'circle',
+    b_shape text default 'box'
+    )
 RETURNS text LANGUAGE plpgsql AS $$
 DECLARE
-    dot text := 'digraph G {{' || E'\n' ||
-                '  node [shape=circle];' || E'\n';
+    dot text := format(E'digraph G {{\n  nodesep=0.2;\n  ranksep=0.2;\n node [shape=%s];\n edge [splines=false];\n', a_shape);
     i bigint;
     rec record;
 BEGIN
     -- Emit edge nodes as boxes
     FOR i IN (select * from irows(transpose(a)) union select * from irows(b) order by irows)
     LOOP
-        dot := dot || format('  e%s [shape=box];%s', i::text, E'\n');
+        dot := dot || format(E'  "%s:%s" [shape=%s];\n', b_prefix, i::text, b_shape);
     END LOOP;
 
     -- Emit arcs from source nodes to edge nodes
     FOR rec IN SELECT * FROM elements(a)
     LOOP
-        dot := dot || format('  n%s -> e%s;%s', rec.i::text, rec.j::text, E'\n');
+        dot := dot || format(E'  "%s:%s" -> "%s:%s";\n', a_prefix, rec.i::text, b_prefix, rec.j::text);
     END LOOP;
 
     -- Emit arcs from edge nodes to destination nodes
     FOR rec IN SELECT * FROM elements(b)
     LOOP
-        dot := dot || format('  e%s -> n%s;%s', rec.i::text, rec.j::text, E'\n');
+        dot := dot || format(E'  "%s:%s" -> "%s:%s";\n', b_prefix, rec.i::text, a_prefix, rec.j::text);
     END LOOP;
 
     dot := dot || '}}';

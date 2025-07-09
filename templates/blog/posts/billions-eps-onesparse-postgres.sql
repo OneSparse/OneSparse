@@ -16,6 +16,15 @@
 
 -- # Billions of Edges Per Second with Postgres
 
+-- OneSparse is a Postgres extension that brings the power of Graph
+-- Linear Algebra to Postgres. Have you found yourself spending too
+-- much time extracting, transforming, and loading graphs into side
+-- databases that need constant money, maintanance and impedence
+-- matching with SQL?  With OneSparse, it's easy to turn SQL data into
+-- graphs and back again all without needing any external tooling.
+--
+-- <!-- more -->
+--
 -- For years now those of us over at [The GraphBLAS Forum](graphblas.org)
 -- have been working hard to bring a standardized, state-of-the-art
 -- parallel graph traversal API to all possible architectures.  This API
@@ -27,8 +36,6 @@
 -- computation, the ability for users to define their own edge types and
 -- operators, and has a built-in JIT compiler that can target many
 -- computing architectures including [Nvidia CUDA]().
-
--- <!-- more -->
 
 -- OneSparse is more than just fast graphs, its graph algorithms are
 -- expressed using [Linear
@@ -62,53 +69,81 @@
 -- efficiently schedule graph operations in bulk across many cores, or
 -- whatever other processing unit the particular architecture employs.
 --
+-- ## Graphs are Matrices and Matrices are Graphs
+--
 -- The key idea is that graphs and matricies are conceptuals
 -- reflections of each other, an idea understood now for hundreds of
 -- years.  Creating a Graph in OneSparse is the same as creating a
 -- matrix.
 --
+-- Just like arrays, matrices can be literally expressed as text in
+-- SQL:
 
 create extension if not exists onesparse;
 
-with example as (select 'bool(7:7)[0:1:t 0:3:t 1:4:t 1:6:t 2:5:t 3:0:t 3:2:t 4:5:t 5:2:t 6:2:t 6:3:t 6:4:t]'::matrix as graph)
-    select draw(graph) as twocol_a_source, print(graph) as twocol_b_source from example \gset
+create materialized view example as
+    select 'bool(7:7)[0:1:t 0:3:t 1:4:t 1:6:t 2:5:t 3:0:t 3:2:t 4:5:t 5:2:t 6:2:t 6:3:t 6:4:t]'::matrix
+    as graph;
+
+select draw(graph) as twocol_a_source, print(graph) as twocol_b_source from example \gset
 \i sql/twocol_drawtext.sql
 
-with a as (select random_matrix(4,8,48,sym:=false,seed:=0.41) as m),
-     b as (select random_matrix(4,8,48,sym:=false,seed:=0.42) as m)
-select hyperdraw(triu((select m from a)), triu((select m from b))) as draw_source \gset
+-- On the left is the graphical representation of the matrix, and on
+-- the right is the matrix representation of the graph.  This is the
+-- main concept of the GraphBLAS.  By unifying these two concepts,
+-- both edge-and-node graph operations and algebraic operations can be
+-- performed to analyze the graph.
+--
+-- ## Hypergraphs and Multigraphs
+--
+-- Hypergraphs are graphs where an edge can have more than one source
+-- or destination.  These are important types of graphs for modeling
+-- complex interactions and finacial situations where relationships
+-- are not just one-to-one.  A commonly studied example would be the
+-- multi-party financial transaction networks, where transactions
+-- represent *hyperedges* with multiple inputs and outputs.
+--
+-- This type of graph can be easily modeled with OneSparse using two
+-- matrices called *Incidence Matrices*, one that maps output address
+-- nodes to transaction hyperedges and the other that maps
+-- transactions to input address nodes.  Let's fake some data by
+-- making two random incidence matrices, one for address output nodes
+-- to transaction hyperedges, and the other for transaction edges to
+-- input nodes.
+
+create materialized view txn_graph as
+        select triu(random_matrix(6,8,32,sym:=false,min:=0,max:=42,seed:=0.43)) as addr_to_txn,
+               triu(random_matrix(8,6,32,sym:=false,min:=0,max:=42,seed:=0.42)) as txn_to_addr;
+
+select print(addr_to_txn), print(txn_to_addr) from txn_graph;
+
+select hyperdraw(addr_to_txn, txn_to_addr, 'A', 'T') as draw_source from txn_graph \gset
 \i sql/draw.sql
 
--- By specifying operations in a high level algebraic form, the
--- library implementor can use [advanced sparse compression
--- techniques](https://en.wikipedia.org/wiki/Sparse_matrix),
--- statistical and structural knowledge of the data, and other
--- optimizations to target the best approach for a given architecture
--- on a per-operation basis.
---
--- ## OneSparse
---
--- OneSparse is a Postgres extension that brings the power of SuiteSparse
--- to Postgres. Have you found yourself spending too much time
--- extracting, transforming, and loading graphs into side databases that
--- need constant money, maintanance and impedence matching with SQL.
--- With OneSparse, it's easy to turn SQL data into graphs and back again
--- in pure SQL.
+-- Now you can do full graph analysis on hypergraphs by using matrix
+-- multiplication to project an adjacency matrix of addresses to
+-- addresses, or transactions to transactions:
 
--- OneSparse can serialize and deserialize graphs into Postgres
--- objects to and from an on-disk state.  This state can come from
--- various sources, but the simplest is the ["TOAST" storage]() of
--- large variable length data arrays in rows.  However, the one major
--- limitation of this approach is that Postgres is limited by design
--- to a maximum TOAST size of about 1 gigabyte which typically limits
--- TOASTed graphs to a few hundred million edges at most.
+with addr_to_addr as (select mxm(addr_to_txn, txn_to_addr, 'plus_plus_int32')
+                      as ata from txn_graph),
+     txn_to_txn   as (select transpose(mxm(
+                                transpose(addr_to_txn),
+                                transpose(txn_to_addr),
+                                'plus_plus_int32'))
+                      as ttt from txn_graph)
+select (select draw(ata, reduce_rows(ata), true, true, true, 0.5) from addr_to_addr) as twocol_a_source,
+       (select draw(ttt, reduce_rows(ttt), true, true, true, 0.5, shape:='box') from txn_to_txn) as twocol_b_source \gset
+\i sql/twocol.sql
 
--- TOAST storage is very useful for small graphs, or sub-graphs of a
--- large graph, but graphs with many billions of edges blow right past
--- this size limit, so OneSparse also provides functions for loading
--- much larger graphs from either SQL queries, Large Object storage,
--- or most optimally, from compressed files on the server filesystem
--- itself.
+-- ## High Performance Parallel Breadth First Search (BFS)
+--
+-- BFS is the core operation of graph analysis.  Like a pebble thrown
+-- into a pond, you start from a point in the graph, and traverse all
+-- the edges you find, as you find them.  As you traverse the graph
+-- you can accumulate some interesting information as you go, like how
+-- many edges away from the starting point you are, the "level" and
+-- the row index of the node you got here from, the "parent".  In the
+-- GraphBLAS, this information is accumulated in vectors.
 
 -- For the purposes of a quick demo, we will use a very small graph
 -- that is very commonly studied in graph theory called the
@@ -125,7 +160,6 @@ create materialized view if not exists karate as
 
 select graph from karate;
 
---
 -- Like all SQL types in Postgres, an object must have a literal
 -- input/output format that can recreate the object.  The default
 -- format shown here shows a list of *edge coordinates*.  To see the
@@ -133,12 +167,81 @@ select graph from karate;
 
 select print(graph) from karate;
 
+-- !!! note
+--     The print() function is only useful for illustration and
+--     debugging purposes on small graphs, trying to print a very
+--     large graph will exhaust the memory of Postgres.
+--
 -- This graph can now be accessed from SQL using the powerful
 -- GraphBLAS API exposed by OneSparse.  For example, we can query the
 -- number of rows, columns and values in the graph:
 
 select nrows(graph), ncols(graph), nvals(graph) from karate;
 
+-- ### Level BFS
+-- Level BFS exposes the depth of each vertex starting from a
+-- given source vertex using the breadth-first search algorithm.
+-- See [https://en.wikipedia.org/wiki/Breadth-first_search](https://en.wikipedia.org/wiki/Breadth-first_search) for details.
+
+select draw(triu(graph), (select level from bfs(graph, 1)), false, false, true, 0.5) as draw_source from karate \gset
+\i sql/draw_sfdp.sql
+
+--
+-- ### Parent BFS
+-- Parent BFS returns the predecessor of each vertex in the
+-- BFS tree rooted at the chosen source. It is also based on
+-- [https://en.wikipedia.org/wiki/Breadth-first_search](https://en.wikipedia.org/wiki/Breadth-first_search).
+--
+select draw(triu(graph), (select parent from bfs(graph, 1)), false, false, true, 0.5) as draw_source from karate \gset
+\i sql/draw_sfdp.sql
+--
+-- It's pretty easy to write a function in just about any language
+-- that will do a BFS across a graph, but as graphs get bigger these
+-- approaches do not scale.  In order to BFS efficiently, multiple
+-- cores must be used and coordinate their parallel work.
+--
+-- Different kinds of processor architectures, CPUs, GPUs, FPGAs etc,
+-- have extremely different ways of doing concurrent work.  Reaching
+-- the scale of billions of nodes and hundreds of cores requires the
+-- kind of sparse computing expertise that's been used to develop the
+-- GraphBLAS API.
+--
+-- For example, we've benchmarked OneSparse using the industry
+-- standard [GAP Benchmark Suite]().  The GAP is a group of publicly
+-- available [graph data sets]() and algorithms that graph libraries
+-- can use to benchmark their performance.
+--
+-- ### Benchmarks
+--
+-- <div style="text-align: center;">
+--   <img src="/images/BFS.svg" alt="BFS GAP Benchmarks with OneSparse"/>
+-- </div>
+--
+-- This chart displays BFS performance on several GAP graphs.  The
+-- smallest graph, `road`, has 57M edges.  The largest graph `urand`
+-- has 4.3B edges.  The values show the number of "Edges Per Second"
+-- OneSparse can traverse with BFS by dividing the number of edges in
+-- the graph by the run time.
+--
+-- ## Storing Graphs
+--
+-- OneSparse can serialize and deserialize graphs into Postgres
+-- objects to and from an on-disk state.  This state can come from
+-- various sources, but the simplest is the ["TOAST" storage]() of
+-- large variable length data arrays in rows.  However, the one major
+-- limitation of this approach is that Postgres is limited by design
+-- to a maximum TOAST size of about 1 gigabyte which typically limits
+-- TOASTed graphs to a few hundred million edges at most.
+
+-- TOAST storage is very useful for small graphs, or sub-graphs of a
+-- large graph, but graphs with many billions of edges blow right past
+-- this size limit, so OneSparse also provides functions for loading
+-- much larger graphs from either SQL queries, Large Object storage,
+-- or most optimally, from compressed files on the server filesystem
+-- itself.
+--
+-- ## Degree Centrality
+--
 -- At first a matrix might seem like an odd way to store a graph, but
 -- now we bring the power of Linear Algebra into play.  For example,
 -- let's suppose you want to know the "degree" of every node in the
@@ -212,61 +315,6 @@ select draw(triu(graph),
 
 -- Which centrality is the "best"?  Well there is no answer to that,
 -- they are all tools in the analyst toolbox.
---
--- ## High Performance Parallel Breadth First Search (BFS)
---
--- BFS is the core operation of graph alalytics.  Like a pepple thrown
--- into a pond, you start from a point in the graph, and traverse all
--- the edges you find, as you find them.  As you traverse the graphs
--- you can accumulate some interesting information as you go, like how
--- many edges away from the starting point you are, the "level" and
--- the row index of the node you got here from, the "parent".  In the
--- GraphBLAS, this information is accumulated in vectors.
---
--- ## Level BFS
--- Level BFS exposes the depth of each vertex starting from a
--- given source vertex using the breadth-first search algorithm.
--- See [https://en.wikipedia.org/wiki/Breadth-first_search](https://en.wikipedia.org/wiki/Breadth-first_search) for details.
-
-select draw(triu(graph), (select level from bfs(graph, 1)), false, false, true, 0.5) as draw_source from karate \gset
-\i sql/draw_sfdp.sql
-
---
--- ## Parent BFS
--- Parent BFS returns the predecessor of each vertex in the
--- BFS tree rooted at the chosen source. It is also based on
--- [https://en.wikipedia.org/wiki/Breadth-first_search](https://en.wikipedia.org/wiki/Breadth-first_search).
---
-select draw(triu(graph), (select parent from bfs(graph, 1)), false, false, true, 0.5) as draw_source from karate \gset
-\i sql/draw_sfdp.sql
---
--- It's pretty easy to write a function in just about any language
--- that will do a BFS across a graph, but as graphs get bigger these
--- approaches do not scale.  In order to BFS efficiently, multiple
--- cores must be used and coordinate their parallel work.
---
--- Different kinds of processor architectures, CPUs, GPUs, FPGAs etc,
--- have extremely different ways of doing concurrent work.  Reaching
--- the scale of billions of nodes and hundreds of cores requires the
--- kind of sparse computing expertise that's been used to develop the
--- GraphBLAS API.
---
--- For example, we've benchmarked OneSparse using the industry
--- standard [GAP Benchmark Suite]().  The GAP is a group of publicly
--- available [graph data sets]() and algorithms that graph libraries
--- can use to benchmark their performance.
---
--- ### Benchmarks
---
--- <div style="text-align: center;">
---   <img src="/images/BFS.svg" alt="BFS GAP Benchmarks with OneSparse"/>
--- </div>
---
--- This chart displays BFS performance on several GAP graphs.  The
--- smallest graph, `road`, has 57M edges.  The largest graph `urand`
--- has 4.3B edges.  The values show the number of "Edges Per Second"
--- OneSparse can traverse with BFS by dividing the number of edges in
--- the graph by the run time.
 --
 -- ## OneSparse Beta
 --
