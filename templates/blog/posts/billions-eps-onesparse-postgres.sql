@@ -304,6 +304,31 @@ select draw(triu(graph),
 --
 -- ## OneSparse Beta
 --
+-- OneSparse is still in development, and to-date wraps almost all of
+-- the GraphBLAS features in SuiteSparse.  There's still some work to
+-- do, but we want to get some of this work out in to the world to get
+-- gigaedge graph ideas moving in Postgres.
+--
+-- OneSparse Beta is now released, and it requires Postgres 18 Beta.
+-- Due to some very recently changes in the Postgres core that
+-- OneSparse relies on for its performance, support for Postgres less
+-- than 18 is not practical.  So now's your chance to try OneSparse
+-- and Postgres 18 together using one of our [beta Docker
+-- images](/docker.html) to try it out!
+--
 -- ## Preview Table Access Method
 --
+-- OneSparse has many plans for where to take the extension, and our
+-- next major release will contain a major new feature that unifies
+-- SQL and OneSparse even more.
 --
+-- Using the relatively new [Table Access Method]() API, we are
+-- working to have automatic graph updates happen completely behind
+-- the scenes, no matrices or vectors, just edge tables and super-fast
+-- algorithms.  While you can always drop "down to the algebra" if you
+-- want to, this will provide a much simpler interface for users who
+-- already have the algorithms and data in hand.
+--
+-- This will also make a deeper unification with the concepts of both
+-- linear and relational algebra.  By unifying tables and matrices,
+-- either or both can be used seamlessly in combination.
