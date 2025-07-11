@@ -15,23 +15,27 @@ categories:
 OneSparse is a Postgres extension that brings the power of Graph
 Linear Algebra to Postgres. Have you found yourself spending too
 much time extracting, transforming, and loading graphs into side
-databases that need constant money, maintanance and impedence
+databases that need constant money, maintanance and impedance
 matching with SQL?  With OneSparse, it's easy to turn SQL data into
 graphs and back again all without needing any external tooling.
 
 <!-- more -->
 
-For years now those of us over at [The GraphBLAS Forum](graphblas.org)
-have been working hard to bring a standardized, state-of-the-art
-parallel graph traversal API to all possible architectures.  This API
-work has led to the evolution of the high performance graph linear
-algebra library [SuiteSparse
+For years now those of us over at [The GraphBLAS
+Forum](graphblas.org) have been working hard to bring a
+standardized, state-of-the-art parallel graph traversal API to all
+possible architectures.  This API work has led to the evolution of
+the high performance graph linear algebra library [SuiteSparse
 GraphBLAS](https://people.engr.tamu.edu/davis/GraphBLAS.html) by
-[Dr. Timothy Davis et al]() at at [Texas A&M University]().
+[Dr. Timothy Davis et
+al](https://engineering.tamu.edu/cse/profiles/davis-tim.html) at
+[Texas A&M
+University](https://engineering.tamu.edu/cse/index.html).
 SuiteSparse contains powerful optimized kernels for sparse graph
-computation, the ability for users to define their own edge types and
-operators, and has a built-in JIT compiler that can target many
-computing architectures including [Nvidia CUDA]().
+computation, the ability for users to define their own edge types
+and operators, and has a built-in JIT compiler that can target many
+computing architectures including [Nvidia
+CUDA](https://developer.nvidia.com/cuda-toolkit).
 OneSparse is more than just fast graphs, its graph algorithms are
 expressed using [Linear
 Algebra](https://en.wikipedia.org/wiki/Linear_algebra) operations
@@ -245,7 +249,7 @@ main concept of the GraphBLAS.  By unifying these two concepts,
 both edge-and-node graph operations and algebraic operations can be
 performed to analyze the graph.
 
-## Hypergraphs and Multigraphs
+## Hypergraphs
 
 Hypergraphs are graphs where an edge can have more than one source
 or destination.  These are important types of graphs for modeling
@@ -257,10 +261,11 @@ represent *hyperedges* with multiple inputs and outputs.
 This type of graph can be easily modeled with OneSparse using two
 matrices called *Incidence Matrices*, one that maps output address
 nodes to transaction hyperedges and the other that maps
-transactions to input address nodes.  Let's fake some data by
-making two random incidence matrices, one for address output nodes
-to transaction hyperedges, and the other for transaction edges to
-input nodes.
+transactions to input address nodes.
+
+Let's fake some data by making two random incidence matrices, one
+for address output nodes to transaction hyperedges, and the other
+for transaction edges to input nodes.
 ``` postgres-console
 create materialized view txn_graph as
         select triu(random_matrix(12,15,60,sym:=false,min:=0,max:=9,seed:=0.43)) as addr_to_txn,
@@ -298,499 +303,573 @@ select hyperdraw(addr_to_txn, txn_to_addr, 'A', 'T') as draw_source from txn_gra
 ```
 <div>
 <!-- Title: G Pages: 1 -->
-<svg width="620pt" height="364pt"
- viewBox="0.00 0.00 620.05 363.50" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 359.5)">
+<svg width="730pt" height="441pt"
+ viewBox="0.00 0.00 730.00 440.50" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 436.5)">
 <title>G</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-359.5 616.05,-359.5 616.05,4 -4,4"/>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-436.5 726,-436.5 726,4 -4,4"/>
 <!-- T:0 -->
 <g id="node1" class="node">
 <title>T:0</title>
-<polygon fill="none" stroke="black" points="406,-208.82 376,-208.82 376,-191.82 406,-191.82 406,-208.82"/>
-<text text-anchor="middle" x="391" y="-198.42" font-family="Times,serif" font-size="8.00">T:0</text>
+<polygon fill="none" stroke="black" points="440,-252.82 410,-252.82 410,-235.82 440,-235.82 440,-252.82"/>
+<text text-anchor="middle" x="425" y="-242.42" font-family="Times,serif" font-size="8.00">T:0</text>
 </g>
 <!-- A:4 -->
 <g id="node20" class="node">
 <title>A:4</title>
-<ellipse fill="none" stroke="black" cx="398" cy="-152.37" rx="21.84" ry="21.84"/>
-<text text-anchor="middle" x="398" y="-150.47" font-family="Times,serif" font-size="8.00">A:4</text>
+<ellipse fill="none" stroke="black" cx="456" cy="-185.37" rx="21.84" ry="21.84"/>
+<text text-anchor="middle" x="456" y="-183.47" font-family="Times,serif" font-size="8.00">A:4</text>
 </g>
 <!-- T:0&#45;&gt;A:4 -->
 <g id="edge35" class="edge">
 <title>T:0&#45;&gt;A:4</title>
-<path fill="none" stroke="black" d="M392.16,-191.73C392.49,-189.56 392.87,-187.05 393.28,-184.37"/>
-<polygon fill="black" stroke="black" points="396.77,-184.67 394.82,-174.26 389.85,-183.62 396.77,-184.67"/>
+<path fill="none" stroke="black" d="M429.31,-235.4C432.37,-229.78 436.68,-221.86 440.94,-214.03"/>
+<polygon fill="black" stroke="black" points="444.14,-215.47 445.85,-205.02 437.99,-212.13 444.14,-215.47"/>
+<text text-anchor="middle" x="441" y="-221.42" font-family="Times,serif" font-size="8.00">1</text>
 </g>
 <!-- A:5 -->
 <g id="node21" class="node">
 <title>A:5</title>
-<ellipse fill="none" stroke="black" cx="252" cy="-152.37" rx="21.84" ry="21.84"/>
-<text text-anchor="middle" x="252" y="-150.47" font-family="Times,serif" font-size="8.00">A:5</text>
+<ellipse fill="none" stroke="black" cx="335" cy="-185.37" rx="21.84" ry="21.84"/>
+<text text-anchor="middle" x="335" y="-183.47" font-family="Times,serif" font-size="8.00">A:5</text>
 </g>
 <!-- T:0&#45;&gt;A:5 -->
 <g id="edge36" class="edge">
 <title>T:0&#45;&gt;A:5</title>
-<path fill="none" stroke="black" d="M375.75,-197.31C349.64,-193.7 297.58,-185.77 281,-177.82 279.17,-176.95 277.37,-175.93 275.6,-174.82"/>
-<polygon fill="black" stroke="black" points="277.36,-171.77 267.23,-168.67 273.22,-177.41 277.36,-171.77"/>
+<path fill="none" stroke="black" d="M417.77,-235.42C412.81,-230.28 405.9,-223.67 399,-218.82 388.17,-211.21 375.3,-204.33 363.96,-198.88"/>
+<polygon fill="black" stroke="black" points="365.41,-195.69 354.87,-194.65 362.46,-202.04 365.41,-195.69"/>
+<text text-anchor="middle" x="413" y="-221.42" font-family="Times,serif" font-size="8.00">7</text>
 </g>
 <!-- T:1 -->
 <g id="node2" class="node">
 <title>T:1</title>
-<polygon fill="none" stroke="black" points="191,-297.66 161,-297.66 161,-280.66 191,-280.66 191,-297.66"/>
-<text text-anchor="middle" x="176" y="-287.26" font-family="Times,serif" font-size="8.00">T:1</text>
+<polygon fill="none" stroke="black" points="205,-363.66 175,-363.66 175,-346.66 205,-346.66 205,-363.66"/>
+<text text-anchor="middle" x="190" y="-353.26" font-family="Times,serif" font-size="8.00">T:1</text>
 </g>
 <!-- A:2 -->
 <g id="node18" class="node">
 <title>A:2</title>
-<ellipse fill="none" stroke="black" cx="176" cy="-244.74" rx="21.84" ry="21.84"/>
-<text text-anchor="middle" x="176" y="-242.84" font-family="Times,serif" font-size="8.00">A:2</text>
+<ellipse fill="none" stroke="black" cx="190" cy="-299.74" rx="21.84" ry="21.84"/>
+<text text-anchor="middle" x="190" y="-297.84" font-family="Times,serif" font-size="8.00">A:2</text>
 </g>
 <!-- T:1&#45;&gt;A:2 -->
 <g id="edge37" class="edge">
 <title>T:1&#45;&gt;A:2</title>
-<path fill="none" stroke="black" d="M176,-280.38C176,-279.31 176,-278.15 176,-276.94"/>
-<polygon fill="black" stroke="black" points="179.5,-276.92 176,-266.92 172.5,-276.92 179.5,-276.92"/>
+<path fill="none" stroke="black" d="M190,-346.28C190,-342.39 190,-337.42 190,-332.19"/>
+<polygon fill="black" stroke="black" points="193.5,-332.05 190,-322.05 186.5,-332.05 193.5,-332.05"/>
+<text text-anchor="middle" x="193" y="-332.26" font-family="Times,serif" font-size="8.00">3</text>
 </g>
 <!-- T:1&#45;&gt;A:5 -->
 <g id="edge38" class="edge">
 <title>T:1&#45;&gt;A:5</title>
-<path fill="none" stroke="black" d="M188.88,-280.48C194.33,-276.79 200.45,-272.01 205,-266.66 225.42,-242.69 237.93,-208.61 244.86,-184.1"/>
-<polygon fill="black" stroke="black" points="248.29,-184.8 247.49,-174.24 241.53,-183 248.29,-184.8"/>
+<path fill="none" stroke="black" d="M205.01,-353.31C242,-350.89 336.13,-342.75 358,-321.66 386.91,-293.79 367.78,-243.96 351.33,-213.18"/>
+<polygon fill="black" stroke="black" points="354.3,-211.31 346.37,-204.28 348.19,-214.72 354.3,-211.31"/>
+<text text-anchor="middle" x="375" y="-263.42" font-family="Times,serif" font-size="8.00">6</text>
 </g>
 <!-- T:2 -->
 <g id="node3" class="node">
 <title>T:2</title>
-<polygon fill="none" stroke="black" points="450,-208.82 420,-208.82 420,-191.82 450,-191.82 450,-208.82"/>
-<text text-anchor="middle" x="435" y="-198.42" font-family="Times,serif" font-size="8.00">T:2</text>
+<polygon fill="none" stroke="black" points="484,-252.82 454,-252.82 454,-235.82 484,-235.82 484,-252.82"/>
+<text text-anchor="middle" x="469" y="-242.42" font-family="Times,serif" font-size="8.00">T:2</text>
 </g>
 <!-- T:2&#45;&gt;A:4 -->
 <g id="edge39" class="edge">
 <title>T:2&#45;&gt;A:4</title>
-<path fill="none" stroke="black" d="M428.89,-191.73C425.77,-187.85 421.77,-182.89 417.69,-177.83"/>
-<polygon fill="black" stroke="black" points="420.34,-175.53 411.34,-169.93 414.88,-179.92 420.34,-175.53"/>
+<path fill="none" stroke="black" d="M467.19,-235.4C466.07,-230.48 464.54,-223.79 462.98,-216.94"/>
+<polygon fill="black" stroke="black" points="466.34,-215.94 460.7,-206.97 459.52,-217.5 466.34,-215.94"/>
+<text text-anchor="middle" x="468" y="-221.42" font-family="Times,serif" font-size="8.00">4</text>
 </g>
 <!-- A:6 -->
 <g id="node22" class="node">
 <title>A:6</title>
-<ellipse fill="none" stroke="black" cx="310" cy="-152.37" rx="21.84" ry="21.84"/>
-<text text-anchor="middle" x="310" y="-150.47" font-family="Times,serif" font-size="8.00">A:6</text>
+<ellipse fill="none" stroke="black" cx="244" cy="-185.37" rx="21.84" ry="21.84"/>
+<text text-anchor="middle" x="244" y="-183.47" font-family="Times,serif" font-size="8.00">A:6</text>
 </g>
 <!-- T:2&#45;&gt;A:6 -->
 <g id="edge40" class="edge">
 <title>T:2&#45;&gt;A:6</title>
-<path fill="none" stroke="black" d="M419.63,-194.04C417.41,-193.29 415.15,-192.53 413,-191.82 393.51,-185.4 388.27,-184.87 369,-177.82 359.18,-174.23 348.6,-169.97 339.14,-166.02"/>
-<polygon fill="black" stroke="black" points="340.34,-162.73 329.77,-162.06 337.62,-169.18 340.34,-162.73"/>
+<path fill="none" stroke="black" d="M453.76,-237.51C451.52,-236.83 449.22,-236.24 447,-235.82 426.78,-232.02 278.96,-239.48 262,-227.82 257.85,-224.97 254.66,-220.95 252.19,-216.52"/>
+<polygon fill="black" stroke="black" points="255.29,-214.87 248.09,-207.1 248.87,-217.67 255.29,-214.87"/>
+<text text-anchor="middle" x="265" y="-221.42" font-family="Times,serif" font-size="8.00">1</text>
 </g>
 <!-- A:11 -->
 <g id="node25" class="node">
 <title>A:11</title>
-<ellipse fill="none" stroke="black" cx="492" cy="-152.37" rx="25.41" ry="25.41"/>
-<text text-anchor="middle" x="492" y="-150.47" font-family="Times,serif" font-size="8.00">A:11</text>
+<ellipse fill="none" stroke="black" cx="553" cy="-185.37" rx="25.41" ry="25.41"/>
+<text text-anchor="middle" x="553" y="-183.47" font-family="Times,serif" font-size="8.00">A:11</text>
 </g>
 <!-- T:2&#45;&gt;A:11 -->
 <g id="edge42" class="edge">
 <title>T:2&#45;&gt;A:11</title>
-<path fill="none" stroke="black" d="M444.41,-191.73C449.87,-187.34 457.05,-181.55 464.17,-175.8"/>
-<polygon fill="black" stroke="black" points="466.82,-178.17 472.4,-169.17 462.42,-172.72 466.82,-178.17"/>
+<path fill="none" stroke="black" d="M484.2,-240.63C494.14,-238.35 507.06,-234.39 517,-227.82 522.43,-224.24 527.52,-219.62 532.07,-214.77"/>
+<polygon fill="black" stroke="black" points="534.83,-216.92 538.74,-207.08 529.55,-212.33 534.83,-216.92"/>
+<text text-anchor="middle" x="530" y="-221.42" font-family="Times,serif" font-size="8.00">0</text>
 </g>
 <!-- A:10 -->
 <g id="node26" class="node">
 <title>A:10</title>
-<ellipse fill="none" stroke="black" cx="396" cy="-56.46" rx="25.41" ry="25.41"/>
-<text text-anchor="middle" x="396" y="-54.56" font-family="Times,serif" font-size="8.00">A:10</text>
+<ellipse fill="none" stroke="black" cx="448" cy="-67.46" rx="25.41" ry="25.41"/>
+<text text-anchor="middle" x="448" y="-65.56" font-family="Times,serif" font-size="8.00">A:10</text>
 </g>
 <!-- T:2&#45;&gt;A:10 -->
 <g id="edge41" class="edge">
 <title>T:2&#45;&gt;A:10</title>
-<path fill="none" stroke="black" d="M434.92,-191.57C434.62,-178.16 433.23,-149.86 427,-126.91 423.49,-113.97 417.88,-100.36 412.4,-88.66"/>
-<polygon fill="black" stroke="black" points="415.39,-86.8 407.87,-79.33 409.09,-89.85 415.39,-86.8"/>
+<path fill="none" stroke="black" d="M474,-235.67C485.08,-217.64 509.13,-171.86 488,-142.91 481.12,-133.49 470.88,-143.51 463,-134.91 455.11,-126.3 451.08,-114.44 449.1,-103.12"/>
+<polygon fill="black" stroke="black" points="452.54,-102.46 447.8,-92.99 445.6,-103.35 452.54,-102.46"/>
+<text text-anchor="middle" x="495" y="-145.51" font-family="Times,serif" font-size="8.00">0</text>
 </g>
 <!-- T:3 -->
 <g id="node4" class="node">
 <title>T:3</title>
-<polygon fill="none" stroke="black" points="228,-208.82 198,-208.82 198,-191.82 228,-191.82 228,-208.82"/>
-<text text-anchor="middle" x="213" y="-198.42" font-family="Times,serif" font-size="8.00">T:3</text>
+<polygon fill="none" stroke="black" points="212,-252.82 182,-252.82 182,-235.82 212,-235.82 212,-252.82"/>
+<text text-anchor="middle" x="197" y="-242.42" font-family="Times,serif" font-size="8.00">T:3</text>
 </g>
 <!-- T:3&#45;&gt;A:5 -->
 <g id="edge43" class="edge">
 <title>T:3&#45;&gt;A:5</title>
-<path fill="none" stroke="black" d="M219.44,-191.73C222.87,-187.69 227.3,-182.47 231.78,-177.2"/>
-<polygon fill="black" stroke="black" points="234.47,-179.44 238.27,-169.55 229.13,-174.91 234.47,-179.44"/>
+<path fill="none" stroke="black" d="M212.26,-241.23C226.32,-238.99 247.57,-234.77 265,-227.82 280.2,-221.76 295.98,-212.69 308.71,-204.58"/>
+<polygon fill="black" stroke="black" points="310.93,-207.31 317.38,-198.9 307.09,-201.46 310.93,-207.31"/>
+<text text-anchor="middle" x="287" y="-221.42" font-family="Times,serif" font-size="8.00">5</text>
 </g>
 <!-- A:7 -->
 <g id="node23" class="node">
 <title>A:7</title>
-<ellipse fill="none" stroke="black" cx="74" cy="-152.37" rx="21.84" ry="21.84"/>
-<text text-anchor="middle" x="74" y="-150.47" font-family="Times,serif" font-size="8.00">A:7</text>
+<ellipse fill="none" stroke="black" cx="96" cy="-185.37" rx="21.84" ry="21.84"/>
+<text text-anchor="middle" x="96" y="-183.47" font-family="Times,serif" font-size="8.00">A:7</text>
 </g>
 <!-- T:3&#45;&gt;A:7 -->
 <g id="edge44" class="edge">
 <title>T:3&#45;&gt;A:7</title>
-<path fill="none" stroke="black" d="M197.86,-194.32C175.45,-186.91 133,-172.87 104.11,-163.32"/>
-<polygon fill="black" stroke="black" points="105.11,-159.97 94.51,-160.15 102.91,-166.61 105.11,-159.97"/>
+<path fill="none" stroke="black" d="M181.65,-240.34C171.19,-237.91 157.25,-233.87 146,-227.82 136.32,-222.61 126.76,-215.36 118.63,-208.37"/>
+<polygon fill="black" stroke="black" points="120.82,-205.63 111.03,-201.56 116.14,-210.84 120.82,-205.63"/>
+<text text-anchor="middle" x="149" y="-221.42" font-family="Times,serif" font-size="8.00">0</text>
 </g>
 <!-- T:4 -->
 <g id="node5" class="node">
 <title>T:4</title>
-<polygon fill="none" stroke="black" points="302,-208.82 272,-208.82 272,-191.82 302,-191.82 302,-208.82"/>
-<text text-anchor="middle" x="287" y="-198.42" font-family="Times,serif" font-size="8.00">T:4</text>
+<polygon fill="none" stroke="black" points="286,-252.82 256,-252.82 256,-235.82 286,-235.82 286,-252.82"/>
+<text text-anchor="middle" x="271" y="-242.42" font-family="Times,serif" font-size="8.00">T:4</text>
 </g>
 <!-- T:4&#45;&gt;A:6 -->
 <g id="edge45" class="edge">
 <title>T:4&#45;&gt;A:6</title>
-<path fill="none" stroke="black" d="M290.8,-191.73C292.29,-188.75 294.1,-185.13 296.01,-181.31"/>
-<polygon fill="black" stroke="black" points="299.19,-182.78 300.54,-172.28 292.93,-179.65 299.19,-182.78"/>
+<path fill="none" stroke="black" d="M255.97,-240.39C248.94,-238.19 241.21,-234.37 237,-227.82 234.65,-224.16 233.77,-219.96 233.81,-215.66"/>
+<polygon fill="black" stroke="black" points="237.28,-216.09 235.3,-205.68 230.36,-215.06 237.28,-216.09"/>
+<text text-anchor="middle" x="240" y="-221.42" font-family="Times,serif" font-size="8.00">4</text>
 </g>
 <!-- T:5 -->
 <g id="node6" class="node">
 <title>T:5</title>
-<polygon fill="none" stroke="black" points="478,-112.91 448,-112.91 448,-95.91 478,-95.91 478,-112.91"/>
-<text text-anchor="middle" x="463" y="-102.51" font-family="Times,serif" font-size="8.00">T:5</text>
+<polygon fill="none" stroke="black" points="500,-134.91 470,-134.91 470,-117.91 500,-117.91 500,-134.91"/>
+<text text-anchor="middle" x="485" y="-124.51" font-family="Times,serif" font-size="8.00">T:5</text>
 </g>
 <!-- T:5&#45;&gt;A:10 -->
 <g id="edge47" class="edge">
 <title>T:5&#45;&gt;A:10</title>
-<path fill="none" stroke="black" d="M449.83,-95.76C443.19,-91.78 435.05,-86.76 428,-81.91 426.74,-81.05 425.46,-80.15 424.18,-79.23"/>
-<polygon fill="black" stroke="black" points="425.87,-76.14 415.74,-73.04 421.73,-81.78 425.87,-76.14"/>
+<path fill="none" stroke="black" d="M479.86,-117.49C476.49,-112.31 471.85,-105.18 467.16,-97.96"/>
+<polygon fill="black" stroke="black" points="470.09,-96.03 461.71,-89.55 464.22,-99.85 470.09,-96.03"/>
+<text text-anchor="middle" x="477" y="-103.51" font-family="Times,serif" font-size="8.00">7</text>
 </g>
 <!-- A:8 -->
 <g id="node27" class="node">
 <title>A:8</title>
-<ellipse fill="none" stroke="black" cx="457" cy="-56.46" rx="21.84" ry="21.84"/>
-<text text-anchor="middle" x="457" y="-54.56" font-family="Times,serif" font-size="8.00">A:8</text>
+<ellipse fill="none" stroke="black" cx="525" cy="-67.46" rx="21.84" ry="21.84"/>
+<text text-anchor="middle" x="525" y="-65.56" font-family="Times,serif" font-size="8.00">A:8</text>
 </g>
 <!-- T:5&#45;&gt;A:8 -->
 <g id="edge46" class="edge">
 <title>T:5&#45;&gt;A:8</title>
-<path fill="none" stroke="black" d="M462.01,-95.82C461.73,-93.65 461.4,-91.14 461.05,-88.46"/>
-<polygon fill="black" stroke="black" points="464.49,-87.81 459.73,-78.35 457.55,-88.71 464.49,-87.81"/>
+<path fill="none" stroke="black" d="M498.55,-117.62C501.61,-115.41 504.64,-112.81 507,-109.91 509.92,-106.32 512.45,-102.19 514.62,-97.95"/>
+<polygon fill="black" stroke="black" points="517.88,-99.23 518.78,-88.67 511.49,-96.36 517.88,-99.23"/>
+<text text-anchor="middle" x="515" y="-103.51" font-family="Times,serif" font-size="8.00">8</text>
 </g>
 <!-- T:6 -->
 <g id="node7" class="node">
 <title>T:6</title>
-<polygon fill="none" stroke="black" points="354,-112.91 324,-112.91 324,-95.91 354,-95.91 354,-112.91"/>
-<text text-anchor="middle" x="339" y="-102.51" font-family="Times,serif" font-size="8.00">T:6</text>
+<polygon fill="none" stroke="black" points="426,-134.91 396,-134.91 396,-117.91 426,-117.91 426,-134.91"/>
+<text text-anchor="middle" x="411" y="-124.51" font-family="Times,serif" font-size="8.00">T:6</text>
 </g>
 <!-- A:9 -->
 <g id="node24" class="node">
 <title>A:9</title>
-<ellipse fill="none" stroke="black" cx="335" cy="-56.46" rx="21.84" ry="21.84"/>
-<text text-anchor="middle" x="335" y="-54.56" font-family="Times,serif" font-size="8.00">A:9</text>
+<ellipse fill="none" stroke="black" cx="330" cy="-67.46" rx="21.84" ry="21.84"/>
+<text text-anchor="middle" x="330" y="-65.56" font-family="Times,serif" font-size="8.00">A:9</text>
 </g>
 <!-- T:6&#45;&gt;A:9 -->
 <g id="edge49" class="edge">
 <title>T:6&#45;&gt;A:9</title>
-<path fill="none" stroke="black" d="M338.34,-95.82C338.15,-93.65 337.93,-91.14 337.7,-88.46"/>
-<polygon fill="black" stroke="black" points="341.17,-88 336.82,-78.35 334.2,-88.61 341.17,-88"/>
+<path fill="none" stroke="black" d="M395.91,-124.91C382.75,-123.75 363.83,-120.23 351,-109.91 346.86,-106.58 343.46,-102.23 340.7,-97.59"/>
+<polygon fill="black" stroke="black" points="343.76,-95.88 336.13,-88.53 337.51,-99.03 343.76,-95.88"/>
+<text text-anchor="middle" x="354" y="-103.51" font-family="Times,serif" font-size="8.00">4</text>
 </g>
 <!-- T:6&#45;&gt;A:10 -->
 <g id="edge50" class="edge">
 <title>T:6&#45;&gt;A:10</title>
-<path fill="none" stroke="black" d="M348.41,-95.82C353.87,-91.43 361.05,-85.64 368.17,-79.89"/>
-<polygon fill="black" stroke="black" points="370.82,-82.26 376.4,-73.26 366.42,-76.81 370.82,-82.26"/>
+<path fill="none" stroke="black" d="M416.14,-117.49C419.51,-112.31 424.15,-105.18 428.84,-97.96"/>
+<polygon fill="black" stroke="black" points="431.78,-99.85 434.29,-89.55 425.91,-96.03 431.78,-99.85"/>
+<text text-anchor="middle" x="430" y="-103.51" font-family="Times,serif" font-size="8.00">2</text>
 </g>
 <!-- T:6&#45;&gt;A:8 -->
 <g id="edge48" class="edge">
 <title>T:6&#45;&gt;A:8</title>
-<path fill="none" stroke="black" d="M354.03,-98.26C356.67,-97.43 359.4,-96.61 362,-95.91 390.96,-88.14 401.06,-95.08 428,-81.91 429.82,-81.02 431.62,-79.99 433.38,-78.87"/>
-<polygon fill="black" stroke="black" points="435.77,-81.46 441.74,-72.7 431.62,-75.82 435.77,-81.46"/>
+<path fill="none" stroke="black" d="M426.24,-124.5C441.21,-123.06 464.31,-119.37 482,-109.91 490.15,-105.55 497.84,-99.21 504.4,-92.78"/>
+<polygon fill="black" stroke="black" points="507.15,-94.96 511.54,-85.32 502.09,-90.12 507.15,-94.96"/>
+<text text-anchor="middle" x="497" y="-103.51" font-family="Times,serif" font-size="8.00">3</text>
 </g>
 <!-- T:7 -->
 <g id="node8" class="node">
 <title>T:7</title>
-<polygon fill="none" stroke="black" points="602,-112.91 572,-112.91 572,-95.91 602,-95.91 602,-112.91"/>
-<text text-anchor="middle" x="587" y="-102.51" font-family="Times,serif" font-size="8.00">T:7</text>
+<polygon fill="none" stroke="black" points="674,-134.91 644,-134.91 644,-117.91 674,-117.91 674,-134.91"/>
+<text text-anchor="middle" x="659" y="-124.51" font-family="Times,serif" font-size="8.00">T:7</text>
 </g>
 <!-- T:7&#45;&gt;A:8 -->
 <g id="edge51" class="edge">
 <title>T:7&#45;&gt;A:8</title>
-<path fill="none" stroke="black" d="M571.83,-98.05C551.17,-90.74 513.7,-77.5 487.19,-68.13"/>
-<polygon fill="black" stroke="black" points="488.22,-64.78 477.62,-64.75 485.89,-71.38 488.22,-64.78"/>
+<path fill="none" stroke="black" d="M643.89,-118.99C622.31,-109.82 582.22,-92.78 554.61,-81.04"/>
+<polygon fill="black" stroke="black" points="555.63,-77.67 545.06,-76.98 552.89,-84.11 555.63,-77.67"/>
+<text text-anchor="middle" x="622" y="-103.51" font-family="Times,serif" font-size="8.00">6</text>
 </g>
 <!-- T:8 -->
 <g id="node9" class="node">
 <title>T:8</title>
-<polygon fill="none" stroke="black" points="180,-112.91 150,-112.91 150,-95.91 180,-95.91 180,-112.91"/>
-<text text-anchor="middle" x="165" y="-102.51" font-family="Times,serif" font-size="8.00">T:8</text>
+<polygon fill="none" stroke="black" points="196,-134.91 166,-134.91 166,-117.91 196,-117.91 196,-134.91"/>
+<text text-anchor="middle" x="181" y="-124.51" font-family="Times,serif" font-size="8.00">T:8</text>
 </g>
 <!-- T:8&#45;&gt;A:9 -->
 <g id="edge52" class="edge">
 <title>T:8&#45;&gt;A:9</title>
-<path fill="none" stroke="black" d="M180.09,-99.33C207.87,-91.82 267.61,-75.67 304.25,-65.77"/>
-<polygon fill="black" stroke="black" points="305.19,-69.14 313.93,-63.15 303.36,-62.38 305.19,-69.14"/>
+<path fill="none" stroke="black" d="M196.11,-119.64C220.41,-110.35 268.63,-91.91 300.08,-79.89"/>
+<polygon fill="black" stroke="black" points="301.56,-83.07 309.66,-76.23 299.06,-76.53 301.56,-83.07"/>
+<text text-anchor="middle" x="246" y="-103.51" font-family="Times,serif" font-size="8.00">2</text>
 </g>
 <!-- T:9 -->
 <g id="node10" class="node">
 <title>T:9</title>
-<polygon fill="none" stroke="black" points="61,-112.91 31,-112.91 31,-95.91 61,-95.91 61,-112.91"/>
-<text text-anchor="middle" x="46" y="-102.51" font-family="Times,serif" font-size="8.00">T:9</text>
+<polygon fill="none" stroke="black" points="30,-134.91 0,-134.91 0,-117.91 30,-117.91 30,-134.91"/>
+<text text-anchor="middle" x="15" y="-124.51" font-family="Times,serif" font-size="8.00">T:9</text>
 </g>
 <!-- T:10 -->
 <g id="node11" class="node">
 <title>T:10</title>
-<polygon fill="none" stroke="black" points="435.5,-17 400.5,-17 400.5,0 435.5,0 435.5,-17"/>
-<text text-anchor="middle" x="418" y="-6.6" font-family="Times,serif" font-size="8.00">T:10</text>
+<polygon fill="none" stroke="black" points="651.5,-17 616.5,-17 616.5,0 651.5,0 651.5,-17"/>
+<text text-anchor="middle" x="634" y="-6.6" font-family="Times,serif" font-size="8.00">T:10</text>
 </g>
 <!-- T:11 -->
 <g id="node12" class="node">
 <title>T:11</title>
-<polygon fill="none" stroke="black" points="219.5,-17 184.5,-17 184.5,0 219.5,0 219.5,-17"/>
-<text text-anchor="middle" x="202" y="-6.6" font-family="Times,serif" font-size="8.00">T:11</text>
+<polygon fill="none" stroke="black" points="303.5,-17 268.5,-17 268.5,0 303.5,0 303.5,-17"/>
+<text text-anchor="middle" x="286" y="-6.6" font-family="Times,serif" font-size="8.00">T:11</text>
 </g>
 <!-- T:12 -->
 <g id="node13" class="node">
 <title>T:12</title>
-<polygon fill="none" stroke="black" points="557.5,-112.91 522.5,-112.91 522.5,-95.91 557.5,-95.91 557.5,-112.91"/>
-<text text-anchor="middle" x="540" y="-102.51" font-family="Times,serif" font-size="8.00">T:12</text>
+<polygon fill="none" stroke="black" points="629.5,-134.91 594.5,-134.91 594.5,-117.91 629.5,-117.91 629.5,-134.91"/>
+<text text-anchor="middle" x="612" y="-124.51" font-family="Times,serif" font-size="8.00">T:12</text>
 </g>
 <!-- T:13 -->
 <g id="node14" class="node">
 <title>T:13</title>
-<polygon fill="none" stroke="black" points="403.5,-112.91 368.5,-112.91 368.5,-95.91 403.5,-95.91 403.5,-112.91"/>
-<text text-anchor="middle" x="386" y="-102.51" font-family="Times,serif" font-size="8.00">T:13</text>
+<polygon fill="none" stroke="black" points="549.5,-134.91 514.5,-134.91 514.5,-117.91 549.5,-117.91 549.5,-134.91"/>
+<text text-anchor="middle" x="532" y="-124.51" font-family="Times,serif" font-size="8.00">T:13</text>
 </g>
 <!-- T:14 -->
 <g id="node15" class="node">
 <title>T:14</title>
-<polygon fill="none" stroke="black" points="269.5,-112.91 234.5,-112.91 234.5,-95.91 269.5,-95.91 269.5,-112.91"/>
-<text text-anchor="middle" x="252" y="-102.51" font-family="Times,serif" font-size="8.00">T:14</text>
+<polygon fill="none" stroke="black" points="280.5,-134.91 245.5,-134.91 245.5,-117.91 280.5,-117.91 280.5,-134.91"/>
+<text text-anchor="middle" x="263" y="-124.51" font-family="Times,serif" font-size="8.00">T:14</text>
 </g>
 <!-- A:0 -->
 <g id="node16" class="node">
 <title>A:0</title>
-<ellipse fill="none" stroke="black" cx="116" cy="-333.58" rx="21.84" ry="21.84"/>
-<text text-anchor="middle" x="116" y="-331.68" font-family="Times,serif" font-size="8.00">A:0</text>
+<ellipse fill="none" stroke="black" cx="100" cy="-410.58" rx="21.84" ry="21.84"/>
+<text text-anchor="middle" x="100" y="-408.68" font-family="Times,serif" font-size="8.00">A:0</text>
 </g>
 <!-- A:0&#45;&gt;T:1 -->
 <g id="edge1" class="edge">
 <title>A:0&#45;&gt;T:1</title>
-<path fill="none" stroke="black" d="M133.68,-320.09C140.87,-315 149.21,-309.1 156.57,-303.9"/>
-<polygon fill="black" stroke="black" points="159.08,-306.42 165.22,-297.78 155.04,-300.7 159.08,-306.42"/>
+<path fill="none" stroke="black" d="M118.65,-398.52C133.14,-389.91 153.28,-377.96 168.46,-368.95"/>
+<polygon fill="black" stroke="black" points="170.37,-371.89 177.18,-363.77 166.79,-365.87 170.37,-371.89"/>
+<text text-anchor="middle" x="167" y="-374.26" font-family="Times,serif" font-size="8.00">6</text>
 </g>
 <!-- A:0&#45;&gt;T:8 -->
 <g id="edge2" class="edge">
 <title>A:0&#45;&gt;T:8</title>
-<path fill="none" stroke="black" d="M120.43,-312.02C129.95,-267.9 152.2,-164.76 161.16,-123.22"/>
-<polygon fill="black" stroke="black" points="164.63,-123.75 163.31,-113.23 157.78,-122.27 164.63,-123.75"/>
+<path fill="none" stroke="black" d="M100,-388.53C100,-378.69 100,-366.83 100,-356.16 100,-356.16 100,-356.16 100,-264.32 100,-250.69 148.21,-176.6 170.25,-143.45"/>
+<polygon fill="black" stroke="black" points="173.29,-145.19 175.93,-134.93 167.47,-141.31 173.29,-145.19"/>
+<text text-anchor="middle" x="103" y="-263.42" font-family="Times,serif" font-size="8.00">5</text>
 </g>
 <!-- A:0&#45;&gt;T:9 -->
 <g id="edge3" class="edge">
 <title>A:0&#45;&gt;T:9</title>
-<path fill="none" stroke="black" d="M96.05,-323.38C70.65,-310.13 30,-283.09 30,-245.74 30,-245.74 30,-245.74 30,-199.32 30,-172.35 36.49,-141.63 41.21,-122.89"/>
-<polygon fill="black" stroke="black" points="44.61,-123.69 43.78,-113.13 37.85,-121.91 44.61,-123.69"/>
+<path fill="none" stroke="black" d="M78.72,-405.24C54.72,-398.96 19,-384.8 19,-356.16 19,-356.16 19,-356.16 19,-184.37 19,-171.27 17.93,-156.52 16.9,-145.32"/>
+<polygon fill="black" stroke="black" points="20.36,-144.74 15.89,-135.14 13.4,-145.44 20.36,-144.74"/>
+<text text-anchor="middle" x="22" y="-263.42" font-family="Times,serif" font-size="8.00">5</text>
 </g>
 <!-- A:1 -->
 <g id="node17" class="node">
 <title>A:1</title>
-<ellipse fill="none" stroke="black" cx="394" cy="-244.74" rx="21.84" ry="21.84"/>
-<text text-anchor="middle" x="394" y="-242.84" font-family="Times,serif" font-size="8.00">A:1</text>
+<ellipse fill="none" stroke="black" cx="329" cy="-299.74" rx="21.84" ry="21.84"/>
+<text text-anchor="middle" x="329" y="-297.84" font-family="Times,serif" font-size="8.00">A:1</text>
 </g>
 <!-- A:1&#45;&gt;T:2 -->
 <g id="edge4" class="edge">
 <title>A:1&#45;&gt;T:2</title>
-<path fill="none" stroke="black" d="M408.8,-228.43C412.62,-224.48 416.71,-220.24 420.51,-216.31"/>
-<polygon fill="black" stroke="black" points="423.26,-218.51 427.69,-208.88 418.23,-213.64 423.26,-218.51"/>
+<path fill="none" stroke="black" d="M341.56,-281.67C348.21,-273.95 357.06,-265.53 367,-260.82 396.52,-246.85 409.74,-258.08 443.61,-252.94"/>
+<polygon fill="black" stroke="black" points="444.57,-256.32 453.74,-251.02 443.26,-249.45 444.57,-256.32"/>
+<text text-anchor="middle" x="370" y="-263.42" font-family="Times,serif" font-size="8.00">2</text>
 </g>
 <!-- A:1&#45;&gt;T:8 -->
 <g id="edge5" class="edge">
 <title>A:1&#45;&gt;T:8</title>
-<path fill="none" stroke="black" d="M377.12,-230.69C360.66,-218.65 334.46,-201.26 309,-191.82 272.69,-178.37 256.44,-197.35 223,-177.82 216.91,-174.27 192,-141.67 176.87,-121.45"/>
-<polygon fill="black" stroke="black" points="179.49,-119.1 170.72,-113.17 173.88,-123.28 179.49,-119.1"/>
+<path fill="none" stroke="black" d="M309.2,-289.52C292.33,-281.18 267.89,-267.92 249,-252.82 213.28,-224.29 193.72,-171.71 185.59,-144.59"/>
+<polygon fill="black" stroke="black" points="188.95,-143.63 182.86,-134.96 182.22,-145.53 188.95,-143.63"/>
+<text text-anchor="middle" x="228" y="-221.42" font-family="Times,serif" font-size="8.00">5</text>
 </g>
 <!-- A:1&#45;&gt;T:12 -->
 <g id="edge6" class="edge">
 <title>A:1&#45;&gt;T:12</title>
-<path fill="none" stroke="black" d="M415.16,-239.03C444.33,-231.39 496.4,-213.42 524,-177.82 536.19,-162.1 539.49,-138.98 540.2,-123.12"/>
-<polygon fill="black" stroke="black" points="543.7,-123.11 540.34,-113.06 536.7,-123.01 543.7,-123.11"/>
+<path fill="none" stroke="black" d="M351,-298.02C400.67,-295.15 522.04,-280.92 585,-210.82 601.51,-192.44 607.94,-163.84 610.43,-145.36"/>
+<polygon fill="black" stroke="black" points="613.92,-145.67 611.53,-135.35 606.96,-144.91 613.92,-145.67"/>
+<text text-anchor="middle" x="580" y="-221.42" font-family="Times,serif" font-size="8.00">0</text>
 </g>
 <!-- A:1&#45;&gt;T:14 -->
 <g id="edge7" class="edge">
 <title>A:1&#45;&gt;T:14</title>
-<path fill="none" stroke="black" d="M380.57,-226.93C376.52,-221.37 372.27,-215.02 369,-208.82 350.88,-174.55 367.93,-152.72 339,-126.91 319.21,-109.26 306.73,-119.34 281,-112.91 280.55,-112.8 280.09,-112.68 279.63,-112.57"/>
-<polygon fill="black" stroke="black" points="280.33,-109.14 269.78,-110.06 278.61,-115.92 280.33,-109.14"/>
+<path fill="none" stroke="black" d="M321.43,-279.09C308.4,-245.28 281.97,-176.66 269.63,-144.62"/>
+<polygon fill="black" stroke="black" points="272.76,-143 265.9,-134.93 266.22,-145.52 272.76,-143"/>
+<text text-anchor="middle" x="305" y="-221.42" font-family="Times,serif" font-size="8.00">6</text>
 </g>
 <!-- A:2&#45;&gt;T:3 -->
 <g id="edge8" class="edge">
 <title>A:2&#45;&gt;T:3</title>
-<path fill="none" stroke="black" d="M190.2,-227.46C193.32,-223.89 196.61,-220.12 199.69,-216.58"/>
-<polygon fill="black" stroke="black" points="202.39,-218.82 206.32,-208.98 197.11,-214.22 202.39,-218.82"/>
+<path fill="none" stroke="black" d="M191.88,-277.84C192.29,-273.94 192.77,-269.83 193.79,-263.06"/>
+<polygon fill="black" stroke="black" points="197.29,-263.29 195.4,-252.87 190.38,-262.2 197.29,-263.29"/>
+<text text-anchor="middle" x="197" y="-263.42" font-family="Times,serif" font-size="8.00">8</text>
 </g>
 <!-- A:2&#45;&gt;T:4 -->
 <g id="edge9" class="edge">
 <title>A:2&#45;&gt;T:4</title>
-<path fill="none" stroke="black" d="M196.36,-235.96C214.91,-228.87 242.35,-218.39 262.18,-210.81"/>
-<polygon fill="black" stroke="black" points="263.67,-213.99 271.76,-207.15 261.17,-207.45 263.67,-213.99"/>
+<path fill="none" stroke="black" d="M207.98,-286.89C220.7,-278.5 237.77,-267.24 250.94,-258.55"/>
+<polygon fill="black" stroke="black" points="252.91,-261.45 259.33,-253.02 249.06,-255.6 252.91,-261.45"/>
+<text text-anchor="middle" x="251" y="-263.42" font-family="Times,serif" font-size="8.00">2</text>
 </g>
 <!-- A:2&#45;&gt;T:8 -->
 <g id="edge10" class="edge">
 <title>A:2&#45;&gt;T:8</title>
-<path fill="none" stroke="black" d="M174.33,-222.73C172.16,-195.47 168.42,-148.38 166.39,-122.94"/>
-<polygon fill="black" stroke="black" points="169.88,-122.61 165.6,-112.92 162.9,-123.17 169.88,-122.61"/>
+<path fill="none" stroke="black" d="M182.02,-278.97C179.21,-270.98 176.4,-261.6 175,-252.82 168.94,-214.73 174.12,-169.37 177.9,-145"/>
+<polygon fill="black" stroke="black" points="181.36,-145.54 179.54,-135.11 174.45,-144.4 181.36,-145.54"/>
+<text text-anchor="middle" x="176" y="-221.42" font-family="Times,serif" font-size="8.00">9</text>
 </g>
 <!-- A:2&#45;&gt;T:10 -->
 <g id="edge11" class="edge">
 <title>A:2&#45;&gt;T:10</title>
-<path fill="none" stroke="black" d="M164.09,-226.18C145.73,-196.73 115.4,-136.61 143,-95.91 153.94,-79.78 287.29,-36.47 306,-31 334.22,-22.75 367.38,-16.84 390.26,-13.33"/>
-<polygon fill="black" stroke="black" points="390.92,-16.77 400.3,-11.84 389.89,-9.84 390.92,-16.77"/>
+<path fill="none" stroke="black" d="M210.87,-292.59C241.36,-283.89 299.99,-268.23 351,-260.82 412.68,-251.87 430.06,-265.88 491,-252.82 532.4,-243.96 538.67,-228.04 580,-218.82 591.74,-216.2 679.58,-219.42 688,-210.82 740.67,-157.02 711.65,-107.2 674,-42 669.66,-34.48 662.86,-27.99 656.09,-22.83"/>
+<polygon fill="black" stroke="black" points="657.94,-19.85 647.73,-17.03 653.95,-25.61 657.94,-19.85"/>
+<text text-anchor="middle" x="719" y="-145.51" font-family="Times,serif" font-size="8.00">8</text>
 </g>
 <!-- A:2&#45;&gt;T:11 -->
 <g id="edge12" class="edge">
 <title>A:2&#45;&gt;T:11</title>
-<path fill="none" stroke="black" d="M154.07,-242.49C106.89,-238.5 0,-221.89 0,-153.37 0,-153.37 0,-153.37 0,-103.41 0,-27.45 118.9,-12.77 174.26,-10.05"/>
-<polygon fill="black" stroke="black" points="174.57,-13.54 184.43,-9.65 174.3,-6.55 174.57,-13.54"/>
+<path fill="none" stroke="black" d="M169.97,-290.02C142.38,-276.94 93.11,-249.57 67,-210.82 51.06,-187.17 52,-176.94 52,-148.41 52,-148.41 52,-148.41 52,-66.46 52,-24.45 196.16,-13.3 258.18,-10.44"/>
+<polygon fill="black" stroke="black" points="258.57,-13.93 268.41,-10.01 258.27,-6.93 258.57,-13.93"/>
+<text text-anchor="middle" x="55" y="-145.51" font-family="Times,serif" font-size="8.00">6</text>
 </g>
 <!-- A:3 -->
 <g id="node19" class="node">
 <title>A:3</title>
-<ellipse fill="none" stroke="black" cx="586" cy="-152.37" rx="21.84" ry="21.84"/>
-<text text-anchor="middle" x="586" y="-150.47" font-family="Times,serif" font-size="8.00">A:3</text>
+<ellipse fill="none" stroke="black" cx="659" cy="-185.37" rx="21.84" ry="21.84"/>
+<text text-anchor="middle" x="659" y="-183.47" font-family="Times,serif" font-size="8.00">A:3</text>
 </g>
 <!-- A:3&#45;&gt;T:7 -->
 <g id="edge13" class="edge">
 <title>A:3&#45;&gt;T:7</title>
-<path fill="none" stroke="black" d="M586.46,-130.27C586.51,-128.01 586.56,-125.72 586.61,-123.49"/>
-<polygon fill="black" stroke="black" points="590.11,-123.39 586.83,-113.31 583.11,-123.23 590.11,-123.39"/>
+<path fill="none" stroke="black" d="M659,-163.16C659,-157.3 659,-151 659,-145.35"/>
+<polygon fill="black" stroke="black" points="662.5,-145 659,-135 655.5,-145 662.5,-145"/>
+<text text-anchor="middle" x="662" y="-145.51" font-family="Times,serif" font-size="8.00">8</text>
 </g>
 <!-- A:3&#45;&gt;T:10 -->
 <g id="edge14" class="edge">
 <title>A:3&#45;&gt;T:10</title>
-<path fill="none" stroke="black" d="M600.34,-135.33C608.68,-123.98 616.24,-108.58 609,-95.91 575.49,-37.22 490.1,-18.21 445.73,-12.19"/>
-<polygon fill="black" stroke="black" points="445.99,-8.7 435.64,-10.96 445.14,-15.65 445.99,-8.7"/>
+<path fill="none" stroke="black" d="M670.44,-166.34C677.45,-153.15 684.48,-134.69 681,-117.91 673.84,-83.39 655.11,-46.35 643.57,-25.74"/>
+<polygon fill="black" stroke="black" points="646.58,-23.96 638.57,-17.03 640.51,-27.44 646.58,-23.96"/>
+<text text-anchor="middle" x="682" y="-103.51" font-family="Times,serif" font-size="8.00">0</text>
 </g>
 <!-- A:3&#45;&gt;T:12 -->
 <g id="edge15" class="edge">
 <title>A:3&#45;&gt;T:12</title>
-<path fill="none" stroke="black" d="M570.94,-136.32C565.85,-131.23 560.17,-125.56 555.08,-120.47"/>
-<polygon fill="black" stroke="black" points="557.28,-117.73 547.73,-113.14 552.33,-122.68 557.28,-117.73"/>
+<path fill="none" stroke="black" d="M649.56,-165.06C645.4,-157.66 640.07,-149.43 634,-142.91 633.58,-142.46 633.15,-142.02 632.7,-141.58"/>
+<polygon fill="black" stroke="black" points="634.78,-138.75 624.83,-135.11 630.33,-144.16 634.78,-138.75"/>
+<text text-anchor="middle" x="643" y="-145.51" font-family="Times,serif" font-size="8.00">3</text>
 </g>
 <!-- A:3&#45;&gt;T:13 -->
 <g id="edge16" class="edge">
 <title>A:3&#45;&gt;T:13</title>
-<path fill="none" stroke="black" d="M566.28,-142.29C554.28,-137.1 538.52,-130.85 524,-126.91 513.59,-124.09 450.98,-114.8 413.77,-109.4"/>
-<polygon fill="black" stroke="black" points="413.96,-105.89 403.56,-107.93 412.96,-112.82 413.96,-105.89"/>
+<path fill="none" stroke="black" d="M641.93,-171.3C629.29,-162.19 611.34,-150.37 594,-142.91 583.11,-138.23 570.51,-134.75 559.52,-132.29"/>
+<polygon fill="black" stroke="black" points="560.1,-128.84 549.59,-130.24 558.68,-135.69 560.1,-128.84"/>
+<text text-anchor="middle" x="613" y="-145.51" font-family="Times,serif" font-size="8.00">3</text>
 </g>
 <!-- A:4&#45;&gt;T:6 -->
 <g id="edge17" class="edge">
 <title>A:4&#45;&gt;T:6</title>
-<path fill="none" stroke="black" d="M380.93,-138.08C373.4,-132.21 364.54,-125.31 356.91,-119.36"/>
-<polygon fill="black" stroke="black" points="358.71,-116.33 348.67,-112.95 354.41,-121.85 358.71,-116.33"/>
+<path fill="none" stroke="black" d="M450.09,-163.89C447.28,-156.67 443.34,-148.88 438,-142.91 436.99,-141.78 435.87,-140.71 434.69,-139.7"/>
+<polygon fill="black" stroke="black" points="436.48,-136.68 426.24,-133.94 432.53,-142.47 436.48,-136.68"/>
+<text text-anchor="middle" x="447" y="-145.51" font-family="Times,serif" font-size="8.00">5</text>
 </g>
 <!-- A:4&#45;&gt;T:10 -->
 <g id="edge18" class="edge">
 <title>A:4&#45;&gt;T:10</title>
-<path fill="none" stroke="black" d="M418.25,-143.73C442.68,-134.31 481.01,-118.83 485,-112.91 490.97,-104.05 492.42,-39.76 486,-31 476.81,-18.46 460.29,-13.05 445.83,-10.79"/>
-<polygon fill="black" stroke="black" points="446.13,-7.3 435.8,-9.65 445.33,-14.26 446.13,-7.3"/>
+<path fill="none" stroke="black" d="M476.98,-178C498.94,-170.51 533.45,-156.32 557,-134.91 591.56,-103.5 616.03,-52.99 627.19,-26.69"/>
+<polygon fill="black" stroke="black" points="630.48,-27.88 631.04,-17.3 624.01,-25.23 630.48,-27.88"/>
+<text text-anchor="middle" x="589" y="-103.51" font-family="Times,serif" font-size="8.00">5</text>
 </g>
 <!-- A:4&#45;&gt;T:11 -->
 <g id="edge19" class="edge">
 <title>A:4&#45;&gt;T:11</title>
-<path fill="none" stroke="black" d="M380.38,-138.69C374.14,-134.57 366.95,-130.21 360,-126.91 341.84,-118.29 334.41,-122.96 317,-112.91 295.07,-100.25 243.04,-50.12 217.16,-24.6"/>
-<polygon fill="black" stroke="black" points="219.32,-21.81 209.75,-17.26 214.39,-26.78 219.32,-21.81"/>
+<path fill="none" stroke="black" d="M434.78,-178.97C420.33,-174.2 401.91,-165.79 391,-151.91 355.24,-106.42 403.39,-65.43 362,-25 355.16,-18.32 332.55,-14.28 313.75,-12.01"/>
+<polygon fill="black" stroke="black" points="313.87,-8.5 303.55,-10.9 313.11,-15.46 313.87,-8.5"/>
+<text text-anchor="middle" x="381" y="-103.51" font-family="Times,serif" font-size="8.00">8</text>
 </g>
 <!-- A:4&#45;&gt;T:13 -->
 <g id="edge20" class="edge">
 <title>A:4&#45;&gt;T:13</title>
-<path fill="none" stroke="black" d="M392.7,-131.08C392,-128.4 391.29,-125.67 390.6,-123.04"/>
-<polygon fill="black" stroke="black" points="393.94,-121.97 388.03,-113.17 387.17,-123.73 393.94,-121.97"/>
+<path fill="none" stroke="black" d="M465.71,-165.35C470.57,-157.45 477.11,-148.78 485,-142.91 486.84,-141.54 495.34,-138.61 504.61,-135.67"/>
+<polygon fill="black" stroke="black" points="505.8,-138.96 514.31,-132.66 503.72,-132.28 505.8,-138.96"/>
+<text text-anchor="middle" x="488" y="-145.51" font-family="Times,serif" font-size="8.00">1</text>
 </g>
 <!-- A:4&#45;&gt;T:14 -->
 <g id="edge21" class="edge">
 <title>A:4&#45;&gt;T:14</title>
-<path fill="none" stroke="black" d="M381.82,-137.02C376.74,-133.19 370.91,-129.42 365,-126.91 330.16,-112.12 318.02,-120.77 281,-112.91 280.54,-112.81 280.08,-112.71 279.62,-112.61"/>
-<polygon fill="black" stroke="black" points="280.27,-109.17 269.73,-110.26 278.65,-115.98 280.27,-109.17"/>
+<path fill="none" stroke="black" d="M435.43,-177.44C416.72,-171.05 388.38,-161.19 364,-151.91 354.13,-148.15 352.12,-145.94 342,-142.91 325.25,-137.89 306,-134.08 290.7,-131.49"/>
+<polygon fill="black" stroke="black" points="291.24,-128.03 280.81,-129.89 290.12,-134.94 291.24,-128.03"/>
+<text text-anchor="middle" x="367" y="-145.51" font-family="Times,serif" font-size="8.00">3</text>
 </g>
 <!-- A:5&#45;&gt;T:6 -->
 <g id="edge22" class="edge">
 <title>A:5&#45;&gt;T:6</title>
-<path fill="none" stroke="black" d="M267.51,-136.6C271.68,-133.12 276.33,-129.63 281,-126.91 291.16,-120.99 303.24,-116.2 313.74,-112.66"/>
-<polygon fill="black" stroke="black" points="315.11,-115.9 323.58,-109.54 312.99,-109.22 315.11,-115.9"/>
+<path fill="none" stroke="black" d="M332.28,-163.39C332.46,-156.12 334.1,-148.42 339,-142.91 345.18,-135.97 367.58,-131.91 385.78,-129.7"/>
+<polygon fill="black" stroke="black" points="386.28,-133.17 395.85,-128.61 385.53,-126.21 386.28,-133.17"/>
+<text text-anchor="middle" x="342" y="-145.51" font-family="Times,serif" font-size="8.00">2</text>
 </g>
 <!-- A:5&#45;&gt;T:11 -->
 <g id="edge23" class="edge">
 <title>A:5&#45;&gt;T:11</title>
-<path fill="none" stroke="black" d="M239.56,-134C235.42,-127.61 231.08,-120.15 228,-112.91 215.71,-84.02 208.29,-48.02 204.69,-27.02"/>
-<polygon fill="black" stroke="black" points="208.12,-26.34 203.07,-17.03 201.21,-27.46 208.12,-26.34"/>
+<path fill="none" stroke="black" d="M326.68,-165.07C319.07,-146.79 307.97,-118.4 301,-92.91 294.95,-70.77 290.7,-44.64 288.31,-27.6"/>
+<polygon fill="black" stroke="black" points="291.74,-26.87 286.95,-17.42 284.8,-27.8 291.74,-26.87"/>
+<text text-anchor="middle" x="309" y="-103.51" font-family="Times,serif" font-size="8.00">3</text>
 </g>
 <!-- A:5&#45;&gt;T:13 -->
 <g id="edge24" class="edge">
 <title>A:5&#45;&gt;T:13</title>
-<path fill="none" stroke="black" d="M266.89,-136.25C271.14,-132.69 275.99,-129.25 281,-126.91 311.02,-112.89 323.74,-119.82 358.45,-113.14"/>
-<polygon fill="black" stroke="black" points="359.29,-116.54 368.32,-111 357.8,-109.7 359.29,-116.54"/>
+<path fill="none" stroke="black" d="M352.53,-171.86C367.15,-162.14 388.92,-149.28 410,-142.91 448.49,-131.27 462.51,-141.31 504.36,-134.94"/>
+<polygon fill="black" stroke="black" points="505.11,-138.37 514.36,-133.2 503.91,-131.47 505.11,-138.37"/>
+<text text-anchor="middle" x="413" y="-145.51" font-family="Times,serif" font-size="8.00">1</text>
 </g>
 <!-- A:5&#45;&gt;T:14 -->
 <g id="edge25" class="edge">
 <title>A:5&#45;&gt;T:14</title>
-<path fill="none" stroke="black" d="M252,-130.27C252,-128.01 252,-125.72 252,-123.49"/>
-<polygon fill="black" stroke="black" points="255.5,-123.31 252,-113.31 248.5,-123.31 255.5,-123.31"/>
+<path fill="none" stroke="black" d="M317.75,-171.21C310.13,-165.35 301.08,-158.33 293,-151.91 288.81,-148.58 284.33,-144.96 280.14,-141.54"/>
+<polygon fill="black" stroke="black" points="282.09,-138.62 272.14,-134.98 277.65,-144.03 282.09,-138.62"/>
+<text text-anchor="middle" x="296" y="-145.51" font-family="Times,serif" font-size="8.00">3</text>
 </g>
 <!-- A:6&#45;&gt;T:8 -->
 <g id="edge26" class="edge">
 <title>A:6&#45;&gt;T:8</title>
-<path fill="none" stroke="black" d="M295.09,-136.29C290.84,-132.72 286,-129.28 281,-126.91 265.32,-119.49 219.62,-112.48 190.48,-108.58"/>
-<polygon fill="black" stroke="black" points="190.59,-105.07 180.22,-107.25 189.68,-112.01 190.59,-105.07"/>
+<path fill="none" stroke="black" d="M228.77,-169.51C220.41,-161.49 209.78,-151.49 200,-142.91 199.54,-142.51 199.07,-142.1 198.6,-141.69"/>
+<polygon fill="black" stroke="black" points="200.7,-138.89 190.78,-135.17 196.21,-144.26 200.7,-138.89"/>
+<text text-anchor="middle" x="213" y="-145.51" font-family="Times,serif" font-size="8.00">2</text>
 </g>
 <!-- A:6&#45;&gt;T:12 -->
 <g id="edge27" class="edge">
 <title>A:6&#45;&gt;T:12</title>
-<path fill="none" stroke="black" d="M329.47,-141.72C340.75,-136.53 355.38,-130.48 369,-126.91 419.23,-113.74 433.49,-119.53 485,-112.91 493.83,-111.78 503.46,-110.48 512.15,-109.29"/>
-<polygon fill="black" stroke="black" points="512.75,-112.75 522.17,-107.91 511.79,-105.81 512.75,-112.75"/>
+<path fill="none" stroke="black" d="M263.34,-174.99C275.34,-169.62 291.22,-163.3 306,-159.91 352.48,-149.26 366.58,-162.85 413,-151.91 423.28,-149.49 424.71,-145.29 435,-142.91 487.95,-130.69 502.94,-140.36 557,-134.91 565.86,-134.02 575.49,-132.79 584.18,-131.59"/>
+<polygon fill="black" stroke="black" points="584.8,-135.04 594.2,-130.16 583.81,-128.11 584.8,-135.04"/>
+<text text-anchor="middle" x="438" y="-145.51" font-family="Times,serif" font-size="8.00">1</text>
 </g>
 <!-- A:6&#45;&gt;T:14 -->
 <g id="edge28" class="edge">
 <title>A:6&#45;&gt;T:14</title>
-<path fill="none" stroke="black" d="M293.89,-137.48C289.73,-133.98 285.24,-130.26 281,-126.91 277.72,-124.32 274.18,-121.61 270.74,-119.04"/>
-<polygon fill="black" stroke="black" points="272.71,-116.14 262.59,-113.02 268.55,-121.77 272.71,-116.14"/>
+<path fill="none" stroke="black" d="M242.62,-163.38C242.85,-158.18 243.58,-152.62 247.87,-143.94"/>
+<polygon fill="black" stroke="black" points="251.04,-145.44 252.9,-135.01 244.94,-142.01 251.04,-145.44"/>
+<text text-anchor="middle" x="250" y="-145.51" font-family="Times,serif" font-size="8.00">5</text>
 </g>
 <!-- A:7&#45;&gt;T:8 -->
 <g id="edge29" class="edge">
 <title>A:7&#45;&gt;T:8</title>
-<path fill="none" stroke="black" d="M93.3,-141.62C107.17,-134.62 125.96,-125.13 140.82,-117.62"/>
-<polygon fill="black" stroke="black" points="142.59,-120.65 149.93,-113.02 139.43,-114.4 142.59,-120.65"/>
+<path fill="none" stroke="black" d="M106.25,-165.62C111.5,-157.59 118.57,-148.73 127,-142.91 135.49,-137.05 146.18,-133.39 155.8,-131.11"/>
+<polygon fill="black" stroke="black" points="156.55,-134.53 165.67,-129.13 155.18,-127.66 156.55,-134.53"/>
+<text text-anchor="middle" x="130" y="-145.51" font-family="Times,serif" font-size="8.00">3</text>
 </g>
 <!-- A:7&#45;&gt;T:9 -->
 <g id="edge30" class="edge">
 <title>A:7&#45;&gt;T:9</title>
-<path fill="none" stroke="black" d="M62.93,-133.2C60.66,-129.47 58.28,-125.56 56.04,-121.89"/>
-<polygon fill="black" stroke="black" points="58.84,-119.75 50.64,-113.03 52.86,-123.39 58.84,-119.75"/>
+<path fill="none" stroke="black" d="M83.58,-166.74C77.06,-158.55 68.46,-149.25 59,-142.91 53.26,-139.07 46.46,-136.06 39.94,-133.76"/>
+<polygon fill="black" stroke="black" points="40.72,-130.34 30.13,-130.72 38.64,-137.03 40.72,-130.34"/>
+<text text-anchor="middle" x="73" y="-145.51" font-family="Times,serif" font-size="8.00">0</text>
 </g>
 <!-- A:7&#45;&gt;T:11 -->
 <g id="edge31" class="edge">
 <title>A:7&#45;&gt;T:11</title>
-<path fill="none" stroke="black" d="M85.1,-133.21C92.25,-122.04 102.04,-107.66 112,-95.91 135.32,-68.4 166.38,-40.12 185.24,-23.71"/>
-<polygon fill="black" stroke="black" points="187.68,-26.23 192.98,-17.05 183.12,-20.92 187.68,-26.23"/>
+<path fill="none" stroke="black" d="M102.92,-164.29C105.96,-157.11 109.99,-149.25 115,-142.91 158.09,-88.41 227.9,-43.17 263.52,-22.15"/>
+<polygon fill="black" stroke="black" points="265.32,-25.15 272.21,-17.11 261.81,-19.1 265.32,-25.15"/>
+<text text-anchor="middle" x="158" y="-103.51" font-family="Times,serif" font-size="8.00">5</text>
 </g>
 <!-- A:9&#45;&gt;T:10 -->
 <g id="edge32" class="edge">
 <title>A:9&#45;&gt;T:10</title>
-<path fill="none" stroke="black" d="M350.56,-40.77C354.73,-37.28 359.37,-33.78 364,-31 372.3,-26.03 381.96,-21.76 390.8,-18.37"/>
-<polygon fill="black" stroke="black" points="392.1,-21.63 400.31,-14.93 389.71,-15.04 392.1,-21.63"/>
+<path fill="none" stroke="black" d="M350.66,-59.77C367.97,-54.36 393.39,-46.88 416,-42 483.64,-27.4 564.5,-17.21 606.15,-12.48"/>
+<polygon fill="black" stroke="black" points="606.79,-15.94 616.34,-11.35 606.02,-8.98 606.79,-15.94"/>
+<text text-anchor="middle" x="508" y="-27.6" font-family="Times,serif" font-size="8.00">7</text>
 </g>
 <!-- A:9&#45;&gt;T:11 -->
 <g id="edge33" class="edge">
 <title>A:9&#45;&gt;T:11</title>
-<path fill="none" stroke="black" d="M318.74,-41.28C313.66,-37.45 307.85,-33.64 302,-31 278.85,-20.53 250.35,-15.05 229.7,-12.25"/>
-<polygon fill="black" stroke="black" points="230.04,-8.76 219.69,-11.02 229.19,-15.71 230.04,-8.76"/>
+<path fill="none" stroke="black" d="M317.04,-49.68C311.06,-41.94 304.01,-32.81 298.14,-25.21"/>
+<polygon fill="black" stroke="black" points="300.81,-22.94 291.92,-17.17 295.27,-27.22 300.81,-22.94"/>
+<text text-anchor="middle" x="308" y="-27.6" font-family="Times,serif" font-size="8.00">5</text>
 </g>
 <!-- A:11&#45;&gt;T:12 -->
 <g id="edge34" class="edge">
 <title>A:11&#45;&gt;T:12</title>
-<path fill="none" stroke="black" d="M510.15,-133.99C514.86,-129.48 519.89,-124.66 524.46,-120.29"/>
-<polygon fill="black" stroke="black" points="527.2,-122.52 532,-113.07 522.35,-117.46 527.2,-122.52"/>
+<path fill="none" stroke="black" d="M566.53,-163.6C571.77,-156.52 578.15,-148.89 585,-142.91 585.96,-142.07 586.98,-141.26 588.03,-140.47"/>
+<polygon fill="black" stroke="black" points="589.99,-143.36 596.45,-134.96 586.16,-137.5 589.99,-143.36"/>
+<text text-anchor="middle" x="588" y="-145.51" font-family="Times,serif" font-size="8.00">4</text>
 </g>
 </g>
 </svg>
 </div>
 
-Now you can do full graph analysis on hypergraphs by using matrix
-multiplication to project an adjacency matrix of addresses to
-addresses, or transactions to transactions:
+Incidence matrices construct hypergraphs, but how can we collapse
+these two matrices together to do address-to-address or
+transaction-to-transaction analysis?  This bring us to the magic of
+linear algebra, an in particular matrix multiplication.  You might
+notice that the two matrices *conform*, One is `m` by `n`, and the
+other is `n` by `m`. This means they can be multiplied, which
+causes the two incidence matrices to collapse along either
+dimension.
+Let's see with an example.  If the left matrix is multiplied by the
+right, then the resulting matrix will be a square adjacency matrix
+mapping addresses to addresses.  If flip the order of matrices,
+they still conform, but this time to a mapping from transactions to
+transactions:
 ``` postgres-console
 with addr_to_addr as (select addr_to_txn @++ txn_to_addr as ata
                       from txn_graph),
-     txn_to_txn   as (select transpose(transpose(addr_to_txn) @++ transpose(txn_to_addr)) as ttt
+     txn_to_txn   as (select txn_to_addr @++ addr_to_txn as ttt
                       from txn_graph)
-select (select draw(ata, reduce_rows(ata), true, true, true, 0.5, label:='Address to Address') from addr_to_addr) as twocol_a_source,
-       (select draw(ttt, reduce_rows(ttt), true, true, true, 0.5, label:='Transaction to Transaction', shape:='box') from txn_to_txn) as twocol_b_source \gset
+select (select draw(ata,
+                    reduce_rows(ata),
+                    true,
+                    true,
+                    true,
+                    0.5,
+                    label:='Address to Address') from addr_to_addr) as twocol_a_source,
+       (select draw(ttt,
+                    reduce_rows(ttt),
+                    true,
+                    true,
+                    true,
+                    0.5,
+                    label:='Transaction to Transaction', shape:='box') from txn_to_txn) as twocol_b_source \gset
 ```
 <table style="width: 100%; table-layout: fixed;" class="dot-table">
   <tr>
@@ -1354,7 +1433,52 @@ select (select draw(ata, reduce_rows(ata), true, true, true, 0.5, label:='Addres
     </td>
   </tr>
 </table>
-## Storing Graphs
+Notice the operator being used above is `@++`.  Like Python,
+OneSparse uses the `@` operator the denote matrix multiplication.
+OneSparse supports `@` as you would expect, but it also lets you
+extend the multiplication over
+[Semirings](https://en.wikipedia.org/wiki/Semiring), which defines
+the binary operators applied during the matrix multiplication.  The
+`@++` operators means do matrix multiplication over a semiring that
+does plus for both binary operations in the multiplication.
+
+This may seem weird at first if you haven't worked with semirings,
+but the main idea is that matrix multiplication consists of two
+binary operators, the "multiplicative" operator is used when
+mapping matching elements in row and column vectors.  The
+"additive" operator (technically a
+[Monoid](https://en.wikipedia.org/wiki/Monoid) is used to reduce
+the multiplicative products into a result.  The GraphBLAS lets you
+customize which operators are used in the matrix multiplication.
+
+Since the above graph shows the flow of value through the graph, we
+don't want the traditional "times" operator, we want "plus" to add
+the path values, so instead of the standard "plus_times" semiring
+(the `@` operator) that everyone is already familiar with, we are
+using the "plus_plus" semiring.
+
+The GraphBLAS comes with over a thousand useful semirings for graph
+operations.  OneSparse does not have a shortcut operator for most
+of these semirings, only for the most common ones.  To access less
+common semirings you can pass a name to the `mxm` function. You can
+even create your own custom semirings and custom element types that
+they can operate on.  More on that in a future blog post.
+## High Performance Parallel Breadth First Search (BFS)
+
+BFS is the core operation of graph analysis.  Like a pebble thrown
+into a pond, you start from a point in the graph, and traverse all
+the edges you find, as you find them.  As you traverse the graph
+you can accumulate some interesting information as you go, like how
+many edges away from the starting point you are, the "level" and
+the row index of the node you got here from, the "parent".  In the
+GraphBLAS, this information is accumulated in vectors.
+For the purposes of a quick demo, we will use a very small graph
+that is very commonly studied in graph theory called the
+[Newman/karate](https://sparse.tamu.edu/Newman/karate) graph, which
+can be downloaded from the [SuiteSparse Matrix
+Collection](https://sparse.tamu.edu/).
+
+### Storing Graphs
 
 OneSparse can serialize and deserialize graphs into Postgres
 objects to and from an on-disk state.  This state can come from
@@ -1370,23 +1494,10 @@ much larger graphs from either SQL queries, Large Object storage,
 or most optimally, from compressed files on the server filesystem
 itself.
 
-## High Performance Parallel Breadth First Search (BFS)
-
-BFS is the core operation of graph analysis.  Like a pebble thrown
-into a pond, you start from a point in the graph, and traverse all
-the edges you find, as you find them.  As you traverse the graph
-you can accumulate some interesting information as you go, like how
-many edges away from the starting point you are, the "level" and
-the row index of the node you got here from, the "parent".  In the
-GraphBLAS, this information is accumulated in vectors.
-For the purposes of a quick demo, we will use a very small graph
-that is very commonly studied in graph theory called the
-[Newman/karate]() graph, which can be downloaded from the
-[SuiteSparse Matrix Collection]().
-
 A simple approach for small graphs that fit into the TOAST limit is
 to make a materialized view that loads the graph data from disk
-using the standard [Matrix Market]() format:
+using the standard [Matrix
+Market](https://math.nist.gov/MatrixMarket/formats.html) format:
 ``` postgres-console
 create materialized view if not exists karate as
     select mmread('/home/postgres/onesparse/demo/karate.mtx') as graph;
@@ -1400,7 +1511,13 @@ Level BFS exposes the depth of each vertex starting from a
 given source vertex using the breadth-first search algorithm.
 See [https://en.wikipedia.org/wiki/Breadth-first_search](https://en.wikipedia.org/wiki/Breadth-first_search) for details.
 ``` postgres-console
-select draw(triu(graph), (select level from bfs(graph, 1)), false, false, true, 0.5, label:='Level BFS') as draw_source from karate \gset
+select draw(triu(graph),
+            (select level from bfs(graph, 1)),
+            false,
+            false,
+            true,
+            0.5,
+            label:='Level BFS') as draw_source from karate \gset
 ```
 <div>
 <!-- Title: %3 Pages: 1 -->
@@ -2016,7 +2133,12 @@ BFS tree rooted at the chosen source. It is also based on
 [https://en.wikipedia.org/wiki/Breadth-first_search](https://en.wikipedia.org/wiki/Breadth-first_search).
 
 ``` postgres-console
-select draw(triu(graph), (select parent from bfs(graph, 1)), false, false, true, 0.5) as draw_source from karate \gset
+select draw(triu(graph),
+            (select parent from bfs(graph, 1)),
+            false,
+            false,
+            true,
+            0.5) as draw_source from karate \gset
 ```
 <div>
 <!-- Title: %3 Pages: 1 -->
@@ -2636,8 +2758,9 @@ kind of sparse computing expertise that's been used to develop the
 GraphBLAS API.
 
 For example, we've benchmarked OneSparse using the industry
-standard [GAP Benchmark Suite]().  The GAP is a group of publicly
-available [graph data sets]() and algorithms that graph libraries
+standard [GAP Benchmark Suite](https://github.com/sbeamer/gapbs).
+The GAP is a group of publicly available [graph data
+sets](https://sparse.tamu.edu/) and algorithms that graph libraries
 can use to benchmark their performance.
 
 ### Benchmarks
@@ -2652,10 +2775,25 @@ has 4.3B edges.  The values show the number of "Edges Per Second"
 OneSparse can traverse with BFS by dividing the number of edges in
 the graph by the run time.
 
+Here we can see how insanely fast OneSparse can do all graph
+traversal, achieving over 7 billion edges per second on some
+graphs.  SuiteSparse uses clever sparse matrix compression
+techniques and highly optimized JIT kernels for sparse
+multiplication to get these results.
+
+Interestingly, the [road
+graph](https://sparse.tamu.edu/GAP/GAP-road) doesn't appear at
+first to do so well.  One issue is that the graph is so "small" at
+only 57M edges, that it can't take advantage of all the cores.
+This is exacerbated by some of the issues that extreme sparsity can
+bring.  The road graph is very sparse, the degree distribution is
+relatively uniform, and it has a very high diameter.  This is a
+relatively common but tricky kind of graph to traverse in parallel.
+
 ## Degree Centrality
 
 At first a matrix might seem like an odd way to store a graph, but
-now we bring the power of Linear Algebra into play.  For example,
+it we brings the power of Linear Algebra into play.  For example,
 let's suppose you want to know the "degree" of every node in the
 graph, that is, how many edges connect to the node.
 
@@ -2678,7 +2816,11 @@ each node:
 ``` postgres-console
 select draw(triu(graph),
             reduce_cols(cast_to(graph, 'int32')),
-            false, false, true, 0.5, 'Degree of Karate Graph')
+            false,
+            false,
+            true,
+            0.5,
+            'Degree of Karate Graph')
     as draw_source from karate \gset
 ```
 <div>
@@ -3288,11 +3430,6 @@ select draw(triu(graph),
 </div>
 
 
-!!! note
-    The draw() function is part of the OneSparse doctest
-    infrastructure, it's used to generate these doctest diagrams
-    in-line with this documentation, which is also a test.
-
 We saw the core idea about how graphs and matrices can be one and
 the same, but now we see the relationship to vectors and graphs.
 Vectors represent sets of nodes in the graph.  They map the node to
@@ -3301,16 +3438,25 @@ reduction is a core operation of linear algebra, and the GraphBLAS
 fully embaces this.  Vectors often end up being the result of an
 algebraic graph algorithm.
 
+## PageRank
+
 Degree was simple enough, but what about more advanced algorithms?
 This is where the GraphBLAS community really bring the power of
-deep graph research with the [LAGraph]() library.  LAGraph is a
-collection of optimized graph algorithms using the GraphBLAS API.
-OneSparse also wraps LAgraph functions and exposes them to SQL.
-For example, let's [PageRank]() the karate graph:
+deep graph research with the
+[LAGraph](https://github.com/GraphBLAS/LAGraph) library.  LAGraph
+is a collection of optimized graph algorithms using the GraphBLAS
+API.  OneSparse also wraps LAgraph functions and exposes them to
+SQL.  For example, let's
+[PageRank](https://en.wikipedia.org/wiki/PageRank) the karate
+graph:
 ``` postgres-console
 select draw(triu(graph),
             pagerank(graph),
-            false, false, true, 0.5, 'PageRank The Karate Graph')
+            false,
+            false,
+            true,
+            0.5,
+            'PageRank Karate Graph')
     as draw_source from karate \gset
 ```
 <div>
@@ -3320,7 +3466,7 @@ select draw(triu(graph),
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 630.31)">
 <title>%3</title>
 <polygon fill="white" stroke="transparent" points="-4,4 -4,-630.31 1283.65,-630.31 1283.65,4 -4,4"/>
-<text text-anchor="middle" x="639.83" y="-7.4" font-family="Times,serif" font-size="12.00">PageRank The Karate Graph</text>
+<text text-anchor="middle" x="639.83" y="-7.4" font-family="Times,serif" font-size="12.00">PageRank Karate Graph</text>
 <!-- 0 -->
 <g id="node1" class="node">
 <title>0</title>
@@ -3922,7 +4068,10 @@ select draw(triu(graph),
 Wait isn't this the same as the degree graph?  Nope, but they sure
 do look similar! This is because at this small-scale PageRank
 essentially degenerates into degree.  Both of these algorithms are
-called *centralities* and LAGraph has several of them, for example
+called *centralities* and LAGraph has several of them.
+
+## Triangle Centrality
+
 [Triangle Centrality]() uses the number of triangles a node is
 connected to to compute its centrality score.  This goes on the
 assumption that triangles form stronger bonds than individual
@@ -3930,7 +4079,11 @@ edges.
 ``` postgres-console
 select draw(triu(graph),
             triangle_centrality(graph),
-            false, false, true, 0.5, 'The Karate Graph')
+            false,
+            false,
+            true,
+            0.5,
+            'Triange Centrality Karate Graph')
     as draw_source from karate \gset
 ```
 <div>
@@ -3940,7 +4093,7 @@ select draw(triu(graph),
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 630.31)">
 <title>%3</title>
 <polygon fill="white" stroke="transparent" points="-4,4 -4,-630.31 1283.65,-630.31 1283.65,4 -4,4"/>
-<text text-anchor="middle" x="639.83" y="-7.4" font-family="Times,serif" font-size="12.00">The Karate Graph</text>
+<text text-anchor="middle" x="639.83" y="-7.4" font-family="Times,serif" font-size="12.00">Triange Centrality Karate Graph</text>
 <!-- 0 -->
 <g id="node1" class="node">
 <title>0</title>
@@ -4544,7 +4697,11 @@ algorithm, which considers how many squares nodes connect to:
 ``` postgres-console
 select draw(triu(graph),
             square_clustering(graph),
-            false, false, true, 0.5, 'The Karate Graph')
+            false,
+            false,
+            true,
+            0.5,
+            'Square Clustering Karate Graph')
     as draw_source from karate \gset
 ```
 <div>
@@ -4554,7 +4711,7 @@ select draw(triu(graph),
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 552.12)">
 <title>%3</title>
 <polygon fill="white" stroke="transparent" points="-4,4 -4,-552.12 1327.72,-552.12 1327.72,4 -4,4"/>
-<text text-anchor="middle" x="661.86" y="-7.4" font-family="Times,serif" font-size="12.00">The Karate Graph</text>
+<text text-anchor="middle" x="661.86" y="-7.4" font-family="Times,serif" font-size="12.00">Square Clustering Karate Graph</text>
 <!-- 0 -->
 <g id="node1" class="node">
 <title>0</title>
@@ -5158,5 +5315,41 @@ they are all tools in the analyst toolbox.
 
 ## OneSparse Beta
 
+OneSparse is still in development, and to-date wraps almost all of
+the GraphBLAS features in SuiteSparse.  There's still some work to
+do, but we want to get some of this work out in to the world to get
+gigaedge graph ideas moving in Postgres.
+
+OneSparse Beta is now released, and it requires Postgres 18 Beta.
+Due to some very recently changes in the Postgres core that
+OneSparse relies on for its performance, support for Postgres less
+than 18 is not practical.  So now's your chance to try OneSparse
+and Postgres 18 together using one of our [beta Docker
+images](/docker.html) to try it out!
+
+## Preview Custom Type and Operators
+
+SuiteSparse comes with a huge collection of useful types,
+operators, and semirings, but what makes it really powerful is the
+ability to make your own elements types and operators that work on
+them.  Since this means exposing the user to the SuiteSparse JIT,
+we're still working out the best way to make it simple and useful
+without allowing SQL to safely use custom JIT code.  Stay tuned to
+our blog for more updates.
+
 ## Preview Table Access Method
 
+OneSparse has many plans for where to take the extension, and our
+next major release will contain a major new feature that unifies
+SQL and OneSparse even more.
+
+Using the relatively new [Table Access Method]() API, we are
+working to have automatic graph updates happen completely behind
+the scenes, no matrices or vectors, just edge tables and super-fast
+algorithms.  While you can always drop "down to the algebra" if you
+want to, this will provide a much simpler interface for users who
+already have the algorithms and data in hand.
+
+This will also make a deeper unification with the concepts of both
+linear and relational algebra.  By unifying tables and matrices,
+either or both can be used seamlessly in combination.

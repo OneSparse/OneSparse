@@ -19,23 +19,27 @@
 -- OneSparse is a Postgres extension that brings the power of Graph
 -- Linear Algebra to Postgres. Have you found yourself spending too
 -- much time extracting, transforming, and loading graphs into side
--- databases that need constant money, maintanance and impedence
+-- databases that need constant money, maintanance and impedance
 -- matching with SQL?  With OneSparse, it's easy to turn SQL data into
 -- graphs and back again all without needing any external tooling.
 --
 -- <!-- more -->
 --
--- For years now those of us over at [The GraphBLAS Forum](graphblas.org)
--- have been working hard to bring a standardized, state-of-the-art
--- parallel graph traversal API to all possible architectures.  This API
--- work has led to the evolution of the high performance graph linear
--- algebra library [SuiteSparse
+-- For years now those of us over at [The GraphBLAS
+-- Forum](graphblas.org) have been working hard to bring a
+-- standardized, state-of-the-art parallel graph traversal API to all
+-- possible architectures.  This API work has led to the evolution of
+-- the high performance graph linear algebra library [SuiteSparse
 -- GraphBLAS](https://people.engr.tamu.edu/davis/GraphBLAS.html) by
--- [Dr. Timothy Davis et al]() at at [Texas A&M University]().
+-- [Dr. Timothy Davis et
+-- al](https://engineering.tamu.edu/cse/profiles/davis-tim.html) at
+-- [Texas A&M
+-- University](https://engineering.tamu.edu/cse/index.html).
 -- SuiteSparse contains powerful optimized kernels for sparse graph
--- computation, the ability for users to define their own edge types and
--- operators, and has a built-in JIT compiler that can target many
--- computing architectures including [Nvidia CUDA]().
+-- computation, the ability for users to define their own edge types
+-- and operators, and has a built-in JIT compiler that can target many
+-- computing architectures including [Nvidia
+-- CUDA](https://developer.nvidia.com/cuda-toolkit).
 
 -- OneSparse is more than just fast graphs, its graph algorithms are
 -- expressed using [Linear
@@ -94,7 +98,7 @@ select draw(graph, label:='Graph') as twocol_a_source, print(graph) as twocol_b_
 -- both edge-and-node graph operations and algebraic operations can be
 -- performed to analyze the graph.
 --
--- ## Hypergraphs and Multigraphs
+-- ## Hypergraphs
 --
 -- Hypergraphs are graphs where an edge can have more than one source
 -- or destination.  These are important types of graphs for modeling
@@ -106,10 +110,11 @@ select draw(graph, label:='Graph') as twocol_a_source, print(graph) as twocol_b_
 -- This type of graph can be easily modeled with OneSparse using two
 -- matrices called *Incidence Matrices*, one that maps output address
 -- nodes to transaction hyperedges and the other that maps
--- transactions to input address nodes.  Let's fake some data by
--- making two random incidence matrices, one for address output nodes
--- to transaction hyperedges, and the other for transaction edges to
--- input nodes.
+-- transactions to input address nodes.
+--
+-- Let's fake some data by making two random incidence matrices, one
+-- for address output nodes to transaction hyperedges, and the other
+-- for transaction edges to input nodes.
 
 create materialized view txn_graph as
         select triu(random_matrix(12,15,60,sym:=false,min:=0,max:=9,seed:=0.43)) as addr_to_txn,
@@ -123,20 +128,90 @@ select print(addr_to_txn) as "Address to Transaction", print(txn_to_addr) as "Tr
 select hyperdraw(addr_to_txn, txn_to_addr, 'A', 'T') as draw_source from txn_graph \gset
 \i sql/draw.sql
 
--- Now you can do full graph analysis on hypergraphs by using matrix
--- multiplication to project an adjacency matrix of addresses to
--- addresses, or transactions to transactions:
+-- Incidence matrices construct hypergraphs, but how can we collapse
+-- these two matrices together to do address-to-address or
+-- transaction-to-transaction analysis?  This bring us to the magic of
+-- linear algebra, an in particular matrix multiplication.  You might
+-- notice that the two matrices *conform*, One is `m` by `n`, and the
+-- other is `n` by `m`. This means they can be multiplied, which
+-- causes the two incidence matrices to collapse along either
+-- dimension.
+
+-- Let's see with an example.  If the left matrix is multiplied by the
+-- right, then the resulting matrix will be a square adjacency matrix
+-- mapping addresses to addresses.  If flip the order of matrices,
+-- they still conform, but this time to a mapping from transactions to
+-- transactions:
 
 with addr_to_addr as (select addr_to_txn @++ txn_to_addr as ata
                       from txn_graph),
-     txn_to_txn   as (select transpose(transpose(addr_to_txn) @++ transpose(txn_to_addr)) as ttt
+     txn_to_txn   as (select txn_to_addr @++ addr_to_txn as ttt
                       from txn_graph)
 
-select (select draw(ata, reduce_rows(ata), true, true, true, 0.5, label:='Address to Address') from addr_to_addr) as twocol_a_source,
-       (select draw(ttt, reduce_rows(ttt), true, true, true, 0.5, label:='Transaction to Transaction', shape:='box') from txn_to_txn) as twocol_b_source \gset
+select (select draw(ata,
+                    reduce_rows(ata),
+                    true,
+                    true,
+                    true,
+                    0.5,
+                    label:='Address to Address') from addr_to_addr) as twocol_a_source,
+       (select draw(ttt,
+                    reduce_rows(ttt),
+                    true,
+                    true,
+                    true,
+                    0.5,
+                    label:='Transaction to Transaction', shape:='box') from txn_to_txn) as twocol_b_source \gset
 \i sql/twocol.sql
 
--- ## Storing Graphs
+-- Notice the operator being used above is `@++`.  Like Python,
+-- OneSparse uses the `@` operator the denote matrix multiplication.
+-- OneSparse supports `@` as you would expect, but it also lets you
+-- extend the multiplication over
+-- [Semirings](https://en.wikipedia.org/wiki/Semiring), which defines
+-- the binary operators applied during the matrix multiplication.  The
+-- `@++` operators means do matrix multiplication over a semiring that
+-- does plus for both binary operations in the multiplication.
+--
+-- This may seem weird at first if you haven't worked with semirings,
+-- but the main idea is that matrix multiplication consists of two
+-- binary operators, the "multiplicative" operator is used when
+-- mapping matching elements in row and column vectors.  The
+-- "additive" operator (technically a
+-- [Monoid](https://en.wikipedia.org/wiki/Monoid) is used to reduce
+-- the multiplicative products into a result.  The GraphBLAS lets you
+-- customize which operators are used in the matrix multiplication.
+--
+-- Since the above graph shows the flow of value through the graph, we
+-- don't want the traditional "times" operator, we want "plus" to add
+-- the path values, so instead of the standard "plus_times" semiring
+-- (the `@` operator) that everyone is already familiar with, we are
+-- using the "plus_plus" semiring.
+--
+-- The GraphBLAS comes with over a thousand useful semirings for graph
+-- operations.  OneSparse does not have a shortcut operator for most
+-- of these semirings, only for the most common ones.  To access less
+-- common semirings you can pass a name to the `mxm` function. You can
+-- even create your own custom semirings and custom element types that
+-- they can operate on.  More on that in a future blog post.
+
+-- ## High Performance Parallel Breadth First Search (BFS)
+--
+-- BFS is the core operation of graph analysis.  Like a pebble thrown
+-- into a pond, you start from a point in the graph, and traverse all
+-- the edges you find, as you find them.  As you traverse the graph
+-- you can accumulate some interesting information as you go, like how
+-- many edges away from the starting point you are, the "level" and
+-- the row index of the node you got here from, the "parent".  In the
+-- GraphBLAS, this information is accumulated in vectors.
+
+-- For the purposes of a quick demo, we will use a very small graph
+-- that is very commonly studied in graph theory called the
+-- [Newman/karate](https://sparse.tamu.edu/Newman/karate) graph, which
+-- can be downloaded from the [SuiteSparse Matrix
+-- Collection](https://sparse.tamu.edu/).
+--
+-- ### Storing Graphs
 --
 -- OneSparse can serialize and deserialize graphs into Postgres
 -- objects to and from an on-disk state.  This state can come from
@@ -153,24 +228,10 @@ select (select draw(ata, reduce_rows(ata), true, true, true, 0.5, label:='Addres
 -- or most optimally, from compressed files on the server filesystem
 -- itself.
 --
--- ## High Performance Parallel Breadth First Search (BFS)
---
--- BFS is the core operation of graph analysis.  Like a pebble thrown
--- into a pond, you start from a point in the graph, and traverse all
--- the edges you find, as you find them.  As you traverse the graph
--- you can accumulate some interesting information as you go, like how
--- many edges away from the starting point you are, the "level" and
--- the row index of the node you got here from, the "parent".  In the
--- GraphBLAS, this information is accumulated in vectors.
-
--- For the purposes of a quick demo, we will use a very small graph
--- that is very commonly studied in graph theory called the
--- [Newman/karate]() graph, which can be downloaded from the
--- [SuiteSparse Matrix Collection]().
---
 -- A simple approach for small graphs that fit into the TOAST limit is
 -- to make a materialized view that loads the graph data from disk
--- using the standard [Matrix Market]() format:
+-- using the standard [Matrix
+-- Market](https://math.nist.gov/MatrixMarket/formats.html) format:
 
 create materialized view if not exists karate as
     select mmread('/home/postgres/onesparse/demo/karate.mtx') as graph;
@@ -185,7 +246,13 @@ create materialized view if not exists karate as
 -- given source vertex using the breadth-first search algorithm.
 -- See [https://en.wikipedia.org/wiki/Breadth-first_search](https://en.wikipedia.org/wiki/Breadth-first_search) for details.
 
-select draw(triu(graph), (select level from bfs(graph, 1)), false, false, true, 0.5, label:='Level BFS') as draw_source from karate \gset
+select draw(triu(graph),
+            (select level from bfs(graph, 1)),
+            false,
+            false,
+            true,
+            0.5,
+            label:='Level BFS') as draw_source from karate \gset
 \i sql/draw_sfdp.sql
 
 --
@@ -195,7 +262,12 @@ select draw(triu(graph), (select level from bfs(graph, 1)), false, false, true, 
 -- BFS tree rooted at the chosen source. It is also based on
 -- [https://en.wikipedia.org/wiki/Breadth-first_search](https://en.wikipedia.org/wiki/Breadth-first_search).
 --
-select draw(triu(graph), (select parent from bfs(graph, 1)), false, false, true, 0.5) as draw_source from karate \gset
+select draw(triu(graph),
+            (select parent from bfs(graph, 1)),
+            false,
+            false,
+            true,
+            0.5) as draw_source from karate \gset
 \i sql/draw_sfdp.sql
 --
 -- It's pretty easy to write a function in just about any language
@@ -210,8 +282,9 @@ select draw(triu(graph), (select parent from bfs(graph, 1)), false, false, true,
 -- GraphBLAS API.
 --
 -- For example, we've benchmarked OneSparse using the industry
--- standard [GAP Benchmark Suite]().  The GAP is a group of publicly
--- available [graph data sets]() and algorithms that graph libraries
+-- standard [GAP Benchmark Suite](https://github.com/sbeamer/gapbs).
+-- The GAP is a group of publicly available [graph data
+-- sets](https://sparse.tamu.edu/) and algorithms that graph libraries
 -- can use to benchmark their performance.
 --
 -- ### Benchmarks
@@ -226,10 +299,25 @@ select draw(triu(graph), (select parent from bfs(graph, 1)), false, false, true,
 -- OneSparse can traverse with BFS by dividing the number of edges in
 -- the graph by the run time.
 --
+-- Here we can see how insanely fast OneSparse can do all graph
+-- traversal, achieving over 7 billion edges per second on some
+-- graphs.  SuiteSparse uses clever sparse matrix compression
+-- techniques and highly optimized JIT kernels for sparse
+-- multiplication to get these results.
+--
+-- Interestingly, the [road
+-- graph](https://sparse.tamu.edu/GAP/GAP-road) doesn't appear at
+-- first to do so well.  One issue is that the graph is so "small" at
+-- only 57M edges, that it can't take advantage of all the cores.
+-- This is exacerbated by some of the issues that extreme sparsity can
+-- bring.  The road graph is very sparse, the degree distribution is
+-- relatively uniform, and it has a very high diameter.  This is a
+-- relatively common but tricky kind of graph to traverse in parallel.
+--
 -- ## Degree Centrality
 --
 -- At first a matrix might seem like an odd way to store a graph, but
--- now we bring the power of Linear Algebra into play.  For example,
+-- it we brings the power of Linear Algebra into play.  For example,
 -- let's suppose you want to know the "degree" of every node in the
 -- graph, that is, how many edges connect to the node.
 --
@@ -245,14 +333,13 @@ select reduce_cols(cast_to(graph, 'int32')) as "Karate Degree" from karate;
 
 select draw(triu(graph),
             reduce_cols(cast_to(graph, 'int32')),
-            false, false, true, 0.5, 'Degree of Karate Graph')
+            false,
+            false,
+            true,
+            0.5,
+            'Degree of Karate Graph')
     as draw_source from karate \gset
 \i sql/draw_sfdp.sql
---
--- !!! note
---     The draw() function is part of the OneSparse doctest
---     infrastructure, it's used to generate these doctest diagrams
---     in-line with this documentation, which is also a test.
 --
 -- We saw the core idea about how graphs and matrices can be one and
 -- the same, but now we see the relationship to vectors and graphs.
@@ -262,23 +349,35 @@ select draw(triu(graph),
 -- fully embaces this.  Vectors often end up being the result of an
 -- algebraic graph algorithm.
 --
+-- ## PageRank
+--
 -- Degree was simple enough, but what about more advanced algorithms?
 -- This is where the GraphBLAS community really bring the power of
--- deep graph research with the [LAGraph]() library.  LAGraph is a
--- collection of optimized graph algorithms using the GraphBLAS API.
--- OneSparse also wraps LAgraph functions and exposes them to SQL.
--- For example, let's [PageRank]() the karate graph:
+-- deep graph research with the
+-- [LAGraph](https://github.com/GraphBLAS/LAGraph) library.  LAGraph
+-- is a collection of optimized graph algorithms using the GraphBLAS
+-- API.  OneSparse also wraps LAgraph functions and exposes them to
+-- SQL.  For example, let's
+-- [PageRank](https://en.wikipedia.org/wiki/PageRank) the karate
+-- graph:
 
 select draw(triu(graph),
             pagerank(graph),
-            false, false, true, 0.5, 'PageRank The Karate Graph')
+            false,
+            false,
+            true,
+            0.5,
+            'PageRank Karate Graph')
     as draw_source from karate \gset
 \i sql/draw_sfdp.sql
 
 -- Wait isn't this the same as the degree graph?  Nope, but they sure
 -- do look similar! This is because at this small-scale PageRank
 -- essentially degenerates into degree.  Both of these algorithms are
--- called *centralities* and LAGraph has several of them, for example
+-- called *centralities* and LAGraph has several of them.
+--
+-- ## Triangle Centrality
+--
 -- [Triangle Centrality]() uses the number of triangles a node is
 -- connected to to compute its centrality score.  This goes on the
 -- assumption that triangles form stronger bonds than individual
@@ -286,7 +385,11 @@ select draw(triu(graph),
 
 select draw(triu(graph),
             triangle_centrality(graph),
-            false, false, true, 0.5, 'The Karate Graph')
+            false,
+            false,
+            true,
+            0.5,
+            'Triange Centrality Karate Graph')
     as draw_source from karate \gset
 \i sql/draw_sfdp.sql
 
@@ -295,7 +398,11 @@ select draw(triu(graph),
 
 select draw(triu(graph),
             square_clustering(graph),
-            false, false, true, 0.5, 'The Karate Graph')
+            false,
+            false,
+            true,
+            0.5,
+            'Square Clustering Karate Graph')
     as draw_source from karate \gset
 \i sql/draw_sfdp.sql
 
@@ -304,6 +411,41 @@ select draw(triu(graph),
 --
 -- ## OneSparse Beta
 --
+-- OneSparse is still in development, and to-date wraps almost all of
+-- the GraphBLAS features in SuiteSparse.  There's still some work to
+-- do, but we want to get some of this work out in to the world to get
+-- gigaedge graph ideas moving in Postgres.
+--
+-- OneSparse Beta is now released, and it requires Postgres 18 Beta.
+-- Due to some very recently changes in the Postgres core that
+-- OneSparse relies on for its performance, support for Postgres less
+-- than 18 is not practical.  So now's your chance to try OneSparse
+-- and Postgres 18 together using one of our [beta Docker
+-- images](/docker.html) to try it out!
+--
+-- ## Preview Custom Type and Operators
+--
+-- SuiteSparse comes with a huge collection of useful types,
+-- operators, and semirings, but what makes it really powerful is the
+-- ability to make your own elements types and operators that work on
+-- them.  Since this means exposing the user to the SuiteSparse JIT,
+-- we're still working out the best way to make it simple and useful
+-- without allowing SQL to safely use custom JIT code.  Stay tuned to
+-- our blog for more updates.
+--
 -- ## Preview Table Access Method
 --
+-- OneSparse has many plans for where to take the extension, and our
+-- next major release will contain a major new feature that unifies
+-- SQL and OneSparse even more.
 --
+-- Using the relatively new [Table Access Method]() API, we are
+-- working to have automatic graph updates happen completely behind
+-- the scenes, no matrices or vectors, just edge tables and super-fast
+-- algorithms.  While you can always drop "down to the algebra" if you
+-- want to, this will provide a much simpler interface for users who
+-- already have the algorithms and data in hand.
+--
+-- This will also make a deeper unification with the concepts of both
+-- linear and relational algebra.  By unifying tables and matrices,
+-- either or both can be used seamlessly in combination.

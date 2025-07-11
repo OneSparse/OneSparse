@@ -2686,13 +2686,23 @@ BEGIN
     -- Emit arcs from source nodes to edge nodes
     FOR rec IN SELECT * FROM elements(a)
     LOOP
-        dot := dot || format(E'  "%s:%s" -> "%s:%s";\n', a_prefix, rec.i::text, b_prefix, rec.j::text);
+        dot := dot || format(E'  "%s:%s" -> "%s:%s"', a_prefix, rec.i::text, b_prefix, rec.j::text);
+        if a_weights then
+            dot = dot || format(E' [label="%s"];\n', print(rec.v));
+        else
+            dot = dot || E';\n';
+        end if;
     END LOOP;
 
     -- Emit arcs from edge nodes to destination nodes
     FOR rec IN SELECT * FROM elements(b)
     LOOP
-        dot := dot || format(E'  "%s:%s" -> "%s:%s";\n', b_prefix, rec.i::text, a_prefix, rec.j::text);
+        dot := dot || format(E'  "%s:%s" -> "%s:%s"', b_prefix, rec.i::text, a_prefix, rec.j::text);
+        if b_weights then
+            dot = dot || format(E' [label="%s"];\n', print(rec.v));
+        else
+            dot = dot || E';\n';
+        end if;
     END LOOP;
 
     dot := dot || '}';
