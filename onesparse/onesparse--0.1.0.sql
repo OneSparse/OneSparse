@@ -2425,6 +2425,48 @@ CREATE OPERATOR @<+< (
     FUNCTION = min_plus_min_op
     );
 
+CREATE FUNCTION plus_plus(
+        a matrix,
+        b matrix,
+        c matrix default null,
+        mask matrix default null,
+        accum binaryop default null,
+        descr descriptor default null)
+RETURNS matrix
+    RETURN mxm(a, b, ('plus_plus_' || name(type(a)))::semiring, c, mask, accum, descr);
+
+CREATE FUNCTION plus_plus(
+        a matrix,
+        b vector,
+        c vector default null,
+        mask vector default null,
+        accum binaryop default null,
+        descr descriptor default null)
+RETURNS vector
+    RETURN mxv(a, b, ('plus_plus_' || name(type(a)))::semiring, c, mask, accum, descr);
+
+CREATE FUNCTION plus_plus(
+        a vector,
+        b matrix,
+        c vector default null,
+        mask vector default null,
+        accum binaryop default null,
+        descr descriptor default null)
+RETURNS vector
+    RETURN vxm(a, b, ('plus_plus_' || name(type(a)))::semiring, c, mask, accum, descr);
+
+CREATE FUNCTION plus_plus_op(
+        a matrix,
+        b matrix)
+RETURNS matrix
+    RETURN plus_plus(a, b);
+
+CREATE OPERATOR @++ (
+    LEFTARG = matrix,
+    RIGHTARG = matrix,
+    FUNCTION = plus_plus_op
+    );
+
 CREATE FUNCTION serialize(a matrix)
 RETURNS bytea
 AS '$libdir/onesparse', 'matrix_serialize'

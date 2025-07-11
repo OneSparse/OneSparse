@@ -85,7 +85,7 @@ create materialized view example as
     select 'bool(7:7)[0:1:t 0:3:t 1:4:t 1:6:t 2:5:t 3:0:t 3:2:t 4:5:t 5:2:t 6:2:t 6:3:t 6:4:t]'::matrix
     as graph;
 
-select draw(graph) as twocol_a_source, print(graph) as twocol_b_source from example \gset
+select draw(graph, label:='Graph') as twocol_a_source, print(graph) as twocol_b_source from example \gset
 \i sql/twocol_drawtext.sql
 
 -- On the left is the graphical representation of the matrix, and on
@@ -112,10 +112,13 @@ select draw(graph) as twocol_a_source, print(graph) as twocol_b_source from exam
 -- input nodes.
 
 create materialized view txn_graph as
-        select triu(random_matrix(6,8,32,sym:=false,min:=0,max:=42,seed:=0.43)) as addr_to_txn,
-               triu(random_matrix(8,6,32,sym:=false,min:=0,max:=42,seed:=0.42)) as txn_to_addr;
+        select triu(random_matrix(12,15,60,sym:=false,min:=0,max:=9,seed:=0.43)) as addr_to_txn,
+               triu(random_matrix(15,12,50,sym:=false,min:=0,max:=9,seed:=0.42)) as txn_to_addr;
 
-select print(addr_to_txn), print(txn_to_addr) from txn_graph;
+-- When we print the two matrices, we can see that one is 12x15 and
+-- the other is 15x12.
+
+select print(addr_to_txn) as "Address to Transaction", print(txn_to_addr) as "Transaction to Address" from txn_graph;
 
 select hyperdraw(addr_to_txn, txn_to_addr, 'A', 'T') as draw_source from txn_graph \gset
 \i sql/draw.sql
@@ -124,17 +127,32 @@ select hyperdraw(addr_to_txn, txn_to_addr, 'A', 'T') as draw_source from txn_gra
 -- multiplication to project an adjacency matrix of addresses to
 -- addresses, or transactions to transactions:
 
-with addr_to_addr as (select mxm(addr_to_txn, txn_to_addr, 'plus_plus_int32')
-                      as ata from txn_graph),
-     txn_to_txn   as (select transpose(mxm(
-                                transpose(addr_to_txn),
-                                transpose(txn_to_addr),
-                                'plus_plus_int32'))
-                      as ttt from txn_graph)
-select (select draw(ata, reduce_rows(ata), true, true, true, 0.5) from addr_to_addr) as twocol_a_source,
-       (select draw(ttt, reduce_rows(ttt), true, true, true, 0.5, shape:='box') from txn_to_txn) as twocol_b_source \gset
+with addr_to_addr as (select addr_to_txn @++ txn_to_addr as ata
+                      from txn_graph),
+     txn_to_txn   as (select transpose(transpose(addr_to_txn) @++ transpose(txn_to_addr)) as ttt
+                      from txn_graph)
+
+select (select draw(ata, reduce_rows(ata), true, true, true, 0.5, label:='Address to Address') from addr_to_addr) as twocol_a_source,
+       (select draw(ttt, reduce_rows(ttt), true, true, true, 0.5, label:='Transaction to Transaction', shape:='box') from txn_to_txn) as twocol_b_source \gset
 \i sql/twocol.sql
 
+-- ## Storing Graphs
+--
+-- OneSparse can serialize and deserialize graphs into Postgres
+-- objects to and from an on-disk state.  This state can come from
+-- various sources, but the simplest is the ["TOAST" storage]() of
+-- large variable length data arrays in rows.  However, the one major
+-- limitation of this approach is that Postgres is limited by design
+-- to a maximum TOAST size of about 1 gigabyte which typically limits
+-- TOASTed graphs to a few hundred million edges at most.
+
+-- TOAST storage is very useful for small graphs, or sub-graphs of a
+-- large graph, but graphs with many billions of edges blow right past
+-- this size limit, so OneSparse also provides functions for loading
+-- much larger graphs from either SQL queries, Large Object storage,
+-- or most optimally, from compressed files on the server filesystem
+-- itself.
+--
 -- ## High Performance Parallel Breadth First Search (BFS)
 --
 -- BFS is the core operation of graph analysis.  Like a pebble thrown
@@ -150,44 +168,29 @@ select (select draw(ata, reduce_rows(ata), true, true, true, 0.5) from addr_to_a
 -- [Newman/karate]() graph, which can be downloaded from the
 -- [SuiteSparse Matrix Collection]().
 --
--- Now we can create graphs, a simple approach for small graphs that
--- fit into the TOAST limit is to make a materialized view that loads
--- the graph data from disk using the standard [Matrix Market]()
--- format:
+-- A simple approach for small graphs that fit into the TOAST limit is
+-- to make a materialized view that loads the graph data from disk
+-- using the standard [Matrix Market]() format:
 
 create materialized view if not exists karate as
     select mmread('/home/postgres/onesparse/demo/karate.mtx') as graph;
 
-select graph from karate;
-
--- Like all SQL types in Postgres, an object must have a literal
--- input/output format that can recreate the object.  The default
--- format shown here shows a list of *edge coordinates*.  To see the
--- matrix like representation, OneSparse provides a `print()` function:
-
-select print(graph) from karate;
-
--- !!! note
---     The print() function is only useful for illustration and
---     debugging purposes on small graphs, trying to print a very
---     large graph will exhaust the memory of Postgres.
---
 -- This graph can now be accessed from SQL using the powerful
--- GraphBLAS API exposed by OneSparse.  For example, we can query the
--- number of rows, columns and values in the graph:
-
-select nrows(graph), ncols(graph), nvals(graph) from karate;
+-- GraphBLAS API exposed by OneSparse.
+--
 
 -- ### Level BFS
+--
 -- Level BFS exposes the depth of each vertex starting from a
 -- given source vertex using the breadth-first search algorithm.
 -- See [https://en.wikipedia.org/wiki/Breadth-first_search](https://en.wikipedia.org/wiki/Breadth-first_search) for details.
 
-select draw(triu(graph), (select level from bfs(graph, 1)), false, false, true, 0.5) as draw_source from karate \gset
+select draw(triu(graph), (select level from bfs(graph, 1)), false, false, true, 0.5, label:='Level BFS') as draw_source from karate \gset
 \i sql/draw_sfdp.sql
 
 --
 -- ### Parent BFS
+--
 -- Parent BFS returns the predecessor of each vertex in the
 -- BFS tree rooted at the chosen source. It is also based on
 -- [https://en.wikipedia.org/wiki/Breadth-first_search](https://en.wikipedia.org/wiki/Breadth-first_search).
@@ -223,23 +226,6 @@ select draw(triu(graph), (select parent from bfs(graph, 1)), false, false, true,
 -- OneSparse can traverse with BFS by dividing the number of edges in
 -- the graph by the run time.
 --
--- ## Storing Graphs
---
--- OneSparse can serialize and deserialize graphs into Postgres
--- objects to and from an on-disk state.  This state can come from
--- various sources, but the simplest is the ["TOAST" storage]() of
--- large variable length data arrays in rows.  However, the one major
--- limitation of this approach is that Postgres is limited by design
--- to a maximum TOAST size of about 1 gigabyte which typically limits
--- TOASTed graphs to a few hundred million edges at most.
-
--- TOAST storage is very useful for small graphs, or sub-graphs of a
--- large graph, but graphs with many billions of edges blow right past
--- this size limit, so OneSparse also provides functions for loading
--- much larger graphs from either SQL queries, Large Object storage,
--- or most optimally, from compressed files on the server filesystem
--- itself.
---
 -- ## Degree Centrality
 --
 -- At first a matrix might seem like an odd way to store a graph, but
@@ -251,7 +237,7 @@ select draw(triu(graph), (select parent from bfs(graph, 1)), false, false, true,
 -- the column vectors of the matrix into a vector which contains the
 -- degree for each node:
 
-select reduce_cols(cast_to(graph, 'int32')) from karate;
+select reduce_cols(cast_to(graph, 'int32')) as "Karate Degree" from karate;
 
 -- A vector maps a node's row index to a value.  Now look at the graph
 -- where nodes are labled and color mapped according to the degree of
