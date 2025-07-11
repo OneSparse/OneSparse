@@ -88,6 +88,15 @@ Datum scalar_print(PG_FUNCTION_ARGS) {
 				appendStringInfo(&buf, "%f", fp64);
 				break;
 			}
+		case GrB_BOOL_CODE:
+			{
+				bool b8;
+				OS_CHECK(GrB_Scalar_extractElement(&b8, s->scalar),
+					  s->scalar,
+					  "Error extracting scalar value.");
+				appendStringInfo(&buf, b8? "t" : "f");
+				break;
+			}
 	}
 
 	PG_RETURN_TEXT_P(cstring_to_text(buf.data));

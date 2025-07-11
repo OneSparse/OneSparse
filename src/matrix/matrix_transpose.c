@@ -21,8 +21,8 @@ Datum matrix_transpose(PG_FUNCTION_ARGS)
 	if (PG_ARGISNULL(1))
 	{
 		OS_MTYPE(type, a);
-		OS_MNROWS(nrows, a);
-		OS_MNCOLS(ncols, a);
+		OS_MNROWS(ncols, a);
+		OS_MNCOLS(nrows, a);
 		c = new_matrix(type, nrows, ncols, CurrentMemoryContext, NULL);
 	}
 	else
