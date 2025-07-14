@@ -352,6 +352,11 @@ RETURNS matrix
 AS '$libdir/onesparse', 'matrix_apply_second'
 LANGUAGE C STABLE;
 
+CREATE FUNCTION diag(v vector)
+RETURNS matrix
+AS '$libdir/onesparse', 'matrix_diag'
+LANGUAGE C STABLE;
+
 CREATE FUNCTION nnz(a matrix)
 RETURNS scalar
     RETURN reduce_scalar(apply(a, 'one_bool'::unaryop, c=>'int64'::matrix));
@@ -1093,6 +1098,19 @@ BEGIN
 
     dot := dot || '}}';
     RETURN dot;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION gnuplot(m matrix)
+RETURNS text LANGUAGE plpgsql AS $$
+DECLARE
+  result text := '';
+  r record;
+BEGIN
+  FOR r IN SELECT * FROM elements(m) LOOP
+    result := result || r.i || ' ' || r.j || ' ' || print(r.v) || E'\n';
+  END LOOP;
+  RETURN result;
 END;
 $$;
 

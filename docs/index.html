@@ -61,85 +61,94 @@
 	  <section id="two" class="wrapper style3 fade-up">
 		<div class="inner">
 		  <h2>What we do</h2>
-		  <p>Graphs present the most difficult
-			computing challenges faced by enterprise
-			users today.  Trillions of rows of data
-			are stored in relational databases, but
-			SQL does not have the analytical power to
-			bring insight from existing data.</p>
-          <p>OneSparse brings high-performance,
-            multi-core graph analytics to Postgres.
-            By leveraging the SuiteSparse GraphBLAS
-            library OneSparse can traverse billions of
-            edges per second on immense graphs using
-            all available cpu resources on readily
-            available commodity cloud hardware. </p>
+		  <p>Graphs present the most difficult computing challenges
+			faced by enterprise users today.  Trillions of rows of
+			data are stored in relational databases, but SQL does not
+			have the analytical power to bring insight from existing
+			highly connected sparse data.</p>
 
-          <h2>Highest Performance Graph Processing</h2>
+          <p>OneSparse brings high-performance, multi-core graph
+            analytics to Postgres.  By leveraging the SuiteSparse
+            GraphBLAS library OneSparse can traverse billions of edges
+            per second on immense graphs using all available cpu
+            resources on readily available commodity cloud
+            hardware. </p>
 
-          <p>Below are benchmarks on a 48-core AMD
-            EPYC cloud server using a variety of
-            graphs from
+          <h2>Billions of Edges Per Second with Postgres</h2>
+
+          <p>Below are benchmarks on a 48-core AMD EPYC cloud server
+            using a variety of graphs from
             the <a href="http://gap.cs.berkeley.edu/benchmark.html">GAP
-              Graph Benchmarks</a>.  GAP is the industry
-            standard benchmark for measuring the
-            performance of various popular graph
-            algorithms on public graph data available
-            from <a href="https://sparse.tamu.edu/">The
-              SuiteSparse Collection.</a></p>
+            Graph Benchmarks</a>.  GAP is the industry standard
+            benchmark for measuring the performance of various popular
+            graph algorithms on public graph data available
+            from <a href="https://sparse.tamu.edu/">The SuiteSparse
+            Collection.</a>  OneSparse is proud to be one of the only
+            graph database solutions that has published GAP
+            results.</p>
 
           <div class="image-container">
             <figure>
               <img src="images/BFS.svg"/>
-              <figcaption>Edges per second running
-                LAGraph BFS on GAP graphs.
+              <figcaption>Breadth First Search
               </figcaption>
             </figure>
             <figure>
-              <img src="images/GAP.svg"/>
+              <img src="images/PageRank.svg"/>
               <figcaption>
-                <a href="https://en.wikipedia.org/wiki/PageRank">PageRank</a>,
-                <a href="https://en.wikipedia.org/wiki/Parallel_single-source_shortest_path_algorithm">Single
-                  Source Shorest Path</a> and
-                <a href="https://en.wikipedia.org/wiki/Component_(graph_theory)">Connected
-                  Components</a>. </figcaption>
+                <a href="https://en.wikipedia.org/wiki/PageRank">PageRank</a></figcaption>
             </figure>
           </div>
-          <h2>NVIDIA Blackwell and Beyond</h2>
+          <div class="image-container">
+            <figure>
+              <img src="images/ConnectedComponents.svg"/>
+              <figcaption>
+                <a href="https://en.wikipedia.org/wiki/Connected_component">Connected Components</a></figcaption>
+            </figure>
+            <figure>
+              <img src="images/SSSP.svg"/>
+              <figcaption>
+                <a href="https://en.wikipedia.org/wiki/Shortest_path_problem">Single Source Shortest Path</a></figcaption>
+            </figure>
+          </div>
+          <p>OneSparse brings large scale graph analytics to Postgres.
+          Users can pick from a large library of preexisting
+          algorithms like those used in GAP, or roll their own using
+          our powerful Linear Algebra framework</p>
+
+          <h2>NVIDIA Blackwell</h2>
 
           <div class="image-container">
             <figure>
               <img src="images/blackwell.png"/>
               <figcaption></figcaption>
             </figure>
-            <p>By utilizing the powerful JIT compiler
-              built into the SuiteSparse library,
-              OneSparse is able to target high
-              performance code onto a variety of
-              architectures, including NVIDIA CUDA.
-              Upcoming Blackwell architectures with
-              unified physical memory bring drastic
-              improvements in sparse graph algorithms,
-              avoid the ping-pong effects of low speed
-              data copying across slow PCI busses.</p>
+            <p>By utilizing the powerful JIT compiler built into the
+              SuiteSparse library, OneSparse is able to target high
+              performance code onto a variety of architectures,
+              including NVIDIA CUDA.  Upcoming Blackwell architectures
+              with unified physical memory bring drastic improvements
+              in sparse graph algorithms, avoid the ping-pong effects
+              of low speed data copying across slow PCI busses.</p>
           </div>
 
+          <h2>Future Accelerators</h2>
+
           <div class="image-container">
-            <p>Test By utilizing the powerful JIT compiler
-              built into the SuiteSparse library,
-              OneSparse is able to target high
-              performance code onto a variety of
-              architectures, including NVIDIA CUDA.
-              Upcoming Blackwell architectures with
-              unified physical memory bring drastic
-              improvements in sparse graph algorithms,
-              avoid the ping-pong effects of low speed
-              data copying across slow PCI busses.</p>
+            <p>Test By utilizing the powerful JIT compiler built into
+              the SuiteSparse library, OneSparse is able to target
+              high performance code onto a variety of architectures,
+              including NVIDIA CUDA.  Upcoming Blackwell architectures
+              with unified physical memory bring drastic improvements
+              in sparse graph algorithms, avoid the ping-pong effects
+              of low speed data copying across slow PCI busses.</p>
             <figure>
               <img src="images/procvenn.png"/>
               <figcaption></figcaption>
             </figure>
           </div>
+
+          <h2>We Support The Most Advanced Sparse Computing Libraries</h2>
 
 		  <div class="features">
 			<section>
@@ -155,6 +164,7 @@
               <a href="https://github.com/OneSparse/OneSparse" class="button">GitHub</a>
               <a href="/docs.html" class="button">Docs</a>
 			</section>
+
 			<section>
 			  <span class="icon solid major fa-desktop"></span>
 			  <h3>SuiteSparse:GraphBLAS</h3>
@@ -167,10 +177,38 @@
 				SuiteSparse and contribute
 				important use cases to its future
 				development.</p>
-              <a href="https://people.engr.tamu.edu/davis/GraphBLAS.html" class="button">Website</a>
+              <a href="https://people.engr.tamu.edu/davis/GraphBLAS.html"
+              class="button">Website</a>
+			</section>
+
+			<section>
+			  <span class="icon solid major fa-desktop"></span>
+			  <h3>LAGraph</h3>
+			  <p>LAGraph is a suite of advanced, high performance
+			  graph algorithms implemented with the GraphBLAS.  These
+			  battle-tested algorithms come built into OneSparse,
+			  quickly accelerating analytics with minimal setup.
+              </p>
+              <a href="https://github.com/GraphBLAS/LAGraph"
+              class="button">Github</a>
+			</section>
+			<section>
+
+			  <span class="icon solid major fa-desktop"></span>
+			  <h3>Python GraphBLAS</h3>
+			  <p>Postgres is the most popular database in the world,
+			  and Python is the gold standard for ML, AI and other
+			  data science programming languages.  Our team has
+			  decades of Python programming experience, and we plan
+			  very deep integration of OneSparse with the native
+			  python-graphblas library.
+              </p>
+              <a href="https://github.com/python-graphblas/python-graphblas"
+              class="button">Github</a>
 			</section>
 		  </div>
-          <h2>The GraphBLAS Consortium</h2>
+
+          <h2>The GraphBLAS Organization</h2>
           <p>OneSparse is powered by the SuiteSparse GraphBLAS library
             which is the high performance reference implemntation
             of <a href="graphblas.org">the GraphBLAS

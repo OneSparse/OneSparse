@@ -6,7 +6,7 @@ ARG GID
 RUN apt-get update && \
     apt-get install -y make cmake git curl build-essential m4 sudo gdbserver python3-pip \
     gdb libreadline-dev bison flex zlib1g-dev libicu-dev icu-devtools tmux zile zip \
-    gawk wget python3-full python3-virtualenv graphviz python3-dev libpq-dev python3-psycopg2 libssl-dev
+    gawk wget python3-full python3-virtualenv graphviz python3-dev libpq-dev python3-psycopg2 libssl-dev gnuplot
 
 RUN deluser --remove-home ubuntu
 # add postgres user and make data dir        

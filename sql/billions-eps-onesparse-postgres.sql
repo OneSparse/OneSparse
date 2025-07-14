@@ -21,7 +21,8 @@
 -- much time extracting, transforming, and loading graphs into side
 -- databases that need constant money, maintanance and impedance
 -- matching with SQL?  With OneSparse, it's easy to turn SQL data into
--- graphs and back again all without needing any external tooling.
+-- high performance graphs and back again all without needing any
+-- external tooling; it's all done in the database.
 --
 -- <!-- more -->
 --
@@ -117,8 +118,8 @@ select draw(graph, label:='Graph') as twocol_a_source, print(graph) as twocol_b_
 -- for transaction edges to input nodes.
 
 create materialized view txn_graph as
-        select triu(random_matrix(12,15,60,sym:=false,min:=0,max:=9,seed:=0.43)) as addr_to_txn,
-               triu(random_matrix(15,12,50,sym:=false,min:=0,max:=9,seed:=0.42)) as txn_to_addr;
+        select triu(random_matrix(12,15,60,sym:=false,min:=1,max:=9,seed:=0.43)) as addr_to_txn,
+               triu(random_matrix(15,12,50,sym:=false,min:=1,max:=9,seed:=0.42)) as txn_to_addr;
 
 -- When we print the two matrices, we can see that one is 12x15 and
 -- the other is 15x12.
@@ -215,11 +216,12 @@ select (select draw(ata,
 --
 -- OneSparse can serialize and deserialize graphs into Postgres
 -- objects to and from an on-disk state.  This state can come from
--- various sources, but the simplest is the ["TOAST" storage]() of
--- large variable length data arrays in rows.  However, the one major
--- limitation of this approach is that Postgres is limited by design
--- to a maximum TOAST size of about 1 gigabyte which typically limits
--- TOASTed graphs to a few hundred million edges at most.
+-- various sources, but the simplest is the ["TOAST"
+-- storage](https://www.postgresql.org/docs/current/storage-toast.html)
+-- of large variable length data arrays in rows.  However, the one
+-- major limitation of this approach is that Postgres is limited by
+-- design to a maximum TOAST size of about 1 gigabyte which typically
+-- limits TOASTed graphs to a few hundred million edges at most.
 
 -- TOAST storage is very useful for small graphs, or sub-graphs of a
 -- large graph, but graphs with many billions of edges blow right past
@@ -378,10 +380,10 @@ select draw(triu(graph),
 --
 -- ## Triangle Centrality
 --
--- [Triangle Centrality]() uses the number of triangles a node is
--- connected to to compute its centrality score.  This goes on the
--- assumption that triangles form stronger bonds than individual
--- edges.
+-- [Triangle Centrality](https://arxiv.org/abs/2105.00110) uses the
+-- number of triangles a node is connected to to compute its
+-- centrality score.  This goes on the assumption that triangles form
+-- stronger bonds than individual edges.
 
 select draw(triu(graph),
             triangle_centrality(graph),
@@ -393,7 +395,8 @@ select draw(triu(graph),
     as draw_source from karate \gset
 \i sql/draw_sfdp.sql
 
--- This can be taken even further with the [Square Clustering]()
+-- This can be taken even further with the [Square
+-- Clustering](https://networkx.org/documentation/stable/reference/algorithms/generated/networkx.algorithms.cluster.square_clustering.html)
 -- algorithm, which considers how many squares nodes connect to:
 
 select draw(triu(graph),
@@ -423,7 +426,7 @@ select draw(triu(graph),
 -- and Postgres 18 together using one of our [beta Docker
 -- images](/docker.html) to try it out!
 --
--- ## Preview Custom Type and Operators
+-- ## Preview Custom Types and Operators
 --
 -- SuiteSparse comes with a huge collection of useful types,
 -- operators, and semirings, but what makes it really powerful is the
@@ -439,13 +442,34 @@ select draw(triu(graph),
 -- next major release will contain a major new feature that unifies
 -- SQL and OneSparse even more.
 --
--- Using the relatively new [Table Access Method]() API, we are
--- working to have automatic graph updates happen completely behind
--- the scenes, no matrices or vectors, just edge tables and super-fast
--- algorithms.  While you can always drop "down to the algebra" if you
--- want to, this will provide a much simpler interface for users who
--- already have the algorithms and data in hand.
+-- ![Tables, Graphs, and Matrices](/table_graph_matrix.png)
 --
--- This will also make a deeper unification with the concepts of both
--- linear and relational algebra.  By unifying tables and matrices,
--- either or both can be used seamlessly in combination.
+-- We can see here there are three distinct form of graph analysis,
+-- relational, procedural, and algebraic.  OneSparse aims to unify all
+-- three models so that you have maximum flexibility when you process
+-- your graph data.  Combined workflows, like powerful ETL processing
+-- with SQL, traditional per-edge style traversal with Python, and
+-- high performance graph analysis with algebra are possible and
+-- encouraged.
+--
+-- Using the relatively new [Table Access Method
+-- (TAM)](https://www.postgresql.org/docs/current/tableam.html) API,
+-- we are working to have automatic graph updates happen completely
+-- behind the scenes, no matrices or vectors, just edge tables and
+-- super-fast algorithms.  While you can always drop "down to the
+-- algebra" if you want to, this will provide a much simpler interface
+-- for users who already have the algorithms and data in hand.
+--
+-- ![OneSparse CRDT Graphs](/images/CRDTGraphs.png)
+--
+-- In the next release, we will store TAM-backed graphs in shared
+-- memory, avoiding loading costs to enable very high performance
+-- traversal with high query throughput.  Insert, updates and other
+-- modifications of the matrix will be performed asynchronously using
+-- CRDT Graph semantics for near-zero latency commits with eventual
+-- consistency to the graph, while still ensuring strong ACID
+-- consistency at the table level.
+--
+-- OneSparse is a very early product, and we encourage you to try it
+-- out and send us feedback, but do expect some rapid changes and
+-- advancements over the next few months.
