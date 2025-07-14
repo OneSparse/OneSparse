@@ -38,16 +38,13 @@
 	  <section id="intro" class="wrapper style1 fullscreen fade-up">
 		<div class="inner">
 		  <h1>OneSparse</h1>
-		  <p>OneSparse combines the power of Linear
-            Algebra and PostgreSQL to create the
-            next-generation of data-rich AI and ML
-            applications.  Powerful SQL queries,
-            combined with the analytical power
-            Sparse Linear Algebra, provide a rich
-            framework for high performance GraphRAG,
-            Sparse Distributed Representations, and
-            architecture agnostic sparse parallel
-            performance on CPUs, GPUs, and cutting
+		  <p>OneSparse combines the power of Linear Algebra and
+            PostgreSQL to create the next-generation of data-rich AI
+            and ML applications.  Powerful SQL queries, combined with
+            the analytical power Sparse Linear Algebra, provide a rich
+            framework for high performance GraphRAG, Sparse
+            Distributed Representations, and architecture agnostic
+            sparse parallel performance on CPUs, GPUs, and cutting
             edge sparse accelerators.
           </p>
 		  <ul class="actions">
@@ -60,20 +57,6 @@
 	  <!-- Two -->
 	  <section id="two" class="wrapper style3 fade-up">
 		<div class="inner">
-		  <h2>What we do</h2>
-		  <p>Graphs present the most difficult computing challenges
-			faced by enterprise users today.  Trillions of rows of
-			data are stored in relational databases, but SQL does not
-			have the analytical power to bring insight from existing
-			highly connected sparse data.</p>
-
-          <p>OneSparse brings high-performance, multi-core graph
-            analytics to Postgres.  By leveraging the SuiteSparse
-            GraphBLAS library OneSparse can traverse billions of edges
-            per second on immense graphs using all available cpu
-            resources on readily available commodity cloud
-            hardware. </p>
-
           <h2>Billions of Edges Per Second with Postgres</h2>
 
           <p>Below are benchmarks on a 48-core AMD EPYC cloud server
@@ -111,10 +94,43 @@
                 <a href="https://en.wikipedia.org/wiki/Shortest_path_problem">Single Source Shortest Path</a></figcaption>
             </figure>
           </div>
-          <p>OneSparse brings large scale graph analytics to Postgres.
+          <p>OneSparse brings large scale graph analysis to Postgres.
           Users can pick from a large library of preexisting
           algorithms like those used in GAP, or roll their own using
           our powerful Linear Algebra framework</p>
+
+		  <h2>The AI Revolution needs Graphs</h2>
+		  <p>Graphs present the most difficult computing challenges
+			faced by enterprise users today. Trillions of rows of data
+			are stored in relational databases, but SQL does not have
+			the analytical power to bring insight from existing highly
+			connected sparse data.</p>
+
+          <p>Recent advancements in AI language models have brought
+            powerful insight into unstructured information generation,
+            but large-scale knowledge problems require structured
+            semantic encoding and connection rules.  Semantic
+            structuring with Graphs are a natural fit these types of
+            models.</p>
+
+          <p>But Graphs open up a whole world of computing issues,
+            they tend to be very sparse, and this gets worse as they
+            scale bigger.  Advanced sparse optimized computing
+            techniques are needed to avoid the induced highly random
+            access patterns.</p>
+
+          <p>Further challenges involve wranging the vast amount of
+            data, processing, cleaning and organizing it.  SQL is
+            excellent for this task, but falls short of providing
+            high-performance graph analysis where billions of edges
+            must be traversed every second.</p>
+
+          <p>OneSparse brings high-performance, multi-core graph
+            analysis to Postgres.  By leveraging the SuiteSparse
+            GraphBLAS library OneSparse can traverse billions of edges
+            per second on immense graphs using all available CPU
+            resources on readily available commodity cloud
+            hardware. </p>
 
           <h2>NVIDIA Blackwell</h2>
 
@@ -129,7 +145,7 @@
               including NVIDIA CUDA.  Upcoming Blackwell architectures
               with unified physical memory bring drastic improvements
               in sparse graph algorithms, avoid the ping-pong effects
-              of low speed data copying across slow PCI busses.</p>
+              of low speed data copying across slow PCI buses.</p>
           </div>
 
           <h2>Future Accelerators</h2>
@@ -141,9 +157,9 @@
               including NVIDIA CUDA.  Upcoming Blackwell architectures
               with unified physical memory bring drastic improvements
               in sparse graph algorithms, avoid the ping-pong effects
-              of low speed data copying across slow PCI busses.</p>
+              of low speed data copying across slow PCI buses.</p>
             <figure>
-              <img src="images/procvenn.png"/>
+              <img src="images/FPGA.jpg"/>
               <figcaption></figcaption>
             </figure>
           </div>
@@ -187,7 +203,7 @@
 			  <p>LAGraph is a suite of advanced, high performance
 			  graph algorithms implemented with the GraphBLAS.  These
 			  battle-tested algorithms come built into OneSparse,
-			  quickly accelerating analytics with minimal setup.
+			  quickly accelerating analysis with minimal setup.
               </p>
               <a href="https://github.com/GraphBLAS/LAGraph"
               class="button">Github</a>
@@ -210,7 +226,7 @@
 
           <h2>The GraphBLAS Organization</h2>
           <p>OneSparse is powered by the SuiteSparse GraphBLAS library
-            which is the high performance reference implemntation
+            which is the high performance reference implementation
             of <a href="graphblas.org">the GraphBLAS
               Organization</a>.</p>
           <table>
