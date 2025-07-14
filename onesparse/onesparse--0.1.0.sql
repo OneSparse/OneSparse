@@ -1966,6 +1966,11 @@ RETURNS matrix
 AS '$libdir/onesparse', 'matrix_apply_second'
 LANGUAGE C STABLE;
 
+CREATE FUNCTION diag(v vector)
+RETURNS matrix
+AS '$libdir/onesparse', 'matrix_diag'
+LANGUAGE C STABLE;
+
 CREATE FUNCTION nnz(a matrix)
 RETURNS scalar
     RETURN reduce_scalar(apply(a, 'one_bool'::unaryop, c=>'int64'::matrix));
@@ -2425,6 +2430,48 @@ CREATE OPERATOR @<+< (
     FUNCTION = min_plus_min_op
     );
 
+CREATE FUNCTION plus_plus(
+        a matrix,
+        b matrix,
+        c matrix default null,
+        mask matrix default null,
+        accum binaryop default null,
+        descr descriptor default null)
+RETURNS matrix
+    RETURN mxm(a, b, ('plus_plus_' || name(type(a)))::semiring, c, mask, accum, descr);
+
+CREATE FUNCTION plus_plus(
+        a matrix,
+        b vector,
+        c vector default null,
+        mask vector default null,
+        accum binaryop default null,
+        descr descriptor default null)
+RETURNS vector
+    RETURN mxv(a, b, ('plus_plus_' || name(type(a)))::semiring, c, mask, accum, descr);
+
+CREATE FUNCTION plus_plus(
+        a vector,
+        b matrix,
+        c vector default null,
+        mask vector default null,
+        accum binaryop default null,
+        descr descriptor default null)
+RETURNS vector
+    RETURN vxm(a, b, ('plus_plus_' || name(type(a)))::semiring, c, mask, accum, descr);
+
+CREATE FUNCTION plus_plus_op(
+        a matrix,
+        b matrix)
+RETURNS matrix
+    RETURN plus_plus(a, b);
+
+CREATE OPERATOR @++ (
+    LEFTARG = matrix,
+    RIGHTARG = matrix,
+    FUNCTION = plus_plus_op
+    );
+
 CREATE FUNCTION serialize(a matrix)
 RETURNS bytea
 AS '$libdir/onesparse', 'matrix_serialize'
@@ -2559,7 +2606,9 @@ create or replace function draw(
     directed bool default true,
     color_nodes bool default false,
     alpha double precision default 1.0,
-    label text default null) returns text language plpgsql set search_path = onesparse,public as
+    label text default null,
+    shape text default 'circle')
+    returns text language plpgsql set search_path = onesparse,public as
     $$
     declare
         row bigint;
@@ -2571,10 +2620,10 @@ create or replace function draw(
         edge text;
     begin
         if directed then
-            result = E'digraph {\n';
+            result = format(E'digraph {\n node [shape=%s];\n rankdir=LR;\n', shape);
             edge = '->';
         else
-            result = E'graph {\n';
+            result = format(E'graph {\n  node [shape=%s];\n', shape);
             edge = '--';
         end if;
         if node_labels is not null then
@@ -2589,7 +2638,7 @@ create or replace function draw(
                     color_style = format(E'style=filled fillcolor="%s"', jet_color(value::double precision, alpha));
                 end if;
                 value = get_element(node_labels, row);
-                result = result || format(E'%s [label="%s : %s" %s]\n', row, row, left(print(value), 4), color_style);
+                result = result || format(E'%s [label="%s : %s" %s];\n', row, row, left(print(value), 4), color_style);
             end loop;
         end if;
         for row, col, value in select * from elements(a) loop
@@ -2599,9 +2648,9 @@ create or replace function draw(
                 if color_nodes then
                     color_style = format(E'style=filled fillcolor="%s"', jet_color(value::double precision, alpha));
                 end if;
-                result = result || format(E' [label="%s" %s]\n', left(print(value), 4), color_style);
+                result = result || format(E' [label="%s" %s];\n', left(print(value), 4), color_style);
             else
-                result = result || E'\n';
+                result = result || E';\n';
             end if;
         end loop;
         if label is not null then
@@ -2611,6 +2660,73 @@ create or replace function draw(
         return result;
     end;
     $$;
+
+CREATE OR REPLACE FUNCTION hyperdraw(
+    a matrix,
+    b matrix,
+    a_prefix text default 'a',
+    b_prefix text default 'b',
+    a_labels vector default null,
+    b_labels vector default null,
+    a_weights bool default true,
+    b_weights bool default true,
+    color_nodes bool default false,
+    alpha double precision default 1.0,
+    label text default null,
+    a_shape text default 'circle',
+    b_shape text default 'box'
+    )
+RETURNS text LANGUAGE plpgsql AS $$
+DECLARE
+    dot text := format(E'digraph G {\n  nodesep=0.2;\n  ranksep=0.2;\n node [shape=%s];\n edge [splines=false];\n', a_shape);
+    i bigint;
+    rec record;
+BEGIN
+    -- Emit edge nodes as boxes
+    FOR i IN (select * from irows(transpose(a)) union select * from irows(b) order by irows)
+    LOOP
+        dot := dot || format(E'  "%s:%s" [shape=%s];\n', b_prefix, i::text, b_shape);
+    END LOOP;
+
+    -- Emit arcs from source nodes to edge nodes
+    FOR rec IN SELECT * FROM elements(a)
+    LOOP
+        dot := dot || format(E'  "%s:%s" -> "%s:%s"', a_prefix, rec.i::text, b_prefix, rec.j::text);
+        if a_weights then
+            dot = dot || format(E' [label="%s"];\n', print(rec.v));
+        else
+            dot = dot || E';\n';
+        end if;
+    END LOOP;
+
+    -- Emit arcs from edge nodes to destination nodes
+    FOR rec IN SELECT * FROM elements(b)
+    LOOP
+        dot := dot || format(E'  "%s:%s" -> "%s:%s"', b_prefix, rec.i::text, a_prefix, rec.j::text);
+        if b_weights then
+            dot = dot || format(E' [label="%s"];\n', print(rec.v));
+        else
+            dot = dot || E';\n';
+        end if;
+    END LOOP;
+
+    dot := dot || '}';
+    RETURN dot;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION gnuplot(m matrix)
+RETURNS text LANGUAGE plpgsql AS $$
+DECLARE
+  result text := '';
+  r record;
+BEGIN
+  FOR r IN SELECT * FROM elements(m) LOOP
+    result := result || r.i || ' ' || r.j || ' ' || print(r.v) || E'\n';
+  END LOOP;
+  RETURN result;
+END;
+$$;
 
 create or replace function kronpower(m matrix, k integer, s semiring default 'plus_times_int32')
     returns matrix language plpgsql set search_path = onesparse,public as
