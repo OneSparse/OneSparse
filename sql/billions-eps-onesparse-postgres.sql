@@ -19,7 +19,7 @@
 -- OneSparse is a Postgres extension that brings the power of Graph
 -- Linear Algebra to Postgres. Have you found yourself spending too
 -- much time extracting, transforming, and loading graphs into side
--- databases that need constant money, maintanance and impedance
+-- databases that need constant money, maintenance and impedance
 -- matching with SQL?  With OneSparse, it's easy to turn SQL data into
 -- high performance graphs and back again all without needing any
 -- external tooling; it's all done in the database.
@@ -39,7 +39,7 @@
 -- SuiteSparse contains powerful optimized kernels for sparse graph
 -- computation, the ability for users to define their own edge types
 -- and operators, and has a built-in JIT compiler that can target many
--- computing architectures including [Nvidia
+-- computing architectures including [NVIDIA
 -- CUDA](https://developer.nvidia.com/cuda-toolkit).
 
 -- OneSparse is more than just fast graphs, its graph algorithms are
@@ -61,7 +61,7 @@
 -- Other libraries use an "Actor" model where the algorithm defines
 -- the behavior of a node when it receives or sends messages to its
 -- adjacent actors.  This approach has good parallelism opportunities,
--- but reasoning about complex algorithms and their data hazzards can
+-- but reasoning about complex algorithms and their data hazards can
 -- be difficult.  Seeing the forest for the trees is hard from an
 -- all-tree perspective.
 --
@@ -76,7 +76,7 @@
 --
 -- ## Graphs are Matrices and Matrices are Graphs
 --
--- The key idea is that graphs and matricies are conceptuals
+-- The key idea is that graphs and matrices are conceptual
 -- reflections of each other, an idea understood now for hundreds of
 -- years.  Creating a Graph in OneSparse is the same as creating a
 -- matrix.
@@ -103,7 +103,7 @@ select draw(graph, label:='Graph') as twocol_a_source, print(graph) as twocol_b_
 --
 -- Hypergraphs are graphs where an edge can have more than one source
 -- or destination.  These are important types of graphs for modeling
--- complex interactions and finacial situations where relationships
+-- complex interactions and financial situations where relationships
 -- are not just one-to-one.  A commonly studied example would be the
 -- multi-party financial transaction networks, where transactions
 -- represent *hyperedges* with multiple inputs and outputs.
@@ -330,7 +330,7 @@ select draw(triu(graph),
 select reduce_cols(cast_to(graph, 'int32')) as "Karate Degree" from karate;
 
 -- A vector maps a node's row index to a value.  Now look at the graph
--- where nodes are labled and color mapped according to the degree of
+-- where nodes are labeled and color mapped according to the degree of
 -- each node:
 
 select draw(triu(graph),
@@ -348,7 +348,7 @@ select draw(triu(graph),
 -- Vectors represent sets of nodes in the graph.  They map the node to
 -- some useful piece of information, like the nodes degree.  Vector
 -- reduction is a core operation of linear algebra, and the GraphBLAS
--- fully embaces this.  Vectors often end up being the result of an
+-- fully embraces this.  Vectors often end up being the result of an
 -- algebraic graph algorithm.
 --
 -- ## PageRank
@@ -391,7 +391,7 @@ select draw(triu(graph),
             false,
             true,
             0.5,
-            'Triange Centrality Karate Graph')
+            'Triangle Centrality Karate Graph')
     as draw_source from karate \gset
 \i sql/draw_sfdp.sql
 
