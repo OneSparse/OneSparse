@@ -351,20 +351,20 @@ select draw(a) as binop_a_source, draw(b) as binop_b_source, draw(eunion(a, 3::s
 --
 -- The entire matrix can be reduced to a scalar value:
 
-select print(a) as a, 'plus_monoid_int32' as monoid, reduce_scalar(a) from test_fixture;
+select print(b) as b, 'plus_monoid_int32' as monoid, reduce_scalar(b) from test_fixture;
 
 -- The entire matrix can be reduced to a scalar value with a provided
 -- monoid that changes the reduction operation:
 
-select print(a) as a, 'min_monoid_int32' as monoid, reduce_scalar(a, 'min_monoid_int32') from test_fixture;
+select print(b) as b, 'min_monoid_int32' as monoid, reduce_scalar(b, 'min_monoid_int32') from test_fixture;
 
 -- The matrix can also be reduced to a column vector:
 
-select print(a) as a, 'plus_monoid_int32' as monoid, print(reduce_cols(a)) as reduce_cols from test_fixture;
+select print(b) as b, 'plus_monoid_int32' as monoid, print(reduce_cols(b)) as reduce_cols from test_fixture;
 
 -- To reduce a row vector:
 
-select print(a) as a, 'plus_monoid_int32' as monoid, print(reduce_rows(a)) as reduce_rows from test_fixture;
+select print(b) as b, 'plus_monoid_int32' as monoid, print(reduce_rows(b)) as reduce_rows from test_fixture;
 
 -- ## Matrix Matrix Multiplication
 --

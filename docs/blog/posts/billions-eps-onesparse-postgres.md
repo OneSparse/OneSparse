@@ -1,5 +1,5 @@
 ---
-draft: true
+draft: false
 authors:
   - michelp
 date: 2025-07-01
@@ -13,22 +13,23 @@ categories:
 ---
 # Billions of Edges Per Second with Postgres
 Chances are you're reading this because, like me, you are a huge
-fan of Postgres.  It's a powerful and featured filled framework,
-and is excellent for transactional workloads and some analysis
-tasks.  While I've always considered Postgres a pretty decent tool
-for storing small graphs using foreign keys for edge relationships,
-Postgres is not optmized for traversing billions of edges for very
-large, sparse graphs.
+fan of Postgres.  It's a powerful and featured-filled data
+framework, and is excellent for transactional workloads and
+analysis tasks.  While I've always considered Postgres a pretty
+decent tool for storing small graphs using foreign keys for edge
+relationships, Postgres is not optmized for traversing billions of
+edges for very large, sparse graphs.
 
 <!-- more -->
 
-And so you find yourself spending too much time extracting,
-transforming, and loading graphs into external graph tools that
-need constant money, maintenance and suffer impedance matching with
-SQL?  Copying data is expensive, and moving huge graphs can really
-slow things down.  With OneSparse, it's easy to turn SQL data into
-high performance graphs and back again without needing any external
-tooling, or the best database in the world, Postgres.xg
+SQL has lacked graph analytical features for some time, and recent
+standardizations on SQL graph syntax have focused on simple node
+and edge relationships, but not on large scale algorithmic
+performance.  Until now, heavy external graph databases that
+require copying data out-of-process to syncronize graph state were
+the norm.  With OneSparse, it's easy to turn SQL data into high
+performance graphs and back again without needing any external
+tooling, just the best database in the world, Postgres.
 
 For years now those of us over at [The GraphBLAS
 Forum](graphblas.org) have been working hard to bring a
@@ -42,11 +43,11 @@ al](https://engineering.tamu.edu/cse/profiles/davis-tim.html) at
 University](https://engineering.tamu.edu/cse/index.html).
 
 OneSparse uses SuiteSparse and it's optimized kernels for sparse
-graph computation, the ability for users to define their own edge
-types and operators, and built-in JIT compiler that can target many
-computing architectures including [NVIDIA
-CUDA](https://developer.nvidia.com/cuda-toolkit) to bring
-graph analysis to Postgres.
+graph computation, bringing support for custom edge types and
+operators and built-in JIT compiler that can target many computing
+architectures including [NVIDIA
+CUDA](https://developer.nvidia.com/cuda-toolkit) to bring graph
+analysis to Postgres.
 OneSparse is more than just fast graphs, its graph algorithms are
 expressed using [Linear
 Algebra](https://en.wikipedia.org/wiki/Linear_algebra) operations
@@ -54,6 +55,7 @@ to traverse and process graphs that are represented as matrices.
 In this approach inspired by the [mathematical roots of graph
 theory](https://en.wikipedia.org/wiki/Adjacency_matrix), sets of
 nodes are sparse Vectors and graphs of nodes are sparse Matrices.
+
 This differs quite a bit from most graph processing libraries that
 focus on individual nodes and edges, which are inherently serial
 concepts.  Writing efficient bulk parallel decisions at such a low
@@ -61,21 +63,21 @@ level is complex, and hard to retarget to new architectures due to
 close-to-the-metal complexities that all new and coming families of
 parallel processors possess.
 
-Other libraries use an "Actor" model where the algorithm defines
-the behavior of a node when it receives or sends messages to its
+Other libraries use an actor-model where the algorithm defines the
+behavior of a node when it receives or sends messages to its
 adjacent actors.  This approach has good parallelism opportunities,
 but reasoning about complex algorithms and their data hazards can
 be difficult.  Seeing the forest for the trees is hard from an
 all-tree perspective.
 
-By basing itself on the abstractions of math, the GraphBLAS
-leverages the rules and objects of [Linear
+By basing itself on [Linear
 Algebra](https://en.wikipedia.org/wiki/Linear_algebra), and in
 particular Sparse [Matrix
 Multiplication](https://en.wikipedia.org/wiki/Matrix_multiplication),
-over [Semirings](https://en.wikipedia.org/wiki/Semiring) to
-efficiently schedule graph operations in bulk across many cores, or
-whatever other processing unit the particular architecture employs.
+over [Semirings](https://en.wikipedia.org/wiki/Semiring) OneSparse
+can efficiently schedule graph operations in bulk across many
+cores, or whatever other processing unit the particular
+architecture employs.
 
 ## Graphs are Matrices and Matrices are Graphs
 
@@ -259,22 +261,7 @@ main concept of the GraphBLAS.  By unifying these two concepts,
 both edge-and-node graph operations and algebraic operations can be
 performed to analyze the graph.
 
-## High Performance Parallel Breadth First Search (BFS)
-
-BFS is the core operation of graph analysis.  Like a pebble thrown
-into a pond, you start from a point in the graph, and traverse all
-the edges you find, as you find them.  As you traverse the graph
-you can accumulate some interesting information as you go, like how
-many edges away from the starting point you are, the "level" and
-the row index of the node you got here from, the "parent".  In the
-GraphBLAS, this information is accumulated in vectors.
-For the purposes of a quick demo, we will use a very small graph
-that is very commonly studied in graph theory called the
-[Newman/karate](https://sparse.tamu.edu/Newman/karate) graph, which
-can be downloaded from the [SuiteSparse Matrix
-Collection](https://sparse.tamu.edu/).
-
-### Storing Graphs
+## Storing Graphs
 
 OneSparse can serialize and deserialize graphs into Postgres
 objects to and from an on-disk state.  This state can come from
@@ -291,9 +278,10 @@ much larger graphs from either SQL queries, Large Object storage,
 or most optimally, from compressed files on the server filesystem
 itself.
 
-A simple approach for small graphs that fit into the TOAST limit is
-to make a materialized view that loads the graph data from disk
-using the standard [Matrix
+For small graphs, storing them as varlena objects is perfectly
+fine.  A simple approach for small graphs that fit into the TOAST
+limit is to make a materialized view that loads the graph data from
+disk using the standard [Matrix
 Market](https://math.nist.gov/MatrixMarket/formats.html) format:
 ``` postgres-console
 create materialized view if not exists karate as
@@ -301,6 +289,25 @@ create materialized view if not exists karate as
 ```
 This graph can now be accessed from SQL using the GraphBLAS API
 exposed by OneSparse.
+
+## High Performance Parallel Breadth First Search (BFS)
+
+BFS is the core operation of graph analysis.  Like a pebble thrown
+into a pond, you start at one point in the graph and traverse all
+the edges you find, as you find them.  Traverse the graph
+accumulates interesting information as you go, like how many edges
+away from the starting point you are, the "level" and the row index
+of the node you got here from, the "parent".  In the GraphBLAS,
+this information is accumulated in vectors, whose graph analog are
+sets of nodes with values mapped to them.
+
+It's pretty easy to write a function in just about any language
+that will do a BFS across a graph, but as graphs get bigger these
+approaches do not scale.  In order to BFS efficiently, multiple
+cores must be used and coordinate their parallel work across
+different processor architectures, CPUs, GPUs, FPGAs etc. Reaching
+the scale of hundreds and thousands of varying core architectures
+in a hardware-portable way is the main goal of the GraphBLAS API.
 
 ### Level BFS
 
@@ -1543,17 +1550,6 @@ select draw(triu(graph),
 </div>
 
 
-It's pretty easy to write a function in just about any language
-that will do a BFS across a graph, but as graphs get bigger these
-approaches do not scale.  In order to BFS efficiently, multiple
-cores must be used and coordinate their parallel work.
-
-Different kinds of processor architectures, CPUs, GPUs, FPGAs etc,
-have extremely different ways of doing concurrent work.  Reaching
-the scale of billions of nodes and hundreds of cores requires the
-kind of sparse computing expertise that's been used to develop the
-GraphBLAS API.
-
 For example, we've benchmarked OneSparse using the industry
 standard [GAP Benchmark Suite](https://github.com/sbeamer/gapbs).
 The GAP is a group of publicly available [graph data
@@ -1581,11 +1577,14 @@ multiplication to get these results.
 Interestingly, the [road
 graph](https://sparse.tamu.edu/GAP/GAP-road) doesn't appear at
 first to do so well.  One issue is that the graph is so "small" at
-only 57M edges, that it can't take advantage of all the cores.
+only 57M edges, that it can't take full advantage of all the cores.
 This is exacerbated by some of the issues that extreme sparsity can
 bring.  The road graph is very sparse, the degree distribution is
-relatively uniform, and it has a very high diameter.  This is a
-relatively common but tricky kind of graph to traverse in parallel.
+relatively uniform, leaving little opportunity for bulk operation,
+and it has a very high diameter meaning there are many work levels.
+This is a relatively common but tricky kind of graph to traverse in
+parallel using any language or technique, and shows how graphs are
+hard!
 
 ## Degree Centrality
 
@@ -1596,7 +1595,10 @@ graph, that is, how many edges connect to the node.
 
 This can be done by reducing the Matrix to a Vector, which sums all
 the column vectors of the matrix into a vector which contains the
-degree for each node:
+degree for each node.  Since the karate graph is boolean (the
+weights are true or false), Casting this matrix to an integer will
+set each edge weight to one, the reduction operation then sums up
+all the edge weights which will equal the out degree for that node.
 ``` postgres-console
 select reduce_cols(cast_to(graph, 'int32')) as "Karate Degree" from karate;
 ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
@@ -2230,7 +2232,7 @@ select draw(triu(graph),
 We saw the core idea about how graphs and matrices can be one and
 the same, but now we see the relationship to vectors and graphs.
 Vectors represent sets of nodes in the graph.  They map the node to
-some useful piece of information, like the nodes degree.  Vector
+some useful piece of information, like the node's degree.  Vector
 reduction is a core operation of linear algebra, and the GraphBLAS
 fully embraces this.  Vectors often end up being the result of an
 algebraic graph algorithm.
@@ -3489,638 +3491,19 @@ select draw(triu(graph),
 </svg>
 </div>
 
-This can be taken even further with the [Square
-Clustering](https://networkx.org/documentation/stable/reference/algorithms/generated/networkx.algorithms.cluster.square_clustering.html)
-algorithm, which considers how many squares nodes connect to:
-``` postgres-console
-select draw(triu(graph),
-            square_clustering(graph),
-            false,
-            false,
-            true,
-            0.5,
-            'Square Clustering Karate Graph')
-    as draw_source from karate \gset
-```
-<div>
-<!-- Title: %3 Pages: 1 -->
-<svg width="1332pt" height="556pt"
- viewBox="0.00 0.00 1331.72 556.12" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 552.12)">
-<title>%3</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-552.12 1327.72,-552.12 1327.72,4 -4,4"/>
-<text text-anchor="middle" x="661.86" y="-7.4" font-family="Times,serif" font-size="12.00">Square Clustering Karate Graph</text>
-<!-- 0 -->
-<g id="node1" class="node">
-<title>0</title>
-<ellipse fill="#00007f" fill-opacity="0.498039" stroke="black" cx="534.1" cy="-294.15" rx="33.47" ry="33.47"/>
-<text text-anchor="middle" x="534.1" y="-292.25" font-family="Times,serif" font-size="8.00">0 : 0.09</text>
-</g>
-<!-- 1 -->
-<g id="node2" class="node">
-<title>1</title>
-<ellipse fill="#0030ff" fill-opacity="0.498039" stroke="black" cx="651.68" cy="-171.19" rx="33.47" ry="33.47"/>
-<text text-anchor="middle" x="651.68" y="-169.29" font-family="Times,serif" font-size="8.00">1 : 0.17</text>
-</g>
-<!-- 0&#45;&#45;1 -->
-<g id="edge1" class="edge">
-<title>0&#45;&#45;1</title>
-<path fill="none" stroke="black" d="M557.33,-269.86C577.95,-248.3 607.9,-216.98 628.5,-195.43"/>
-</g>
-<!-- 2 -->
-<g id="node3" class="node">
-<title>2</title>
-<ellipse fill="#0000d2" fill-opacity="0.498039" stroke="black" cx="797.14" cy="-222.57" rx="33.47" ry="33.47"/>
-<text text-anchor="middle" x="797.14" y="-220.67" font-family="Times,serif" font-size="8.00">2 : 0.12</text>
-</g>
-<!-- 0&#45;&#45;2 -->
-<g id="edge2" class="edge">
-<title>0&#45;&#45;2</title>
-<path fill="none" stroke="black" d="M566.36,-285.38C616.98,-271.6 714.51,-245.06 765.04,-231.3"/>
-</g>
-<!-- 3 -->
-<g id="node4" class="node">
-<title>3</title>
-<ellipse fill="#0090ff" fill-opacity="0.498039" stroke="black" cx="572.77" cy="-194.91" rx="33.47" ry="33.47"/>
-<text text-anchor="middle" x="572.77" y="-193.01" font-family="Times,serif" font-size="8.00">3 : 0.21</text>
-</g>
-<!-- 0&#45;&#45;3 -->
-<g id="edge3" class="edge">
-<title>0&#45;&#45;3</title>
-<path fill="none" stroke="black" d="M546.23,-263.03C550.84,-251.2 556.08,-237.74 560.68,-225.93"/>
-</g>
-<!-- 4 -->
-<g id="node5" class="node">
-<title>4</title>
-<ellipse fill="#0000ca" fill-opacity="0.498039" stroke="black" cx="328.65" cy="-434.82" rx="33.47" ry="33.47"/>
-<text text-anchor="middle" x="328.65" y="-432.92" font-family="Times,serif" font-size="8.00">4 : 0.12</text>
-</g>
-<!-- 0&#45;&#45;4 -->
-<g id="edge4" class="edge">
-<title>0&#45;&#45;4</title>
-<path fill="none" stroke="black" d="M506.39,-313.13C467.07,-340.05 395.51,-389.05 356.25,-415.93"/>
-</g>
-<!-- 5 -->
-<g id="node6" class="node">
-<title>5</title>
-<ellipse fill="#00008b" fill-opacity="0.498039" stroke="black" cx="215.9" cy="-313.29" rx="33.47" ry="33.47"/>
-<text text-anchor="middle" x="215.9" y="-311.39" font-family="Times,serif" font-size="8.00">5 : 0.09</text>
-</g>
-<!-- 0&#45;&#45;5 -->
-<g id="edge5" class="edge">
-<title>0&#45;&#45;5</title>
-<path fill="none" stroke="black" d="M500.65,-296.17C439.54,-299.84 310.52,-307.6 249.38,-311.28"/>
-</g>
-<!-- 6 -->
-<g id="node7" class="node">
-<title>6</title>
-<ellipse fill="#00008b" fill-opacity="0.498039" stroke="black" cx="227.93" cy="-395.26" rx="33.47" ry="33.47"/>
-<text text-anchor="middle" x="227.93" y="-393.36" font-family="Times,serif" font-size="8.00">6 : 0.09</text>
-</g>
-<!-- 0&#45;&#45;6 -->
-<g id="edge6" class="edge">
-<title>0&#45;&#45;6</title>
-<path fill="none" stroke="black" d="M502.49,-304.59C443.82,-323.97 318.72,-365.28 259.83,-384.73"/>
-</g>
-<!-- 7 -->
-<g id="node8" class="node">
-<title>7</title>
-<ellipse fill="#4bffb3" fill-opacity="0.498039" stroke="black" cx="615.25" cy="-105.44" rx="33.47" ry="33.47"/>
-<text text-anchor="middle" x="615.25" y="-103.54" font-family="Times,serif" font-size="8.00">7 : 0.30</text>
-</g>
-<!-- 0&#45;&#45;7 -->
-<g id="edge7" class="edge">
-<title>0&#45;&#45;7</title>
-<path fill="none" stroke="black" d="M547.32,-263.41C562.41,-228.32 586.95,-171.25 602.04,-136.17"/>
-</g>
-<!-- 8 -->
-<g id="node9" class="node">
-<title>8</title>
-<ellipse fill="#0010ff" fill-opacity="0.498039" stroke="black" cx="849.99" cy="-283.03" rx="33.47" ry="33.47"/>
-<text text-anchor="middle" x="849.99" y="-281.13" font-family="Times,serif" font-size="8.00">8 : 0.15</text>
-</g>
-<!-- 0&#45;&#45;8 -->
-<g id="edge8" class="edge">
-<title>0&#45;&#45;8</title>
-<path fill="none" stroke="black" d="M567.61,-292.97C628.26,-290.84 755.6,-286.35 816.35,-284.21"/>
-</g>
-<!-- 10 -->
-<g id="node11" class="node">
-<title>10</title>
-<ellipse fill="#0000ca" fill-opacity="0.498039" stroke="black" cx="313.05" cy="-336.35" rx="37.45" ry="37.45"/>
-<text text-anchor="middle" x="313.05" y="-334.45" font-family="Times,serif" font-size="8.00">10 : 0.12</text>
-</g>
-<!-- 0&#45;&#45;10 -->
-<g id="edge9" class="edge">
-<title>0&#45;&#45;10</title>
-<path fill="none" stroke="black" d="M501.01,-300.47C460.54,-308.19 392.24,-321.23 350.07,-329.28"/>
-</g>
-<!-- 12 -->
-<g id="node12" class="node">
-<title>12</title>
-<ellipse fill="#27ffd7" fill-opacity="0.498039" stroke="black" cx="377.18" cy="-186.52" rx="37.45" ry="37.45"/>
-<text text-anchor="middle" x="377.18" y="-184.62" font-family="Times,serif" font-size="8.00">12 : 0.28</text>
-</g>
-<!-- 0&#45;&#45;12 -->
-<g id="edge11" class="edge">
-<title>0&#45;&#45;12</title>
-<path fill="none" stroke="black" d="M506.41,-275.16C478.87,-256.27 436.71,-227.35 408.09,-207.72"/>
-</g>
-<!-- 13 -->
-<g id="node13" class="node">
-<title>13</title>
-<ellipse fill="#0067ff" fill-opacity="0.498039" stroke="black" cx="730.54" cy="-238.71" rx="37.45" ry="37.45"/>
-<text text-anchor="middle" x="730.54" y="-236.81" font-family="Times,serif" font-size="8.00">13 : 0.19</text>
-</g>
-<!-- 0&#45;&#45;13 -->
-<g id="edge12" class="edge">
-<title>0&#45;&#45;13</title>
-<path fill="none" stroke="black" d="M566.1,-285.12C601.22,-275.21 657.47,-259.33 694.22,-248.96"/>
-</g>
-<!-- 17 -->
-<g id="node17" class="node">
-<title>17</title>
-<ellipse fill="#ffdf00" fill-opacity="0.498039" stroke="black" cx="449.94" cy="-127.97" rx="37.45" ry="37.45"/>
-<text text-anchor="middle" x="449.94" y="-126.07" font-family="Times,serif" font-size="8.00">17 : 0.40</text>
-</g>
-<!-- 0&#45;&#45;17 -->
-<g id="edge13" class="edge">
-<title>0&#45;&#45;17</title>
-<path fill="none" stroke="black" d="M519.06,-264.44C504.4,-235.5 482.15,-191.58 466.88,-161.42"/>
-</g>
-<!-- 19 -->
-<g id="node19" class="node">
-<title>19</title>
-<ellipse fill="#002aff" fill-opacity="0.498039" stroke="black" cx="743.21" cy="-326.55" rx="37.45" ry="37.45"/>
-<text text-anchor="middle" x="743.21" y="-324.65" font-family="Times,serif" font-size="8.00">19 : 0.16</text>
-</g>
-<!-- 0&#45;&#45;19 -->
-<g id="edge14" class="edge">
-<title>0&#45;&#45;19</title>
-<path fill="none" stroke="black" d="M567.24,-299.29C605.01,-305.14 666.61,-314.69 706,-320.79"/>
-</g>
-<!-- 21 -->
-<g id="node21" class="node">
-<title>21</title>
-<ellipse fill="#ffdf00" fill-opacity="0.498039" stroke="black" cx="492.91" cy="-58.48" rx="37.45" ry="37.45"/>
-<text text-anchor="middle" x="492.91" y="-56.58" font-family="Times,serif" font-size="8.00">21 : 0.40</text>
-</g>
-<!-- 0&#45;&#45;21 -->
-<g id="edge15" class="edge">
-<title>0&#45;&#45;21</title>
-<path fill="none" stroke="black" d="M528.38,-261.38C520.77,-217.88 507.37,-141.24 499.4,-95.63"/>
-</g>
-<!-- 31 -->
-<g id="node31" class="node">
-<title>31</title>
-<ellipse fill="#000085" fill-opacity="0.498039" stroke="black" cx="887.77" cy="-380.25" rx="37.45" ry="37.45"/>
-<text text-anchor="middle" x="887.77" y="-378.35" font-family="Times,serif" font-size="8.00">31 : 0.09</text>
-</g>
-<!-- 0&#45;&#45;31 -->
-<g id="edge16" class="edge">
-<title>0&#45;&#45;31</title>
-<path fill="none" stroke="black" d="M566.43,-302.02C632.33,-318.07 781.85,-354.46 851.19,-371.34"/>
-</g>
-<!-- 11 -->
-<g id="node34" class="node">
-<title>11</title>
-<ellipse fill="none" stroke="black" cx="430.81" cy="-529.03" rx="19.18" ry="19.18"/>
-<text text-anchor="middle" x="430.81" y="-527.13" font-family="Times,serif" font-size="8.00">11</text>
-</g>
-<!-- 0&#45;&#45;11 -->
-<g id="edge10" class="edge">
-<title>0&#45;&#45;11</title>
-<path fill="none" stroke="black" d="M520.6,-324.86C498.67,-374.72 456.01,-471.72 438.55,-511.43"/>
-</g>
-<!-- 1&#45;&#45;2 -->
-<g id="edge17" class="edge">
-<title>1&#45;&#45;2</title>
-<path fill="none" stroke="black" d="M683.25,-182.34C707.64,-190.96 741.26,-202.83 765.64,-211.44"/>
-</g>
-<!-- 1&#45;&#45;3 -->
-<g id="edge18" class="edge">
-<title>1&#45;&#45;3</title>
-<path fill="none" stroke="black" d="M619.58,-180.84C614.72,-182.3 609.7,-183.81 604.84,-185.27"/>
-</g>
-<!-- 1&#45;&#45;7 -->
-<g id="edge19" class="edge">
-<title>1&#45;&#45;7</title>
-<path fill="none" stroke="black" d="M635.38,-141.78C634.1,-139.45 632.79,-137.1 631.51,-134.78"/>
-</g>
-<!-- 1&#45;&#45;13 -->
-<g id="edge20" class="edge">
-<title>1&#45;&#45;13</title>
-<path fill="none" stroke="black" d="M677.07,-192.93C684.99,-199.71 693.79,-207.24 701.92,-214.2"/>
-</g>
-<!-- 1&#45;&#45;17 -->
-<g id="edge21" class="edge">
-<title>1&#45;&#45;17</title>
-<path fill="none" stroke="black" d="M618.82,-164.15C582.65,-156.4 524.63,-143.97 486.9,-135.88"/>
-</g>
-<!-- 1&#45;&#45;19 -->
-<g id="edge22" class="edge">
-<title>1&#45;&#45;19</title>
-<path fill="none" stroke="black" d="M668.68,-200.05C684.4,-226.73 707.73,-266.32 724.09,-294.09"/>
-</g>
-<!-- 1&#45;&#45;21 -->
-<g id="edge23" class="edge">
-<title>1&#45;&#45;21</title>
-<path fill="none" stroke="black" d="M624.39,-151.82C596.37,-131.93 552.85,-101.03 523.64,-80.29"/>
-</g>
-<!-- 30 -->
-<g id="node30" class="node">
-<title>30</title>
-<ellipse fill="#0043ff" fill-opacity="0.498039" stroke="black" cx="910.31" cy="-180.67" rx="37.45" ry="37.45"/>
-<text text-anchor="middle" x="910.31" y="-178.77" font-family="Times,serif" font-size="8.00">30 : 0.18</text>
-</g>
-<!-- 1&#45;&#45;30 -->
-<g id="edge24" class="edge">
-<title>1&#45;&#45;30</title>
-<path fill="none" stroke="black" d="M684.96,-172.41C733.12,-174.18 821.99,-177.43 872.54,-179.29"/>
-</g>
-<!-- 2&#45;&#45;3 -->
-<g id="edge25" class="edge">
-<title>2&#45;&#45;3</title>
-<path fill="none" stroke="black" d="M764.04,-218.49C721.61,-213.26 648.5,-204.25 606.01,-199.01"/>
-</g>
-<!-- 2&#45;&#45;7 -->
-<g id="edge26" class="edge">
-<title>2&#45;&#45;7</title>
-<path fill="none" stroke="black" d="M769.12,-204.52C734.94,-182.51 677.5,-145.52 643.3,-123.5"/>
-</g>
-<!-- 2&#45;&#45;8 -->
-<g id="edge27" class="edge">
-<title>2&#45;&#45;8</title>
-<path fill="none" stroke="black" d="M819.25,-247.86C822.08,-251.09 824.97,-254.41 827.8,-257.64"/>
-</g>
-<!-- 9 -->
-<g id="node10" class="node">
-<title>9</title>
-<ellipse fill="#00d9ff" fill-opacity="0.498039" stroke="black" cx="967.48" cy="-72.48" rx="33.47" ry="33.47"/>
-<text text-anchor="middle" x="967.48" y="-70.58" font-family="Times,serif" font-size="8.00">9 : 0.25</text>
-</g>
-<!-- 2&#45;&#45;9 -->
-<g id="edge28" class="edge">
-<title>2&#45;&#45;9</title>
-<path fill="none" stroke="black" d="M822.28,-200.42C854.58,-171.96 910.31,-122.86 942.52,-94.47"/>
-</g>
-<!-- 2&#45;&#45;13 -->
-<g id="edge29" class="edge">
-<title>2&#45;&#45;13</title>
-<path fill="none" stroke="black" d="M764.62,-230.45C764.49,-230.48 764.36,-230.51 764.23,-230.54"/>
-</g>
-<!-- 27 -->
-<g id="node27" class="node">
-<title>27</title>
-<ellipse fill="#0000c6" fill-opacity="0.498039" stroke="black" cx="988.3" cy="-282.18" rx="37.45" ry="37.45"/>
-<text text-anchor="middle" x="988.3" y="-280.28" font-family="Times,serif" font-size="8.00">27 : 0.12</text>
-</g>
-<!-- 2&#45;&#45;27 -->
-<g id="edge30" class="edge">
-<title>2&#45;&#45;27</title>
-<path fill="none" stroke="black" d="M829.14,-232.54C863.15,-243.15 916.82,-259.89 952.29,-270.95"/>
-</g>
-<!-- 28 -->
-<g id="node28" class="node">
-<title>28</title>
-<ellipse fill="#0016ff" fill-opacity="0.498039" stroke="black" cx="893.68" cy="-434.36" rx="37.45" ry="37.45"/>
-<text text-anchor="middle" x="893.68" y="-432.46" font-family="Times,serif" font-size="8.00">28 : 0.16</text>
-</g>
-<!-- 2&#45;&#45;28 -->
-<g id="edge31" class="edge">
-<title>2&#45;&#45;28</title>
-<path fill="none" stroke="black" d="M810.97,-252.91C828.75,-291.91 859.53,-359.45 878.11,-400.21"/>
-</g>
-<!-- 32 -->
-<g id="node32" class="node">
-<title>32</title>
-<ellipse fill="#0000f5" fill-opacity="0.498039" stroke="black" cx="1087.29" cy="-312.84" rx="37.45" ry="37.45"/>
-<text text-anchor="middle" x="1087.29" y="-310.94" font-family="Times,serif" font-size="8.00">32 : 0.14</text>
-</g>
-<!-- 2&#45;&#45;32 -->
-<g id="edge32" class="edge">
-<title>2&#45;&#45;32</title>
-<path fill="none" stroke="black" d="M829.03,-232.48C883.49,-249.43 994.11,-283.85 1051.28,-301.63"/>
-</g>
-<!-- 3&#45;&#45;7 -->
-<g id="edge33" class="edge">
-<title>3&#45;&#45;7</title>
-<path fill="none" stroke="black" d="M587.15,-164.62C591.58,-155.29 596.45,-145.03 600.88,-135.7"/>
-</g>
-<!-- 3&#45;&#45;12 -->
-<g id="edge34" class="edge">
-<title>3&#45;&#45;12</title>
-<path fill="none" stroke="black" d="M539.14,-193.47C504.52,-191.98 450.69,-189.67 414.7,-188.13"/>
-</g>
-<!-- 3&#45;&#45;13 -->
-<g id="edge35" class="edge">
-<title>3&#45;&#45;13</title>
-<path fill="none" stroke="black" d="M605.07,-203.88C631.04,-211.09 667.49,-221.21 694.42,-228.68"/>
-</g>
-<!-- 4&#45;&#45;6 -->
-<g id="edge36" class="edge">
-<title>4&#45;&#45;6</title>
-<path fill="none" stroke="black" d="M297.61,-422.63C285.36,-417.82 271.3,-412.3 259.04,-407.48"/>
-</g>
-<!-- 4&#45;&#45;10 -->
-<g id="edge37" class="edge">
-<title>4&#45;&#45;10</title>
-<path fill="none" stroke="black" d="M323.41,-401.75C321.98,-392.7 320.42,-382.83 318.95,-373.56"/>
-</g>
-<!-- 5&#45;&#45;6 -->
-<g id="edge38" class="edge">
-<title>5&#45;&#45;6</title>
-<path fill="none" stroke="black" d="M220.8,-346.63C221.55,-351.77 222.33,-357.08 223.08,-362.22"/>
-</g>
-<!-- 5&#45;&#45;10 -->
-<g id="edge39" class="edge">
-<title>5&#45;&#45;10</title>
-<path fill="none" stroke="black" d="M248.25,-320.97C257.31,-323.12 267.21,-325.47 276.48,-327.67"/>
-</g>
-<!-- 16 -->
-<g id="node16" class="node">
-<title>16</title>
-<ellipse fill="#8eff70" fill-opacity="0.498039" stroke="black" cx="37.48" cy="-384.77" rx="37.45" ry="37.45"/>
-<text text-anchor="middle" x="37.48" y="-382.87" font-family="Times,serif" font-size="8.00">16 : 0.33</text>
-</g>
-<!-- 5&#45;&#45;16 -->
-<g id="edge40" class="edge">
-<title>5&#45;&#45;16</title>
-<path fill="none" stroke="black" d="M184.82,-325.74C153.47,-338.3 105.16,-357.66 72.48,-370.75"/>
-</g>
-<!-- 6&#45;&#45;16 -->
-<g id="edge41" class="edge">
-<title>6&#45;&#45;16</title>
-<path fill="none" stroke="black" d="M194.32,-393.41C160.9,-391.57 109.72,-388.75 74.99,-386.84"/>
-</g>
-<!-- 8&#45;&#45;30 -->
-<g id="edge42" class="edge">
-<title>8&#45;&#45;30</title>
-<path fill="none" stroke="black" d="M866.95,-254.24C874.48,-241.47 883.37,-226.38 891.14,-213.2"/>
-</g>
-<!-- 8&#45;&#45;32 -->
-<g id="edge43" class="edge">
-<title>8&#45;&#45;32</title>
-<path fill="none" stroke="black" d="M882.98,-287.17C926.79,-292.68 1003.96,-302.37 1049.89,-308.14"/>
-</g>
-<!-- 33 -->
-<g id="node33" class="node">
-<title>33</title>
-<ellipse fill="#0000c2" fill-opacity="0.498039" stroke="black" cx="1050.52" cy="-280.84" rx="37.45" ry="37.45"/>
-<text text-anchor="middle" x="1050.52" y="-278.94" font-family="Times,serif" font-size="8.00">33 : 0.12</text>
-</g>
-<!-- 8&#45;&#45;33 -->
-<g id="edge44" class="edge">
-<title>8&#45;&#45;33</title>
-<path fill="none" stroke="black" d="M883.55,-282.66C919.23,-282.27 975.53,-281.66 1012.74,-281.25"/>
-</g>
-<!-- 9&#45;&#45;33 -->
-<g id="edge45" class="edge">
-<title>9&#45;&#45;33</title>
-<path fill="none" stroke="black" d="M979.92,-103.67C995.12,-141.82 1020.77,-206.2 1036.62,-245.95"/>
-</g>
-<!-- 13&#45;&#45;33 -->
-<g id="edge46" class="edge">
-<title>13&#45;&#45;33</title>
-<path fill="none" stroke="black" d="M767.87,-243.62C829.36,-251.72 951.27,-267.77 1012.93,-275.89"/>
-</g>
-<!-- 14 -->
-<g id="node14" class="node">
-<title>14</title>
-<ellipse fill="#7f0000" fill-opacity="0.498039" stroke="black" cx="1273.41" cy="-240.74" rx="37.45" ry="37.45"/>
-<text text-anchor="middle" x="1273.41" y="-238.84" font-family="Times,serif" font-size="8.00">14 : 0.56</text>
-</g>
-<!-- 14&#45;&#45;32 -->
-<g id="edge47" class="edge">
-<title>14&#45;&#45;32</title>
-<path fill="none" stroke="black" d="M1238.41,-254.3C1205.24,-267.15 1155.68,-286.34 1122.46,-299.21"/>
-</g>
-<!-- 14&#45;&#45;33 -->
-<g id="edge48" class="edge">
-<title>14&#45;&#45;33</title>
-<path fill="none" stroke="black" d="M1236.36,-247.41C1195.14,-254.82 1128.92,-266.74 1087.67,-274.16"/>
-</g>
-<!-- 15 -->
-<g id="node15" class="node">
-<title>15</title>
-<ellipse fill="#7f0000" fill-opacity="0.498039" stroke="black" cx="1220.29" cy="-457.39" rx="37.45" ry="37.45"/>
-<text text-anchor="middle" x="1220.29" y="-455.49" font-family="Times,serif" font-size="8.00">15 : 0.56</text>
-</g>
-<!-- 15&#45;&#45;32 -->
-<g id="edge49" class="edge">
-<title>15&#45;&#45;32</title>
-<path fill="none" stroke="black" d="M1194.65,-429.52C1171.1,-403.92 1136.38,-366.19 1112.86,-340.62"/>
-</g>
-<!-- 15&#45;&#45;33 -->
-<g id="edge50" class="edge">
-<title>15&#45;&#45;33</title>
-<path fill="none" stroke="black" d="M1194.14,-430.19C1162.23,-397.01 1108.62,-341.26 1076.71,-308.07"/>
-</g>
-<!-- 18 -->
-<g id="node18" class="node">
-<title>18</title>
-<ellipse fill="#7f0000" fill-opacity="0.498039" stroke="black" cx="1263.33" cy="-392.01" rx="37.45" ry="37.45"/>
-<text text-anchor="middle" x="1263.33" y="-390.11" font-family="Times,serif" font-size="8.00">18 : 0.56</text>
-</g>
-<!-- 18&#45;&#45;32 -->
-<g id="edge51" class="edge">
-<title>18&#45;&#45;32</title>
-<path fill="none" stroke="black" d="M1228.97,-376.55C1197.95,-362.6 1152.56,-342.19 1121.57,-328.25"/>
-</g>
-<!-- 18&#45;&#45;33 -->
-<g id="edge52" class="edge">
-<title>18&#45;&#45;33</title>
-<path fill="none" stroke="black" d="M1230.08,-374.64C1190.22,-353.81 1123.8,-319.12 1083.89,-298.27"/>
-</g>
-<!-- 19&#45;&#45;33 -->
-<g id="edge53" class="edge">
-<title>19&#45;&#45;33</title>
-<path fill="none" stroke="black" d="M780.28,-321.04C839.35,-312.25 954.17,-295.17 1013.32,-286.37"/>
-</g>
-<!-- 20 -->
-<g id="node20" class="node">
-<title>20</title>
-<ellipse fill="#7f0000" fill-opacity="0.498039" stroke="black" cx="1286.24" cy="-315.51" rx="37.45" ry="37.45"/>
-<text text-anchor="middle" x="1286.24" y="-313.61" font-family="Times,serif" font-size="8.00">20 : 0.56</text>
-</g>
-<!-- 20&#45;&#45;32 -->
-<g id="edge54" class="edge">
-<title>20&#45;&#45;32</title>
-<path fill="none" stroke="black" d="M1248.35,-315C1212.95,-314.52 1160.4,-313.82 1125.04,-313.34"/>
-</g>
-<!-- 20&#45;&#45;33 -->
-<g id="edge55" class="edge">
-<title>20&#45;&#45;33</title>
-<path fill="none" stroke="black" d="M1249.15,-310.05C1205.07,-303.57 1131.94,-292.82 1087.78,-286.32"/>
-</g>
-<!-- 22 -->
-<g id="node22" class="node">
-<title>22</title>
-<ellipse fill="#7f0000" fill-opacity="0.498039" stroke="black" cx="1151.23" cy="-501.38" rx="37.45" ry="37.45"/>
-<text text-anchor="middle" x="1151.23" y="-499.48" font-family="Times,serif" font-size="8.00">22 : 0.56</text>
-</g>
-<!-- 22&#45;&#45;32 -->
-<g id="edge56" class="edge">
-<title>22&#45;&#45;32</title>
-<path fill="none" stroke="black" d="M1139.05,-465.48C1127.68,-431.93 1110.79,-382.12 1099.43,-348.61"/>
-</g>
-<!-- 22&#45;&#45;33 -->
-<g id="edge57" class="edge">
-<title>22&#45;&#45;33</title>
-<path fill="none" stroke="black" d="M1135.5,-466.92C1116.58,-425.49 1085.02,-356.38 1066.15,-315.06"/>
-</g>
-<!-- 23 -->
-<g id="node23" class="node">
-<title>23</title>
-<ellipse fill="#0012ff" fill-opacity="0.498039" stroke="black" cx="1162.5" cy="-265.16" rx="37.45" ry="37.45"/>
-<text text-anchor="middle" x="1162.5" y="-263.26" font-family="Times,serif" font-size="8.00">23 : 0.15</text>
-</g>
-<!-- 25 -->
-<g id="node25" class="node">
-<title>25</title>
-<ellipse fill="#003aff" fill-opacity="0.498039" stroke="black" cx="1097.47" cy="-423.29" rx="37.45" ry="37.45"/>
-<text text-anchor="middle" x="1097.47" y="-421.39" font-family="Times,serif" font-size="8.00">25 : 0.17</text>
-</g>
-<!-- 23&#45;&#45;25 -->
-<g id="edge58" class="edge">
-<title>23&#45;&#45;25</title>
-<path fill="none" stroke="black" d="M1148.23,-299.86C1137.43,-326.13 1122.65,-362.07 1111.82,-388.39"/>
-</g>
-<!-- 23&#45;&#45;27 -->
-<g id="edge59" class="edge">
-<title>23&#45;&#45;27</title>
-<path fill="none" stroke="black" d="M1125.13,-268.81C1095.74,-271.68 1054.99,-275.66 1025.61,-278.54"/>
-</g>
-<!-- 29 -->
-<g id="node29" class="node">
-<title>29</title>
-<ellipse fill="#0055ff" fill-opacity="0.498039" stroke="black" cx="1201.59" cy="-158.37" rx="37.45" ry="37.45"/>
-<text text-anchor="middle" x="1201.59" y="-156.47" font-family="Times,serif" font-size="8.00">29 : 0.18</text>
-</g>
-<!-- 23&#45;&#45;29 -->
-<g id="edge60" class="edge">
-<title>23&#45;&#45;29</title>
-<path fill="none" stroke="black" d="M1175.41,-229.9C1179.68,-218.23 1184.43,-205.26 1188.7,-193.6"/>
-</g>
-<!-- 23&#45;&#45;32 -->
-<g id="edge61" class="edge">
-<title>23&#45;&#45;32</title>
-<path fill="none" stroke="black" d="M1130.61,-285.38C1126.76,-287.81 1122.84,-290.3 1119,-292.74"/>
-</g>
-<!-- 23&#45;&#45;33 -->
-<g id="edge62" class="edge">
-<title>23&#45;&#45;33</title>
-<path fill="none" stroke="black" d="M1125.21,-270.38C1113.13,-272.07 1099.72,-273.95 1087.65,-275.64"/>
-</g>
-<!-- 24 -->
-<g id="node24" class="node">
-<title>24</title>
-<ellipse fill="#0000ca" fill-opacity="0.498039" stroke="black" cx="1003.78" cy="-498.2" rx="37.45" ry="37.45"/>
-<text text-anchor="middle" x="1003.78" y="-496.3" font-family="Times,serif" font-size="8.00">24 : 0.12</text>
-</g>
-<!-- 24&#45;&#45;25 -->
-<g id="edge63" class="edge">
-<title>24&#45;&#45;25</title>
-<path fill="none" stroke="black" d="M1033.17,-474.7C1044.33,-465.78 1057.04,-455.62 1068.19,-446.7"/>
-</g>
-<!-- 24&#45;&#45;27 -->
-<g id="edge64" class="edge">
-<title>24&#45;&#45;27</title>
-<path fill="none" stroke="black" d="M1001.08,-460.57C998.25,-421.05 993.82,-359.24 990.99,-319.74"/>
-</g>
-<!-- 24&#45;&#45;31 -->
-<g id="edge65" class="edge">
-<title>24&#45;&#45;31</title>
-<path fill="none" stroke="black" d="M977.45,-471.44C958.6,-452.27 933.31,-426.55 914.39,-407.31"/>
-</g>
-<!-- 25&#45;&#45;31 -->
-<g id="edge66" class="edge">
-<title>25&#45;&#45;31</title>
-<path fill="none" stroke="black" d="M1060.46,-415.69C1022.25,-407.85 962.97,-395.68 924.76,-387.84"/>
-</g>
-<!-- 26 -->
-<g id="node26" class="node">
-<title>26</title>
-<ellipse fill="#0000dc" fill-opacity="0.498039" stroke="black" cx="1257.63" cy="-78.2" rx="37.45" ry="37.45"/>
-<text text-anchor="middle" x="1257.63" y="-76.3" font-family="Times,serif" font-size="8.00">26 : 0.13</text>
-</g>
-<!-- 26&#45;&#45;29 -->
-<g id="edge67" class="edge">
-<title>26&#45;&#45;29</title>
-<path fill="none" stroke="black" d="M1236.12,-108.97C1231.87,-115.06 1227.39,-121.46 1223.13,-127.55"/>
-</g>
-<!-- 26&#45;&#45;33 -->
-<g id="edge68" class="edge">
-<title>26&#45;&#45;33</title>
-<path fill="none" stroke="black" d="M1230.56,-104.69C1190.86,-143.53 1117.3,-215.5 1077.6,-254.34"/>
-</g>
-<!-- 27&#45;&#45;33 -->
-<g id="edge69" class="edge">
-<title>27&#45;&#45;33</title>
-<path fill="none" stroke="black" d="M1025.93,-281.37C1026.03,-281.37 1026.14,-281.37 1026.24,-281.36"/>
-</g>
-<!-- 28&#45;&#45;31 -->
-<g id="edge70" class="edge">
-<title>28&#45;&#45;31</title>
-<path fill="none" stroke="black" d="M889.6,-397.07C889.59,-396.92 889.57,-396.78 889.56,-396.63"/>
-</g>
-<!-- 28&#45;&#45;33 -->
-<g id="edge71" class="edge">
-<title>28&#45;&#45;33</title>
-<path fill="none" stroke="black" d="M920.64,-407.97C949.46,-379.76 994.87,-335.31 1023.65,-307.14"/>
-</g>
-<!-- 29&#45;&#45;32 -->
-<g id="edge72" class="edge">
-<title>29&#45;&#45;32</title>
-<path fill="none" stroke="black" d="M1179.28,-188.52C1159.21,-215.65 1129.86,-255.31 1109.74,-282.5"/>
-</g>
-<!-- 29&#45;&#45;33 -->
-<g id="edge73" class="edge">
-<title>29&#45;&#45;33</title>
-<path fill="none" stroke="black" d="M1172.46,-181.98C1145.8,-203.6 1106.53,-235.43 1079.82,-257.09"/>
-</g>
-<!-- 30&#45;&#45;32 -->
-<g id="edge74" class="edge">
-<title>30&#45;&#45;32</title>
-<path fill="none" stroke="black" d="M940.73,-203.39C973.25,-227.67 1024.49,-265.94 1056.97,-290.19"/>
-</g>
-<!-- 30&#45;&#45;33 -->
-<g id="edge75" class="edge">
-<title>30&#45;&#45;33</title>
-<path fill="none" stroke="black" d="M941.08,-202.65C964.46,-219.36 996.46,-242.22 1019.82,-258.91"/>
-</g>
-<!-- 31&#45;&#45;32 -->
-<g id="edge76" class="edge">
-<title>31&#45;&#45;32</title>
-<path fill="none" stroke="black" d="M923.44,-368.19C959.64,-355.96 1015.38,-337.13 1051.6,-324.9"/>
-</g>
-<!-- 31&#45;&#45;33 -->
-<g id="edge77" class="edge">
-<title>31&#45;&#45;33</title>
-<path fill="none" stroke="black" d="M919.92,-360.61C948.46,-343.18 989.92,-317.85 1018.43,-300.44"/>
-</g>
-<!-- 32&#45;&#45;33 -->
-<g id="edge78" class="edge">
-<title>32&#45;&#45;33</title>
-<path fill="none" stroke="black" d="M1058.68,-287.94C1058.53,-287.81 1058.39,-287.68 1058.24,-287.56"/>
-</g>
-</g>
-</svg>
-</div>
-
 Which centrality is the "best"?  Well there is no answer to that,
 they are all tools in the analyst toolbox.
 
 ## The Algebrea of Hypergraphs
 
-OneSparse is excellet at simple graphs of nodes and edges, but many
-more advanced use cases need *hypergraphs*, edge can have more than
-one source or destination.  These are important types of graphs for
-modeling complex interactions and financial situations where
-relationships are not just one-to-one.  A commonly studied example
-would be the multi-party financial transaction networks, where
-transactions represent *hyperedges* with multiple inputs and
-outputs.
+OneSparse is great at simple graphs of nodes and edges as we've
+seen, but many more advanced use cases need *hypergraphs*, edge can
+have more than one source or destination.  These are important
+types of graphs for modeling complex interactions and financial
+situations where relationships are not just one-to-one.  A commonly
+studied example would be the multi-party financial transaction
+networks, where transactions represent *hyperedges* with multiple
+inputs and outputs.
 
 This type of graph can be easily modeled with OneSparse using a
 bipartite representation using two matrices called *Incidence
@@ -4713,10 +4096,10 @@ select hyperdraw(addr_to_txn, txn_to_addr, 'A', 'T') as draw_source from txn_gra
 Incidence matrices construct hypergraphs, but how can we collapse
 these two matrices together to do address-to-address or
 transaction-to-transaction analysis?  This bring us to the magic of
-linear algebra, an in particular matrix multiplication.  You might
+linear algebra, and in particular matrix multiplication.  You might
 notice that the two matrices *conform*, One is `m` by `n`, and the
 other is `n` by `m`. This means they can be multiplied, which
-causes the two incidence matrices to collapse along either
+causes the two incidence matrices to collapse along their common
 dimension.
 Let's see with an example.  If the left matrix is multiplied by the
 right, then the resulting matrix will be a square adjacency matrix
@@ -4724,10 +4107,10 @@ mapping addresses to addresses.  If flip the order of matrices,
 they still conform, but this time to a mapping from transactions to
 transactions:
 ``` postgres-console
-with addr_to_addr as (select addr_to_txn @++ txn_to_addr as ata
-                      from txn_graph),
-     txn_to_txn   as (select txn_to_addr @++ addr_to_txn as ttt
-                      from txn_graph)
+with addr_to_addr as
+        (select addr_to_txn @++ txn_to_addr as ata from txn_graph),
+     txn_to_txn as
+        (select txn_to_addr @++ addr_to_txn as ttt from txn_graph)
 select (select draw(ata,
                     reduce_rows(ata),
                     true,
@@ -5352,6 +4735,8 @@ select (select draw(ata,
     </td>
   </tr>
 </table>
+## Matrix Multiplication over Semirings
+
 Notice the operator being used above is `@++`.  Like Python,
 OneSparse uses the `@` operator the denote matrix multiplication.
 OneSparse supports `@` as you would expect, but it also lets you
@@ -5362,42 +4747,44 @@ the binary operators applied during the matrix multiplication.  The
 does plus for both binary operations in the multiplication.
 
 This may seem weird at first if you haven't worked with semirings,
-but the main idea is that matrix multiplication consists of two
-binary operators, the "multiplicative" operator is used when
-mapping matching elements in row and column vectors.  The
-"additive" operator (technically a
-[Monoid](https://en.wikipedia.org/wiki/Monoid) is used to reduce
-the multiplicative products into a result.  The GraphBLAS lets you
-customize which operators are used in the matrix multiplication.
+but the main idea is that matrix multiplication is an *operational
+pattern* which consists of two binary operators.  The
+"multiplicative" operator is used when mapping matching elements in
+row and column vectors.  The "additive" operator, technically a
+[Monoid](https://en.wikipedia.org/wiki/Monoid), is used to reduce
+the multiplicative products into a result.  Semirings lets you
+customize *which operators are used* in the matrix multiplication.
 
 Since the above graph shows the flow of value through the graph, we
 don't want the traditional "times" operator, we want "plus" to add
 the path values, so instead of the standard "plus_times" semiring
 (the `@` operator) that everyone is already familiar with, we are
-using the "plus_plus" semiring.
+using the "plus_plus" semiring `@++`.
 
-The GraphBLAS comes with over a thousand useful semirings for graph
+The GraphBLAS comes with thousands of useful semirings for graph
 operations.  OneSparse does not have a shortcut operator for most
 of these semirings, only for the most common ones.  To access less
-common semirings you can pass a name to the `mxm` function. You can
-even create your own custom semirings and custom element types that
-they can operate on.  More on that in a future blog post.
+common semirings you can pass a name to the
+[mxm](https://onesparse.com/test_matrix_header.html#matrix-matrix-multiplication)
+function. You can even create your own custom semirings and custom
+element types that they can operate on.  More on that in a future
+blog post.
 
-## OneSparse Beta
+## OneSparse Alpha
 
 OneSparse is still in development, and to-date wraps almost all of
 the GraphBLAS features in SuiteSparse.  There's still some work to
-do, but we want to get some of this work out in to the world to get
-gigaedge graph ideas moving in Postgres.
+do, but we are moving fast to bring these remainingfeatures.
 
-OneSparse Beta is now released, and it requires Postgres 18 Beta.
-Due to some very recently changes in the Postgres core that
-OneSparse relies on for its performance, support for Postgres less
-than 18 is not practical.  So now's your chance to try OneSparse
-and Postgres 18 together using one of our [beta Docker
-images](/docker.html) to try it out!
+OneSparse can be downloaded from
+[Github](https://github.com/OneSparse/OneSparse/) and requires
+Postgres 18 Beta.  Due to some very recently changes in the
+Postgres core that OneSparse relies on for its performance, support
+for Postgres less than 18 is not practical.  So now's your chance
+to try OneSparse and Postgres 18 together using one of our [demo
+Docker images](/docker.html) to try it out!
 
-## Preview Custom Types and Operators
+## Coming Soon: Custom Types and Operators
 
 SuiteSparse comes with a huge collection of useful types,
 operators, and semirings, but what makes it really powerful is the
@@ -5407,11 +4794,12 @@ we're still working out the best way to make it simple and useful
 without allowing SQL to safely use custom JIT code.  Stay tuned to
 our blog for more updates.
 
-## Preview Table Access Method
+## Coming Soon: Table Access Method
 
-OneSparse has many plans for where to take the extension, and our
-next major release will contain a major new feature that unifies
-SQL and OneSparse even more.
+OneSparse has many plans for where to take the extension,
+eventually supporting native integrate into the new standard SQL
+graph syntax, and our next release will contain a major new feature
+that unifies SQL and OneSparse even more.
 
 ![Tables, Graphs, and Matrices](/table_graph_matrix.png)
 

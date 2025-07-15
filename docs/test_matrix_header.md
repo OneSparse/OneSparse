@@ -2378,16 +2378,16 @@ select draw(a) as binop_a_source, draw(b) as binop_b_source, draw(eunion(a, 3::s
 
 The entire matrix can be reduced to a scalar value:
 ``` postgres-console
-select print(a) as a, 'plus_monoid_int32' as monoid, reduce_scalar(a) from test_fixture;
+select print(b) as b, 'plus_monoid_int32' as monoid, reduce_scalar(b) from test_fixture;
 ┌────────────────────┬───────────────────┬───────────────┐
-│         a          │      monoid       │ reduce_scalar │
+│         b          │      monoid       │ reduce_scalar │
 ├────────────────────┼───────────────────┼───────────────┤
-│      0  1  2  3    │ plus_monoid_int32 │ int32:24      │
+│      0  1  2  3    │ plus_monoid_int32 │ int32:22      │
 │    ────────────    │                   │               │
-│  0│     2  1  1    │                   │               │
-│  1│  2     3  2    │                   │               │
-│  2│  1  3     3    │                   │               │
-│  3│  1  2  3       │                   │               │
+│  0│           4    │                   │               │
+│  1│  4     2  1    │                   │               │
+│  2│     4     2    │                   │               │
+│  3│     4  1       │                   │               │
 │                    │                   │               │
 └────────────────────┴───────────────────┴───────────────┘
 (1 row)
@@ -2396,16 +2396,16 @@ select print(a) as a, 'plus_monoid_int32' as monoid, reduce_scalar(a) from test_
 The entire matrix can be reduced to a scalar value with a provided
 monoid that changes the reduction operation:
 ``` postgres-console
-select print(a) as a, 'min_monoid_int32' as monoid, reduce_scalar(a, 'min_monoid_int32') from test_fixture;
+select print(b) as b, 'min_monoid_int32' as monoid, reduce_scalar(b, 'min_monoid_int32') from test_fixture;
 ┌────────────────────┬──────────────────┬───────────────┐
-│         a          │      monoid      │ reduce_scalar │
+│         b          │      monoid      │ reduce_scalar │
 ├────────────────────┼──────────────────┼───────────────┤
 │      0  1  2  3    │ min_monoid_int32 │ int32:1       │
 │    ────────────    │                  │               │
-│  0│     2  1  1    │                  │               │
-│  1│  2     3  2    │                  │               │
-│  2│  1  3     3    │                  │               │
-│  3│  1  2  3       │                  │               │
+│  0│           4    │                  │               │
+│  1│  4     2  1    │                  │               │
+│  2│     4     2    │                  │               │
+│  3│     4  1       │                  │               │
 │                    │                  │               │
 └────────────────────┴──────────────────┴───────────────┘
 (1 row)
@@ -2413,16 +2413,16 @@ select print(a) as a, 'min_monoid_int32' as monoid, reduce_scalar(a, 'min_monoid
 ```
 The matrix can also be reduced to a column vector:
 ``` postgres-console
-select print(a) as a, 'plus_monoid_int32' as monoid, print(reduce_cols(a)) as reduce_cols from test_fixture;
+select print(b) as b, 'plus_monoid_int32' as monoid, print(reduce_cols(b)) as reduce_cols from test_fixture;
 ┌────────────────────┬───────────────────┬─────────────┐
-│         a          │      monoid       │ reduce_cols │
+│         b          │      monoid       │ reduce_cols │
 ├────────────────────┼───────────────────┼─────────────┤
 │      0  1  2  3    │ plus_monoid_int32 │             │
 │    ────────────    │                   │    ───      │
-│  0│     2  1  1    │                   │  0│  4      │
-│  1│  2     3  2    │                   │  1│  7      │
-│  2│  1  3     3    │                   │  2│  7      │
-│  3│  1  2  3       │                   │  3│  6      │
+│  0│           4    │                   │  0│  4      │
+│  1│  4     2  1    │                   │  1│  7      │
+│  2│     4     2    │                   │  2│  6      │
+│  3│     4  1       │                   │  3│  5      │
 │                    │                   │             │
 └────────────────────┴───────────────────┴─────────────┘
 (1 row)
@@ -2430,16 +2430,16 @@ select print(a) as a, 'plus_monoid_int32' as monoid, print(reduce_cols(a)) as re
 ```
 To reduce a row vector:
 ``` postgres-console
-select print(a) as a, 'plus_monoid_int32' as monoid, print(reduce_rows(a)) as reduce_rows from test_fixture;
+select print(b) as b, 'plus_monoid_int32' as monoid, print(reduce_rows(b)) as reduce_rows from test_fixture;
 ┌────────────────────┬───────────────────┬─────────────┐
-│         a          │      monoid       │ reduce_rows │
+│         b          │      monoid       │ reduce_rows │
 ├────────────────────┼───────────────────┼─────────────┤
 │      0  1  2  3    │ plus_monoid_int32 │             │
 │    ────────────    │                   │    ───      │
-│  0│     2  1  1    │                   │  0│  4      │
-│  1│  2     3  2    │                   │  1│  7      │
-│  2│  1  3     3    │                   │  2│  7      │
-│  3│  1  2  3       │                   │  3│  6      │
+│  0│           4    │                   │  0│  4      │
+│  1│  4     2  1    │                   │  1│  8      │
+│  2│     4     2    │                   │  2│  3      │
+│  3│     4  1       │                   │  3│  7      │
 │                    │                   │             │
 └────────────────────┴───────────────────┴─────────────┘
 (1 row)
