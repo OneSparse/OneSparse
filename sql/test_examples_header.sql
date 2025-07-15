@@ -29,7 +29,8 @@
 -- Let's load the graph into a materialized view to make its use from
 -- SQL very easy:
 
-create materialized view karate as select mmread('/home/postgres/onesparse/demo/karate.mtx') as graph;
+create materialized view karate if not exists
+    as select mmread('/home/postgres/onesparse/demo/karate.mtx') as graph;
 
 -- The karate graph is now loaded into the view and looks like this,
 -- here it's drawn with colors to indicate the "out-degree" of each
