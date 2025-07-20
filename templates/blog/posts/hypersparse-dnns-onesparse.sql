@@ -1,5 +1,25 @@
+\pset linestyle unicode
+\pset border 2
+-- ---
+-- draft: false
+-- authors:
+--   - michelp
+-- date: 2025-07-01
+-- categories:
+--   - onesparse
+--   - postgres
+--   - graphblas
+--   - suitesparse
+--   - graphs
+--   - linear algebra
+-- ---
+
+-- # HyperSparse Deep Neural Networks in Postgres
+--
 
 create extension if not exists onesparse;
+
+-- ## Neuron Table
 
 drop table if exists neuron1024 cascade;
 create table neuron1024 (
@@ -9,12 +29,7 @@ create table neuron1024 (
     weight real
     );
 
-drop table if exists sparse_images cascade;
-create table sparse_images1024 (
-    i integer,
-    j integer,
-    weight real
-    );
+-- ### Neuron Loading Function
 
 CREATE OR REPLACE FUNCTION load_neuron1024(dir text, upto integer default 120)
 RETURNS void AS $$
@@ -46,6 +61,16 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- ## Image Input Table
+
+drop table if exists sparse_images cascade;
+create table sparse_images1024 (
+    i integer,
+    j integer,
+    weight real
+    );
+
+-- ### Image Loading Function
 
 CREATE OR REPLACE FUNCTION load_images(file text)
 RETURNS void AS $$
@@ -61,15 +86,16 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- ## Load Neural and Image Data
 
 select load_neuron1024('/home/postgres/onesparse/demo/sdnn/neuron1024');
 select load_images('/home/postgres/onesparse/demo/sdnn/sparse-images-1024.tsv');
 
 create index on neuron1024 (layer) include (i, j);
 
+-- ## Materialized View of Layer Matrices
 
 drop materialized view if exists layer_graph;
-
 CREATE materialized view layer_graph as
     select layer,
            resize(matrix_agg(i, j, weight), 1024, 1024) as edges
@@ -78,10 +104,14 @@ CREATE materialized view layer_graph as
     group by layer
     order by layer;
 
+-- ## Materialized View of Image Matrix
+
 drop materialized view if exists images1024;
 CREATE materialized view images1024 as
     select resize(matrix_agg(i, j, weight), 123904, 7312384) as images
     from sparse_images1024;
+
+-- ## Build Hypersparse Network
 
 CREATE OR REPLACE FUNCTION build_network(upto integer default 120)
 RETURNS matrix AS $$
@@ -105,9 +135,13 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql set search_path = onesparse,public;
 
+-- ## Materialized View of Network
+
 drop materialized view if exists network1024;
 create materialized view network1024 as
     select build_network() as network;
+
+-- ## Bias Matrix
 
 drop materialized view if exists bias1024;
 create materialized view bias1024 as
