@@ -1,0 +1,3 @@
+\setenv draw_source :draw_source
+\! echo $draw_source | ./gt-dot2svg.py | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
+sh: 1: ./gt-dot2svg.py: not found

@@ -200,8 +200,7 @@ select draw(triu(graph),
 --   <img src="/images/BFS.svg" alt="BFS GAP Benchmarks with OneSparse"/>
 -- </div>
 --
--- This chart displays BFS performance on several GAP graphs.  The
--- smallest graph, `road`, has 57M edges.  The largest graph `urand`
+-- This chart displays BFS performance on several GAP graphs. The largest graph `urand`
 -- has 4.3B edges.  The values show the number of "Edges Per Second"
 -- OneSparse can traverse with BFS by dividing the number of edges in
 -- the graph by the run time.
@@ -211,18 +210,6 @@ select draw(triu(graph),
 -- graphs.  SuiteSparse uses clever sparse matrix compression
 -- techniques and highly optimized JIT kernels for sparse
 -- multiplication to get these results.
---
--- Interestingly, the [road
--- graph](https://sparse.tamu.edu/GAP/GAP-road) doesn't appear at
--- first to do so well.  One issue is that the graph is so "small" at
--- only 57M edges, that it can't take full advantage of all the cores.
--- This is exacerbated by some of the issues that extreme sparsity can
--- bring.  The road graph is very sparse, the degree distribution is
--- relatively uniform, leaving little opportunity for bulk operation,
--- and it has a very high diameter meaning there are many work levels.
--- This is a relatively common but tricky kind of graph to traverse in
--- parallel using any language or technique, and shows how graphs are
--- hard!
 --
 -- ## Degree Centrality
 --

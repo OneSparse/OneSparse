@@ -27,11 +27,9 @@ shown here is a common test graph for documentation purposes.
 Let's load the graph into a materialized view to make its use from
 SQL very easy:
 ``` postgres-console
-create materialized view karate if not exists
+create materialized view if not exists karate
     as select mmread('/home/postgres/onesparse/demo/karate.mtx') as graph;
-ERROR:  syntax error at or near "if"
-LINE 1: create materialized view karate if not exists
-                                        ^
+NOTICE:  relation "karate" already exists, skipping
 ```
 The karate graph is now loaded into the view and looks like this,
 here it's drawn with colors to indicate the "out-degree" of each

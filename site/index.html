@@ -1,14 +1,10 @@
 <!DOCTYPE HTML>
-<!--
-	Hyperspace by HTML5 UP
-	html5up.net | @ajlkn
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
-  -->
 <html>
   <head>
 	<title>OneSparse</title>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
 	<link rel="stylesheet" href="assets/css/main.css" />
 	<!-- <link rel="stylesheet" href="assets/css/extra.css" /> -->
 	<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
@@ -18,6 +14,8 @@
 	<!-- Sidebar -->
 	<section id="sidebar">
 	  <div class="inner">
+        <img src="images/onesparselogo.png"/>
+        <p/>
 		<nav>
           <ul>
             <li><a href="#intro">Welcome</a></li>
@@ -38,14 +36,18 @@
 	  <section id="intro" class="wrapper style1 fullscreen fade-up">
 		<div class="inner">
 		  <h1>OneSparse</h1>
-		  <p>OneSparse combines the power of Linear Algebra and
-            PostgreSQL to create the next-generation of data-rich AI
-            and ML applications.  Powerful SQL queries, combined with
-            the analytical power Sparse Linear Algebra, provide a rich
-            framework for high performance GraphRAG, Sparse
-            Distributed Representations, and architecture agnostic
-            sparse parallel performance on CPUs, GPUs, and cutting
-            edge sparse accelerators.
+		  <p><strong>OneSparse brings sparse linear algebra to
+            PostgreSQL, unlocking high-performance AI, machine
+            learning and deep graph analysis to your relational
+            data.</strong>
+          </p>
+
+          <p>With native support for sparse graph computation, it
+            powers advanced workloads like Graph Retrieval-Augmented
+            Generation (GraphRAG), Graph Neural Networks (GNNs), and
+            Sparse Distributed Representations, all using standard SQL
+            and running efficiently on CPUs, GPUs, and next-generation
+            sparse accelerators.
           </p>
 		  <ul class="actions">
 			<li><a href="/docs.html" class="button scrolly">Read The Docs</a></li>
@@ -57,18 +59,68 @@
 	  <!-- Two -->
 	  <section id="two" class="wrapper style3 fade-up">
 		<div class="inner">
+          <h2>Accelerate Data Analysis</h2>
+		  <div class="features">
+			<section>
+			  <span class="icon solid major fa-code"></span>
+			  <h3>Accelerate AI Workloads</h3>
+			  <p>AI Models and Agent Frameworks are becoming
+			    increasingly sparse, and sparity is the future of AI
+			    as models that run up against the physical limits of
+			    dense hardware.  OneSparse is uniquely positioned to
+			    take advantage of the newest sparse hardware coming
+			    from NVIDIA and AMD.
+              </p>
+			</section>
+			<section>
+			  <span class="icon solid major fa-code"></span>
+			  <h3>Financial Analysis</h3>
+			  <p>Financial transactions form edges in immense graphs.
+			    Until large scale graph API like the OneSparse came
+			    along, financial analysis was bottlenecked by the
+			    limits of SQL and low level edge-centric APIs.
+			    OneSparse can load and analyze financial graphs with
+			    hundreds of billions of edges using a simple API.
+              </p>
+			</section>
+			<section>
+			  <span class="icon solid major fa-code"></span>
+			  <h3>Security and Response</h3>
+			  <p>Modern security threats come from many distributed
+			    attack vectors. OneSparse has been used at MIT Lincoln
+			    Laboratories to do threat detection and response on
+			    billions of IP packets per day to secure global
+			    networks and mitigate threats.
+              </p>
+			</section>
+			<section>
+			  <span class="icon solid major fa-code"></span>
+			  <h3>Vector Classification and Search</h3>
+			  <p>Model output vectors represent highly compressed
+			    semantic knowledge, but associating vectors with each
+			    other and pre-trained models is a complex sparse
+			    problem.  OneSparse greatly accelerates sparse vector
+			    classification and search over exisisting data without
+			    leaving your SQL database.
+              </p>
+			</section>
+          </div>
+
           <h2>Billions of Edges Per Second with Postgres</h2>
 
-          <p>Below are benchmarks on a 48-core AMD EPYC cloud server
-            using a variety of graphs from
-            the <a href="http://gap.cs.berkeley.edu/benchmark.html">GAP
-            Graph Benchmarks</a>.  GAP is the industry standard
-            benchmark for measuring the performance of various popular
-            graph algorithms on public graph data available
-            from <a href="https://sparse.tamu.edu/">The SuiteSparse
-            Collection.</a>  OneSparse is proud to be one of the only
-            graph database solutions that has published GAP
-            results.</p>
+          <p><strong>OneSparse is the only Postgres graph database
+              with GAP benchmark results.</strong>
+          </p>
+          <p>Benchmarks below were run on a 48-core AMD EPYC cloud
+              server using graphs from the
+            <a href="http://gap.cs.berkeley.edu/benchmark.html">GAP
+              Benchmark Suite</a>, the industry standard for
+              evaluating graph algorithm performance.  Datasets are
+              drawn from the
+            <a href="https://sparse.tamu.edu/">SuiteSparse Matrix
+            Collection</a>, a widely used repository of real-world
+            sparse graphs.
+          </p>
 
           <div class="image-container">
             <figure>
@@ -79,103 +131,42 @@
             <figure>
               <img src="images/PageRank.svg"/>
               <figcaption>
-                <a href="https://en.wikipedia.org/wiki/PageRank">PageRank</a></figcaption>
+                <a href="https://en.wikipedia.org/wiki/PageRank">PageRank</a>
+              </figcaption>
             </figure>
           </div>
           <div class="image-container">
             <figure>
               <img src="images/ConnectedComponents.svg"/>
               <figcaption>
-                <a href="https://en.wikipedia.org/wiki/Connected_component">Connected Components</a></figcaption>
+                <a href="https://en.wikipedia.org/wiki/Connected_component">Connected
+                Components</a>
+              </figcaption>
             </figure>
             <figure>
               <img src="images/SSSP.svg"/>
               <figcaption>
-                <a href="https://en.wikipedia.org/wiki/Shortest_path_problem">Single Source Shortest Path</a></figcaption>
+                <a href="https://en.wikipedia.org/wiki/Shortest_path_problem">Single
+                  Source Shortest Path</a>
+              </figcaption>
             </figure>
           </div>
+          <br/>
           <p>OneSparse brings large scale graph analysis to Postgres.
-          Users can pick from a large library of preexisting
-          algorithms like those used in GAP, or roll their own using
-          our powerful Linear Algebra framework</p>
+            Users can pick from a large library of preexisting
+            algorithms like those used in GAP, or roll their own using
+            our powerful Linear Algebra framework.
+          </p>
 
-		  <h2>The AI Revolution needs Graphs</h2>
-		  <p>Graphs present the most difficult computing challenges
-			faced by enterprise users today. Trillions of rows of data
-			are stored in relational databases, but SQL does not have
-			the analytical power to bring insight from existing highly
-			connected sparse data.</p>
-
-          <p>Recent advancements in AI language models have brought
-            powerful insight into unstructured information generation,
-            but large-scale knowledge problems require structured
-            semantic encoding and connection rules.  Semantic
-            structuring with Graphs are a natural fit these types of
-            models.</p>
-
-          <p>But Graphs open up a whole world of computing issues,
-            they tend to be very sparse, and this gets worse as they
-            scale bigger.  Advanced sparse optimized computing
-            techniques are needed to avoid the induced highly random
-            access patterns.</p>
-
-          <p>Further challenges involve wranging the vast amount of
-            data, processing, cleaning and organizing it.  SQL is
-            excellent for this task, but falls short of providing
-            high-performance graph analysis where billions of edges
-            must be traversed every second.</p>
-
-          <p>OneSparse brings high-performance, multi-core graph
-            analysis to Postgres.  By leveraging the SuiteSparse
-            GraphBLAS library OneSparse can traverse billions of edges
-            per second on immense graphs using all available CPU
-            resources on readily available commodity cloud
-            hardware. </p>
-
-          <h2>NVIDIA Blackwell</h2>
-
-          <div class="image-container">
-            <figure>
-              <img src="images/blackwell.png"/>
-              <figcaption></figcaption>
-            </figure>
-            <p>By utilizing the powerful JIT compiler built into the
-              SuiteSparse library, OneSparse is able to target high
-              performance code onto a variety of architectures,
-              including NVIDIA CUDA.  Upcoming Blackwell architectures
-              with unified physical memory bring drastic improvements
-              in sparse graph algorithms, avoid the ping-pong effects
-              of low speed data copying across slow PCI buses.</p>
-          </div>
-
-          <h2>Future Accelerators</h2>
-
-          <div class="image-container">
-            <p>Test By utilizing the powerful JIT compiler built into
-              the SuiteSparse library, OneSparse is able to target
-              high performance code onto a variety of architectures,
-              including NVIDIA CUDA.  Upcoming Blackwell architectures
-              with unified physical memory bring drastic improvements
-              in sparse graph algorithms, avoid the ping-pong effects
-              of low speed data copying across slow PCI buses.</p>
-            <figure>
-              <img src="images/FPGA.jpg"/>
-              <figcaption></figcaption>
-            </figure>
-          </div>
-
-          <h2>We Support The Most Advanced Sparse Computing Libraries</h2>
+          <h2>OneSparse is at the Heart of Sparse Computing</h2>
 
 		  <div class="features">
 			<section>
 			  <span class="icon solid major fa-code"></span>
 			  <h3>OneSparse Postgres</h3>
-			  <p>OneSparse's core product
-				provides high performance sparse
-				linear algebra on the most
-				powerful open-source relational
-				database in the world:
-				PostgreSQL.
+			  <p>OneSparse's core product provides high performance
+				sparse linear algebra on the most powerful open-source
+				relational database in the world: PostgreSQL.
               </p>
               <a href="https://github.com/OneSparse/OneSparse" class="button">GitHub</a>
               <a href="/docs.html" class="button">Docs</a>
@@ -184,15 +175,13 @@
 			<section>
 			  <span class="icon solid major fa-desktop"></span>
 			  <h3>SuiteSparse:GraphBLAS</h3>
-			  <p>The reference implementation of
-				the GraphBLAS API is a
-				foundational library for all of
-				OneSparse and many other software
-				frameworks like MATLAB.  OneSparse
-				helps support the development of
-				SuiteSparse and contribute
-				important use cases to its future
-				development.</p>
+			  <p>The reference implementation of the GraphBLAS API is
+				a foundational library for all of OneSparse and many
+				other software frameworks like Python and MATLAB.
+				OneSparse helps support the development of SuiteSparse
+				and contribute important use cases to its future
+				development.
+              </p>
               <a href="https://people.engr.tamu.edu/davis/GraphBLAS.html"
               class="button">Website</a>
 			</section>
@@ -201,9 +190,10 @@
 			  <span class="icon solid major fa-desktop"></span>
 			  <h3>LAGraph</h3>
 			  <p>LAGraph is a suite of advanced, high performance
-			  graph algorithms implemented with the GraphBLAS.  These
-			  battle-tested algorithms come built into OneSparse,
-			  quickly accelerating analysis with minimal setup.
+			    graph algorithms implemented with the GraphBLAS by
+			    world-class experts in sparse graph computing.  These
+			    battle-tested algorithms come built into OneSparse,
+			    quickly accelerating analysis with minimal setup.
               </p>
               <a href="https://github.com/GraphBLAS/LAGraph"
               class="button">Github</a>
@@ -213,11 +203,11 @@
 			  <span class="icon solid major fa-desktop"></span>
 			  <h3>Python GraphBLAS</h3>
 			  <p>Postgres is the most popular database in the world,
-			  and Python is the gold standard for ML, AI and other
-			  data science programming languages.  Our team has
-			  decades of Python programming experience, and we plan
-			  very deep integration of OneSparse with the native
-			  python-graphblas library.
+			    and Python is the gold standard for ML, AI and other
+			    data science programming languages.  Our team has
+			    decades of Python programming experience, and we plan
+			    very deep integration of OneSparse with the native
+			    python-graphblas library.
               </p>
               <a href="https://github.com/python-graphblas/python-graphblas"
               class="button">Github</a>
@@ -227,40 +217,32 @@
           <h2>The GraphBLAS Organization</h2>
           <p>OneSparse is powered by the SuiteSparse GraphBLAS library
             which is the high performance reference implementation
-            of <a href="graphblas.org">the GraphBLAS
-              Organization</a>.</p>
-          <table>
-            <tr>
-              <td><img width="64" src="images/aristotle.png"/></td>
-              <td><img width="64" src="images/anaconda.png"/></td>
-              <td><img width="64" src="images/berkeley.png"/></td>
-              <td><img width="64" src="images/cmu.png"/></td>
-              <td><img width="64" src="images/cwi.png"/></td>
-              <td><img width="64" src="images/du.png"/></td>
-            </tr>
-            <tr>
-              <td><img width="64" src="images/onesparse.png"/></td>
-              <td><img width="64" src="images/humboldt.png"/></td>
-              <td><img width="64" src="images/intel.png"/></td>
-              <td><img width="64" src="images/imbr.png"/></td>
-              <td><img width="64" src="images/falkor.png"/></td>
-              <td><img width="64" src="images/mit.png"/></td>
-            </tr>
-            <tr>
-              <td><img width="64" src="images/njit.png"/></td>
-              <td><img width="64" src="images/nvidia.png"/></td>
-              <td><img width="64" src="images/pnnl.png"/></td>
-              <td><img width="64" src="images/redis.png"/></td>
-              <td><img width="64" src="images/romatre.png"/></td>
-              <td><img width="64" src="images/tamu.png"/></td>
-            </tr>
-            <tr>
-              <td><img width="64" src="images/ucdavis.png"/></td>
-              <td><img width="64" src="images/ucsb.png"/></td>
-              <td><img width="64" src="images/unibz.png"/></td>
-              <td><img width="64" src="images/JuliaComputing.jpg"/></td>
-            </tr>
-          </table>
+            of <a href="graphblas.org">the GraphBLAS Organization</a>.
+          </p>
+          <div class="logo-grid">
+              <img width="64" src="images/aristotle.png"/>
+              <img width="64" src="images/anaconda.png"/>
+              <img width="64" src="images/berkeley.png"/>
+              <img width="64" src="images/cmu.png"/>
+              <img width="64" src="images/cwi.png"/>
+              <img width="64" src="images/du.png"/>
+              <img width="64" src="images/onesparse.png"/>
+              <img width="64" src="images/humboldt.png"/>
+              <img width="64" src="images/intel.png"/>
+              <img width="64" src="images/imbr.png"/>
+              <img width="64" src="images/falkor.png"/>
+              <img width="64" src="images/mit.png"/>
+              <img width="64" src="images/njit.png"/>
+              <img width="64" src="images/nvidia.png"/>
+              <img width="64" src="images/pnnl.png"/>
+              <img width="64" src="images/redis.png"/>
+              <img width="64" src="images/romatre.png"/>
+              <img width="64" src="images/tamu.png"/>
+              <img width="64" src="images/ucdavis.png"/>
+              <img width="64" src="images/ucsb.png"/>
+              <img width="64" src="images/unibz.png"/>
+              <img width="64" src="images/JuliaComputing.jpg"/>
+          </div>
 		</div>
 	  </section>
 
@@ -269,17 +251,13 @@
 		  <div class="content">
 			<div class="inner">
 			  <h2>Michel Pelletier</h2>
-			  <p>Michel is Python and Postgres
-				coder and author of multiple
-				libraries and extensions.  He
-				has decades of experience with
-				complex data problems from large
-				scale text search to machine
-				learning and graph analysis.  He
-				is a member of the GraphBLAS C
-				API Committee and long time
-				contributor to sparse linear
-				algebra with the GraphBLAS.
+			  <p>Michel is a Python and Postgres developer and author
+				of many libraries and extensions.  He has decades of
+				experience with complex data problems from large scale
+				text search to machine learning and graph analysis.
+				He is a member of the GraphBLAS C API Committee and
+				long time contributor to sparse linear algebra with
+				the GraphBLAS.
               </p>
 			  <ul class="actions">
 				<li><a href="https://github.com/michelp/" class="button">Learn More on GitHub</a></li>
@@ -291,9 +269,24 @@
 		  <div class="content">
 			<div class="inner">
 			  <h2>Dr. David Bader</h2>
-			  <p>David A. Bader is a Distinguished Professor and founder of the <a href=https://ds.njit.edu/ target=_blank rel=noopener>Department of Data Science</a> in the <a href=https://computing.njit.edu/ target=_blank rel=noopener>Ying Wu College of Computing</a> and Director of the <a href=https://datascience.njit.edu/ target=_blank rel=noopener>Institute for Data Science</a> at <a href=https://www.njit.edu/ target=_blank rel=noopener>New Jersey Institute of Technology</a>.</p>
+			  <p>David A. Bader is a Distinguished Professor and
+			    founder of
+			    the <a href="https://ds.njit.edu/">Department of Data
+			    Science</a> in
+			    the <a href="https://computing.njit.edu/">Ying Wu
+			    College of Computing</a> and Director of the
+			    <a href="https://datascience.njit.edu/">Institute for
+			      Data Science</a> at
+			      the <a href="https://www.njit.edu/">New Jersey
+			      Institute of Technology</a>.  He is a 2025 recipient
+			      of
+			      the <a href="https://www.hpcwire.com/35-hpc-legends-david-bader/">35
+			      HPC Legends Award</a>.
+              </p>
 			  <ul class="actions">
-				<li><a href="https://davidbader.net/" class="button">Learn More at David Bader's Site</a></li>
+				<li><a href="https://davidbader.net/"
+				class="button">Learn More at David Bader's
+				Site</a></li>
 			  </ul>
 			</div>
 		  </div>
@@ -303,16 +296,24 @@
 			<div class="inner">
 			  <h2>Dr. Tim Davis</h2>
 			  <p>  Dr. Timothy A. Davis is a Professor in the
-                <a href="https://engineering.tamu.edu/cse/index.html">Computer Science and Engineering Department</a>
-                at <a href="https://www.tamu.edu/">Texas A&M University</a> and a Fellow of
-                <a href="https://www.siam.org/">SIAM</a>, <a href="https://www.acm.org/">ACM</a>, and
-                <a href="https://www.ieee.org/">IEEE</a>. He serves as an associate editor for the
-                <a href="https://dl.acm.org/journal/toms">ACM Transactions on Mathematical Software</a>.
-                In 2018, he received the
-                <a href="https://www.sigmaxi.org/programs/prizes-awards/walston-chubb">Walston Chubb Award for Innovation</a>
-                from <a href="https://www.sigmaxi.org/">Sigma Xi</a>.</p>
+                <a href="https://engineering.tamu.edu/cse/index.html">Computer
+                Science and Engineering Department</a>
+                at <a href="https://www.tamu.edu/">Texas A&M
+                University</a> and a Fellow of
+                <a href="https://www.siam.org/">SIAM</a>, <a href="https://www.acm.org/">ACM</a>,
+                and
+                <a href="https://www.ieee.org/">IEEE</a>. He serves as
+                an associate editor for the
+                <a href="https://dl.acm.org/journal/toms">ACM
+                Transactions on Mathematical Software</a>.  In 2018,
+                he received the
+                <a href="https://www.sigmaxi.org/programs/prizes-awards/walston-chubb">Walston
+                Chubb Award for Innovation</a>
+                from <a href="https://www.sigmaxi.org/">Sigma Xi</a>.
+              </p>
 			  <ul class="actions">
-				<li><a href="https://people.engr.tamu.edu/davis/welcome.html" class="button">Learn More at Tim Davis' Site</a></li>
+				<li><a href="https://people.engr.tamu.edu/davis/welcome.html"
+				class="button">Learn More at Tim Davis' Site</a></li>
 			  </ul>
 			</div>
 		  </div>
@@ -348,7 +349,9 @@
 	<footer id="footer" class="wrapper style1-alt">
 	  <div class="inner">
 		<ul class="menu">
-		  <li>&copy; OneSparse, Inc. All rights reserved.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+		  <li>&copy; OneSparse, Inc. All rights
+		  reserved.</li><li>Design: <a href="http://html5up.net">HTML5
+		  UP</a></li>
 		</ul>
 	  </div>
 	</footer>
@@ -361,6 +364,5 @@
 	<script src="assets/js/breakpoints.min.js"></script>
 	<script src="assets/js/util.js"></script>
 	<script src="assets/js/main.js"></script>
-
   </body>
 </html>
