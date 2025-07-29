@@ -1,0 +1,12 @@
+\setenv draw_source :draw_source
+\! echo $draw_source | ./sql/gt-dot2svg.py | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
+Traceback (most recent call last):
+  File "/home/postgres/onesparse/./sql/gt-dot2svg.py", line 5, in <module>
+    g = load_graph(sys.stdin, fmt="dot")
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3/dist-packages/graph_tool/__init__.py", line 3555, in load_graph
+    g.load(file_name, fmt, ignore_vp, ignore_ep, ignore_gp)
+  File "/usr/lib/python3/dist-packages/graph_tool/__init__.py", line 3091, in load
+    props = self.__graph.read_from_file("", file_name, fmt,
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: Wanted "graph" or "digraph" (token is "<colon> ':'")

@@ -13,26 +13,27 @@
 --   - graphs
 --   - linear algebra
 -- ---
-
 -- # HyperSparse Deep Neural Networks in Postgres
 --
-
 create extension if not exists onesparse;
-
+NOTICE:  extension "onesparse" already exists, skipping
 -- ## Neuron Table
-
 drop table if exists neuron1024 cascade;
+NOTICE:  table "neuron1024" does not exist, skipping
 create table neuron1024 (
     layer integer,
     i integer,
     j integer,
     weight real
     );
-
 select * from neuron1024;
+┌───────┬───┬───┬────────┐
+│ layer │ i │ j │ weight │
+├───────┼───┼───┼────────┤
+└───────┴───┴───┴────────┘
+(0 rows)
 
 -- ### Neuron Loading Function
-
 CREATE OR REPLACE FUNCTION load_neuron1024(dir text, upto integer default 120)
 RETURNS void AS $$
 DECLARE
@@ -51,7 +52,7 @@ BEGIN
             continue;
         end if;
         cmd := format(
-            'awk -v lid=%s ''{{print lid "\t" $1-1 "\t" $2-1 "\t" $3}}'' %s/%s',
+            'awk -v lid=%s ''{print lid "\t" $1-1 "\t" $2-1 "\t" $3}'' %s/%s',
             layer, dir, file
         );
         raise notice 'load layer tsv: %', layer;
@@ -62,41 +63,33 @@ BEGIN
     END LOOP;
 END;
 $$ LANGUAGE plpgsql;
-
 -- ## Image Input Table
-
 drop table if exists sparse_images cascade;
+NOTICE:  table "sparse_images" does not exist, skipping
 create table sparse_images1024 (
     i integer,
     j integer,
     weight real
     );
-
 -- ### Image Loading Function
-
 CREATE OR REPLACE FUNCTION load_images(file text)
 RETURNS void AS $$
 DECLARE
     cmd text;
 BEGIN
     cmd := format(
-        'awk ''{{print $1-1 "\t" $2-1 "\t" $3}}'' %s', file);
+        'awk ''{print $1-1 "\t" $2-1 "\t" $3}'' %s', file);
     EXECUTE format(
         'COPY sparse_images1024(i, j, weight) FROM PROGRAM %L WITH (FORMAT text)',
         cmd
     );
 END;
 $$ LANGUAGE plpgsql;
-
 -- ## Load Neural and Image Data
-
 -- select load_neuron1024('/home/postgres/onesparse/demo/sdnn/neuron1024');
 -- select load_images('/home/postgres/onesparse/demo/sdnn/sparse-images-1024.tsv');
-
 -- create index on neuron1024 (layer) include (i, j);
-
 -- -- ## Materialized View of Layer Matrices
-
 -- drop materialized view if exists layer_graph;
 -- CREATE materialized view layer_graph as
 --     select layer,
@@ -105,16 +98,12 @@ $$ LANGUAGE plpgsql;
 --     where layer <= 120
 --     group by layer
 --     order by layer;
-
 -- -- ## Materialized View of Image Matrix
-
 -- drop materialized view if exists images1024;
 -- CREATE materialized view images1024 as
 --     select resize(matrix_agg(i, j, weight), 123904, 7312384) as images
 --     from sparse_images1024;
-
 -- -- ## Build Hypersparse Network
-
 -- CREATE OR REPLACE FUNCTION build_network(upto integer default 120)
 -- RETURNS matrix AS $$
 -- DECLARE
@@ -136,15 +125,11 @@ $$ LANGUAGE plpgsql;
 --     return ret;
 -- END;
 -- $$ LANGUAGE plpgsql set search_path = onesparse,public;
-
 -- -- ## Materialized View of Network
-
 -- drop materialized view if exists network1024;
 -- create materialized view network1024 as
 --     select build_network() as network;
-
 -- -- ## Bias Matrix
-
 -- drop materialized view if exists bias1024;
 -- create materialized view bias1024 as
 --     select diag(assign(vector('fp32', 7312384), 0.3::float4)) as bias;

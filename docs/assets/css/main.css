@@ -197,10 +197,10 @@ input, select, textarea {
 		}
 
 			h1.major:after {
-				background-image: -moz-linear-gradient(to right, #5e42a6, #4eb76d);
-				background-image: -webkit-linear-gradient(to right, #5e42a6, #4eb76d);
-				background-image: -ms-linear-gradient(to right, #5e42a6, #4eb76d);
-				background-image: linear-gradient(to right, #5e42a6, #4eb76d);
+				background-image: -moz-linear-gradient(to right, #285138, #285138);
+				background-image: -webkit-linear-gradient(to right, #285138, #285138);
+				background-image: -ms-linear-gradient(to right, #285138, #285138);
+				background-image: linear-gradient(to right, #285138, #285138);
 				-moz-transition: max-width 0.2s ease;
 				-webkit-transition: max-width 0.2s ease;
 				-ms-transition: max-width 0.2s ease;
@@ -2444,7 +2444,7 @@ input, select, textarea {
 		input[type="radio"]:checked + label:before {
 			background: #ffffff;
 			border-color: #ffffff;
-			color: #4eb76d;
+			color: #285138;
 			content: '\f00c';
 		}
 
@@ -2536,7 +2536,7 @@ input, select, textarea {
 			}
 
 				.wrapper.style1 .icon.major:before {
-					color: #5e42a6;
+					color: #285138;
 				}
 
 				.wrapper.style1-alt .icon.major:before {
@@ -2552,7 +2552,7 @@ input, select, textarea {
 				}
 
 				.wrapper.style3 .icon.major:before {
-					color: #4eb76d;
+					color: #285138;
 				}
 
 				.wrapper.style3-alt .icon.major:before {
@@ -3240,7 +3240,7 @@ input, select, textarea {
 		}
 
 		.wrapper.style1 {
-			background-color: #5e42a6;
+			background-color: #285138;
 		}
 
 		.wrapper.style1-alt {
@@ -3256,7 +3256,7 @@ input, select, textarea {
 		}
 
 		.wrapper.style3 {
-			background-color: #4eb76d;
+			background-color: #285138;
 		}
 
 		.wrapper.style3-alt {
@@ -3370,7 +3370,7 @@ input, select, textarea {
 		display: -webkit-flex;
 		display: -ms-flex;
 		display: flex;
-		background-color: #5e42a6;
+		background-color: #285138;
 		cursor: default;
 		padding: 1.75em 2em;
 	}
@@ -3765,10 +3765,10 @@ input, select, textarea {
 			}
 
 			#sidebar nav a:after {
-				background-image: -moz-linear-gradient(to right, #5e42a6, #4eb76d);
-				background-image: -webkit-linear-gradient(to right, #5e42a6, #4eb76d);
-				background-image: -ms-linear-gradient(to right, #5e42a6, #4eb76d);
-				background-image: linear-gradient(to right, #5e42a6, #4eb76d);
+				background-image: -moz-linear-gradient(to right, #285138, #285138);
+				background-image: -webkit-linear-gradient(to right, #285138, #285138);
+				background-image: -ms-linear-gradient(to right, #285138, #285138);
+				background-image: linear-gradient(to right, #285138, #285138);
 				-moz-transition: max-width 0.2s ease;
 				-webkit-transition: max-width 0.2s ease;
 				-ms-transition: max-width 0.2s ease;
@@ -3857,7 +3857,7 @@ input, select, textarea {
 
 						#sidebar nav a:after {
 							background-image: none;
-							background-color: #4eb76d;
+							background-color: #285138;
 						}
 
 		}
@@ -3956,3 +3956,17 @@ input, select, textarea {
 /*   color: var(--text-color); */
 /*   font-size: 0.9em; */
 /* } */
+
+.logo-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.logo-grid img {
+  max-width: 64px;
+  height: auto;
+  object-fit: contain;
+  flex-shrink: 0;
+}

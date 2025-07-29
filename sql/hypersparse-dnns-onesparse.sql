@@ -51,7 +51,7 @@ BEGIN
             continue;
         end if;
         cmd := format(
-            'awk -v lid=%s ''{{print lid "\t" $1-1 "\t" $2-1 "\t" $3}}'' %s/%s',
+            'awk -v lid=%s ''{print lid "\t" $1-1 "\t" $2-1 "\t" $3}'' %s/%s',
             layer, dir, file
         );
         raise notice 'load layer tsv: %', layer;
@@ -80,7 +80,7 @@ DECLARE
     cmd text;
 BEGIN
     cmd := format(
-        'awk ''{{print $1-1 "\t" $2-1 "\t" $3}}'' %s', file);
+        'awk ''{print $1-1 "\t" $2-1 "\t" $3}'' %s', file);
     EXECUTE format(
         'COPY sparse_images1024(i, j, weight) FROM PROGRAM %L WITH (FORMAT text)',
         cmd

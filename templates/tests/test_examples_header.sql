@@ -29,7 +29,7 @@
 -- Let's load the graph into a materialized view to make its use from
 -- SQL very easy:
 
-create materialized view karate if not exists
+create materialized view if not exists karate
     as select mmread('/home/postgres/onesparse/demo/karate.mtx') as graph;
 
 -- The karate graph is now loaded into the view and looks like this,
