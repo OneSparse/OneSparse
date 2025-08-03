@@ -10,6 +10,7 @@ types.  These types are:
 ┌───────────┬──────────────────┬───────────────────────────────────────────────────────────────────────────────────────┐
 │  Schema   │       Name       │                                      Description                                      │
 ├───────────┼──────────────────┼───────────────────────────────────────────────────────────────────────────────────────┤
+│ onesparse │ argminmax_x_p    │ Return type for argminmax with value and index vectors.                               │
 │ onesparse │ bfs_level_parent │ Return type for bfs with level and parent vectors.                                    │
 │ onesparse │ binaryop         │ BinaryOps apply a function to two elements and returning an element.                  │
 │ onesparse │ descriptor       │ Descriptors control specific details of GraphBLAS operations.                         │
@@ -23,7 +24,7 @@ types.  These types are:
 │ onesparse │ unaryop          │ UnaryOps apply a function to an element, returning an element.                        │
 │ onesparse │ vector           │ Vectors hold a sparse array of elements.                                              │
 └───────────┴──────────────────┴───────────────────────────────────────────────────────────────────────────────────────┘
-(12 rows)
+(13 rows)
 
 ```
 ## Element Types

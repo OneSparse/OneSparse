@@ -236,9 +236,8 @@ select u != v as "u != v", u = v as "u = v", v = u as "v = u", v = u as "v = u" 
 ┌────────┬───────┬───────┬───────┐
 │ u != v │ u = v │ v = u │ v = u │
 ├────────┼───────┼───────┼───────┤
-│ t      │ f     │ f     │ f     │
 └────────┴───────┴───────┴───────┘
-(1 row)
+(0 rows)
 
 ```
 ## Elementwise Addition
@@ -259,18 +258,11 @@ OneSparse.  Different binaryops are passed to eadd to do different
 elementwise operations:
 ``` postgres-console
 select print(u |+ v) as "u |+ v", print(u |- v) as "u |- v", print(u |* v) as "u |* v", print(u |/ v) as "u |/ v" from test_fixture;
-┌───────────┬───────────┬───────────┬───────────┐
-│  u |+ v   │  u |- v   │  u |* v   │  u |/ v   │
-├───────────┼───────────┼───────────┼───────────┤
-│           │           │           │           │
-│    ───    │    ───    │    ───    │    ───    │
-│  0│       │  0│       │  0│       │  0│       │
-│  1│  5    │  1│ -1    │  1│  6    │  1│  0    │
-│  2│  3    │  2│  3    │  2│  3    │  2│  3    │
-│  3│       │  3│       │  3│       │  3│       │
-│           │           │           │           │
-└───────────┴───────────┴───────────┴───────────┘
-(1 row)
+┌────────┬────────┬────────┬────────┐
+│ u |+ v │ u |- v │ u |* v │ u |/ v │
+├────────┼────────┼────────┼────────┤
+└────────┴────────┴────────┴────────┘
+(0 rows)
 
 ```
 ## Elementwise Multiplication
@@ -291,18 +283,11 @@ OneSparse.  Different binaryops are passed to emult to do different
 elementwise operations:
 ``` postgres-console
 select print(u &+ v) as "u &+ v", print(u &- v) as "u &- v", print(u &* v) as "u &* v", print(u &/ v) as "u &/ v" from test_fixture;
-┌───────────┬───────────┬───────────┬───────────┐
-│  u &+ v   │  u &- v   │  u &* v   │  u &/ v   │
-├───────────┼───────────┼───────────┼───────────┤
-│           │           │           │           │
-│    ───    │    ───    │    ───    │    ───    │
-│  0│       │  0│       │  0│       │  0│       │
-│  1│  5    │  1│ -1    │  1│  6    │  1│  0    │
-│  2│       │  2│       │  2│       │  2│       │
-│  3│       │  3│       │  3│       │  3│       │
-│           │           │           │           │
-└───────────┴───────────┴───────────┴───────────┘
-(1 row)
+┌────────┬────────┬────────┬────────┐
+│ u &+ v │ u &- v │ u &* v │ u &/ v │
+├────────┼────────┼────────┼────────┤
+└────────┴────────┴────────┴────────┘
+(0 rows)
 
 ```
 ## Elementwise Union

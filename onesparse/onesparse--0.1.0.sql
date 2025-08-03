@@ -2507,6 +2507,11 @@ RETURNS matrix
 AS '$libdir/onesparse', 'matrix_load'
 LANGUAGE C STRICT;
 
+CREATE FUNCTION random_matrix(t type, nrows bigint default -1, ncols bigint default -1, density float8 default 0.1, seed bigint default null)
+RETURNS matrix
+AS '$libdir/onesparse', 'matrix_random'
+LANGUAGE C STABLE;
+
 create function print(a matrix) returns text language plpgsql set search_path = onesparse,public as
     $$
     declare
@@ -2538,7 +2543,7 @@ create function print(a matrix) returns text language plpgsql set search_path = 
     end;
     $$;
 
-create or replace function random_matrix(
+create or replace function old_random_matrix(
     nrows integer,
     ncols integer,
     nvals integer,
@@ -2740,6 +2745,13 @@ create or replace function kronpower(m matrix, k integer, s semiring default 'pl
     return m;
     end;
     $$;
+
+
+CREATE FUNCTION onesparse_tam_handler(internal) RETURNS table_am_handler
+    AS  'MODULE_PATHNAME'
+    LANGUAGE C;
+
+CREATE ACCESS METHOD onesparse TYPE TABLE HANDLER onesparse_tam_handler;
 CREATE FUNCTION matrix_agg_bigint (state matrix, i bigint, j bigint, v bigint)
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_agg_int64'
@@ -2997,4 +3009,41 @@ RETURNS matrix
 LANGUAGE sql STABLE
 BEGIN ATOMIC
   SELECT fglt(graph($1));
+END;
+
+CREATE TYPE argminmax_x_p AS (x_result vector, p_result vector);
+
+COMMENT ON TYPE argminmax_x_p IS 'Return type for argminmax with value and index vectors.';
+
+CREATE FUNCTION argminmax(graph, integer, bool)
+RETURNS argminmax_x_p
+AS '$libdir/onesparse', 'graph_argminmax'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION argmin(graph, integer)
+RETURNS argminmax_x_p
+LANGUAGE sql STABLE
+BEGIN ATOMIC
+  SELECT argminmax($1, $2, true);
+END;
+
+CREATE FUNCTION argmax(graph, integer)
+RETURNS argminmax_x_p
+LANGUAGE sql STABLE
+BEGIN ATOMIC
+  SELECT argminmax($1, $2, false);
+END;
+
+CREATE FUNCTION argmin(matrix, integer)
+RETURNS argminmax_x_p
+LANGUAGE sql STABLE
+BEGIN ATOMIC
+  SELECT argminmax(graph($1), $2, true);
+END;
+
+CREATE FUNCTION argmax(matrix, integer)
+RETURNS argminmax_x_p
+LANGUAGE sql STABLE
+BEGIN ATOMIC
+  SELECT argminmax(graph($1), $2, false);
 END;

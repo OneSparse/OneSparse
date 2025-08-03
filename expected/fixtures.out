@@ -29,6 +29,10 @@ insert into onesparse.test_fixture (T, a, b, d, s, u, v, unaryop, indexunaryop, 
         'times_int32',
         'plus_monoid_int32',
         'plus_times_int32');
+ERROR:  function random_matrix(integer, integer, integer, integer, integer, boolean, numeric) does not exist
+LINE 3:         random_matrix(4, 4, 10, 1, 4, true, 0.0 + 0.3),
+                ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
 create or replace function test_expand(graph matrix) returns matrix language plpgsql as
     $$
     declare

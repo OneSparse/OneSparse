@@ -70,6 +70,24 @@ Datum scalar_print(PG_FUNCTION_ARGS) {
 				appendStringInfo(&buf, "%hu", vu16);
 				break;
 			}
+		case GrB_INT8_CODE:
+			{
+				int8_t vi8;
+				OS_CHECK(GrB_Scalar_extractElement(&vi8, s->scalar),
+					  s->scalar,
+					  "Error extracting scalar value.");
+				appendStringInfo(&buf, "%d", (int)vi8);
+				break;
+			}
+		case GrB_UINT8_CODE:
+			{
+				uint8_t vu8;
+				OS_CHECK(GrB_Scalar_extractElement(&vu8, s->scalar),
+					  s->scalar,
+					  "Error extracting scalar value.");
+				appendStringInfo(&buf, "%u", (unsigned int)vu8);
+				break;
+			}
 		case GrB_FP64_CODE:
 			{
 				double fp64;

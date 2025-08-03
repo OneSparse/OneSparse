@@ -69,6 +69,15 @@ Datum scalar_out(PG_FUNCTION_ARGS)
 			result = palloc(GxB_MAX_NAME_LEN);
 			snprintf(result, GxB_MAX_NAME_LEN, "%s:" "%" PRIi16, sname, value);
 		}
+		else if (type_code == GrB_INT8_CODE)
+		{
+			int8_t value;
+			OS_CHECK(GrB_Scalar_extractElement(&value, scalar->scalar),
+				  scalar->scalar,
+				  "Error extracting scalar element.");
+			result = palloc(GxB_MAX_NAME_LEN);
+			snprintf(result, GxB_MAX_NAME_LEN, "%s:" "%" PRIi8, sname, value);
+		}
 		else if (type_code == GrB_UINT16_CODE)
 		{
 			uint16_t value;
@@ -77,6 +86,15 @@ Datum scalar_out(PG_FUNCTION_ARGS)
 				  "Error extracting scalar element.");
 			result = palloc(GxB_MAX_NAME_LEN);
 			snprintf(result, GxB_MAX_NAME_LEN, "%s:" "%" PRIu16, sname, value);
+		}
+		else if (type_code == GrB_UINT8_CODE)
+		{
+			uint8_t value;
+			OS_CHECK(GrB_Scalar_extractElement(&value, scalar->scalar),
+				  scalar->scalar,
+				  "Error extracting scalar element.");
+			result = palloc(GxB_MAX_NAME_LEN);
+			snprintf(result, GxB_MAX_NAME_LEN, "%s:" "%" PRIu8, sname, value);
 		}
 		else if (type_code == GrB_FP64_CODE)
 		{
