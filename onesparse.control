@@ -4,3 +4,5 @@ default_version = '0.1.0'
 relocatable = false
 schema = 'onesparse'
 requires = ''
+module_pathname = '$libdir/onesparse'
+

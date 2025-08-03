@@ -893,6 +893,11 @@ RETURNS matrix
 AS '$libdir/onesparse', 'matrix_load'
 LANGUAGE C STRICT;
 
+CREATE FUNCTION random_matrix(t type, nrows bigint default -1, ncols bigint default -1, density float8 default 0.1, seed bigint default null)
+RETURNS matrix
+AS '$libdir/onesparse', 'matrix_random'
+LANGUAGE C STABLE;
+
 create function print(a matrix) returns text language plpgsql set search_path = onesparse,public as
     $$
     declare
@@ -924,7 +929,7 @@ create function print(a matrix) returns text language plpgsql set search_path = 
     end;
     $$;
 
-create or replace function random_matrix(
+create or replace function old_random_matrix(
     nrows integer,
     ncols integer,
     nvals integer,
@@ -1126,3 +1131,10 @@ create or replace function kronpower(m matrix, k integer, s semiring default 'pl
     return m;
     end;
     $$;
+
+
+CREATE FUNCTION onesparse_tam_handler(internal) RETURNS table_am_handler
+    AS  'MODULE_PATHNAME'
+    LANGUAGE C;
+
+CREATE ACCESS METHOD onesparse TYPE TABLE HANDLER onesparse_tam_handler;

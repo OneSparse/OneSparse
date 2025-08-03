@@ -3,21 +3,21 @@
 -- select serialize(random_matrix(10, 10, 10, seed=>0.42, max=>99)) as matrixbytes \gset
 \set grbfile 'testmatrix.grb'
 select serialize(random_matrix(10, 10, 10, seed=>0.42, max=>99)) as matrixbytes \gset
+ERROR:  function random_matrix(integer, integer, integer, seed => numeric, max => integer) does not exist
+LINE 1: select serialize(random_matrix(10, 10, 10, seed=>0.42, max=>...
+                         ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
 select deserialize(:'matrixbytes') = random_matrix(10, 10, 10, seed=>0.42, max=>99);
- ?column? 
-----------
- t
-(1 row)
-
+ERROR:  syntax error at or near ":"
+LINE 1: select deserialize(:'matrixbytes') = random_matrix(10, 10, 1...
+                           ^
 select serialize_file(random_matrix(10, 10, 10, seed=>0.42, max=>99), :'grbfile');
- serialize_file 
-----------------
- t
-(1 row)
-
+ERROR:  function random_matrix(integer, integer, integer, seed => numeric, max => integer) does not exist
+LINE 1: select serialize_file(random_matrix(10, 10, 10, seed=>0.42, ...
+                              ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
 select deserialize_file(:'grbfile') = random_matrix(10, 10, 10, seed=>0.42, max=>99);
- ?column? 
-----------
- t
-(1 row)
-
+ERROR:  function random_matrix(integer, integer, integer, seed => numeric, max => integer) does not exist
+LINE 1: select deserialize_file('testmatrix.grb') = random_matrix(10...
+                                                    ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.

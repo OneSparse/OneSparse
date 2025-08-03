@@ -3,7 +3,6 @@
 PG_FUNCTION_INFO_V1(graph_triangle_centrality);
 Datum graph_triangle_centrality(PG_FUNCTION_ARGS)
 {
-	GrB_Type type;
 	os_Graph *graph;
 	GrB_Vector output;
 	GrB_Index vsize;

@@ -134,7 +134,7 @@ Datum matrix_out(PG_FUNCTION_ARGS)
 	OS_START_BENCH();
 	matrix = OS_GETARG_MATRIX(0);
 	result = _print_matrix(matrix->matrix);
-	OS_START_BENCH();
+	OS_END_BENCH();
 	PG_RETURN_CSTRING(result);
 }
 

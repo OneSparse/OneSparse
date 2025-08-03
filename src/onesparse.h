@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
+
 #include "postgres.h"
 #include "fmgr.h"
 #include "miscadmin.h"
@@ -22,17 +23,27 @@
 #include "utils/arrayaccess.h"
 #include "utils/guc.h"
 #include "utils/varlena.h"
+#include "utils/uuid.h"
 #include "catalog/pg_type_d.h"
 #include "catalog/pg_type.h"
 #include "parser/parse_func.h"
 #include "utils/lsyscache.h"
 #include "nodes/pg_list.h"
 #include "nodes/supportnodes.h"
+#include "access/tableam.h"
+#include "access/genam.h"
+#include "access/heapam.h"
+#include "utils/rel.h"
+#include "executor/tuptable.h"
+#include "commands/defrem.h"
 #include "common/hashfn.h"
+#include "access/xact.h"
+#include "storage/itemptr.h"
+#include "commands/vacuum.h"
+
 #include <GraphBLAS.h>
 #include <LAGraph.h>
 #include <LAGraphX.h>
-#include "access/xact.h"
 
 #define OS_DEBUG
 

@@ -3,7 +3,6 @@
 PG_FUNCTION_INFO_V1(graph_fglt);
 Datum graph_fglt(PG_FUNCTION_ARGS)
 {
-	GrB_Type type;
 	os_Graph *graph;
 	GrB_Matrix output;
 	char msg [LAGRAPH_MSG_LEN];
