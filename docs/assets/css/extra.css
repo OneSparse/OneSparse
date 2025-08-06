@@ -2,10 +2,10 @@
 
 /* Color overrides only — keep original CSS intact */
 :root {
-  --bg-default: #f5f5f5;
-  --bg-alt: #ffffff;
+  --bg-default: #f0f0f0
+  --bg-alt: #f0f0f0;
   --text-color: #222222;
-  --link-color: #1a73e8;
+  --link-color: #000000;
   --link-hover: #1558b0;
   --border-light: rgba(0,0,0,0.1);
 }
