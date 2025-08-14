@@ -24,7 +24,3 @@ Datum vector_resize(PG_FUNCTION_ARGS)
 
 SUPPORT_FN(vector_resize, linitial);
 
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

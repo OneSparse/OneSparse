@@ -417,7 +417,3 @@ void _PG_init(void)
                              NULL);
 }
 
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

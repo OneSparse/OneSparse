@@ -67,7 +67,3 @@ Datum matrix_eunion(PG_FUNCTION_ARGS)
 SUPPORT_FN(matrix_eunion, lsixth);
 #undef lsixth
 
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

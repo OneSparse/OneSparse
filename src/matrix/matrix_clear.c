@@ -20,7 +20,3 @@ Datum matrix_clear(PG_FUNCTION_ARGS)
 
 SUPPORT_FN(matrix_clear, linitial);
 
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

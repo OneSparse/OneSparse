@@ -46,7 +46,3 @@ Datum matrix_transpose(PG_FUNCTION_ARGS)
 
 SUPPORT_FN(matrix_transpose, lsecond);
 
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

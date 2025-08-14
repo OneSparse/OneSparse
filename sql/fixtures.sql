@@ -19,8 +19,8 @@ delete from onesparse.test_fixture;
 select 0.0 seed \gset
 insert into onesparse.test_fixture (T, a, b, d, s, u, v, unaryop, indexunaryop, binaryop, monoid, semiring) values
     ('int32',
-        random_matrix(4, 4, 10, 1, 4, true, :seed + 0.3),
-        random_matrix(4, 4, 10, 1, 4, false, :seed + 0.4),
+        random_matrix('int8', 4, 4, :seed + 0.3),
+        random_matrix('int8', 4, 4, :seed + 0.4),
         dense_matrix(4, 4, 1),
         'int32(2:2)[0:0:1 0:1:1 1:1:1]'::matrix,
         'int32(4)[1:2]'::vector,

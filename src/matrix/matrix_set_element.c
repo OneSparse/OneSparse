@@ -29,7 +29,3 @@ Datum matrix_set_element(PG_FUNCTION_ARGS)
 
 SUPPORT_FN(matrix_set_element, linitial);
 
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

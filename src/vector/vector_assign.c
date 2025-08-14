@@ -45,7 +45,3 @@ vector_assign(PG_FUNCTION_ARGS)
 
 SUPPORT_FN(vector_assign, linitial);
 
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

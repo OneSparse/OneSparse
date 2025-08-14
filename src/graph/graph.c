@@ -196,8 +196,3 @@ os_Graph* DatumGetGraph(Datum datum)
 	graph->flat_datum_pointer = flat_datum_pointer;
 	return graph;
 }
-
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

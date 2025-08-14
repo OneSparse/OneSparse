@@ -39,7 +39,3 @@ Datum graph_sssp(PG_FUNCTION_ARGS)
 	OS_RETURN_VECTOR(new_vector(type, vsize, CurrentMemoryContext, output));
 }
 
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

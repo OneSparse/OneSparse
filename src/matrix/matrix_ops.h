@@ -39,7 +39,3 @@ Datum FN(matrix_agg)(PG_FUNCTION_ARGS)
 #undef PG_RETURN
 #undef NO_SCALAR_MATH
 
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

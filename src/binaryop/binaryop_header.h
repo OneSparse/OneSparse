@@ -49,10 +49,6 @@ void initialize_binaryops()
     entry->name = strdup("oneb_bool");
     entry->binaryop = GrB_ONEB_BOOL;
 
-    entry = binaryophash_insert(binaryophash, "pow_bool", &found);
-    entry->name = strdup("pow_bool");
-    entry->binaryop = GxB_POW_BOOL;
-
     entry = binaryophash_insert(binaryophash, "first_int8", &found);
     entry->name = strdup("first_int8");
     entry->binaryop = GrB_FIRST_INT8;
@@ -64,10 +60,6 @@ void initialize_binaryops()
     entry = binaryophash_insert(binaryophash, "oneb_int8", &found);
     entry->name = strdup("oneb_int8");
     entry->binaryop = GrB_ONEB_INT8;
-
-    entry = binaryophash_insert(binaryophash, "pow_int8", &found);
-    entry->name = strdup("pow_int8");
-    entry->binaryop = GxB_POW_INT8;
 
     entry = binaryophash_insert(binaryophash, "first_int16", &found);
     entry->name = strdup("first_int16");
@@ -81,10 +73,6 @@ void initialize_binaryops()
     entry->name = strdup("oneb_int16");
     entry->binaryop = GrB_ONEB_INT16;
 
-    entry = binaryophash_insert(binaryophash, "pow_int16", &found);
-    entry->name = strdup("pow_int16");
-    entry->binaryop = GxB_POW_INT16;
-
     entry = binaryophash_insert(binaryophash, "first_int32", &found);
     entry->name = strdup("first_int32");
     entry->binaryop = GrB_FIRST_INT32;
@@ -96,10 +84,6 @@ void initialize_binaryops()
     entry = binaryophash_insert(binaryophash, "oneb_int32", &found);
     entry->name = strdup("oneb_int32");
     entry->binaryop = GrB_ONEB_INT32;
-
-    entry = binaryophash_insert(binaryophash, "pow_int32", &found);
-    entry->name = strdup("pow_int32");
-    entry->binaryop = GxB_POW_INT32;
 
     entry = binaryophash_insert(binaryophash, "first_int64", &found);
     entry->name = strdup("first_int64");
@@ -113,10 +97,6 @@ void initialize_binaryops()
     entry->name = strdup("oneb_int64");
     entry->binaryop = GrB_ONEB_INT64;
 
-    entry = binaryophash_insert(binaryophash, "pow_int64", &found);
-    entry->name = strdup("pow_int64");
-    entry->binaryop = GxB_POW_INT64;
-
     entry = binaryophash_insert(binaryophash, "first_uint8", &found);
     entry->name = strdup("first_uint8");
     entry->binaryop = GrB_FIRST_UINT8;
@@ -128,10 +108,6 @@ void initialize_binaryops()
     entry = binaryophash_insert(binaryophash, "oneb_uint8", &found);
     entry->name = strdup("oneb_uint8");
     entry->binaryop = GrB_ONEB_UINT8;
-
-    entry = binaryophash_insert(binaryophash, "pow_uint8", &found);
-    entry->name = strdup("pow_uint8");
-    entry->binaryop = GxB_POW_UINT8;
 
     entry = binaryophash_insert(binaryophash, "first_uint16", &found);
     entry->name = strdup("first_uint16");
@@ -145,10 +121,6 @@ void initialize_binaryops()
     entry->name = strdup("oneb_uint16");
     entry->binaryop = GrB_ONEB_UINT16;
 
-    entry = binaryophash_insert(binaryophash, "pow_uint16", &found);
-    entry->name = strdup("pow_uint16");
-    entry->binaryop = GxB_POW_UINT16;
-
     entry = binaryophash_insert(binaryophash, "first_uint32", &found);
     entry->name = strdup("first_uint32");
     entry->binaryop = GrB_FIRST_UINT32;
@@ -160,10 +132,6 @@ void initialize_binaryops()
     entry = binaryophash_insert(binaryophash, "oneb_uint32", &found);
     entry->name = strdup("oneb_uint32");
     entry->binaryop = GrB_ONEB_UINT32;
-
-    entry = binaryophash_insert(binaryophash, "pow_uint32", &found);
-    entry->name = strdup("pow_uint32");
-    entry->binaryop = GxB_POW_UINT32;
 
     entry = binaryophash_insert(binaryophash, "first_uint64", &found);
     entry->name = strdup("first_uint64");
@@ -177,10 +145,6 @@ void initialize_binaryops()
     entry->name = strdup("oneb_uint64");
     entry->binaryop = GrB_ONEB_UINT64;
 
-    entry = binaryophash_insert(binaryophash, "pow_uint64", &found);
-    entry->name = strdup("pow_uint64");
-    entry->binaryop = GxB_POW_UINT64;
-
     entry = binaryophash_insert(binaryophash, "first_fp32", &found);
     entry->name = strdup("first_fp32");
     entry->binaryop = GrB_FIRST_FP32;
@@ -192,10 +156,6 @@ void initialize_binaryops()
     entry = binaryophash_insert(binaryophash, "oneb_fp32", &found);
     entry->name = strdup("oneb_fp32");
     entry->binaryop = GrB_ONEB_FP32;
-
-    entry = binaryophash_insert(binaryophash, "pow_fp32", &found);
-    entry->name = strdup("pow_fp32");
-    entry->binaryop = GxB_POW_FP32;
 
     entry = binaryophash_insert(binaryophash, "first_fp64", &found);
     entry->name = strdup("first_fp64");
@@ -209,10 +169,6 @@ void initialize_binaryops()
     entry->name = strdup("oneb_fp64");
     entry->binaryop = GrB_ONEB_FP64;
 
-    entry = binaryophash_insert(binaryophash, "pow_fp64", &found);
-    entry->name = strdup("pow_fp64");
-    entry->binaryop = GxB_POW_FP64;
-
     entry = binaryophash_insert(binaryophash, "first_fc32", &found);
     entry->name = strdup("first_fc32");
     entry->binaryop = GxB_FIRST_FC32;
@@ -225,10 +181,6 @@ void initialize_binaryops()
     entry->name = strdup("oneb_fc32");
     entry->binaryop = GxB_ONEB_FC32;
 
-    entry = binaryophash_insert(binaryophash, "pow_fc32", &found);
-    entry->name = strdup("pow_fc32");
-    entry->binaryop = GxB_POW_FC32;
-
     entry = binaryophash_insert(binaryophash, "first_fc64", &found);
     entry->name = strdup("first_fc64");
     entry->binaryop = GxB_FIRST_FC64;
@@ -240,6 +192,54 @@ void initialize_binaryops()
     entry = binaryophash_insert(binaryophash, "oneb_fc64", &found);
     entry->name = strdup("oneb_fc64");
     entry->binaryop = GxB_ONEB_FC64;
+
+    entry = binaryophash_insert(binaryophash, "pow_bool", &found);
+    entry->name = strdup("pow_bool");
+    entry->binaryop = GxB_POW_BOOL;
+
+    entry = binaryophash_insert(binaryophash, "pow_int8", &found);
+    entry->name = strdup("pow_int8");
+    entry->binaryop = GxB_POW_INT8;
+
+    entry = binaryophash_insert(binaryophash, "pow_int16", &found);
+    entry->name = strdup("pow_int16");
+    entry->binaryop = GxB_POW_INT16;
+
+    entry = binaryophash_insert(binaryophash, "pow_int32", &found);
+    entry->name = strdup("pow_int32");
+    entry->binaryop = GxB_POW_INT32;
+
+    entry = binaryophash_insert(binaryophash, "pow_int64", &found);
+    entry->name = strdup("pow_int64");
+    entry->binaryop = GxB_POW_INT64;
+
+    entry = binaryophash_insert(binaryophash, "pow_uint8", &found);
+    entry->name = strdup("pow_uint8");
+    entry->binaryop = GxB_POW_UINT8;
+
+    entry = binaryophash_insert(binaryophash, "pow_uint16", &found);
+    entry->name = strdup("pow_uint16");
+    entry->binaryop = GxB_POW_UINT16;
+
+    entry = binaryophash_insert(binaryophash, "pow_uint32", &found);
+    entry->name = strdup("pow_uint32");
+    entry->binaryop = GxB_POW_UINT32;
+
+    entry = binaryophash_insert(binaryophash, "pow_uint64", &found);
+    entry->name = strdup("pow_uint64");
+    entry->binaryop = GxB_POW_UINT64;
+
+    entry = binaryophash_insert(binaryophash, "pow_fp32", &found);
+    entry->name = strdup("pow_fp32");
+    entry->binaryop = GxB_POW_FP32;
+
+    entry = binaryophash_insert(binaryophash, "pow_fp64", &found);
+    entry->name = strdup("pow_fp64");
+    entry->binaryop = GxB_POW_FP64;
+
+    entry = binaryophash_insert(binaryophash, "pow_fc32", &found);
+    entry->name = strdup("pow_fc32");
+    entry->binaryop = GxB_POW_FC32;
 
     entry = binaryophash_insert(binaryophash, "pow_fc64", &found);
     entry->name = strdup("pow_fc64");
@@ -1225,6 +1225,102 @@ void initialize_binaryops()
     entry->name = strdup("copysign_fp64");
     entry->binaryop = GxB_COPYSIGN_FP64;
 
+    entry = binaryophash_insert(binaryophash, "bget_int8", &found);
+    entry->name = strdup("bget_int8");
+    entry->binaryop = GxB_BGET_INT8;
+
+    entry = binaryophash_insert(binaryophash, "bset_int8", &found);
+    entry->name = strdup("bset_int8");
+    entry->binaryop = GxB_BSET_INT8;
+
+    entry = binaryophash_insert(binaryophash, "bclr_int8", &found);
+    entry->name = strdup("bclr_int8");
+    entry->binaryop = GxB_BCLR_INT8;
+
+    entry = binaryophash_insert(binaryophash, "bget_int16", &found);
+    entry->name = strdup("bget_int16");
+    entry->binaryop = GxB_BGET_INT16;
+
+    entry = binaryophash_insert(binaryophash, "bset_int16", &found);
+    entry->name = strdup("bset_int16");
+    entry->binaryop = GxB_BSET_INT16;
+
+    entry = binaryophash_insert(binaryophash, "bclr_int16", &found);
+    entry->name = strdup("bclr_int16");
+    entry->binaryop = GxB_BCLR_INT16;
+
+    entry = binaryophash_insert(binaryophash, "bget_int32", &found);
+    entry->name = strdup("bget_int32");
+    entry->binaryop = GxB_BGET_INT32;
+
+    entry = binaryophash_insert(binaryophash, "bset_int32", &found);
+    entry->name = strdup("bset_int32");
+    entry->binaryop = GxB_BSET_INT32;
+
+    entry = binaryophash_insert(binaryophash, "bclr_int32", &found);
+    entry->name = strdup("bclr_int32");
+    entry->binaryop = GxB_BCLR_INT32;
+
+    entry = binaryophash_insert(binaryophash, "bget_int64", &found);
+    entry->name = strdup("bget_int64");
+    entry->binaryop = GxB_BGET_INT64;
+
+    entry = binaryophash_insert(binaryophash, "bset_int64", &found);
+    entry->name = strdup("bset_int64");
+    entry->binaryop = GxB_BSET_INT64;
+
+    entry = binaryophash_insert(binaryophash, "bclr_int64", &found);
+    entry->name = strdup("bclr_int64");
+    entry->binaryop = GxB_BCLR_INT64;
+
+    entry = binaryophash_insert(binaryophash, "bget_uint8", &found);
+    entry->name = strdup("bget_uint8");
+    entry->binaryop = GxB_BGET_UINT8;
+
+    entry = binaryophash_insert(binaryophash, "bset_uint8", &found);
+    entry->name = strdup("bset_uint8");
+    entry->binaryop = GxB_BSET_UINT8;
+
+    entry = binaryophash_insert(binaryophash, "bclr_uint8", &found);
+    entry->name = strdup("bclr_uint8");
+    entry->binaryop = GxB_BCLR_UINT8;
+
+    entry = binaryophash_insert(binaryophash, "bget_uint16", &found);
+    entry->name = strdup("bget_uint16");
+    entry->binaryop = GxB_BGET_UINT16;
+
+    entry = binaryophash_insert(binaryophash, "bset_uint16", &found);
+    entry->name = strdup("bset_uint16");
+    entry->binaryop = GxB_BSET_UINT16;
+
+    entry = binaryophash_insert(binaryophash, "bclr_uint16", &found);
+    entry->name = strdup("bclr_uint16");
+    entry->binaryop = GxB_BCLR_UINT16;
+
+    entry = binaryophash_insert(binaryophash, "bget_uint32", &found);
+    entry->name = strdup("bget_uint32");
+    entry->binaryop = GxB_BGET_UINT32;
+
+    entry = binaryophash_insert(binaryophash, "bset_uint32", &found);
+    entry->name = strdup("bset_uint32");
+    entry->binaryop = GxB_BSET_UINT32;
+
+    entry = binaryophash_insert(binaryophash, "bclr_uint32", &found);
+    entry->name = strdup("bclr_uint32");
+    entry->binaryop = GxB_BCLR_UINT32;
+
+    entry = binaryophash_insert(binaryophash, "bget_uint64", &found);
+    entry->name = strdup("bget_uint64");
+    entry->binaryop = GxB_BGET_UINT64;
+
+    entry = binaryophash_insert(binaryophash, "bset_uint64", &found);
+    entry->name = strdup("bset_uint64");
+    entry->binaryop = GxB_BSET_UINT64;
+
+    entry = binaryophash_insert(binaryophash, "bclr_uint64", &found);
+    entry->name = strdup("bclr_uint64");
+    entry->binaryop = GxB_BCLR_UINT64;
+
     entry = binaryophash_insert(binaryophash, "bor_int8", &found);
     entry->name = strdup("bor_int8");
     entry->binaryop = GrB_BOR_INT8;
@@ -1352,102 +1448,6 @@ void initialize_binaryops()
     entry = binaryophash_insert(binaryophash, "bxnor_uint64", &found);
     entry->name = strdup("bxnor_uint64");
     entry->binaryop = GrB_BXNOR_UINT64;
-
-    entry = binaryophash_insert(binaryophash, "bget_int8", &found);
-    entry->name = strdup("bget_int8");
-    entry->binaryop = GxB_BGET_INT8;
-
-    entry = binaryophash_insert(binaryophash, "bset_int8", &found);
-    entry->name = strdup("bset_int8");
-    entry->binaryop = GxB_BSET_INT8;
-
-    entry = binaryophash_insert(binaryophash, "bclr_int8", &found);
-    entry->name = strdup("bclr_int8");
-    entry->binaryop = GxB_BCLR_INT8;
-
-    entry = binaryophash_insert(binaryophash, "bget_int16", &found);
-    entry->name = strdup("bget_int16");
-    entry->binaryop = GxB_BGET_INT16;
-
-    entry = binaryophash_insert(binaryophash, "bset_int16", &found);
-    entry->name = strdup("bset_int16");
-    entry->binaryop = GxB_BSET_INT16;
-
-    entry = binaryophash_insert(binaryophash, "bclr_int16", &found);
-    entry->name = strdup("bclr_int16");
-    entry->binaryop = GxB_BCLR_INT16;
-
-    entry = binaryophash_insert(binaryophash, "bget_int32", &found);
-    entry->name = strdup("bget_int32");
-    entry->binaryop = GxB_BGET_INT32;
-
-    entry = binaryophash_insert(binaryophash, "bset_int32", &found);
-    entry->name = strdup("bset_int32");
-    entry->binaryop = GxB_BSET_INT32;
-
-    entry = binaryophash_insert(binaryophash, "bclr_int32", &found);
-    entry->name = strdup("bclr_int32");
-    entry->binaryop = GxB_BCLR_INT32;
-
-    entry = binaryophash_insert(binaryophash, "bget_int64", &found);
-    entry->name = strdup("bget_int64");
-    entry->binaryop = GxB_BGET_INT64;
-
-    entry = binaryophash_insert(binaryophash, "bset_int64", &found);
-    entry->name = strdup("bset_int64");
-    entry->binaryop = GxB_BSET_INT64;
-
-    entry = binaryophash_insert(binaryophash, "bclr_int64", &found);
-    entry->name = strdup("bclr_int64");
-    entry->binaryop = GxB_BCLR_INT64;
-
-    entry = binaryophash_insert(binaryophash, "bget_uint8", &found);
-    entry->name = strdup("bget_uint8");
-    entry->binaryop = GxB_BGET_UINT8;
-
-    entry = binaryophash_insert(binaryophash, "bset_uint8", &found);
-    entry->name = strdup("bset_uint8");
-    entry->binaryop = GxB_BSET_UINT8;
-
-    entry = binaryophash_insert(binaryophash, "bclr_uint8", &found);
-    entry->name = strdup("bclr_uint8");
-    entry->binaryop = GxB_BCLR_UINT8;
-
-    entry = binaryophash_insert(binaryophash, "bget_uint16", &found);
-    entry->name = strdup("bget_uint16");
-    entry->binaryop = GxB_BGET_UINT16;
-
-    entry = binaryophash_insert(binaryophash, "bset_uint16", &found);
-    entry->name = strdup("bset_uint16");
-    entry->binaryop = GxB_BSET_UINT16;
-
-    entry = binaryophash_insert(binaryophash, "bclr_uint16", &found);
-    entry->name = strdup("bclr_uint16");
-    entry->binaryop = GxB_BCLR_UINT16;
-
-    entry = binaryophash_insert(binaryophash, "bget_uint32", &found);
-    entry->name = strdup("bget_uint32");
-    entry->binaryop = GxB_BGET_UINT32;
-
-    entry = binaryophash_insert(binaryophash, "bset_uint32", &found);
-    entry->name = strdup("bset_uint32");
-    entry->binaryop = GxB_BSET_UINT32;
-
-    entry = binaryophash_insert(binaryophash, "bclr_uint32", &found);
-    entry->name = strdup("bclr_uint32");
-    entry->binaryop = GxB_BCLR_UINT32;
-
-    entry = binaryophash_insert(binaryophash, "bget_uint64", &found);
-    entry->name = strdup("bget_uint64");
-    entry->binaryop = GxB_BGET_UINT64;
-
-    entry = binaryophash_insert(binaryophash, "bset_uint64", &found);
-    entry->name = strdup("bset_uint64");
-    entry->binaryop = GxB_BSET_UINT64;
-
-    entry = binaryophash_insert(binaryophash, "bclr_uint64", &found);
-    entry->name = strdup("bclr_uint64");
-    entry->binaryop = GxB_BCLR_UINT64;
 
     entry = binaryophash_insert(binaryophash, "bshift_int8", &found);
     entry->name = strdup("bshift_int8");

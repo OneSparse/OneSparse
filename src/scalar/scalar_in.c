@@ -197,7 +197,3 @@ Datum _scalar_in(char *input)
 	OS_RETURN_SCALAR(scalar);
 }
 
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

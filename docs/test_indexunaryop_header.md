@@ -1,3 +1,7 @@
+```
+\pset linestyle unicode
+\pset border 2
+```
 # IndexUnaryOp
 
 IndexUnaryOps apply a function to a positional element, returning an element.
@@ -27,9 +31,9 @@ IndexUnaryOps apply a function to a positional element, returning an element.
 | valueeq_fp64 | GrB_VALUEEQ_FP64 |
 | valueeq_int32 | GrB_VALUEEQ_INT32 |
 | valueeq_uint32 | GrB_VALUEEQ_UINT32 |
-| valueeq_fc32 | GxB_VALUEEQ_FC32 |
 | valueeq_int64 | GrB_VALUEEQ_INT64 |
 | valueeq_uint64 | GrB_VALUEEQ_UINT64 |
+| valueeq_fc32 | GxB_VALUEEQ_FC32 |
 | valueeq_fc64 | GxB_VALUEEQ_FC64 |
 | valuene_int8 | GrB_VALUENE_INT8 |
 | valuene_uint8 | GrB_VALUENE_UINT8 |
@@ -40,9 +44,9 @@ IndexUnaryOps apply a function to a positional element, returning an element.
 | valuene_fp64 | GrB_VALUENE_FP64 |
 | valuene_int32 | GrB_VALUENE_INT32 |
 | valuene_uint32 | GrB_VALUENE_UINT32 |
-| valuene_fc32 | GxB_VALUENE_FC32 |
 | valuene_int64 | GrB_VALUENE_INT64 |
 | valuene_uint64 | GrB_VALUENE_UINT64 |
+| valuene_fc32 | GxB_VALUENE_FC32 |
 | valuene_fc64 | GxB_VALUENE_FC64 |
 | valuelt_int8 | GrB_VALUELT_INT8 |
 | valuelt_uint8 | GrB_VALUELT_UINT8 |

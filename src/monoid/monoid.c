@@ -165,8 +165,3 @@ Datum monoid_name(PG_FUNCTION_ARGS)
 	monoid = OS_GETARG_MONOID(0);
 	PG_RETURN_TEXT_P(cstring_to_text(monoid->name));
 }
-
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

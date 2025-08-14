@@ -306,8 +306,3 @@ os_Scalar* DatumGetScalar(Datum datum)
 	datum = expand_scalar(flat, CurrentMemoryContext);
 	return ScalarGetEOHP(datum);
 }
-
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

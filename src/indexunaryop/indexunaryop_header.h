@@ -158,10 +158,6 @@ void initialize_indexunaryops()
     entry->name = strdup("valueeq_uint32");
     entry->indexunaryop = GrB_VALUEEQ_UINT32;
 
-    entry = indexunaryophash_insert(indexunaryophash, "valueeq_fc32", &found);
-    entry->name = strdup("valueeq_fc32");
-    entry->indexunaryop = GxB_VALUEEQ_FC32;
-
     entry = indexunaryophash_insert(indexunaryophash, "valueeq_int64", &found);
     entry->name = strdup("valueeq_int64");
     entry->indexunaryop = GrB_VALUEEQ_INT64;
@@ -169,6 +165,10 @@ void initialize_indexunaryops()
     entry = indexunaryophash_insert(indexunaryophash, "valueeq_uint64", &found);
     entry->name = strdup("valueeq_uint64");
     entry->indexunaryop = GrB_VALUEEQ_UINT64;
+
+    entry = indexunaryophash_insert(indexunaryophash, "valueeq_fc32", &found);
+    entry->name = strdup("valueeq_fc32");
+    entry->indexunaryop = GxB_VALUEEQ_FC32;
 
     entry = indexunaryophash_insert(indexunaryophash, "valueeq_fc64", &found);
     entry->name = strdup("valueeq_fc64");
@@ -210,10 +210,6 @@ void initialize_indexunaryops()
     entry->name = strdup("valuene_uint32");
     entry->indexunaryop = GrB_VALUENE_UINT32;
 
-    entry = indexunaryophash_insert(indexunaryophash, "valuene_fc32", &found);
-    entry->name = strdup("valuene_fc32");
-    entry->indexunaryop = GxB_VALUENE_FC32;
-
     entry = indexunaryophash_insert(indexunaryophash, "valuene_int64", &found);
     entry->name = strdup("valuene_int64");
     entry->indexunaryop = GrB_VALUENE_INT64;
@@ -221,6 +217,10 @@ void initialize_indexunaryops()
     entry = indexunaryophash_insert(indexunaryophash, "valuene_uint64", &found);
     entry->name = strdup("valuene_uint64");
     entry->indexunaryop = GrB_VALUENE_UINT64;
+
+    entry = indexunaryophash_insert(indexunaryophash, "valuene_fc32", &found);
+    entry->name = strdup("valuene_fc32");
+    entry->indexunaryop = GxB_VALUENE_FC32;
 
     entry = indexunaryophash_insert(indexunaryophash, "valuene_fc64", &found);
     entry->name = strdup("valuene_fc64");

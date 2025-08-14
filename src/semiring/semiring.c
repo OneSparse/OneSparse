@@ -162,8 +162,3 @@ Datum semiring_name(PG_FUNCTION_ARGS)
 	semiring = OS_GETARG_SEMIRING(0);
 	PG_RETURN_TEXT_P(cstring_to_text(semiring->name));
 }
-
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

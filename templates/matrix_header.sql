@@ -277,6 +277,14 @@ RETURNS vector
 AS '$libdir/onesparse', 'matrix_vxm'
 LANGUAGE C STABLE;
 
+CREATE FUNCTION norm(
+    a matrix,
+    inout c matrix default null
+    )
+RETURNS matrix
+AS '$libdir/onesparse', 'matrix_norm'
+LANGUAGE C STABLE;
+
 CREATE FUNCTION kronecker(
     a matrix,
     b matrix,
@@ -896,7 +904,7 @@ LANGUAGE C STRICT;
 CREATE FUNCTION random_matrix(t type, nrows bigint default -1, ncols bigint default -1, density float8 default 0.1, seed bigint default null)
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_random'
-LANGUAGE C STABLE;
+LANGUAGE C VOLATILE;
 
 create function print(a matrix) returns text language plpgsql set search_path = onesparse,public as
     $$

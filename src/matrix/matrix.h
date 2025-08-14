@@ -75,9 +75,4 @@ os_Matrix* DatumGetMatrixMaybeABC(Datum d, os_Matrix *A, os_Matrix *B, os_Matrix
 os_Matrix* _parse_matrix(char *input);
 char* _print_matrix(GrB_Matrix matrix);
 
-#endif /* OS_MATRIX_H */
-
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */
+#endif 

@@ -38,7 +38,3 @@ Datum matrix_save(PG_FUNCTION_ARGS) {
     PG_RETURN_OID(lo_oid);
 }
 
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

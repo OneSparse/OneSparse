@@ -286,8 +286,3 @@ os_Matrix* DatumGetMatrixMaybeABC(Datum datum, os_Matrix *A, os_Matrix *B, os_Ma
 	matrix->flat_datum_pointer = flat_datum_pointer;
 	return matrix;
 }
-
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

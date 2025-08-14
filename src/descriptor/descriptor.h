@@ -34,9 +34,4 @@ os_Descriptor* DatumGetDescriptor(Datum d);
 #define OS_DESCRIPTOR_DATA(_flat) ((char*)(_flat) + OS_DESCRIPTOR_FLATSIZE())
 #define DescriptorGetEOHP(_datum) (os_Descriptor *) DatumGetEOHP(_datum)
 
-#endif /* OS_DESCRIPTOR_H */
-
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */
+#endif 

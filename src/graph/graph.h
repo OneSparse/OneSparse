@@ -55,9 +55,4 @@ os_Graph* DatumGetGraph(Datum d);
 #define OS_GRAPH_DATA(_flat) ((char*)(_flat) + OS_GRAPH_FLATSIZE())
 #define GraphGetEOHP(_datum) (os_Graph *) DatumGetEOHP(_datum)
 
-#endif /* OS_GRAPH_H */
-
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */
+#endif 

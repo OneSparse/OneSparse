@@ -47,7 +47,3 @@ vector_reduce_scalar(PG_FUNCTION_ARGS)
 
 SUPPORT_FN(vector_reduce_scalar, lthird);
 
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

@@ -64,9 +64,4 @@ os_Vector* DatumGetVectorMaybeABC(Datum d, os_Vector *A, os_Vector *B, os_Vector
 #define OS_VECTOR_DATA(_flat) ((char*)(_flat) + OS_VECTOR_FLATSIZE())
 #define VectorGetEOHP(_datum) (os_Vector *) DatumGetEOHP(_datum)
 
-#endif /* OS_VECTOR_H */
-
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */
+#endif 

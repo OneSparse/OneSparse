@@ -31,7 +31,3 @@ Datum graph_out(PG_FUNCTION_ARGS)
 	PG_RETURN_CSTRING(output);
 }
 
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

@@ -59,7 +59,3 @@ Datum matrix_extract_matrix(PG_FUNCTION_ARGS)
 
 SUPPORT_FN(matrix_extract_matrix, lfourth);
 
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

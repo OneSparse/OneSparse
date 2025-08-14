@@ -18,7 +18,3 @@ Datum graph_triangle_count(PG_FUNCTION_ARGS)
     PG_RETURN_INT64(result);
 }
 
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

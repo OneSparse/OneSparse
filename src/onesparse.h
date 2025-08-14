@@ -123,7 +123,7 @@
 #define OS_VSIZE(_size, _v)\
 	OS_CHECK(GrB_Vector_size(&_size, _v->vector), \
 		  _v->vector, \
-		  "Cannot get matrix type");
+		  "Cannot get vector size");
 
 #define OS_STYPE(_stype, _s)      \
 	OS_CHECK(GxB_Scalar_type(&_stype, _s->scalar),\
@@ -222,9 +222,4 @@ void _PG_init(void);
 #include "matrix/matrix.h"
 #include "graph/graph.h"
 
-#endif /* OS_H */
-
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */
+#endif 

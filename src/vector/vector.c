@@ -266,8 +266,3 @@ os_Vector* DatumGetVectorMaybeABC(Datum datum, os_Vector *A, os_Vector *B, os_Ve
 	vector->flat_datum_pointer = flat_datum_pointer;
 	return vector;
 }
-
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

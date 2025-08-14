@@ -436,8 +436,3 @@ onesparse_tam_handler(PG_FUNCTION_ARGS)
     PG_RETURN_POINTER(r);
 }
 
-
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

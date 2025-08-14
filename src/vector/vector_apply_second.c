@@ -31,6 +31,7 @@ Datum vector_apply_second(PG_FUNCTION_ARGS)
 	if (PG_ARGISNULL(3))
 	{
 		OS_VSIZE(usize, u);
+		elog(DEBUG1, "Vector size %lu", usize);
 		w = new_vector(type, usize, CurrentMemoryContext, NULL);
 	}
 	else
@@ -40,21 +41,18 @@ Datum vector_apply_second(PG_FUNCTION_ARGS)
 	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 5);
 	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 6);
 
-	OS_CHECK(GrB_apply(w->vector,
-					   mask,
-					   accum,
-					   binaryop,
-					   u->vector,
-					   s->scalar,
-					   descriptor),
-			 w->vector,
-			 "Error in grb_vector_apply_binaryop1st");
+	OS_CHECK( GrB_Vector_apply_BinaryOp2nd_Scalar(
+				  w->vector,
+				  mask,
+				  accum,
+				  binaryop,
+				  u->vector,
+				  s->scalar,
+				  descriptor),
+			  w->vector,
+			  "Error in grb_vector_apply_binaryop2nd");
 	OS_RETURN_VECTOR(w);
 }
 
 SUPPORT_FN(vector_apply_second, lfourth);
 
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

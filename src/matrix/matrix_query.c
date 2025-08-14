@@ -166,8 +166,3 @@ Datum matrix_query(PG_FUNCTION_ARGS)
 	OS_END_BENCH();
 	OS_RETURN_MATRIX(A);
 }
-
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

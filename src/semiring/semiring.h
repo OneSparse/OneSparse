@@ -34,9 +34,4 @@ os_Semiring* DatumGetSemiring(Datum d);
 #define OS_SEMIRING_DATA(_flat) ((char*)(_flat) + OS_SEMIRING_FLATSIZE())
 #define SemiringGetEOHP(_datum) (os_Semiring *) DatumGetEOHP(_datum)
 
-#endif /* OS_SEMIRING_H */
-
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */
+#endif 

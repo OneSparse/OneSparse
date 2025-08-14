@@ -26,7 +26,3 @@ Datum vector_info(PG_FUNCTION_ARGS) {
 	PG_RETURN_TEXT_P(cstring_to_text_with_len(result, size+1));
 }
 
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

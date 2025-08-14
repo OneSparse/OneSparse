@@ -32,7 +32,3 @@ Datum matrix_serialize(PG_FUNCTION_ARGS) {
 }
 
 
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

@@ -49,10 +49,6 @@ void initialize_unaryops()
     entry->name = strdup("minv_bool");
     entry->unaryop = GrB_MINV_BOOL;
 
-    entry = unaryophash_insert(unaryophash, "lnot_bool", &found);
-    entry->name = strdup("lnot_bool");
-    entry->unaryop = GxB_LNOT_BOOL;
-
     entry = unaryophash_insert(unaryophash, "identity_int8", &found);
     entry->name = strdup("identity_int8");
     entry->unaryop = GrB_IDENTITY_INT8;
@@ -64,10 +60,6 @@ void initialize_unaryops()
     entry = unaryophash_insert(unaryophash, "minv_int8", &found);
     entry->name = strdup("minv_int8");
     entry->unaryop = GrB_MINV_INT8;
-
-    entry = unaryophash_insert(unaryophash, "lnot_int8", &found);
-    entry->name = strdup("lnot_int8");
-    entry->unaryop = GxB_LNOT_INT8;
 
     entry = unaryophash_insert(unaryophash, "identity_int16", &found);
     entry->name = strdup("identity_int16");
@@ -81,10 +73,6 @@ void initialize_unaryops()
     entry->name = strdup("minv_int16");
     entry->unaryop = GrB_MINV_INT16;
 
-    entry = unaryophash_insert(unaryophash, "lnot_int16", &found);
-    entry->name = strdup("lnot_int16");
-    entry->unaryop = GxB_LNOT_INT16;
-
     entry = unaryophash_insert(unaryophash, "identity_int32", &found);
     entry->name = strdup("identity_int32");
     entry->unaryop = GrB_IDENTITY_INT32;
@@ -96,10 +84,6 @@ void initialize_unaryops()
     entry = unaryophash_insert(unaryophash, "minv_int32", &found);
     entry->name = strdup("minv_int32");
     entry->unaryop = GrB_MINV_INT32;
-
-    entry = unaryophash_insert(unaryophash, "lnot_int32", &found);
-    entry->name = strdup("lnot_int32");
-    entry->unaryop = GxB_LNOT_INT32;
 
     entry = unaryophash_insert(unaryophash, "identity_int64", &found);
     entry->name = strdup("identity_int64");
@@ -113,10 +97,6 @@ void initialize_unaryops()
     entry->name = strdup("minv_int64");
     entry->unaryop = GrB_MINV_INT64;
 
-    entry = unaryophash_insert(unaryophash, "lnot_int64", &found);
-    entry->name = strdup("lnot_int64");
-    entry->unaryop = GxB_LNOT_INT64;
-
     entry = unaryophash_insert(unaryophash, "identity_uint8", &found);
     entry->name = strdup("identity_uint8");
     entry->unaryop = GrB_IDENTITY_UINT8;
@@ -128,10 +108,6 @@ void initialize_unaryops()
     entry = unaryophash_insert(unaryophash, "minv_uint8", &found);
     entry->name = strdup("minv_uint8");
     entry->unaryop = GrB_MINV_UINT8;
-
-    entry = unaryophash_insert(unaryophash, "lnot_uint8", &found);
-    entry->name = strdup("lnot_uint8");
-    entry->unaryop = GxB_LNOT_UINT8;
 
     entry = unaryophash_insert(unaryophash, "identity_uint16", &found);
     entry->name = strdup("identity_uint16");
@@ -145,10 +121,6 @@ void initialize_unaryops()
     entry->name = strdup("minv_uint16");
     entry->unaryop = GrB_MINV_UINT16;
 
-    entry = unaryophash_insert(unaryophash, "lnot_uint16", &found);
-    entry->name = strdup("lnot_uint16");
-    entry->unaryop = GxB_LNOT_UINT16;
-
     entry = unaryophash_insert(unaryophash, "identity_uint32", &found);
     entry->name = strdup("identity_uint32");
     entry->unaryop = GrB_IDENTITY_UINT32;
@@ -160,10 +132,6 @@ void initialize_unaryops()
     entry = unaryophash_insert(unaryophash, "minv_uint32", &found);
     entry->name = strdup("minv_uint32");
     entry->unaryop = GrB_MINV_UINT32;
-
-    entry = unaryophash_insert(unaryophash, "lnot_uint32", &found);
-    entry->name = strdup("lnot_uint32");
-    entry->unaryop = GxB_LNOT_UINT32;
 
     entry = unaryophash_insert(unaryophash, "identity_uint64", &found);
     entry->name = strdup("identity_uint64");
@@ -177,10 +145,6 @@ void initialize_unaryops()
     entry->name = strdup("minv_uint64");
     entry->unaryop = GrB_MINV_UINT64;
 
-    entry = unaryophash_insert(unaryophash, "lnot_uint64", &found);
-    entry->name = strdup("lnot_uint64");
-    entry->unaryop = GxB_LNOT_UINT64;
-
     entry = unaryophash_insert(unaryophash, "identity_fp32", &found);
     entry->name = strdup("identity_fp32");
     entry->unaryop = GrB_IDENTITY_FP32;
@@ -192,10 +156,6 @@ void initialize_unaryops()
     entry = unaryophash_insert(unaryophash, "minv_fp32", &found);
     entry->name = strdup("minv_fp32");
     entry->unaryop = GrB_MINV_FP32;
-
-    entry = unaryophash_insert(unaryophash, "lnot_fp32", &found);
-    entry->name = strdup("lnot_fp32");
-    entry->unaryop = GxB_LNOT_FP32;
 
     entry = unaryophash_insert(unaryophash, "identity_fp64", &found);
     entry->name = strdup("identity_fp64");
@@ -209,9 +169,169 @@ void initialize_unaryops()
     entry->name = strdup("minv_fp64");
     entry->unaryop = GrB_MINV_FP64;
 
+    entry = unaryophash_insert(unaryophash, "abs_bool", &found);
+    entry->name = strdup("abs_bool");
+    entry->unaryop = GrB_ABS_BOOL;
+
+    entry = unaryophash_insert(unaryophash, "abs_int8", &found);
+    entry->name = strdup("abs_int8");
+    entry->unaryop = GrB_ABS_INT8;
+
+    entry = unaryophash_insert(unaryophash, "bnot_int8", &found);
+    entry->name = strdup("bnot_int8");
+    entry->unaryop = GrB_BNOT_INT8;
+
+    entry = unaryophash_insert(unaryophash, "abs_int16", &found);
+    entry->name = strdup("abs_int16");
+    entry->unaryop = GrB_ABS_INT16;
+
+    entry = unaryophash_insert(unaryophash, "bnot_int16", &found);
+    entry->name = strdup("bnot_int16");
+    entry->unaryop = GrB_BNOT_INT16;
+
+    entry = unaryophash_insert(unaryophash, "abs_int32", &found);
+    entry->name = strdup("abs_int32");
+    entry->unaryop = GrB_ABS_INT32;
+
+    entry = unaryophash_insert(unaryophash, "bnot_int32", &found);
+    entry->name = strdup("bnot_int32");
+    entry->unaryop = GrB_BNOT_INT32;
+
+    entry = unaryophash_insert(unaryophash, "abs_int64", &found);
+    entry->name = strdup("abs_int64");
+    entry->unaryop = GrB_ABS_INT64;
+
+    entry = unaryophash_insert(unaryophash, "bnot_int64", &found);
+    entry->name = strdup("bnot_int64");
+    entry->unaryop = GrB_BNOT_INT64;
+
+    entry = unaryophash_insert(unaryophash, "abs_uint8", &found);
+    entry->name = strdup("abs_uint8");
+    entry->unaryop = GrB_ABS_UINT8;
+
+    entry = unaryophash_insert(unaryophash, "bnot_uint8", &found);
+    entry->name = strdup("bnot_uint8");
+    entry->unaryop = GrB_BNOT_UINT8;
+
+    entry = unaryophash_insert(unaryophash, "abs_uint16", &found);
+    entry->name = strdup("abs_uint16");
+    entry->unaryop = GrB_ABS_UINT16;
+
+    entry = unaryophash_insert(unaryophash, "bnot_uint16", &found);
+    entry->name = strdup("bnot_uint16");
+    entry->unaryop = GrB_BNOT_UINT16;
+
+    entry = unaryophash_insert(unaryophash, "abs_uint32", &found);
+    entry->name = strdup("abs_uint32");
+    entry->unaryop = GrB_ABS_UINT32;
+
+    entry = unaryophash_insert(unaryophash, "bnot_uint32", &found);
+    entry->name = strdup("bnot_uint32");
+    entry->unaryop = GrB_BNOT_UINT32;
+
+    entry = unaryophash_insert(unaryophash, "abs_uint64", &found);
+    entry->name = strdup("abs_uint64");
+    entry->unaryop = GrB_ABS_UINT64;
+
+    entry = unaryophash_insert(unaryophash, "bnot_uint64", &found);
+    entry->name = strdup("bnot_uint64");
+    entry->unaryop = GrB_BNOT_UINT64;
+
+    entry = unaryophash_insert(unaryophash, "abs_fp32", &found);
+    entry->name = strdup("abs_fp32");
+    entry->unaryop = GrB_ABS_FP32;
+
+    entry = unaryophash_insert(unaryophash, "abs_fp64", &found);
+    entry->name = strdup("abs_fp64");
+    entry->unaryop = GrB_ABS_FP64;
+
+    entry = unaryophash_insert(unaryophash, "lnot_bool", &found);
+    entry->name = strdup("lnot_bool");
+    entry->unaryop = GxB_LNOT_BOOL;
+
+    entry = unaryophash_insert(unaryophash, "one_bool", &found);
+    entry->name = strdup("one_bool");
+    entry->unaryop = GxB_ONE_BOOL;
+
+    entry = unaryophash_insert(unaryophash, "lnot_int8", &found);
+    entry->name = strdup("lnot_int8");
+    entry->unaryop = GxB_LNOT_INT8;
+
+    entry = unaryophash_insert(unaryophash, "one_int8", &found);
+    entry->name = strdup("one_int8");
+    entry->unaryop = GxB_ONE_INT8;
+
+    entry = unaryophash_insert(unaryophash, "lnot_int16", &found);
+    entry->name = strdup("lnot_int16");
+    entry->unaryop = GxB_LNOT_INT16;
+
+    entry = unaryophash_insert(unaryophash, "one_int16", &found);
+    entry->name = strdup("one_int16");
+    entry->unaryop = GxB_ONE_INT16;
+
+    entry = unaryophash_insert(unaryophash, "lnot_int32", &found);
+    entry->name = strdup("lnot_int32");
+    entry->unaryop = GxB_LNOT_INT32;
+
+    entry = unaryophash_insert(unaryophash, "one_int32", &found);
+    entry->name = strdup("one_int32");
+    entry->unaryop = GxB_ONE_INT32;
+
+    entry = unaryophash_insert(unaryophash, "lnot_int64", &found);
+    entry->name = strdup("lnot_int64");
+    entry->unaryop = GxB_LNOT_INT64;
+
+    entry = unaryophash_insert(unaryophash, "one_int64", &found);
+    entry->name = strdup("one_int64");
+    entry->unaryop = GxB_ONE_INT64;
+
+    entry = unaryophash_insert(unaryophash, "lnot_uint8", &found);
+    entry->name = strdup("lnot_uint8");
+    entry->unaryop = GxB_LNOT_UINT8;
+
+    entry = unaryophash_insert(unaryophash, "one_uint8", &found);
+    entry->name = strdup("one_uint8");
+    entry->unaryop = GxB_ONE_UINT8;
+
+    entry = unaryophash_insert(unaryophash, "lnot_uint16", &found);
+    entry->name = strdup("lnot_uint16");
+    entry->unaryop = GxB_LNOT_UINT16;
+
+    entry = unaryophash_insert(unaryophash, "one_uint16", &found);
+    entry->name = strdup("one_uint16");
+    entry->unaryop = GxB_ONE_UINT16;
+
+    entry = unaryophash_insert(unaryophash, "lnot_uint32", &found);
+    entry->name = strdup("lnot_uint32");
+    entry->unaryop = GxB_LNOT_UINT32;
+
+    entry = unaryophash_insert(unaryophash, "one_uint32", &found);
+    entry->name = strdup("one_uint32");
+    entry->unaryop = GxB_ONE_UINT32;
+
+    entry = unaryophash_insert(unaryophash, "lnot_uint64", &found);
+    entry->name = strdup("lnot_uint64");
+    entry->unaryop = GxB_LNOT_UINT64;
+
+    entry = unaryophash_insert(unaryophash, "one_uint64", &found);
+    entry->name = strdup("one_uint64");
+    entry->unaryop = GxB_ONE_UINT64;
+
+    entry = unaryophash_insert(unaryophash, "lnot_fp32", &found);
+    entry->name = strdup("lnot_fp32");
+    entry->unaryop = GxB_LNOT_FP32;
+
+    entry = unaryophash_insert(unaryophash, "one_fp32", &found);
+    entry->name = strdup("one_fp32");
+    entry->unaryop = GxB_ONE_FP32;
+
     entry = unaryophash_insert(unaryophash, "lnot_fp64", &found);
     entry->name = strdup("lnot_fp64");
     entry->unaryop = GxB_LNOT_FP64;
+
+    entry = unaryophash_insert(unaryophash, "one_fp64", &found);
+    entry->name = strdup("one_fp64");
+    entry->unaryop = GxB_ONE_FP64;
 
     entry = unaryophash_insert(unaryophash, "identity_fc32", &found);
     entry->name = strdup("identity_fc32");
@@ -237,126 +357,6 @@ void initialize_unaryops()
     entry->name = strdup("minv_fc64");
     entry->unaryop = GxB_MINV_FC64;
 
-    entry = unaryophash_insert(unaryophash, "one_bool", &found);
-    entry->name = strdup("one_bool");
-    entry->unaryop = GxB_ONE_BOOL;
-
-    entry = unaryophash_insert(unaryophash, "abs_bool", &found);
-    entry->name = strdup("abs_bool");
-    entry->unaryop = GrB_ABS_BOOL;
-
-    entry = unaryophash_insert(unaryophash, "one_int8", &found);
-    entry->name = strdup("one_int8");
-    entry->unaryop = GxB_ONE_INT8;
-
-    entry = unaryophash_insert(unaryophash, "abs_int8", &found);
-    entry->name = strdup("abs_int8");
-    entry->unaryop = GrB_ABS_INT8;
-
-    entry = unaryophash_insert(unaryophash, "bnot_int8", &found);
-    entry->name = strdup("bnot_int8");
-    entry->unaryop = GrB_BNOT_INT8;
-
-    entry = unaryophash_insert(unaryophash, "one_int16", &found);
-    entry->name = strdup("one_int16");
-    entry->unaryop = GxB_ONE_INT16;
-
-    entry = unaryophash_insert(unaryophash, "abs_int16", &found);
-    entry->name = strdup("abs_int16");
-    entry->unaryop = GrB_ABS_INT16;
-
-    entry = unaryophash_insert(unaryophash, "bnot_int16", &found);
-    entry->name = strdup("bnot_int16");
-    entry->unaryop = GrB_BNOT_INT16;
-
-    entry = unaryophash_insert(unaryophash, "one_int32", &found);
-    entry->name = strdup("one_int32");
-    entry->unaryop = GxB_ONE_INT32;
-
-    entry = unaryophash_insert(unaryophash, "abs_int32", &found);
-    entry->name = strdup("abs_int32");
-    entry->unaryop = GrB_ABS_INT32;
-
-    entry = unaryophash_insert(unaryophash, "bnot_int32", &found);
-    entry->name = strdup("bnot_int32");
-    entry->unaryop = GrB_BNOT_INT32;
-
-    entry = unaryophash_insert(unaryophash, "one_int64", &found);
-    entry->name = strdup("one_int64");
-    entry->unaryop = GxB_ONE_INT64;
-
-    entry = unaryophash_insert(unaryophash, "abs_int64", &found);
-    entry->name = strdup("abs_int64");
-    entry->unaryop = GrB_ABS_INT64;
-
-    entry = unaryophash_insert(unaryophash, "bnot_int64", &found);
-    entry->name = strdup("bnot_int64");
-    entry->unaryop = GrB_BNOT_INT64;
-
-    entry = unaryophash_insert(unaryophash, "one_uint8", &found);
-    entry->name = strdup("one_uint8");
-    entry->unaryop = GxB_ONE_UINT8;
-
-    entry = unaryophash_insert(unaryophash, "abs_uint8", &found);
-    entry->name = strdup("abs_uint8");
-    entry->unaryop = GrB_ABS_UINT8;
-
-    entry = unaryophash_insert(unaryophash, "bnot_uint8", &found);
-    entry->name = strdup("bnot_uint8");
-    entry->unaryop = GrB_BNOT_UINT8;
-
-    entry = unaryophash_insert(unaryophash, "one_uint16", &found);
-    entry->name = strdup("one_uint16");
-    entry->unaryop = GxB_ONE_UINT16;
-
-    entry = unaryophash_insert(unaryophash, "abs_uint16", &found);
-    entry->name = strdup("abs_uint16");
-    entry->unaryop = GrB_ABS_UINT16;
-
-    entry = unaryophash_insert(unaryophash, "bnot_uint16", &found);
-    entry->name = strdup("bnot_uint16");
-    entry->unaryop = GrB_BNOT_UINT16;
-
-    entry = unaryophash_insert(unaryophash, "one_uint32", &found);
-    entry->name = strdup("one_uint32");
-    entry->unaryop = GxB_ONE_UINT32;
-
-    entry = unaryophash_insert(unaryophash, "abs_uint32", &found);
-    entry->name = strdup("abs_uint32");
-    entry->unaryop = GrB_ABS_UINT32;
-
-    entry = unaryophash_insert(unaryophash, "bnot_uint32", &found);
-    entry->name = strdup("bnot_uint32");
-    entry->unaryop = GrB_BNOT_UINT32;
-
-    entry = unaryophash_insert(unaryophash, "one_uint64", &found);
-    entry->name = strdup("one_uint64");
-    entry->unaryop = GxB_ONE_UINT64;
-
-    entry = unaryophash_insert(unaryophash, "abs_uint64", &found);
-    entry->name = strdup("abs_uint64");
-    entry->unaryop = GrB_ABS_UINT64;
-
-    entry = unaryophash_insert(unaryophash, "bnot_uint64", &found);
-    entry->name = strdup("bnot_uint64");
-    entry->unaryop = GrB_BNOT_UINT64;
-
-    entry = unaryophash_insert(unaryophash, "one_fp32", &found);
-    entry->name = strdup("one_fp32");
-    entry->unaryop = GxB_ONE_FP32;
-
-    entry = unaryophash_insert(unaryophash, "abs_fp32", &found);
-    entry->name = strdup("abs_fp32");
-    entry->unaryop = GrB_ABS_FP32;
-
-    entry = unaryophash_insert(unaryophash, "one_fp64", &found);
-    entry->name = strdup("one_fp64");
-    entry->unaryop = GxB_ONE_FP64;
-
-    entry = unaryophash_insert(unaryophash, "abs_fp64", &found);
-    entry->name = strdup("abs_fp64");
-    entry->unaryop = GrB_ABS_FP64;
-
     entry = unaryophash_insert(unaryophash, "one_fc32", &found);
     entry->name = strdup("one_fc32");
     entry->unaryop = GxB_ONE_FC32;
@@ -368,50 +368,6 @@ void initialize_unaryops()
     entry = unaryophash_insert(unaryophash, "lnot", &found);
     entry->name = strdup("lnot");
     entry->unaryop = GrB_LNOT;
-
-    entry = unaryophash_insert(unaryophash, "abs_bool", &found);
-    entry->name = strdup("abs_bool");
-    entry->unaryop = GxB_ABS_BOOL;
-
-    entry = unaryophash_insert(unaryophash, "abs_int8", &found);
-    entry->name = strdup("abs_int8");
-    entry->unaryop = GxB_ABS_INT8;
-
-    entry = unaryophash_insert(unaryophash, "abs_int16", &found);
-    entry->name = strdup("abs_int16");
-    entry->unaryop = GxB_ABS_INT16;
-
-    entry = unaryophash_insert(unaryophash, "abs_int32", &found);
-    entry->name = strdup("abs_int32");
-    entry->unaryop = GxB_ABS_INT32;
-
-    entry = unaryophash_insert(unaryophash, "abs_int64", &found);
-    entry->name = strdup("abs_int64");
-    entry->unaryop = GxB_ABS_INT64;
-
-    entry = unaryophash_insert(unaryophash, "abs_uint8", &found);
-    entry->name = strdup("abs_uint8");
-    entry->unaryop = GxB_ABS_UINT8;
-
-    entry = unaryophash_insert(unaryophash, "abs_uint16", &found);
-    entry->name = strdup("abs_uint16");
-    entry->unaryop = GxB_ABS_UINT16;
-
-    entry = unaryophash_insert(unaryophash, "abs_uint32", &found);
-    entry->name = strdup("abs_uint32");
-    entry->unaryop = GxB_ABS_UINT32;
-
-    entry = unaryophash_insert(unaryophash, "abs_uint64", &found);
-    entry->name = strdup("abs_uint64");
-    entry->unaryop = GxB_ABS_UINT64;
-
-    entry = unaryophash_insert(unaryophash, "abs_fp32", &found);
-    entry->name = strdup("abs_fp32");
-    entry->unaryop = GxB_ABS_FP32;
-
-    entry = unaryophash_insert(unaryophash, "abs_fp64", &found);
-    entry->name = strdup("abs_fp64");
-    entry->unaryop = GxB_ABS_FP64;
 
     entry = unaryophash_insert(unaryophash, "sqrt_fp32", &found);
     entry->name = strdup("sqrt_fp32");
@@ -988,6 +944,50 @@ void initialize_unaryops()
     entry = unaryophash_insert(unaryophash, "positionj1_int64", &found);
     entry->name = strdup("positionj1_int64");
     entry->unaryop = GxB_POSITIONJ1_INT64;
+
+    entry = unaryophash_insert(unaryophash, "abs_bool", &found);
+    entry->name = strdup("abs_bool");
+    entry->unaryop = GxB_ABS_BOOL;
+
+    entry = unaryophash_insert(unaryophash, "abs_int8", &found);
+    entry->name = strdup("abs_int8");
+    entry->unaryop = GxB_ABS_INT8;
+
+    entry = unaryophash_insert(unaryophash, "abs_int16", &found);
+    entry->name = strdup("abs_int16");
+    entry->unaryop = GxB_ABS_INT16;
+
+    entry = unaryophash_insert(unaryophash, "abs_int32", &found);
+    entry->name = strdup("abs_int32");
+    entry->unaryop = GxB_ABS_INT32;
+
+    entry = unaryophash_insert(unaryophash, "abs_int64", &found);
+    entry->name = strdup("abs_int64");
+    entry->unaryop = GxB_ABS_INT64;
+
+    entry = unaryophash_insert(unaryophash, "abs_uint8", &found);
+    entry->name = strdup("abs_uint8");
+    entry->unaryop = GxB_ABS_UINT8;
+
+    entry = unaryophash_insert(unaryophash, "abs_uint16", &found);
+    entry->name = strdup("abs_uint16");
+    entry->unaryop = GxB_ABS_UINT16;
+
+    entry = unaryophash_insert(unaryophash, "abs_uint32", &found);
+    entry->name = strdup("abs_uint32");
+    entry->unaryop = GxB_ABS_UINT32;
+
+    entry = unaryophash_insert(unaryophash, "abs_uint64", &found);
+    entry->name = strdup("abs_uint64");
+    entry->unaryop = GxB_ABS_UINT64;
+
+    entry = unaryophash_insert(unaryophash, "abs_fp32", &found);
+    entry->name = strdup("abs_fp32");
+    entry->unaryop = GxB_ABS_FP32;
+
+    entry = unaryophash_insert(unaryophash, "abs_fp64", &found);
+    entry->name = strdup("abs_fp64");
+    entry->unaryop = GxB_ABS_FP64;
     }
 
 GrB_UnaryOp lookup_unaryop(char *name)

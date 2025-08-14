@@ -53,7 +53,3 @@ Datum matrix_random(PG_FUNCTION_ARGS)
 	OS_RETURN_MATRIX(A);
 }
 
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

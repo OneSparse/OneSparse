@@ -120,7 +120,3 @@ Datum scalar_print(PG_FUNCTION_ARGS) {
 	PG_RETURN_TEXT_P(cstring_to_text(buf.data));
 }
 
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

@@ -54,7 +54,3 @@ Datum vector_apply_first(PG_FUNCTION_ARGS)
 
 SUPPORT_FN(vector_apply_first, lfourth);
 
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

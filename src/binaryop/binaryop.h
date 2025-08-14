@@ -34,9 +34,4 @@ os_BinaryOp* DatumGetBinaryOp(Datum d);
 #define OS_BINARYOP_DATA(_flat) ((char*)(_flat) + OS_BINARYOP_FLATSIZE())
 #define BinaryOpGetEOHP(_datum) (os_BinaryOp *) DatumGetEOHP(_datum)
 
-#endif /* OS_BINARYOP_H */
-
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */
+#endif 

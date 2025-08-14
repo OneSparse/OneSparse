@@ -30,7 +30,3 @@ Datum matrix_remove_element(PG_FUNCTION_ARGS)
 
 SUPPORT_FN(matrix_remove_element, linitial);
 
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

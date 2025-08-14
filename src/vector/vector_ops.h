@@ -32,14 +32,51 @@ Datum FN(vector_agg)(PG_FUNCTION_ARGS)
     OS_RETURN_VECTOR(state);
 }
 
+PG_FUNCTION_INFO_V1(FN(vector));
+PG_FUNCTION_INFO_V1(FN(cast_vector));
+
+Datum FN(vector)(PG_FUNCTION_ARGS)
+{
+	os_Vector* v;
+	ArrayType *arr;
+	GrB_Index size;
+
+	LOGF();
+	if (!PG_ARGISNULL(0))
+	{
+		arr = PG_GETARG_ARRAYTYPE_P(0);
+	}
+	v = new_vector(GB_TYPE, size, CurrentMemoryContext, NULL);
+	OS_RETURN_VECTOR(v);
+}
+
+Datum FN(cast_vector)(PG_FUNCTION_ARGS)
+{
+	os_Vector* v;
+	ArrayType *arr;
+	int n = 0;
+    int16 elmlen;
+	bool elmbyval;
+	char elmalign;
+	Datum *elems;
+
+	LOGF();
+	ERRORNULL(0);
+
+	v = OS_GETARG_VECTOR(0);
+
+	elems = palloc(n * sizeof(Datum));
+    get_typlenbyvalalign(INT8OID, &elmlen, &elmbyval, &elmalign);
+
+    arr = construct_array(elems, n, INT8OID, elmlen, elmbyval, elmalign);
+	PG_RETURN_ARRAYTYPE_P(arr);
+}
+
 #undef SUFFIX
 #undef PG_TYPE
 #undef GB_TYPE
+#undef PG_TYPEOID
 #undef PG_GETARG
 #undef PG_RETURN
 #undef NO_SCALAR_MATH
 
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

@@ -34,7 +34,3 @@ Datum vector_type(PG_FUNCTION_ARGS) {
 	OS_RETURN_TYPE(result);
 }
 
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

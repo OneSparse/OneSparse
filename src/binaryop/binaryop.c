@@ -167,7 +167,3 @@ Datum binaryop_name(PG_FUNCTION_ARGS)
 	binaryop = OS_GETARG_BINARYOP(0);
 	PG_RETURN_TEXT_P(cstring_to_text(binaryop->name));
 }
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

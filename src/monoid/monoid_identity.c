@@ -15,7 +15,3 @@ Datum monoid_identity(PG_FUNCTION_ARGS)
              "Error extracting scalar nvals.");
 	OS_RETURN_SCALAR(scalar);
 }
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

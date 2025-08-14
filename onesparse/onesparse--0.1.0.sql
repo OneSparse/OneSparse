@@ -919,12 +919,12 @@ RETURNS bigint
 AS '$libdir/onesparse', 'vector_nvals'
 LANGUAGE C;
 
-CREATE FUNCTION vector_bool(b vector)
+CREATE FUNCTION test_vector_bool(b vector)
 RETURNS bool
 RETURN nvals(b) > 0;
 
 CREATE CAST (vector AS bool)
-    WITH FUNCTION vector_bool(vector)
+    WITH FUNCTION test_vector_bool(vector)
     AS IMPLICIT;
 
 CREATE FUNCTION size(vector)
@@ -1475,27 +1475,36 @@ create function print(a vector) returns text language plpgsql as
     end;
     $$;
 
-create function random_vector(
-    vsize integer,
-    nvals integer,
-    max integer default 2^31 - 1,
-    seed double precision default null)
-    returns vector language plpgsql as
-    $$
-    declare v vector = vector('int32', vsize);
-    prob double precision = nvals::double precision / vsize;
-    begin
-        if (seed is not null) then
-            perform setseed(seed);
-        end if;
-        for i in 0..vsize-1 loop
-            if random() < prob then
-                v = set_element(v, i, random(0, max));
-            end if;
-        end loop;
-        return v;
-    end;
-    $$;
+CREATE FUNCTION random_vector(t type, size bigint default -1, density float8 default 0.1, seed bigint default null)
+RETURNS vector
+AS '$libdir/onesparse', 'vector_random'
+LANGUAGE C VOLATILE;
+
+CREATE FUNCTION vxv(
+    a vector,
+    b vector,
+    op semiring default null,
+    inout c vector default null,
+    mask vector default null,
+    accum binaryop default null,
+    descr descriptor default null
+    )
+RETURNS vector
+AS '$libdir/onesparse', 'vector_vxv'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION norm(
+    a vector,
+    inout c vector default null
+    )
+RETURNS vector
+AS '$libdir/onesparse', 'vector_norm'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION lsh(q vector)
+RETURNS bigint
+AS '$libdir/onesparse', 'vector_lsh'
+LANGUAGE C STABLE;
 
 create function dense_vector(
     t type,
@@ -1539,8 +1548,23 @@ create or replace function draw(a vector) returns text language plpgsql as
         return result;
     end;
     $$;
+CREATE FUNCTION vector_bigint(bigint[])
+RETURNS vector
+AS '$libdir/onesparse', 'vector_int64'
+LANGUAGE C;
 
+CREATE FUNCTION bigint_vector(vector)
+RETURNS bigint[]
+AS '$libdir/onesparse', 'cast_vector_int64'
+LANGUAGE C;
 
+CREATE CAST (bigint[] AS onesparse.vector)
+    WITH FUNCTION onesparse.vector_bigint(bigint[])
+    AS IMPLICIT;
+
+CREATE CAST (onesparse.vector AS bigint[])
+    WITH FUNCTION onesparse.bigint_vector(vector)
+    AS ASSIGNMENT;
 
 CREATE FUNCTION vector_agg_bigint (state vector, i bigint, v bigint)
 RETURNS vector
@@ -1553,8 +1577,23 @@ CREATE AGGREGATE vector_agg (i bigint, v bigint )
     STYPE=vector,
     FINALFUNC=vector_agg_final
     );
+CREATE FUNCTION vector_integer(integer[])
+RETURNS vector
+AS '$libdir/onesparse', 'vector_int32'
+LANGUAGE C;
 
+CREATE FUNCTION integer_vector(vector)
+RETURNS integer[]
+AS '$libdir/onesparse', 'cast_vector_int32'
+LANGUAGE C;
 
+CREATE CAST (integer[] AS onesparse.vector)
+    WITH FUNCTION onesparse.vector_integer(integer[])
+    AS IMPLICIT;
+
+CREATE CAST (onesparse.vector AS integer[])
+    WITH FUNCTION onesparse.integer_vector(vector)
+    AS ASSIGNMENT;
 
 CREATE FUNCTION vector_agg_integer (state vector, i bigint, v integer)
 RETURNS vector
@@ -1567,8 +1606,23 @@ CREATE AGGREGATE vector_agg (i bigint, v integer )
     STYPE=vector,
     FINALFUNC=vector_agg_final
     );
+CREATE FUNCTION vector_smallint(smallint[])
+RETURNS vector
+AS '$libdir/onesparse', 'vector_int16'
+LANGUAGE C;
 
+CREATE FUNCTION smallint_vector(vector)
+RETURNS smallint[]
+AS '$libdir/onesparse', 'cast_vector_int16'
+LANGUAGE C;
 
+CREATE CAST (smallint[] AS onesparse.vector)
+    WITH FUNCTION onesparse.vector_smallint(smallint[])
+    AS IMPLICIT;
+
+CREATE CAST (onesparse.vector AS smallint[])
+    WITH FUNCTION onesparse.smallint_vector(vector)
+    AS ASSIGNMENT;
 
 CREATE FUNCTION vector_agg_smallint (state vector, i bigint, v smallint)
 RETURNS vector
@@ -1581,8 +1635,23 @@ CREATE AGGREGATE vector_agg (i bigint, v smallint )
     STYPE=vector,
     FINALFUNC=vector_agg_final
     );
+CREATE FUNCTION vector_float4(float4[])
+RETURNS vector
+AS '$libdir/onesparse', 'vector_fp32'
+LANGUAGE C;
 
+CREATE FUNCTION float4_vector(vector)
+RETURNS float4[]
+AS '$libdir/onesparse', 'cast_vector_fp32'
+LANGUAGE C;
 
+CREATE CAST (float4[] AS onesparse.vector)
+    WITH FUNCTION onesparse.vector_float4(float4[])
+    AS IMPLICIT;
+
+CREATE CAST (onesparse.vector AS float4[])
+    WITH FUNCTION onesparse.float4_vector(vector)
+    AS ASSIGNMENT;
 
 CREATE FUNCTION vector_agg_float4 (state vector, i bigint, v float4)
 RETURNS vector
@@ -1595,8 +1664,23 @@ CREATE AGGREGATE vector_agg (i bigint, v float4 )
     STYPE=vector,
     FINALFUNC=vector_agg_final
     );
+CREATE FUNCTION vector_float8(float8[])
+RETURNS vector
+AS '$libdir/onesparse', 'vector_fp64'
+LANGUAGE C;
 
+CREATE FUNCTION float8_vector(vector)
+RETURNS float8[]
+AS '$libdir/onesparse', 'cast_vector_fp64'
+LANGUAGE C;
 
+CREATE CAST (float8[] AS onesparse.vector)
+    WITH FUNCTION onesparse.vector_float8(float8[])
+    AS IMPLICIT;
+
+CREATE CAST (onesparse.vector AS float8[])
+    WITH FUNCTION onesparse.float8_vector(vector)
+    AS ASSIGNMENT;
 
 CREATE FUNCTION vector_agg_float8 (state vector, i bigint, v float8)
 RETURNS vector
@@ -1609,8 +1693,23 @@ CREATE AGGREGATE vector_agg (i bigint, v float8 )
     STYPE=vector,
     FINALFUNC=vector_agg_final
     );
+CREATE FUNCTION vector_bool(bool[])
+RETURNS vector
+AS '$libdir/onesparse', 'vector_bool'
+LANGUAGE C;
 
+CREATE FUNCTION bool_vector(vector)
+RETURNS bool[]
+AS '$libdir/onesparse', 'cast_vector_bool'
+LANGUAGE C;
 
+CREATE CAST (bool[] AS onesparse.vector)
+    WITH FUNCTION onesparse.vector_bool(bool[])
+    AS IMPLICIT;
+
+CREATE CAST (onesparse.vector AS bool[])
+    WITH FUNCTION onesparse.bool_vector(vector)
+    AS ASSIGNMENT;
 
 -- complain if script is sourced in psql, rather than via CREATE EXTENSION
 \echo Use "CREATE EXTENSION onesparse" to load this file. \quit
@@ -1889,6 +1988,14 @@ CREATE FUNCTION vxm(
     )
 RETURNS vector
 AS '$libdir/onesparse', 'matrix_vxm'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION norm(
+    a matrix,
+    inout c matrix default null
+    )
+RETURNS matrix
+AS '$libdir/onesparse', 'matrix_norm'
 LANGUAGE C STABLE;
 
 CREATE FUNCTION kronecker(
@@ -2510,7 +2617,7 @@ LANGUAGE C STRICT;
 CREATE FUNCTION random_matrix(t type, nrows bigint default -1, ncols bigint default -1, density float8 default 0.1, seed bigint default null)
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_random'
-LANGUAGE C STABLE;
+LANGUAGE C VOLATILE;
 
 create function print(a matrix) returns text language plpgsql set search_path = onesparse,public as
     $$

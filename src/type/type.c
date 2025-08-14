@@ -154,8 +154,3 @@ Datum type_out(PG_FUNCTION_ARGS)
 	snprintf(result, strlen(type->name)+1, "%s", type->name);
 	PG_RETURN_CSTRING(result);
 }
-
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

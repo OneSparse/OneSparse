@@ -164,7 +164,3 @@ Datum indexunaryop_name(PG_FUNCTION_ARGS)
 	indexunaryop = OS_GETARG_INDEXUNARYOP(0);
 	PG_RETURN_TEXT_P(cstring_to_text(indexunaryop->name));
 }
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

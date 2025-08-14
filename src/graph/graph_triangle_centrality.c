@@ -31,7 +31,3 @@ Datum graph_triangle_centrality(PG_FUNCTION_ARGS)
 	OS_RETURN_VECTOR(new_vector(GrB_FP64, vsize, CurrentMemoryContext, output));
 }
 
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */
