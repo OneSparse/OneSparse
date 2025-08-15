@@ -52,4 +52,3 @@ Datum matrix_random(PG_FUNCTION_ARGS)
 	A = new_matrix(NULL, nrows, ncols, CurrentMemoryContext, result);
 	OS_RETURN_MATRIX(A);
 }
-

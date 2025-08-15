@@ -318,11 +318,11 @@ select draw(triu(graph),
 -- for transaction edges to input nodes.
 
 create materialized view txn_graph as
-        select triu(random_matrix(12,15,60,sym:=false,min:=1,max:=9,seed:=0.43)) as addr_to_txn,
-               triu(random_matrix(15,12,50,sym:=false,min:=1,max:=9,seed:=0.42)) as txn_to_addr;
+        select triu(random_matrix('uint8', 12, 16, 1, 41)) as addr_to_txn,
+               triu(random_matrix('uint8', 16, 12, 1, 42)) as txn_to_addr;
 
--- When we print the two matrices, we can see that one is 12x15 and
--- the other is 15x12.
+-- When we print the two matrices, we can see that one is 12x16 and
+-- the other is 16x12.
 
 select print(addr_to_txn) as "Address to Transaction", print(txn_to_addr) as "Transaction to Address" from txn_graph;
 

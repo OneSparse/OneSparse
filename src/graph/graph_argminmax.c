@@ -47,4 +47,3 @@ Datum graph_argminmax(PG_FUNCTION_ARGS)
     tuple = heap_form_tuple(tupdesc, values, nulls);
     PG_RETURN_DATUM(HeapTupleGetDatum(tuple));
 }
-

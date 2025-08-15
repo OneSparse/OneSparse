@@ -435,4 +435,3 @@ onesparse_tam_handler(PG_FUNCTION_ARGS)
     TableAmRoutine *r = get_onesparse_routine();
     PG_RETURN_POINTER(r);
 }
-
