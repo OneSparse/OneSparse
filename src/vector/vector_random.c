@@ -9,7 +9,6 @@ Datum vector_random(PG_FUNCTION_ARGS)
 	uint64_t seed;
 	os_Vector *v;
 	GrB_Matrix result;
-	GrB_Vector col;
 	char msg [LAGRAPH_MSG_LEN];
     struct timeval start, end;
 
@@ -56,7 +55,7 @@ Datum vector_random(PG_FUNCTION_ARGS)
 				 0,
 				 NULL
 				 ),
-			 col,
+			 v->vector,
 			 "Error extracting random vector");
 
 	OS_END_BENCH();

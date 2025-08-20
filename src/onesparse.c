@@ -235,6 +235,10 @@ const char* error_name(GrB_Info info)
 			return "EMPTY_OBJECT";
 		case GxB_JIT_ERROR:
 			return "JIT_ERROR";
+		case GxB_GPU_ERROR:
+			return "GPU_ERROR";
+		case GxB_OUTPUT_IS_READONLY:
+			return "OUTPUT_IS_READONLY";
 	}
 	return "Unknown Info enum value";
 }

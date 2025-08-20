@@ -152,12 +152,12 @@ select print(s) from test_fixture;
 -- values, an optional max value, and an optional random seed for
 -- deterministic generation:
 
-select print(random_matrix('uint8', 8, 8, 1, 42)) as random_matrix;
+select print(random_matrix('int8', 8, 8, 0.5, 42) % 42) as random_matrix;
 
 -- This random matrix is also a random *graph*:
 --
 
-select draw(random_matrix('uint8', 8, 8, 1, 42)) as draw_source \gset
+select draw(random_matrix('int8', 8, 8, 0.5, 42) % 42) as draw_source \gset
 \i sql/draw.sql
 
 -- ## Empty Matrices
@@ -447,11 +447,11 @@ select print(a > 1) as "a > 1", print(a >= 1) as "a >= 1", print(a < 1) as "a < 
 -- values, this turns your graph into a direct acyclic graph (DAG) by
 -- removing all the links "back" from higher number nodes to lower.
 
-select print(random_matrix('uint8', 8, 8, 1, 42)) as matrix,
-       print(choose(random_matrix('uint8', 8, 8, 1, 42), 'triu', 0)) as triu from test_fixture;
+select print(random_matrix('int8', 8, 8, 0.5, 42) % 42) as matrix,
+       print(choose(random_matrix('uint8', 8, 8, 1, 42), 'triu', 0) % 42) as triu from test_fixture;
 
-select draw(random_matrix('uint8', 8, 8, 1, 42)) as uop_a_source,
-       draw(choose(random_matrix('uint8', 8, 8, 1, 42), 'triu', 0)) as uop_b_source
+select draw(random_matrix('int8', 8, 8, 0.5, 42) % 42) as uop_a_source,
+       draw(choose(random_matrix('int8', 8, 8, 0.5, 42) % 42, 'triu', 0)) as uop_b_source
        from test_fixture \gset
 \i sql/uop.sql
 

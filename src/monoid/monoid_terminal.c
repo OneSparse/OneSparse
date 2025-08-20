@@ -1,8 +1,8 @@
 #include "../onesparse.h"
 
-PG_FUNCTION_INFO_V1(monoid_identity);
+PG_FUNCTION_INFO_V1(monoid_terminal);
 
-Datum monoid_identity(PG_FUNCTION_ARGS)
+Datum monoid_terminal(PG_FUNCTION_ARGS)
 {
 	os_Monoid *monoid;
 	os_Scalar *scalar;
@@ -22,13 +22,13 @@ Datum monoid_identity(PG_FUNCTION_ARGS)
 
 	OS_CHECK(GrB_Scalar_new(&tmp, type),
 			 tmp,
-			 "Error creating new monoid identity scalar.");
+			 "Error creating new monoid terminal scalar.");
 
 	OS_CHECK(GrB_get(monoid->monoid,
                      tmp,
-                     GxB_MONOID_IDENTITY),
+                     GxB_MONOID_TERMINAL),
              monoid->monoid,
-             "Error extracting monoid identity.");
+             "Error extracting monoid terminal.");
 
 	scalar = new_scalar(type, CurrentMemoryContext, tmp);
 

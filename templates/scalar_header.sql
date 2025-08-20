@@ -52,3 +52,4 @@ CREATE FUNCTION clear(scalar)
 RETURNS scalar
 AS '$libdir/onesparse', 'scalar_clear'
 LANGUAGE C;
+

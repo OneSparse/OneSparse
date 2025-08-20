@@ -4,6 +4,60 @@
 --
 -- Monoids apply a BinaryOp and an identity value to two elements, returning an element.
 --
+-- ## Monoid identity
+--
+select ident('plus_monoid_int8');
+┌────────┐
+│ ident  │
+├────────┤
+│ int8:0 │
+└────────┘
+(1 row)
+
+select ident('min_monoid_int8');
+┌──────────┐
+│  ident   │
+├──────────┤
+│ int8:127 │
+└──────────┘
+(1 row)
+
+select ident('max_monoid_int8');
+┌───────────┐
+│   ident   │
+├───────────┤
+│ int8:-128 │
+└───────────┘
+(1 row)
+
+-- ## Monoid terminal
+--
+select terminal('plus_monoid_int8');
+┌──────────┐
+│ terminal │
+├──────────┤
+│ int      │
+└──────────┘
+(1 row)
+
+select terminal('min_monoid_int8');
+┌───────────┐
+│ terminal  │
+├───────────┤
+│ int8:-128 │
+└───────────┘
+(1 row)
+
+select terminal('max_monoid_int8');
+┌──────────┐
+│ terminal │
+├──────────┤
+│ int8:127 │
+└──────────┘
+(1 row)
+
+-- ## Builtin SuiteSparse Monoids
+--
 -- | OneSparse Name | SuiteSparse Name |
 -- |----------------|------------------|
 -- | min_monoid_int8 | GrB_MIN_MONOID_INT8 |

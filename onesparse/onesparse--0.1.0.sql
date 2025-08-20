@@ -59,156 +59,6 @@ LANGUAGE C IMMUTABLE STRICT;
 -- complain if script is sourced in psql, rather than via CREATE EXTENSION
 \echo Use "CREATE EXTENSION onesparse" to load this file. \quit
 
-CREATE TYPE unaryop;
-
-CREATE FUNCTION unaryop_in(cstring)
-RETURNS unaryop
-AS '$libdir/onesparse', 'unaryop_in'
-LANGUAGE C IMMUTABLE STRICT;
-
-CREATE FUNCTION unaryop_out(unaryop)
-RETURNS cstring
-AS '$libdir/onesparse', 'unaryop_out'
-LANGUAGE C IMMUTABLE STRICT;
-
-CREATE TYPE unaryop (
-    input = unaryop_in,
-    output = unaryop_out,
-    alignment = int4,
-    storage = 'main',
-    internallength = VARIABLE
-    );
-
-COMMENT ON TYPE unaryop IS 'UnaryOps apply a function to an element, returning an element.';
-
-CREATE FUNCTION name(unaryop)
-RETURNS text
-AS '$libdir/onesparse', 'unaryop_name'
-LANGUAGE C IMMUTABLE STRICT;
--- complain if script is sourced in psql, rather than via CREATE EXTENSION
-\echo Use "CREATE EXTENSION onesparse" to load this file. \quit
-
-CREATE TYPE indexunaryop;
-
-CREATE FUNCTION indexunaryop_in(cstring)
-RETURNS indexunaryop
-AS '$libdir/onesparse', 'indexunaryop_in'
-LANGUAGE C IMMUTABLE STRICT;
-
-CREATE FUNCTION indexunaryop_out(indexunaryop)
-RETURNS cstring
-AS '$libdir/onesparse', 'indexunaryop_out'
-LANGUAGE C IMMUTABLE STRICT;
-
-CREATE TYPE indexunaryop (
-    input = indexunaryop_in,
-    output = indexunaryop_out,
-    alignment = int4,
-    storage = 'main',
-    internallength = VARIABLE
-    );
-
-COMMENT ON TYPE indexunaryop IS 'IndexUnaryOps apply a function to a positional element, returning an element.';
-
-CREATE FUNCTION name(indexunaryop)
-RETURNS text
-AS '$libdir/onesparse', 'indexunaryop_name'
-LANGUAGE C IMMUTABLE STRICT;
--- complain if script is sourced in psql, rather than via CREATE EXTENSION
-\echo Use "CREATE EXTENSION onesparse" to load this file. \quit
-
-CREATE TYPE binaryop;
-
-CREATE FUNCTION binaryop_in(cstring)
-RETURNS binaryop
-AS '$libdir/onesparse', 'binaryop_in'
-LANGUAGE C IMMUTABLE STRICT;
-
-CREATE FUNCTION binaryop_out(binaryop)
-RETURNS cstring
-AS '$libdir/onesparse', 'binaryop_out'
-LANGUAGE C IMMUTABLE STRICT;
-
-CREATE TYPE binaryop (
-    input = binaryop_in,
-    output = binaryop_out,
-    alignment = int4,
-    storage = 'main',
-    internallength = VARIABLE
-    );
-
-COMMENT ON TYPE binaryop IS 'BinaryOps apply a function to two elements and returning an element.';
-
-CREATE FUNCTION name(binaryop)
-RETURNS text
-AS '$libdir/onesparse', 'binaryop_name'
-LANGUAGE C IMMUTABLE STRICT;
--- complain if script is sourced in psql, rather than via CREATE EXTENSION
-\echo Use "CREATE EXTENSION onesparse" to load this file. \quit
-
-CREATE TYPE monoid;
-
-CREATE FUNCTION monoid_in(cstring)
-RETURNS monoid
-AS '$libdir/onesparse', 'monoid_in'
-LANGUAGE C IMMUTABLE STRICT;
-
-CREATE FUNCTION monoid_out(monoid)
-RETURNS cstring
-AS '$libdir/onesparse', 'monoid_out'
-LANGUAGE C IMMUTABLE STRICT;
-
-CREATE TYPE monoid (
-    input = monoid_in,
-    output = monoid_out,
-    alignment = int4,
-    storage = 'main',
-    internallength = VARIABLE
-    );
-
-COMMENT ON TYPE monoid IS 'Monoids apply a BinaryOp and an identity value to two elements, returning an element.';
-
-CREATE FUNCTION name(monoid)
-RETURNS text
-AS '$libdir/onesparse', 'monoid_name'
-LANGUAGE C IMMUTABLE STRICT;
-
--- CREATE FUNCTION identity(monoid)
--- RETURNS scalar
--- AS '$libdir/onesparse', 'monoid_identity'
--- LANGUAGE C IMMUTABLE STRICT;
--- complain if script is sourced in psql, rather than via CREATE EXTENSION
-\echo Use "CREATE EXTENSION onesparse" to load this file. \quit
-
-CREATE TYPE semiring;
-
-CREATE FUNCTION semiring_in(cstring)
-RETURNS semiring
-AS '$libdir/onesparse', 'semiring_in'
-LANGUAGE C IMMUTABLE STRICT;
-
-CREATE FUNCTION semiring_out(semiring)
-RETURNS cstring
-AS '$libdir/onesparse', 'semiring_out'
-LANGUAGE C IMMUTABLE STRICT;
-
-CREATE TYPE semiring (
-    input = semiring_in,
-    output = semiring_out,
-    alignment = int4,
-    storage = 'main',
-    internallength = VARIABLE
-    );
-
-COMMENT ON TYPE semiring IS 'Semirings associate additive and multiplicative operators for matrix multiplication.';
-
-CREATE FUNCTION name(semiring)
-RETURNS text
-AS '$libdir/onesparse', 'semiring_name'
-LANGUAGE C IMMUTABLE STRICT;
--- complain if script is sourced in psql, rather than via CREATE EXTENSION
-\echo Use "CREATE EXTENSION onesparse" to load this file. \quit
-
 CREATE TYPE scalar;
 
 CREATE FUNCTION scalar_in(cstring)
@@ -260,6 +110,7 @@ CREATE FUNCTION clear(scalar)
 RETURNS scalar
 AS '$libdir/onesparse', 'scalar_clear'
 LANGUAGE C;
+
 
 CREATE FUNCTION scalar_bigint(bigint)
 RETURNS scalar
@@ -869,6 +720,166 @@ CREATE CAST (bool AS onesparse.scalar)
 CREATE CAST (onesparse.scalar AS bool)
     WITH FUNCTION onesparse.bool_scalar(scalar)
     AS ASSIGNMENT;
+-- complain if script is sourced in psql, rather than via CREATE EXTENSION
+\echo Use "CREATE EXTENSION onesparse" to load this file. \quit
+
+CREATE TYPE unaryop;
+
+CREATE FUNCTION unaryop_in(cstring)
+RETURNS unaryop
+AS '$libdir/onesparse', 'unaryop_in'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION unaryop_out(unaryop)
+RETURNS cstring
+AS '$libdir/onesparse', 'unaryop_out'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE TYPE unaryop (
+    input = unaryop_in,
+    output = unaryop_out,
+    alignment = int4,
+    storage = 'main',
+    internallength = VARIABLE
+    );
+
+COMMENT ON TYPE unaryop IS 'UnaryOps apply a function to an element, returning an element.';
+
+CREATE FUNCTION name(unaryop)
+RETURNS text
+AS '$libdir/onesparse', 'unaryop_name'
+LANGUAGE C IMMUTABLE STRICT;
+-- complain if script is sourced in psql, rather than via CREATE EXTENSION
+\echo Use "CREATE EXTENSION onesparse" to load this file. \quit
+
+CREATE TYPE indexunaryop;
+
+CREATE FUNCTION indexunaryop_in(cstring)
+RETURNS indexunaryop
+AS '$libdir/onesparse', 'indexunaryop_in'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION indexunaryop_out(indexunaryop)
+RETURNS cstring
+AS '$libdir/onesparse', 'indexunaryop_out'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE TYPE indexunaryop (
+    input = indexunaryop_in,
+    output = indexunaryop_out,
+    alignment = int4,
+    storage = 'main',
+    internallength = VARIABLE
+    );
+
+COMMENT ON TYPE indexunaryop IS 'IndexUnaryOps apply a function to a positional element, returning an element.';
+
+CREATE FUNCTION name(indexunaryop)
+RETURNS text
+AS '$libdir/onesparse', 'indexunaryop_name'
+LANGUAGE C IMMUTABLE STRICT;
+-- complain if script is sourced in psql, rather than via CREATE EXTENSION
+\echo Use "CREATE EXTENSION onesparse" to load this file. \quit
+
+CREATE TYPE binaryop;
+
+CREATE FUNCTION binaryop_in(cstring)
+RETURNS binaryop
+AS '$libdir/onesparse', 'binaryop_in'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION binaryop_out(binaryop)
+RETURNS cstring
+AS '$libdir/onesparse', 'binaryop_out'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE TYPE binaryop (
+    input = binaryop_in,
+    output = binaryop_out,
+    alignment = int4,
+    storage = 'main',
+    internallength = VARIABLE
+    );
+
+COMMENT ON TYPE binaryop IS 'BinaryOps apply a function to two elements and returning an element.';
+
+CREATE FUNCTION name(binaryop)
+RETURNS text
+AS '$libdir/onesparse', 'binaryop_name'
+LANGUAGE C IMMUTABLE STRICT;
+-- complain if script is sourced in psql, rather than via CREATE EXTENSION
+\echo Use "CREATE EXTENSION onesparse" to load this file. \quit
+
+CREATE TYPE monoid;
+
+CREATE FUNCTION monoid_in(cstring)
+RETURNS monoid
+AS '$libdir/onesparse', 'monoid_in'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION monoid_out(monoid)
+RETURNS cstring
+AS '$libdir/onesparse', 'monoid_out'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE TYPE monoid (
+    input = monoid_in,
+    output = monoid_out,
+    alignment = int4,
+    storage = 'main',
+    internallength = VARIABLE
+    );
+
+COMMENT ON TYPE monoid IS 'Monoids apply a BinaryOp and an identity value to two elements, returning an element.';
+
+CREATE FUNCTION name(monoid)
+RETURNS text
+AS '$libdir/onesparse', 'monoid_name'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION ident(monoid)
+RETURNS scalar
+AS '$libdir/onesparse', 'monoid_identity'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION terminal(monoid)
+RETURNS scalar
+AS '$libdir/onesparse', 'monoid_terminal'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION oper(monoid)
+RETURNS binaryop
+AS '$libdir/onesparse', 'monoid_operator'
+LANGUAGE C IMMUTABLE STRICT;
+-- complain if script is sourced in psql, rather than via CREATE EXTENSION
+\echo Use "CREATE EXTENSION onesparse" to load this file. \quit
+
+CREATE TYPE semiring;
+
+CREATE FUNCTION semiring_in(cstring)
+RETURNS semiring
+AS '$libdir/onesparse', 'semiring_in'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION semiring_out(semiring)
+RETURNS cstring
+AS '$libdir/onesparse', 'semiring_out'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE TYPE semiring (
+    input = semiring_in,
+    output = semiring_out,
+    alignment = int4,
+    storage = 'main',
+    internallength = VARIABLE
+    );
+
+COMMENT ON TYPE semiring IS 'Semirings associate additive and multiplicative operators for matrix multiplication.';
+
+CREATE FUNCTION name(semiring)
+RETURNS text
+AS '$libdir/onesparse', 'semiring_name'
+LANGUAGE C IMMUTABLE STRICT;
 -- complain if script is sourced in psql, rather than via CREATE EXTENSION
 \echo Use "CREATE EXTENSION onesparse" to load this file. \quit
 
@@ -1504,7 +1515,7 @@ LANGUAGE C STABLE;
 CREATE FUNCTION lsh(q vector)
 RETURNS bigint
 AS '$libdir/onesparse', 'vector_lsh'
-LANGUAGE C STABLE;
+LANGUAGE C IMMUTABLE;
 
 create function dense_vector(
     t type,
@@ -2257,6 +2268,10 @@ CREATE FUNCTION neq(a matrix, b matrix)
 RETURNS bool
 RETURN NOT eq(a, b);
 
+CREATE FUNCTION fmod(a matrix, s scalar)
+RETURNS matrix
+RETURN onesparse.apply(a, s, 'fmod_fp64');
+
 CREATE FUNCTION gt(a matrix, s scalar)
 RETURNS matrix
 RETURN onesparse.choose(a, ('valuegt_' || name(type(a)))::indexunaryop, s);
@@ -2385,6 +2400,12 @@ CREATE OPERATOR * (
     LEFTARG = matrix,
     RIGHTARG = scalar,
     FUNCTION = times_second_op
+    );
+
+CREATE OPERATOR % (
+    LEFTARG = matrix,
+    RIGHTARG = scalar,
+    FUNCTION = fmod
     );
 
 -- ewise add "OR ops"
@@ -2626,25 +2647,25 @@ create function print(a matrix) returns text language plpgsql set search_path = 
         jmax int = ncols(a) - 1;
         out text = '';
     begin
-        out = out || repeat(' ', 3);
+        out = out || repeat(' ', 4);
         for i in 0..jmax loop
-            out = out || lpad(i::text, 3);
+            out = out || lpad(i::text, 4);
         end loop;
-        out = out || E'\n   ';
+        out = out || E'\n    ';
         for i in 0..jmax loop
-            out = out || repeat(E'\u2500', 3);
+            out = out || repeat(E'\u2500', 4);
         end loop;
         out = out || E'\n';
         for i in 0..imax loop
-            out = out || lpad(i::text, 2) || E'\u2502';
+            out = out || lpad(i::text, 3) || E'\u2502';
             for j in 0..jmax loop
                 if contains(a, i, j) then
-                    out = out || lpad(print(get_element(a, i, j)), 3);
+                    out = out || lpad(print(get_element(a, i, j)), 4);
                 else
-                    out = out || E'   ';
+                    out = out || E'    ';
                 end if;
             end loop;
-            out = out || E'   \n';
+            out = out || E'    \n';
         end loop;
         return out;
     end;
@@ -2852,13 +2873,6 @@ create or replace function kronpower(m matrix, k integer, s semiring default 'pl
     return m;
     end;
     $$;
-
-
-CREATE FUNCTION onesparse_tam_handler(internal) RETURNS table_am_handler
-    AS  'MODULE_PATHNAME'
-    LANGUAGE C;
-
-CREATE ACCESS METHOD onesparse TYPE TABLE HANDLER onesparse_tam_handler;
 CREATE FUNCTION matrix_agg_bigint (state matrix, i bigint, j bigint, v bigint)
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_agg_int64'

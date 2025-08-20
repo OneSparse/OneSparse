@@ -20,7 +20,8 @@ Datum expand_binaryop(os_FlatBinaryOp *flat,	MemoryContext parentcontext);
 
 os_BinaryOp* new_binaryop(
 	char* name,
-	MemoryContext parentcontext);
+	MemoryContext parentcontext,
+	GrB_BinaryOp binop);
 
 os_BinaryOp* DatumGetBinaryOp(Datum d);
 
@@ -34,4 +35,4 @@ os_BinaryOp* DatumGetBinaryOp(Datum d);
 #define OS_BINARYOP_DATA(_flat) ((char*)(_flat) + OS_BINARYOP_FLATSIZE())
 #define BinaryOpGetEOHP(_datum) (os_BinaryOp *) DatumGetEOHP(_datum)
 
-#endif 
+#endif

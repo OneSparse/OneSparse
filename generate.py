@@ -232,12 +232,12 @@ def write_source(outfile):
     objects = [
         Template('type', outfile, dict(decls=type_decls, names=type_list)),
         Template('descriptor', outfile, dict(decls=descriptor_decls, names=descriptor_list)),
+        Template('scalar', outfile),
         Template('unaryop', outfile, dict(decls=unaryop_decls, names=unaryop_list)),
         Template('indexunaryop', outfile, dict(decls=indexunaryop_decls, names=indexunaryop_list)),
         Template('binaryop', outfile, dict(decls=binop_decls, names=binop_list)),
         Template('monoid', outfile, dict(decls=monoid_decls, names=monoid_list)),
         Template('semiring', outfile, dict(decls=semiring_decls, names=semiring_list)),
-        Template('scalar', outfile),
         Template('vector', outfile),
         Template('matrix', outfile),
         Template('graph', outfile),

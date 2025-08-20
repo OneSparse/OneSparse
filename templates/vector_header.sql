@@ -633,7 +633,7 @@ LANGUAGE C STABLE;
 CREATE FUNCTION lsh(q vector)
 RETURNS bigint
 AS '$libdir/onesparse', 'vector_lsh'
-LANGUAGE C STABLE;
+LANGUAGE C IMMUTABLE;
 
 create function dense_vector(
     t type,

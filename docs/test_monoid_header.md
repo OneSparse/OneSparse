@@ -1,6 +1,47 @@
+```
+\pset linestyle unicode
+\pset border 2
+```
 # Monoid
 
-Monoids apply a BinaryOp and an identity value to two elements, returning an element.
+In [abstract
+algebra](https://en.wikipedia.org/wiki/Abstract_algebra "Abstract
+algebra"), a **monoid** is a set equipped with an
+[associative](https://en.wikipedia.org/wiki/Associative
+"Associative") [binary
+operation](https://en.wikipedia.org/wiki/Binary_operation "Binary
+operation") and an [identity
+element](https://en.wikipedia.org/wiki/Identity_element "Identity
+element"). For example, the nonnegative
+[integers](https://en.wikipedia.org/wiki/Integer "Integer") with
+addition form a monoid, the identity element being 0.
+
+## Monoid identity
+
+```
+select ident('plus_monoid_int8');
+
+select ident('min_monoid_int8');
+
+select ident('max_monoid_int8');
+
+```
+## Monoid terminal
+
+Monoid terminals tell SuiteSparse when it can terminate a large
+array operation because the terminal value has been found.
+
+```
+select terminal('plus_monoid_int8');
+
+select terminal('plus_monoid_int16');
+
+select terminal('min_monoid_int8');
+
+select terminal('max_monoid_int8');
+
+```
+## Builtin SuiteSparse Monoids
 
 | OneSparse Name | SuiteSparse Name |
 |----------------|------------------|

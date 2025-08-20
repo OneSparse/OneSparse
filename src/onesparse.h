@@ -156,6 +156,7 @@
 
 #ifdef OS_DEBUG
 #define LOGF() elog(DEBUG1, __func__)
+
 #define OS_START_BENCH()                        \
 	ereport(DEBUG1, (errmsg("%s()", __func__))); \
     gettimeofday(&start, NULL);
@@ -167,6 +168,7 @@
                          (end.tv_usec - start.tv_usec) / 1000000.0;         \
         ereport(DEBUG1, (errmsg("%s() took %.6f seconds", __func__, elapsed))); \
     } while (0)
+
 #else
 #define LOGF()
 #define OS_START_BENCH()
@@ -206,7 +208,8 @@ GrB_BinaryOp lookup_binaryop(char *name);
 GrB_Monoid lookup_monoid(char *name);
 GrB_Semiring lookup_semiring(char *name);
 
-void burble_notice_func(const char *fmt, ...);
+void burble_notice_func(const char *fmt, ...)
+	    pg_attribute_printf(1, 2);
 
 void _PG_init(void);
 
@@ -222,4 +225,4 @@ void _PG_init(void);
 #include "matrix/matrix.h"
 #include "graph/graph.h"
 
-#endif 
+#endif

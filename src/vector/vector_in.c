@@ -59,7 +59,7 @@ Datum vector_in(PG_FUNCTION_ARGS)
 
         if (typ == GrB_INT64) {
             int64_t num;
-			matched = strtoll(number_token, &endptr, 10);
+			num = strtoll(number_token, &endptr, 10);
             if (errno != 0 || *endptr != '\0')
 				elog(ERROR, "Invalid INT64 %s", number_token);
 			OS_CHECK(GrB_Vector_setElement(vector->vector, num, index),
@@ -68,7 +68,7 @@ Datum vector_in(PG_FUNCTION_ARGS)
         }
         else if (typ == GrB_UINT64) {
             uint64_t num;
-			matched = strtoull(number_token, &endptr, 10);
+			num = strtoull(number_token, &endptr, 10);
             if (errno != 0 || *endptr != '\0')
 				elog(ERROR, "Invalid UINT64 %s", number_token);
 			OS_CHECK(GrB_Vector_setElement(vector->vector, num, index),
@@ -103,6 +103,26 @@ Datum vector_in(PG_FUNCTION_ARGS)
             unsigned int num = (int)strtoul(number_token, &endptr, 10);
             if (errno != 0 || *endptr != '\0')
 				elog(ERROR, "Invalid UINT16 %s", number_token);
+			OS_CHECK(GrB_Vector_setElement(vector->vector, num, index),
+				  vector->vector,
+				  "Error setting Vector Element");
+        }
+        else if (typ == GrB_INT8) {
+			long num = strtol(number_token, &endptr, 10);
+			if (num < INT8_MIN || num > INT8_MAX)
+				elog(ERROR, "Invalid INT8 range %s", number_token);
+            if (errno != 0 || *endptr != '\0')
+				elog(ERROR, "Invalid INT8 %s", number_token);
+			OS_CHECK(GrB_Vector_setElement(vector->vector, num, index),
+				  vector->vector,
+				  "Error setting Vector Element");
+        }
+        else if (typ == GrB_UINT8) {
+			unsigned long num = strtoul(number_token, &endptr, 10);
+			if (num < INT8_MIN || num > INT8_MAX)
+				elog(ERROR, "Invalid UINT8 range %s", number_token);
+            if (errno != 0 || *endptr != '\0')
+				elog(ERROR, "Invalid UINT8 %s", number_token);
 			OS_CHECK(GrB_Vector_setElement(vector->vector, num, index),
 				  vector->vector,
 				  "Error setting Vector Element");

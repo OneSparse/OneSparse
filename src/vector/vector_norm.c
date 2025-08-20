@@ -6,8 +6,7 @@ Datum vector_norm(PG_FUNCTION_ARGS)
 	GrB_Type type;
 	os_Vector *u, *w, *w2;
 	GrB_Index usize;
-    GrB_Vector scale;
-	float sumsq, norm, inv;
+	float sumsq, norm;
     struct timeval start, end;
 
 	ERRORNULL(0);

@@ -718,8 +718,8 @@ select draw(triu(graph),
 --
 -- We'll use some random weighted graphs for demonstration purposes as
 -- well, one directed and one undirected.
-create materialized view rgraph as select triu(random_matrix('uint8', 8, 8, 2, 43), 1) as graph;
-create materialized view urgraph as select random_matrix('uint8', 8, 8, 2, 44) as graph;
+create materialized view rgraph as select triu(random_matrix('uint8', 8, 8, 2, 43) % 42, 1) as graph;
+create materialized view urgraph as select random_matrix('uint8', 8, 8, 2, 44) % 42 as graph;
 select draw(triu(graph), reduce_cols(one(graph)), true, true, true, 0.5, 'Random Weighted Directed Graph') as col_a_source from rgraph \gset
 select draw(triu(graph), reduce_cols(one(graph)), true, false, true, 0.5, 'Random Weighted Undirected Graph') as col_b_source from urgraph \gset
 \i sql/draw_2col.sql
@@ -755,7 +755,7 @@ select draw(triu(graph), reduce_cols(one(graph)), true, false, true, 0.5, 'Rando
 -- <title>0&#45;&gt;1</title>
 -- <path fill="none" stroke="black" d="M99.11,-87.83C120.91,-79.65 153.71,-67.34 178.21,-58.14"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="179.69,-61.33 187.82,-54.54 177.23,-54.78 179.69,-61.33"/>
--- <text text-anchor="middle" x="130.66" y="-75.59" font-family="Times,serif" font-size="8.00">114</text>
+-- <text text-anchor="middle" x="133.16" y="-75.59" font-family="Times,serif" font-size="8.00">30</text>
 -- </g>
 -- <!-- 2 -->
 -- <g id="node3" class="node">
@@ -768,7 +768,7 @@ select draw(triu(graph), reduce_cols(one(graph)), true, false, true, 0.5, 'Rando
 -- <title>0&#45;&gt;2</title>
 -- <path fill="none" stroke="black" d="M90.27,-116.73C126.14,-166.81 219.37,-296.98 260.82,-354.87"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="258.11,-357.1 266.78,-363.19 263.8,-353.02 258.11,-357.1"/>
--- <text text-anchor="middle" x="170.05" y="-238.4" font-family="Times,serif" font-size="8.00">53</text>
+-- <text text-anchor="middle" x="170.05" y="-238.4" font-family="Times,serif" font-size="8.00">11</text>
 -- </g>
 -- <!-- 3 -->
 -- <g id="node4" class="node">
@@ -781,7 +781,7 @@ select draw(triu(graph), reduce_cols(one(graph)), true, false, true, 0.5, 'Rando
 -- <title>0&#45;&gt;3</title>
 -- <path fill="none" stroke="black" d="M97.78,-108.82C149.27,-137.56 277.94,-209.4 337.13,-242.45"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="335.58,-245.59 346.02,-247.41 338.99,-239.48 335.58,-245.59"/>
--- <text text-anchor="middle" x="209.46" y="-178.23" font-family="Times,serif" font-size="8.00">123</text>
+-- <text text-anchor="middle" x="211.96" y="-178.23" font-family="Times,serif" font-size="8.00">39</text>
 -- </g>
 -- <!-- 4 -->
 -- <g id="node5" class="node">
@@ -794,7 +794,7 @@ select draw(triu(graph), reduce_cols(one(graph)), true, false, true, 0.5, 'Rando
 -- <title>0&#45;&gt;4</title>
 -- <path fill="none" stroke="black" d="M100.52,-98.26C147.42,-101.49 249.49,-108.52 303.37,-112.22"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="303.25,-115.72 313.47,-112.92 303.73,-108.74 303.25,-115.72"/>
--- <text text-anchor="middle" x="193.95" y="-107.84" font-family="Times,serif" font-size="8.00">170</text>
+-- <text text-anchor="middle" x="198.95" y="-107.84" font-family="Times,serif" font-size="8.00">2</text>
 -- </g>
 -- <!-- 5 -->
 -- <g id="node6" class="node">
@@ -807,7 +807,7 @@ select draw(triu(graph), reduce_cols(one(graph)), true, false, true, 0.5, 'Rando
 -- <title>0&#45;&gt;5</title>
 -- <path fill="none" stroke="black" d="M91.96,-115.61C113.09,-140.57 150.29,-184.51 174.34,-212.92"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="171.92,-215.47 181.05,-220.84 177.26,-210.95 171.92,-215.47"/>
--- <text text-anchor="middle" x="127.65" y="-166.86" font-family="Times,serif" font-size="8.00">53</text>
+-- <text text-anchor="middle" x="127.65" y="-166.86" font-family="Times,serif" font-size="8.00">11</text>
 -- </g>
 -- <!-- 6 -->
 -- <g id="node7" class="node">
@@ -820,7 +820,7 @@ select draw(triu(graph), reduce_cols(one(graph)), true, false, true, 0.5, 'Rando
 -- <title>0&#45;&gt;6</title>
 -- <path fill="none" stroke="black" d="M67.17,-120.03C58.87,-142.49 46.29,-176.59 36.97,-201.8"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="33.64,-200.74 33.46,-211.33 40.2,-203.16 33.64,-200.74"/>
--- <text text-anchor="middle" x="44.07" y="-163.52" font-family="Times,serif" font-size="8.00">113</text>
+-- <text text-anchor="middle" x="46.57" y="-163.52" font-family="Times,serif" font-size="8.00">29</text>
 -- </g>
 -- <!-- 7 -->
 -- <g id="node8" class="node">
@@ -833,14 +833,14 @@ select draw(triu(graph), reduce_cols(one(graph)), true, false, true, 0.5, 'Rando
 -- <title>0&#45;&gt;7</title>
 -- <path fill="none" stroke="black" d="M77.39,-121.27C80.62,-172.75 88.04,-291.03 91.35,-343.6"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="87.86,-344.02 91.98,-353.78 94.85,-343.58 87.86,-344.02"/>
--- <text text-anchor="middle" x="78.87" y="-235.04" font-family="Times,serif" font-size="8.00">85</text>
+-- <text text-anchor="middle" x="81.37" y="-235.04" font-family="Times,serif" font-size="8.00">1</text>
 -- </g>
 -- <!-- 1&#45;&gt;2 -->
 -- <g id="edge8" class="edge">
 -- <title>1&#45;&gt;2</title>
 -- <path fill="none" stroke="black" d="M216.28,-70.03C228.52,-129.13 259.92,-280.63 274.09,-348.98"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="270.67,-349.74 276.13,-358.82 277.52,-348.32 270.67,-349.74"/>
--- <text text-anchor="middle" x="239.68" y="-212.1" font-family="Times,serif" font-size="8.00">67</text>
+-- <text text-anchor="middle" x="239.68" y="-212.1" font-family="Times,serif" font-size="8.00">25</text>
 -- </g>
 -- <!-- 1&#45;&gt;3 -->
 -- <g id="edge9" class="edge">
@@ -861,14 +861,14 @@ select draw(triu(graph), reduce_cols(one(graph)), true, false, true, 0.5, 'Rando
 -- <title>1&#45;&gt;5</title>
 -- <path fill="none" stroke="black" d="M209.44,-70.74C206.99,-104.83 202.57,-166.08 199.78,-204.79"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="196.27,-204.84 199.04,-215.07 203.25,-205.35 196.27,-204.84"/>
--- <text text-anchor="middle" x="196.61" y="-140.37" font-family="Times,serif" font-size="8.00">230</text>
+-- <text text-anchor="middle" x="199.11" y="-140.37" font-family="Times,serif" font-size="8.00">20</text>
 -- </g>
 -- <!-- 1&#45;&gt;6 -->
 -- <g id="edge12" class="edge">
 -- <title>1&#45;&gt;6</title>
 -- <path fill="none" stroke="black" d="M193.7,-63.55C160.38,-97.35 87.85,-170.91 49.56,-209.75"/>
--- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="46.91,-207.45 42.38,-217.03 51.9,-212.36 46.91,-207.45"/>
--- <text text-anchor="middle" x="116.13" y="-139.25" font-family="Times,serif" font-size="8.00">84</text>
+-- <polygon fill="#00007f" fill-opacity="0.498039" stroke="black" points="46.91,-207.45 42.38,-217.03 51.9,-212.36 46.91,-207.45"/>
+-- <text text-anchor="middle" x="118.63" y="-139.25" font-family="Times,serif" font-size="8.00">0</text>
 -- </g>
 -- <!-- 1&#45;&gt;7 -->
 -- <g id="edge13" class="edge">
@@ -889,21 +889,21 @@ select draw(triu(graph), reduce_cols(one(graph)), true, false, true, 0.5, 'Rando
 -- <title>2&#45;&gt;4</title>
 -- <path fill="none" stroke="black" d="M286.37,-359.01C296.56,-311.07 319.25,-204.25 330.97,-149.08"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="334.44,-149.59 333.09,-139.09 327.59,-148.14 334.44,-149.59"/>
--- <text text-anchor="middle" x="300.67" y="-256.65" font-family="Times,serif" font-size="8.00">124</text>
+-- <text text-anchor="middle" x="303.17" y="-256.65" font-family="Times,serif" font-size="8.00">40</text>
 -- </g>
 -- <!-- 2&#45;&gt;5 -->
 -- <g id="edge16" class="edge">
 -- <title>2&#45;&gt;5</title>
 -- <path fill="none" stroke="black" d="M268.63,-361.87C254.41,-337.59 231.14,-297.85 215.05,-270.38"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="217.97,-268.44 209.9,-261.58 211.93,-271.97 217.97,-268.44"/>
--- <text text-anchor="middle" x="233.84" y="-318.72" font-family="Times,serif" font-size="8.00">211</text>
+-- <text text-anchor="middle" x="238.84" y="-318.72" font-family="Times,serif" font-size="8.00">1</text>
 -- </g>
 -- <!-- 2&#45;&gt;6 -->
 -- <g id="edge17" class="edge">
 -- <title>2&#45;&gt;6</title>
 -- <path fill="none" stroke="black" d="M259.78,-370.93C214.24,-344.58 107.69,-282.92 55.15,-252.51"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="56.7,-249.36 46.29,-247.38 53.19,-255.42 56.7,-249.36"/>
--- <text text-anchor="middle" x="151.96" y="-314.32" font-family="Times,serif" font-size="8.00">59</text>
+-- <text text-anchor="middle" x="151.96" y="-314.32" font-family="Times,serif" font-size="8.00">17</text>
 -- </g>
 -- <!-- 3&#45;&gt;4 -->
 -- <g id="edge18" class="edge">
@@ -917,63 +917,63 @@ select draw(triu(graph), reduce_cols(one(graph)), true, false, true, 0.5, 'Rando
 -- <title>3&#45;&gt;5</title>
 -- <path fill="none" stroke="black" d="M343.02,-256.73C313.83,-253.37 265.19,-247.78 232.19,-243.98"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="232.41,-240.49 222.07,-242.82 231.61,-247.44 232.41,-240.49"/>
--- <text text-anchor="middle" x="279.6" y="-252.96" font-family="Times,serif" font-size="8.00">234</text>
+-- <text text-anchor="middle" x="282.1" y="-252.96" font-family="Times,serif" font-size="8.00">24</text>
 -- </g>
 -- <!-- 3&#45;&gt;6 -->
 -- <g id="edge20" class="edge">
 -- <title>3&#45;&gt;6</title>
 -- <path fill="none" stroke="black" d="M342.87,-257.79C282.59,-253.45 128.9,-242.4 59.59,-237.42"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="59.83,-233.93 49.6,-236.7 59.33,-240.91 59.83,-233.93"/>
--- <text text-anchor="middle" x="193.23" y="-250.2" font-family="Times,serif" font-size="8.00">169</text>
+-- <text text-anchor="middle" x="198.23" y="-250.2" font-family="Times,serif" font-size="8.00">1</text>
 -- </g>
 -- <!-- 3&#45;&gt;7 -->
 -- <g id="edge21" class="edge">
 -- <title>3&#45;&gt;7</title>
 -- <path fill="none" stroke="black" d="M344.39,-268.96C292.66,-289.67 169.19,-339.1 116.96,-360.01"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="115.49,-356.83 107.51,-363.79 118.09,-363.32 115.49,-356.83"/>
--- <text text-anchor="middle" x="222.67" y="-308.08" font-family="Times,serif" font-size="8.00">205</text>
+-- <text text-anchor="middle" x="225.17" y="-317.08" font-family="Times,serif" font-size="8.00">37</text>
 -- </g>
 -- <!-- 4&#45;&gt;5 -->
 -- <g id="edge22" class="edge">
 -- <title>4&#45;&gt;5</title>
 -- <path fill="none" stroke="black" d="M319.56,-131.27C295,-153.09 251.78,-191.5 223.84,-216.33"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="221.2,-213.99 216.05,-223.25 225.85,-219.23 221.2,-213.99"/>
--- <text text-anchor="middle" x="263.7" y="-176.4" font-family="Times,serif" font-size="8.00">107</text>
+-- <text text-anchor="middle" x="266.2" y="-176.4" font-family="Times,serif" font-size="8.00">23</text>
 -- </g>
 -- <!-- 4&#45;&gt;6 -->
 -- <g id="edge23" class="edge">
 -- <title>4&#45;&gt;6</title>
 -- <path fill="none" stroke="black" d="M314.98,-123.57C259.88,-144.71 121.47,-197.81 57.77,-222.25"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="56.3,-219.06 48.21,-225.91 58.8,-225.6 56.3,-219.06"/>
--- <text text-anchor="middle" x="178.37" y="-175.51" font-family="Times,serif" font-size="8.00">149</text>
+-- <text text-anchor="middle" x="180.87" y="-175.51" font-family="Times,serif" font-size="8.00">23</text>
 -- </g>
 -- <!-- 4&#45;&gt;7 -->
 -- <g id="edge24" class="edge">
 -- <title>4&#45;&gt;7</title>
 -- <path fill="none" stroke="black" d="M321.04,-132.56C276.29,-179.06 156.82,-303.25 111.11,-350.76"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="108.36,-348.57 103.95,-358.21 113.4,-353.43 108.36,-348.57"/>
--- <text text-anchor="middle" x="221.58" y="-244.26" font-family="Times,serif" font-size="8.00">74</text>
+-- <text text-anchor="middle" x="221.58" y="-244.26" font-family="Times,serif" font-size="8.00">32</text>
 -- </g>
 -- <!-- 5&#45;&gt;6 -->
 -- <g id="edge25" class="edge">
 -- <title>5&#45;&gt;6</title>
 -- <path fill="none" stroke="black" d="M172.16,-239.23C142.57,-238.36 93.18,-236.92 59.81,-235.94"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="59.68,-232.44 49.58,-235.64 59.47,-239.43 59.68,-232.44"/>
--- <text text-anchor="middle" x="107.98" y="-240.19" font-family="Times,serif" font-size="8.00">229</text>
+-- <text text-anchor="middle" x="110.48" y="-240.19" font-family="Times,serif" font-size="8.00">19</text>
 -- </g>
 -- <!-- 5&#45;&gt;7 -->
 -- <g id="edge26" class="edge">
 -- <title>5&#45;&gt;7</title>
 -- <path fill="none" stroke="black" d="M181.63,-259.37C162.12,-283.64 128.88,-324.96 109.12,-349.53"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="106.28,-347.48 102.74,-357.47 111.73,-351.87 106.28,-347.48"/>
--- <text text-anchor="middle" x="137.38" y="-307.05" font-family="Times,serif" font-size="8.00">254</text>
+-- <text text-anchor="middle" x="142.38" y="-307.05" font-family="Times,serif" font-size="8.00">2</text>
 -- </g>
 -- <!-- 6&#45;&gt;7 -->
 -- <g id="edge27" class="edge">
 -- <title>6&#45;&gt;7</title>
 -- <path fill="none" stroke="black" d="M36.02,-257.16C48.51,-281.83 68.58,-321.44 81.26,-346.47"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="78.24,-348.26 85.88,-355.59 84.48,-345.09 78.24,-348.26"/>
--- <text text-anchor="middle" x="50.64" y="-304.41" font-family="Times,serif" font-size="8.00">144</text>
+-- <text text-anchor="middle" x="53.14" y="-304.41" font-family="Times,serif" font-size="8.00">18</text>
 -- </g>
 -- </g>
 -- </svg>
@@ -987,12 +987,12 @@ select draw(triu(graph), reduce_cols(one(graph)), true, false, true, 0.5, 'Rando
 \! echo $draw_source | dot -Ksfdp -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
 -- <div>
 -- <!-- Title: %3 Pages: 1 -->
--- <svg width="449pt" height="430pt"
---  viewBox="0.00 0.00 448.85 430.13" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+-- <svg width="439pt" height="430pt"
+--  viewBox="0.00 0.00 438.85 430.13" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 -- <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 426.13)">
 -- <title>%3</title>
--- <polygon fill="white" stroke="transparent" points="-4,4 -4,-426.13 444.85,-426.13 444.85,4 -4,4"/>
--- <text text-anchor="middle" x="220.43" y="-7.4" font-family="Times,serif" font-size="12.00">Random Weighted Undirected Graph</text>
+-- <polygon fill="white" stroke="transparent" points="-4,4 -4,-426.13 434.85,-426.13 434.85,4 -4,4"/>
+-- <text text-anchor="middle" x="215.43" y="-7.4" font-family="Times,serif" font-size="12.00">Random Weighted Undirected Graph</text>
 -- <!-- 0 -->
 -- <g id="node1" class="node">
 -- <title>0</title>
@@ -1003,7 +1003,7 @@ select draw(triu(graph), reduce_cols(one(graph)), true, false, true, 0.5, 'Rando
 -- <g id="edge1" class="edge">
 -- <title>0&#45;&#45;0</title>
 -- <path fill="none" stroke="black" d="M102.13,-105.37C112.19,-105.83 120.71,-103.6 120.71,-98.68 120.71,-93.76 112.19,-91.53 102.13,-91.99"/>
--- <text text-anchor="middle" x="126.21" y="-96.78" font-family="Times,serif" font-size="8.00">65</text>
+-- <text text-anchor="middle" x="126.21" y="-96.78" font-family="Times,serif" font-size="8.00">23</text>
 -- </g>
 -- <!-- 1 -->
 -- <g id="node2" class="node">
@@ -1015,7 +1015,7 @@ select draw(triu(graph), reduce_cols(one(graph)), true, false, true, 0.5, 'Rando
 -- <g id="edge2" class="edge">
 -- <title>0&#45;&#45;1</title>
 -- <path fill="none" stroke="black" d="M101.25,-89.94C127.39,-80.13 169.54,-64.31 195.68,-54.5"/>
--- <text text-anchor="middle" x="140.47" y="-74.82" font-family="Times,serif" font-size="8.00">114</text>
+-- <text text-anchor="middle" x="142.97" y="-74.82" font-family="Times,serif" font-size="8.00">30</text>
 -- </g>
 -- <!-- 2 -->
 -- <g id="node3" class="node">
@@ -1027,7 +1027,7 @@ select draw(triu(graph), reduce_cols(one(graph)), true, false, true, 0.5, 'Rando
 -- <g id="edge3" class="edge">
 -- <title>0&#45;&#45;2</title>
 -- <path fill="none" stroke="black" d="M92.66,-119.21C131.84,-173.91 238.39,-322.69 277.36,-377.11"/>
--- <text text-anchor="middle" x="179.51" y="-250.76" font-family="Times,serif" font-size="8.00">53</text>
+-- <text text-anchor="middle" x="179.51" y="-250.76" font-family="Times,serif" font-size="8.00">11</text>
 -- </g>
 -- <!-- 3 -->
 -- <g id="node4" class="node">
@@ -1039,7 +1039,7 @@ select draw(triu(graph), reduce_cols(one(graph)), true, false, true, 0.5, 'Rando
 -- <g id="edge4" class="edge">
 -- <title>0&#45;&#45;3</title>
 -- <path fill="none" stroke="black" d="M99.83,-110.89C155.95,-142.22 304.53,-225.17 360.43,-256.38"/>
--- <text text-anchor="middle" x="222.13" y="-186.24" font-family="Times,serif" font-size="8.00">123</text>
+-- <text text-anchor="middle" x="224.63" y="-186.24" font-family="Times,serif" font-size="8.00">39</text>
 -- </g>
 -- <!-- 4 -->
 -- <g id="node5" class="node">
@@ -1051,7 +1051,7 @@ select draw(triu(graph), reduce_cols(one(graph)), true, false, true, 0.5, 'Rando
 -- <g id="edge5" class="edge">
 -- <title>0&#45;&#45;4</title>
 -- <path fill="none" stroke="black" d="M102.7,-100.38C154.62,-103.95 274.42,-112.2 326.46,-115.78"/>
--- <text text-anchor="middle" x="206.58" y="-110.68" font-family="Times,serif" font-size="8.00">170</text>
+-- <text text-anchor="middle" x="211.58" y="-110.68" font-family="Times,serif" font-size="8.00">2</text>
 -- </g>
 -- <!-- 5 -->
 -- <g id="node6" class="node">
@@ -1063,7 +1063,7 @@ select draw(triu(graph), reduce_cols(one(graph)), true, false, true, 0.5, 'Rando
 -- <g id="edge6" class="edge">
 -- <title>0&#45;&#45;5</title>
 -- <path fill="none" stroke="black" d="M93.98,-117.6C118.17,-146.17 163.79,-200.05 188.14,-228.81"/>
--- <text text-anchor="middle" x="135.56" y="-175.81" font-family="Times,serif" font-size="8.00">53</text>
+-- <text text-anchor="middle" x="135.56" y="-175.81" font-family="Times,serif" font-size="8.00">11</text>
 -- </g>
 -- <!-- 6 -->
 -- <g id="node7" class="node">
@@ -1075,7 +1075,7 @@ select draw(triu(graph), reduce_cols(one(graph)), true, false, true, 0.5, 'Rando
 -- <g id="edge7" class="edge">
 -- <title>0&#45;&#45;6</title>
 -- <path fill="none" stroke="black" d="M69.29,-122.15C59.4,-148.95 43.31,-192.53 33.41,-219.33"/>
--- <text text-anchor="middle" x="43.35" y="-173.34" font-family="Times,serif" font-size="8.00">113</text>
+-- <text text-anchor="middle" x="45.85" y="-173.34" font-family="Times,serif" font-size="8.00">29</text>
 -- </g>
 -- <!-- 7 -->
 -- <g id="node8" class="node">
@@ -1087,7 +1087,7 @@ select draw(triu(graph), reduce_cols(one(graph)), true, false, true, 0.5, 'Rando
 -- <g id="edge8" class="edge">
 -- <title>0&#45;&#45;7</title>
 -- <path fill="none" stroke="black" d="M79.51,-123.42C82.89,-177.21 90.87,-304.28 94.26,-358.2"/>
--- <text text-anchor="middle" x="78.88" y="-243.41" font-family="Times,serif" font-size="8.00">162</text>
+-- <text text-anchor="middle" x="81.38" y="-243.41" font-family="Times,serif" font-size="8.00">36</text>
 -- </g>
 -- <!-- 1&#45;&#45;1 -->
 -- <g id="edge9" class="edge">
@@ -1099,7 +1099,7 @@ select draw(triu(graph), reduce_cols(one(graph)), true, false, true, 0.5, 'Rando
 -- <g id="edge10" class="edge">
 -- <title>1&#45;&#45;2</title>
 -- <path fill="none" stroke="black" d="M224.08,-70.2C237.44,-134.68 273.52,-308.8 286.85,-373.1"/>
--- <text text-anchor="middle" x="249.96" y="-224.25" font-family="Times,serif" font-size="8.00">67</text>
+-- <text text-anchor="middle" x="249.96" y="-224.25" font-family="Times,serif" font-size="8.00">25</text>
 -- </g>
 -- <!-- 1&#45;&#45;3 -->
 -- <g id="edge11" class="edge">
@@ -1117,13 +1117,13 @@ select draw(triu(graph), reduce_cols(one(graph)), true, false, true, 0.5, 'Rando
 -- <g id="edge13" class="edge">
 -- <title>1&#45;&#45;5</title>
 -- <path fill="none" stroke="black" d="M217.22,-70.56C214.41,-109.49 209.01,-184.5 206.2,-223.36"/>
--- <text text-anchor="middle" x="203.71" y="-149.56" font-family="Times,serif" font-size="8.00">230</text>
+-- <text text-anchor="middle" x="206.21" y="-149.56" font-family="Times,serif" font-size="8.00">20</text>
 -- </g>
 -- <!-- 1&#45;&#45;6 -->
 -- <g id="edge14" class="edge">
 -- <title>1&#45;&#45;6</title>
 -- <path fill="none" stroke="black" d="M201.43,-63.58C164.44,-101.1 78.98,-187.78 42.15,-225.14"/>
--- <text text-anchor="middle" x="116.29" y="-146.96" font-family="Times,serif" font-size="8.00">84</text>
+-- <text text-anchor="middle" x="118.79" y="-146.96" font-family="Times,serif" font-size="8.00">0</text>
 -- </g>
 -- <!-- 1&#45;&#45;7 -->
 -- <g id="edge15" class="edge">
@@ -1135,7 +1135,7 @@ select draw(triu(graph), reduce_cols(one(graph)), true, false, true, 0.5, 'Rando
 -- <g id="edge16" class="edge">
 -- <title>2&#45;&#45;2</title>
 -- <path fill="none" stroke="black" d="M316.05,-404.08C326.11,-404.54 334.63,-402.31 334.63,-397.39 334.63,-392.46 326.11,-390.23 316.05,-390.69"/>
--- <text text-anchor="middle" x="340.13" y="-395.49" font-family="Times,serif" font-size="8.00">62</text>
+-- <text text-anchor="middle" x="340.13" y="-395.49" font-family="Times,serif" font-size="8.00">20</text>
 -- </g>
 -- <!-- 2&#45;&#45;3 -->
 -- <g id="edge17" class="edge">
@@ -1147,25 +1147,25 @@ select draw(triu(graph), reduce_cols(one(graph)), true, false, true, 0.5, 'Rando
 -- <g id="edge18" class="edge">
 -- <title>2&#45;&#45;4</title>
 -- <path fill="none" stroke="black" d="M297.05,-373.04C308.3,-320.1 334.87,-195.05 346.14,-141.99"/>
--- <text text-anchor="middle" x="313.6" y="-260.11" font-family="Times,serif" font-size="8.00">124</text>
+-- <text text-anchor="middle" x="316.1" y="-260.11" font-family="Times,serif" font-size="8.00">40</text>
 -- </g>
 -- <!-- 2&#45;&#45;5 -->
 -- <g id="edge19" class="edge">
 -- <title>2&#45;&#45;5</title>
 -- <path fill="none" stroke="black" d="M279.35,-375.99C262.73,-347.6 233.54,-297.78 216.93,-269.41"/>
--- <text text-anchor="middle" x="240.14" y="-316.3" font-family="Times,serif" font-size="8.00">211</text>
+-- <text text-anchor="middle" x="245.14" y="-325.3" font-family="Times,serif" font-size="8.00">1</text>
 -- </g>
 -- <!-- 2&#45;&#45;6 -->
 -- <g id="edge20" class="edge">
 -- <title>2&#45;&#45;6</title>
 -- <path fill="none" stroke="black" d="M270.02,-384.73C219.8,-355.67 96.68,-284.42 46.54,-255.4"/>
--- <text text-anchor="middle" x="152.78" y="-322.67" font-family="Times,serif" font-size="8.00">80</text>
+-- <text text-anchor="middle" x="152.78" y="-322.67" font-family="Times,serif" font-size="8.00">38</text>
 -- </g>
 -- <!-- 3&#45;&#45;3 -->
 -- <g id="edge21" class="edge">
 -- <title>3&#45;&#45;3</title>
 -- <path fill="none" stroke="black" d="M406.27,-275.17C416.33,-275.64 424.85,-273.4 424.85,-268.48 424.85,-263.56 416.33,-261.33 406.27,-261.79"/>
--- <text text-anchor="middle" x="432.85" y="-266.58" font-family="Times,serif" font-size="8.00">211</text>
+-- <text text-anchor="middle" x="427.85" y="-266.58" font-family="Times,serif" font-size="8.00">1</text>
 -- </g>
 -- <!-- 3&#45;&#45;4 -->
 -- <g id="edge22" class="edge">
@@ -1177,19 +1177,19 @@ select draw(triu(graph), reduce_cols(one(graph)), true, false, true, 0.5, 'Rando
 -- <g id="edge23" class="edge">
 -- <title>3&#45;&#45;5</title>
 -- <path fill="none" stroke="black" d="M357.4,-265.64C323.55,-261.75 263.09,-254.8 229.2,-250.9"/>
--- <text text-anchor="middle" x="285.3" y="-260.87" font-family="Times,serif" font-size="8.00">234</text>
+-- <text text-anchor="middle" x="287.8" y="-260.87" font-family="Times,serif" font-size="8.00">24</text>
 -- </g>
 -- <!-- 3&#45;&#45;6 -->
 -- <g id="edge24" class="edge">
 -- <title>3&#45;&#45;6</title>
 -- <path fill="none" stroke="black" d="M357.26,-266.7C291.89,-262 115.62,-249.32 49.9,-244.6"/>
--- <text text-anchor="middle" x="195.58" y="-258.25" font-family="Times,serif" font-size="8.00">169</text>
+-- <text text-anchor="middle" x="200.58" y="-258.25" font-family="Times,serif" font-size="8.00">1</text>
 -- </g>
 -- <!-- 3&#45;&#45;7 -->
 -- <g id="edge25" class="edge">
 -- <title>3&#45;&#45;7</title>
 -- <path fill="none" stroke="black" d="M358.67,-277.86C304.86,-299.41 172.91,-352.23 119.17,-373.74"/>
--- <text text-anchor="middle" x="230.92" y="-328.4" font-family="Times,serif" font-size="8.00">205</text>
+-- <text text-anchor="middle" x="233.42" y="-328.4" font-family="Times,serif" font-size="8.00">37</text>
 -- </g>
 -- <!-- 4&#45;&#45;4 -->
 -- <g id="edge26" class="edge">
@@ -1201,49 +1201,49 @@ select draw(triu(graph), reduce_cols(one(graph)), true, false, true, 0.5, 'Rando
 -- <g id="edge27" class="edge">
 -- <title>4&#45;&#45;5</title>
 -- <path fill="none" stroke="black" d="M332.73,-134.03C304.63,-159.01 251.63,-206.1 223.34,-231.24"/>
--- <text text-anchor="middle" x="270.04" y="-185.23" font-family="Times,serif" font-size="8.00">107</text>
+-- <text text-anchor="middle" x="272.54" y="-185.23" font-family="Times,serif" font-size="8.00">23</text>
 -- </g>
 -- <!-- 4&#45;&#45;6 -->
 -- <g id="edge28" class="edge">
 -- <title>4&#45;&#45;6</title>
 -- <path fill="none" stroke="black" d="M328.11,-126.41C268.07,-149.44 108.23,-210.76 48.07,-233.84"/>
--- <text text-anchor="middle" x="180.09" y="-182.72" font-family="Times,serif" font-size="8.00">149</text>
+-- <text text-anchor="middle" x="182.59" y="-182.72" font-family="Times,serif" font-size="8.00">23</text>
 -- </g>
 -- <!-- 4&#45;&#45;7 -->
 -- <g id="edge29" class="edge">
 -- <title>4&#45;&#45;7</title>
 -- <path fill="none" stroke="black" d="M334.18,-135.33C287.74,-183.6 159.98,-316.4 113.24,-364.98"/>
--- <text text-anchor="middle" x="229.21" y="-252.76" font-family="Times,serif" font-size="8.00">74</text>
+-- <text text-anchor="middle" x="229.21" y="-252.76" font-family="Times,serif" font-size="8.00">32</text>
 -- </g>
 -- <!-- 5&#45;&#45;5 -->
 -- <g id="edge30" class="edge">
 -- <title>5&#45;&#45;5</title>
 -- <path fill="none" stroke="black" d="M228.59,-254.74C238.65,-255.2 247.17,-252.97 247.17,-248.05 247.17,-243.13 238.65,-240.9 228.59,-241.36"/>
--- <text text-anchor="middle" x="252.67" y="-246.15" font-family="Times,serif" font-size="8.00">48</text>
+-- <text text-anchor="middle" x="250.17" y="-246.15" font-family="Times,serif" font-size="8.00">6</text>
 -- </g>
 -- <!-- 5&#45;&#45;6 -->
 -- <g id="edge31" class="edge">
 -- <title>5&#45;&#45;6</title>
 -- <path fill="none" stroke="black" d="M179.44,-247.32C145.11,-246.31 83.73,-244.52 49.52,-243.52"/>
--- <text text-anchor="middle" x="106.48" y="-248.02" font-family="Times,serif" font-size="8.00">229</text>
+-- <text text-anchor="middle" x="108.98" y="-248.02" font-family="Times,serif" font-size="8.00">19</text>
 -- </g>
 -- <!-- 5&#45;&#45;7 -->
 -- <g id="edge32" class="edge">
 -- <title>5&#45;&#45;7</title>
 -- <path fill="none" stroke="black" d="M188.86,-267.4C168.22,-293.07 131.98,-338.13 111.35,-363.78"/>
--- <text text-anchor="middle" x="142.11" y="-309.19" font-family="Times,serif" font-size="8.00">254</text>
+-- <text text-anchor="middle" x="147.11" y="-309.19" font-family="Times,serif" font-size="8.00">2</text>
 -- </g>
 -- <!-- 6&#45;&#45;7 -->
 -- <g id="edge33" class="edge">
 -- <title>6&#45;&#45;7</title>
 -- <path fill="none" stroke="black" d="M36.01,-265.02C49.32,-291.29 71.33,-334.74 84.61,-360.96"/>
--- <text text-anchor="middle" x="52.31" y="-315.59" font-family="Times,serif" font-size="8.00">144</text>
+-- <text text-anchor="middle" x="54.81" y="-315.59" font-family="Times,serif" font-size="8.00">18</text>
 -- </g>
 -- <!-- 7&#45;&#45;7 -->
 -- <g id="edge34" class="edge">
 -- <title>7&#45;&#45;7</title>
 -- <path fill="none" stroke="black" d="M119.99,-389.78C130.04,-390.24 138.57,-388.01 138.57,-383.09 138.57,-378.17 130.04,-375.94 119.99,-376.4"/>
--- <text text-anchor="middle" x="146.57" y="-381.19" font-family="Times,serif" font-size="8.00">229</text>
+-- <text text-anchor="middle" x="144.07" y="-381.19" font-family="Times,serif" font-size="8.00">19</text>
 -- </g>
 -- </g>
 -- </svg>

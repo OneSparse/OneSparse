@@ -544,6 +544,10 @@ CREATE FUNCTION neq(a matrix, b matrix)
 RETURNS bool
 RETURN NOT eq(a, b);
 
+CREATE FUNCTION fmod(a matrix, s scalar)
+RETURNS matrix
+RETURN onesparse.apply(a, s, 'fmod_fp64');
+
 CREATE FUNCTION gt(a matrix, s scalar)
 RETURNS matrix
 RETURN onesparse.choose(a, ('valuegt_' || name(type(a)))::indexunaryop, s);
@@ -672,6 +676,12 @@ CREATE OPERATOR * (
     LEFTARG = matrix,
     RIGHTARG = scalar,
     FUNCTION = times_second_op
+    );
+
+CREATE OPERATOR % (
+    LEFTARG = matrix,
+    RIGHTARG = scalar,
+    FUNCTION = fmod
     );
 
 -- ewise add "OR ops"
@@ -913,25 +923,25 @@ create function print(a matrix) returns text language plpgsql set search_path = 
         jmax int = ncols(a) - 1;
         out text = '';
     begin
-        out = out || repeat(' ', 3);
+        out = out || repeat(' ', 4);
         for i in 0..jmax loop
-            out = out || lpad(i::text, 3);
+            out = out || lpad(i::text, 4);
         end loop;
-        out = out || E'\n   ';
+        out = out || E'\n    ';
         for i in 0..jmax loop
-            out = out || repeat(E'\u2500', 3);
+            out = out || repeat(E'\u2500', 4);
         end loop;
         out = out || E'\n';
         for i in 0..imax loop
-            out = out || lpad(i::text, 2) || E'\u2502';
+            out = out || lpad(i::text, 3) || E'\u2502';
             for j in 0..jmax loop
                 if contains(a, i, j) then
-                    out = out || lpad(print(get_element(a, i, j)), 3);
+                    out = out || lpad(print(get_element(a, i, j)), 4);
                 else
-                    out = out || E'   ';
+                    out = out || E'    ';
                 end if;
             end loop;
-            out = out || E'   \n';
+            out = out || E'    \n';
         end loop;
         return out;
     end;
@@ -1139,10 +1149,3 @@ create or replace function kronpower(m matrix, k integer, s semiring default 'pl
     return m;
     end;
     $$;
-
-
-CREATE FUNCTION onesparse_tam_handler(internal) RETURNS table_am_handler
-    AS  'MODULE_PATHNAME'
-    LANGUAGE C;
-
-CREATE ACCESS METHOD onesparse TYPE TABLE HANDLER onesparse_tam_handler;
