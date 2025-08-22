@@ -18,9 +18,21 @@
 --
 select ident('plus_monoid_int8');
 
+select ident('plus_monoid_int16');
+
+select ident('plus_monoid_fp32');
+
 select ident('min_monoid_int8');
 
+select ident('min_monoid_int16');
+
+select ident('min_monoid_fp32');
+
 select ident('max_monoid_int8');
+
+select ident('max_monoid_int16');
+
+select ident('max_monoid_fp32');
 
 -- ## Monoid terminal
 --
@@ -33,7 +45,15 @@ select terminal('plus_monoid_int16');
 
 select terminal('min_monoid_int8');
 
+select terminal('min_monoid_int16');
+
 select terminal('max_monoid_int8');
+
+select terminal('max_monoid_int16');
+
+select terminal('land_monoid_bool');
+
+select terminal('lor_monoid_bool');
 
 -- ## Builtin SuiteSparse Monoids
 --

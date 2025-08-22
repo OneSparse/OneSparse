@@ -2,7 +2,17 @@
 \pset border 2
 -- # Monoid
 --
--- Monoids apply a BinaryOp and an identity value to two elements, returning an element.
+-- In [abstract
+-- algebra](https://en.wikipedia.org/wiki/Abstract_algebra "Abstract
+-- algebra"), a **monoid** is a set equipped with an
+-- [associative](https://en.wikipedia.org/wiki/Associative
+-- "Associative") [binary
+-- operation](https://en.wikipedia.org/wiki/Binary_operation "Binary
+-- operation") and an [identity
+-- element](https://en.wikipedia.org/wiki/Identity_element "Identity
+-- element"). For example, the nonnegative
+-- [integers](https://en.wikipedia.org/wiki/Integer "Integer") with
+-- addition form a monoid, the identity element being 0.
 --
 -- ## Monoid identity
 --
@@ -14,12 +24,44 @@ select ident('plus_monoid_int8');
 └────────┘
 (1 row)
 
+select ident('plus_monoid_int16');
+┌─────────┐
+│  ident  │
+├─────────┤
+│ int16:0 │
+└─────────┘
+(1 row)
+
+select ident('plus_monoid_fp32');
+┌───────────────┐
+│     ident     │
+├───────────────┤
+│ fp32:0.000000 │
+└───────────────┘
+(1 row)
+
 select ident('min_monoid_int8');
 ┌──────────┐
 │  ident   │
 ├──────────┤
 │ int8:127 │
 └──────────┘
+(1 row)
+
+select ident('min_monoid_int16');
+┌─────────────┐
+│    ident    │
+├─────────────┤
+│ int16:32767 │
+└─────────────┘
+(1 row)
+
+select ident('min_monoid_fp32');
+┌───────────────┐
+│     ident     │
+├───────────────┤
+│ fp32:Infinity │
+└───────────────┘
 (1 row)
 
 select ident('max_monoid_int8');
@@ -30,9 +72,36 @@ select ident('max_monoid_int8');
 └───────────┘
 (1 row)
 
+select ident('max_monoid_int16');
+┌──────────────┐
+│    ident     │
+├──────────────┤
+│ int16:-32768 │
+└──────────────┘
+(1 row)
+
+select ident('max_monoid_fp32');
+┌────────────────┐
+│     ident      │
+├────────────────┤
+│ fp32:-Infinity │
+└────────────────┘
+(1 row)
+
 -- ## Monoid terminal
 --
+-- Monoid terminals tell SuiteSparse when it can terminate a large
+-- array operation because the terminal value has been found.
+--
 select terminal('plus_monoid_int8');
+┌──────────┐
+│ terminal │
+├──────────┤
+│ int      │
+└──────────┘
+(1 row)
+
+select terminal('plus_monoid_int16');
 ┌──────────┐
 │ terminal │
 ├──────────┤
@@ -48,11 +117,43 @@ select terminal('min_monoid_int8');
 └───────────┘
 (1 row)
 
+select terminal('min_monoid_int16');
+┌──────────────┐
+│   terminal   │
+├──────────────┤
+│ int16:-32768 │
+└──────────────┘
+(1 row)
+
 select terminal('max_monoid_int8');
 ┌──────────┐
 │ terminal │
 ├──────────┤
 │ int8:127 │
+└──────────┘
+(1 row)
+
+select terminal('max_monoid_int16');
+┌─────────────┐
+│  terminal   │
+├─────────────┤
+│ int16:32767 │
+└─────────────┘
+(1 row)
+
+select terminal('land_monoid_bool');
+┌──────────┐
+│ terminal │
+├──────────┤
+│ bool:f   │
+└──────────┘
+(1 row)
+
+select terminal('lor_monoid_bool');
+┌──────────┐
+│ terminal │
+├──────────┤
+│ bool:t   │
 └──────────┘
 (1 row)
 
