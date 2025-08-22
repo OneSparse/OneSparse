@@ -1559,6 +1559,7 @@ create or replace function draw(a vector) returns text language plpgsql as
         return result;
     end;
     $$;
+
 CREATE FUNCTION vector_bigint(bigint[])
 RETURNS vector
 AS '$libdir/onesparse', 'vector_int64'
@@ -1588,6 +1589,7 @@ CREATE AGGREGATE vector_agg (i bigint, v bigint )
     STYPE=vector,
     FINALFUNC=vector_agg_final
     );
+
 CREATE FUNCTION vector_integer(integer[])
 RETURNS vector
 AS '$libdir/onesparse', 'vector_int32'
@@ -1617,6 +1619,7 @@ CREATE AGGREGATE vector_agg (i bigint, v integer )
     STYPE=vector,
     FINALFUNC=vector_agg_final
     );
+
 CREATE FUNCTION vector_smallint(smallint[])
 RETURNS vector
 AS '$libdir/onesparse', 'vector_int16'
@@ -1646,6 +1649,7 @@ CREATE AGGREGATE vector_agg (i bigint, v smallint )
     STYPE=vector,
     FINALFUNC=vector_agg_final
     );
+
 CREATE FUNCTION vector_float4(float4[])
 RETURNS vector
 AS '$libdir/onesparse', 'vector_fp32'
@@ -1675,6 +1679,7 @@ CREATE AGGREGATE vector_agg (i bigint, v float4 )
     STYPE=vector,
     FINALFUNC=vector_agg_final
     );
+
 CREATE FUNCTION vector_float8(float8[])
 RETURNS vector
 AS '$libdir/onesparse', 'vector_fp64'
@@ -1704,6 +1709,7 @@ CREATE AGGREGATE vector_agg (i bigint, v float8 )
     STYPE=vector,
     FINALFUNC=vector_agg_final
     );
+
 CREATE FUNCTION vector_bool(bool[])
 RETURNS vector
 AS '$libdir/onesparse', 'vector_bool'

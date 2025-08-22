@@ -1,3 +1,4 @@
+
 CREATE FUNCTION vector_{type.pgtype}({type.pgtype}[])
 RETURNS vector
 AS '$libdir/onesparse', 'vector_{type.name}'

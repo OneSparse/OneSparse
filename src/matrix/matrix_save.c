@@ -9,9 +9,10 @@ Datum matrix_save(PG_FUNCTION_ARGS) {
     int fd;
     struct timeval start, end;
 
-	OS_START_BENCH();
     matrix = OS_GETARG_MATRIX(0);
     lo_oid = PG_GETARG_OID(1);
+
+	OS_START_BENCH();
 
     if (lo_oid == InvalidOid) {
         lo_func_oid = LookupFuncName(list_make1(makeString("lo_create")), 1, (Oid[]){OIDOID}, false);
@@ -20,10 +21,6 @@ Datum matrix_save(PG_FUNCTION_ARGS) {
 
     lo_func_oid = LookupFuncName(list_make1(makeString("lo_open")), 2, (Oid[]){OIDOID, INT4OID}, false);
     fd = DatumGetInt32(OidFunctionCall2(lo_func_oid, ObjectIdGetDatum(lo_oid), Int32GetDatum(INV_WRITE)));
-
-    OS_CHECK(GrB_wait(matrix->matrix, GrB_MATERIALIZE),
-             matrix->matrix,
-             "Error waiting to materialize matrix.");
 
     OS_CHECK(GxB_Matrix_serialize(&data, &size, matrix->matrix, NULL),
              matrix->matrix,

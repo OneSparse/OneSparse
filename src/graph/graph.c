@@ -28,10 +28,6 @@ static Size graph_get_flat_size(ExpandedObjectHeader *eohptr) {
 		return graph->flat_size;
 	}
 
-    OS_CHECK(GrB_wait(graph->graph->A, GrB_MATERIALIZE),
-			 graph->graph->A,
-			 "Error waiting to materialize graph.");
-
 	OS_CHECK(GxB_Matrix_serialize(
 				 &serialized_data,
 				 &serialized_size,

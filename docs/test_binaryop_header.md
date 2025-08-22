@@ -1,3 +1,7 @@
+```
+\pset linestyle unicode
+\pset border 2
+```
 # BinaryOp
 
 In [mathematics](https://en.wikipedia.org/wiki/Mathematics

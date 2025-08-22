@@ -1,3 +1,7 @@
+```
+\pset linestyle unicode
+\pset border 2
+```
 # Semiring
 
 In [abstract

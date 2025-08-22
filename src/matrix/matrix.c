@@ -28,10 +28,6 @@ static Size matrix_get_flat_size(ExpandedObjectHeader *eohptr) {
 		return matrix->flat_size;
 	}
 
-    OS_CHECK(GrB_wait(matrix->matrix, GrB_MATERIALIZE),
-		  matrix->matrix,
-		  "Error waiting to materialize matrix.");
-
 	OS_CHECK(GxB_Matrix_serialize(
 			  &serialized_data,
 			  &serialized_size,
@@ -68,15 +64,6 @@ static void flatten_matrix(
 
 	memset(flat, 0, allocated_size);
 
-	OS_CHECK(GrB_get(
-			  matrix->matrix,
-			  &flat->type_code,
-			  GrB_EL_TYPE_CODE),
-		  matrix->matrix,
-		  "Cannot get Matrix Type code.");
-
-	OS_MNROWS(flat->nrows, matrix);
-	OS_MNCOLS(flat->ncols, matrix);
 	data = OS_MATRIX_DATA(flat);
 
 	memcpy(data, matrix->serialized_data, matrix->serialized_size);
@@ -145,24 +132,24 @@ os_Matrix* new_matrix(
 /* Expand a flat matrix in to an Expanded one, return as Postgres Datum. */
 Datum expand_matrix(os_FlatMatrix *flat, MemoryContext parentcontext)
 {
-	GrB_Type type;
 	os_Matrix *matrix;
+	GrB_Matrix tmp;
 	void* data;
     struct timeval start, end;
 
 	OS_START_BENCH();
-	type = code_type(flat->type_code);
-	matrix = new_matrix(type, flat->nrows, flat->ncols, parentcontext, NULL);
 	data = OS_MATRIX_DATA(flat);
 
 	OS_CHECK(GxB_Matrix_deserialize(
-			  &matrix->matrix,
-			  type,
+			  &tmp,
+			  NULL,
 			  data,
-			  flat->serialized_size, NULL),
-		  matrix->matrix,
+			  flat->serialized_size,
+			  NULL),
+		  tmp,
 		  "Error deserializing matrix");
 
+	matrix = new_matrix(NULL, 0, 0, parentcontext, tmp);
 	OS_END_BENCH();
 	OS_RETURN_MATRIX(matrix);
 }
