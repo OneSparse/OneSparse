@@ -1,19 +1,30 @@
-```
-\pset linestyle unicode
-\pset border 2
-```
 # Types
 
-```
-set client_min_messages = 'WARNING'; -- pragma:hide
+``` postgres-console
 create extension if not exists onesparse;
-
 ```
 OneSparse exposes SuiteSparse:GraphBLAS objects as native Postgres
 types.  These types are:
-```
-
-\dT onesparse.*
+``` postgres-console
+                                                   List of data types
+┌───────────┬──────────────────┬───────────────────────────────────────────────────────────────────────────────────────┐
+│  Schema   │       Name       │                                      Description                                      │
+├───────────┼──────────────────┼───────────────────────────────────────────────────────────────────────────────────────┤
+│ onesparse │ argminmax_x_p    │ Return type for argminmax with value and index vectors.                               │
+│ onesparse │ bfs_level_parent │ Return type for bfs with level and parent vectors.                                    │
+│ onesparse │ binaryop         │ BinaryOps apply a function to two elements and returning an element.                  │
+│ onesparse │ descriptor       │ Descriptors control specific details of GraphBLAS operations.                         │
+│ onesparse │ graph            │ Graphs wrap the LAGraph library functions.                                            │
+│ onesparse │ indexunaryop     │ IndexUnaryOps apply a function to a positional element, returning an element.         │
+│ onesparse │ matrix           │ Matrices hold sparse rows and columns of elements.                                    │
+│ onesparse │ monoid           │ Monoids apply a BinaryOp and an identity value to two elements, returning an element. │
+│ onesparse │ scalar           │ Scalars hold individual element values.                                               │
+│ onesparse │ semiring         │ Semirings associate additive and multiplicative operators for matrix multiplication.  │
+│ onesparse │ type             │ Types define the structure and behavior of elements.                                  │
+│ onesparse │ unaryop          │ UnaryOps apply a function to an element, returning an element.                        │
+│ onesparse │ vector           │ Vectors hold a sparse array of elements.                                              │
+└───────────┴──────────────────┴───────────────────────────────────────────────────────────────────────────────────────┘
+(13 rows)
 
 ```
 ## Element Types
@@ -35,17 +46,47 @@ SuiteSparse provides a wider variety of numeric types than Postgres
 
 Types can stored in tables in the database, they can be created by
 casting the SuiteSparse type name to the `type` type:
-```
-
+``` postgres-console
 select 'int32'::type;
+┌───────┐
+│ type  │
+├───────┤
+│ int32 │
+└───────┘
+(1 row)
 
 ```
 Matrix, Vector and Scalar constructors take a type argument.  The
 name is implicity cast to type in this case.  The two examples:
-```
-
+``` postgres-console
 select matrix('int32');
+┌────────┐
+│ matrix │
+├────────┤
+│ int32  │
+└────────┘
+(1 row)
+
 select matrix('int32'::type);
+┌────────┐
+│ matrix │
+├────────┤
+│ int32  │
+└────────┘
+(1 row)
+
+```
+## User Defined Types
+``` postgres-console
+insert into user_defined_type (name, type_def) values
+    ('tuple_fp64', 'typedef struct {int64_t k; double v;} tuple_fp64;');
+select 'tuple_fp64'::type;
+┌────────────┐
+│    type    │
+├────────────┤
+│ tuple_fp64 │
+└────────────┘
+(1 row)
 
 ```
 Are equivalent.

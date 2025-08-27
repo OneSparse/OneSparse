@@ -1,24 +1,5 @@
-
 #include "onesparse.h"
 PG_MODULE_MAGIC;
-
-void burble_notice_func(const char *format, ...)
-{
-	char buffer[1024*8];
-	size_t bsize = sizeof(buffer);
-	va_list args;
-    int result;
-
-    va_start(args, format);
-    result = vsnprintf(buffer, bsize, format, args); // Call vsnprintf
-	va_end(args);
-
-	if (result >= 0) {
-         ereport(NOTICE, (errmsg("%s", buffer)));
-    } else {
-		elog(ERROR, "Could not format burble message.");
-    }
-}
 
 uint64_t* get_c_array_from_pg_array(FunctionCallInfo fcinfo, int arg_number, uint64_t *out_nelems) {
     ArrayType *input_array;
@@ -347,57 +328,29 @@ GrB_Semiring default_semiring(GrB_Type type)
 	return NULL;
 }
 
-void *calloc_function(size_t num, size_t size) {
-  MemoryContext oldcxt;
-  void *p;
-  size_t total;
-  total = num * size;
-  oldcxt = MemoryContextSwitchTo(TopMemoryContext);
-  p = palloc_extended(total, MCXT_ALLOC_HUGE | MCXT_ALLOC_ZERO);
-  MemoryContextSwitchTo(oldcxt);
-  return p;
-}
-
-void *malloc_function(size_t size) {
-  MemoryContext oldcxt;
-  void *p;
-  oldcxt = MemoryContextSwitchTo(TopMemoryContext);
-
-  p = palloc_extended(size, MCXT_ALLOC_HUGE);
-  MemoryContextSwitchTo(oldcxt);
-  return p;
-}
-
-void *realloc_function(void *p, size_t size) {
-  MemoryContext oldcxt;
-  oldcxt = MemoryContextSwitchTo(TopMemoryContext);
-  p = repalloc_huge(p, size);
-  MemoryContextSwitchTo(oldcxt);
-  return p;
-}
-
-void free_function(void *p) {
-  //  MemoryContext oldcxt;
-  //  oldcxt = MemoryContextSwitchTo(TopMemoryContext);
-  pfree(p);
-  //  MemoryContextSwitchTo(oldcxt);
-}
-
-static void burble_assign_hook(bool newvalue, void *extra);
-static bool os_burble = false;
-
-static void burble_assign_hook(bool newvalue, void *extra)
+bool
+spi_ensure_connected(void)
 {
-	OK_CHECK(GrB_set (GrB_GLOBAL, (int32_t) newvalue, GxB_BURBLE),
-			 "Cannot set burble function");
+    int rc;
+
+    rc = SPI_connect();
+    if (rc == SPI_OK_CONNECT)
+    {
+        return true;   /* we connected */
+    }
+    if (rc == SPI_ERROR_CONNECT)
+    {
+        return false;  /* already connected by our caller */
+    }
+
+    elog(ERROR, "spi_ensure_connected: SPI_connect failed with code %d", rc);
+    pg_unreachable();
 }
 
 void _PG_init(void)
 {
 	char msg [LAGRAPH_MSG_LEN];
-
 	LAGraph_Init(msg);
-
 	initialize_types();
 	initialize_descriptors();
 	initialize_unaryops();
@@ -405,19 +358,5 @@ void _PG_init(void)
 	initialize_binaryops();
 	initialize_monoids();
 	initialize_semirings();
-
-	OK_CHECK(GrB_set (GrB_GLOBAL, (void*) burble_notice_func, GxB_PRINTF, sizeof(void*)),
-			 "Cannot set burble print function");
-
-	DefineCustomBoolVariable("onesparse.burble",
-                             "Enable or disable the SuiteSparse burble feature.",
-                             "Session-level parameter to control burble behavior.",
-                             &os_burble,
-                             false,
-                             PGC_USERSET,
-                             0,
-                             NULL,
-                             burble_assign_hook,
-                             NULL);
+	initialize_gucs();
 }
-

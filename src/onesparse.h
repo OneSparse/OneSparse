@@ -35,6 +35,7 @@
 #include "access/heapam.h"
 #include "utils/rel.h"
 #include "executor/tuptable.h"
+#include "executor/spi.h"
 #include "commands/defrem.h"
 #include "common/hashfn.h"
 #include "access/xact.h"
@@ -187,11 +188,6 @@ GrB_BinaryOp default_binaryop(GrB_Type type);
 GrB_Monoid default_monoid(GrB_Type type);
 GrB_Semiring default_semiring(GrB_Type type);
 
-void *malloc_function(size_t);
-void *calloc_function(size_t, size_t);
-void *realloc_function(void*, size_t);
-void free_function(void*);
-
 void initialize_types(void);
 void initialize_descriptors(void);
 void initialize_unaryops(void);
@@ -199,17 +195,21 @@ void initialize_indexunaryops(void);
 void initialize_binaryops(void);
 void initialize_monoids(void);
 void initialize_semirings(void);
+void initialize_gucs(void);
 
 GrB_Type lookup_type(char *name);
 GrB_Descriptor lookup_descriptor(char *name);
 GrB_UnaryOp lookup_unaryop(char *name);
 GrB_IndexUnaryOp lookup_indexunaryop(char *name);
 GrB_BinaryOp lookup_binaryop(char *name);
+GxB_IndexBinaryOp lookup_indexbinaryop(char *name);
 GrB_Monoid lookup_monoid(char *name);
 GrB_Semiring lookup_semiring(char *name);
 
 void burble_notice_func(const char *fmt, ...)
 	    pg_attribute_printf(1, 2);
+
+bool spi_ensure_connected(void);
 
 void _PG_init(void);
 
@@ -218,6 +218,7 @@ void _PG_init(void);
 #include "unaryop/unaryop.h"
 #include "indexunaryop/indexunaryop.h"
 #include "binaryop/binaryop.h"
+#include "indexbinaryop/indexbinaryop.h"
 #include "monoid/monoid.h"
 #include "semiring/semiring.h"
 #include "scalar/scalar.h"

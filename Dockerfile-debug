@@ -91,7 +91,11 @@ ENV EDITOR zile
 RUN sudo make && sudo make install && sudo make clean
 
 # start the database            
-RUN initdb -D "$PGDATA" -c shared_preload_libraries='onesparse' -c search_path='public,onesparse' --encoding UTF8
+RUN initdb -D "$PGDATA" \
+    -c shared_preload_libraries='onesparse' \
+    -c search_path='public,onesparse' \
+    -c onesparse.jit_control='on' \
+    --encoding UTF8
 EXPOSE 5432
 # wait forever
 

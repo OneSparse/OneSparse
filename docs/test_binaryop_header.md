@@ -1,7 +1,3 @@
-```
-\pset linestyle unicode
-\pset border 2
-```
 # BinaryOp
 
 In [mathematics](https://en.wikipedia.org/wiki/Mathematics
@@ -14,6 +10,54 @@ produce another element. More formally, a binary operation is an
 [operation](https://en.wikipedia.org/wiki/Operation_(mathematics)
 "Operation (mathematics)") of
 [arity](https://en.wikipedia.org/wiki/Arity "Arity") two.
+
+## User Defined Binary Operators
+
+User defined functions can be registered with OneSparse by
+inserting them into the `onesparse.user_defined_binaryop` table.
+They can then be JIT compiled into kernels and used in any function
+that takes a `binaryop` argument:
+
+``` postgres-console
+show onesparse.jit_control;  -- This must be set to 'on' in postgres config.
+┌───────────────────────┐
+│ onesparse.jit_control │
+├───────────────────────┤
+│ on                    │
+└───────────────────────┘
+(1 row)
+
+```
+
+Insert the expected function types and function body into the
+table.  Here is an example function that computes the [Hamming
+Distance](https://en.wikipedia.org/wiki/Hamming_distance) between
+two elements.  See the SuiteSparse User Guide for more details:
+
+``` postgres-console
+insert into user_defined_binaryop (name, ztype, xtype, ytype, func) VALUES
+    ('binary_hamming_dist', 'int64', 'int64', 'int64',
+    $$
+    void binary_hamming_dist (int64_t *z, int64_t *x, int64_t *y) {
+        (*z) = __builtin_popcountll((*x)^(*y));
+       };
+    $$);
+```
+The new operator can now be used in functions that take `binaryop`
+operators like `eadd`:
+``` postgres-console
+select eadd(random_vector('int64', 16, 'inf', 42),
+            random_vector('int64', 16, 'inf', 43),
+            'binary_hamming_dist');
+┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                               eadd                                               │
+├──────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ int64(16)[0:32 1:31 2:31 3:30 4:36 5:37 6:30 7:35 8:35 9:27 10:33 11:28 12:32 13:37 14:36 15:32] │
+└──────────────────────────────────────────────────────────────────────────────────────────────────┘
+(1 row)
+
+```
+## Built-in Operators
 
 | OneSparse Name | SuiteSparse Name |
 |----------------|------------------|

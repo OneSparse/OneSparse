@@ -1,9 +1,9 @@
-typedef struct binaryop_entry
+typedef struct indexbinaryop_entry
 {{
 	uint32 status;
 	char *name;
-    GrB_BinaryOp binaryop;
-}} binaryop_entry;
+    GxB_IndexBinaryOp indexbinaryop;
+}} indexbinaryop_entry;
 
 static uint32 hash_string_pointer(char *s);
 
@@ -15,10 +15,10 @@ hash_string_pointer(char *s)
 	return hash_bytes(ss, strlen(s));
     }}
 
-#define BINARYOPHASH_INITIAL_SIZE 2000
+#define INDEXBINARYOPHASH_INITIAL_SIZE 2000
 
-#define SH_PREFIX		binaryophash
-#define SH_ELEMENT_TYPE binaryop_entry
+#define SH_PREFIX		indexbinaryophash
+#define SH_ELEMENT_TYPE indexbinaryop_entry
 #define SH_KEY_TYPE		char *
 #define	SH_KEY			name
 #define SH_HASH_KEY(tb, key)	hash_string_pointer(key)
@@ -28,22 +28,22 @@ hash_string_pointer(char *s)
 #define SH_DEFINE
 #include "lib/simplehash.h"
 
-static binaryophash_hash *binaryophash;
+static indexbinaryophash_hash *indexbinaryophash;
 
-void initialize_binaryops()
+void initialize_indexbinaryops()
 {{
     bool found;
-    binaryop_entry *entry;
+    indexbinaryop_entry *entry;
 
-    binaryophash = binaryophash_create(TopMemoryContext, BINARYOPHASH_INITIAL_SIZE, NULL);
+    indexbinaryophash = indexbinaryophash_create(TopMemoryContext, INDEXBINARYOPHASH_INITIAL_SIZE, NULL);
     {decls}
     }}
 
-GrB_BinaryOp lookup_binaryop(char *name)
+GxB_IndexBinaryOp lookup_indexbinaryop(char *name)
 {{
-    binaryop_entry *entry;
+    indexbinaryop_entry *entry;
 	bool connected;
-    GrB_BinaryOp op;
+    GxB_IndexBinaryOp op;
 	Oid argtypes[1];
 	Datum values[1];
 	char nulls[1];
@@ -58,21 +58,24 @@ GrB_BinaryOp lookup_binaryop(char *name)
 	Datum d_ztype;
 	Datum d_xtype;
 	Datum d_ytype;
+	Datum d_ttype;
 
 	char *func;
 	char *ztype_name;
 	char *xtype_name;
 	char *ytype_name;
+	char *ttype_name;
 
 	GrB_Type ztype;
 	GrB_Type xtype;
 	GrB_Type ytype;
+	GrB_Type ttype;
 
-	entry = binaryophash_lookup(binaryophash, name);
+	entry = indexbinaryophash_lookup(indexbinaryophash, name);
 
     if (entry)
 	{{
-        return entry->binaryop;
+        return entry->indexbinaryop;
 	}}
 
 	op = NULL;
@@ -83,8 +86,8 @@ GrB_BinaryOp lookup_binaryop(char *name)
 	nulls[0] = ' ';
 
 	plan = SPI_prepare(
-		"select ztype, xtype, ytype, func "
-		"from onesparse.user_defined_binaryop "
+		"select ztype, xtype, ytype, ttype, func "
+		"from onesparse.user_defined_indexbinaryop "
 		"where name = $1 "
 		"limit 1",
 		1,
@@ -93,13 +96,13 @@ GrB_BinaryOp lookup_binaryop(char *name)
 
 	if (plan == NULL)
 	{{
-		elog(ERROR, "lookup_binaryop: SPI_prepare failed");
+		elog(ERROR, "lookup_indexbinaryop: SPI_prepare failed");
 	}}
 
 	execres = SPI_execute_plan(plan, values, nulls, true, 1);
 	if (execres != SPI_OK_SELECT)
 	{{
-		elog(ERROR, "lookup_binaryop: SPI_execute_plan failed");
+		elog(ERROR, "lookup_indexbinaryop: SPI_execute_plan failed");
 	}}
 
 	if (SPI_processed == 1)
@@ -111,44 +114,52 @@ GrB_BinaryOp lookup_binaryop(char *name)
 		d_ztype = SPI_getbinval(tuple, tupdesc, 1, &isnull);
 		if (isnull)
 		{{
-			elog(ERROR, "lookup_binaryop: ztype is NULL");
+			elog(ERROR, "lookup_indexbinaryop: ztype is NULL");
 		}}
 		d_xtype = SPI_getbinval(tuple, tupdesc, 2, &isnull);
 		if (isnull)
 		{{
-			elog(ERROR, "lookup_binaryop: xtype is NULL");
+			elog(ERROR, "lookup_indexbinaryop: xtype is NULL");
 		}}
 		d_ytype = SPI_getbinval(tuple, tupdesc, 3, &isnull);
 		if (isnull)
 		{{
-			elog(ERROR, "lookup_binaryop: ytype is NULL");
+			elog(ERROR, "lookup_indexbinaryop: ytype is NULL");
 		}}
-		d_func = SPI_getbinval(tuple, tupdesc, 4, &isnull);
+		d_ttype = SPI_getbinval(tuple, tupdesc, 4, &isnull);
 		if (isnull)
 		{{
-			elog(ERROR, "lookup_binaryop: func is NULL");
+			elog(ERROR, "lookup_indexbinaryop: ttype is NULL");
+		}}
+		d_func = SPI_getbinval(tuple, tupdesc, 5, &isnull);
+		if (isnull)
+		{{
+			elog(ERROR, "lookup_indexbinaryop: func is NULL");
 		}}
 
 		ztype_name = TextDatumGetCString(d_ztype);
 		xtype_name = TextDatumGetCString(d_xtype);
 		ytype_name = TextDatumGetCString(d_ytype);
+		ttype_name = TextDatumGetCString(d_ttype);
 		func = TextDatumGetCString(d_func);
 
 		ztype = lookup_type(ztype_name);
 		xtype = lookup_type(xtype_name);
 		ytype = lookup_type(ytype_name);
+		ttype = lookup_type(ttype_name);
 
-		if (ztype == NULL || xtype == NULL || ytype == NULL)
+		if (ztype == NULL || xtype == NULL || ytype == NULL ||  ttype == NULL)
 		{{
-			elog(ERROR, "lookup_binaryop: unknown GraphBLAS type(s) for '%s'", name);
+			elog(ERROR, "lookup_indexbinaryop: unknown GraphBLAS type(s) for '%s'", name);
 		}}
 
-		OS_CHECK(GxB_BinaryOp_new(
+		OS_CHECK(GxB_IndexBinaryOp_new(
 					 &op,
 					 NULL,
 					 ztype,
 					 xtype,
 					 ytype,
+					 ttype,
 					 name,
 					 func
 					 ),
@@ -160,7 +171,7 @@ GrB_BinaryOp lookup_binaryop(char *name)
     {{
         if (SPI_finish() != SPI_OK_FINISH)
         {{
-            elog(ERROR, "lookup_binaryop: SPI_finish failed");
+            elog(ERROR, "lookup_indexbinaryop: SPI_finish failed");
 		}}
 	}}
     return op;
