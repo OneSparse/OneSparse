@@ -14,7 +14,3 @@ vector_agg_final(PG_FUNCTION_ARGS)
     OS_RETURN_VECTOR(state);
 }
 
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

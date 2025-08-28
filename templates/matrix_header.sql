@@ -277,6 +277,14 @@ RETURNS vector
 AS '$libdir/onesparse', 'matrix_vxm'
 LANGUAGE C STABLE;
 
+CREATE FUNCTION norm(
+    a matrix,
+    inout c matrix default null
+    )
+RETURNS matrix
+AS '$libdir/onesparse', 'matrix_norm'
+LANGUAGE C STABLE;
+
 CREATE FUNCTION kronecker(
     a matrix,
     b matrix,
@@ -536,6 +544,10 @@ CREATE FUNCTION neq(a matrix, b matrix)
 RETURNS bool
 RETURN NOT eq(a, b);
 
+CREATE FUNCTION fmod(a matrix, s scalar)
+RETURNS matrix
+RETURN onesparse.apply(a, s, 'fmod_fp64');
+
 CREATE FUNCTION gt(a matrix, s scalar)
 RETURNS matrix
 RETURN onesparse.choose(a, ('valuegt_' || name(type(a)))::indexunaryop, s);
@@ -664,6 +676,12 @@ CREATE OPERATOR * (
     LEFTARG = matrix,
     RIGHTARG = scalar,
     FUNCTION = times_second_op
+    );
+
+CREATE OPERATOR % (
+    LEFTARG = matrix,
+    RIGHTARG = scalar,
+    FUNCTION = fmod
     );
 
 -- ewise add "OR ops"
@@ -893,6 +911,11 @@ RETURNS matrix
 AS '$libdir/onesparse', 'matrix_load'
 LANGUAGE C STRICT;
 
+CREATE FUNCTION random_matrix(t type, nrows bigint default -1, ncols bigint default -1, density float8 default 0.1, seed bigint default null)
+RETURNS matrix
+AS '$libdir/onesparse', 'matrix_random'
+LANGUAGE C VOLATILE;
+
 create function print(a matrix) returns text language plpgsql set search_path = onesparse,public as
     $$
     declare
@@ -900,31 +923,31 @@ create function print(a matrix) returns text language plpgsql set search_path = 
         jmax int = ncols(a) - 1;
         out text = '';
     begin
-        out = out || repeat(' ', 3);
+        out = out || repeat(' ', 4);
         for i in 0..jmax loop
-            out = out || lpad(i::text, 3);
+            out = out || lpad(i::text, 4);
         end loop;
-        out = out || E'\n   ';
+        out = out || E'\n    ';
         for i in 0..jmax loop
-            out = out || repeat(E'\u2500', 3);
+            out = out || repeat(E'\u2500', 4);
         end loop;
         out = out || E'\n';
         for i in 0..imax loop
-            out = out || lpad(i::text, 2) || E'\u2502';
+            out = out || lpad(i::text, 3) || E'\u2502';
             for j in 0..jmax loop
                 if contains(a, i, j) then
-                    out = out || lpad(print(get_element(a, i, j)), 3);
+                    out = out || lpad(print(get_element(a, i, j)), 4);
                 else
-                    out = out || E'   ';
+                    out = out || E'    ';
                 end if;
             end loop;
-            out = out || E'   \n';
+            out = out || E'    \n';
         end loop;
         return out;
     end;
     $$;
 
-create or replace function random_matrix(
+create or replace function old_random_matrix(
     nrows integer,
     ncols integer,
     nvals integer,

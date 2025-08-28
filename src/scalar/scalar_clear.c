@@ -18,7 +18,3 @@ Datum scalar_clear(PG_FUNCTION_ARGS)
 
 SUPPORT_FN(scalar_clear, linitial);
 
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

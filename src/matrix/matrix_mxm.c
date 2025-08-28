@@ -60,7 +60,3 @@ Datum matrix_mxm(PG_FUNCTION_ARGS)
 
 SUPPORT_FN(matrix_mxm, lfourth);
 
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

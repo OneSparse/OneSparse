@@ -54,7 +54,3 @@ matrix_extract_col_vector(PG_FUNCTION_ARGS)
 
 SUPPORT_FN(matrix_extract_col_vector, lfourth);
 
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

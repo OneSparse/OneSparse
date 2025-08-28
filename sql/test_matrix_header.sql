@@ -152,12 +152,12 @@ select print(s) from test_fixture;
 -- values, an optional max value, and an optional random seed for
 -- deterministic generation:
 
-select print(random_matrix(8, 8, 16, seed=>0.42, max=>42)) as random_matrix;
+select print(random_matrix('int8', 8, 8, 0.5, 42) % 42) as random_matrix;
 
 -- This random matrix is also a random *graph*:
 --
 
-select draw(random_matrix(8, 8, 16, seed=>0.42, max=>42)) as draw_source \gset
+select draw(random_matrix('int8', 8, 8, 0.5, 42) % 42) as draw_source \gset
 \i sql/draw.sql
 
 -- ## Empty Matrices
@@ -444,14 +444,15 @@ select draw(a) as uop_a_source, draw(choose(a, indexunaryop, 1)) as uop_b_source
 select print(a > 1) as "a > 1", print(a >= 1) as "a >= 1", print(a < 1) as "a < 1", print(a <= 1) as "a <= 1" from test_fixture;
 
 -- A useful select operator is `triu`, it select only upper triangular
--- values, this turns your graph into a direct acyclic graph (DAG) by
--- removing all the links "back" from higher number nodes to lower.
+-- values from a given offset, where 0 is the digonal, this turns your
+-- graph into a direct acyclic graph (DAG) by removing all the links
+-- "back" from higher number nodes to lower.
 
-select print(random_matrix(8, 8, 16, seed=>0.42, max=>42)) as matrix,
-       print(choose(random_matrix(8, 8, 16, seed=>0.42, max=>42), 'triu', 0)) as triu from test_fixture;
+select print(random_matrix('int8', 8, 8, 0.5, 42) % 42) as matrix,
+       print(choose(random_matrix('uint8', 8, 8, 1, 42), 'triu', 1) % 42) as triu from test_fixture;
 
-select draw(random_matrix(8, 8, 16, seed=>0.42, max=>42)) as uop_a_source,
-       draw(choose(random_matrix(8, 8, 16, seed=>0.42, max=>42), 'triu', 0)) as uop_b_source
+select draw(random_matrix('int8', 8, 8, 0.5, 42) % 42) as uop_a_source,
+       draw(choose(random_matrix('int8', 8, 8, 0.5, 42) % 42, 'triu', 1)) as uop_b_source
        from test_fixture \gset
 \i sql/uop.sql
 
@@ -475,6 +476,9 @@ select draw(s) as binop_a_source, draw(s) as binop_b_source, draw(kronecker(s, s
 -- certain number of times, `kronpower`:
 
 select print(kronpower(s, 2)) from test_fixture;
+
+select draw(kronpower(s, 2)) as draw_source from test_fixture \gset
+\i sql/draw.sql
 
 -- Kronecker products can very quickly make huge graphs with power law
 -- distributions.  These are handy synthetic graphs to mimic certain

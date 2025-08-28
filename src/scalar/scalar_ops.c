@@ -43,7 +43,3 @@
 #define NO_SCALAR_MATH
 #include "scalar_ops.h"
 
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

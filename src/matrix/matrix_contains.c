@@ -29,7 +29,3 @@ Datum matrix_contains(PG_FUNCTION_ARGS)
 	PG_RETURN_BOOL(false);
 }
 
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

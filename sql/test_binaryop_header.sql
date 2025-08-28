@@ -2,61 +2,104 @@
 \pset border 2
 -- # BinaryOp
 --
--- BinaryOps apply a function to two elements and returning an element.
+-- In [mathematics](https://en.wikipedia.org/wiki/Mathematics
+-- "Mathematics"), a **binary operation** or **dyadic operation** is a
+-- rule for combining two
+-- [elements](https://en.wikipedia.org/wiki/Element_(mathematics)
+-- "Element (mathematics)") (called
+-- [operands](https://en.wikipedia.org/wiki/Operands "Operands")) to
+-- produce another element. More formally, a binary operation is an
+-- [operation](https://en.wikipedia.org/wiki/Operation_(mathematics)
+-- "Operation (mathematics)") of
+-- [arity](https://en.wikipedia.org/wiki/Arity "Arity") two.
+--
+-- ## User Defined Binary Operators
+--
+-- User defined functions can be registered with OneSparse by
+-- inserting them into the `onesparse.user_defined_binaryop` table.
+-- They can then be JIT compiled into kernels and used in any function
+-- that takes a `binaryop` argument:
+--
+
+show onesparse.jit_control;  -- This must be set to 'on' in postgres config.
+
+--
+-- Insert the expected function types and function body into the
+-- table.  Here is an example function that computes the [Hamming
+-- Distance](https://en.wikipedia.org/wiki/Hamming_distance) between
+-- two elements.  See the SuiteSparse User Guide for more details:
+--
+
+insert into user_defined_binaryop (name, ztype, xtype, ytype, func) VALUES
+    ('binary_hamming_dist', 'int64', 'int64', 'int64',
+    $$
+    void binary_hamming_dist (int64_t *z, int64_t *x, int64_t *y) {
+        (*z) = __builtin_popcountll((*x)^(*y));
+       };
+    $$);
+
+-- The new operator can now be used in functions that take `binaryop`
+-- operators like `eadd`:
+
+select eadd(random_vector('int64', 16, 'inf', 42),
+            random_vector('int64', 16, 'inf', 43),
+            'binary_hamming_dist');
+
+-- ## Built-in Operators
 --
 -- | OneSparse Name | SuiteSparse Name |
 -- |----------------|------------------|
 -- | first_bool | GrB_FIRST_BOOL |
 -- | second_bool | GrB_SECOND_BOOL |
 -- | oneb_bool | GrB_ONEB_BOOL |
--- | pow_bool | GxB_POW_BOOL |
 -- | first_int8 | GrB_FIRST_INT8 |
 -- | second_int8 | GrB_SECOND_INT8 |
 -- | oneb_int8 | GrB_ONEB_INT8 |
--- | pow_int8 | GxB_POW_INT8 |
 -- | first_int16 | GrB_FIRST_INT16 |
 -- | second_int16 | GrB_SECOND_INT16 |
 -- | oneb_int16 | GrB_ONEB_INT16 |
--- | pow_int16 | GxB_POW_INT16 |
 -- | first_int32 | GrB_FIRST_INT32 |
 -- | second_int32 | GrB_SECOND_INT32 |
 -- | oneb_int32 | GrB_ONEB_INT32 |
--- | pow_int32 | GxB_POW_INT32 |
 -- | first_int64 | GrB_FIRST_INT64 |
 -- | second_int64 | GrB_SECOND_INT64 |
 -- | oneb_int64 | GrB_ONEB_INT64 |
--- | pow_int64 | GxB_POW_INT64 |
 -- | first_uint8 | GrB_FIRST_UINT8 |
 -- | second_uint8 | GrB_SECOND_UINT8 |
 -- | oneb_uint8 | GrB_ONEB_UINT8 |
--- | pow_uint8 | GxB_POW_UINT8 |
 -- | first_uint16 | GrB_FIRST_UINT16 |
 -- | second_uint16 | GrB_SECOND_UINT16 |
 -- | oneb_uint16 | GrB_ONEB_UINT16 |
--- | pow_uint16 | GxB_POW_UINT16 |
 -- | first_uint32 | GrB_FIRST_UINT32 |
 -- | second_uint32 | GrB_SECOND_UINT32 |
 -- | oneb_uint32 | GrB_ONEB_UINT32 |
--- | pow_uint32 | GxB_POW_UINT32 |
 -- | first_uint64 | GrB_FIRST_UINT64 |
 -- | second_uint64 | GrB_SECOND_UINT64 |
 -- | oneb_uint64 | GrB_ONEB_UINT64 |
--- | pow_uint64 | GxB_POW_UINT64 |
 -- | first_fp32 | GrB_FIRST_FP32 |
 -- | second_fp32 | GrB_SECOND_FP32 |
 -- | oneb_fp32 | GrB_ONEB_FP32 |
--- | pow_fp32 | GxB_POW_FP32 |
 -- | first_fp64 | GrB_FIRST_FP64 |
 -- | second_fp64 | GrB_SECOND_FP64 |
 -- | oneb_fp64 | GrB_ONEB_FP64 |
--- | pow_fp64 | GxB_POW_FP64 |
 -- | first_fc32 | GxB_FIRST_FC32 |
 -- | second_fc32 | GxB_SECOND_FC32 |
 -- | oneb_fc32 | GxB_ONEB_FC32 |
--- | pow_fc32 | GxB_POW_FC32 |
 -- | first_fc64 | GxB_FIRST_FC64 |
 -- | second_fc64 | GxB_SECOND_FC64 |
 -- | oneb_fc64 | GxB_ONEB_FC64 |
+-- | pow_bool | GxB_POW_BOOL |
+-- | pow_int8 | GxB_POW_INT8 |
+-- | pow_int16 | GxB_POW_INT16 |
+-- | pow_int32 | GxB_POW_INT32 |
+-- | pow_int64 | GxB_POW_INT64 |
+-- | pow_uint8 | GxB_POW_UINT8 |
+-- | pow_uint16 | GxB_POW_UINT16 |
+-- | pow_uint32 | GxB_POW_UINT32 |
+-- | pow_uint64 | GxB_POW_UINT64 |
+-- | pow_fp32 | GxB_POW_FP32 |
+-- | pow_fp64 | GxB_POW_FP64 |
+-- | pow_fc32 | GxB_POW_FC32 |
 -- | pow_fc64 | GxB_POW_FC64 |
 -- | plus_bool | GrB_PLUS_BOOL |
 -- | minus_bool | GrB_MINUS_BOOL |
@@ -303,6 +346,30 @@
 -- | copysign_fp32 | GxB_COPYSIGN_FP32 |
 -- | ldexp_fp64 | GxB_LDEXP_FP64 |
 -- | copysign_fp64 | GxB_COPYSIGN_FP64 |
+-- | bget_int8 | GxB_BGET_INT8 |
+-- | bset_int8 | GxB_BSET_INT8 |
+-- | bclr_int8 | GxB_BCLR_INT8 |
+-- | bget_int16 | GxB_BGET_INT16 |
+-- | bset_int16 | GxB_BSET_INT16 |
+-- | bclr_int16 | GxB_BCLR_INT16 |
+-- | bget_int32 | GxB_BGET_INT32 |
+-- | bset_int32 | GxB_BSET_INT32 |
+-- | bclr_int32 | GxB_BCLR_INT32 |
+-- | bget_int64 | GxB_BGET_INT64 |
+-- | bset_int64 | GxB_BSET_INT64 |
+-- | bclr_int64 | GxB_BCLR_INT64 |
+-- | bget_uint8 | GxB_BGET_UINT8 |
+-- | bset_uint8 | GxB_BSET_UINT8 |
+-- | bclr_uint8 | GxB_BCLR_UINT8 |
+-- | bget_uint16 | GxB_BGET_UINT16 |
+-- | bset_uint16 | GxB_BSET_UINT16 |
+-- | bclr_uint16 | GxB_BCLR_UINT16 |
+-- | bget_uint32 | GxB_BGET_UINT32 |
+-- | bset_uint32 | GxB_BSET_UINT32 |
+-- | bclr_uint32 | GxB_BCLR_UINT32 |
+-- | bget_uint64 | GxB_BGET_UINT64 |
+-- | bset_uint64 | GxB_BSET_UINT64 |
+-- | bclr_uint64 | GxB_BCLR_UINT64 |
 -- | bor_int8 | GrB_BOR_INT8 |
 -- | band_int8 | GrB_BAND_INT8 |
 -- | bxor_int8 | GrB_BXOR_INT8 |
@@ -335,30 +402,6 @@
 -- | band_uint64 | GrB_BAND_UINT64 |
 -- | bxor_uint64 | GrB_BXOR_UINT64 |
 -- | bxnor_uint64 | GrB_BXNOR_UINT64 |
--- | bget_int8 | GxB_BGET_INT8 |
--- | bset_int8 | GxB_BSET_INT8 |
--- | bclr_int8 | GxB_BCLR_INT8 |
--- | bget_int16 | GxB_BGET_INT16 |
--- | bset_int16 | GxB_BSET_INT16 |
--- | bclr_int16 | GxB_BCLR_INT16 |
--- | bget_int32 | GxB_BGET_INT32 |
--- | bset_int32 | GxB_BSET_INT32 |
--- | bclr_int32 | GxB_BCLR_INT32 |
--- | bget_int64 | GxB_BGET_INT64 |
--- | bset_int64 | GxB_BSET_INT64 |
--- | bclr_int64 | GxB_BCLR_INT64 |
--- | bget_uint8 | GxB_BGET_UINT8 |
--- | bset_uint8 | GxB_BSET_UINT8 |
--- | bclr_uint8 | GxB_BCLR_UINT8 |
--- | bget_uint16 | GxB_BGET_UINT16 |
--- | bset_uint16 | GxB_BSET_UINT16 |
--- | bclr_uint16 | GxB_BCLR_UINT16 |
--- | bget_uint32 | GxB_BGET_UINT32 |
--- | bset_uint32 | GxB_BSET_UINT32 |
--- | bclr_uint32 | GxB_BCLR_UINT32 |
--- | bget_uint64 | GxB_BGET_UINT64 |
--- | bset_uint64 | GxB_BSET_UINT64 |
--- | bclr_uint64 | GxB_BCLR_UINT64 |
 -- | bshift_int8 | GxB_BSHIFT_INT8 |
 -- | bshift_int16 | GxB_BSHIFT_INT16 |
 -- | bshift_int32 | GxB_BSHIFT_INT32 |

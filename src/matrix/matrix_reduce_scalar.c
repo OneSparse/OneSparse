@@ -43,7 +43,3 @@ matrix_reduce_scalar(PG_FUNCTION_ARGS)
 	OS_RETURN_SCALAR(result);
 }
 
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

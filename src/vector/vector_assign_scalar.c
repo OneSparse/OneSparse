@@ -46,7 +46,3 @@ vector_assign_scalar(PG_FUNCTION_ARGS)
 
 SUPPORT_FN(vector_assign_scalar, linitial);
 
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

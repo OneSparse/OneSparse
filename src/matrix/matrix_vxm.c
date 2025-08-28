@@ -14,7 +14,6 @@ Datum matrix_vxm(PG_FUNCTION_ARGS)
 	int nargs;
     struct timeval start, end;
 
-	OS_START_BENCH();
 	ERRORNULL(0);
 	ERRORNULL(1);
 
@@ -44,6 +43,7 @@ Datum matrix_vxm(PG_FUNCTION_ARGS)
 	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 5);
 	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 6);
 
+	OS_START_BENCH();
 	OS_CHECK(GrB_vxm(c->vector,
 					 mask,
 					 accum,
@@ -60,7 +60,3 @@ Datum matrix_vxm(PG_FUNCTION_ARGS)
 
 SUPPORT_FN(matrix_vxm, lfourth);
 
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

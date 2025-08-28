@@ -34,9 +34,4 @@ os_UnaryOp* DatumGetUnaryOp(Datum d);
 #define OS_UNARYOP_DATA(_flat) ((char*)(_flat) + OS_UNARYOP_FLATSIZE())
 #define UnaryOpGetEOHP(_datum) (os_UnaryOp *) DatumGetEOHP(_datum)
 
-#endif /* OS_UNARYOP_H */
-
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */
+#endif 

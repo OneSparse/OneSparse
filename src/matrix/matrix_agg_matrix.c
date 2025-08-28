@@ -49,7 +49,3 @@ Datum matrix_agg_matrix(PG_FUNCTION_ARGS)
     OS_RETURN_MATRIX(state);
 }
 
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

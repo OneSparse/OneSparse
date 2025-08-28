@@ -3,7 +3,6 @@
 PG_FUNCTION_INFO_V1(graph_fglt);
 Datum graph_fglt(PG_FUNCTION_ARGS)
 {
-	GrB_Type type;
 	os_Graph *graph;
 	GrB_Matrix output;
 	char msg [LAGRAPH_MSG_LEN];
@@ -25,7 +24,3 @@ Datum graph_fglt(PG_FUNCTION_ARGS)
 	OS_RETURN_MATRIX(new_matrix(NULL, 0, 0, CurrentMemoryContext, output));
 }
 
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

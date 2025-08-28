@@ -95,6 +95,18 @@ char *_print_matrix(GrB_Matrix matrix)
 				appendStringInfo(&buf, "%lu:%lu:%u", row, col, vu16);
 				break;
 				}
+			case GrB_INT8_CODE:
+				{
+				int8_t vi8 = GxB_Iterator_get_INT8(iterator);
+				appendStringInfo(&buf, "%lu:%lu:%hhd", row, col, vi8);
+				break;
+				}
+			case GrB_UINT8_CODE:
+				{
+				uint8_t vu8 = GxB_Iterator_get_UINT8(iterator);
+				appendStringInfo(&buf, "%lu:%lu:%hhu", row, col, vu8);
+				break;
+				}
 			case GrB_FP64_CODE:
 				{
 				double vf64 = GxB_Iterator_get_FP64(iterator);
@@ -134,11 +146,7 @@ Datum matrix_out(PG_FUNCTION_ARGS)
 	OS_START_BENCH();
 	matrix = OS_GETARG_MATRIX(0);
 	result = _print_matrix(matrix->matrix);
-	OS_START_BENCH();
+	OS_END_BENCH();
 	PG_RETURN_CSTRING(result);
 }
 
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

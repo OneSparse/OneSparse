@@ -56,7 +56,3 @@ Datum matrix_reduce_vector(PG_FUNCTION_ARGS)
 
 SUPPORT_FN(matrix_reduce_vector, lthird);
 
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

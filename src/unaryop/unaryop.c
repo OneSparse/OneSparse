@@ -162,8 +162,3 @@ Datum unaryop_name(PG_FUNCTION_ARGS)
 	unaryop = OS_GETARG_UNARYOP(0);
 	PG_RETURN_TEXT_P(cstring_to_text(unaryop->name));
 }
-
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

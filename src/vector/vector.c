@@ -28,10 +28,6 @@ static Size vector_get_flat_size(ExpandedObjectHeader *eohptr) {
 		return vector->flat_size;
 	}
 
-    OS_CHECK(GrB_wait(vector->vector, GrB_MATERIALIZE),
-		  vector->vector,
-		  "Error waiting to materialize vector.");
-
 	OS_CHECK(GxB_Vector_serialize(&serialized_data, &serialized_size, vector->vector, NULL),
 		  vector->vector,
 		  "Error serializing vector");
@@ -266,8 +262,3 @@ os_Vector* DatumGetVectorMaybeABC(Datum datum, os_Vector *A, os_Vector *B, os_Ve
 	vector->flat_datum_pointer = flat_datum_pointer;
 	return vector;
 }
-
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

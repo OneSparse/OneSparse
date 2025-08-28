@@ -13,7 +13,3 @@ Datum vector_nvals(PG_FUNCTION_ARGS)
 	PG_RETURN_INT64(result);
 }
 
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

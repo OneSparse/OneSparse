@@ -5,11 +5,7 @@
 
 typedef struct os_FlatMatrix {
     int32 vl_len_;
-	int32_t type_code;
-	GrB_Index nrows;
-	GrB_Index ncols;
 	GrB_Index serialized_size;
-	Oid loid;
 } os_FlatMatrix;
 
 typedef struct os_Matrix  {
@@ -20,7 +16,6 @@ typedef struct os_Matrix  {
     Size flat_size;
     void* serialized_data;
     GrB_Index serialized_size;
-	Oid loid;
 } os_Matrix;
 
 typedef struct os_Matrix_ExtractState {
@@ -75,9 +70,4 @@ os_Matrix* DatumGetMatrixMaybeABC(Datum d, os_Matrix *A, os_Matrix *B, os_Matrix
 os_Matrix* _parse_matrix(char *input);
 char* _print_matrix(GrB_Matrix matrix);
 
-#endif /* OS_MATRIX_H */
-
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */
+#endif

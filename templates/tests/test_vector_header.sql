@@ -66,6 +66,18 @@ select size('int32(10)[]'::vector);
 -- Create a vector with some values
 select 'int32[0:1 1:2 2:3]'::vector;
 
+-- Cast a vector from a Postgres array
+select '{{1,2,3}}'::integer[]::vector;
+
+-- Cast from a Postgres array with NULL indicating empty value:
+select '{{1,NULL,3}}'::integer[]::vector;
+
+-- Cast a Postgres array from a vector
+select 'int32(3)[0:1 1:2 2:3]'::vector::integer[];
+
+-- Cast a Postgres array from a vector with  NULL indicating empty value:
+select 'int32(3)[0:1 2:3]'::vector::integer[];
+
 -- Count those values
 select nvals('int32[0:1 1:2 2:3]'::vector);
 

@@ -59,156 +59,6 @@ LANGUAGE C IMMUTABLE STRICT;
 -- complain if script is sourced in psql, rather than via CREATE EXTENSION
 \echo Use "CREATE EXTENSION onesparse" to load this file. \quit
 
-CREATE TYPE unaryop;
-
-CREATE FUNCTION unaryop_in(cstring)
-RETURNS unaryop
-AS '$libdir/onesparse', 'unaryop_in'
-LANGUAGE C IMMUTABLE STRICT;
-
-CREATE FUNCTION unaryop_out(unaryop)
-RETURNS cstring
-AS '$libdir/onesparse', 'unaryop_out'
-LANGUAGE C IMMUTABLE STRICT;
-
-CREATE TYPE unaryop (
-    input = unaryop_in,
-    output = unaryop_out,
-    alignment = int4,
-    storage = 'main',
-    internallength = VARIABLE
-    );
-
-COMMENT ON TYPE unaryop IS 'UnaryOps apply a function to an element, returning an element.';
-
-CREATE FUNCTION name(unaryop)
-RETURNS text
-AS '$libdir/onesparse', 'unaryop_name'
-LANGUAGE C IMMUTABLE STRICT;
--- complain if script is sourced in psql, rather than via CREATE EXTENSION
-\echo Use "CREATE EXTENSION onesparse" to load this file. \quit
-
-CREATE TYPE indexunaryop;
-
-CREATE FUNCTION indexunaryop_in(cstring)
-RETURNS indexunaryop
-AS '$libdir/onesparse', 'indexunaryop_in'
-LANGUAGE C IMMUTABLE STRICT;
-
-CREATE FUNCTION indexunaryop_out(indexunaryop)
-RETURNS cstring
-AS '$libdir/onesparse', 'indexunaryop_out'
-LANGUAGE C IMMUTABLE STRICT;
-
-CREATE TYPE indexunaryop (
-    input = indexunaryop_in,
-    output = indexunaryop_out,
-    alignment = int4,
-    storage = 'main',
-    internallength = VARIABLE
-    );
-
-COMMENT ON TYPE indexunaryop IS 'IndexUnaryOps apply a function to a positional element, returning an element.';
-
-CREATE FUNCTION name(indexunaryop)
-RETURNS text
-AS '$libdir/onesparse', 'indexunaryop_name'
-LANGUAGE C IMMUTABLE STRICT;
--- complain if script is sourced in psql, rather than via CREATE EXTENSION
-\echo Use "CREATE EXTENSION onesparse" to load this file. \quit
-
-CREATE TYPE binaryop;
-
-CREATE FUNCTION binaryop_in(cstring)
-RETURNS binaryop
-AS '$libdir/onesparse', 'binaryop_in'
-LANGUAGE C IMMUTABLE STRICT;
-
-CREATE FUNCTION binaryop_out(binaryop)
-RETURNS cstring
-AS '$libdir/onesparse', 'binaryop_out'
-LANGUAGE C IMMUTABLE STRICT;
-
-CREATE TYPE binaryop (
-    input = binaryop_in,
-    output = binaryop_out,
-    alignment = int4,
-    storage = 'main',
-    internallength = VARIABLE
-    );
-
-COMMENT ON TYPE binaryop IS 'BinaryOps apply a function to two elements and returning an element.';
-
-CREATE FUNCTION name(binaryop)
-RETURNS text
-AS '$libdir/onesparse', 'binaryop_name'
-LANGUAGE C IMMUTABLE STRICT;
--- complain if script is sourced in psql, rather than via CREATE EXTENSION
-\echo Use "CREATE EXTENSION onesparse" to load this file. \quit
-
-CREATE TYPE monoid;
-
-CREATE FUNCTION monoid_in(cstring)
-RETURNS monoid
-AS '$libdir/onesparse', 'monoid_in'
-LANGUAGE C IMMUTABLE STRICT;
-
-CREATE FUNCTION monoid_out(monoid)
-RETURNS cstring
-AS '$libdir/onesparse', 'monoid_out'
-LANGUAGE C IMMUTABLE STRICT;
-
-CREATE TYPE monoid (
-    input = monoid_in,
-    output = monoid_out,
-    alignment = int4,
-    storage = 'main',
-    internallength = VARIABLE
-    );
-
-COMMENT ON TYPE monoid IS 'Monoids apply a BinaryOp and an identity value to two elements, returning an element.';
-
-CREATE FUNCTION name(monoid)
-RETURNS text
-AS '$libdir/onesparse', 'monoid_name'
-LANGUAGE C IMMUTABLE STRICT;
-
--- CREATE FUNCTION identity(monoid)
--- RETURNS scalar
--- AS '$libdir/onesparse', 'monoid_identity'
--- LANGUAGE C IMMUTABLE STRICT;
--- complain if script is sourced in psql, rather than via CREATE EXTENSION
-\echo Use "CREATE EXTENSION onesparse" to load this file. \quit
-
-CREATE TYPE semiring;
-
-CREATE FUNCTION semiring_in(cstring)
-RETURNS semiring
-AS '$libdir/onesparse', 'semiring_in'
-LANGUAGE C IMMUTABLE STRICT;
-
-CREATE FUNCTION semiring_out(semiring)
-RETURNS cstring
-AS '$libdir/onesparse', 'semiring_out'
-LANGUAGE C IMMUTABLE STRICT;
-
-CREATE TYPE semiring (
-    input = semiring_in,
-    output = semiring_out,
-    alignment = int4,
-    storage = 'main',
-    internallength = VARIABLE
-    );
-
-COMMENT ON TYPE semiring IS 'Semirings associate additive and multiplicative operators for matrix multiplication.';
-
-CREATE FUNCTION name(semiring)
-RETURNS text
-AS '$libdir/onesparse', 'semiring_name'
-LANGUAGE C IMMUTABLE STRICT;
--- complain if script is sourced in psql, rather than via CREATE EXTENSION
-\echo Use "CREATE EXTENSION onesparse" to load this file. \quit
-
 CREATE TYPE scalar;
 
 CREATE FUNCTION scalar_in(cstring)
@@ -260,6 +110,7 @@ CREATE FUNCTION clear(scalar)
 RETURNS scalar
 AS '$libdir/onesparse', 'scalar_clear'
 LANGUAGE C;
+
 
 CREATE FUNCTION scalar_bigint(bigint)
 RETURNS scalar
@@ -872,6 +723,166 @@ CREATE CAST (onesparse.scalar AS bool)
 -- complain if script is sourced in psql, rather than via CREATE EXTENSION
 \echo Use "CREATE EXTENSION onesparse" to load this file. \quit
 
+CREATE TYPE unaryop;
+
+CREATE FUNCTION unaryop_in(cstring)
+RETURNS unaryop
+AS '$libdir/onesparse', 'unaryop_in'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION unaryop_out(unaryop)
+RETURNS cstring
+AS '$libdir/onesparse', 'unaryop_out'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE TYPE unaryop (
+    input = unaryop_in,
+    output = unaryop_out,
+    alignment = int4,
+    storage = 'main',
+    internallength = VARIABLE
+    );
+
+COMMENT ON TYPE unaryop IS 'UnaryOps apply a function to an element, returning an element.';
+
+CREATE FUNCTION name(unaryop)
+RETURNS text
+AS '$libdir/onesparse', 'unaryop_name'
+LANGUAGE C IMMUTABLE STRICT;
+-- complain if script is sourced in psql, rather than via CREATE EXTENSION
+\echo Use "CREATE EXTENSION onesparse" to load this file. \quit
+
+CREATE TYPE indexunaryop;
+
+CREATE FUNCTION indexunaryop_in(cstring)
+RETURNS indexunaryop
+AS '$libdir/onesparse', 'indexunaryop_in'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION indexunaryop_out(indexunaryop)
+RETURNS cstring
+AS '$libdir/onesparse', 'indexunaryop_out'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE TYPE indexunaryop (
+    input = indexunaryop_in,
+    output = indexunaryop_out,
+    alignment = int4,
+    storage = 'main',
+    internallength = VARIABLE
+    );
+
+COMMENT ON TYPE indexunaryop IS 'IndexUnaryOps apply a function to a positional element, returning an element.';
+
+CREATE FUNCTION name(indexunaryop)
+RETURNS text
+AS '$libdir/onesparse', 'indexunaryop_name'
+LANGUAGE C IMMUTABLE STRICT;
+-- complain if script is sourced in psql, rather than via CREATE EXTENSION
+\echo Use "CREATE EXTENSION onesparse" to load this file. \quit
+
+CREATE TYPE binaryop;
+
+CREATE FUNCTION binaryop_in(cstring)
+RETURNS binaryop
+AS '$libdir/onesparse', 'binaryop_in'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION binaryop_out(binaryop)
+RETURNS cstring
+AS '$libdir/onesparse', 'binaryop_out'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE TYPE binaryop (
+    input = binaryop_in,
+    output = binaryop_out,
+    alignment = int4,
+    storage = 'main',
+    internallength = VARIABLE
+    );
+
+COMMENT ON TYPE binaryop IS 'BinaryOps apply a function to two elements and returning an element.';
+
+CREATE FUNCTION name(binaryop)
+RETURNS text
+AS '$libdir/onesparse', 'binaryop_name'
+LANGUAGE C IMMUTABLE STRICT;
+-- complain if script is sourced in psql, rather than via CREATE EXTENSION
+\echo Use "CREATE EXTENSION onesparse" to load this file. \quit
+
+CREATE TYPE monoid;
+
+CREATE FUNCTION monoid_in(cstring)
+RETURNS monoid
+AS '$libdir/onesparse', 'monoid_in'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION monoid_out(monoid)
+RETURNS cstring
+AS '$libdir/onesparse', 'monoid_out'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE TYPE monoid (
+    input = monoid_in,
+    output = monoid_out,
+    alignment = int4,
+    storage = 'main',
+    internallength = VARIABLE
+    );
+
+COMMENT ON TYPE monoid IS 'Monoids apply a BinaryOp and an identity value to two elements, returning an element.';
+
+CREATE FUNCTION name(monoid)
+RETURNS text
+AS '$libdir/onesparse', 'monoid_name'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION ident(monoid)
+RETURNS scalar
+AS '$libdir/onesparse', 'monoid_identity'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION terminal(monoid)
+RETURNS scalar
+AS '$libdir/onesparse', 'monoid_terminal'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION oper(monoid)
+RETURNS binaryop
+AS '$libdir/onesparse', 'monoid_operator'
+LANGUAGE C IMMUTABLE STRICT;
+-- complain if script is sourced in psql, rather than via CREATE EXTENSION
+\echo Use "CREATE EXTENSION onesparse" to load this file. \quit
+
+CREATE TYPE semiring;
+
+CREATE FUNCTION semiring_in(cstring)
+RETURNS semiring
+AS '$libdir/onesparse', 'semiring_in'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION semiring_out(semiring)
+RETURNS cstring
+AS '$libdir/onesparse', 'semiring_out'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE TYPE semiring (
+    input = semiring_in,
+    output = semiring_out,
+    alignment = int4,
+    storage = 'main',
+    internallength = VARIABLE
+    );
+
+COMMENT ON TYPE semiring IS 'Semirings associate additive and multiplicative operators for matrix multiplication.';
+
+CREATE FUNCTION name(semiring)
+RETURNS text
+AS '$libdir/onesparse', 'semiring_name'
+LANGUAGE C IMMUTABLE STRICT;
+-- complain if script is sourced in psql, rather than via CREATE EXTENSION
+\echo Use "CREATE EXTENSION onesparse" to load this file. \quit
+
 CREATE TYPE vector;
 
 CREATE FUNCTION vector_in(cstring)
@@ -919,12 +930,12 @@ RETURNS bigint
 AS '$libdir/onesparse', 'vector_nvals'
 LANGUAGE C;
 
-CREATE FUNCTION vector_bool(b vector)
+CREATE FUNCTION test_vector_bool(b vector)
 RETURNS bool
 RETURN nvals(b) > 0;
 
 CREATE CAST (vector AS bool)
-    WITH FUNCTION vector_bool(vector)
+    WITH FUNCTION test_vector_bool(vector)
     AS IMPLICIT;
 
 CREATE FUNCTION size(vector)
@@ -1475,27 +1486,36 @@ create function print(a vector) returns text language plpgsql as
     end;
     $$;
 
-create function random_vector(
-    vsize integer,
-    nvals integer,
-    max integer default 2^31 - 1,
-    seed double precision default null)
-    returns vector language plpgsql as
-    $$
-    declare v vector = vector('int32', vsize);
-    prob double precision = nvals::double precision / vsize;
-    begin
-        if (seed is not null) then
-            perform setseed(seed);
-        end if;
-        for i in 0..vsize-1 loop
-            if random() < prob then
-                v = set_element(v, i, random(0, max));
-            end if;
-        end loop;
-        return v;
-    end;
-    $$;
+CREATE FUNCTION random_vector(t type, size bigint default -1, density float8 default 0.1, seed bigint default null)
+RETURNS vector
+AS '$libdir/onesparse', 'vector_random'
+LANGUAGE C VOLATILE;
+
+CREATE FUNCTION vxv(
+    a vector,
+    b vector,
+    op semiring default null,
+    inout c vector default null,
+    mask vector default null,
+    accum binaryop default null,
+    descr descriptor default null
+    )
+RETURNS vector
+AS '$libdir/onesparse', 'vector_vxv'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION norm(
+    a vector,
+    inout c vector default null
+    )
+RETURNS vector
+AS '$libdir/onesparse', 'vector_norm'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION lsh(q vector)
+RETURNS bigint
+AS '$libdir/onesparse', 'vector_lsh'
+LANGUAGE C IMMUTABLE;
 
 create function dense_vector(
     t type,
@@ -1540,7 +1560,23 @@ create or replace function draw(a vector) returns text language plpgsql as
     end;
     $$;
 
+CREATE FUNCTION vector_bigint(bigint[])
+RETURNS vector
+AS '$libdir/onesparse', 'vector_int64'
+LANGUAGE C;
 
+CREATE FUNCTION bigint_vector(vector)
+RETURNS bigint[]
+AS '$libdir/onesparse', 'cast_vector_int64'
+LANGUAGE C;
+
+CREATE CAST (bigint[] AS onesparse.vector)
+    WITH FUNCTION onesparse.vector_bigint(bigint[])
+    AS IMPLICIT;
+
+CREATE CAST (onesparse.vector AS bigint[])
+    WITH FUNCTION onesparse.bigint_vector(vector)
+    AS ASSIGNMENT;
 
 CREATE FUNCTION vector_agg_bigint (state vector, i bigint, v bigint)
 RETURNS vector
@@ -1554,7 +1590,23 @@ CREATE AGGREGATE vector_agg (i bigint, v bigint )
     FINALFUNC=vector_agg_final
     );
 
+CREATE FUNCTION vector_integer(integer[])
+RETURNS vector
+AS '$libdir/onesparse', 'vector_int32'
+LANGUAGE C;
 
+CREATE FUNCTION integer_vector(vector)
+RETURNS integer[]
+AS '$libdir/onesparse', 'cast_vector_int32'
+LANGUAGE C;
+
+CREATE CAST (integer[] AS onesparse.vector)
+    WITH FUNCTION onesparse.vector_integer(integer[])
+    AS IMPLICIT;
+
+CREATE CAST (onesparse.vector AS integer[])
+    WITH FUNCTION onesparse.integer_vector(vector)
+    AS ASSIGNMENT;
 
 CREATE FUNCTION vector_agg_integer (state vector, i bigint, v integer)
 RETURNS vector
@@ -1568,7 +1620,23 @@ CREATE AGGREGATE vector_agg (i bigint, v integer )
     FINALFUNC=vector_agg_final
     );
 
+CREATE FUNCTION vector_smallint(smallint[])
+RETURNS vector
+AS '$libdir/onesparse', 'vector_int16'
+LANGUAGE C;
 
+CREATE FUNCTION smallint_vector(vector)
+RETURNS smallint[]
+AS '$libdir/onesparse', 'cast_vector_int16'
+LANGUAGE C;
+
+CREATE CAST (smallint[] AS onesparse.vector)
+    WITH FUNCTION onesparse.vector_smallint(smallint[])
+    AS IMPLICIT;
+
+CREATE CAST (onesparse.vector AS smallint[])
+    WITH FUNCTION onesparse.smallint_vector(vector)
+    AS ASSIGNMENT;
 
 CREATE FUNCTION vector_agg_smallint (state vector, i bigint, v smallint)
 RETURNS vector
@@ -1582,7 +1650,23 @@ CREATE AGGREGATE vector_agg (i bigint, v smallint )
     FINALFUNC=vector_agg_final
     );
 
+CREATE FUNCTION vector_float4(float4[])
+RETURNS vector
+AS '$libdir/onesparse', 'vector_fp32'
+LANGUAGE C;
 
+CREATE FUNCTION float4_vector(vector)
+RETURNS float4[]
+AS '$libdir/onesparse', 'cast_vector_fp32'
+LANGUAGE C;
+
+CREATE CAST (float4[] AS onesparse.vector)
+    WITH FUNCTION onesparse.vector_float4(float4[])
+    AS IMPLICIT;
+
+CREATE CAST (onesparse.vector AS float4[])
+    WITH FUNCTION onesparse.float4_vector(vector)
+    AS ASSIGNMENT;
 
 CREATE FUNCTION vector_agg_float4 (state vector, i bigint, v float4)
 RETURNS vector
@@ -1596,7 +1680,23 @@ CREATE AGGREGATE vector_agg (i bigint, v float4 )
     FINALFUNC=vector_agg_final
     );
 
+CREATE FUNCTION vector_float8(float8[])
+RETURNS vector
+AS '$libdir/onesparse', 'vector_fp64'
+LANGUAGE C;
 
+CREATE FUNCTION float8_vector(vector)
+RETURNS float8[]
+AS '$libdir/onesparse', 'cast_vector_fp64'
+LANGUAGE C;
+
+CREATE CAST (float8[] AS onesparse.vector)
+    WITH FUNCTION onesparse.vector_float8(float8[])
+    AS IMPLICIT;
+
+CREATE CAST (onesparse.vector AS float8[])
+    WITH FUNCTION onesparse.float8_vector(vector)
+    AS ASSIGNMENT;
 
 CREATE FUNCTION vector_agg_float8 (state vector, i bigint, v float8)
 RETURNS vector
@@ -1610,7 +1710,23 @@ CREATE AGGREGATE vector_agg (i bigint, v float8 )
     FINALFUNC=vector_agg_final
     );
 
+CREATE FUNCTION vector_bool(bool[])
+RETURNS vector
+AS '$libdir/onesparse', 'vector_bool'
+LANGUAGE C;
 
+CREATE FUNCTION bool_vector(vector)
+RETURNS bool[]
+AS '$libdir/onesparse', 'cast_vector_bool'
+LANGUAGE C;
+
+CREATE CAST (bool[] AS onesparse.vector)
+    WITH FUNCTION onesparse.vector_bool(bool[])
+    AS IMPLICIT;
+
+CREATE CAST (onesparse.vector AS bool[])
+    WITH FUNCTION onesparse.bool_vector(vector)
+    AS ASSIGNMENT;
 
 -- complain if script is sourced in psql, rather than via CREATE EXTENSION
 \echo Use "CREATE EXTENSION onesparse" to load this file. \quit
@@ -1891,6 +2007,14 @@ RETURNS vector
 AS '$libdir/onesparse', 'matrix_vxm'
 LANGUAGE C STABLE;
 
+CREATE FUNCTION norm(
+    a matrix,
+    inout c matrix default null
+    )
+RETURNS matrix
+AS '$libdir/onesparse', 'matrix_norm'
+LANGUAGE C STABLE;
+
 CREATE FUNCTION kronecker(
     a matrix,
     b matrix,
@@ -2150,6 +2274,10 @@ CREATE FUNCTION neq(a matrix, b matrix)
 RETURNS bool
 RETURN NOT eq(a, b);
 
+CREATE FUNCTION fmod(a matrix, s scalar)
+RETURNS matrix
+RETURN onesparse.apply(a, s, 'fmod_fp64');
+
 CREATE FUNCTION gt(a matrix, s scalar)
 RETURNS matrix
 RETURN onesparse.choose(a, ('valuegt_' || name(type(a)))::indexunaryop, s);
@@ -2278,6 +2406,12 @@ CREATE OPERATOR * (
     LEFTARG = matrix,
     RIGHTARG = scalar,
     FUNCTION = times_second_op
+    );
+
+CREATE OPERATOR % (
+    LEFTARG = matrix,
+    RIGHTARG = scalar,
+    FUNCTION = fmod
     );
 
 -- ewise add "OR ops"
@@ -2507,6 +2641,11 @@ RETURNS matrix
 AS '$libdir/onesparse', 'matrix_load'
 LANGUAGE C STRICT;
 
+CREATE FUNCTION random_matrix(t type, nrows bigint default -1, ncols bigint default -1, density float8 default 0.1, seed bigint default null)
+RETURNS matrix
+AS '$libdir/onesparse', 'matrix_random'
+LANGUAGE C VOLATILE;
+
 create function print(a matrix) returns text language plpgsql set search_path = onesparse,public as
     $$
     declare
@@ -2514,31 +2653,31 @@ create function print(a matrix) returns text language plpgsql set search_path = 
         jmax int = ncols(a) - 1;
         out text = '';
     begin
-        out = out || repeat(' ', 3);
+        out = out || repeat(' ', 4);
         for i in 0..jmax loop
-            out = out || lpad(i::text, 3);
+            out = out || lpad(i::text, 4);
         end loop;
-        out = out || E'\n   ';
+        out = out || E'\n    ';
         for i in 0..jmax loop
-            out = out || repeat(E'\u2500', 3);
+            out = out || repeat(E'\u2500', 4);
         end loop;
         out = out || E'\n';
         for i in 0..imax loop
-            out = out || lpad(i::text, 2) || E'\u2502';
+            out = out || lpad(i::text, 3) || E'\u2502';
             for j in 0..jmax loop
                 if contains(a, i, j) then
-                    out = out || lpad(print(get_element(a, i, j)), 3);
+                    out = out || lpad(print(get_element(a, i, j)), 4);
                 else
-                    out = out || E'   ';
+                    out = out || E'    ';
                 end if;
             end loop;
-            out = out || E'   \n';
+            out = out || E'    \n';
         end loop;
         return out;
     end;
     $$;
 
-create or replace function random_matrix(
+create or replace function old_random_matrix(
     nrows integer,
     ncols integer,
     nvals integer,
@@ -2998,3 +3137,72 @@ LANGUAGE sql STABLE
 BEGIN ATOMIC
   SELECT fglt(graph($1));
 END;
+
+CREATE TYPE argminmax_x_p AS (x_result vector, p_result vector);
+
+COMMENT ON TYPE argminmax_x_p IS 'Return type for argminmax with value and index vectors.';
+
+CREATE FUNCTION argminmax(graph, integer, bool)
+RETURNS argminmax_x_p
+AS '$libdir/onesparse', 'graph_argminmax'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION argmin(graph, integer)
+RETURNS argminmax_x_p
+LANGUAGE sql STABLE
+BEGIN ATOMIC
+  SELECT argminmax($1, $2, true);
+END;
+
+CREATE FUNCTION argmax(graph, integer)
+RETURNS argminmax_x_p
+LANGUAGE sql STABLE
+BEGIN ATOMIC
+  SELECT argminmax($1, $2, false);
+END;
+
+CREATE FUNCTION argmin(matrix, integer)
+RETURNS argminmax_x_p
+LANGUAGE sql STABLE
+BEGIN ATOMIC
+  SELECT argminmax(graph($1), $2, true);
+END;
+
+CREATE FUNCTION argmax(matrix, integer)
+RETURNS argminmax_x_p
+LANGUAGE sql STABLE
+BEGIN ATOMIC
+  SELECT argminmax(graph($1), $2, false);
+END;
+
+create table user_defined_type (
+    name text primary key,
+    type_def text not null);
+
+create table user_defined_unaryop (
+    name text primary key,
+    ztype text not null,
+    xtype text not null,
+    func text not null);
+
+create table user_defined_indexunaryop (
+    name text primary key,
+    ztype text not null,
+    xtype text not null,
+    ttype text not null,
+    func text not null);
+
+create table user_defined_binaryop (
+    name text primary key,
+    ztype text not null,
+    xtype text not null,
+    ytype text not null,
+    func text not null);
+
+create table user_defined_indexbinaryop (
+    name text primary key,
+    ztype text not null,
+    xtype text not null,
+    ytype text not null,
+    ttype text not null,
+    func text not null);

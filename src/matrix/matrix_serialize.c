@@ -11,10 +11,6 @@ Datum matrix_serialize(PG_FUNCTION_ARGS) {
 	OS_START_BENCH();
 	matrix = OS_GETARG_MATRIX(0);
 
-    OS_CHECK(GrB_wait(matrix->matrix, GrB_MATERIALIZE),
-		  matrix->matrix,
-		  "Error waiting to materialize matrix.");
-
 	OS_CHECK(GxB_Matrix_serialize(
 			  &data,
 			  &size,
@@ -32,7 +28,3 @@ Datum matrix_serialize(PG_FUNCTION_ARGS) {
 }
 
 
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

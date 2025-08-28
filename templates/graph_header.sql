@@ -166,3 +166,40 @@ LANGUAGE sql STABLE
 BEGIN ATOMIC
   SELECT fglt(graph($1));
 END;
+
+CREATE TYPE argminmax_x_p AS (x_result vector, p_result vector);
+
+COMMENT ON TYPE argminmax_x_p IS 'Return type for argminmax with value and index vectors.';
+
+CREATE FUNCTION argminmax(graph, integer, bool)
+RETURNS argminmax_x_p
+AS '$libdir/onesparse', 'graph_argminmax'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION argmin(graph, integer)
+RETURNS argminmax_x_p
+LANGUAGE sql STABLE
+BEGIN ATOMIC
+  SELECT argminmax($1, $2, true);
+END;
+
+CREATE FUNCTION argmax(graph, integer)
+RETURNS argminmax_x_p
+LANGUAGE sql STABLE
+BEGIN ATOMIC
+  SELECT argminmax($1, $2, false);
+END;
+
+CREATE FUNCTION argmin(matrix, integer)
+RETURNS argminmax_x_p
+LANGUAGE sql STABLE
+BEGIN ATOMIC
+  SELECT argminmax(graph($1), $2, true);
+END;
+
+CREATE FUNCTION argmax(matrix, integer)
+RETURNS argminmax_x_p
+LANGUAGE sql STABLE
+BEGIN ATOMIC
+  SELECT argminmax(graph($1), $2, false);
+END;

@@ -18,7 +18,3 @@ Datum scalar_nvals(PG_FUNCTION_ARGS)
 	PG_RETURN_INT16(result ? 1 : 0);
 }
 
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

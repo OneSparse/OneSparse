@@ -48,12 +48,12 @@ RETURNS bigint
 AS '$libdir/onesparse', 'vector_nvals'
 LANGUAGE C;
 
-CREATE FUNCTION vector_bool(b vector)
+CREATE FUNCTION test_vector_bool(b vector)
 RETURNS bool
 RETURN nvals(b) > 0;
 
 CREATE CAST (vector AS bool)
-    WITH FUNCTION vector_bool(vector)
+    WITH FUNCTION test_vector_bool(vector)
     AS IMPLICIT;
 
 CREATE FUNCTION size(vector)
@@ -604,27 +604,36 @@ create function print(a vector) returns text language plpgsql as
     end;
     $$;
 
-create function random_vector(
-    vsize integer,
-    nvals integer,
-    max integer default 2^31 - 1,
-    seed double precision default null)
-    returns vector language plpgsql as
-    $$
-    declare v vector = vector('int32', vsize);
-    prob double precision = nvals::double precision / vsize;
-    begin
-        if (seed is not null) then
-            perform setseed(seed);
-        end if;
-        for i in 0..vsize-1 loop
-            if random() < prob then
-                v = set_element(v, i, random(0, max));
-            end if;
-        end loop;
-        return v;
-    end;
-    $$;
+CREATE FUNCTION random_vector(t type, size bigint default -1, density float8 default 0.1, seed bigint default null)
+RETURNS vector
+AS '$libdir/onesparse', 'vector_random'
+LANGUAGE C VOLATILE;
+
+CREATE FUNCTION vxv(
+    a vector,
+    b vector,
+    op semiring default null,
+    inout c vector default null,
+    mask vector default null,
+    accum binaryop default null,
+    descr descriptor default null
+    )
+RETURNS vector
+AS '$libdir/onesparse', 'vector_vxv'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION norm(
+    a vector,
+    inout c vector default null
+    )
+RETURNS vector
+AS '$libdir/onesparse', 'vector_norm'
+LANGUAGE C STABLE;
+
+CREATE FUNCTION lsh(q vector)
+RETURNS bigint
+AS '$libdir/onesparse', 'vector_lsh'
+LANGUAGE C IMMUTABLE;
 
 create function dense_vector(
     t type,

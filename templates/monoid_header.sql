@@ -28,7 +28,17 @@ RETURNS text
 AS '$libdir/onesparse', 'monoid_name'
 LANGUAGE C IMMUTABLE STRICT;
 
--- CREATE FUNCTION identity(monoid)
--- RETURNS scalar
--- AS '$libdir/onesparse', 'monoid_identity'
--- LANGUAGE C IMMUTABLE STRICT;
+CREATE FUNCTION ident(monoid)
+RETURNS scalar
+AS '$libdir/onesparse', 'monoid_identity'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION terminal(monoid)
+RETURNS scalar
+AS '$libdir/onesparse', 'monoid_terminal'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION oper(monoid)
+RETURNS binaryop
+AS '$libdir/onesparse', 'monoid_operator'
+LANGUAGE C IMMUTABLE STRICT;

@@ -28,10 +28,6 @@ static Size graph_get_flat_size(ExpandedObjectHeader *eohptr) {
 		return graph->flat_size;
 	}
 
-    OS_CHECK(GrB_wait(graph->graph->A, GrB_MATERIALIZE),
-			 graph->graph->A,
-			 "Error waiting to materialize graph.");
-
 	OS_CHECK(GxB_Matrix_serialize(
 				 &serialized_data,
 				 &serialized_size,
@@ -196,8 +192,3 @@ os_Graph* DatumGetGraph(Datum datum)
 	graph->flat_datum_pointer = flat_datum_pointer;
 	return graph;
 }
-
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

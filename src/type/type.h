@@ -34,9 +34,4 @@ os_Type* DatumGetType(Datum d);
 #define OS_TYPE_DATA(_flat) ((char*)(_flat) + OS_TYPE_FLATSIZE())
 #define TypeGetEOHP(_datum) (os_Type *) DatumGetEOHP(_datum)
 
-#endif /* OS_TYPE_H */
-
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */
+#endif 

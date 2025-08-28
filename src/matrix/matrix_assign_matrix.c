@@ -52,7 +52,3 @@ Datum matrix_assign_matrix(PG_FUNCTION_ARGS)
 
 SUPPORT_FN(matrix_assign_matrix, linitial);
 
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

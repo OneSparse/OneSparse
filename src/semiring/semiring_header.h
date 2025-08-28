@@ -37,14 +37,6 @@ void initialize_semirings()
 
     semiringhash = semiringhash_create(TopMemoryContext, SEMIRINGHASH_INITIAL_SIZE, NULL);
     
-    entry = semiringhash_insert(semiringhash, "min_first_int8", &found);
-    entry->name = strdup("min_first_int8");
-    entry->semiring = GxB_MIN_FIRST_INT8;
-
-    entry = semiringhash_insert(semiringhash, "max_first_int8", &found);
-    entry->name = strdup("max_first_int8");
-    entry->semiring = GxB_MAX_FIRST_INT8;
-
     entry = semiringhash_insert(semiringhash, "plus_first_int8", &found);
     entry->name = strdup("plus_first_int8");
     entry->semiring = GxB_PLUS_FIRST_INT8;
@@ -56,14 +48,6 @@ void initialize_semirings()
     entry = semiringhash_insert(semiringhash, "any_first_int8", &found);
     entry->name = strdup("any_first_int8");
     entry->semiring = GxB_ANY_FIRST_INT8;
-
-    entry = semiringhash_insert(semiringhash, "min_first_int16", &found);
-    entry->name = strdup("min_first_int16");
-    entry->semiring = GxB_MIN_FIRST_INT16;
-
-    entry = semiringhash_insert(semiringhash, "max_first_int16", &found);
-    entry->name = strdup("max_first_int16");
-    entry->semiring = GxB_MAX_FIRST_INT16;
 
     entry = semiringhash_insert(semiringhash, "plus_first_int16", &found);
     entry->name = strdup("plus_first_int16");
@@ -77,14 +61,6 @@ void initialize_semirings()
     entry->name = strdup("any_first_int16");
     entry->semiring = GxB_ANY_FIRST_INT16;
 
-    entry = semiringhash_insert(semiringhash, "min_first_int32", &found);
-    entry->name = strdup("min_first_int32");
-    entry->semiring = GxB_MIN_FIRST_INT32;
-
-    entry = semiringhash_insert(semiringhash, "max_first_int32", &found);
-    entry->name = strdup("max_first_int32");
-    entry->semiring = GxB_MAX_FIRST_INT32;
-
     entry = semiringhash_insert(semiringhash, "plus_first_int32", &found);
     entry->name = strdup("plus_first_int32");
     entry->semiring = GxB_PLUS_FIRST_INT32;
@@ -96,14 +72,6 @@ void initialize_semirings()
     entry = semiringhash_insert(semiringhash, "any_first_int32", &found);
     entry->name = strdup("any_first_int32");
     entry->semiring = GxB_ANY_FIRST_INT32;
-
-    entry = semiringhash_insert(semiringhash, "min_first_int64", &found);
-    entry->name = strdup("min_first_int64");
-    entry->semiring = GxB_MIN_FIRST_INT64;
-
-    entry = semiringhash_insert(semiringhash, "max_first_int64", &found);
-    entry->name = strdup("max_first_int64");
-    entry->semiring = GxB_MAX_FIRST_INT64;
 
     entry = semiringhash_insert(semiringhash, "plus_first_int64", &found);
     entry->name = strdup("plus_first_int64");
@@ -117,14 +85,6 @@ void initialize_semirings()
     entry->name = strdup("any_first_int64");
     entry->semiring = GxB_ANY_FIRST_INT64;
 
-    entry = semiringhash_insert(semiringhash, "min_first_uint8", &found);
-    entry->name = strdup("min_first_uint8");
-    entry->semiring = GxB_MIN_FIRST_UINT8;
-
-    entry = semiringhash_insert(semiringhash, "max_first_uint8", &found);
-    entry->name = strdup("max_first_uint8");
-    entry->semiring = GxB_MAX_FIRST_UINT8;
-
     entry = semiringhash_insert(semiringhash, "plus_first_uint8", &found);
     entry->name = strdup("plus_first_uint8");
     entry->semiring = GxB_PLUS_FIRST_UINT8;
@@ -136,14 +96,6 @@ void initialize_semirings()
     entry = semiringhash_insert(semiringhash, "any_first_uint8", &found);
     entry->name = strdup("any_first_uint8");
     entry->semiring = GxB_ANY_FIRST_UINT8;
-
-    entry = semiringhash_insert(semiringhash, "min_first_uint16", &found);
-    entry->name = strdup("min_first_uint16");
-    entry->semiring = GxB_MIN_FIRST_UINT16;
-
-    entry = semiringhash_insert(semiringhash, "max_first_uint16", &found);
-    entry->name = strdup("max_first_uint16");
-    entry->semiring = GxB_MAX_FIRST_UINT16;
 
     entry = semiringhash_insert(semiringhash, "plus_first_uint16", &found);
     entry->name = strdup("plus_first_uint16");
@@ -157,14 +109,6 @@ void initialize_semirings()
     entry->name = strdup("any_first_uint16");
     entry->semiring = GxB_ANY_FIRST_UINT16;
 
-    entry = semiringhash_insert(semiringhash, "min_first_uint32", &found);
-    entry->name = strdup("min_first_uint32");
-    entry->semiring = GxB_MIN_FIRST_UINT32;
-
-    entry = semiringhash_insert(semiringhash, "max_first_uint32", &found);
-    entry->name = strdup("max_first_uint32");
-    entry->semiring = GxB_MAX_FIRST_UINT32;
-
     entry = semiringhash_insert(semiringhash, "plus_first_uint32", &found);
     entry->name = strdup("plus_first_uint32");
     entry->semiring = GxB_PLUS_FIRST_UINT32;
@@ -176,14 +120,6 @@ void initialize_semirings()
     entry = semiringhash_insert(semiringhash, "any_first_uint32", &found);
     entry->name = strdup("any_first_uint32");
     entry->semiring = GxB_ANY_FIRST_UINT32;
-
-    entry = semiringhash_insert(semiringhash, "min_first_uint64", &found);
-    entry->name = strdup("min_first_uint64");
-    entry->semiring = GxB_MIN_FIRST_UINT64;
-
-    entry = semiringhash_insert(semiringhash, "max_first_uint64", &found);
-    entry->name = strdup("max_first_uint64");
-    entry->semiring = GxB_MAX_FIRST_UINT64;
 
     entry = semiringhash_insert(semiringhash, "plus_first_uint64", &found);
     entry->name = strdup("plus_first_uint64");
@@ -197,14 +133,6 @@ void initialize_semirings()
     entry->name = strdup("any_first_uint64");
     entry->semiring = GxB_ANY_FIRST_UINT64;
 
-    entry = semiringhash_insert(semiringhash, "min_first_fp32", &found);
-    entry->name = strdup("min_first_fp32");
-    entry->semiring = GxB_MIN_FIRST_FP32;
-
-    entry = semiringhash_insert(semiringhash, "max_first_fp32", &found);
-    entry->name = strdup("max_first_fp32");
-    entry->semiring = GxB_MAX_FIRST_FP32;
-
     entry = semiringhash_insert(semiringhash, "plus_first_fp32", &found);
     entry->name = strdup("plus_first_fp32");
     entry->semiring = GxB_PLUS_FIRST_FP32;
@@ -216,14 +144,6 @@ void initialize_semirings()
     entry = semiringhash_insert(semiringhash, "any_first_fp32", &found);
     entry->name = strdup("any_first_fp32");
     entry->semiring = GxB_ANY_FIRST_FP32;
-
-    entry = semiringhash_insert(semiringhash, "min_first_fp64", &found);
-    entry->name = strdup("min_first_fp64");
-    entry->semiring = GxB_MIN_FIRST_FP64;
-
-    entry = semiringhash_insert(semiringhash, "max_first_fp64", &found);
-    entry->name = strdup("max_first_fp64");
-    entry->semiring = GxB_MAX_FIRST_FP64;
 
     entry = semiringhash_insert(semiringhash, "plus_first_fp64", &found);
     entry->name = strdup("plus_first_fp64");
@@ -237,14 +157,6 @@ void initialize_semirings()
     entry->name = strdup("any_first_fp64");
     entry->semiring = GxB_ANY_FIRST_FP64;
 
-    entry = semiringhash_insert(semiringhash, "min_second_int8", &found);
-    entry->name = strdup("min_second_int8");
-    entry->semiring = GxB_MIN_SECOND_INT8;
-
-    entry = semiringhash_insert(semiringhash, "max_second_int8", &found);
-    entry->name = strdup("max_second_int8");
-    entry->semiring = GxB_MAX_SECOND_INT8;
-
     entry = semiringhash_insert(semiringhash, "plus_second_int8", &found);
     entry->name = strdup("plus_second_int8");
     entry->semiring = GxB_PLUS_SECOND_INT8;
@@ -256,14 +168,6 @@ void initialize_semirings()
     entry = semiringhash_insert(semiringhash, "any_second_int8", &found);
     entry->name = strdup("any_second_int8");
     entry->semiring = GxB_ANY_SECOND_INT8;
-
-    entry = semiringhash_insert(semiringhash, "min_second_int16", &found);
-    entry->name = strdup("min_second_int16");
-    entry->semiring = GxB_MIN_SECOND_INT16;
-
-    entry = semiringhash_insert(semiringhash, "max_second_int16", &found);
-    entry->name = strdup("max_second_int16");
-    entry->semiring = GxB_MAX_SECOND_INT16;
 
     entry = semiringhash_insert(semiringhash, "plus_second_int16", &found);
     entry->name = strdup("plus_second_int16");
@@ -277,14 +181,6 @@ void initialize_semirings()
     entry->name = strdup("any_second_int16");
     entry->semiring = GxB_ANY_SECOND_INT16;
 
-    entry = semiringhash_insert(semiringhash, "min_second_int32", &found);
-    entry->name = strdup("min_second_int32");
-    entry->semiring = GxB_MIN_SECOND_INT32;
-
-    entry = semiringhash_insert(semiringhash, "max_second_int32", &found);
-    entry->name = strdup("max_second_int32");
-    entry->semiring = GxB_MAX_SECOND_INT32;
-
     entry = semiringhash_insert(semiringhash, "plus_second_int32", &found);
     entry->name = strdup("plus_second_int32");
     entry->semiring = GxB_PLUS_SECOND_INT32;
@@ -296,14 +192,6 @@ void initialize_semirings()
     entry = semiringhash_insert(semiringhash, "any_second_int32", &found);
     entry->name = strdup("any_second_int32");
     entry->semiring = GxB_ANY_SECOND_INT32;
-
-    entry = semiringhash_insert(semiringhash, "min_second_int64", &found);
-    entry->name = strdup("min_second_int64");
-    entry->semiring = GxB_MIN_SECOND_INT64;
-
-    entry = semiringhash_insert(semiringhash, "max_second_int64", &found);
-    entry->name = strdup("max_second_int64");
-    entry->semiring = GxB_MAX_SECOND_INT64;
 
     entry = semiringhash_insert(semiringhash, "plus_second_int64", &found);
     entry->name = strdup("plus_second_int64");
@@ -317,14 +205,6 @@ void initialize_semirings()
     entry->name = strdup("any_second_int64");
     entry->semiring = GxB_ANY_SECOND_INT64;
 
-    entry = semiringhash_insert(semiringhash, "min_second_uint8", &found);
-    entry->name = strdup("min_second_uint8");
-    entry->semiring = GxB_MIN_SECOND_UINT8;
-
-    entry = semiringhash_insert(semiringhash, "max_second_uint8", &found);
-    entry->name = strdup("max_second_uint8");
-    entry->semiring = GxB_MAX_SECOND_UINT8;
-
     entry = semiringhash_insert(semiringhash, "plus_second_uint8", &found);
     entry->name = strdup("plus_second_uint8");
     entry->semiring = GxB_PLUS_SECOND_UINT8;
@@ -336,14 +216,6 @@ void initialize_semirings()
     entry = semiringhash_insert(semiringhash, "any_second_uint8", &found);
     entry->name = strdup("any_second_uint8");
     entry->semiring = GxB_ANY_SECOND_UINT8;
-
-    entry = semiringhash_insert(semiringhash, "min_second_uint16", &found);
-    entry->name = strdup("min_second_uint16");
-    entry->semiring = GxB_MIN_SECOND_UINT16;
-
-    entry = semiringhash_insert(semiringhash, "max_second_uint16", &found);
-    entry->name = strdup("max_second_uint16");
-    entry->semiring = GxB_MAX_SECOND_UINT16;
 
     entry = semiringhash_insert(semiringhash, "plus_second_uint16", &found);
     entry->name = strdup("plus_second_uint16");
@@ -357,14 +229,6 @@ void initialize_semirings()
     entry->name = strdup("any_second_uint16");
     entry->semiring = GxB_ANY_SECOND_UINT16;
 
-    entry = semiringhash_insert(semiringhash, "min_second_uint32", &found);
-    entry->name = strdup("min_second_uint32");
-    entry->semiring = GxB_MIN_SECOND_UINT32;
-
-    entry = semiringhash_insert(semiringhash, "max_second_uint32", &found);
-    entry->name = strdup("max_second_uint32");
-    entry->semiring = GxB_MAX_SECOND_UINT32;
-
     entry = semiringhash_insert(semiringhash, "plus_second_uint32", &found);
     entry->name = strdup("plus_second_uint32");
     entry->semiring = GxB_PLUS_SECOND_UINT32;
@@ -376,14 +240,6 @@ void initialize_semirings()
     entry = semiringhash_insert(semiringhash, "any_second_uint32", &found);
     entry->name = strdup("any_second_uint32");
     entry->semiring = GxB_ANY_SECOND_UINT32;
-
-    entry = semiringhash_insert(semiringhash, "min_second_uint64", &found);
-    entry->name = strdup("min_second_uint64");
-    entry->semiring = GxB_MIN_SECOND_UINT64;
-
-    entry = semiringhash_insert(semiringhash, "max_second_uint64", &found);
-    entry->name = strdup("max_second_uint64");
-    entry->semiring = GxB_MAX_SECOND_UINT64;
 
     entry = semiringhash_insert(semiringhash, "plus_second_uint64", &found);
     entry->name = strdup("plus_second_uint64");
@@ -397,14 +253,6 @@ void initialize_semirings()
     entry->name = strdup("any_second_uint64");
     entry->semiring = GxB_ANY_SECOND_UINT64;
 
-    entry = semiringhash_insert(semiringhash, "min_second_fp32", &found);
-    entry->name = strdup("min_second_fp32");
-    entry->semiring = GxB_MIN_SECOND_FP32;
-
-    entry = semiringhash_insert(semiringhash, "max_second_fp32", &found);
-    entry->name = strdup("max_second_fp32");
-    entry->semiring = GxB_MAX_SECOND_FP32;
-
     entry = semiringhash_insert(semiringhash, "plus_second_fp32", &found);
     entry->name = strdup("plus_second_fp32");
     entry->semiring = GxB_PLUS_SECOND_FP32;
@@ -416,14 +264,6 @@ void initialize_semirings()
     entry = semiringhash_insert(semiringhash, "any_second_fp32", &found);
     entry->name = strdup("any_second_fp32");
     entry->semiring = GxB_ANY_SECOND_FP32;
-
-    entry = semiringhash_insert(semiringhash, "min_second_fp64", &found);
-    entry->name = strdup("min_second_fp64");
-    entry->semiring = GxB_MIN_SECOND_FP64;
-
-    entry = semiringhash_insert(semiringhash, "max_second_fp64", &found);
-    entry->name = strdup("max_second_fp64");
-    entry->semiring = GxB_MAX_SECOND_FP64;
 
     entry = semiringhash_insert(semiringhash, "plus_second_fp64", &found);
     entry->name = strdup("plus_second_fp64");
@@ -641,14 +481,6 @@ void initialize_semirings()
     entry->name = strdup("min_min_int8");
     entry->semiring = GxB_MIN_MIN_INT8;
 
-    entry = semiringhash_insert(semiringhash, "max_min_int8", &found);
-    entry->name = strdup("max_min_int8");
-    entry->semiring = GxB_MAX_MIN_INT8;
-
-    entry = semiringhash_insert(semiringhash, "plus_min_int8", &found);
-    entry->name = strdup("plus_min_int8");
-    entry->semiring = GxB_PLUS_MIN_INT8;
-
     entry = semiringhash_insert(semiringhash, "times_min_int8", &found);
     entry->name = strdup("times_min_int8");
     entry->semiring = GxB_TIMES_MIN_INT8;
@@ -660,14 +492,6 @@ void initialize_semirings()
     entry = semiringhash_insert(semiringhash, "min_min_int16", &found);
     entry->name = strdup("min_min_int16");
     entry->semiring = GxB_MIN_MIN_INT16;
-
-    entry = semiringhash_insert(semiringhash, "max_min_int16", &found);
-    entry->name = strdup("max_min_int16");
-    entry->semiring = GxB_MAX_MIN_INT16;
-
-    entry = semiringhash_insert(semiringhash, "plus_min_int16", &found);
-    entry->name = strdup("plus_min_int16");
-    entry->semiring = GxB_PLUS_MIN_INT16;
 
     entry = semiringhash_insert(semiringhash, "times_min_int16", &found);
     entry->name = strdup("times_min_int16");
@@ -681,14 +505,6 @@ void initialize_semirings()
     entry->name = strdup("min_min_int32");
     entry->semiring = GxB_MIN_MIN_INT32;
 
-    entry = semiringhash_insert(semiringhash, "max_min_int32", &found);
-    entry->name = strdup("max_min_int32");
-    entry->semiring = GxB_MAX_MIN_INT32;
-
-    entry = semiringhash_insert(semiringhash, "plus_min_int32", &found);
-    entry->name = strdup("plus_min_int32");
-    entry->semiring = GxB_PLUS_MIN_INT32;
-
     entry = semiringhash_insert(semiringhash, "times_min_int32", &found);
     entry->name = strdup("times_min_int32");
     entry->semiring = GxB_TIMES_MIN_INT32;
@@ -700,14 +516,6 @@ void initialize_semirings()
     entry = semiringhash_insert(semiringhash, "min_min_int64", &found);
     entry->name = strdup("min_min_int64");
     entry->semiring = GxB_MIN_MIN_INT64;
-
-    entry = semiringhash_insert(semiringhash, "max_min_int64", &found);
-    entry->name = strdup("max_min_int64");
-    entry->semiring = GxB_MAX_MIN_INT64;
-
-    entry = semiringhash_insert(semiringhash, "plus_min_int64", &found);
-    entry->name = strdup("plus_min_int64");
-    entry->semiring = GxB_PLUS_MIN_INT64;
 
     entry = semiringhash_insert(semiringhash, "times_min_int64", &found);
     entry->name = strdup("times_min_int64");
@@ -721,14 +529,6 @@ void initialize_semirings()
     entry->name = strdup("min_min_uint8");
     entry->semiring = GxB_MIN_MIN_UINT8;
 
-    entry = semiringhash_insert(semiringhash, "max_min_uint8", &found);
-    entry->name = strdup("max_min_uint8");
-    entry->semiring = GxB_MAX_MIN_UINT8;
-
-    entry = semiringhash_insert(semiringhash, "plus_min_uint8", &found);
-    entry->name = strdup("plus_min_uint8");
-    entry->semiring = GxB_PLUS_MIN_UINT8;
-
     entry = semiringhash_insert(semiringhash, "times_min_uint8", &found);
     entry->name = strdup("times_min_uint8");
     entry->semiring = GxB_TIMES_MIN_UINT8;
@@ -740,14 +540,6 @@ void initialize_semirings()
     entry = semiringhash_insert(semiringhash, "min_min_uint16", &found);
     entry->name = strdup("min_min_uint16");
     entry->semiring = GxB_MIN_MIN_UINT16;
-
-    entry = semiringhash_insert(semiringhash, "max_min_uint16", &found);
-    entry->name = strdup("max_min_uint16");
-    entry->semiring = GxB_MAX_MIN_UINT16;
-
-    entry = semiringhash_insert(semiringhash, "plus_min_uint16", &found);
-    entry->name = strdup("plus_min_uint16");
-    entry->semiring = GxB_PLUS_MIN_UINT16;
 
     entry = semiringhash_insert(semiringhash, "times_min_uint16", &found);
     entry->name = strdup("times_min_uint16");
@@ -761,14 +553,6 @@ void initialize_semirings()
     entry->name = strdup("min_min_uint32");
     entry->semiring = GxB_MIN_MIN_UINT32;
 
-    entry = semiringhash_insert(semiringhash, "max_min_uint32", &found);
-    entry->name = strdup("max_min_uint32");
-    entry->semiring = GxB_MAX_MIN_UINT32;
-
-    entry = semiringhash_insert(semiringhash, "plus_min_uint32", &found);
-    entry->name = strdup("plus_min_uint32");
-    entry->semiring = GxB_PLUS_MIN_UINT32;
-
     entry = semiringhash_insert(semiringhash, "times_min_uint32", &found);
     entry->name = strdup("times_min_uint32");
     entry->semiring = GxB_TIMES_MIN_UINT32;
@@ -780,14 +564,6 @@ void initialize_semirings()
     entry = semiringhash_insert(semiringhash, "min_min_uint64", &found);
     entry->name = strdup("min_min_uint64");
     entry->semiring = GxB_MIN_MIN_UINT64;
-
-    entry = semiringhash_insert(semiringhash, "max_min_uint64", &found);
-    entry->name = strdup("max_min_uint64");
-    entry->semiring = GxB_MAX_MIN_UINT64;
-
-    entry = semiringhash_insert(semiringhash, "plus_min_uint64", &found);
-    entry->name = strdup("plus_min_uint64");
-    entry->semiring = GxB_PLUS_MIN_UINT64;
 
     entry = semiringhash_insert(semiringhash, "times_min_uint64", &found);
     entry->name = strdup("times_min_uint64");
@@ -801,14 +577,6 @@ void initialize_semirings()
     entry->name = strdup("min_min_fp32");
     entry->semiring = GxB_MIN_MIN_FP32;
 
-    entry = semiringhash_insert(semiringhash, "max_min_fp32", &found);
-    entry->name = strdup("max_min_fp32");
-    entry->semiring = GxB_MAX_MIN_FP32;
-
-    entry = semiringhash_insert(semiringhash, "plus_min_fp32", &found);
-    entry->name = strdup("plus_min_fp32");
-    entry->semiring = GxB_PLUS_MIN_FP32;
-
     entry = semiringhash_insert(semiringhash, "times_min_fp32", &found);
     entry->name = strdup("times_min_fp32");
     entry->semiring = GxB_TIMES_MIN_FP32;
@@ -821,14 +589,6 @@ void initialize_semirings()
     entry->name = strdup("min_min_fp64");
     entry->semiring = GxB_MIN_MIN_FP64;
 
-    entry = semiringhash_insert(semiringhash, "max_min_fp64", &found);
-    entry->name = strdup("max_min_fp64");
-    entry->semiring = GxB_MAX_MIN_FP64;
-
-    entry = semiringhash_insert(semiringhash, "plus_min_fp64", &found);
-    entry->name = strdup("plus_min_fp64");
-    entry->semiring = GxB_PLUS_MIN_FP64;
-
     entry = semiringhash_insert(semiringhash, "times_min_fp64", &found);
     entry->name = strdup("times_min_fp64");
     entry->semiring = GxB_TIMES_MIN_FP64;
@@ -836,10 +596,6 @@ void initialize_semirings()
     entry = semiringhash_insert(semiringhash, "any_min_fp64", &found);
     entry->name = strdup("any_min_fp64");
     entry->semiring = GxB_ANY_MIN_FP64;
-
-    entry = semiringhash_insert(semiringhash, "min_max_int8", &found);
-    entry->name = strdup("min_max_int8");
-    entry->semiring = GxB_MIN_MAX_INT8;
 
     entry = semiringhash_insert(semiringhash, "max_max_int8", &found);
     entry->name = strdup("max_max_int8");
@@ -857,10 +613,6 @@ void initialize_semirings()
     entry->name = strdup("any_max_int8");
     entry->semiring = GxB_ANY_MAX_INT8;
 
-    entry = semiringhash_insert(semiringhash, "min_max_int16", &found);
-    entry->name = strdup("min_max_int16");
-    entry->semiring = GxB_MIN_MAX_INT16;
-
     entry = semiringhash_insert(semiringhash, "max_max_int16", &found);
     entry->name = strdup("max_max_int16");
     entry->semiring = GxB_MAX_MAX_INT16;
@@ -876,10 +628,6 @@ void initialize_semirings()
     entry = semiringhash_insert(semiringhash, "any_max_int16", &found);
     entry->name = strdup("any_max_int16");
     entry->semiring = GxB_ANY_MAX_INT16;
-
-    entry = semiringhash_insert(semiringhash, "min_max_int32", &found);
-    entry->name = strdup("min_max_int32");
-    entry->semiring = GxB_MIN_MAX_INT32;
 
     entry = semiringhash_insert(semiringhash, "max_max_int32", &found);
     entry->name = strdup("max_max_int32");
@@ -897,10 +645,6 @@ void initialize_semirings()
     entry->name = strdup("any_max_int32");
     entry->semiring = GxB_ANY_MAX_INT32;
 
-    entry = semiringhash_insert(semiringhash, "min_max_int64", &found);
-    entry->name = strdup("min_max_int64");
-    entry->semiring = GxB_MIN_MAX_INT64;
-
     entry = semiringhash_insert(semiringhash, "max_max_int64", &found);
     entry->name = strdup("max_max_int64");
     entry->semiring = GxB_MAX_MAX_INT64;
@@ -916,10 +660,6 @@ void initialize_semirings()
     entry = semiringhash_insert(semiringhash, "any_max_int64", &found);
     entry->name = strdup("any_max_int64");
     entry->semiring = GxB_ANY_MAX_INT64;
-
-    entry = semiringhash_insert(semiringhash, "min_max_uint8", &found);
-    entry->name = strdup("min_max_uint8");
-    entry->semiring = GxB_MIN_MAX_UINT8;
 
     entry = semiringhash_insert(semiringhash, "max_max_uint8", &found);
     entry->name = strdup("max_max_uint8");
@@ -937,10 +677,6 @@ void initialize_semirings()
     entry->name = strdup("any_max_uint8");
     entry->semiring = GxB_ANY_MAX_UINT8;
 
-    entry = semiringhash_insert(semiringhash, "min_max_uint16", &found);
-    entry->name = strdup("min_max_uint16");
-    entry->semiring = GxB_MIN_MAX_UINT16;
-
     entry = semiringhash_insert(semiringhash, "max_max_uint16", &found);
     entry->name = strdup("max_max_uint16");
     entry->semiring = GxB_MAX_MAX_UINT16;
@@ -956,10 +692,6 @@ void initialize_semirings()
     entry = semiringhash_insert(semiringhash, "any_max_uint16", &found);
     entry->name = strdup("any_max_uint16");
     entry->semiring = GxB_ANY_MAX_UINT16;
-
-    entry = semiringhash_insert(semiringhash, "min_max_uint32", &found);
-    entry->name = strdup("min_max_uint32");
-    entry->semiring = GxB_MIN_MAX_UINT32;
 
     entry = semiringhash_insert(semiringhash, "max_max_uint32", &found);
     entry->name = strdup("max_max_uint32");
@@ -977,10 +709,6 @@ void initialize_semirings()
     entry->name = strdup("any_max_uint32");
     entry->semiring = GxB_ANY_MAX_UINT32;
 
-    entry = semiringhash_insert(semiringhash, "min_max_uint64", &found);
-    entry->name = strdup("min_max_uint64");
-    entry->semiring = GxB_MIN_MAX_UINT64;
-
     entry = semiringhash_insert(semiringhash, "max_max_uint64", &found);
     entry->name = strdup("max_max_uint64");
     entry->semiring = GxB_MAX_MAX_UINT64;
@@ -996,10 +724,6 @@ void initialize_semirings()
     entry = semiringhash_insert(semiringhash, "any_max_uint64", &found);
     entry->name = strdup("any_max_uint64");
     entry->semiring = GxB_ANY_MAX_UINT64;
-
-    entry = semiringhash_insert(semiringhash, "min_max_fp32", &found);
-    entry->name = strdup("min_max_fp32");
-    entry->semiring = GxB_MIN_MAX_FP32;
 
     entry = semiringhash_insert(semiringhash, "max_max_fp32", &found);
     entry->name = strdup("max_max_fp32");
@@ -1017,10 +741,6 @@ void initialize_semirings()
     entry->name = strdup("any_max_fp32");
     entry->semiring = GxB_ANY_MAX_FP32;
 
-    entry = semiringhash_insert(semiringhash, "min_max_fp64", &found);
-    entry->name = strdup("min_max_fp64");
-    entry->semiring = GxB_MIN_MAX_FP64;
-
     entry = semiringhash_insert(semiringhash, "max_max_fp64", &found);
     entry->name = strdup("max_max_fp64");
     entry->semiring = GxB_MAX_MAX_FP64;
@@ -1037,14 +757,6 @@ void initialize_semirings()
     entry->name = strdup("any_max_fp64");
     entry->semiring = GxB_ANY_MAX_FP64;
 
-    entry = semiringhash_insert(semiringhash, "min_plus_int8", &found);
-    entry->name = strdup("min_plus_int8");
-    entry->semiring = GxB_MIN_PLUS_INT8;
-
-    entry = semiringhash_insert(semiringhash, "max_plus_int8", &found);
-    entry->name = strdup("max_plus_int8");
-    entry->semiring = GxB_MAX_PLUS_INT8;
-
     entry = semiringhash_insert(semiringhash, "plus_plus_int8", &found);
     entry->name = strdup("plus_plus_int8");
     entry->semiring = GxB_PLUS_PLUS_INT8;
@@ -1056,14 +768,6 @@ void initialize_semirings()
     entry = semiringhash_insert(semiringhash, "any_plus_int8", &found);
     entry->name = strdup("any_plus_int8");
     entry->semiring = GxB_ANY_PLUS_INT8;
-
-    entry = semiringhash_insert(semiringhash, "min_plus_int16", &found);
-    entry->name = strdup("min_plus_int16");
-    entry->semiring = GxB_MIN_PLUS_INT16;
-
-    entry = semiringhash_insert(semiringhash, "max_plus_int16", &found);
-    entry->name = strdup("max_plus_int16");
-    entry->semiring = GxB_MAX_PLUS_INT16;
 
     entry = semiringhash_insert(semiringhash, "plus_plus_int16", &found);
     entry->name = strdup("plus_plus_int16");
@@ -1077,14 +781,6 @@ void initialize_semirings()
     entry->name = strdup("any_plus_int16");
     entry->semiring = GxB_ANY_PLUS_INT16;
 
-    entry = semiringhash_insert(semiringhash, "min_plus_int32", &found);
-    entry->name = strdup("min_plus_int32");
-    entry->semiring = GxB_MIN_PLUS_INT32;
-
-    entry = semiringhash_insert(semiringhash, "max_plus_int32", &found);
-    entry->name = strdup("max_plus_int32");
-    entry->semiring = GxB_MAX_PLUS_INT32;
-
     entry = semiringhash_insert(semiringhash, "plus_plus_int32", &found);
     entry->name = strdup("plus_plus_int32");
     entry->semiring = GxB_PLUS_PLUS_INT32;
@@ -1096,14 +792,6 @@ void initialize_semirings()
     entry = semiringhash_insert(semiringhash, "any_plus_int32", &found);
     entry->name = strdup("any_plus_int32");
     entry->semiring = GxB_ANY_PLUS_INT32;
-
-    entry = semiringhash_insert(semiringhash, "min_plus_int64", &found);
-    entry->name = strdup("min_plus_int64");
-    entry->semiring = GxB_MIN_PLUS_INT64;
-
-    entry = semiringhash_insert(semiringhash, "max_plus_int64", &found);
-    entry->name = strdup("max_plus_int64");
-    entry->semiring = GxB_MAX_PLUS_INT64;
 
     entry = semiringhash_insert(semiringhash, "plus_plus_int64", &found);
     entry->name = strdup("plus_plus_int64");
@@ -1117,14 +805,6 @@ void initialize_semirings()
     entry->name = strdup("any_plus_int64");
     entry->semiring = GxB_ANY_PLUS_INT64;
 
-    entry = semiringhash_insert(semiringhash, "min_plus_uint8", &found);
-    entry->name = strdup("min_plus_uint8");
-    entry->semiring = GxB_MIN_PLUS_UINT8;
-
-    entry = semiringhash_insert(semiringhash, "max_plus_uint8", &found);
-    entry->name = strdup("max_plus_uint8");
-    entry->semiring = GxB_MAX_PLUS_UINT8;
-
     entry = semiringhash_insert(semiringhash, "plus_plus_uint8", &found);
     entry->name = strdup("plus_plus_uint8");
     entry->semiring = GxB_PLUS_PLUS_UINT8;
@@ -1136,14 +816,6 @@ void initialize_semirings()
     entry = semiringhash_insert(semiringhash, "any_plus_uint8", &found);
     entry->name = strdup("any_plus_uint8");
     entry->semiring = GxB_ANY_PLUS_UINT8;
-
-    entry = semiringhash_insert(semiringhash, "min_plus_uint16", &found);
-    entry->name = strdup("min_plus_uint16");
-    entry->semiring = GxB_MIN_PLUS_UINT16;
-
-    entry = semiringhash_insert(semiringhash, "max_plus_uint16", &found);
-    entry->name = strdup("max_plus_uint16");
-    entry->semiring = GxB_MAX_PLUS_UINT16;
 
     entry = semiringhash_insert(semiringhash, "plus_plus_uint16", &found);
     entry->name = strdup("plus_plus_uint16");
@@ -1157,14 +829,6 @@ void initialize_semirings()
     entry->name = strdup("any_plus_uint16");
     entry->semiring = GxB_ANY_PLUS_UINT16;
 
-    entry = semiringhash_insert(semiringhash, "min_plus_uint32", &found);
-    entry->name = strdup("min_plus_uint32");
-    entry->semiring = GxB_MIN_PLUS_UINT32;
-
-    entry = semiringhash_insert(semiringhash, "max_plus_uint32", &found);
-    entry->name = strdup("max_plus_uint32");
-    entry->semiring = GxB_MAX_PLUS_UINT32;
-
     entry = semiringhash_insert(semiringhash, "plus_plus_uint32", &found);
     entry->name = strdup("plus_plus_uint32");
     entry->semiring = GxB_PLUS_PLUS_UINT32;
@@ -1176,14 +840,6 @@ void initialize_semirings()
     entry = semiringhash_insert(semiringhash, "any_plus_uint32", &found);
     entry->name = strdup("any_plus_uint32");
     entry->semiring = GxB_ANY_PLUS_UINT32;
-
-    entry = semiringhash_insert(semiringhash, "min_plus_uint64", &found);
-    entry->name = strdup("min_plus_uint64");
-    entry->semiring = GxB_MIN_PLUS_UINT64;
-
-    entry = semiringhash_insert(semiringhash, "max_plus_uint64", &found);
-    entry->name = strdup("max_plus_uint64");
-    entry->semiring = GxB_MAX_PLUS_UINT64;
 
     entry = semiringhash_insert(semiringhash, "plus_plus_uint64", &found);
     entry->name = strdup("plus_plus_uint64");
@@ -1197,14 +853,6 @@ void initialize_semirings()
     entry->name = strdup("any_plus_uint64");
     entry->semiring = GxB_ANY_PLUS_UINT64;
 
-    entry = semiringhash_insert(semiringhash, "min_plus_fp32", &found);
-    entry->name = strdup("min_plus_fp32");
-    entry->semiring = GxB_MIN_PLUS_FP32;
-
-    entry = semiringhash_insert(semiringhash, "max_plus_fp32", &found);
-    entry->name = strdup("max_plus_fp32");
-    entry->semiring = GxB_MAX_PLUS_FP32;
-
     entry = semiringhash_insert(semiringhash, "plus_plus_fp32", &found);
     entry->name = strdup("plus_plus_fp32");
     entry->semiring = GxB_PLUS_PLUS_FP32;
@@ -1216,14 +864,6 @@ void initialize_semirings()
     entry = semiringhash_insert(semiringhash, "any_plus_fp32", &found);
     entry->name = strdup("any_plus_fp32");
     entry->semiring = GxB_ANY_PLUS_FP32;
-
-    entry = semiringhash_insert(semiringhash, "min_plus_fp64", &found);
-    entry->name = strdup("min_plus_fp64");
-    entry->semiring = GxB_MIN_PLUS_FP64;
-
-    entry = semiringhash_insert(semiringhash, "max_plus_fp64", &found);
-    entry->name = strdup("max_plus_fp64");
-    entry->semiring = GxB_MAX_PLUS_FP64;
 
     entry = semiringhash_insert(semiringhash, "plus_plus_fp64", &found);
     entry->name = strdup("plus_plus_fp64");
@@ -1437,18 +1077,6 @@ void initialize_semirings()
     entry->name = strdup("any_minus_fp64");
     entry->semiring = GxB_ANY_MINUS_FP64;
 
-    entry = semiringhash_insert(semiringhash, "min_times_int8", &found);
-    entry->name = strdup("min_times_int8");
-    entry->semiring = GxB_MIN_TIMES_INT8;
-
-    entry = semiringhash_insert(semiringhash, "max_times_int8", &found);
-    entry->name = strdup("max_times_int8");
-    entry->semiring = GxB_MAX_TIMES_INT8;
-
-    entry = semiringhash_insert(semiringhash, "plus_times_int8", &found);
-    entry->name = strdup("plus_times_int8");
-    entry->semiring = GxB_PLUS_TIMES_INT8;
-
     entry = semiringhash_insert(semiringhash, "times_times_int8", &found);
     entry->name = strdup("times_times_int8");
     entry->semiring = GxB_TIMES_TIMES_INT8;
@@ -1456,18 +1084,6 @@ void initialize_semirings()
     entry = semiringhash_insert(semiringhash, "any_times_int8", &found);
     entry->name = strdup("any_times_int8");
     entry->semiring = GxB_ANY_TIMES_INT8;
-
-    entry = semiringhash_insert(semiringhash, "min_times_int16", &found);
-    entry->name = strdup("min_times_int16");
-    entry->semiring = GxB_MIN_TIMES_INT16;
-
-    entry = semiringhash_insert(semiringhash, "max_times_int16", &found);
-    entry->name = strdup("max_times_int16");
-    entry->semiring = GxB_MAX_TIMES_INT16;
-
-    entry = semiringhash_insert(semiringhash, "plus_times_int16", &found);
-    entry->name = strdup("plus_times_int16");
-    entry->semiring = GxB_PLUS_TIMES_INT16;
 
     entry = semiringhash_insert(semiringhash, "times_times_int16", &found);
     entry->name = strdup("times_times_int16");
@@ -1477,18 +1093,6 @@ void initialize_semirings()
     entry->name = strdup("any_times_int16");
     entry->semiring = GxB_ANY_TIMES_INT16;
 
-    entry = semiringhash_insert(semiringhash, "min_times_int32", &found);
-    entry->name = strdup("min_times_int32");
-    entry->semiring = GxB_MIN_TIMES_INT32;
-
-    entry = semiringhash_insert(semiringhash, "max_times_int32", &found);
-    entry->name = strdup("max_times_int32");
-    entry->semiring = GxB_MAX_TIMES_INT32;
-
-    entry = semiringhash_insert(semiringhash, "plus_times_int32", &found);
-    entry->name = strdup("plus_times_int32");
-    entry->semiring = GxB_PLUS_TIMES_INT32;
-
     entry = semiringhash_insert(semiringhash, "times_times_int32", &found);
     entry->name = strdup("times_times_int32");
     entry->semiring = GxB_TIMES_TIMES_INT32;
@@ -1496,18 +1100,6 @@ void initialize_semirings()
     entry = semiringhash_insert(semiringhash, "any_times_int32", &found);
     entry->name = strdup("any_times_int32");
     entry->semiring = GxB_ANY_TIMES_INT32;
-
-    entry = semiringhash_insert(semiringhash, "min_times_int64", &found);
-    entry->name = strdup("min_times_int64");
-    entry->semiring = GxB_MIN_TIMES_INT64;
-
-    entry = semiringhash_insert(semiringhash, "max_times_int64", &found);
-    entry->name = strdup("max_times_int64");
-    entry->semiring = GxB_MAX_TIMES_INT64;
-
-    entry = semiringhash_insert(semiringhash, "plus_times_int64", &found);
-    entry->name = strdup("plus_times_int64");
-    entry->semiring = GxB_PLUS_TIMES_INT64;
 
     entry = semiringhash_insert(semiringhash, "times_times_int64", &found);
     entry->name = strdup("times_times_int64");
@@ -1517,18 +1109,6 @@ void initialize_semirings()
     entry->name = strdup("any_times_int64");
     entry->semiring = GxB_ANY_TIMES_INT64;
 
-    entry = semiringhash_insert(semiringhash, "min_times_uint8", &found);
-    entry->name = strdup("min_times_uint8");
-    entry->semiring = GxB_MIN_TIMES_UINT8;
-
-    entry = semiringhash_insert(semiringhash, "max_times_uint8", &found);
-    entry->name = strdup("max_times_uint8");
-    entry->semiring = GxB_MAX_TIMES_UINT8;
-
-    entry = semiringhash_insert(semiringhash, "plus_times_uint8", &found);
-    entry->name = strdup("plus_times_uint8");
-    entry->semiring = GxB_PLUS_TIMES_UINT8;
-
     entry = semiringhash_insert(semiringhash, "times_times_uint8", &found);
     entry->name = strdup("times_times_uint8");
     entry->semiring = GxB_TIMES_TIMES_UINT8;
@@ -1536,18 +1116,6 @@ void initialize_semirings()
     entry = semiringhash_insert(semiringhash, "any_times_uint8", &found);
     entry->name = strdup("any_times_uint8");
     entry->semiring = GxB_ANY_TIMES_UINT8;
-
-    entry = semiringhash_insert(semiringhash, "min_times_uint16", &found);
-    entry->name = strdup("min_times_uint16");
-    entry->semiring = GxB_MIN_TIMES_UINT16;
-
-    entry = semiringhash_insert(semiringhash, "max_times_uint16", &found);
-    entry->name = strdup("max_times_uint16");
-    entry->semiring = GxB_MAX_TIMES_UINT16;
-
-    entry = semiringhash_insert(semiringhash, "plus_times_uint16", &found);
-    entry->name = strdup("plus_times_uint16");
-    entry->semiring = GxB_PLUS_TIMES_UINT16;
 
     entry = semiringhash_insert(semiringhash, "times_times_uint16", &found);
     entry->name = strdup("times_times_uint16");
@@ -1557,18 +1125,6 @@ void initialize_semirings()
     entry->name = strdup("any_times_uint16");
     entry->semiring = GxB_ANY_TIMES_UINT16;
 
-    entry = semiringhash_insert(semiringhash, "min_times_uint32", &found);
-    entry->name = strdup("min_times_uint32");
-    entry->semiring = GxB_MIN_TIMES_UINT32;
-
-    entry = semiringhash_insert(semiringhash, "max_times_uint32", &found);
-    entry->name = strdup("max_times_uint32");
-    entry->semiring = GxB_MAX_TIMES_UINT32;
-
-    entry = semiringhash_insert(semiringhash, "plus_times_uint32", &found);
-    entry->name = strdup("plus_times_uint32");
-    entry->semiring = GxB_PLUS_TIMES_UINT32;
-
     entry = semiringhash_insert(semiringhash, "times_times_uint32", &found);
     entry->name = strdup("times_times_uint32");
     entry->semiring = GxB_TIMES_TIMES_UINT32;
@@ -1576,18 +1132,6 @@ void initialize_semirings()
     entry = semiringhash_insert(semiringhash, "any_times_uint32", &found);
     entry->name = strdup("any_times_uint32");
     entry->semiring = GxB_ANY_TIMES_UINT32;
-
-    entry = semiringhash_insert(semiringhash, "min_times_uint64", &found);
-    entry->name = strdup("min_times_uint64");
-    entry->semiring = GxB_MIN_TIMES_UINT64;
-
-    entry = semiringhash_insert(semiringhash, "max_times_uint64", &found);
-    entry->name = strdup("max_times_uint64");
-    entry->semiring = GxB_MAX_TIMES_UINT64;
-
-    entry = semiringhash_insert(semiringhash, "plus_times_uint64", &found);
-    entry->name = strdup("plus_times_uint64");
-    entry->semiring = GxB_PLUS_TIMES_UINT64;
 
     entry = semiringhash_insert(semiringhash, "times_times_uint64", &found);
     entry->name = strdup("times_times_uint64");
@@ -1597,18 +1141,6 @@ void initialize_semirings()
     entry->name = strdup("any_times_uint64");
     entry->semiring = GxB_ANY_TIMES_UINT64;
 
-    entry = semiringhash_insert(semiringhash, "min_times_fp32", &found);
-    entry->name = strdup("min_times_fp32");
-    entry->semiring = GxB_MIN_TIMES_FP32;
-
-    entry = semiringhash_insert(semiringhash, "max_times_fp32", &found);
-    entry->name = strdup("max_times_fp32");
-    entry->semiring = GxB_MAX_TIMES_FP32;
-
-    entry = semiringhash_insert(semiringhash, "plus_times_fp32", &found);
-    entry->name = strdup("plus_times_fp32");
-    entry->semiring = GxB_PLUS_TIMES_FP32;
-
     entry = semiringhash_insert(semiringhash, "times_times_fp32", &found);
     entry->name = strdup("times_times_fp32");
     entry->semiring = GxB_TIMES_TIMES_FP32;
@@ -1616,18 +1148,6 @@ void initialize_semirings()
     entry = semiringhash_insert(semiringhash, "any_times_fp32", &found);
     entry->name = strdup("any_times_fp32");
     entry->semiring = GxB_ANY_TIMES_FP32;
-
-    entry = semiringhash_insert(semiringhash, "min_times_fp64", &found);
-    entry->name = strdup("min_times_fp64");
-    entry->semiring = GxB_MIN_TIMES_FP64;
-
-    entry = semiringhash_insert(semiringhash, "max_times_fp64", &found);
-    entry->name = strdup("max_times_fp64");
-    entry->semiring = GxB_MAX_TIMES_FP64;
-
-    entry = semiringhash_insert(semiringhash, "plus_times_fp64", &found);
-    entry->name = strdup("plus_times_fp64");
-    entry->semiring = GxB_PLUS_TIMES_FP64;
 
     entry = semiringhash_insert(semiringhash, "times_times_fp64", &found);
     entry->name = strdup("times_times_fp64");
@@ -5301,33 +4821,17 @@ void initialize_semirings()
     entry->name = strdup("lor_lor_bool");
     entry->semiring = GxB_LOR_LOR_BOOL;
 
-    entry = semiringhash_insert(semiringhash, "land_lor_bool", &found);
-    entry->name = strdup("land_lor_bool");
-    entry->semiring = GxB_LAND_LOR_BOOL;
-
     entry = semiringhash_insert(semiringhash, "lxor_lor_bool", &found);
     entry->name = strdup("lxor_lor_bool");
     entry->semiring = GxB_LXOR_LOR_BOOL;
-
-    entry = semiringhash_insert(semiringhash, "eq_lor_bool", &found);
-    entry->name = strdup("eq_lor_bool");
-    entry->semiring = GxB_EQ_LOR_BOOL;
 
     entry = semiringhash_insert(semiringhash, "any_lor_bool", &found);
     entry->name = strdup("any_lor_bool");
     entry->semiring = GxB_ANY_LOR_BOOL;
 
-    entry = semiringhash_insert(semiringhash, "lor_land_bool", &found);
-    entry->name = strdup("lor_land_bool");
-    entry->semiring = GxB_LOR_LAND_BOOL;
-
     entry = semiringhash_insert(semiringhash, "land_land_bool", &found);
     entry->name = strdup("land_land_bool");
     entry->semiring = GxB_LAND_LAND_BOOL;
-
-    entry = semiringhash_insert(semiringhash, "lxor_land_bool", &found);
-    entry->name = strdup("lxor_land_bool");
-    entry->semiring = GxB_LXOR_LAND_BOOL;
 
     entry = semiringhash_insert(semiringhash, "eq_land_bool", &found);
     entry->name = strdup("eq_land_bool");
@@ -6744,6 +6248,502 @@ void initialize_semirings()
     entry = semiringhash_insert(semiringhash, "lxnor_lor_semiring_bool", &found);
     entry->name = strdup("lxnor_lor_semiring_bool");
     entry->semiring = GrB_LXNOR_LOR_SEMIRING_BOOL;
+
+    entry = semiringhash_insert(semiringhash, "plus_times_int8", &found);
+    entry->name = strdup("plus_times_int8");
+    entry->semiring = GxB_PLUS_TIMES_INT8;
+
+    entry = semiringhash_insert(semiringhash, "plus_min_int8", &found);
+    entry->name = strdup("plus_min_int8");
+    entry->semiring = GxB_PLUS_MIN_INT8;
+
+    entry = semiringhash_insert(semiringhash, "min_plus_int8", &found);
+    entry->name = strdup("min_plus_int8");
+    entry->semiring = GxB_MIN_PLUS_INT8;
+
+    entry = semiringhash_insert(semiringhash, "plus_times_int16", &found);
+    entry->name = strdup("plus_times_int16");
+    entry->semiring = GxB_PLUS_TIMES_INT16;
+
+    entry = semiringhash_insert(semiringhash, "plus_min_int16", &found);
+    entry->name = strdup("plus_min_int16");
+    entry->semiring = GxB_PLUS_MIN_INT16;
+
+    entry = semiringhash_insert(semiringhash, "min_plus_int16", &found);
+    entry->name = strdup("min_plus_int16");
+    entry->semiring = GxB_MIN_PLUS_INT16;
+
+    entry = semiringhash_insert(semiringhash, "plus_times_int32", &found);
+    entry->name = strdup("plus_times_int32");
+    entry->semiring = GxB_PLUS_TIMES_INT32;
+
+    entry = semiringhash_insert(semiringhash, "plus_min_int32", &found);
+    entry->name = strdup("plus_min_int32");
+    entry->semiring = GxB_PLUS_MIN_INT32;
+
+    entry = semiringhash_insert(semiringhash, "min_plus_int32", &found);
+    entry->name = strdup("min_plus_int32");
+    entry->semiring = GxB_MIN_PLUS_INT32;
+
+    entry = semiringhash_insert(semiringhash, "plus_times_int64", &found);
+    entry->name = strdup("plus_times_int64");
+    entry->semiring = GxB_PLUS_TIMES_INT64;
+
+    entry = semiringhash_insert(semiringhash, "plus_min_int64", &found);
+    entry->name = strdup("plus_min_int64");
+    entry->semiring = GxB_PLUS_MIN_INT64;
+
+    entry = semiringhash_insert(semiringhash, "min_plus_int64", &found);
+    entry->name = strdup("min_plus_int64");
+    entry->semiring = GxB_MIN_PLUS_INT64;
+
+    entry = semiringhash_insert(semiringhash, "plus_times_uint8", &found);
+    entry->name = strdup("plus_times_uint8");
+    entry->semiring = GxB_PLUS_TIMES_UINT8;
+
+    entry = semiringhash_insert(semiringhash, "plus_min_uint8", &found);
+    entry->name = strdup("plus_min_uint8");
+    entry->semiring = GxB_PLUS_MIN_UINT8;
+
+    entry = semiringhash_insert(semiringhash, "min_plus_uint8", &found);
+    entry->name = strdup("min_plus_uint8");
+    entry->semiring = GxB_MIN_PLUS_UINT8;
+
+    entry = semiringhash_insert(semiringhash, "plus_times_uint16", &found);
+    entry->name = strdup("plus_times_uint16");
+    entry->semiring = GxB_PLUS_TIMES_UINT16;
+
+    entry = semiringhash_insert(semiringhash, "plus_min_uint16", &found);
+    entry->name = strdup("plus_min_uint16");
+    entry->semiring = GxB_PLUS_MIN_UINT16;
+
+    entry = semiringhash_insert(semiringhash, "min_plus_uint16", &found);
+    entry->name = strdup("min_plus_uint16");
+    entry->semiring = GxB_MIN_PLUS_UINT16;
+
+    entry = semiringhash_insert(semiringhash, "plus_times_uint32", &found);
+    entry->name = strdup("plus_times_uint32");
+    entry->semiring = GxB_PLUS_TIMES_UINT32;
+
+    entry = semiringhash_insert(semiringhash, "plus_min_uint32", &found);
+    entry->name = strdup("plus_min_uint32");
+    entry->semiring = GxB_PLUS_MIN_UINT32;
+
+    entry = semiringhash_insert(semiringhash, "min_plus_uint32", &found);
+    entry->name = strdup("min_plus_uint32");
+    entry->semiring = GxB_MIN_PLUS_UINT32;
+
+    entry = semiringhash_insert(semiringhash, "plus_times_uint64", &found);
+    entry->name = strdup("plus_times_uint64");
+    entry->semiring = GxB_PLUS_TIMES_UINT64;
+
+    entry = semiringhash_insert(semiringhash, "plus_min_uint64", &found);
+    entry->name = strdup("plus_min_uint64");
+    entry->semiring = GxB_PLUS_MIN_UINT64;
+
+    entry = semiringhash_insert(semiringhash, "min_plus_uint64", &found);
+    entry->name = strdup("min_plus_uint64");
+    entry->semiring = GxB_MIN_PLUS_UINT64;
+
+    entry = semiringhash_insert(semiringhash, "plus_times_fp32", &found);
+    entry->name = strdup("plus_times_fp32");
+    entry->semiring = GxB_PLUS_TIMES_FP32;
+
+    entry = semiringhash_insert(semiringhash, "plus_min_fp32", &found);
+    entry->name = strdup("plus_min_fp32");
+    entry->semiring = GxB_PLUS_MIN_FP32;
+
+    entry = semiringhash_insert(semiringhash, "min_plus_fp32", &found);
+    entry->name = strdup("min_plus_fp32");
+    entry->semiring = GxB_MIN_PLUS_FP32;
+
+    entry = semiringhash_insert(semiringhash, "plus_times_fp64", &found);
+    entry->name = strdup("plus_times_fp64");
+    entry->semiring = GxB_PLUS_TIMES_FP64;
+
+    entry = semiringhash_insert(semiringhash, "plus_min_fp64", &found);
+    entry->name = strdup("plus_min_fp64");
+    entry->semiring = GxB_PLUS_MIN_FP64;
+
+    entry = semiringhash_insert(semiringhash, "min_plus_fp64", &found);
+    entry->name = strdup("min_plus_fp64");
+    entry->semiring = GxB_MIN_PLUS_FP64;
+
+    entry = semiringhash_insert(semiringhash, "min_times_int8", &found);
+    entry->name = strdup("min_times_int8");
+    entry->semiring = GxB_MIN_TIMES_INT8;
+
+    entry = semiringhash_insert(semiringhash, "min_first_int8", &found);
+    entry->name = strdup("min_first_int8");
+    entry->semiring = GxB_MIN_FIRST_INT8;
+
+    entry = semiringhash_insert(semiringhash, "min_second_int8", &found);
+    entry->name = strdup("min_second_int8");
+    entry->semiring = GxB_MIN_SECOND_INT8;
+
+    entry = semiringhash_insert(semiringhash, "min_times_int16", &found);
+    entry->name = strdup("min_times_int16");
+    entry->semiring = GxB_MIN_TIMES_INT16;
+
+    entry = semiringhash_insert(semiringhash, "min_first_int16", &found);
+    entry->name = strdup("min_first_int16");
+    entry->semiring = GxB_MIN_FIRST_INT16;
+
+    entry = semiringhash_insert(semiringhash, "min_second_int16", &found);
+    entry->name = strdup("min_second_int16");
+    entry->semiring = GxB_MIN_SECOND_INT16;
+
+    entry = semiringhash_insert(semiringhash, "min_times_int32", &found);
+    entry->name = strdup("min_times_int32");
+    entry->semiring = GxB_MIN_TIMES_INT32;
+
+    entry = semiringhash_insert(semiringhash, "min_first_int32", &found);
+    entry->name = strdup("min_first_int32");
+    entry->semiring = GxB_MIN_FIRST_INT32;
+
+    entry = semiringhash_insert(semiringhash, "min_second_int32", &found);
+    entry->name = strdup("min_second_int32");
+    entry->semiring = GxB_MIN_SECOND_INT32;
+
+    entry = semiringhash_insert(semiringhash, "min_times_int64", &found);
+    entry->name = strdup("min_times_int64");
+    entry->semiring = GxB_MIN_TIMES_INT64;
+
+    entry = semiringhash_insert(semiringhash, "min_first_int64", &found);
+    entry->name = strdup("min_first_int64");
+    entry->semiring = GxB_MIN_FIRST_INT64;
+
+    entry = semiringhash_insert(semiringhash, "min_second_int64", &found);
+    entry->name = strdup("min_second_int64");
+    entry->semiring = GxB_MIN_SECOND_INT64;
+
+    entry = semiringhash_insert(semiringhash, "min_times_uint8", &found);
+    entry->name = strdup("min_times_uint8");
+    entry->semiring = GxB_MIN_TIMES_UINT8;
+
+    entry = semiringhash_insert(semiringhash, "min_first_uint8", &found);
+    entry->name = strdup("min_first_uint8");
+    entry->semiring = GxB_MIN_FIRST_UINT8;
+
+    entry = semiringhash_insert(semiringhash, "min_second_uint8", &found);
+    entry->name = strdup("min_second_uint8");
+    entry->semiring = GxB_MIN_SECOND_UINT8;
+
+    entry = semiringhash_insert(semiringhash, "min_times_uint16", &found);
+    entry->name = strdup("min_times_uint16");
+    entry->semiring = GxB_MIN_TIMES_UINT16;
+
+    entry = semiringhash_insert(semiringhash, "min_first_uint16", &found);
+    entry->name = strdup("min_first_uint16");
+    entry->semiring = GxB_MIN_FIRST_UINT16;
+
+    entry = semiringhash_insert(semiringhash, "min_second_uint16", &found);
+    entry->name = strdup("min_second_uint16");
+    entry->semiring = GxB_MIN_SECOND_UINT16;
+
+    entry = semiringhash_insert(semiringhash, "min_times_uint32", &found);
+    entry->name = strdup("min_times_uint32");
+    entry->semiring = GxB_MIN_TIMES_UINT32;
+
+    entry = semiringhash_insert(semiringhash, "min_first_uint32", &found);
+    entry->name = strdup("min_first_uint32");
+    entry->semiring = GxB_MIN_FIRST_UINT32;
+
+    entry = semiringhash_insert(semiringhash, "min_second_uint32", &found);
+    entry->name = strdup("min_second_uint32");
+    entry->semiring = GxB_MIN_SECOND_UINT32;
+
+    entry = semiringhash_insert(semiringhash, "min_times_uint64", &found);
+    entry->name = strdup("min_times_uint64");
+    entry->semiring = GxB_MIN_TIMES_UINT64;
+
+    entry = semiringhash_insert(semiringhash, "min_first_uint64", &found);
+    entry->name = strdup("min_first_uint64");
+    entry->semiring = GxB_MIN_FIRST_UINT64;
+
+    entry = semiringhash_insert(semiringhash, "min_second_uint64", &found);
+    entry->name = strdup("min_second_uint64");
+    entry->semiring = GxB_MIN_SECOND_UINT64;
+
+    entry = semiringhash_insert(semiringhash, "min_times_fp32", &found);
+    entry->name = strdup("min_times_fp32");
+    entry->semiring = GxB_MIN_TIMES_FP32;
+
+    entry = semiringhash_insert(semiringhash, "min_first_fp32", &found);
+    entry->name = strdup("min_first_fp32");
+    entry->semiring = GxB_MIN_FIRST_FP32;
+
+    entry = semiringhash_insert(semiringhash, "min_second_fp32", &found);
+    entry->name = strdup("min_second_fp32");
+    entry->semiring = GxB_MIN_SECOND_FP32;
+
+    entry = semiringhash_insert(semiringhash, "min_times_fp64", &found);
+    entry->name = strdup("min_times_fp64");
+    entry->semiring = GxB_MIN_TIMES_FP64;
+
+    entry = semiringhash_insert(semiringhash, "min_first_fp64", &found);
+    entry->name = strdup("min_first_fp64");
+    entry->semiring = GxB_MIN_FIRST_FP64;
+
+    entry = semiringhash_insert(semiringhash, "min_second_fp64", &found);
+    entry->name = strdup("min_second_fp64");
+    entry->semiring = GxB_MIN_SECOND_FP64;
+
+    entry = semiringhash_insert(semiringhash, "min_max_int8", &found);
+    entry->name = strdup("min_max_int8");
+    entry->semiring = GxB_MIN_MAX_INT8;
+
+    entry = semiringhash_insert(semiringhash, "max_plus_int8", &found);
+    entry->name = strdup("max_plus_int8");
+    entry->semiring = GxB_MAX_PLUS_INT8;
+
+    entry = semiringhash_insert(semiringhash, "max_times_int8", &found);
+    entry->name = strdup("max_times_int8");
+    entry->semiring = GxB_MAX_TIMES_INT8;
+
+    entry = semiringhash_insert(semiringhash, "min_max_int16", &found);
+    entry->name = strdup("min_max_int16");
+    entry->semiring = GxB_MIN_MAX_INT16;
+
+    entry = semiringhash_insert(semiringhash, "max_plus_int16", &found);
+    entry->name = strdup("max_plus_int16");
+    entry->semiring = GxB_MAX_PLUS_INT16;
+
+    entry = semiringhash_insert(semiringhash, "max_times_int16", &found);
+    entry->name = strdup("max_times_int16");
+    entry->semiring = GxB_MAX_TIMES_INT16;
+
+    entry = semiringhash_insert(semiringhash, "min_max_int32", &found);
+    entry->name = strdup("min_max_int32");
+    entry->semiring = GxB_MIN_MAX_INT32;
+
+    entry = semiringhash_insert(semiringhash, "max_plus_int32", &found);
+    entry->name = strdup("max_plus_int32");
+    entry->semiring = GxB_MAX_PLUS_INT32;
+
+    entry = semiringhash_insert(semiringhash, "max_times_int32", &found);
+    entry->name = strdup("max_times_int32");
+    entry->semiring = GxB_MAX_TIMES_INT32;
+
+    entry = semiringhash_insert(semiringhash, "min_max_int64", &found);
+    entry->name = strdup("min_max_int64");
+    entry->semiring = GxB_MIN_MAX_INT64;
+
+    entry = semiringhash_insert(semiringhash, "max_plus_int64", &found);
+    entry->name = strdup("max_plus_int64");
+    entry->semiring = GxB_MAX_PLUS_INT64;
+
+    entry = semiringhash_insert(semiringhash, "max_times_int64", &found);
+    entry->name = strdup("max_times_int64");
+    entry->semiring = GxB_MAX_TIMES_INT64;
+
+    entry = semiringhash_insert(semiringhash, "min_max_uint8", &found);
+    entry->name = strdup("min_max_uint8");
+    entry->semiring = GxB_MIN_MAX_UINT8;
+
+    entry = semiringhash_insert(semiringhash, "max_plus_uint8", &found);
+    entry->name = strdup("max_plus_uint8");
+    entry->semiring = GxB_MAX_PLUS_UINT8;
+
+    entry = semiringhash_insert(semiringhash, "max_times_uint8", &found);
+    entry->name = strdup("max_times_uint8");
+    entry->semiring = GxB_MAX_TIMES_UINT8;
+
+    entry = semiringhash_insert(semiringhash, "min_max_uint16", &found);
+    entry->name = strdup("min_max_uint16");
+    entry->semiring = GxB_MIN_MAX_UINT16;
+
+    entry = semiringhash_insert(semiringhash, "max_plus_uint16", &found);
+    entry->name = strdup("max_plus_uint16");
+    entry->semiring = GxB_MAX_PLUS_UINT16;
+
+    entry = semiringhash_insert(semiringhash, "max_times_uint16", &found);
+    entry->name = strdup("max_times_uint16");
+    entry->semiring = GxB_MAX_TIMES_UINT16;
+
+    entry = semiringhash_insert(semiringhash, "min_max_uint32", &found);
+    entry->name = strdup("min_max_uint32");
+    entry->semiring = GxB_MIN_MAX_UINT32;
+
+    entry = semiringhash_insert(semiringhash, "max_plus_uint32", &found);
+    entry->name = strdup("max_plus_uint32");
+    entry->semiring = GxB_MAX_PLUS_UINT32;
+
+    entry = semiringhash_insert(semiringhash, "max_times_uint32", &found);
+    entry->name = strdup("max_times_uint32");
+    entry->semiring = GxB_MAX_TIMES_UINT32;
+
+    entry = semiringhash_insert(semiringhash, "min_max_uint64", &found);
+    entry->name = strdup("min_max_uint64");
+    entry->semiring = GxB_MIN_MAX_UINT64;
+
+    entry = semiringhash_insert(semiringhash, "max_plus_uint64", &found);
+    entry->name = strdup("max_plus_uint64");
+    entry->semiring = GxB_MAX_PLUS_UINT64;
+
+    entry = semiringhash_insert(semiringhash, "max_times_uint64", &found);
+    entry->name = strdup("max_times_uint64");
+    entry->semiring = GxB_MAX_TIMES_UINT64;
+
+    entry = semiringhash_insert(semiringhash, "min_max_fp32", &found);
+    entry->name = strdup("min_max_fp32");
+    entry->semiring = GxB_MIN_MAX_FP32;
+
+    entry = semiringhash_insert(semiringhash, "max_plus_fp32", &found);
+    entry->name = strdup("max_plus_fp32");
+    entry->semiring = GxB_MAX_PLUS_FP32;
+
+    entry = semiringhash_insert(semiringhash, "max_times_fp32", &found);
+    entry->name = strdup("max_times_fp32");
+    entry->semiring = GxB_MAX_TIMES_FP32;
+
+    entry = semiringhash_insert(semiringhash, "min_max_fp64", &found);
+    entry->name = strdup("min_max_fp64");
+    entry->semiring = GxB_MIN_MAX_FP64;
+
+    entry = semiringhash_insert(semiringhash, "max_plus_fp64", &found);
+    entry->name = strdup("max_plus_fp64");
+    entry->semiring = GxB_MAX_PLUS_FP64;
+
+    entry = semiringhash_insert(semiringhash, "max_times_fp64", &found);
+    entry->name = strdup("max_times_fp64");
+    entry->semiring = GxB_MAX_TIMES_FP64;
+
+    entry = semiringhash_insert(semiringhash, "max_first_int8", &found);
+    entry->name = strdup("max_first_int8");
+    entry->semiring = GxB_MAX_FIRST_INT8;
+
+    entry = semiringhash_insert(semiringhash, "max_second_int8", &found);
+    entry->name = strdup("max_second_int8");
+    entry->semiring = GxB_MAX_SECOND_INT8;
+
+    entry = semiringhash_insert(semiringhash, "max_min_int8", &found);
+    entry->name = strdup("max_min_int8");
+    entry->semiring = GxB_MAX_MIN_INT8;
+
+    entry = semiringhash_insert(semiringhash, "max_first_int16", &found);
+    entry->name = strdup("max_first_int16");
+    entry->semiring = GxB_MAX_FIRST_INT16;
+
+    entry = semiringhash_insert(semiringhash, "max_second_int16", &found);
+    entry->name = strdup("max_second_int16");
+    entry->semiring = GxB_MAX_SECOND_INT16;
+
+    entry = semiringhash_insert(semiringhash, "max_min_int16", &found);
+    entry->name = strdup("max_min_int16");
+    entry->semiring = GxB_MAX_MIN_INT16;
+
+    entry = semiringhash_insert(semiringhash, "max_first_int32", &found);
+    entry->name = strdup("max_first_int32");
+    entry->semiring = GxB_MAX_FIRST_INT32;
+
+    entry = semiringhash_insert(semiringhash, "max_second_int32", &found);
+    entry->name = strdup("max_second_int32");
+    entry->semiring = GxB_MAX_SECOND_INT32;
+
+    entry = semiringhash_insert(semiringhash, "max_min_int32", &found);
+    entry->name = strdup("max_min_int32");
+    entry->semiring = GxB_MAX_MIN_INT32;
+
+    entry = semiringhash_insert(semiringhash, "max_first_int64", &found);
+    entry->name = strdup("max_first_int64");
+    entry->semiring = GxB_MAX_FIRST_INT64;
+
+    entry = semiringhash_insert(semiringhash, "max_second_int64", &found);
+    entry->name = strdup("max_second_int64");
+    entry->semiring = GxB_MAX_SECOND_INT64;
+
+    entry = semiringhash_insert(semiringhash, "max_min_int64", &found);
+    entry->name = strdup("max_min_int64");
+    entry->semiring = GxB_MAX_MIN_INT64;
+
+    entry = semiringhash_insert(semiringhash, "max_first_uint8", &found);
+    entry->name = strdup("max_first_uint8");
+    entry->semiring = GxB_MAX_FIRST_UINT8;
+
+    entry = semiringhash_insert(semiringhash, "max_second_uint8", &found);
+    entry->name = strdup("max_second_uint8");
+    entry->semiring = GxB_MAX_SECOND_UINT8;
+
+    entry = semiringhash_insert(semiringhash, "max_min_uint8", &found);
+    entry->name = strdup("max_min_uint8");
+    entry->semiring = GxB_MAX_MIN_UINT8;
+
+    entry = semiringhash_insert(semiringhash, "max_first_uint16", &found);
+    entry->name = strdup("max_first_uint16");
+    entry->semiring = GxB_MAX_FIRST_UINT16;
+
+    entry = semiringhash_insert(semiringhash, "max_second_uint16", &found);
+    entry->name = strdup("max_second_uint16");
+    entry->semiring = GxB_MAX_SECOND_UINT16;
+
+    entry = semiringhash_insert(semiringhash, "max_min_uint16", &found);
+    entry->name = strdup("max_min_uint16");
+    entry->semiring = GxB_MAX_MIN_UINT16;
+
+    entry = semiringhash_insert(semiringhash, "max_first_uint32", &found);
+    entry->name = strdup("max_first_uint32");
+    entry->semiring = GxB_MAX_FIRST_UINT32;
+
+    entry = semiringhash_insert(semiringhash, "max_second_uint32", &found);
+    entry->name = strdup("max_second_uint32");
+    entry->semiring = GxB_MAX_SECOND_UINT32;
+
+    entry = semiringhash_insert(semiringhash, "max_min_uint32", &found);
+    entry->name = strdup("max_min_uint32");
+    entry->semiring = GxB_MAX_MIN_UINT32;
+
+    entry = semiringhash_insert(semiringhash, "max_first_uint64", &found);
+    entry->name = strdup("max_first_uint64");
+    entry->semiring = GxB_MAX_FIRST_UINT64;
+
+    entry = semiringhash_insert(semiringhash, "max_second_uint64", &found);
+    entry->name = strdup("max_second_uint64");
+    entry->semiring = GxB_MAX_SECOND_UINT64;
+
+    entry = semiringhash_insert(semiringhash, "max_min_uint64", &found);
+    entry->name = strdup("max_min_uint64");
+    entry->semiring = GxB_MAX_MIN_UINT64;
+
+    entry = semiringhash_insert(semiringhash, "max_first_fp32", &found);
+    entry->name = strdup("max_first_fp32");
+    entry->semiring = GxB_MAX_FIRST_FP32;
+
+    entry = semiringhash_insert(semiringhash, "max_second_fp32", &found);
+    entry->name = strdup("max_second_fp32");
+    entry->semiring = GxB_MAX_SECOND_FP32;
+
+    entry = semiringhash_insert(semiringhash, "max_min_fp32", &found);
+    entry->name = strdup("max_min_fp32");
+    entry->semiring = GxB_MAX_MIN_FP32;
+
+    entry = semiringhash_insert(semiringhash, "max_first_fp64", &found);
+    entry->name = strdup("max_first_fp64");
+    entry->semiring = GxB_MAX_FIRST_FP64;
+
+    entry = semiringhash_insert(semiringhash, "max_second_fp64", &found);
+    entry->name = strdup("max_second_fp64");
+    entry->semiring = GxB_MAX_SECOND_FP64;
+
+    entry = semiringhash_insert(semiringhash, "max_min_fp64", &found);
+    entry->name = strdup("max_min_fp64");
+    entry->semiring = GxB_MAX_MIN_FP64;
+
+    entry = semiringhash_insert(semiringhash, "lor_land_bool", &found);
+    entry->name = strdup("lor_land_bool");
+    entry->semiring = GxB_LOR_LAND_BOOL;
+
+    entry = semiringhash_insert(semiringhash, "land_lor_bool", &found);
+    entry->name = strdup("land_lor_bool");
+    entry->semiring = GxB_LAND_LOR_BOOL;
+
+    entry = semiringhash_insert(semiringhash, "lxor_land_bool", &found);
+    entry->name = strdup("lxor_land_bool");
+    entry->semiring = GxB_LXOR_LAND_BOOL;
+
+    entry = semiringhash_insert(semiringhash, "eq_lor_bool", &found);
+    entry->name = strdup("eq_lor_bool");
+    entry->semiring = GxB_EQ_LOR_BOOL;
     }
 
 GrB_Semiring lookup_semiring(char *name)

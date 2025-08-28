@@ -70,8 +70,8 @@ select draw(triu(graph),
 -- We'll use some random weighted graphs for demonstration purposes as
 -- well, one directed and one undirected.
 
-create materialized view rgraph as select triu(random_matrix(8, 8, 28, 1, 10, false, 0.22), 1) > 0 as graph;
-create materialized view urgraph as select random_matrix(8, 8, 28, 1, 10, true, 0.22) > 0 as graph;
+create materialized view rgraph as select triu(random_matrix('uint8', 8, 8, 1, 43) % 42, 1) as graph;
+create materialized view urgraph as select random_matrix('uint8', 8, 8, 1, 44) % 42 as graph;
 
 select draw(triu(graph), reduce_cols(one(graph)), true, true, true, 0.5, 'Random Weighted Directed Graph') as col_a_source from rgraph \gset
 select draw(triu(graph), reduce_cols(one(graph)), true, false, true, 0.5, 'Random Weighted Undirected Graph') as col_b_source from urgraph \gset

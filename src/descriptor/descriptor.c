@@ -164,8 +164,3 @@ Datum descriptor_name(PG_FUNCTION_ARGS)
 	descriptor = OS_GETARG_DESCRIPTOR(0);
 	PG_RETURN_TEXT_P(cstring_to_text(descriptor->name));
 }
-
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

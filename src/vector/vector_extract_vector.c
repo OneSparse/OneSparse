@@ -51,7 +51,3 @@ vector_extract_vector(PG_FUNCTION_ARGS)
 
 SUPPORT_FN(vector_extract_vector, lthird);
 
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

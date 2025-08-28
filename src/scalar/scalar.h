@@ -35,9 +35,4 @@ os_Scalar* DatumGetScalar(Datum d);
 #define OS_SCALAR_DATA(_flat) ((char*)(_flat) + OS_SCALAR_FLATSIZE())
 #define ScalarGetEOHP(_datum) (os_Scalar *) DatumGetEOHP(_datum)
 
-#endif /* OS_SCALAR_H */
-
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */
+#endif 

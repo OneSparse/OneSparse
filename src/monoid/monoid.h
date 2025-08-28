@@ -34,9 +34,4 @@ os_Monoid* DatumGetMonoid(Datum d);
 #define OS_MONOID_DATA(_flat) ((char*)(_flat) + OS_MONOID_FLATSIZE())
 #define MonoidGetEOHP(_datum) (os_Monoid *) DatumGetEOHP(_datum)
 
-#endif /* OS_MONOID_H */
-
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */
+#endif 

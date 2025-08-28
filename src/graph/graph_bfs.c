@@ -3,7 +3,6 @@
 PG_FUNCTION_INFO_V1(graph_bfs);
 Datum graph_bfs(PG_FUNCTION_ARGS)
 {
-	GrB_Type type;
 	os_Graph *graph;
 	GrB_Index source;
 	GrB_Vector level;
@@ -49,7 +48,3 @@ Datum graph_bfs(PG_FUNCTION_ARGS)
     PG_RETURN_DATUM(HeapTupleGetDatum(tuple));
 }
 
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

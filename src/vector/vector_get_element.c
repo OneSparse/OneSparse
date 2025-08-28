@@ -27,7 +27,3 @@ Datum vector_get_element(PG_FUNCTION_ARGS)
 	OS_RETURN_SCALAR(scalar);
 }
 
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

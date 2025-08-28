@@ -20,7 +20,3 @@ Datum scalar_wait(PG_FUNCTION_ARGS)
 
 SUPPORT_FN(scalar_wait, linitial);
 
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

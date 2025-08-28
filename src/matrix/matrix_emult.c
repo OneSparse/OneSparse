@@ -58,7 +58,3 @@ Datum matrix_emult(PG_FUNCTION_ARGS)
 
 SUPPORT_FN(matrix_emult, lfourth);
 
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

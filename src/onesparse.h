@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
+
 #include "postgres.h"
 #include "fmgr.h"
 #include "miscadmin.h"
@@ -22,17 +23,28 @@
 #include "utils/arrayaccess.h"
 #include "utils/guc.h"
 #include "utils/varlena.h"
+#include "utils/uuid.h"
 #include "catalog/pg_type_d.h"
 #include "catalog/pg_type.h"
 #include "parser/parse_func.h"
 #include "utils/lsyscache.h"
 #include "nodes/pg_list.h"
 #include "nodes/supportnodes.h"
+#include "access/tableam.h"
+#include "access/genam.h"
+#include "access/heapam.h"
+#include "utils/rel.h"
+#include "executor/tuptable.h"
+#include "executor/spi.h"
+#include "commands/defrem.h"
 #include "common/hashfn.h"
+#include "access/xact.h"
+#include "storage/itemptr.h"
+#include "commands/vacuum.h"
+
 #include <GraphBLAS.h>
 #include <LAGraph.h>
 #include <LAGraphX.h>
-#include "access/xact.h"
 
 #define OS_DEBUG
 
@@ -112,7 +124,7 @@
 #define OS_VSIZE(_size, _v)\
 	OS_CHECK(GrB_Vector_size(&_size, _v->vector), \
 		  _v->vector, \
-		  "Cannot get matrix type");
+		  "Cannot get vector size");
 
 #define OS_STYPE(_stype, _s)      \
 	OS_CHECK(GxB_Scalar_type(&_stype, _s->scalar),\
@@ -145,6 +157,7 @@
 
 #ifdef OS_DEBUG
 #define LOGF() elog(DEBUG1, __func__)
+
 #define OS_START_BENCH()                        \
 	ereport(DEBUG1, (errmsg("%s()", __func__))); \
     gettimeofday(&start, NULL);
@@ -156,6 +169,7 @@
                          (end.tv_usec - start.tv_usec) / 1000000.0;         \
         ereport(DEBUG1, (errmsg("%s() took %.6f seconds", __func__, elapsed))); \
     } while (0)
+
 #else
 #define LOGF()
 #define OS_START_BENCH()
@@ -174,11 +188,6 @@ GrB_BinaryOp default_binaryop(GrB_Type type);
 GrB_Monoid default_monoid(GrB_Type type);
 GrB_Semiring default_semiring(GrB_Type type);
 
-void *malloc_function(size_t);
-void *calloc_function(size_t, size_t);
-void *realloc_function(void*, size_t);
-void free_function(void*);
-
 void initialize_types(void);
 void initialize_descriptors(void);
 void initialize_unaryops(void);
@@ -186,16 +195,21 @@ void initialize_indexunaryops(void);
 void initialize_binaryops(void);
 void initialize_monoids(void);
 void initialize_semirings(void);
+void initialize_gucs(void);
 
 GrB_Type lookup_type(char *name);
 GrB_Descriptor lookup_descriptor(char *name);
 GrB_UnaryOp lookup_unaryop(char *name);
 GrB_IndexUnaryOp lookup_indexunaryop(char *name);
 GrB_BinaryOp lookup_binaryop(char *name);
+GxB_IndexBinaryOp lookup_indexbinaryop(char *name);
 GrB_Monoid lookup_monoid(char *name);
 GrB_Semiring lookup_semiring(char *name);
 
-void burble_notice_func(const char *fmt, ...);
+void burble_notice_func(const char *fmt, ...)
+	    pg_attribute_printf(1, 2);
+
+bool spi_ensure_connected(void);
 
 void _PG_init(void);
 
@@ -204,6 +218,7 @@ void _PG_init(void);
 #include "unaryop/unaryop.h"
 #include "indexunaryop/indexunaryop.h"
 #include "binaryop/binaryop.h"
+#include "indexbinaryop/indexbinaryop.h"
 #include "monoid/monoid.h"
 #include "semiring/semiring.h"
 #include "scalar/scalar.h"
@@ -211,9 +226,4 @@ void _PG_init(void);
 #include "matrix/matrix.h"
 #include "graph/graph.h"
 
-#endif /* OS_H */
-
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */
+#endif

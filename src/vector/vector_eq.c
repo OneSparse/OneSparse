@@ -60,7 +60,3 @@ Datum vector_eq(PG_FUNCTION_ARGS)
 	PG_RETURN_BOOL(result);
 }
 
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

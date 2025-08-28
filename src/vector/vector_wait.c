@@ -20,7 +20,3 @@ Datum vector_wait(PG_FUNCTION_ARGS)
 
 SUPPORT_FN(vector_wait, linitial);
 
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

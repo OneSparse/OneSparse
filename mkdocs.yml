@@ -11,8 +11,9 @@ nav:
   - Semiring: test_semiring_header.md
   - Monoid: test_monoid_header.md
   - BinaryOp: test_binaryop_header.md
-  - IndexUnaryOp: test_indexunaryop_header.md
+  - IndexBinaryOp: test_indexbinaryop_header.md
   - UnaryOp: test_unaryop_header.md
+  - IndexUnaryOp: test_indexunaryop_header.md
   - Descriptor: test_descriptor_header.md
   - Type: test_type_header.md
 

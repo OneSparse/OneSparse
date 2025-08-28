@@ -38,6 +38,15 @@ select 'int32'::type;
 select matrix('int32');
 select matrix('int32'::type);
 
+-- ## User Defined Types
+
+insert into user_defined_type (name, type_def) values
+    ('tuple_fp64', 'typedef struct {{int64_t k; double v;}} tuple_fp64;');
+
+--
+
+select 'tuple_fp64'::type;
+
 -- Are equivalent.
 --
 -- | OneSparse Name | SuiteSparse Name |

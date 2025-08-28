@@ -8,7 +8,3 @@ Datum type_name(PG_FUNCTION_ARGS)
 	type = OS_GETARG_TYPE(0);
 	PG_RETURN_TEXT_P(cstring_to_text(type->name));
 }
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

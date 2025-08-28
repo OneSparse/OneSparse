@@ -31,7 +31,3 @@ Datum graph_in(PG_FUNCTION_ARGS)
 	OS_RETURN_GRAPH(graph);
 }
 
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

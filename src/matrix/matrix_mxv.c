@@ -10,7 +10,7 @@ Datum matrix_mxv(PG_FUNCTION_ARGS)
 	GrB_Descriptor descriptor;
 	GrB_BinaryOp accum;
 	GrB_Semiring semiring;
-	GrB_Index bsize;
+	GrB_Index nrows;
 	int nargs;
     struct timeval start, end;
 
@@ -34,8 +34,8 @@ Datum matrix_mxv(PG_FUNCTION_ARGS)
 
 	if (PG_ARGISNULL(3))
 	{
-		OS_VSIZE(bsize, b);
-		c = new_vector(ctype, bsize, CurrentMemoryContext, NULL);
+		OS_MNROWS(nrows, a);
+		c = new_vector(ctype, nrows, CurrentMemoryContext, NULL);
 	}
 	else
 		c = OS_GETARG_VECTOR(3);
@@ -60,7 +60,3 @@ Datum matrix_mxv(PG_FUNCTION_ARGS)
 
 SUPPORT_FN(matrix_mxv, lfourth);
 
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

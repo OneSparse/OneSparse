@@ -34,9 +34,4 @@ os_IndexUnaryOp* DatumGetIndexUnaryOp(Datum d);
 #define OS_INDEXUNARYOP_DATA(_flat) ((char*)(_flat) + OS_INDEXUNARYOP_FLATSIZE())
 #define IndexUnaryOpGetEOHP(_datum) (os_IndexUnaryOp *) DatumGetEOHP(_datum)
 
-#endif /* OS_INDEXUNARYOP_H */
-
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */
+#endif 

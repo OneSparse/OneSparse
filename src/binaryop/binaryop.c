@@ -59,19 +59,37 @@ static void flatten_binaryop(
 /* Construct an empty expanded binaryop. */
 os_BinaryOp* new_binaryop(
 	char* name,
-	MemoryContext parentcontext)
+	MemoryContext parentcontext,
+	GrB_BinaryOp binop)
 {
-	GrB_BinaryOp binop;
 	os_BinaryOp *binaryop;
 
 	MemoryContext objcxt, oldcxt;
 	MemoryContextCallback *ctxcb;
+	size_t len;
 
 	LOGF();
-	binop = lookup_binaryop(name);
-
 	if (binop == NULL)
-		elog(ERROR, "Unknown binaryop %s", name);
+	{
+		binop = lookup_binaryop(name);
+		if (binop == NULL)
+			elog(ERROR, "Unknown binaryop %s", name);
+	}
+	else
+	{
+		OS_CHECK(GrB_get(binop,
+						 &len,
+						 GrB_NAME),
+				 binop,
+				 "Error extracting binop name len.");
+
+		name = palloc(len+1);
+		OS_CHECK(GrB_get(binop,
+						 name,
+						 GrB_NAME),
+				 binop,
+				 "Error extracting binop name.");
+	}
 
 	objcxt = AllocSetContextCreate(parentcontext,
 								   "expanded binaryop",
@@ -107,7 +125,7 @@ Datum expand_binaryop(os_FlatBinaryOp *flat, MemoryContext parentcontext)
 
 	LOGF();
 
-	binaryop = new_binaryop(flat->name, parentcontext);
+	binaryop = new_binaryop(flat->name, parentcontext, NULL);
 	OS_RETURN_BINARYOP(binaryop);
 }
 
@@ -145,7 +163,7 @@ Datum binaryop_in(PG_FUNCTION_ARGS)
 	char* input;
 
 	input = PG_GETARG_CSTRING(0);
-	binaryop = new_binaryop(input, CurrentMemoryContext);
+	binaryop = new_binaryop(input, CurrentMemoryContext, NULL);
 	OS_RETURN_BINARYOP(binaryop);
 }
 
@@ -167,7 +185,3 @@ Datum binaryop_name(PG_FUNCTION_ARGS)
 	binaryop = OS_GETARG_BINARYOP(0);
 	PG_RETURN_TEXT_P(cstring_to_text(binaryop->name));
 }
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */

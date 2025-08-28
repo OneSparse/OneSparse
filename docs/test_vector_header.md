@@ -173,6 +173,50 @@ select 'int32[0:1 1:2 2:3]'::vector;
 (1 row)
 
 ```
+Cast a vector from a Postgres array
+``` postgres-console
+select '{1,2,3}'::integer[]::vector;
+┌───────────────────────┐
+│        vector         │
+├───────────────────────┤
+│ int32(3)[0:1 1:2 2:3] │
+└───────────────────────┘
+(1 row)
+
+```
+Cast from a Postgres array with NULL indicating empty value:
+``` postgres-console
+select '{1,NULL,3}'::integer[]::vector;
+┌───────────────────┐
+│      vector       │
+├───────────────────┤
+│ int32(3)[0:1 2:3] │
+└───────────────────┘
+(1 row)
+
+```
+Cast a Postgres array from a vector
+``` postgres-console
+select 'int32(3)[0:1 1:2 2:3]'::vector::integer[];
+┌─────────┐
+│  int4   │
+├─────────┤
+│ {1,2,3} │
+└─────────┘
+(1 row)
+
+```
+Cast a Postgres array from a vector with  NULL indicating empty value:
+``` postgres-console
+select 'int32(3)[0:1 2:3]'::vector::integer[];
+┌────────────┐
+│    int4    │
+├────────────┤
+│ {1,NULL,3} │
+└────────────┘
+(1 row)
+
+```
 Count those values
 ``` postgres-console
 select nvals('int32[0:1 1:2 2:3]'::vector);

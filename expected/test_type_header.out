@@ -11,6 +11,7 @@ create extension if not exists onesparse;
 ┌───────────┬──────────────────┬───────────────────────────────────────────────────────────────────────────────────────┐
 │  Schema   │       Name       │                                      Description                                      │
 ├───────────┼──────────────────┼───────────────────────────────────────────────────────────────────────────────────────┤
+│ onesparse │ argminmax_x_p    │ Return type for argminmax with value and index vectors.                               │
 │ onesparse │ bfs_level_parent │ Return type for bfs with level and parent vectors.                                    │
 │ onesparse │ binaryop         │ BinaryOps apply a function to two elements and returning an element.                  │
 │ onesparse │ descriptor       │ Descriptors control specific details of GraphBLAS operations.                         │
@@ -24,7 +25,7 @@ create extension if not exists onesparse;
 │ onesparse │ unaryop          │ UnaryOps apply a function to an element, returning an element.                        │
 │ onesparse │ vector           │ Vectors hold a sparse array of elements.                                              │
 └───────────┴──────────────────┴───────────────────────────────────────────────────────────────────────────────────────┘
-(12 rows)
+(13 rows)
 
 -- ## Element Types
 --
@@ -69,6 +70,17 @@ select matrix('int32'::type);
 ├────────┤
 │ int32  │
 └────────┘
+(1 row)
+
+-- ## User Defined Types
+insert into user_defined_type (name, type_def) values
+    ('tuple_fp64', 'typedef struct {int64_t k; double v;} tuple_fp64;');
+select 'tuple_fp64'::type;
+┌────────────┐
+│    type    │
+├────────────┤
+│ tuple_fp64 │
+└────────────┘
 (1 row)
 
 -- Are equivalent.

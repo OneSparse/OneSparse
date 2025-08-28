@@ -21,10 +21,6 @@ Datum matrix_serialize_file(PG_FUNCTION_ARGS) {
 
 	if (!file) ereport(ERROR, (errmsg("Failed to open file")));
 
-	OS_CHECK(GrB_wait(matrix->matrix, GrB_MATERIALIZE),
-			 matrix->matrix,
-			 "Error waiting to materialize matrix.");
-
 	OS_CHECK(GxB_Matrix_serialize(
 				 &data,
 				 &size,
@@ -44,7 +40,3 @@ Datum matrix_serialize_file(PG_FUNCTION_ARGS) {
 }
 
 
-/* Local Variables: */
-/* mode: c */
-/* c-file-style: "postgresql" */
-/* End: */
