@@ -541,12 +541,12 @@
   
   
     <li class="md-nav__item">
-      <a href="test_indexunaryop_header.html" class="md-nav__link">
+      <a href="test_indexbinaryop_header.html" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    IndexUnaryOp
+    IndexBinaryOp
     
   </span>
   
@@ -569,6 +569,28 @@
   
   <span class="md-ellipsis">
     UnaryOp
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="test_indexunaryop_header.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    IndexUnaryOp
     
   </span>
   
@@ -780,213 +802,249 @@ Create a vector with some values
 </span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="go">└────────────────────┘</span>
 </span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="go">(1 row)</span>
 </span></code></pre></div>
-Count those values
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="k">select</span><span class="w"> </span><span class="n">nvals</span><span class="p">(</span><span class="s1">&#39;int32[0:1 1:2 2:3]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">);</span>
-</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="go">┌───────┐</span>
-</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="go">│ nvals │</span>
-</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="go">├───────┤</span>
-</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="go">│     3 │</span>
-</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="go">└───────┘</span>
+Cast a vector from a Postgres array
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="k">select</span><span class="w"> </span><span class="s1">&#39;{1,2,3}&#39;</span><span class="o">::</span><span class="nb">integer</span><span class="p">[]</span><span class="o">::</span><span class="n">vector</span><span class="p">;</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="go">┌───────────────────────┐</span>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="go">│        vector         │</span>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="go">├───────────────────────┤</span>
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="go">│ int32(3)[0:1 1:2 2:3] │</span>
+</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="go">└───────────────────────┘</span>
 </span><span id="__span-15-7"><a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="go">(1 row)</span>
 </span></code></pre></div>
-Iterate over the index/value pairs
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="k">select</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">elements</span><span class="p">(</span><span class="s1">&#39;int32[0:1 1:2 2:3]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">);</span>
-</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="go">┌───┬─────────┐</span>
-</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="go">│ i │    v    │</span>
-</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="go">├───┼─────────┤</span>
-</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="go">│ 0 │ int32:1 │</span>
-</span><span id="__span-16-6"><a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="go">│ 1 │ int32:2 │</span>
-</span><span id="__span-16-7"><a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="go">│ 2 │ int32:3 │</span>
-</span><span id="__span-16-8"><a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a><span class="go">└───┴─────────┘</span>
-</span><span id="__span-16-9"><a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a><span class="go">(3 rows)</span>
+Cast from a Postgres array with NULL indicating empty value:
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="k">select</span><span class="w"> </span><span class="s1">&#39;{1,NULL,3}&#39;</span><span class="o">::</span><span class="nb">integer</span><span class="p">[]</span><span class="o">::</span><span class="n">vector</span><span class="p">;</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="go">┌───────────────────┐</span>
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="go">│      vector       │</span>
+</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="go">├───────────────────┤</span>
+</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="go">│ int32(3)[0:1 2:3] │</span>
+</span><span id="__span-16-6"><a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="go">└───────────────────┘</span>
+</span><span id="__span-16-7"><a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="go">(1 row)</span>
 </span></code></pre></div>
-Combine bounds and elements
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="k">select</span><span class="w"> </span><span class="s1">&#39;int32(10)[0:1 1:2 2:3]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">;</span>
-</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="go">┌────────────────────────┐</span>
-</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="go">│         vector         │</span>
-</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="go">├────────────────────────┤</span>
-</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="go">│ int32(10)[0:1 1:2 2:3] │</span>
-</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="go">└────────────────────────┘</span>
+Cast a Postgres array from a vector
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="k">select</span><span class="w"> </span><span class="s1">&#39;int32(3)[0:1 1:2 2:3]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="o">::</span><span class="nb">integer</span><span class="p">[];</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="go">┌─────────┐</span>
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="go">│  int4   │</span>
+</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="go">├─────────┤</span>
+</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="go">│ {1,2,3} │</span>
+</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="go">└─────────┘</span>
 </span><span id="__span-17-7"><a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="go">(1 row)</span>
 </span></code></pre></div>
-Bounded size is retained
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="k">select</span><span class="w"> </span><span class="n">size</span><span class="p">(</span><span class="s1">&#39;int32(10)[0:1 1:2 2:3]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">);</span>
-</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="go">┌──────┐</span>
-</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="go">│ size │</span>
-</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="go">├──────┤</span>
-</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="go">│   10 │</span>
-</span><span id="__span-18-6"><a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="go">└──────┘</span>
+Cast a Postgres array from a vector with  NULL indicating empty value:
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="k">select</span><span class="w"> </span><span class="s1">&#39;int32(3)[0:1 2:3]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="o">::</span><span class="nb">integer</span><span class="p">[];</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="go">┌────────────┐</span>
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="go">│    int4    │</span>
+</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="go">├────────────┤</span>
+</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="go">│ {1,NULL,3} │</span>
+</span><span id="__span-18-6"><a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="go">└────────────┘</span>
 </span><span id="__span-18-7"><a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="go">(1 row)</span>
 </span></code></pre></div>
+Count those values
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="k">select</span><span class="w"> </span><span class="n">nvals</span><span class="p">(</span><span class="s1">&#39;int32[0:1 1:2 2:3]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">);</span>
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="go">┌───────┐</span>
+</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="go">│ nvals │</span>
+</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="go">├───────┤</span>
+</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="go">│     3 │</span>
+</span><span id="__span-19-6"><a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a><span class="go">└───────┘</span>
+</span><span id="__span-19-7"><a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a><span class="go">(1 row)</span>
+</span></code></pre></div>
+Iterate over the index/value pairs
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="k">select</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">elements</span><span class="p">(</span><span class="s1">&#39;int32[0:1 1:2 2:3]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">);</span>
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="go">┌───┬─────────┐</span>
+</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="go">│ i │    v    │</span>
+</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="go">├───┼─────────┤</span>
+</span><span id="__span-20-5"><a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="go">│ 0 │ int32:1 │</span>
+</span><span id="__span-20-6"><a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a><span class="go">│ 1 │ int32:2 │</span>
+</span><span id="__span-20-7"><a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a><span class="go">│ 2 │ int32:3 │</span>
+</span><span id="__span-20-8"><a id="__codelineno-20-8" name="__codelineno-20-8" href="#__codelineno-20-8"></a><span class="go">└───┴─────────┘</span>
+</span><span id="__span-20-9"><a id="__codelineno-20-9" name="__codelineno-20-9" href="#__codelineno-20-9"></a><span class="go">(3 rows)</span>
+</span></code></pre></div>
+Combine bounds and elements
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="k">select</span><span class="w"> </span><span class="s1">&#39;int32(10)[0:1 1:2 2:3]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">;</span>
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="go">┌────────────────────────┐</span>
+</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="go">│         vector         │</span>
+</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="go">├────────────────────────┤</span>
+</span><span id="__span-21-5"><a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a><span class="go">│ int32(10)[0:1 1:2 2:3] │</span>
+</span><span id="__span-21-6"><a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a><span class="go">└────────────────────────┘</span>
+</span><span id="__span-21-7"><a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a><span class="go">(1 row)</span>
+</span></code></pre></div>
+Bounded size is retained
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="k">select</span><span class="w"> </span><span class="n">size</span><span class="p">(</span><span class="s1">&#39;int32(10)[0:1 1:2 2:3]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">);</span>
+</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="go">┌──────┐</span>
+</span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="go">│ size │</span>
+</span><span id="__span-22-4"><a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="go">├──────┤</span>
+</span><span id="__span-22-5"><a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a><span class="go">│   10 │</span>
+</span><span id="__span-22-6"><a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a><span class="go">└──────┘</span>
+</span><span id="__span-22-7"><a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a><span class="go">(1 row)</span>
+</span></code></pre></div>
 Attempting to store outside the bounds raises an error
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="k">select</span><span class="w"> </span><span class="n">size</span><span class="p">(</span><span class="s1">&#39;int32(2)[0:1 1:2 2:3]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">);</span>
-</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="gs">ERROR:</span><span class="gr">  INVALID_INDEX GraphBLAS error: GrB_INVALID_INDEX</span>
-</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="gr">function: GrB_Vector_setElement_INT64 (w, x, row)</span>
-</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="gr">Row index 2 out of range; must be &lt; 2: Error setting Vector Element</span>
-</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="gs">LINE 1:</span><span class="gr"> select size(&#39;int32(2)[0:1 1:2 2:3]&#39;::vector);</span>
-</span><span id="__span-19-6"><a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a><span class="gr">                    ^</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="k">select</span><span class="w"> </span><span class="n">size</span><span class="p">(</span><span class="s1">&#39;int32(2)[0:1 1:2 2:3]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">);</span>
+</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="gs">ERROR:</span><span class="gr">  INVALID_INDEX GraphBLAS error: GrB_INVALID_INDEX</span>
+</span><span id="__span-23-3"><a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="gr">function: GrB_Vector_setElement_INT64 (w, x, row)</span>
+</span><span id="__span-23-4"><a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="gr">Row index 2 out of range; must be &lt; 2: Error setting Vector Element</span>
+</span><span id="__span-23-5"><a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a><span class="gs">LINE 1:</span><span class="gr"> select size(&#39;int32(2)[0:1 1:2 2:3]&#39;::vector);</span>
+</span><span id="__span-23-6"><a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a><span class="gr">                    ^</span>
 </span></code></pre></div></p>
 <h2 id="equality">Equality</h2>
 <p>Two matrices can be compared for equality with the '=' and '!=' operators:
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="k">select</span><span class="w"> </span><span class="n">u</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="s s-Name">&quot;u != v&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">u</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="s s-Name">&quot;u = v&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">u</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="s s-Name">&quot;v = u&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">u</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="s s-Name">&quot;v = u&quot;</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">test_fixture</span><span class="p">;</span>
-</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="go">┌────────┬───────┬───────┬───────┐</span>
-</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="go">│ u != v │ u = v │ v = u │ v = u │</span>
-</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="go">├────────┼───────┼───────┼───────┤</span>
-</span><span id="__span-20-5"><a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="go">│ t      │ f     │ f     │ f     │</span>
-</span><span id="__span-20-6"><a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a><span class="go">└────────┴───────┴───────┴───────┘</span>
-</span><span id="__span-20-7"><a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a><span class="go">(1 row)</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="k">select</span><span class="w"> </span><span class="n">u</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="s s-Name">&quot;u != v&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">u</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="s s-Name">&quot;u = v&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">u</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="s s-Name">&quot;v = u&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">u</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="s s-Name">&quot;v = u&quot;</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">test_fixture</span><span class="p">;</span>
+</span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="go">┌────────┬───────┬───────┬───────┐</span>
+</span><span id="__span-24-3"><a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="go">│ u != v │ u = v │ v = u │ v = u │</span>
+</span><span id="__span-24-4"><a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="go">├────────┼───────┼───────┼───────┤</span>
+</span><span id="__span-24-5"><a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a><span class="go">│ t      │ f     │ f     │ f     │</span>
+</span><span id="__span-24-6"><a id="__codelineno-24-6" name="__codelineno-24-6" href="#__codelineno-24-6"></a><span class="go">└────────┴───────┴───────┴───────┘</span>
+</span><span id="__span-24-7"><a id="__codelineno-24-7" name="__codelineno-24-7" href="#__codelineno-24-7"></a><span class="go">(1 row)</span>
 </span></code></pre></div></p>
 <h2 id="elementwise-addition">Elementwise Addition</h2>
 <p>Add two vectors element by element using a binary operator
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="k">select</span><span class="w"> </span><span class="n">eadd</span><span class="p">(</span><span class="s1">&#39;int32[0:1 1:2 2:3]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;int32[0:1 1:2 2:3]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;plus_int32&#39;</span><span class="p">);</span>
-</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="go">┌────────────────────┐</span>
-</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="go">│        eadd        │</span>
-</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="go">├────────────────────┤</span>
-</span><span id="__span-21-5"><a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a><span class="go">│ int32[0:2 1:4 2:6] │</span>
-</span><span id="__span-21-6"><a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a><span class="go">└────────────────────┘</span>
-</span><span id="__span-21-7"><a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a><span class="go">(1 row)</span>
-</span></code></pre></div>
-Eadd can also be accomplished with binary operators specific to
-OneSparse.  Different binaryops are passed to eadd to do different
-elementwise operations:
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="k">select</span><span class="w"> </span><span class="n">print</span><span class="p">(</span><span class="n">u</span><span class="w"> </span><span class="o">|+</span><span class="w"> </span><span class="n">v</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="s s-Name">&quot;u |+ v&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">print</span><span class="p">(</span><span class="n">u</span><span class="w"> </span><span class="o">|-</span><span class="w"> </span><span class="n">v</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="s s-Name">&quot;u |- v&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">print</span><span class="p">(</span><span class="n">u</span><span class="w"> </span><span class="o">|*</span><span class="w"> </span><span class="n">v</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="s s-Name">&quot;u |* v&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">print</span><span class="p">(</span><span class="n">u</span><span class="w"> </span><span class="o">|/</span><span class="w"> </span><span class="n">v</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="s s-Name">&quot;u |/ v&quot;</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">test_fixture</span><span class="p">;</span>
-</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="go">┌───────────┬───────────┬───────────┬───────────┐</span>
-</span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="go">│  u |+ v   │  u |- v   │  u |* v   │  u |/ v   │</span>
-</span><span id="__span-22-4"><a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="go">├───────────┼───────────┼───────────┼───────────┤</span>
-</span><span id="__span-22-5"><a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a><span class="go">│           │           │           │           │</span>
-</span><span id="__span-22-6"><a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a><span class="go">│    ───    │    ───    │    ───    │    ───    │</span>
-</span><span id="__span-22-7"><a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a><span class="go">│  0│       │  0│       │  0│       │  0│       │</span>
-</span><span id="__span-22-8"><a id="__codelineno-22-8" name="__codelineno-22-8" href="#__codelineno-22-8"></a><span class="go">│  1│  5    │  1│ -1    │  1│  6    │  1│  0    │</span>
-</span><span id="__span-22-9"><a id="__codelineno-22-9" name="__codelineno-22-9" href="#__codelineno-22-9"></a><span class="go">│  2│  3    │  2│  3    │  2│  3    │  2│  3    │</span>
-</span><span id="__span-22-10"><a id="__codelineno-22-10" name="__codelineno-22-10" href="#__codelineno-22-10"></a><span class="go">│  3│       │  3│       │  3│       │  3│       │</span>
-</span><span id="__span-22-11"><a id="__codelineno-22-11" name="__codelineno-22-11" href="#__codelineno-22-11"></a><span class="go">│           │           │           │           │</span>
-</span><span id="__span-22-12"><a id="__codelineno-22-12" name="__codelineno-22-12" href="#__codelineno-22-12"></a><span class="go">└───────────┴───────────┴───────────┴───────────┘</span>
-</span><span id="__span-22-13"><a id="__codelineno-22-13" name="__codelineno-22-13" href="#__codelineno-22-13"></a><span class="go">(1 row)</span>
-</span></code></pre></div></p>
-<h2 id="elementwise-multiplication">Elementwise Multiplication</h2>
-<p>Multiply corresponding elements of two vectors
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="k">select</span><span class="w"> </span><span class="n">emult</span><span class="p">(</span><span class="s1">&#39;int32[0:1 1:2 2:3]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;int32[0:1 1:2 2:3]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;times_int32&#39;</span><span class="p">);</span>
-</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="go">┌────────────────────┐</span>
-</span><span id="__span-23-3"><a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="go">│       emult        │</span>
-</span><span id="__span-23-4"><a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="go">├────────────────────┤</span>
-</span><span id="__span-23-5"><a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a><span class="go">│ int32[0:1 1:4 2:9] │</span>
-</span><span id="__span-23-6"><a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a><span class="go">└────────────────────┘</span>
-</span><span id="__span-23-7"><a id="__codelineno-23-7" name="__codelineno-23-7" href="#__codelineno-23-7"></a><span class="go">(1 row)</span>
-</span></code></pre></div>
-Emult can also be accomplished with binary operators specific to
-OneSparse.  Different binaryops are passed to emult to do different
-elementwise operations:
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="k">select</span><span class="w"> </span><span class="n">print</span><span class="p">(</span><span class="n">u</span><span class="w"> </span><span class="o">&amp;+</span><span class="w"> </span><span class="n">v</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="s s-Name">&quot;u &amp;+ v&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">print</span><span class="p">(</span><span class="n">u</span><span class="w"> </span><span class="o">&amp;-</span><span class="w"> </span><span class="n">v</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="s s-Name">&quot;u &amp;- v&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">print</span><span class="p">(</span><span class="n">u</span><span class="w"> </span><span class="o">&amp;*</span><span class="w"> </span><span class="n">v</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="s s-Name">&quot;u &amp;* v&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">print</span><span class="p">(</span><span class="n">u</span><span class="w"> </span><span class="o">&amp;/</span><span class="w"> </span><span class="n">v</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="s s-Name">&quot;u &amp;/ v&quot;</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">test_fixture</span><span class="p">;</span>
-</span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="go">┌───────────┬───────────┬───────────┬───────────┐</span>
-</span><span id="__span-24-3"><a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="go">│  u &amp;+ v   │  u &amp;- v   │  u &amp;* v   │  u &amp;/ v   │</span>
-</span><span id="__span-24-4"><a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="go">├───────────┼───────────┼───────────┼───────────┤</span>
-</span><span id="__span-24-5"><a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a><span class="go">│           │           │           │           │</span>
-</span><span id="__span-24-6"><a id="__codelineno-24-6" name="__codelineno-24-6" href="#__codelineno-24-6"></a><span class="go">│    ───    │    ───    │    ───    │    ───    │</span>
-</span><span id="__span-24-7"><a id="__codelineno-24-7" name="__codelineno-24-7" href="#__codelineno-24-7"></a><span class="go">│  0│       │  0│       │  0│       │  0│       │</span>
-</span><span id="__span-24-8"><a id="__codelineno-24-8" name="__codelineno-24-8" href="#__codelineno-24-8"></a><span class="go">│  1│  5    │  1│ -1    │  1│  6    │  1│  0    │</span>
-</span><span id="__span-24-9"><a id="__codelineno-24-9" name="__codelineno-24-9" href="#__codelineno-24-9"></a><span class="go">│  2│       │  2│       │  2│       │  2│       │</span>
-</span><span id="__span-24-10"><a id="__codelineno-24-10" name="__codelineno-24-10" href="#__codelineno-24-10"></a><span class="go">│  3│       │  3│       │  3│       │  3│       │</span>
-</span><span id="__span-24-11"><a id="__codelineno-24-11" name="__codelineno-24-11" href="#__codelineno-24-11"></a><span class="go">│           │           │           │           │</span>
-</span><span id="__span-24-12"><a id="__codelineno-24-12" name="__codelineno-24-12" href="#__codelineno-24-12"></a><span class="go">└───────────┴───────────┴───────────┴───────────┘</span>
-</span><span id="__span-24-13"><a id="__codelineno-24-13" name="__codelineno-24-13" href="#__codelineno-24-13"></a><span class="go">(1 row)</span>
-</span></code></pre></div></p>
-<h2 id="elementwise-union">Elementwise Union</h2>
-<p>Union of two vectors with scalars for missing values
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="k">select</span><span class="w"> </span><span class="n">eunion</span><span class="p">(</span><span class="s1">&#39;int32[0:1 1:2 2:3]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span><span class="w"> </span><span class="mf">42</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;int32[0:1 1:2 2:3]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span><span class="w"> </span><span class="mf">84</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;plus_int32&#39;</span><span class="p">);</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="k">select</span><span class="w"> </span><span class="n">eadd</span><span class="p">(</span><span class="s1">&#39;int32[0:1 1:2 2:3]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;int32[0:1 1:2 2:3]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;plus_int32&#39;</span><span class="p">);</span>
 </span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="go">┌────────────────────┐</span>
-</span><span id="__span-25-3"><a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a><span class="go">│       eunion       │</span>
+</span><span id="__span-25-3"><a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a><span class="go">│        eadd        │</span>
 </span><span id="__span-25-4"><a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="go">├────────────────────┤</span>
 </span><span id="__span-25-5"><a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a><span class="go">│ int32[0:2 1:4 2:6] │</span>
 </span><span id="__span-25-6"><a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a><span class="go">└────────────────────┘</span>
 </span><span id="__span-25-7"><a id="__codelineno-25-7" name="__codelineno-25-7" href="#__codelineno-25-7"></a><span class="go">(1 row)</span>
+</span></code></pre></div>
+Eadd can also be accomplished with binary operators specific to
+OneSparse.  Different binaryops are passed to eadd to do different
+elementwise operations:
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="k">select</span><span class="w"> </span><span class="n">print</span><span class="p">(</span><span class="n">u</span><span class="w"> </span><span class="o">|+</span><span class="w"> </span><span class="n">v</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="s s-Name">&quot;u |+ v&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">print</span><span class="p">(</span><span class="n">u</span><span class="w"> </span><span class="o">|-</span><span class="w"> </span><span class="n">v</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="s s-Name">&quot;u |- v&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">print</span><span class="p">(</span><span class="n">u</span><span class="w"> </span><span class="o">|*</span><span class="w"> </span><span class="n">v</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="s s-Name">&quot;u |* v&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">print</span><span class="p">(</span><span class="n">u</span><span class="w"> </span><span class="o">|/</span><span class="w"> </span><span class="n">v</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="s s-Name">&quot;u |/ v&quot;</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">test_fixture</span><span class="p">;</span>
+</span><span id="__span-26-2"><a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="go">┌───────────┬───────────┬───────────┬───────────┐</span>
+</span><span id="__span-26-3"><a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="go">│  u |+ v   │  u |- v   │  u |* v   │  u |/ v   │</span>
+</span><span id="__span-26-4"><a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a><span class="go">├───────────┼───────────┼───────────┼───────────┤</span>
+</span><span id="__span-26-5"><a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a><span class="go">│           │           │           │           │</span>
+</span><span id="__span-26-6"><a id="__codelineno-26-6" name="__codelineno-26-6" href="#__codelineno-26-6"></a><span class="go">│    ───    │    ───    │    ───    │    ───    │</span>
+</span><span id="__span-26-7"><a id="__codelineno-26-7" name="__codelineno-26-7" href="#__codelineno-26-7"></a><span class="go">│  0│       │  0│       │  0│       │  0│       │</span>
+</span><span id="__span-26-8"><a id="__codelineno-26-8" name="__codelineno-26-8" href="#__codelineno-26-8"></a><span class="go">│  1│  5    │  1│ -1    │  1│  6    │  1│  0    │</span>
+</span><span id="__span-26-9"><a id="__codelineno-26-9" name="__codelineno-26-9" href="#__codelineno-26-9"></a><span class="go">│  2│  3    │  2│  3    │  2│  3    │  2│  3    │</span>
+</span><span id="__span-26-10"><a id="__codelineno-26-10" name="__codelineno-26-10" href="#__codelineno-26-10"></a><span class="go">│  3│       │  3│       │  3│       │  3│       │</span>
+</span><span id="__span-26-11"><a id="__codelineno-26-11" name="__codelineno-26-11" href="#__codelineno-26-11"></a><span class="go">│           │           │           │           │</span>
+</span><span id="__span-26-12"><a id="__codelineno-26-12" name="__codelineno-26-12" href="#__codelineno-26-12"></a><span class="go">└───────────┴───────────┴───────────┴───────────┘</span>
+</span><span id="__span-26-13"><a id="__codelineno-26-13" name="__codelineno-26-13" href="#__codelineno-26-13"></a><span class="go">(1 row)</span>
+</span></code></pre></div></p>
+<h2 id="elementwise-multiplication">Elementwise Multiplication</h2>
+<p>Multiply corresponding elements of two vectors
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="k">select</span><span class="w"> </span><span class="n">emult</span><span class="p">(</span><span class="s1">&#39;int32[0:1 1:2 2:3]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;int32[0:1 1:2 2:3]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;times_int32&#39;</span><span class="p">);</span>
+</span><span id="__span-27-2"><a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="go">┌────────────────────┐</span>
+</span><span id="__span-27-3"><a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="go">│       emult        │</span>
+</span><span id="__span-27-4"><a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a><span class="go">├────────────────────┤</span>
+</span><span id="__span-27-5"><a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a><span class="go">│ int32[0:1 1:4 2:9] │</span>
+</span><span id="__span-27-6"><a id="__codelineno-27-6" name="__codelineno-27-6" href="#__codelineno-27-6"></a><span class="go">└────────────────────┘</span>
+</span><span id="__span-27-7"><a id="__codelineno-27-7" name="__codelineno-27-7" href="#__codelineno-27-7"></a><span class="go">(1 row)</span>
+</span></code></pre></div>
+Emult can also be accomplished with binary operators specific to
+OneSparse.  Different binaryops are passed to emult to do different
+elementwise operations:
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="k">select</span><span class="w"> </span><span class="n">print</span><span class="p">(</span><span class="n">u</span><span class="w"> </span><span class="o">&amp;+</span><span class="w"> </span><span class="n">v</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="s s-Name">&quot;u &amp;+ v&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">print</span><span class="p">(</span><span class="n">u</span><span class="w"> </span><span class="o">&amp;-</span><span class="w"> </span><span class="n">v</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="s s-Name">&quot;u &amp;- v&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">print</span><span class="p">(</span><span class="n">u</span><span class="w"> </span><span class="o">&amp;*</span><span class="w"> </span><span class="n">v</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="s s-Name">&quot;u &amp;* v&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">print</span><span class="p">(</span><span class="n">u</span><span class="w"> </span><span class="o">&amp;/</span><span class="w"> </span><span class="n">v</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="s s-Name">&quot;u &amp;/ v&quot;</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">test_fixture</span><span class="p">;</span>
+</span><span id="__span-28-2"><a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="go">┌───────────┬───────────┬───────────┬───────────┐</span>
+</span><span id="__span-28-3"><a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a><span class="go">│  u &amp;+ v   │  u &amp;- v   │  u &amp;* v   │  u &amp;/ v   │</span>
+</span><span id="__span-28-4"><a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a><span class="go">├───────────┼───────────┼───────────┼───────────┤</span>
+</span><span id="__span-28-5"><a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a><span class="go">│           │           │           │           │</span>
+</span><span id="__span-28-6"><a id="__codelineno-28-6" name="__codelineno-28-6" href="#__codelineno-28-6"></a><span class="go">│    ───    │    ───    │    ───    │    ───    │</span>
+</span><span id="__span-28-7"><a id="__codelineno-28-7" name="__codelineno-28-7" href="#__codelineno-28-7"></a><span class="go">│  0│       │  0│       │  0│       │  0│       │</span>
+</span><span id="__span-28-8"><a id="__codelineno-28-8" name="__codelineno-28-8" href="#__codelineno-28-8"></a><span class="go">│  1│  5    │  1│ -1    │  1│  6    │  1│  0    │</span>
+</span><span id="__span-28-9"><a id="__codelineno-28-9" name="__codelineno-28-9" href="#__codelineno-28-9"></a><span class="go">│  2│       │  2│       │  2│       │  2│       │</span>
+</span><span id="__span-28-10"><a id="__codelineno-28-10" name="__codelineno-28-10" href="#__codelineno-28-10"></a><span class="go">│  3│       │  3│       │  3│       │  3│       │</span>
+</span><span id="__span-28-11"><a id="__codelineno-28-11" name="__codelineno-28-11" href="#__codelineno-28-11"></a><span class="go">│           │           │           │           │</span>
+</span><span id="__span-28-12"><a id="__codelineno-28-12" name="__codelineno-28-12" href="#__codelineno-28-12"></a><span class="go">└───────────┴───────────┴───────────┴───────────┘</span>
+</span><span id="__span-28-13"><a id="__codelineno-28-13" name="__codelineno-28-13" href="#__codelineno-28-13"></a><span class="go">(1 row)</span>
+</span></code></pre></div></p>
+<h2 id="elementwise-union">Elementwise Union</h2>
+<p>Union of two vectors with scalars for missing values
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="k">select</span><span class="w"> </span><span class="n">eunion</span><span class="p">(</span><span class="s1">&#39;int32[0:1 1:2 2:3]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span><span class="w"> </span><span class="mf">42</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;int32[0:1 1:2 2:3]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span><span class="w"> </span><span class="mf">84</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;plus_int32&#39;</span><span class="p">);</span>
+</span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="go">┌────────────────────┐</span>
+</span><span id="__span-29-3"><a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a><span class="go">│       eunion       │</span>
+</span><span id="__span-29-4"><a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a><span class="go">├────────────────────┤</span>
+</span><span id="__span-29-5"><a id="__codelineno-29-5" name="__codelineno-29-5" href="#__codelineno-29-5"></a><span class="go">│ int32[0:2 1:4 2:6] │</span>
+</span><span id="__span-29-6"><a id="__codelineno-29-6" name="__codelineno-29-6" href="#__codelineno-29-6"></a><span class="go">└────────────────────┘</span>
+</span><span id="__span-29-7"><a id="__codelineno-29-7" name="__codelineno-29-7" href="#__codelineno-29-7"></a><span class="go">(1 row)</span>
 </span></code></pre></div></p>
 <h2 id="reduction">Reduction</h2>
 <p>Reduce a vector to a scalar value using a monoid
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="k">select</span><span class="w"> </span><span class="n">reduce_scalar</span><span class="p">(</span><span class="s1">&#39;int32[0:1 1:2 2:3]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;plus_monoid_int32&#39;</span><span class="p">);</span>
-</span><span id="__span-26-2"><a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="go">┌───────────────┐</span>
-</span><span id="__span-26-3"><a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="go">│ reduce_scalar │</span>
-</span><span id="__span-26-4"><a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a><span class="go">├───────────────┤</span>
-</span><span id="__span-26-5"><a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a><span class="go">│ int32:6       │</span>
-</span><span id="__span-26-6"><a id="__codelineno-26-6" name="__codelineno-26-6" href="#__codelineno-26-6"></a><span class="go">└───────────────┘</span>
-</span><span id="__span-26-7"><a id="__codelineno-26-7" name="__codelineno-26-7" href="#__codelineno-26-7"></a><span class="go">(1 row)</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="k">select</span><span class="w"> </span><span class="n">reduce_scalar</span><span class="p">(</span><span class="s1">&#39;int32[0:1 1:2 2:3]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;plus_monoid_int32&#39;</span><span class="p">);</span>
+</span><span id="__span-30-2"><a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a><span class="go">┌───────────────┐</span>
+</span><span id="__span-30-3"><a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a><span class="go">│ reduce_scalar │</span>
+</span><span id="__span-30-4"><a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a><span class="go">├───────────────┤</span>
+</span><span id="__span-30-5"><a id="__codelineno-30-5" name="__codelineno-30-5" href="#__codelineno-30-5"></a><span class="go">│ int32:6       │</span>
+</span><span id="__span-30-6"><a id="__codelineno-30-6" name="__codelineno-30-6" href="#__codelineno-30-6"></a><span class="go">└───────────────┘</span>
+</span><span id="__span-30-7"><a id="__codelineno-30-7" name="__codelineno-30-7" href="#__codelineno-30-7"></a><span class="go">(1 row)</span>
 </span></code></pre></div></p>
 <h2 id="selection-and-apply">Selection and Apply</h2>
 <p>Filter a vector and apply unary operators
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="k">select</span><span class="w"> </span><span class="n">choose</span><span class="p">(</span><span class="s1">&#39;int32[0:1 1:2 2:3]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;valuegt_int32&#39;</span><span class="p">,</span><span class="w"> </span><span class="mf">1</span><span class="p">);</span>
-</span><span id="__span-27-2"><a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="go">┌────────────────┐</span>
-</span><span id="__span-27-3"><a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="go">│     choose     │</span>
-</span><span id="__span-27-4"><a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a><span class="go">├────────────────┤</span>
-</span><span id="__span-27-5"><a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a><span class="go">│ int32[1:2 2:3] │</span>
-</span><span id="__span-27-6"><a id="__codelineno-27-6" name="__codelineno-27-6" href="#__codelineno-27-6"></a><span class="go">└────────────────┘</span>
-</span><span id="__span-27-7"><a id="__codelineno-27-7" name="__codelineno-27-7" href="#__codelineno-27-7"></a><span class="go">(1 row)</span>
-</span><span id="__span-27-8"><a id="__codelineno-27-8" name="__codelineno-27-8" href="#__codelineno-27-8"></a>
-</span><span id="__span-27-9"><a id="__codelineno-27-9" name="__codelineno-27-9" href="#__codelineno-27-9"></a><span class="go">select apply(&#39;int32[1:1 2:2 3:3]&#39;::vector, &#39;ainv_int32&#39;::unaryop);</span>
-</span><span id="__span-27-10"><a id="__codelineno-27-10" name="__codelineno-27-10" href="#__codelineno-27-10"></a><span class="go">┌───────────────────────┐</span>
-</span><span id="__span-27-11"><a id="__codelineno-27-11" name="__codelineno-27-11" href="#__codelineno-27-11"></a><span class="go">│         apply         │</span>
-</span><span id="__span-27-12"><a id="__codelineno-27-12" name="__codelineno-27-12" href="#__codelineno-27-12"></a><span class="go">├───────────────────────┤</span>
-</span><span id="__span-27-13"><a id="__codelineno-27-13" name="__codelineno-27-13" href="#__codelineno-27-13"></a><span class="go">│ int32[1:-1 2:-2 3:-3] │</span>
-</span><span id="__span-27-14"><a id="__codelineno-27-14" name="__codelineno-27-14" href="#__codelineno-27-14"></a><span class="go">└───────────────────────┘</span>
-</span><span id="__span-27-15"><a id="__codelineno-27-15" name="__codelineno-27-15" href="#__codelineno-27-15"></a><span class="go">(1 row)</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-31-1"><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="k">select</span><span class="w"> </span><span class="n">choose</span><span class="p">(</span><span class="s1">&#39;int32[0:1 1:2 2:3]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;valuegt_int32&#39;</span><span class="p">,</span><span class="w"> </span><span class="mf">1</span><span class="p">);</span>
+</span><span id="__span-31-2"><a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a><span class="go">┌────────────────┐</span>
+</span><span id="__span-31-3"><a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a><span class="go">│     choose     │</span>
+</span><span id="__span-31-4"><a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a><span class="go">├────────────────┤</span>
+</span><span id="__span-31-5"><a id="__codelineno-31-5" name="__codelineno-31-5" href="#__codelineno-31-5"></a><span class="go">│ int32[1:2 2:3] │</span>
+</span><span id="__span-31-6"><a id="__codelineno-31-6" name="__codelineno-31-6" href="#__codelineno-31-6"></a><span class="go">└────────────────┘</span>
+</span><span id="__span-31-7"><a id="__codelineno-31-7" name="__codelineno-31-7" href="#__codelineno-31-7"></a><span class="go">(1 row)</span>
+</span><span id="__span-31-8"><a id="__codelineno-31-8" name="__codelineno-31-8" href="#__codelineno-31-8"></a>
+</span><span id="__span-31-9"><a id="__codelineno-31-9" name="__codelineno-31-9" href="#__codelineno-31-9"></a><span class="go">select apply(&#39;int32[1:1 2:2 3:3]&#39;::vector, &#39;ainv_int32&#39;::unaryop);</span>
+</span><span id="__span-31-10"><a id="__codelineno-31-10" name="__codelineno-31-10" href="#__codelineno-31-10"></a><span class="go">┌───────────────────────┐</span>
+</span><span id="__span-31-11"><a id="__codelineno-31-11" name="__codelineno-31-11" href="#__codelineno-31-11"></a><span class="go">│         apply         │</span>
+</span><span id="__span-31-12"><a id="__codelineno-31-12" name="__codelineno-31-12" href="#__codelineno-31-12"></a><span class="go">├───────────────────────┤</span>
+</span><span id="__span-31-13"><a id="__codelineno-31-13" name="__codelineno-31-13" href="#__codelineno-31-13"></a><span class="go">│ int32[1:-1 2:-2 3:-3] │</span>
+</span><span id="__span-31-14"><a id="__codelineno-31-14" name="__codelineno-31-14" href="#__codelineno-31-14"></a><span class="go">└───────────────────────┘</span>
+</span><span id="__span-31-15"><a id="__codelineno-31-15" name="__codelineno-31-15" href="#__codelineno-31-15"></a><span class="go">(1 row)</span>
 </span></code></pre></div></p>
 <h2 id="setting-and-getting-elements">Setting and Getting Elements</h2>
 <p>Elements can be set individually with <code>set_element</code>, the modified
 input is returned:
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="k">select</span><span class="w"> </span><span class="n">set_element</span><span class="p">(</span><span class="s1">&#39;int32[1:1 2:2 3:3]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span><span class="w"> </span><span class="mf">4</span><span class="p">,</span><span class="w"> </span><span class="mf">4</span><span class="p">);</span>
-</span><span id="__span-28-2"><a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="go">┌────────────────────────┐</span>
-</span><span id="__span-28-3"><a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a><span class="go">│      set_element       │</span>
-</span><span id="__span-28-4"><a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a><span class="go">├────────────────────────┤</span>
-</span><span id="__span-28-5"><a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a><span class="go">│ int32[1:1 2:2 3:3 4:4] │</span>
-</span><span id="__span-28-6"><a id="__codelineno-28-6" name="__codelineno-28-6" href="#__codelineno-28-6"></a><span class="go">└────────────────────────┘</span>
-</span><span id="__span-28-7"><a id="__codelineno-28-7" name="__codelineno-28-7" href="#__codelineno-28-7"></a><span class="go">(1 row)</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-32-1"><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="k">select</span><span class="w"> </span><span class="n">set_element</span><span class="p">(</span><span class="s1">&#39;int32[1:1 2:2 3:3]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span><span class="w"> </span><span class="mf">4</span><span class="p">,</span><span class="w"> </span><span class="mf">4</span><span class="p">);</span>
+</span><span id="__span-32-2"><a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a><span class="go">┌────────────────────────┐</span>
+</span><span id="__span-32-3"><a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a><span class="go">│      set_element       │</span>
+</span><span id="__span-32-4"><a id="__codelineno-32-4" name="__codelineno-32-4" href="#__codelineno-32-4"></a><span class="go">├────────────────────────┤</span>
+</span><span id="__span-32-5"><a id="__codelineno-32-5" name="__codelineno-32-5" href="#__codelineno-32-5"></a><span class="go">│ int32[1:1 2:2 3:3 4:4] │</span>
+</span><span id="__span-32-6"><a id="__codelineno-32-6" name="__codelineno-32-6" href="#__codelineno-32-6"></a><span class="go">└────────────────────────┘</span>
+</span><span id="__span-32-7"><a id="__codelineno-32-7" name="__codelineno-32-7" href="#__codelineno-32-7"></a><span class="go">(1 row)</span>
 </span></code></pre></div>
 Scalar elements can be extracted individually with <code>get_element</code>
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="k">select</span><span class="w"> </span><span class="n">get_element</span><span class="p">(</span><span class="s1">&#39;int32[1:1 2:2 3:3]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span><span class="w"> </span><span class="mf">3</span><span class="p">);</span>
-</span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="go">┌─────────────┐</span>
-</span><span id="__span-29-3"><a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a><span class="go">│ get_element │</span>
-</span><span id="__span-29-4"><a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a><span class="go">├─────────────┤</span>
-</span><span id="__span-29-5"><a id="__codelineno-29-5" name="__codelineno-29-5" href="#__codelineno-29-5"></a><span class="go">│ int32:3     │</span>
-</span><span id="__span-29-6"><a id="__codelineno-29-6" name="__codelineno-29-6" href="#__codelineno-29-6"></a><span class="go">└─────────────┘</span>
-</span><span id="__span-29-7"><a id="__codelineno-29-7" name="__codelineno-29-7" href="#__codelineno-29-7"></a><span class="go">(1 row)</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-33-1"><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="k">select</span><span class="w"> </span><span class="n">get_element</span><span class="p">(</span><span class="s1">&#39;int32[1:1 2:2 3:3]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span><span class="w"> </span><span class="mf">3</span><span class="p">);</span>
+</span><span id="__span-33-2"><a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a><span class="go">┌─────────────┐</span>
+</span><span id="__span-33-3"><a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a><span class="go">│ get_element │</span>
+</span><span id="__span-33-4"><a id="__codelineno-33-4" name="__codelineno-33-4" href="#__codelineno-33-4"></a><span class="go">├─────────────┤</span>
+</span><span id="__span-33-5"><a id="__codelineno-33-5" name="__codelineno-33-5" href="#__codelineno-33-5"></a><span class="go">│ int32:3     │</span>
+</span><span id="__span-33-6"><a id="__codelineno-33-6" name="__codelineno-33-6" href="#__codelineno-33-6"></a><span class="go">└─────────────┘</span>
+</span><span id="__span-33-7"><a id="__codelineno-33-7" name="__codelineno-33-7" href="#__codelineno-33-7"></a><span class="go">(1 row)</span>
 </span></code></pre></div></p>
 <h2 id="utility-operations">Utility Operations</h2>
 <p>Miscellaneous helpers for vectors
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="k">select</span><span class="w"> </span><span class="n">print</span><span class="p">(</span><span class="s1">&#39;int32(4)[1:1 2:2 3:3]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">);</span>
-</span><span id="__span-30-2"><a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a><span class="go">┌───────────┐</span>
-</span><span id="__span-30-3"><a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a><span class="go">│   print   │</span>
-</span><span id="__span-30-4"><a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a><span class="go">├───────────┤</span>
-</span><span id="__span-30-5"><a id="__codelineno-30-5" name="__codelineno-30-5" href="#__codelineno-30-5"></a><span class="go">│           │</span>
-</span><span id="__span-30-6"><a id="__codelineno-30-6" name="__codelineno-30-6" href="#__codelineno-30-6"></a><span class="go">│    ───    │</span>
-</span><span id="__span-30-7"><a id="__codelineno-30-7" name="__codelineno-30-7" href="#__codelineno-30-7"></a><span class="go">│  0│       │</span>
-</span><span id="__span-30-8"><a id="__codelineno-30-8" name="__codelineno-30-8" href="#__codelineno-30-8"></a><span class="go">│  1│  1    │</span>
-</span><span id="__span-30-9"><a id="__codelineno-30-9" name="__codelineno-30-9" href="#__codelineno-30-9"></a><span class="go">│  2│  2    │</span>
-</span><span id="__span-30-10"><a id="__codelineno-30-10" name="__codelineno-30-10" href="#__codelineno-30-10"></a><span class="go">│  3│  3    │</span>
-</span><span id="__span-30-11"><a id="__codelineno-30-11" name="__codelineno-30-11" href="#__codelineno-30-11"></a><span class="go">│           │</span>
-</span><span id="__span-30-12"><a id="__codelineno-30-12" name="__codelineno-30-12" href="#__codelineno-30-12"></a><span class="go">└───────────┘</span>
-</span><span id="__span-30-13"><a id="__codelineno-30-13" name="__codelineno-30-13" href="#__codelineno-30-13"></a><span class="go">(1 row)</span>
-</span><span id="__span-30-14"><a id="__codelineno-30-14" name="__codelineno-30-14" href="#__codelineno-30-14"></a>
-</span><span id="__span-30-15"><a id="__codelineno-30-15" name="__codelineno-30-15" href="#__codelineno-30-15"></a><span class="go">select wait(&#39;int32[0:1 1:2 2:3]&#39;::vector);</span>
-</span><span id="__span-30-16"><a id="__codelineno-30-16" name="__codelineno-30-16" href="#__codelineno-30-16"></a><span class="go">┌────────────────────┐</span>
-</span><span id="__span-30-17"><a id="__codelineno-30-17" name="__codelineno-30-17" href="#__codelineno-30-17"></a><span class="go">│        wait        │</span>
-</span><span id="__span-30-18"><a id="__codelineno-30-18" name="__codelineno-30-18" href="#__codelineno-30-18"></a><span class="go">├────────────────────┤</span>
-</span><span id="__span-30-19"><a id="__codelineno-30-19" name="__codelineno-30-19" href="#__codelineno-30-19"></a><span class="go">│ int32[0:1 1:2 2:3] │</span>
-</span><span id="__span-30-20"><a id="__codelineno-30-20" name="__codelineno-30-20" href="#__codelineno-30-20"></a><span class="go">└────────────────────┘</span>
-</span><span id="__span-30-21"><a id="__codelineno-30-21" name="__codelineno-30-21" href="#__codelineno-30-21"></a><span class="go">(1 row)</span>
-</span><span id="__span-30-22"><a id="__codelineno-30-22" name="__codelineno-30-22" href="#__codelineno-30-22"></a>
-</span><span id="__span-30-23"><a id="__codelineno-30-23" name="__codelineno-30-23" href="#__codelineno-30-23"></a><span class="go">select dup(&#39;int32[0:1 1:2 2:3]&#39;::vector);</span>
-</span><span id="__span-30-24"><a id="__codelineno-30-24" name="__codelineno-30-24" href="#__codelineno-30-24"></a><span class="go">┌────────────────────┐</span>
-</span><span id="__span-30-25"><a id="__codelineno-30-25" name="__codelineno-30-25" href="#__codelineno-30-25"></a><span class="go">│        dup         │</span>
-</span><span id="__span-30-26"><a id="__codelineno-30-26" name="__codelineno-30-26" href="#__codelineno-30-26"></a><span class="go">├────────────────────┤</span>
-</span><span id="__span-30-27"><a id="__codelineno-30-27" name="__codelineno-30-27" href="#__codelineno-30-27"></a><span class="go">│ int32[0:1 1:2 2:3] │</span>
-</span><span id="__span-30-28"><a id="__codelineno-30-28" name="__codelineno-30-28" href="#__codelineno-30-28"></a><span class="go">└────────────────────┘</span>
-</span><span id="__span-30-29"><a id="__codelineno-30-29" name="__codelineno-30-29" href="#__codelineno-30-29"></a><span class="go">(1 row)</span>
-</span><span id="__span-30-30"><a id="__codelineno-30-30" name="__codelineno-30-30" href="#__codelineno-30-30"></a>
-</span><span id="__span-30-31"><a id="__codelineno-30-31" name="__codelineno-30-31" href="#__codelineno-30-31"></a><span class="go">select clear(&#39;int32[0:1 1:2 2:3]&#39;::vector);</span>
-</span><span id="__span-30-32"><a id="__codelineno-30-32" name="__codelineno-30-32" href="#__codelineno-30-32"></a><span class="go">┌───────┐</span>
-</span><span id="__span-30-33"><a id="__codelineno-30-33" name="__codelineno-30-33" href="#__codelineno-30-33"></a><span class="go">│ clear │</span>
-</span><span id="__span-30-34"><a id="__codelineno-30-34" name="__codelineno-30-34" href="#__codelineno-30-34"></a><span class="go">├───────┤</span>
-</span><span id="__span-30-35"><a id="__codelineno-30-35" name="__codelineno-30-35" href="#__codelineno-30-35"></a><span class="go">│ int32 │</span>
-</span><span id="__span-30-36"><a id="__codelineno-30-36" name="__codelineno-30-36" href="#__codelineno-30-36"></a><span class="go">└───────┘</span>
-</span><span id="__span-30-37"><a id="__codelineno-30-37" name="__codelineno-30-37" href="#__codelineno-30-37"></a><span class="go">(1 row)</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-34-1"><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="k">select</span><span class="w"> </span><span class="n">print</span><span class="p">(</span><span class="s1">&#39;int32(4)[1:1 2:2 3:3]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">);</span>
+</span><span id="__span-34-2"><a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a><span class="go">┌───────────┐</span>
+</span><span id="__span-34-3"><a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a><span class="go">│   print   │</span>
+</span><span id="__span-34-4"><a id="__codelineno-34-4" name="__codelineno-34-4" href="#__codelineno-34-4"></a><span class="go">├───────────┤</span>
+</span><span id="__span-34-5"><a id="__codelineno-34-5" name="__codelineno-34-5" href="#__codelineno-34-5"></a><span class="go">│           │</span>
+</span><span id="__span-34-6"><a id="__codelineno-34-6" name="__codelineno-34-6" href="#__codelineno-34-6"></a><span class="go">│    ───    │</span>
+</span><span id="__span-34-7"><a id="__codelineno-34-7" name="__codelineno-34-7" href="#__codelineno-34-7"></a><span class="go">│  0│       │</span>
+</span><span id="__span-34-8"><a id="__codelineno-34-8" name="__codelineno-34-8" href="#__codelineno-34-8"></a><span class="go">│  1│  1    │</span>
+</span><span id="__span-34-9"><a id="__codelineno-34-9" name="__codelineno-34-9" href="#__codelineno-34-9"></a><span class="go">│  2│  2    │</span>
+</span><span id="__span-34-10"><a id="__codelineno-34-10" name="__codelineno-34-10" href="#__codelineno-34-10"></a><span class="go">│  3│  3    │</span>
+</span><span id="__span-34-11"><a id="__codelineno-34-11" name="__codelineno-34-11" href="#__codelineno-34-11"></a><span class="go">│           │</span>
+</span><span id="__span-34-12"><a id="__codelineno-34-12" name="__codelineno-34-12" href="#__codelineno-34-12"></a><span class="go">└───────────┘</span>
+</span><span id="__span-34-13"><a id="__codelineno-34-13" name="__codelineno-34-13" href="#__codelineno-34-13"></a><span class="go">(1 row)</span>
+</span><span id="__span-34-14"><a id="__codelineno-34-14" name="__codelineno-34-14" href="#__codelineno-34-14"></a>
+</span><span id="__span-34-15"><a id="__codelineno-34-15" name="__codelineno-34-15" href="#__codelineno-34-15"></a><span class="go">select wait(&#39;int32[0:1 1:2 2:3]&#39;::vector);</span>
+</span><span id="__span-34-16"><a id="__codelineno-34-16" name="__codelineno-34-16" href="#__codelineno-34-16"></a><span class="go">┌────────────────────┐</span>
+</span><span id="__span-34-17"><a id="__codelineno-34-17" name="__codelineno-34-17" href="#__codelineno-34-17"></a><span class="go">│        wait        │</span>
+</span><span id="__span-34-18"><a id="__codelineno-34-18" name="__codelineno-34-18" href="#__codelineno-34-18"></a><span class="go">├────────────────────┤</span>
+</span><span id="__span-34-19"><a id="__codelineno-34-19" name="__codelineno-34-19" href="#__codelineno-34-19"></a><span class="go">│ int32[0:1 1:2 2:3] │</span>
+</span><span id="__span-34-20"><a id="__codelineno-34-20" name="__codelineno-34-20" href="#__codelineno-34-20"></a><span class="go">└────────────────────┘</span>
+</span><span id="__span-34-21"><a id="__codelineno-34-21" name="__codelineno-34-21" href="#__codelineno-34-21"></a><span class="go">(1 row)</span>
+</span><span id="__span-34-22"><a id="__codelineno-34-22" name="__codelineno-34-22" href="#__codelineno-34-22"></a>
+</span><span id="__span-34-23"><a id="__codelineno-34-23" name="__codelineno-34-23" href="#__codelineno-34-23"></a><span class="go">select dup(&#39;int32[0:1 1:2 2:3]&#39;::vector);</span>
+</span><span id="__span-34-24"><a id="__codelineno-34-24" name="__codelineno-34-24" href="#__codelineno-34-24"></a><span class="go">┌────────────────────┐</span>
+</span><span id="__span-34-25"><a id="__codelineno-34-25" name="__codelineno-34-25" href="#__codelineno-34-25"></a><span class="go">│        dup         │</span>
+</span><span id="__span-34-26"><a id="__codelineno-34-26" name="__codelineno-34-26" href="#__codelineno-34-26"></a><span class="go">├────────────────────┤</span>
+</span><span id="__span-34-27"><a id="__codelineno-34-27" name="__codelineno-34-27" href="#__codelineno-34-27"></a><span class="go">│ int32[0:1 1:2 2:3] │</span>
+</span><span id="__span-34-28"><a id="__codelineno-34-28" name="__codelineno-34-28" href="#__codelineno-34-28"></a><span class="go">└────────────────────┘</span>
+</span><span id="__span-34-29"><a id="__codelineno-34-29" name="__codelineno-34-29" href="#__codelineno-34-29"></a><span class="go">(1 row)</span>
+</span><span id="__span-34-30"><a id="__codelineno-34-30" name="__codelineno-34-30" href="#__codelineno-34-30"></a>
+</span><span id="__span-34-31"><a id="__codelineno-34-31" name="__codelineno-34-31" href="#__codelineno-34-31"></a><span class="go">select clear(&#39;int32[0:1 1:2 2:3]&#39;::vector);</span>
+</span><span id="__span-34-32"><a id="__codelineno-34-32" name="__codelineno-34-32" href="#__codelineno-34-32"></a><span class="go">┌───────┐</span>
+</span><span id="__span-34-33"><a id="__codelineno-34-33" name="__codelineno-34-33" href="#__codelineno-34-33"></a><span class="go">│ clear │</span>
+</span><span id="__span-34-34"><a id="__codelineno-34-34" name="__codelineno-34-34" href="#__codelineno-34-34"></a><span class="go">├───────┤</span>
+</span><span id="__span-34-35"><a id="__codelineno-34-35" name="__codelineno-34-35" href="#__codelineno-34-35"></a><span class="go">│ int32 │</span>
+</span><span id="__span-34-36"><a id="__codelineno-34-36" name="__codelineno-34-36" href="#__codelineno-34-36"></a><span class="go">└───────┘</span>
+</span><span id="__span-34-37"><a id="__codelineno-34-37" name="__codelineno-34-37" href="#__codelineno-34-37"></a><span class="go">(1 row)</span>
 </span></code></pre></div></p>
 
 

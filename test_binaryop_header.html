@@ -12,7 +12,7 @@
         <link rel="prev" href="test_monoid_header.html">
       
       
-        <link rel="next" href="test_indexunaryop_header.html">
+        <link rel="next" href="test_indexbinaryop_header.html">
       
       
       <link rel="icon" href="assets/images/favicon.png">
@@ -405,6 +405,19 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    BinaryOp
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="test_binaryop_header.html" class="md-nav__link md-nav__link--active">
         
   
@@ -417,6 +430,43 @@
 
       </a>
       
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#user-defined-binary-operators" class="md-nav__link">
+    <span class="md-ellipsis">
+      User Defined Binary Operators
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#built-in-operators" class="md-nav__link">
+    <span class="md-ellipsis">
+      Built-in Operators
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -428,12 +478,12 @@
   
   
     <li class="md-nav__item">
-      <a href="test_indexunaryop_header.html" class="md-nav__link">
+      <a href="test_indexbinaryop_header.html" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    IndexUnaryOp
+    IndexBinaryOp
     
   </span>
   
@@ -456,6 +506,28 @@
   
   <span class="md-ellipsis">
     UnaryOp
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="test_indexunaryop_header.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    IndexUnaryOp
     
   </span>
   
@@ -526,7 +598,51 @@
 
 
 <h1 id="binaryop">BinaryOp</h1>
-<p>BinaryOps apply a function to two elements and returning an element.</p>
+<p>In <a href="https://en.wikipedia.org/wiki/Mathematics" title="Mathematics">mathematics</a>, a <strong>binary operation</strong> or <strong>dyadic operation</strong> is a
+rule for combining two
+<a href="https://en.wikipedia.org/wiki/Element_(mathematics)" title="Element (mathematics)">elements</a> (called
+<a href="https://en.wikipedia.org/wiki/Operands" title="Operands">operands</a>) to
+produce another element. More formally, a binary operation is an
+<a href="https://en.wikipedia.org/wiki/Operation_(mathematics)" title="Operation (mathematics)">operation</a> of
+<a href="https://en.wikipedia.org/wiki/Arity" title="Arity">arity</a> two.</p>
+<h2 id="user-defined-binary-operators">User Defined Binary Operators</h2>
+<p>User defined functions can be registered with OneSparse by
+inserting them into the <code>onesparse.user_defined_binaryop</code> table.
+They can then be JIT compiled into kernels and used in any function
+that takes a <code>binaryop</code> argument:</p>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">show</span><span class="w"> </span><span class="n">onesparse</span><span class="mf">.</span><span class="n">jit_control</span><span class="p">;</span><span class="w">  </span><span class="c1">-- This must be set to &#39;on&#39; in postgres config.</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="go">┌───────────────────────┐</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="go">│ onesparse.jit_control │</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="go">├───────────────────────┤</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="go">│ on                    │</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="go">└───────────────────────┘</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="go">(1 row)</span>
+</span></code></pre></div>
+<p>Insert the expected function types and function body into the
+table.  Here is an example function that computes the <a href="https://en.wikipedia.org/wiki/Hamming_distance">Hamming
+Distance</a> between
+two elements.  See the SuiteSparse User Guide for more details:</p>
+<p><div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">insert</span><span class="w"> </span><span class="k">into</span><span class="w"> </span><span class="n">user_defined_binaryop</span><span class="w"> </span><span class="p">(</span><span class="k">name</span><span class="p">,</span><span class="w"> </span><span class="n">ztype</span><span class="p">,</span><span class="w"> </span><span class="n">xtype</span><span class="p">,</span><span class="w"> </span><span class="n">ytype</span><span class="p">,</span><span class="w"> </span><span class="n">func</span><span class="p">)</span><span class="w"> </span><span class="k">VALUES</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="p">(</span><span class="s1">&#39;binary_hamming_dist&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;int64&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;int64&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;int64&#39;</span><span class="p">,</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="err">$$</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span><span class="nb">void</span><span class="w"> </span><span class="n">binary_hamming_dist</span><span class="w"> </span><span class="p">(</span><span class="n">int64_t</span><span class="w"> </span><span class="o">*</span><span class="n">z</span><span class="p">,</span><span class="w"> </span><span class="n">int64_t</span><span class="w"> </span><span class="o">*</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">int64_t</span><span class="w"> </span><span class="o">*</span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">        </span><span class="p">(</span><span class="o">*</span><span class="n">z</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">__builtin_popcountll</span><span class="p">((</span><span class="o">*</span><span class="n">x</span><span class="p">)</span><span class="o">^</span><span class="p">(</span><span class="o">*</span><span class="n">y</span><span class="p">));</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="go">       };</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="go">    $$);</span>
+</span></code></pre></div>
+The new operator can now be used in functions that take <code>binaryop</code>
+operators like <code>eadd</code>:
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">select</span><span class="w"> </span><span class="n">eadd</span><span class="p">(</span><span class="n">random_vector</span><span class="p">(</span><span class="s1">&#39;int64&#39;</span><span class="p">,</span><span class="w"> </span><span class="mf">16</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;inf&#39;</span><span class="p">,</span><span class="w"> </span><span class="mf">42</span><span class="p">),</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">            </span><span class="n">random_vector</span><span class="p">(</span><span class="s1">&#39;int64&#39;</span><span class="p">,</span><span class="w"> </span><span class="mf">16</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;inf&#39;</span><span class="p">,</span><span class="w"> </span><span class="mf">43</span><span class="p">),</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">            </span><span class="s1">&#39;binary_hamming_dist&#39;</span><span class="p">);</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="go">┌──────────────────────────────────────────────────────────────────────────────────────────────────┐</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="go">│                                               eadd                                               │</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="go">├──────────────────────────────────────────────────────────────────────────────────────────────────┤</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="go">│ int64(16)[0:32 1:31 2:31 3:30 4:36 5:37 6:30 7:35 8:35 9:27 10:33 11:28 12:32 13:37 14:36 15:32] │</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="go">└──────────────────────────────────────────────────────────────────────────────────────────────────┘</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="go">(1 row)</span>
+</span></code></pre></div></p>
+<h2 id="built-in-operators">Built-in Operators</h2>
 <table>
 <thead>
 <tr>
@@ -548,10 +664,6 @@
 <td>GrB_ONEB_BOOL</td>
 </tr>
 <tr>
-<td>pow_bool</td>
-<td>GxB_POW_BOOL</td>
-</tr>
-<tr>
 <td>first_int8</td>
 <td>GrB_FIRST_INT8</td>
 </tr>
@@ -562,10 +674,6 @@
 <tr>
 <td>oneb_int8</td>
 <td>GrB_ONEB_INT8</td>
-</tr>
-<tr>
-<td>pow_int8</td>
-<td>GxB_POW_INT8</td>
 </tr>
 <tr>
 <td>first_int16</td>
@@ -580,10 +688,6 @@
 <td>GrB_ONEB_INT16</td>
 </tr>
 <tr>
-<td>pow_int16</td>
-<td>GxB_POW_INT16</td>
-</tr>
-<tr>
 <td>first_int32</td>
 <td>GrB_FIRST_INT32</td>
 </tr>
@@ -594,10 +698,6 @@
 <tr>
 <td>oneb_int32</td>
 <td>GrB_ONEB_INT32</td>
-</tr>
-<tr>
-<td>pow_int32</td>
-<td>GxB_POW_INT32</td>
 </tr>
 <tr>
 <td>first_int64</td>
@@ -612,10 +712,6 @@
 <td>GrB_ONEB_INT64</td>
 </tr>
 <tr>
-<td>pow_int64</td>
-<td>GxB_POW_INT64</td>
-</tr>
-<tr>
 <td>first_uint8</td>
 <td>GrB_FIRST_UINT8</td>
 </tr>
@@ -626,10 +722,6 @@
 <tr>
 <td>oneb_uint8</td>
 <td>GrB_ONEB_UINT8</td>
-</tr>
-<tr>
-<td>pow_uint8</td>
-<td>GxB_POW_UINT8</td>
 </tr>
 <tr>
 <td>first_uint16</td>
@@ -644,10 +736,6 @@
 <td>GrB_ONEB_UINT16</td>
 </tr>
 <tr>
-<td>pow_uint16</td>
-<td>GxB_POW_UINT16</td>
-</tr>
-<tr>
 <td>first_uint32</td>
 <td>GrB_FIRST_UINT32</td>
 </tr>
@@ -658,10 +746,6 @@
 <tr>
 <td>oneb_uint32</td>
 <td>GrB_ONEB_UINT32</td>
-</tr>
-<tr>
-<td>pow_uint32</td>
-<td>GxB_POW_UINT32</td>
 </tr>
 <tr>
 <td>first_uint64</td>
@@ -676,10 +760,6 @@
 <td>GrB_ONEB_UINT64</td>
 </tr>
 <tr>
-<td>pow_uint64</td>
-<td>GxB_POW_UINT64</td>
-</tr>
-<tr>
 <td>first_fp32</td>
 <td>GrB_FIRST_FP32</td>
 </tr>
@@ -690,10 +770,6 @@
 <tr>
 <td>oneb_fp32</td>
 <td>GrB_ONEB_FP32</td>
-</tr>
-<tr>
-<td>pow_fp32</td>
-<td>GxB_POW_FP32</td>
 </tr>
 <tr>
 <td>first_fp64</td>
@@ -708,10 +784,6 @@
 <td>GrB_ONEB_FP64</td>
 </tr>
 <tr>
-<td>pow_fp64</td>
-<td>GxB_POW_FP64</td>
-</tr>
-<tr>
 <td>first_fc32</td>
 <td>GxB_FIRST_FC32</td>
 </tr>
@@ -724,10 +796,6 @@
 <td>GxB_ONEB_FC32</td>
 </tr>
 <tr>
-<td>pow_fc32</td>
-<td>GxB_POW_FC32</td>
-</tr>
-<tr>
 <td>first_fc64</td>
 <td>GxB_FIRST_FC64</td>
 </tr>
@@ -738,6 +806,54 @@
 <tr>
 <td>oneb_fc64</td>
 <td>GxB_ONEB_FC64</td>
+</tr>
+<tr>
+<td>pow_bool</td>
+<td>GxB_POW_BOOL</td>
+</tr>
+<tr>
+<td>pow_int8</td>
+<td>GxB_POW_INT8</td>
+</tr>
+<tr>
+<td>pow_int16</td>
+<td>GxB_POW_INT16</td>
+</tr>
+<tr>
+<td>pow_int32</td>
+<td>GxB_POW_INT32</td>
+</tr>
+<tr>
+<td>pow_int64</td>
+<td>GxB_POW_INT64</td>
+</tr>
+<tr>
+<td>pow_uint8</td>
+<td>GxB_POW_UINT8</td>
+</tr>
+<tr>
+<td>pow_uint16</td>
+<td>GxB_POW_UINT16</td>
+</tr>
+<tr>
+<td>pow_uint32</td>
+<td>GxB_POW_UINT32</td>
+</tr>
+<tr>
+<td>pow_uint64</td>
+<td>GxB_POW_UINT64</td>
+</tr>
+<tr>
+<td>pow_fp32</td>
+<td>GxB_POW_FP32</td>
+</tr>
+<tr>
+<td>pow_fp64</td>
+<td>GxB_POW_FP64</td>
+</tr>
+<tr>
+<td>pow_fc32</td>
+<td>GxB_POW_FC32</td>
 </tr>
 <tr>
 <td>pow_fc64</td>
@@ -1724,6 +1840,102 @@
 <td>GxB_COPYSIGN_FP64</td>
 </tr>
 <tr>
+<td>bget_int8</td>
+<td>GxB_BGET_INT8</td>
+</tr>
+<tr>
+<td>bset_int8</td>
+<td>GxB_BSET_INT8</td>
+</tr>
+<tr>
+<td>bclr_int8</td>
+<td>GxB_BCLR_INT8</td>
+</tr>
+<tr>
+<td>bget_int16</td>
+<td>GxB_BGET_INT16</td>
+</tr>
+<tr>
+<td>bset_int16</td>
+<td>GxB_BSET_INT16</td>
+</tr>
+<tr>
+<td>bclr_int16</td>
+<td>GxB_BCLR_INT16</td>
+</tr>
+<tr>
+<td>bget_int32</td>
+<td>GxB_BGET_INT32</td>
+</tr>
+<tr>
+<td>bset_int32</td>
+<td>GxB_BSET_INT32</td>
+</tr>
+<tr>
+<td>bclr_int32</td>
+<td>GxB_BCLR_INT32</td>
+</tr>
+<tr>
+<td>bget_int64</td>
+<td>GxB_BGET_INT64</td>
+</tr>
+<tr>
+<td>bset_int64</td>
+<td>GxB_BSET_INT64</td>
+</tr>
+<tr>
+<td>bclr_int64</td>
+<td>GxB_BCLR_INT64</td>
+</tr>
+<tr>
+<td>bget_uint8</td>
+<td>GxB_BGET_UINT8</td>
+</tr>
+<tr>
+<td>bset_uint8</td>
+<td>GxB_BSET_UINT8</td>
+</tr>
+<tr>
+<td>bclr_uint8</td>
+<td>GxB_BCLR_UINT8</td>
+</tr>
+<tr>
+<td>bget_uint16</td>
+<td>GxB_BGET_UINT16</td>
+</tr>
+<tr>
+<td>bset_uint16</td>
+<td>GxB_BSET_UINT16</td>
+</tr>
+<tr>
+<td>bclr_uint16</td>
+<td>GxB_BCLR_UINT16</td>
+</tr>
+<tr>
+<td>bget_uint32</td>
+<td>GxB_BGET_UINT32</td>
+</tr>
+<tr>
+<td>bset_uint32</td>
+<td>GxB_BSET_UINT32</td>
+</tr>
+<tr>
+<td>bclr_uint32</td>
+<td>GxB_BCLR_UINT32</td>
+</tr>
+<tr>
+<td>bget_uint64</td>
+<td>GxB_BGET_UINT64</td>
+</tr>
+<tr>
+<td>bset_uint64</td>
+<td>GxB_BSET_UINT64</td>
+</tr>
+<tr>
+<td>bclr_uint64</td>
+<td>GxB_BCLR_UINT64</td>
+</tr>
+<tr>
 <td>bor_int8</td>
 <td>GrB_BOR_INT8</td>
 </tr>
@@ -1850,102 +2062,6 @@
 <tr>
 <td>bxnor_uint64</td>
 <td>GrB_BXNOR_UINT64</td>
-</tr>
-<tr>
-<td>bget_int8</td>
-<td>GxB_BGET_INT8</td>
-</tr>
-<tr>
-<td>bset_int8</td>
-<td>GxB_BSET_INT8</td>
-</tr>
-<tr>
-<td>bclr_int8</td>
-<td>GxB_BCLR_INT8</td>
-</tr>
-<tr>
-<td>bget_int16</td>
-<td>GxB_BGET_INT16</td>
-</tr>
-<tr>
-<td>bset_int16</td>
-<td>GxB_BSET_INT16</td>
-</tr>
-<tr>
-<td>bclr_int16</td>
-<td>GxB_BCLR_INT16</td>
-</tr>
-<tr>
-<td>bget_int32</td>
-<td>GxB_BGET_INT32</td>
-</tr>
-<tr>
-<td>bset_int32</td>
-<td>GxB_BSET_INT32</td>
-</tr>
-<tr>
-<td>bclr_int32</td>
-<td>GxB_BCLR_INT32</td>
-</tr>
-<tr>
-<td>bget_int64</td>
-<td>GxB_BGET_INT64</td>
-</tr>
-<tr>
-<td>bset_int64</td>
-<td>GxB_BSET_INT64</td>
-</tr>
-<tr>
-<td>bclr_int64</td>
-<td>GxB_BCLR_INT64</td>
-</tr>
-<tr>
-<td>bget_uint8</td>
-<td>GxB_BGET_UINT8</td>
-</tr>
-<tr>
-<td>bset_uint8</td>
-<td>GxB_BSET_UINT8</td>
-</tr>
-<tr>
-<td>bclr_uint8</td>
-<td>GxB_BCLR_UINT8</td>
-</tr>
-<tr>
-<td>bget_uint16</td>
-<td>GxB_BGET_UINT16</td>
-</tr>
-<tr>
-<td>bset_uint16</td>
-<td>GxB_BSET_UINT16</td>
-</tr>
-<tr>
-<td>bclr_uint16</td>
-<td>GxB_BCLR_UINT16</td>
-</tr>
-<tr>
-<td>bget_uint32</td>
-<td>GxB_BGET_UINT32</td>
-</tr>
-<tr>
-<td>bset_uint32</td>
-<td>GxB_BSET_UINT32</td>
-</tr>
-<tr>
-<td>bclr_uint32</td>
-<td>GxB_BCLR_UINT32</td>
-</tr>
-<tr>
-<td>bget_uint64</td>
-<td>GxB_BGET_UINT64</td>
-</tr>
-<tr>
-<td>bset_uint64</td>
-<td>GxB_BSET_UINT64</td>
-</tr>
-<tr>
-<td>bclr_uint64</td>
-<td>GxB_BCLR_UINT64</td>
 </tr>
 <tr>
 <td>bshift_int8</td>

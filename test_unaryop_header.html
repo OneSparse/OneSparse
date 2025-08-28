@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="test_indexunaryop_header.html">
+        <link rel="prev" href="test_indexbinaryop_header.html">
       
       
-        <link rel="next" href="test_descriptor_header.html">
+        <link rel="next" href="test_indexunaryop_header.html">
       
       
       <link rel="icon" href="assets/images/favicon.png">
@@ -418,12 +418,12 @@
   
   
     <li class="md-nav__item">
-      <a href="test_indexunaryop_header.html" class="md-nav__link">
+      <a href="test_indexbinaryop_header.html" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    IndexUnaryOp
+    IndexBinaryOp
     
   </span>
   
@@ -449,6 +449,19 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    UnaryOp
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="test_unaryop_header.html" class="md-nav__link md-nav__link--active">
         
   
@@ -461,6 +474,65 @@
 
       </a>
       
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#user-defined-unary-operators" class="md-nav__link">
+    <span class="md-ellipsis">
+      User Defined Unary Operators
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#built-in-operators" class="md-nav__link">
+    <span class="md-ellipsis">
+      Built-in Operators
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="test_indexunaryop_header.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    IndexUnaryOp
+    
+  </span>
+  
+
+      </a>
     </li>
   
 
@@ -527,6 +599,36 @@
 
 <h1 id="unaryop">UnaryOp</h1>
 <p>UnaryOps apply a function to an element, returning an element.</p>
+<h2 id="user-defined-unary-operators">User Defined Unary Operators</h2>
+<p>User defined unaryop functions can be registered with OneSparse by
+inserting them into the <code>onesparse.user_defined_unaryop</code> table.
+They can then be JIT compiled into kernels and used in any function
+that takes a <code>unaryop</code> argument:</p>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">show</span><span class="w"> </span><span class="n">onesparse</span><span class="mf">.</span><span class="n">jit_control</span><span class="p">;</span><span class="w">  </span><span class="c1">-- This must be set to &#39;on&#39; in postgres config.</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="go">┌───────────────────────┐</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="go">│ onesparse.jit_control │</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="go">├───────────────────────┤</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="go">│ on                    │</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="go">└───────────────────────┘</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="go">(1 row)</span>
+</span></code></pre></div>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">insert</span><span class="w"> </span><span class="k">into</span><span class="w"> </span><span class="n">user_defined_unaryop</span><span class="w"> </span><span class="p">(</span><span class="k">name</span><span class="p">,</span><span class="w"> </span><span class="n">ztype</span><span class="p">,</span><span class="w"> </span><span class="n">xtype</span><span class="p">,</span><span class="w"> </span><span class="n">func</span><span class="p">)</span><span class="w"> </span><span class="k">values</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="p">(</span><span class="s1">&#39;abs_udf&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;int64&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;int64&#39;</span><span class="p">,</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="err">$$</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span><span class="nb">void</span><span class="w"> </span><span class="n">abs_udf</span><span class="p">(</span><span class="n">int64_t</span><span class="w"> </span><span class="o">*</span><span class="n">z</span><span class="p">,</span><span class="w"> </span><span class="n">const</span><span class="w"> </span><span class="n">int64_t</span><span class="w"> </span><span class="o">*</span><span class="n">x</span><span class="p">)</span><span class="w">  </span><span class="p">{</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">        </span><span class="p">(</span><span class="o">*</span><span class="n">z</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">llabs</span><span class="p">((</span><span class="o">*</span><span class="n">x</span><span class="p">));</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="go">       };</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="go">    $$);</span>
+</span></code></pre></div>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">select</span><span class="w"> </span><span class="n">apply</span><span class="p">(</span><span class="n">random_vector</span><span class="p">(</span><span class="s1">&#39;int64&#39;</span><span class="p">,</span><span class="w"> </span><span class="mf">4</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;inf&#39;</span><span class="p">,</span><span class="w"> </span><span class="mf">42</span><span class="p">),</span><span class="w"> </span><span class="s1">&#39;abs_udf&#39;</span><span class="o">::</span><span class="n">unaryop</span><span class="p">);</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="go">┌─────────────────────────────────────────────────────────────────────────────────────────────────┐</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="go">│                                              apply                                              │</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="go">├─────────────────────────────────────────────────────────────────────────────────────────────────┤</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="go">│ int64(4)[0:4767286540954276203 1:5014216602933006456 2:340821038812474285 3:582666427928917290] │</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="go">└─────────────────────────────────────────────────────────────────────────────────────────────────┘</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="go">(1 row)</span>
+</span></code></pre></div>
+<h2 id="built-in-operators">Built-in Operators</h2>
 <table>
 <thead>
 <tr>
@@ -548,10 +650,6 @@
 <td>GrB_MINV_BOOL</td>
 </tr>
 <tr>
-<td>lnot_bool</td>
-<td>GxB_LNOT_BOOL</td>
-</tr>
-<tr>
 <td>identity_int8</td>
 <td>GrB_IDENTITY_INT8</td>
 </tr>
@@ -562,10 +660,6 @@
 <tr>
 <td>minv_int8</td>
 <td>GrB_MINV_INT8</td>
-</tr>
-<tr>
-<td>lnot_int8</td>
-<td>GxB_LNOT_INT8</td>
 </tr>
 <tr>
 <td>identity_int16</td>
@@ -580,10 +674,6 @@
 <td>GrB_MINV_INT16</td>
 </tr>
 <tr>
-<td>lnot_int16</td>
-<td>GxB_LNOT_INT16</td>
-</tr>
-<tr>
 <td>identity_int32</td>
 <td>GrB_IDENTITY_INT32</td>
 </tr>
@@ -594,10 +684,6 @@
 <tr>
 <td>minv_int32</td>
 <td>GrB_MINV_INT32</td>
-</tr>
-<tr>
-<td>lnot_int32</td>
-<td>GxB_LNOT_INT32</td>
 </tr>
 <tr>
 <td>identity_int64</td>
@@ -612,10 +698,6 @@
 <td>GrB_MINV_INT64</td>
 </tr>
 <tr>
-<td>lnot_int64</td>
-<td>GxB_LNOT_INT64</td>
-</tr>
-<tr>
 <td>identity_uint8</td>
 <td>GrB_IDENTITY_UINT8</td>
 </tr>
@@ -626,10 +708,6 @@
 <tr>
 <td>minv_uint8</td>
 <td>GrB_MINV_UINT8</td>
-</tr>
-<tr>
-<td>lnot_uint8</td>
-<td>GxB_LNOT_UINT8</td>
 </tr>
 <tr>
 <td>identity_uint16</td>
@@ -644,10 +722,6 @@
 <td>GrB_MINV_UINT16</td>
 </tr>
 <tr>
-<td>lnot_uint16</td>
-<td>GxB_LNOT_UINT16</td>
-</tr>
-<tr>
 <td>identity_uint32</td>
 <td>GrB_IDENTITY_UINT32</td>
 </tr>
@@ -658,10 +732,6 @@
 <tr>
 <td>minv_uint32</td>
 <td>GrB_MINV_UINT32</td>
-</tr>
-<tr>
-<td>lnot_uint32</td>
-<td>GxB_LNOT_UINT32</td>
 </tr>
 <tr>
 <td>identity_uint64</td>
@@ -676,10 +746,6 @@
 <td>GrB_MINV_UINT64</td>
 </tr>
 <tr>
-<td>lnot_uint64</td>
-<td>GxB_LNOT_UINT64</td>
-</tr>
-<tr>
 <td>identity_fp32</td>
 <td>GrB_IDENTITY_FP32</td>
 </tr>
@@ -690,10 +756,6 @@
 <tr>
 <td>minv_fp32</td>
 <td>GrB_MINV_FP32</td>
-</tr>
-<tr>
-<td>lnot_fp32</td>
-<td>GxB_LNOT_FP32</td>
 </tr>
 <tr>
 <td>identity_fp64</td>
@@ -708,8 +770,168 @@
 <td>GrB_MINV_FP64</td>
 </tr>
 <tr>
+<td>abs_bool</td>
+<td>GrB_ABS_BOOL</td>
+</tr>
+<tr>
+<td>abs_int8</td>
+<td>GrB_ABS_INT8</td>
+</tr>
+<tr>
+<td>bnot_int8</td>
+<td>GrB_BNOT_INT8</td>
+</tr>
+<tr>
+<td>abs_int16</td>
+<td>GrB_ABS_INT16</td>
+</tr>
+<tr>
+<td>bnot_int16</td>
+<td>GrB_BNOT_INT16</td>
+</tr>
+<tr>
+<td>abs_int32</td>
+<td>GrB_ABS_INT32</td>
+</tr>
+<tr>
+<td>bnot_int32</td>
+<td>GrB_BNOT_INT32</td>
+</tr>
+<tr>
+<td>abs_int64</td>
+<td>GrB_ABS_INT64</td>
+</tr>
+<tr>
+<td>bnot_int64</td>
+<td>GrB_BNOT_INT64</td>
+</tr>
+<tr>
+<td>abs_uint8</td>
+<td>GrB_ABS_UINT8</td>
+</tr>
+<tr>
+<td>bnot_uint8</td>
+<td>GrB_BNOT_UINT8</td>
+</tr>
+<tr>
+<td>abs_uint16</td>
+<td>GrB_ABS_UINT16</td>
+</tr>
+<tr>
+<td>bnot_uint16</td>
+<td>GrB_BNOT_UINT16</td>
+</tr>
+<tr>
+<td>abs_uint32</td>
+<td>GrB_ABS_UINT32</td>
+</tr>
+<tr>
+<td>bnot_uint32</td>
+<td>GrB_BNOT_UINT32</td>
+</tr>
+<tr>
+<td>abs_uint64</td>
+<td>GrB_ABS_UINT64</td>
+</tr>
+<tr>
+<td>bnot_uint64</td>
+<td>GrB_BNOT_UINT64</td>
+</tr>
+<tr>
+<td>abs_fp32</td>
+<td>GrB_ABS_FP32</td>
+</tr>
+<tr>
+<td>abs_fp64</td>
+<td>GrB_ABS_FP64</td>
+</tr>
+<tr>
+<td>lnot_bool</td>
+<td>GxB_LNOT_BOOL</td>
+</tr>
+<tr>
+<td>one_bool</td>
+<td>GxB_ONE_BOOL</td>
+</tr>
+<tr>
+<td>lnot_int8</td>
+<td>GxB_LNOT_INT8</td>
+</tr>
+<tr>
+<td>one_int8</td>
+<td>GxB_ONE_INT8</td>
+</tr>
+<tr>
+<td>lnot_int16</td>
+<td>GxB_LNOT_INT16</td>
+</tr>
+<tr>
+<td>one_int16</td>
+<td>GxB_ONE_INT16</td>
+</tr>
+<tr>
+<td>lnot_int32</td>
+<td>GxB_LNOT_INT32</td>
+</tr>
+<tr>
+<td>one_int32</td>
+<td>GxB_ONE_INT32</td>
+</tr>
+<tr>
+<td>lnot_int64</td>
+<td>GxB_LNOT_INT64</td>
+</tr>
+<tr>
+<td>one_int64</td>
+<td>GxB_ONE_INT64</td>
+</tr>
+<tr>
+<td>lnot_uint8</td>
+<td>GxB_LNOT_UINT8</td>
+</tr>
+<tr>
+<td>one_uint8</td>
+<td>GxB_ONE_UINT8</td>
+</tr>
+<tr>
+<td>lnot_uint16</td>
+<td>GxB_LNOT_UINT16</td>
+</tr>
+<tr>
+<td>one_uint16</td>
+<td>GxB_ONE_UINT16</td>
+</tr>
+<tr>
+<td>lnot_uint32</td>
+<td>GxB_LNOT_UINT32</td>
+</tr>
+<tr>
+<td>one_uint32</td>
+<td>GxB_ONE_UINT32</td>
+</tr>
+<tr>
+<td>lnot_uint64</td>
+<td>GxB_LNOT_UINT64</td>
+</tr>
+<tr>
+<td>one_uint64</td>
+<td>GxB_ONE_UINT64</td>
+</tr>
+<tr>
+<td>lnot_fp32</td>
+<td>GxB_LNOT_FP32</td>
+</tr>
+<tr>
+<td>one_fp32</td>
+<td>GxB_ONE_FP32</td>
+</tr>
+<tr>
 <td>lnot_fp64</td>
 <td>GxB_LNOT_FP64</td>
+</tr>
+<tr>
+<td>one_fp64</td>
+<td>GxB_ONE_FP64</td>
 </tr>
 <tr>
 <td>identity_fc32</td>
@@ -736,126 +958,6 @@
 <td>GxB_MINV_FC64</td>
 </tr>
 <tr>
-<td>one_bool</td>
-<td>GxB_ONE_BOOL</td>
-</tr>
-<tr>
-<td>abs_bool</td>
-<td>GrB_ABS_BOOL</td>
-</tr>
-<tr>
-<td>one_int8</td>
-<td>GxB_ONE_INT8</td>
-</tr>
-<tr>
-<td>abs_int8</td>
-<td>GrB_ABS_INT8</td>
-</tr>
-<tr>
-<td>bnot_int8</td>
-<td>GrB_BNOT_INT8</td>
-</tr>
-<tr>
-<td>one_int16</td>
-<td>GxB_ONE_INT16</td>
-</tr>
-<tr>
-<td>abs_int16</td>
-<td>GrB_ABS_INT16</td>
-</tr>
-<tr>
-<td>bnot_int16</td>
-<td>GrB_BNOT_INT16</td>
-</tr>
-<tr>
-<td>one_int32</td>
-<td>GxB_ONE_INT32</td>
-</tr>
-<tr>
-<td>abs_int32</td>
-<td>GrB_ABS_INT32</td>
-</tr>
-<tr>
-<td>bnot_int32</td>
-<td>GrB_BNOT_INT32</td>
-</tr>
-<tr>
-<td>one_int64</td>
-<td>GxB_ONE_INT64</td>
-</tr>
-<tr>
-<td>abs_int64</td>
-<td>GrB_ABS_INT64</td>
-</tr>
-<tr>
-<td>bnot_int64</td>
-<td>GrB_BNOT_INT64</td>
-</tr>
-<tr>
-<td>one_uint8</td>
-<td>GxB_ONE_UINT8</td>
-</tr>
-<tr>
-<td>abs_uint8</td>
-<td>GrB_ABS_UINT8</td>
-</tr>
-<tr>
-<td>bnot_uint8</td>
-<td>GrB_BNOT_UINT8</td>
-</tr>
-<tr>
-<td>one_uint16</td>
-<td>GxB_ONE_UINT16</td>
-</tr>
-<tr>
-<td>abs_uint16</td>
-<td>GrB_ABS_UINT16</td>
-</tr>
-<tr>
-<td>bnot_uint16</td>
-<td>GrB_BNOT_UINT16</td>
-</tr>
-<tr>
-<td>one_uint32</td>
-<td>GxB_ONE_UINT32</td>
-</tr>
-<tr>
-<td>abs_uint32</td>
-<td>GrB_ABS_UINT32</td>
-</tr>
-<tr>
-<td>bnot_uint32</td>
-<td>GrB_BNOT_UINT32</td>
-</tr>
-<tr>
-<td>one_uint64</td>
-<td>GxB_ONE_UINT64</td>
-</tr>
-<tr>
-<td>abs_uint64</td>
-<td>GrB_ABS_UINT64</td>
-</tr>
-<tr>
-<td>bnot_uint64</td>
-<td>GrB_BNOT_UINT64</td>
-</tr>
-<tr>
-<td>one_fp32</td>
-<td>GxB_ONE_FP32</td>
-</tr>
-<tr>
-<td>abs_fp32</td>
-<td>GrB_ABS_FP32</td>
-</tr>
-<tr>
-<td>one_fp64</td>
-<td>GxB_ONE_FP64</td>
-</tr>
-<tr>
-<td>abs_fp64</td>
-<td>GrB_ABS_FP64</td>
-</tr>
-<tr>
 <td>one_fc32</td>
 <td>GxB_ONE_FC32</td>
 </tr>
@@ -866,50 +968,6 @@
 <tr>
 <td>lnot</td>
 <td>GrB_LNOT</td>
-</tr>
-<tr>
-<td>abs_bool</td>
-<td>GxB_ABS_BOOL</td>
-</tr>
-<tr>
-<td>abs_int8</td>
-<td>GxB_ABS_INT8</td>
-</tr>
-<tr>
-<td>abs_int16</td>
-<td>GxB_ABS_INT16</td>
-</tr>
-<tr>
-<td>abs_int32</td>
-<td>GxB_ABS_INT32</td>
-</tr>
-<tr>
-<td>abs_int64</td>
-<td>GxB_ABS_INT64</td>
-</tr>
-<tr>
-<td>abs_uint8</td>
-<td>GxB_ABS_UINT8</td>
-</tr>
-<tr>
-<td>abs_uint16</td>
-<td>GxB_ABS_UINT16</td>
-</tr>
-<tr>
-<td>abs_uint32</td>
-<td>GxB_ABS_UINT32</td>
-</tr>
-<tr>
-<td>abs_uint64</td>
-<td>GxB_ABS_UINT64</td>
-</tr>
-<tr>
-<td>abs_fp32</td>
-<td>GxB_ABS_FP32</td>
-</tr>
-<tr>
-<td>abs_fp64</td>
-<td>GxB_ABS_FP64</td>
 </tr>
 <tr>
 <td>sqrt_fp32</td>
@@ -1486,6 +1544,50 @@
 <tr>
 <td>positionj1_int64</td>
 <td>GxB_POSITIONJ1_INT64</td>
+</tr>
+<tr>
+<td>abs_bool</td>
+<td>GxB_ABS_BOOL</td>
+</tr>
+<tr>
+<td>abs_int8</td>
+<td>GxB_ABS_INT8</td>
+</tr>
+<tr>
+<td>abs_int16</td>
+<td>GxB_ABS_INT16</td>
+</tr>
+<tr>
+<td>abs_int32</td>
+<td>GxB_ABS_INT32</td>
+</tr>
+<tr>
+<td>abs_int64</td>
+<td>GxB_ABS_INT64</td>
+</tr>
+<tr>
+<td>abs_uint8</td>
+<td>GxB_ABS_UINT8</td>
+</tr>
+<tr>
+<td>abs_uint16</td>
+<td>GxB_ABS_UINT16</td>
+</tr>
+<tr>
+<td>abs_uint32</td>
+<td>GxB_ABS_UINT32</td>
+</tr>
+<tr>
+<td>abs_uint64</td>
+<td>GxB_ABS_UINT64</td>
+</tr>
+<tr>
+<td>abs_fp32</td>
+<td>GxB_ABS_FP32</td>
+</tr>
+<tr>
+<td>abs_fp64</td>
+<td>GxB_ABS_FP64</td>
 </tr>
 </tbody>
 </table>

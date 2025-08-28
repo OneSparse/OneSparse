@@ -383,6 +383,19 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Monoid
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="test_monoid_header.html" class="md-nav__link md-nav__link--active">
         
   
@@ -394,6 +407,52 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#monoid-identity" class="md-nav__link">
+    <span class="md-ellipsis">
+      Monoid identity
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#monoid-terminal" class="md-nav__link">
+    <span class="md-ellipsis">
+      Monoid terminal
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#builtin-suitesparse-monoids" class="md-nav__link">
+    <span class="md-ellipsis">
+      Builtin SuiteSparse Monoids
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -428,12 +487,12 @@
   
   
     <li class="md-nav__item">
-      <a href="test_indexunaryop_header.html" class="md-nav__link">
+      <a href="test_indexbinaryop_header.html" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    IndexUnaryOp
+    IndexBinaryOp
     
   </span>
   
@@ -456,6 +515,28 @@
   
   <span class="md-ellipsis">
     UnaryOp
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="test_indexunaryop_header.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    IndexUnaryOp
     
   </span>
   
@@ -526,7 +607,154 @@
 
 
 <h1 id="monoid">Monoid</h1>
-<p>Monoids apply a BinaryOp and an identity value to two elements, returning an element.</p>
+<p>In <a href="https://en.wikipedia.org/wiki/Abstract_algebra" title="Abstract algebra">abstract
+algebra</a>, a <strong>monoid</strong> is a set equipped with an
+<a href="https://en.wikipedia.org/wiki/Associative" title="Associative">associative</a> <a href="https://en.wikipedia.org/wiki/Binary_operation" title="Binary operation">binary
+operation</a> and an <a href="https://en.wikipedia.org/wiki/Identity_element" title="Identity element">identity
+element</a>. For example, the nonnegative
+<a href="https://en.wikipedia.org/wiki/Integer" title="Integer">integers</a> with
+addition form a monoid, the identity element being 0.</p>
+<h2 id="monoid-identity">Monoid identity</h2>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">select</span><span class="w"> </span><span class="n">ident</span><span class="p">(</span><span class="s1">&#39;plus_monoid_int8&#39;</span><span class="p">);</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="go">┌────────┐</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="go">│ ident  │</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="go">├────────┤</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="go">│ int8:0 │</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="go">└────────┘</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="go">(1 row)</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="go">select ident(&#39;plus_monoid_int16&#39;);</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="go">┌─────────┐</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="go">│  ident  │</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="go">├─────────┤</span>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="go">│ int16:0 │</span>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="go">└─────────┘</span>
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="go">(1 row)</span>
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="go">select ident(&#39;plus_monoid_fp32&#39;);</span>
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="go">┌───────────────┐</span>
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="go">│     ident     │</span>
+</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="go">├───────────────┤</span>
+</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="go">│ fp32:0.000000 │</span>
+</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="go">└───────────────┘</span>
+</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="go">(1 row)</span>
+</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>
+</span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="go">select ident(&#39;min_monoid_int8&#39;);</span>
+</span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a><span class="go">┌──────────┐</span>
+</span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a><span class="go">│  ident   │</span>
+</span><span id="__span-0-28"><a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a><span class="go">├──────────┤</span>
+</span><span id="__span-0-29"><a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a><span class="go">│ int8:127 │</span>
+</span><span id="__span-0-30"><a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a><span class="go">└──────────┘</span>
+</span><span id="__span-0-31"><a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a><span class="go">(1 row)</span>
+</span><span id="__span-0-32"><a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a>
+</span><span id="__span-0-33"><a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a><span class="go">select ident(&#39;min_monoid_int16&#39;);</span>
+</span><span id="__span-0-34"><a id="__codelineno-0-34" name="__codelineno-0-34" href="#__codelineno-0-34"></a><span class="go">┌─────────────┐</span>
+</span><span id="__span-0-35"><a id="__codelineno-0-35" name="__codelineno-0-35" href="#__codelineno-0-35"></a><span class="go">│    ident    │</span>
+</span><span id="__span-0-36"><a id="__codelineno-0-36" name="__codelineno-0-36" href="#__codelineno-0-36"></a><span class="go">├─────────────┤</span>
+</span><span id="__span-0-37"><a id="__codelineno-0-37" name="__codelineno-0-37" href="#__codelineno-0-37"></a><span class="go">│ int16:32767 │</span>
+</span><span id="__span-0-38"><a id="__codelineno-0-38" name="__codelineno-0-38" href="#__codelineno-0-38"></a><span class="go">└─────────────┘</span>
+</span><span id="__span-0-39"><a id="__codelineno-0-39" name="__codelineno-0-39" href="#__codelineno-0-39"></a><span class="go">(1 row)</span>
+</span><span id="__span-0-40"><a id="__codelineno-0-40" name="__codelineno-0-40" href="#__codelineno-0-40"></a>
+</span><span id="__span-0-41"><a id="__codelineno-0-41" name="__codelineno-0-41" href="#__codelineno-0-41"></a><span class="go">select ident(&#39;min_monoid_fp32&#39;);</span>
+</span><span id="__span-0-42"><a id="__codelineno-0-42" name="__codelineno-0-42" href="#__codelineno-0-42"></a><span class="go">┌───────────────┐</span>
+</span><span id="__span-0-43"><a id="__codelineno-0-43" name="__codelineno-0-43" href="#__codelineno-0-43"></a><span class="go">│     ident     │</span>
+</span><span id="__span-0-44"><a id="__codelineno-0-44" name="__codelineno-0-44" href="#__codelineno-0-44"></a><span class="go">├───────────────┤</span>
+</span><span id="__span-0-45"><a id="__codelineno-0-45" name="__codelineno-0-45" href="#__codelineno-0-45"></a><span class="go">│ fp32:Infinity │</span>
+</span><span id="__span-0-46"><a id="__codelineno-0-46" name="__codelineno-0-46" href="#__codelineno-0-46"></a><span class="go">└───────────────┘</span>
+</span><span id="__span-0-47"><a id="__codelineno-0-47" name="__codelineno-0-47" href="#__codelineno-0-47"></a><span class="go">(1 row)</span>
+</span><span id="__span-0-48"><a id="__codelineno-0-48" name="__codelineno-0-48" href="#__codelineno-0-48"></a>
+</span><span id="__span-0-49"><a id="__codelineno-0-49" name="__codelineno-0-49" href="#__codelineno-0-49"></a><span class="go">select ident(&#39;max_monoid_int8&#39;);</span>
+</span><span id="__span-0-50"><a id="__codelineno-0-50" name="__codelineno-0-50" href="#__codelineno-0-50"></a><span class="go">┌───────────┐</span>
+</span><span id="__span-0-51"><a id="__codelineno-0-51" name="__codelineno-0-51" href="#__codelineno-0-51"></a><span class="go">│   ident   │</span>
+</span><span id="__span-0-52"><a id="__codelineno-0-52" name="__codelineno-0-52" href="#__codelineno-0-52"></a><span class="go">├───────────┤</span>
+</span><span id="__span-0-53"><a id="__codelineno-0-53" name="__codelineno-0-53" href="#__codelineno-0-53"></a><span class="go">│ int8:-128 │</span>
+</span><span id="__span-0-54"><a id="__codelineno-0-54" name="__codelineno-0-54" href="#__codelineno-0-54"></a><span class="go">└───────────┘</span>
+</span><span id="__span-0-55"><a id="__codelineno-0-55" name="__codelineno-0-55" href="#__codelineno-0-55"></a><span class="go">(1 row)</span>
+</span><span id="__span-0-56"><a id="__codelineno-0-56" name="__codelineno-0-56" href="#__codelineno-0-56"></a>
+</span><span id="__span-0-57"><a id="__codelineno-0-57" name="__codelineno-0-57" href="#__codelineno-0-57"></a><span class="go">select ident(&#39;max_monoid_int16&#39;);</span>
+</span><span id="__span-0-58"><a id="__codelineno-0-58" name="__codelineno-0-58" href="#__codelineno-0-58"></a><span class="go">┌──────────────┐</span>
+</span><span id="__span-0-59"><a id="__codelineno-0-59" name="__codelineno-0-59" href="#__codelineno-0-59"></a><span class="go">│    ident     │</span>
+</span><span id="__span-0-60"><a id="__codelineno-0-60" name="__codelineno-0-60" href="#__codelineno-0-60"></a><span class="go">├──────────────┤</span>
+</span><span id="__span-0-61"><a id="__codelineno-0-61" name="__codelineno-0-61" href="#__codelineno-0-61"></a><span class="go">│ int16:-32768 │</span>
+</span><span id="__span-0-62"><a id="__codelineno-0-62" name="__codelineno-0-62" href="#__codelineno-0-62"></a><span class="go">└──────────────┘</span>
+</span><span id="__span-0-63"><a id="__codelineno-0-63" name="__codelineno-0-63" href="#__codelineno-0-63"></a><span class="go">(1 row)</span>
+</span><span id="__span-0-64"><a id="__codelineno-0-64" name="__codelineno-0-64" href="#__codelineno-0-64"></a>
+</span><span id="__span-0-65"><a id="__codelineno-0-65" name="__codelineno-0-65" href="#__codelineno-0-65"></a><span class="go">select ident(&#39;max_monoid_fp32&#39;);</span>
+</span><span id="__span-0-66"><a id="__codelineno-0-66" name="__codelineno-0-66" href="#__codelineno-0-66"></a><span class="go">┌────────────────┐</span>
+</span><span id="__span-0-67"><a id="__codelineno-0-67" name="__codelineno-0-67" href="#__codelineno-0-67"></a><span class="go">│     ident      │</span>
+</span><span id="__span-0-68"><a id="__codelineno-0-68" name="__codelineno-0-68" href="#__codelineno-0-68"></a><span class="go">├────────────────┤</span>
+</span><span id="__span-0-69"><a id="__codelineno-0-69" name="__codelineno-0-69" href="#__codelineno-0-69"></a><span class="go">│ fp32:-Infinity │</span>
+</span><span id="__span-0-70"><a id="__codelineno-0-70" name="__codelineno-0-70" href="#__codelineno-0-70"></a><span class="go">└────────────────┘</span>
+</span><span id="__span-0-71"><a id="__codelineno-0-71" name="__codelineno-0-71" href="#__codelineno-0-71"></a><span class="go">(1 row)</span>
+</span></code></pre></div>
+<h2 id="monoid-terminal">Monoid terminal</h2>
+<p>Monoid terminals tell SuiteSparse when it can terminate a large
+array operation because the terminal value has been found.</p>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">select</span><span class="w"> </span><span class="n">terminal</span><span class="p">(</span><span class="s1">&#39;plus_monoid_int8&#39;</span><span class="p">);</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="go">┌──────────┐</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="go">│ terminal │</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="go">├──────────┤</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="go">│ int      │</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="go">└──────────┘</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="go">(1 row)</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="go">select terminal(&#39;plus_monoid_int16&#39;);</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="go">┌──────────┐</span>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="go">│ terminal │</span>
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="go">├──────────┤</span>
+</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="go">│ int      │</span>
+</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="go">└──────────┘</span>
+</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="go">(1 row)</span>
+</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>
+</span><span id="__span-1-17"><a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="go">select terminal(&#39;min_monoid_int8&#39;);</span>
+</span><span id="__span-1-18"><a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="go">┌───────────┐</span>
+</span><span id="__span-1-19"><a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a><span class="go">│ terminal  │</span>
+</span><span id="__span-1-20"><a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a><span class="go">├───────────┤</span>
+</span><span id="__span-1-21"><a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a><span class="go">│ int8:-128 │</span>
+</span><span id="__span-1-22"><a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a><span class="go">└───────────┘</span>
+</span><span id="__span-1-23"><a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a><span class="go">(1 row)</span>
+</span><span id="__span-1-24"><a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a>
+</span><span id="__span-1-25"><a id="__codelineno-1-25" name="__codelineno-1-25" href="#__codelineno-1-25"></a><span class="go">select terminal(&#39;min_monoid_int16&#39;);</span>
+</span><span id="__span-1-26"><a id="__codelineno-1-26" name="__codelineno-1-26" href="#__codelineno-1-26"></a><span class="go">┌──────────────┐</span>
+</span><span id="__span-1-27"><a id="__codelineno-1-27" name="__codelineno-1-27" href="#__codelineno-1-27"></a><span class="go">│   terminal   │</span>
+</span><span id="__span-1-28"><a id="__codelineno-1-28" name="__codelineno-1-28" href="#__codelineno-1-28"></a><span class="go">├──────────────┤</span>
+</span><span id="__span-1-29"><a id="__codelineno-1-29" name="__codelineno-1-29" href="#__codelineno-1-29"></a><span class="go">│ int16:-32768 │</span>
+</span><span id="__span-1-30"><a id="__codelineno-1-30" name="__codelineno-1-30" href="#__codelineno-1-30"></a><span class="go">└──────────────┘</span>
+</span><span id="__span-1-31"><a id="__codelineno-1-31" name="__codelineno-1-31" href="#__codelineno-1-31"></a><span class="go">(1 row)</span>
+</span><span id="__span-1-32"><a id="__codelineno-1-32" name="__codelineno-1-32" href="#__codelineno-1-32"></a>
+</span><span id="__span-1-33"><a id="__codelineno-1-33" name="__codelineno-1-33" href="#__codelineno-1-33"></a><span class="go">select terminal(&#39;max_monoid_int8&#39;);</span>
+</span><span id="__span-1-34"><a id="__codelineno-1-34" name="__codelineno-1-34" href="#__codelineno-1-34"></a><span class="go">┌──────────┐</span>
+</span><span id="__span-1-35"><a id="__codelineno-1-35" name="__codelineno-1-35" href="#__codelineno-1-35"></a><span class="go">│ terminal │</span>
+</span><span id="__span-1-36"><a id="__codelineno-1-36" name="__codelineno-1-36" href="#__codelineno-1-36"></a><span class="go">├──────────┤</span>
+</span><span id="__span-1-37"><a id="__codelineno-1-37" name="__codelineno-1-37" href="#__codelineno-1-37"></a><span class="go">│ int8:127 │</span>
+</span><span id="__span-1-38"><a id="__codelineno-1-38" name="__codelineno-1-38" href="#__codelineno-1-38"></a><span class="go">└──────────┘</span>
+</span><span id="__span-1-39"><a id="__codelineno-1-39" name="__codelineno-1-39" href="#__codelineno-1-39"></a><span class="go">(1 row)</span>
+</span><span id="__span-1-40"><a id="__codelineno-1-40" name="__codelineno-1-40" href="#__codelineno-1-40"></a>
+</span><span id="__span-1-41"><a id="__codelineno-1-41" name="__codelineno-1-41" href="#__codelineno-1-41"></a><span class="go">select terminal(&#39;max_monoid_int16&#39;);</span>
+</span><span id="__span-1-42"><a id="__codelineno-1-42" name="__codelineno-1-42" href="#__codelineno-1-42"></a><span class="go">┌─────────────┐</span>
+</span><span id="__span-1-43"><a id="__codelineno-1-43" name="__codelineno-1-43" href="#__codelineno-1-43"></a><span class="go">│  terminal   │</span>
+</span><span id="__span-1-44"><a id="__codelineno-1-44" name="__codelineno-1-44" href="#__codelineno-1-44"></a><span class="go">├─────────────┤</span>
+</span><span id="__span-1-45"><a id="__codelineno-1-45" name="__codelineno-1-45" href="#__codelineno-1-45"></a><span class="go">│ int16:32767 │</span>
+</span><span id="__span-1-46"><a id="__codelineno-1-46" name="__codelineno-1-46" href="#__codelineno-1-46"></a><span class="go">└─────────────┘</span>
+</span><span id="__span-1-47"><a id="__codelineno-1-47" name="__codelineno-1-47" href="#__codelineno-1-47"></a><span class="go">(1 row)</span>
+</span><span id="__span-1-48"><a id="__codelineno-1-48" name="__codelineno-1-48" href="#__codelineno-1-48"></a>
+</span><span id="__span-1-49"><a id="__codelineno-1-49" name="__codelineno-1-49" href="#__codelineno-1-49"></a><span class="go">select terminal(&#39;land_monoid_bool&#39;);</span>
+</span><span id="__span-1-50"><a id="__codelineno-1-50" name="__codelineno-1-50" href="#__codelineno-1-50"></a><span class="go">┌──────────┐</span>
+</span><span id="__span-1-51"><a id="__codelineno-1-51" name="__codelineno-1-51" href="#__codelineno-1-51"></a><span class="go">│ terminal │</span>
+</span><span id="__span-1-52"><a id="__codelineno-1-52" name="__codelineno-1-52" href="#__codelineno-1-52"></a><span class="go">├──────────┤</span>
+</span><span id="__span-1-53"><a id="__codelineno-1-53" name="__codelineno-1-53" href="#__codelineno-1-53"></a><span class="go">│ bool:f   │</span>
+</span><span id="__span-1-54"><a id="__codelineno-1-54" name="__codelineno-1-54" href="#__codelineno-1-54"></a><span class="go">└──────────┘</span>
+</span><span id="__span-1-55"><a id="__codelineno-1-55" name="__codelineno-1-55" href="#__codelineno-1-55"></a><span class="go">(1 row)</span>
+</span><span id="__span-1-56"><a id="__codelineno-1-56" name="__codelineno-1-56" href="#__codelineno-1-56"></a>
+</span><span id="__span-1-57"><a id="__codelineno-1-57" name="__codelineno-1-57" href="#__codelineno-1-57"></a><span class="go">select terminal(&#39;lor_monoid_bool&#39;);</span>
+</span><span id="__span-1-58"><a id="__codelineno-1-58" name="__codelineno-1-58" href="#__codelineno-1-58"></a><span class="go">┌──────────┐</span>
+</span><span id="__span-1-59"><a id="__codelineno-1-59" name="__codelineno-1-59" href="#__codelineno-1-59"></a><span class="go">│ terminal │</span>
+</span><span id="__span-1-60"><a id="__codelineno-1-60" name="__codelineno-1-60" href="#__codelineno-1-60"></a><span class="go">├──────────┤</span>
+</span><span id="__span-1-61"><a id="__codelineno-1-61" name="__codelineno-1-61" href="#__codelineno-1-61"></a><span class="go">│ bool:t   │</span>
+</span><span id="__span-1-62"><a id="__codelineno-1-62" name="__codelineno-1-62" href="#__codelineno-1-62"></a><span class="go">└──────────┘</span>
+</span><span id="__span-1-63"><a id="__codelineno-1-63" name="__codelineno-1-63" href="#__codelineno-1-63"></a><span class="go">(1 row)</span>
+</span></code></pre></div>
+<h2 id="builtin-suitesparse-monoids">Builtin SuiteSparse Monoids</h2>
 <table>
 <thead>
 <tr>
@@ -535,46 +763,6 @@
 </tr>
 </thead>
 <tbody>
-<tr>
-<td>min_int8_monoid</td>
-<td>GxB_MIN_INT8_MONOID</td>
-</tr>
-<tr>
-<td>min_int16_monoid</td>
-<td>GxB_MIN_INT16_MONOID</td>
-</tr>
-<tr>
-<td>min_int32_monoid</td>
-<td>GxB_MIN_INT32_MONOID</td>
-</tr>
-<tr>
-<td>min_int64_monoid</td>
-<td>GxB_MIN_INT64_MONOID</td>
-</tr>
-<tr>
-<td>min_uint8_monoid</td>
-<td>GxB_MIN_UINT8_MONOID</td>
-</tr>
-<tr>
-<td>min_uint16_monoid</td>
-<td>GxB_MIN_UINT16_MONOID</td>
-</tr>
-<tr>
-<td>min_uint32_monoid</td>
-<td>GxB_MIN_UINT32_MONOID</td>
-</tr>
-<tr>
-<td>min_uint64_monoid</td>
-<td>GxB_MIN_UINT64_MONOID</td>
-</tr>
-<tr>
-<td>min_fp32_monoid</td>
-<td>GxB_MIN_FP32_MONOID</td>
-</tr>
-<tr>
-<td>min_fp64_monoid</td>
-<td>GxB_MIN_FP64_MONOID</td>
-</tr>
 <tr>
 <td>min_monoid_int8</td>
 <td>GrB_MIN_MONOID_INT8</td>
@@ -616,46 +804,6 @@
 <td>GrB_MIN_MONOID_FP64</td>
 </tr>
 <tr>
-<td>max_int8_monoid</td>
-<td>GxB_MAX_INT8_MONOID</td>
-</tr>
-<tr>
-<td>max_int16_monoid</td>
-<td>GxB_MAX_INT16_MONOID</td>
-</tr>
-<tr>
-<td>max_int32_monoid</td>
-<td>GxB_MAX_INT32_MONOID</td>
-</tr>
-<tr>
-<td>max_int64_monoid</td>
-<td>GxB_MAX_INT64_MONOID</td>
-</tr>
-<tr>
-<td>max_uint8_monoid</td>
-<td>GxB_MAX_UINT8_MONOID</td>
-</tr>
-<tr>
-<td>max_uint16_monoid</td>
-<td>GxB_MAX_UINT16_MONOID</td>
-</tr>
-<tr>
-<td>max_uint32_monoid</td>
-<td>GxB_MAX_UINT32_MONOID</td>
-</tr>
-<tr>
-<td>max_uint64_monoid</td>
-<td>GxB_MAX_UINT64_MONOID</td>
-</tr>
-<tr>
-<td>max_fp32_monoid</td>
-<td>GxB_MAX_FP32_MONOID</td>
-</tr>
-<tr>
-<td>max_fp64_monoid</td>
-<td>GxB_MAX_FP64_MONOID</td>
-</tr>
-<tr>
 <td>max_monoid_int8</td>
 <td>GrB_MAX_MONOID_INT8</td>
 </tr>
@@ -694,46 +842,6 @@
 <tr>
 <td>max_monoid_fp64</td>
 <td>GrB_MAX_MONOID_FP64</td>
-</tr>
-<tr>
-<td>plus_int8_monoid</td>
-<td>GxB_PLUS_INT8_MONOID</td>
-</tr>
-<tr>
-<td>plus_int16_monoid</td>
-<td>GxB_PLUS_INT16_MONOID</td>
-</tr>
-<tr>
-<td>plus_int32_monoid</td>
-<td>GxB_PLUS_INT32_MONOID</td>
-</tr>
-<tr>
-<td>plus_int64_monoid</td>
-<td>GxB_PLUS_INT64_MONOID</td>
-</tr>
-<tr>
-<td>plus_uint8_monoid</td>
-<td>GxB_PLUS_UINT8_MONOID</td>
-</tr>
-<tr>
-<td>plus_uint16_monoid</td>
-<td>GxB_PLUS_UINT16_MONOID</td>
-</tr>
-<tr>
-<td>plus_uint32_monoid</td>
-<td>GxB_PLUS_UINT32_MONOID</td>
-</tr>
-<tr>
-<td>plus_uint64_monoid</td>
-<td>GxB_PLUS_UINT64_MONOID</td>
-</tr>
-<tr>
-<td>plus_fp32_monoid</td>
-<td>GxB_PLUS_FP32_MONOID</td>
-</tr>
-<tr>
-<td>plus_fp64_monoid</td>
-<td>GxB_PLUS_FP64_MONOID</td>
 </tr>
 <tr>
 <td>plus_monoid_int8</td>
@@ -782,46 +890,6 @@
 <tr>
 <td>plus_fc64_monoid</td>
 <td>GxB_PLUS_FC64_MONOID</td>
-</tr>
-<tr>
-<td>times_int8_monoid</td>
-<td>GxB_TIMES_INT8_MONOID</td>
-</tr>
-<tr>
-<td>times_int16_monoid</td>
-<td>GxB_TIMES_INT16_MONOID</td>
-</tr>
-<tr>
-<td>times_int32_monoid</td>
-<td>GxB_TIMES_INT32_MONOID</td>
-</tr>
-<tr>
-<td>times_int64_monoid</td>
-<td>GxB_TIMES_INT64_MONOID</td>
-</tr>
-<tr>
-<td>times_uint8_monoid</td>
-<td>GxB_TIMES_UINT8_MONOID</td>
-</tr>
-<tr>
-<td>times_uint16_monoid</td>
-<td>GxB_TIMES_UINT16_MONOID</td>
-</tr>
-<tr>
-<td>times_uint32_monoid</td>
-<td>GxB_TIMES_UINT32_MONOID</td>
-</tr>
-<tr>
-<td>times_uint64_monoid</td>
-<td>GxB_TIMES_UINT64_MONOID</td>
-</tr>
-<tr>
-<td>times_fp32_monoid</td>
-<td>GxB_TIMES_FP32_MONOID</td>
-</tr>
-<tr>
-<td>times_fp64_monoid</td>
-<td>GxB_TIMES_FP64_MONOID</td>
 </tr>
 <tr>
 <td>times_monoid_int8</td>
@@ -924,42 +992,6 @@
 <td>GxB_ANY_FC64_MONOID</td>
 </tr>
 <tr>
-<td>lor_bool_monoid</td>
-<td>GxB_LOR_BOOL_MONOID</td>
-</tr>
-<tr>
-<td>land_bool_monoid</td>
-<td>GxB_LAND_BOOL_MONOID</td>
-</tr>
-<tr>
-<td>lxor_bool_monoid</td>
-<td>GxB_LXOR_BOOL_MONOID</td>
-</tr>
-<tr>
-<td>lxnor_bool_monoid</td>
-<td>GxB_LXNOR_BOOL_MONOID</td>
-</tr>
-<tr>
-<td>eq_bool_monoid</td>
-<td>GxB_EQ_BOOL_MONOID</td>
-</tr>
-<tr>
-<td>lor_monoid_bool</td>
-<td>GrB_LOR_MONOID_BOOL</td>
-</tr>
-<tr>
-<td>land_monoid_bool</td>
-<td>GrB_LAND_MONOID_BOOL</td>
-</tr>
-<tr>
-<td>lxor_monoid_bool</td>
-<td>GrB_LXOR_MONOID_BOOL</td>
-</tr>
-<tr>
-<td>lxnor_monoid_bool</td>
-<td>GrB_LXNOR_MONOID_BOOL</td>
-</tr>
-<tr>
 <td>bor_uint8_monoid</td>
 <td>GxB_BOR_UINT8_MONOID</td>
 </tr>
@@ -1022,6 +1054,202 @@
 <tr>
 <td>bxnor_uint64_monoid</td>
 <td>GxB_BXNOR_UINT64_MONOID</td>
+</tr>
+<tr>
+<td>lor_monoid_bool</td>
+<td>GrB_LOR_MONOID_BOOL</td>
+</tr>
+<tr>
+<td>land_monoid_bool</td>
+<td>GrB_LAND_MONOID_BOOL</td>
+</tr>
+<tr>
+<td>lxor_monoid_bool</td>
+<td>GrB_LXOR_MONOID_BOOL</td>
+</tr>
+<tr>
+<td>lxnor_monoid_bool</td>
+<td>GrB_LXNOR_MONOID_BOOL</td>
+</tr>
+<tr>
+<td>min_int8_monoid</td>
+<td>GxB_MIN_INT8_MONOID</td>
+</tr>
+<tr>
+<td>min_int16_monoid</td>
+<td>GxB_MIN_INT16_MONOID</td>
+</tr>
+<tr>
+<td>min_int32_monoid</td>
+<td>GxB_MIN_INT32_MONOID</td>
+</tr>
+<tr>
+<td>min_int64_monoid</td>
+<td>GxB_MIN_INT64_MONOID</td>
+</tr>
+<tr>
+<td>min_uint8_monoid</td>
+<td>GxB_MIN_UINT8_MONOID</td>
+</tr>
+<tr>
+<td>min_uint16_monoid</td>
+<td>GxB_MIN_UINT16_MONOID</td>
+</tr>
+<tr>
+<td>min_uint32_monoid</td>
+<td>GxB_MIN_UINT32_MONOID</td>
+</tr>
+<tr>
+<td>min_uint64_monoid</td>
+<td>GxB_MIN_UINT64_MONOID</td>
+</tr>
+<tr>
+<td>min_fp32_monoid</td>
+<td>GxB_MIN_FP32_MONOID</td>
+</tr>
+<tr>
+<td>min_fp64_monoid</td>
+<td>GxB_MIN_FP64_MONOID</td>
+</tr>
+<tr>
+<td>max_int8_monoid</td>
+<td>GxB_MAX_INT8_MONOID</td>
+</tr>
+<tr>
+<td>max_int16_monoid</td>
+<td>GxB_MAX_INT16_MONOID</td>
+</tr>
+<tr>
+<td>max_int32_monoid</td>
+<td>GxB_MAX_INT32_MONOID</td>
+</tr>
+<tr>
+<td>max_int64_monoid</td>
+<td>GxB_MAX_INT64_MONOID</td>
+</tr>
+<tr>
+<td>max_uint8_monoid</td>
+<td>GxB_MAX_UINT8_MONOID</td>
+</tr>
+<tr>
+<td>max_uint16_monoid</td>
+<td>GxB_MAX_UINT16_MONOID</td>
+</tr>
+<tr>
+<td>max_uint32_monoid</td>
+<td>GxB_MAX_UINT32_MONOID</td>
+</tr>
+<tr>
+<td>max_uint64_monoid</td>
+<td>GxB_MAX_UINT64_MONOID</td>
+</tr>
+<tr>
+<td>max_fp32_monoid</td>
+<td>GxB_MAX_FP32_MONOID</td>
+</tr>
+<tr>
+<td>max_fp64_monoid</td>
+<td>GxB_MAX_FP64_MONOID</td>
+</tr>
+<tr>
+<td>plus_int8_monoid</td>
+<td>GxB_PLUS_INT8_MONOID</td>
+</tr>
+<tr>
+<td>plus_int16_monoid</td>
+<td>GxB_PLUS_INT16_MONOID</td>
+</tr>
+<tr>
+<td>plus_int32_monoid</td>
+<td>GxB_PLUS_INT32_MONOID</td>
+</tr>
+<tr>
+<td>plus_int64_monoid</td>
+<td>GxB_PLUS_INT64_MONOID</td>
+</tr>
+<tr>
+<td>plus_uint8_monoid</td>
+<td>GxB_PLUS_UINT8_MONOID</td>
+</tr>
+<tr>
+<td>plus_uint16_monoid</td>
+<td>GxB_PLUS_UINT16_MONOID</td>
+</tr>
+<tr>
+<td>plus_uint32_monoid</td>
+<td>GxB_PLUS_UINT32_MONOID</td>
+</tr>
+<tr>
+<td>plus_uint64_monoid</td>
+<td>GxB_PLUS_UINT64_MONOID</td>
+</tr>
+<tr>
+<td>plus_fp32_monoid</td>
+<td>GxB_PLUS_FP32_MONOID</td>
+</tr>
+<tr>
+<td>plus_fp64_monoid</td>
+<td>GxB_PLUS_FP64_MONOID</td>
+</tr>
+<tr>
+<td>times_int8_monoid</td>
+<td>GxB_TIMES_INT8_MONOID</td>
+</tr>
+<tr>
+<td>times_int16_monoid</td>
+<td>GxB_TIMES_INT16_MONOID</td>
+</tr>
+<tr>
+<td>times_int32_monoid</td>
+<td>GxB_TIMES_INT32_MONOID</td>
+</tr>
+<tr>
+<td>times_int64_monoid</td>
+<td>GxB_TIMES_INT64_MONOID</td>
+</tr>
+<tr>
+<td>times_uint8_monoid</td>
+<td>GxB_TIMES_UINT8_MONOID</td>
+</tr>
+<tr>
+<td>times_uint16_monoid</td>
+<td>GxB_TIMES_UINT16_MONOID</td>
+</tr>
+<tr>
+<td>times_uint32_monoid</td>
+<td>GxB_TIMES_UINT32_MONOID</td>
+</tr>
+<tr>
+<td>times_uint64_monoid</td>
+<td>GxB_TIMES_UINT64_MONOID</td>
+</tr>
+<tr>
+<td>times_fp32_monoid</td>
+<td>GxB_TIMES_FP32_MONOID</td>
+</tr>
+<tr>
+<td>times_fp64_monoid</td>
+<td>GxB_TIMES_FP64_MONOID</td>
+</tr>
+<tr>
+<td>lor_bool_monoid</td>
+<td>GxB_LOR_BOOL_MONOID</td>
+</tr>
+<tr>
+<td>land_bool_monoid</td>
+<td>GxB_LAND_BOOL_MONOID</td>
+</tr>
+<tr>
+<td>lxor_bool_monoid</td>
+<td>GxB_LXOR_BOOL_MONOID</td>
+</tr>
+<tr>
+<td>lxnor_bool_monoid</td>
+<td>GxB_LXNOR_BOOL_MONOID</td>
+</tr>
+<tr>
+<td>eq_bool_monoid</td>
+<td>GxB_EQ_BOOL_MONOID</td>
 </tr>
 </tbody>
 </table>
