@@ -2,7 +2,23 @@
 
 UnaryOps apply a function to an element, returning an element.
 
-## User Defined Unary Ops
+## User Defined Unary Operators
+
+User defined unaryop functions can be registered with OneSparse by
+inserting them into the `onesparse.user_defined_unaryop` table.
+They can then be JIT compiled into kernels and used in any function
+that takes a `unaryop` argument:
+
+``` postgres-console
+show onesparse.jit_control;  -- This must be set to 'on' in postgres config.
+┌───────────────────────┐
+│ onesparse.jit_control │
+├───────────────────────┤
+│ on                    │
+└───────────────────────┘
+(1 row)
+
+```
 
 ``` postgres-console
 insert into user_defined_unaryop (name, ztype, xtype, func) values
@@ -12,6 +28,9 @@ insert into user_defined_unaryop (name, ztype, xtype, func) values
         (*z) = llabs((*x));
        };
     $$);
+```
+
+``` postgres-console
 select apply(random_vector('int64', 4, 'inf', 42), 'abs_udf'::unaryop);
 ┌─────────────────────────────────────────────────────────────────────────────────────────────────┐
 │                                              apply                                              │
@@ -21,6 +40,7 @@ select apply(random_vector('int64', 4, 'inf', 42), 'abs_udf'::unaryop);
 (1 row)
 
 ```
+## Built-in Operators
 
 | OneSparse Name | SuiteSparse Name |
 |----------------|------------------|

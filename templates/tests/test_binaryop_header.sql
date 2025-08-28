@@ -12,7 +12,6 @@
 -- [operation](https://en.wikipedia.org/wiki/Operation_(mathematics)
 -- "Operation (mathematics)") of
 -- [arity](https://en.wikipedia.org/wiki/Arity "Arity") two.
-
 --
 -- ## User Defined Binary Operators
 --
