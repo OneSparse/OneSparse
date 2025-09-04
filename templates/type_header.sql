@@ -27,3 +27,8 @@ CREATE FUNCTION name(type)
 RETURNS text
 AS '$libdir/onesparse', 'type_name'
 LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION jit_type(regtype)
+RETURNS text
+AS '$libdir/onesparse', 'jit_type'
+LANGUAGE C IMMUTABLE STRICT;

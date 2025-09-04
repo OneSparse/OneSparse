@@ -53,3 +53,12 @@ RETURNS scalar
 AS '$libdir/onesparse', 'scalar_clear'
 LANGUAGE C;
 
+CREATE FUNCTION row_scalar(rec record)
+RETURNS bytea
+AS  '$libdir/onesparse', 'row_scalar'
+LANGUAGE C STRICT;
+
+CREATE FUNCTION scalar_row(bytea, anyelement)
+RETURNS anyelement
+AS '$libdir/onesparse', 'scalar_row'
+LANGUAGE C;

@@ -381,6 +381,14 @@ CREATE FUNCTION cast_to(a matrix, t type)
 RETURNS matrix
     RETURN apply(a, ('identity_' || name(t))::unaryop, c=>matrix(t, nrows(a), ncols(a)));
 
+CREATE OR REPLACE FUNCTION cast_to2(a matrix, t type)
+RETURNS matrix AS $$
+    BEGIN
+        a = wait(a);
+        RETURN apply(a, ('identity_' || name(t))::unaryop, c=>matrix(t, nrows(a), ncols(a)));
+    END;
+$$ LANGUAGE plpgsql SET search_path = onesparse,public ;
+
 CREATE FUNCTION matrix_agg_matrix(state matrix, a matrix)
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_agg_matrix'

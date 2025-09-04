@@ -27,6 +27,11 @@ CREATE FUNCTION name(type)
 RETURNS text
 AS '$libdir/onesparse', 'type_name'
 LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION jit_type(regtype)
+RETURNS text
+AS '$libdir/onesparse', 'jit_type'
+LANGUAGE C IMMUTABLE STRICT;
 -- complain if script is sourced in psql, rather than via CREATE EXTENSION
 \echo Use "CREATE EXTENSION onesparse" to load this file. \quit
 
@@ -111,6 +116,15 @@ RETURNS scalar
 AS '$libdir/onesparse', 'scalar_clear'
 LANGUAGE C;
 
+CREATE FUNCTION row_scalar(rec record)
+RETURNS bytea
+AS  '$libdir/onesparse', 'row_scalar'
+LANGUAGE C STRICT;
+
+CREATE FUNCTION scalar_row(bytea, anyelement)
+RETURNS anyelement
+AS '$libdir/onesparse', 'scalar_row'
+LANGUAGE C;
 
 CREATE FUNCTION scalar_bigint(bigint)
 RETURNS scalar
