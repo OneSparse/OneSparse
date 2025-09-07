@@ -250,9 +250,10 @@ RETURNS vector
 AS '$libdir/onesparse', 'vector_extract_vector'
 LANGUAGE C SUPPORT vector_extract_vector_support;
 
-CREATE FUNCTION cast_to(a vector, t type)
+CREATE OR REPLACE FUNCTION cast_to(a vector, t type)
 RETURNS vector
-    RETURN apply(a, ('identity_' || name(t))::unaryop, c=>vector(t, size(a)));
+AS '$libdir/onesparse', 'vector_cast'
+LANGUAGE C STABLE;
 
 CREATE FUNCTION vector_set_element_support(internal)
 RETURNS internal

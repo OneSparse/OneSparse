@@ -1146,9 +1146,10 @@ RETURNS vector
 AS '$libdir/onesparse', 'vector_extract_vector'
 LANGUAGE C SUPPORT vector_extract_vector_support;
 
-CREATE FUNCTION cast_to(a vector, t type)
+CREATE OR REPLACE FUNCTION cast_to(a vector, t type)
 RETURNS vector
-    RETURN apply(a, ('identity_' || name(t))::unaryop, c=>vector(t, size(a)));
+AS '$libdir/onesparse', 'vector_cast'
+LANGUAGE C STABLE;
 
 CREATE FUNCTION vector_set_element_support(internal)
 RETURNS internal
@@ -2110,20 +2111,33 @@ AS '$libdir/onesparse', 'matrix_diag'
 LANGUAGE C STABLE;
 
 CREATE FUNCTION nnz(a matrix)
-RETURNS scalar
-    RETURN reduce_scalar(apply(a, 'one_bool'::unaryop, c=>'int64'::matrix));
+RETURNS scalar AS $$
+    BEGIN
+        a = wait(a);
+        RETURN reduce_scalar(apply(a, 'one_bool'::unaryop, c=>'int64'::matrix));
+    END;
+$$ LANGUAGE plpgsql SET search_path = onesparse,public ;
 
 CREATE FUNCTION row_degree(a matrix)
-RETURNS vector
-    RETURN reduce_rows(apply(a, 'one_bool'::unaryop, c=>'int64'::matrix));
+RETURNS vector AS $$
+    BEGIN
+        a = wait(a);
+        RETURN reduce_rows(apply(a, 'one_bool'::unaryop, c=>'int64'::matrix));
+    END;
+$$ LANGUAGE plpgsql SET search_path = onesparse,public ;
 
 CREATE FUNCTION col_degree(a matrix)
-RETURNS vector
-    RETURN reduce_cols(apply(a, 'one_bool'::unaryop, c=>'int64'::matrix));
+RETURNS vector AS $$
+    BEGIN
+        a = wait(a);
+        RETURN reduce_cols(apply(a, 'one_bool'::unaryop, c=>'int64'::matrix));
+    END;
+$$ LANGUAGE plpgsql SET search_path = onesparse,public ;
 
-CREATE FUNCTION cast_to(a matrix, t type)
+CREATE OR REPLACE FUNCTION cast_to(a matrix, t type)
 RETURNS matrix
-    RETURN apply(a, ('identity_' || name(t))::unaryop, c=>matrix(t, nrows(a), ncols(a)));
+AS '$libdir/onesparse', 'matrix_cast'
+LANGUAGE C STABLE;
 
 CREATE FUNCTION matrix_agg_matrix(state matrix, a matrix)
 RETURNS matrix

@@ -366,28 +366,33 @@ AS '$libdir/onesparse', 'matrix_diag'
 LANGUAGE C STABLE;
 
 CREATE FUNCTION nnz(a matrix)
-RETURNS scalar
-    RETURN reduce_scalar(apply(a, 'one_bool'::unaryop, c=>'int64'::matrix));
-
-CREATE FUNCTION row_degree(a matrix)
-RETURNS vector
-    RETURN reduce_rows(apply(a, 'one_bool'::unaryop, c=>'int64'::matrix));
-
-CREATE FUNCTION col_degree(a matrix)
-RETURNS vector
-    RETURN reduce_cols(apply(a, 'one_bool'::unaryop, c=>'int64'::matrix));
-
-CREATE FUNCTION cast_to(a matrix, t type)
-RETURNS matrix
-    RETURN apply(a, ('identity_' || name(t))::unaryop, c=>matrix(t, nrows(a), ncols(a)));
-
-CREATE OR REPLACE FUNCTION cast_to2(a matrix, t type)
-RETURNS matrix AS $$
+RETURNS scalar AS $$
     BEGIN
         a = wait(a);
-        RETURN apply(a, ('identity_' || name(t))::unaryop, c=>matrix(t, nrows(a), ncols(a)));
+        RETURN reduce_scalar(apply(a, 'one_bool'::unaryop, c=>'int64'::matrix));
     END;
 $$ LANGUAGE plpgsql SET search_path = onesparse,public ;
+
+CREATE FUNCTION row_degree(a matrix)
+RETURNS vector AS $$
+    BEGIN
+        a = wait(a);
+        RETURN reduce_rows(apply(a, 'one_bool'::unaryop, c=>'int64'::matrix));
+    END;
+$$ LANGUAGE plpgsql SET search_path = onesparse,public ;
+
+CREATE FUNCTION col_degree(a matrix)
+RETURNS vector AS $$
+    BEGIN
+        a = wait(a);
+        RETURN reduce_cols(apply(a, 'one_bool'::unaryop, c=>'int64'::matrix));
+    END;
+$$ LANGUAGE plpgsql SET search_path = onesparse,public ;
+
+CREATE OR REPLACE FUNCTION cast_to(a matrix, t type)
+RETURNS matrix
+AS '$libdir/onesparse', 'matrix_cast'
+LANGUAGE C STABLE;
 
 CREATE FUNCTION matrix_agg_matrix(state matrix, a matrix)
 RETURNS matrix
