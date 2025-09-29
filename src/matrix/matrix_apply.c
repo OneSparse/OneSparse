@@ -29,7 +29,9 @@ Datum matrix_apply(PG_FUNCTION_ARGS)
 		C = new_matrix(type, nrows, ncols, CurrentMemoryContext, NULL);
 	}
 	else
+	{
 		C = OS_GETARG_MATRIX_A(2, A);
+	}
 
 	mask = OS_GETARG_MATRIX_HANDLE_OR_NULL_AB(nargs, 3, A, C);
 	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 4);

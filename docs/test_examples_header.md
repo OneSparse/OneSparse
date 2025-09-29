@@ -35,10 +35,7 @@ The karate graph is now loaded into the view and looks like this,
 here it's drawn with colors to indicate the "out-degree" of each
 node:
 ``` postgres-console
-select draw(triu(graph),
-            reduce_cols(cast_to(graph, 'int32')),
-            false, false, true, 0.5, 'The Karate Graph')
-    as draw_source from karate \gset
+select draw(triu(graph), reduce_cols(cast_to(graph, 'int32')), false, false, true, 0.5, 'The Karate Graph') as draw_source from karate \gset
 ```
 <div>
 <!-- Title: %3 Pages: 1 -->

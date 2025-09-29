@@ -36,10 +36,7 @@ create materialized view if not exists karate
 -- here it's drawn with colors to indicate the "out-degree" of each
 -- node:
 
-select draw(triu(graph),
-            reduce_cols(cast_to(graph, 'int32')),
-            false, false, true, 0.5, 'The Karate Graph')
-    as draw_source from karate \gset
+select draw(triu(graph), reduce_cols(cast_to(graph, 'int32')), false, false, true, 0.5, 'The Karate Graph') as draw_source from karate \gset
 \i sql/draw_sfdp.sql
 
 -- ### Matrix Aggregation

@@ -25,9 +25,9 @@ RUN /bin/rm -Rf "$PGDATA" && mkdir "$PGDATA"
 WORKDIR "/home/postgres"
 
 RUN set -eux; \
-    curl -fsSLO https://ftp.postgresql.org/pub/source/v18beta2/postgresql-18beta2.tar.bz2; \
-    tar -xjf postgresql-18beta2.tar.bz2; \
-    cd postgresql-18beta2; \
+    curl -fsSLO https://ftp.postgresql.org/pub/source/v18.0/postgresql-18.0.tar.bz2; \
+    tar -xjf postgresql-18.0.tar.bz2; \
+    cd postgresql-18.0; \
     ./configure --prefix=/usr --with-openssl --with-icu --with-lz4 --with-zstd \
      --enable-debug \
      --enable-depend --enable-cassert --enable-profiling \
@@ -35,7 +35,7 @@ RUN set -eux; \
     make -j"$(nproc)"; \
     sudo make install; \
     cd ..; \
-    sudo rm -rf postgresql-18beta2 postgresql-18beta2.tar.bz2 /var/lib/apt/lists/*
+    sudo rm -rf postgresql-18.0 postgresql-18.0.tar.bz2 /var/lib/apt/lists/*
         
 # # get postgres source and compile with debug and no optimization
 # RUN git clone https://github.com/postgres/postgres.git --depth=1 && \

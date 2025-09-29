@@ -23,12 +23,13 @@ Datum _scalar_in(char *input)
 
 	sscanf(input, "%[^:]:%s", str_type, str_val);
 
-	if (strcmp(str_type, "int64") == 0)
+	typ = lookup_type(str_type);
+	scalar = new_scalar(typ, CurrentMemoryContext, NULL);
+
+	if (typ == GrB_INT64)
 	{
 		int64_t value;
-		typ = GrB_INT64;
 		fmt = "%ld";
-		scalar = new_scalar(typ, CurrentMemoryContext, NULL);
 		if (len)
 		{
 			if (sscanf(str_val, fmt, &value) == 1)
@@ -41,12 +42,10 @@ Datum _scalar_in(char *input)
 				elog(ERROR, "Invalid format for %s %s", fmt, str_val);
 		}
 	}
-	else if (strcmp(str_type, "uint64") == 0)
+	else if (typ == GrB_UINT64)
 	{
 		uint64_t value;
-		typ = GrB_UINT64;
 		fmt = "%llu";
-		scalar = new_scalar(typ, CurrentMemoryContext, NULL);
 		if (len)
 		{
 			if (sscanf(str_val, fmt, &value) == 1)
@@ -59,12 +58,10 @@ Datum _scalar_in(char *input)
 				elog(ERROR, "Invalid format for %s %s", fmt, str_val);
 		}
 	}
-	else if (strcmp(str_type, "int32") == 0)
+	else if (typ == GrB_INT32)
 	{
 		int32_t value;
-		typ = GrB_INT32;
 		fmt = "%i";
-		scalar = new_scalar(typ, CurrentMemoryContext, NULL);
 		if (len)
 		{
 			if (sscanf(str_val, fmt, &value) == 1)
@@ -77,12 +74,10 @@ Datum _scalar_in(char *input)
 				elog(ERROR, "Invalid format for %s %s", fmt, str_val);
 		}
 	}
-	else if (strcmp(str_type, "uint32") == 0)
+	else if (typ == GrB_UINT32)
 	{
 		uint32_t value;
-		typ = GrB_UINT32;
 		fmt = "%u";
-		scalar = new_scalar(typ, CurrentMemoryContext, NULL);
 		if (len)
 		{
 			if (sscanf(str_val, fmt, &value) == 1)
@@ -95,12 +90,10 @@ Datum _scalar_in(char *input)
 				elog(ERROR, "Invalid format for %s %s", fmt, str_val);
 		}
 	}
-	else if (strcmp(str_type, "int16") == 0)
+	else if (typ == GrB_INT16)
 	{
 		int16_t value;
-		typ = GrB_INT16;
 		fmt = "%i";
-		scalar = new_scalar(typ, CurrentMemoryContext, NULL);
 		if (len)
 		{
 			if (sscanf(str_val, fmt, &value) == 1)
@@ -113,12 +106,10 @@ Datum _scalar_in(char *input)
 				elog(ERROR, "Invalid format for %s %s", fmt, str_val);
 		}
 	}
-	else if (strcmp(str_type, "uint16") == 0)
+	else if (typ == GrB_UINT16)
 	{
 		uint16_t value;
-		typ = GrB_UINT16;
 		fmt = "%hu";
-		scalar = new_scalar(typ, CurrentMemoryContext, NULL);
 		if (len)
 		{
 			if (sscanf(str_val, fmt, &value) == 1)
@@ -131,12 +122,10 @@ Datum _scalar_in(char *input)
 				elog(ERROR, "Invalid format for %s %s", fmt, str_val);
 		}
 	}
-	else if (strcmp(str_type, "fp64") == 0)
+	else if (typ == GrB_FP64)
 	{
 		double value;
-		typ = GrB_FP64;
 		fmt = "%lf";
-		scalar = new_scalar(typ, CurrentMemoryContext, NULL);
 		if (len)
 		{
 			if (sscanf(str_val, fmt, &value) == 1)
@@ -149,12 +138,10 @@ Datum _scalar_in(char *input)
 				elog(ERROR, "Invalid format for %s %s", fmt, str_val);
 		}
 	}
-	else if (strcmp(str_type, "fp32") == 0)
+	else if (typ == GrB_FP32)
 	{
 		float value;
-		typ = GrB_FP32;
 		fmt = "%f";
-		scalar = new_scalar(typ, CurrentMemoryContext, NULL);
 		if (len)
 		{
 			if (sscanf(str_val, fmt, &value) == 1)
@@ -167,12 +154,10 @@ Datum _scalar_in(char *input)
 				elog(ERROR, "Invalid format for %s %s", fmt, str_val);
 		}
 	}
-	else if (strcmp(str_type, "bool") == 0)
+	else if (typ == GrB_BOOL)
 	{
 		char value;
-		typ = GrB_BOOL;
 		fmt = "%c";
-		scalar = new_scalar(typ, CurrentMemoryContext, NULL);
 		if (len)
 		{
 			if (sscanf(str_val, fmt, &value) == 1)
@@ -193,7 +178,25 @@ Datum _scalar_in(char *input)
 		}
 	}
 	else
-		elog(ERROR, "Unknown type code %s", str_type);
+	{
+		// UDT
+		size_t  b64len;
+		int     out_len;
+		size_t max_bytes;
+		void *_value;
+
+		b64len = strlen(str_val);
+		max_bytes = pg_b64_dec_len((int) b64len);
+		_value = palloc(max_bytes);
+
+		out_len = pg_b64_decode((const char*) str_val, (int) b64len,
+								(uint8 *) _value, (int) max_bytes);
+		if (out_len < 0)
+			elog(ERROR, "scalar_in: invalid base64 data");
+		OS_CHECK(GrB_Scalar_setElement(scalar->scalar, _value),
+				 scalar->scalar,
+				 "Cannot set scalar element UDT.");
+	}
 	OS_RETURN_SCALAR(scalar);
 }
 

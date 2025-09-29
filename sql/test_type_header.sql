@@ -43,6 +43,8 @@ select matrix('int32'::type);
 insert into user_defined_type (name, type_def) values
     ('tuple_fp64', 'typedef struct {int64_t k; double v;} tuple_fp64;');
 
+--
+
 select 'tuple_fp64'::type;
 
 -- Are equivalent.

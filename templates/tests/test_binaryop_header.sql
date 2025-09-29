@@ -18,8 +18,13 @@
 -- User defined functions can be registered with OneSparse by
 -- inserting them into the `onesparse.user_defined_binaryop` table.
 -- They can then be JIT compiled into kernels and used in any function
--- that takes a `binaryop` argument:
+-- that takes a `binaryop` argument.
 --
+-- To use User Defined Operators, OneSparse must enable the
+-- SuiteSparse JIT compiler by setting `onesparse.jit_control = 'on'`
+-- in your `postgresql.conf`.  The default is `off`.  For maximum
+-- security, only enable JIT compilation on development servers and
+-- turn it off in production.
 
 show onesparse.jit_control;  -- This must be set to 'on' in postgres config.
 

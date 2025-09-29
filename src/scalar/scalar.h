@@ -6,12 +6,15 @@
 typedef struct os_FlatScalar {
     int32 vl_len_;
 	int32_t type_code;
+	char type_name[NAMEDATALEN];
 	int16_t nvals;
 } os_FlatScalar;
 
 typedef struct os_Scalar  {
     ExpandedObjectHeader hdr;
     int em_magic;
+	int32_t type_code;
+	char type_name[NAMEDATALEN];
     GrB_Scalar scalar;
     Size flat_size;
 } os_Scalar;
@@ -35,4 +38,4 @@ os_Scalar* DatumGetScalar(Datum d);
 #define OS_SCALAR_DATA(_flat) ((char*)(_flat) + OS_SCALAR_FLATSIZE())
 #define ScalarGetEOHP(_datum) (os_Scalar *) DatumGetEOHP(_datum)
 
-#endif 
+#endif

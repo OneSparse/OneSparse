@@ -24,10 +24,13 @@
 #include "utils/guc.h"
 #include "utils/varlena.h"
 #include "utils/uuid.h"
+#include "utils/numeric.h"
+#include "utils/varbit.h"
 #include "catalog/pg_type_d.h"
 #include "catalog/pg_type.h"
 #include "parser/parse_func.h"
 #include "utils/lsyscache.h"
+#include "utils/syscache.h"
 #include "nodes/pg_list.h"
 #include "nodes/supportnodes.h"
 #include "access/tableam.h"
@@ -38,9 +41,13 @@
 #include "executor/spi.h"
 #include "commands/defrem.h"
 #include "common/hashfn.h"
+#include "common/base64.h"
 #include "access/xact.h"
 #include "storage/itemptr.h"
 #include "commands/vacuum.h"
+#include "catalog/pg_attribute.h"
+#include "access/tupdesc.h"
+#include "utils/typcache.h"
 
 #include <GraphBLAS.h>
 #include <LAGraph.h>
@@ -225,5 +232,6 @@ void _PG_init(void);
 #include "vector/vector.h"
 #include "matrix/matrix.h"
 #include "graph/graph.h"
+#include "jit/types.h"
 
 #endif
