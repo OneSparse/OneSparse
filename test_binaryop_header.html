@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.11">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.18">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="assets/stylesheets/main.4af4bdda.min.css">
+      <link rel="stylesheet" href="assets/stylesheets/main.7e37652d.min.css">
       
       
 
@@ -609,7 +609,12 @@ produce another element. More formally, a binary operation is an
 <p>User defined functions can be registered with OneSparse by
 inserting them into the <code>onesparse.user_defined_binaryop</code> table.
 They can then be JIT compiled into kernels and used in any function
-that takes a <code>binaryop</code> argument:</p>
+that takes a <code>binaryop</code> argument.</p>
+<p>To use User Defined Operators, OneSparse must enable the
+SuiteSparse JIT compiler by setting <code>onesparse.jit_control = 'on'</code>
+in your <code>postgresql.conf</code>.  The default is <code>off</code>.  For maximum
+security, only enable JIT compilation on development servers and
+turn it off in production.
 <div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">show</span><span class="w"> </span><span class="n">onesparse</span><span class="mf">.</span><span class="n">jit_control</span><span class="p">;</span><span class="w">  </span><span class="c1">-- This must be set to &#39;on&#39; in postgres config.</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="go">┌───────────────────────┐</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="go">│ onesparse.jit_control │</span>
@@ -617,7 +622,7 @@ that takes a <code>binaryop</code> argument:</p>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="go">│ on                    │</span>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="go">└───────────────────────┘</span>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="go">(1 row)</span>
-</span></code></pre></div>
+</span></code></pre></div></p>
 <p>Insert the expected function types and function body into the
 table.  Here is an example function that computes the <a href="https://en.wikipedia.org/wiki/Hamming_distance">Hamming
 Distance</a> between
@@ -2501,10 +2506,10 @@ operators like <code>eadd</code>:
     
     
       
-      <script id="__config" type="application/json">{"base": ".", "features": ["toc.integrate", "toc.follow"], "search": "assets/javascripts/workers/search.f8cc74c7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"base": ".", "features": ["toc.integrate", "toc.follow"], "search": "assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="assets/javascripts/bundle.c8b220af.min.js"></script>
+      <script src="assets/javascripts/bundle.92b07e13.min.js"></script>
       
     
   </body>
