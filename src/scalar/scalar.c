@@ -18,12 +18,15 @@ static Size scalar_get_flat_size(ExpandedObjectHeader *eohptr) {
 	int32_t type_code;
 	GrB_Index nvals;
 	Size data_size;
+	GrB_Type type;
 
 	scalar = (os_Scalar*) eohptr;
 	Assert(scalar->em_magic == scalar_MAGIC);
 
 	if (scalar->flat_size)
+	{
 		return scalar->flat_size;
+	}
 
 	OS_CHECK(GrB_get(scalar->scalar, &type_code, GrB_EL_TYPE_CODE),
 		  scalar->scalar,
@@ -35,7 +38,22 @@ static Size scalar_get_flat_size(ExpandedObjectHeader *eohptr) {
 
 	data_size = 0;
 	if (nvals)
-		data_size = code_size(type_code);
+	{
+		if (type_code == GrB_UDT_CODE)
+		{
+			OS_CHECK(GxB_Scalar_type(&type, scalar->scalar),
+					 scalar->scalar,
+					 "Cannot get scalar type");
+
+			OS_CHECK(GxB_Type_size(&data_size, type),
+					 type,
+					 "Error getting scalar type size");
+		}
+		else
+		{
+			data_size = code_size(type_code);
+		}
+	}
 
 	scalar->flat_size = OS_SCALAR_FLATSIZE() + data_size;
 	return scalar->flat_size;
@@ -48,6 +66,7 @@ static void flatten_scalar(
 	void *result,
 	Size allocated_size)
 {
+	GrB_Type type;
 	GrB_Index nvals;
 	os_Scalar *scalar;
 	os_FlatScalar *flat;
@@ -65,6 +84,17 @@ static void flatten_scalar(
 	OS_CHECK(GrB_get(scalar->scalar, &flat->type_code, GrB_EL_TYPE_CODE),
 		  scalar->scalar,
 		  "Cannot get Scalar Type code.");
+
+	if (flat->type_code == GrB_UDT_CODE)
+	{
+		OS_CHECK(GxB_Scalar_type(&type, scalar->scalar),
+				 scalar->scalar,
+				 "Cannot get scalar type");
+
+		OS_CHECK(GxB_Type_name(flat->type_name, type),
+				 type,
+				 "Error getting scalar type size");
+	}
 
 	OS_CHECK(GrB_Scalar_nvals(&nvals, scalar->scalar),
 		  scalar->scalar,
@@ -137,6 +167,12 @@ static void flatten_scalar(
 		else if (flat->type_code == GrB_BOOL_CODE)
 		{
 			OS_CHECK(GrB_Scalar_extractElement((bool*)data, scalar->scalar),
+				  scalar->scalar,
+				  "Cannot extract Scalar element.");
+		}
+		else if (flat->type_code == GrB_UDT_CODE)
+		{
+			OS_CHECK(GrB_Scalar_extractElement((void*)data, scalar->scalar),
 				  scalar->scalar,
 				  "Cannot extract Scalar element.");
 		}

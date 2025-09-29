@@ -1,5 +1,31 @@
 #include "../onesparse.h"
 
+static void
+emit_field(StringInfoData *out, const char *ctype, const char *fname)
+{
+    const char *arr;
+	size_t baselen;
+
+	arr = strchr(ctype, '[');
+
+    if (arr == NULL)
+    {
+        appendStringInfo(out, "    %s %s;\n", ctype, fname);
+        return;
+    }
+
+    /* Base type is everything before the first '[' (trim trailing spaces). */
+    baselen = (size_t) (arr - ctype);
+    while (baselen > 0 && isspace((unsigned char) ctype[baselen - 1]))
+    {
+        baselen--;
+    }
+
+    /* Print as: <base> <name><array-suffixes>; e.g., "char f_bpchar[16];" */
+    appendStringInfo(out, "    %.*s %s%s;\n",
+                     (int) baselen, ctype, fname, arr);
+}
+
 static const char *
 map_type(Oid typid, int32 typmod, StringInfo scratch)
 {
@@ -165,7 +191,7 @@ jit_type(PG_FUNCTION_ARGS)
         compname = "type";
     }
 
-    appendStringInfo(&out, "typedef struct %s_%s {\n", nspname, compname);
+    appendStringInfo(&out, "typedef struct {\n");
 
     for (int i = 0; i < tupdesc->natts; i++)
     {
@@ -183,10 +209,11 @@ jit_type(PG_FUNCTION_ARGS)
         }
 
         ctype = map_type(a->atttypid, a->atttypmod, &scratch);
-        appendStringInfo(&out, "    %s %s;\n", ctype, NameStr(a->attname));
+		emit_field(&out, ctype, NameStr(a->attname));
+        //appendStringInfo(&out, "    %s %s;\n", ctype, NameStr(a->attname));
     }
 
-    appendStringInfo(&out, "} %s_%s;", nspname, compname);
+    appendStringInfo(&out, "} %s;", compname);
 
     ReleaseTupleDesc(tupdesc);
 

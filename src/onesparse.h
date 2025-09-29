@@ -41,6 +41,7 @@
 #include "executor/spi.h"
 #include "commands/defrem.h"
 #include "common/hashfn.h"
+#include "common/base64.h"
 #include "access/xact.h"
 #include "storage/itemptr.h"
 #include "commands/vacuum.h"
