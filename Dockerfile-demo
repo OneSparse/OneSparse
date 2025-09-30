@@ -1,46 +1,67 @@
-FROM postgres:17
+# ---- builder: compile deps + extension ----
+FROM postgres:18 AS builder
+ARG DEBIAN_FRONTEND=noninteractive
+ARG GBLAS_VER=10.1.1
+ARG LAGRAPH_VER=1.2.0
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates curl xz-utils build-essential cmake m4 \
+    git pkg-config file \
+    libreadline-dev zlib1g-dev flex bison libxml2-dev libxslt1-dev \
+    libssl-dev libyaml-dev \
+    postgresql-server-dev-18 \
+ && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /opt/build
+
+# GraphBLAS
+RUN curl -sSL -o gblas.tgz https://github.com/DrTimothyAldenDavis/GraphBLAS/archive/refs/tags/v${GBLAS_VER}.tar.gz \
+ && tar -xzf gblas.tgz \
+ && make -C GraphBLAS-${GBLAS_VER} library CMAKE_OPTIONS='-DGRAPHBLAS_COMPACT=1' \
+ && make -C GraphBLAS-${GBLAS_VER} install
+
+# LAGraph
+RUN curl -sSL -o lagraph.tgz https://github.com/GraphBLAS/LAGraph/archive/refs/tags/v${LAGRAPH_VER}.tar.gz \
+ && tar -xzf lagraph.tgz \
+ && make -C LAGraph-${LAGRAPH_VER} library \
+ && make -C LAGraph-${LAGRAPH_VER} install
+
+# OneSparse: copy only what’s needed to build the PG extension
+WORKDIR /src
+# If your repo has a dedicated subdir for the extension, prefer copying just that.
+COPY . /src
+RUN ldconfig \
+ && make -C /src \
+ && make -C /src install DESTDIR=/opt/stage
+
+# Optional: strip to shrink
+RUN find /opt/stage -type f -name '*.so' -exec strip --strip-unneeded {} + || true \
+ && strip --strip-unneeded /usr/local/lib/libgraphblas.so* /usr/local/lib/liblagraph.so* || true
+
+# Collect runtime artifacts we’ll copy into the final image
+RUN mkdir -p /opt/runtime/usr/local/lib \
+ && cp -a /usr/local/lib/libgraphblas.so* /opt/runtime/usr/local/lib/ \
+ && cp -a /usr/local/lib/liblagraph.so* /opt/runtime/usr/local/lib/ \
+ && cp -a /usr/local/lib/liblagraphx.so* /opt/runtime/usr/local/lib/ \
+ && mkdir -p /opt/runtime/usr/lib/postgresql/18/lib \
+ && mkdir -p /opt/runtime/usr/share/postgresql/18/extension \
+ && cp -a /opt/stage/usr/lib/postgresql/18/lib/*.so /opt/runtime/usr/lib/postgresql/18/lib/ \
+ && cp -a /opt/stage/usr/share/postgresql/18/extension/* /opt/runtime/usr/share/postgresql/18/extension/
+
+# ---- final: clean postgres image with only runtime bits ----
+FROM postgres:18
 
 ENV DEBIAN_FRONTEND=noninteractive
+# If you want this set at init time:
+ENV POSTGRES_INITDB_ARGS="--encoding=UTF8 --locale=C.UTF-8 -c shared_preload_libraries=onesparse"
 
-RUN apt-get update -y && apt-get install -y \
-    gnupg2 \
-    wget \
-    ca-certificates \
-    build-essential \
-    libreadline-dev \
-    zlib1g-dev \
-    flex \
-    bison \
-    libxml2-dev \
-    libxslt1-dev \
-    libssl-dev \
-    libyaml-dev \
-    git \
-    curl \
-    cmake \
-    m4 \
-    zlib1g-dev \
-    graphviz \
-    postgresql-server-dev-17
-
-USER postgres
-WORKDIR /home/postgres
-
-RUN curl -s -L -J https://github.com/DrTimothyAldenDavis/GraphBLAS/archive/refs/tags/v9.4.2.tar.gz | \
-    tar zxvf - && cd GraphBLAS-9.4.2
-
-USER root
-WORKDIR /home/postgres/GraphBLAS-9.4.2
-RUN make library CMAKE_OPTIONS='-DGRAPHBLAS_COMPACT=1' && make install
-USER postgres    
-
-COPY . /home/postgres/OneSparse
-
-WORKDIR /home/postgres/OneSparse
-USER root
+RUN apt-get update && apt-get install -y --no-install-recommends libgomp1 \
+ && rm -rf /var/lib/apt/lists/*
+    
+# Copy runtime libs and extension
+COPY --from=builder /opt/runtime/ / 
 RUN ldconfig
-    
-RUN make && make install
-    
-RUN chown -R postgres:postgres /home/postgres/OneSparse
-RUN echo 'CREATE EXTENSION onesparse; ALTER SYSTEM SET search_path TO public,onesparse;' > /docker-entrypoint-initdb.d/init-onesparse.sql
+
+# Initialize extension on first cluster creation
+RUN printf "CREATE EXTENSION onesparse;\nALTER SYSTEM SET search_path TO public,onesparse;\n" \
+    > /docker-entrypoint-initdb.d/init-onesparse.sql
