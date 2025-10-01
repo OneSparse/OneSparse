@@ -254,6 +254,7 @@ def write_source(outfile):
         Template('matrix', outfile),
         Template('graph', outfile),
         Template('examples', outfile),
+        Template('io', outfile),
         ]
 
     for o in objects:

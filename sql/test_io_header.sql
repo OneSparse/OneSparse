@@ -10,11 +10,11 @@
 
 \set grbfile 'testmatrix.grb'
 
-select serialize(random_matrix('int8', 10, 10)) as matrixbytes \gset
-select deserialize(:'matrixbytes') = random_matrix('int8', 10, 10);
+select serialize(random_matrix('int8', 10, 10, seed=>42)) as matrixbytes \gset
+select deserialize(:'matrixbytes') = random_matrix('int8', 10, 10, seed=>42);
 
-select serialize_file(random_matrix('int8', 10, 10), :'grbfile');
-select deserialize_file(:'grbfile') = random_matrix('int8', 10, 10);
+select serialize_file(random_matrix('int8', 10, 10, seed=>42), :'grbfile');
+select deserialize_file(:'grbfile') = random_matrix('int8', 10, 10, seed=>42);
 
 -- ## MatrixMarket Format
 --
@@ -22,7 +22,16 @@ select deserialize_file(:'grbfile') = random_matrix('int8', 10, 10);
 -- used by the SuiteSparse Matrix Library.  OneSparse can read these
 -- files and return matrix objects.
 
+create materialized view if not exists karate
+    as select mmread('/home/postgres/onesparse/demo/karate.mtx') as graph;
+
+select print(graph) from karate;
+
 -- ## Large Object Storage
 --
 -- Matrices bigger than the 1GB TOAST limit can be stored in the Large
 -- Object table in Postgres, which supports storage up to 4TB.
+
+select save(graph) as karate_loid from karate \gset
+
+select print(load(:karate_loid));

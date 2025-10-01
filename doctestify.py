@@ -104,6 +104,7 @@ def write_docs():
         Template('test_vector'),
         Template('test_matrix'),
         Template('test_examples'),
+        Template('test_io'),
         ]
 
     for o in objects:

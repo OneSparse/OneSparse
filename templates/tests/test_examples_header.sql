@@ -79,9 +79,8 @@ select draw(triu(graph), reduce_cols(one(graph)), true, false, true, 0.5, 'Rando
 -- given source vertex using the breadth-first search algorithm.
 -- See [https://en.wikipedia.org/wiki/Breadth-first_search](https://en.wikipedia.org/wiki/Breadth-first_search) for details.
 --
-select draw(triu(graph), (select level from bfs(graph, 1)), false, false, true, 0.5) as col_a_source from karate \gset
-select draw(triu(graph), (select level from bfs(graph, 1)), false, false, true, 0.5) as col_b_source from urgraph \gset
-\i sql/draw_2col.sql
+select draw(triu(graph), (select level from bfs(graph, 1)), false, false, true, 0.5) as draw_source from karate \gset
+\i sql/draw_sfdp.sql
 --
 --
 -- ## Parent BFS
@@ -89,18 +88,16 @@ select draw(triu(graph), (select level from bfs(graph, 1)), false, false, true, 
 -- BFS tree rooted at the chosen source. It is also based on
 -- [https://en.wikipedia.org/wiki/Breadth-first_search](https://en.wikipedia.org/wiki/Breadth-first_search).
 --
-select draw(triu(graph), (select parent from bfs(graph, 1)), false, false, true, 0.5) as col_a_source from karate \gset
-select draw(triu(graph), (select parent from bfs(graph, 1)), false, false, true, 0.5) as col_b_source from urgraph \gset
-\i sql/draw_2col.sql
+select draw(triu(graph), (select parent from bfs(graph, 1)), false, false, true, 0.5) as draw_source from karate \gset
+\i sql/draw_sfdp.sql
 --
 -- ### Benchmarks
 -- ![BFS Benchmarks](images/BFS.svg)
 --
 -- ## Single Source Shortest Path
 --
-select draw(triu(graph), sssp(graph, 1::bigint, 1), true, true, true, 0.5) as col_a_source from rgraph \gset
-select draw(triu(graph), sssp(graph, 1::bigint, 1), true, false, true, 0.5) as col_b_source from urgraph \gset
-\i sql/draw_2col.sql
+select draw(triu(graph), sssp(cast_to(graph, 'int32'), 1::bigint, 1), false, false, true, 0.5) as draw_source from karate \gset
+\i sql/draw_sfdp.sql
 --
 -- ### Benchmarks
 -- ![SSSP Benchmarks](images/SSSP.svg)
