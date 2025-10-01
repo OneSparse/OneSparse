@@ -32,6 +32,7 @@ select print(graph) from karate;
 -- Matrices bigger than the 1GB TOAST limit can be stored in the Large
 -- Object table in Postgres, which supports storage up to 4TB.
 
+
 select save(graph) as karate_loid from karate \gset
 
 select print(load(:karate_loid));
