@@ -16,6 +16,7 @@ nav:
   - IndexUnaryOp: test_indexunaryop_header.md
   - Descriptor: test_descriptor_header.md
   - Type: test_type_header.md
+  - Input/Output: test_io_header.md
 
 use_directory_urls: false
 
