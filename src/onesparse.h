@@ -183,42 +183,42 @@
 #define OS_END_BENCH()
 #endif
 
-uint64_t* get_c_array_from_pg_array(FunctionCallInfo fcinfo, int arg_number, uint64_t *out_nelems);
-char* short_code(GrB_Type_Code code);
-GrB_Type code_type(GrB_Type_Code code);
-GrB_Type short_type(char *name);
-size_t code_size(GrB_Type_Code code);
-const char* error_name(GrB_Info info);
-GrB_Type type_promote(GrB_Type left, GrB_Type right);
+uint64_t   *get_c_array_from_pg_array(FunctionCallInfo fcinfo, int arg_number, uint64_t *out_nelems);
+char	   *short_code(GrB_Type_Code code);
+GrB_Type	code_type(GrB_Type_Code code);
+GrB_Type	short_type(char *name);
+size_t		code_size(GrB_Type_Code code);
+const char *error_name(GrB_Info info);
+GrB_Type	type_promote(GrB_Type left, GrB_Type right);
 
 GrB_BinaryOp default_binaryop(GrB_Type type);
-GrB_Monoid default_monoid(GrB_Type type);
+GrB_Monoid	default_monoid(GrB_Type type);
 GrB_Semiring default_semiring(GrB_Type type);
 
-void initialize_types(void);
-void initialize_descriptors(void);
-void initialize_unaryops(void);
-void initialize_indexunaryops(void);
-void initialize_binaryops(void);
-void initialize_monoids(void);
-void initialize_semirings(void);
-void initialize_gucs(void);
+void		initialize_types(void);
+void		initialize_descriptors(void);
+void		initialize_unaryops(void);
+void		initialize_indexunaryops(void);
+void		initialize_binaryops(void);
+void		initialize_monoids(void);
+void		initialize_semirings(void);
+void		initialize_gucs(void);
 
-GrB_Type lookup_type(char *name);
+GrB_Type	lookup_type(char *name);
 GrB_Descriptor lookup_descriptor(char *name);
 GrB_UnaryOp lookup_unaryop(char *name);
 GrB_IndexUnaryOp lookup_indexunaryop(char *name);
 GrB_BinaryOp lookup_binaryop(char *name);
 GxB_IndexBinaryOp lookup_indexbinaryop(char *name);
-GrB_Monoid lookup_monoid(char *name);
+GrB_Monoid	lookup_monoid(char *name);
 GrB_Semiring lookup_semiring(char *name);
 
-void burble_notice_func(const char *fmt, ...)
-	    pg_attribute_printf(1, 2);
+void		burble_notice_func(const char *fmt,...)
+			pg_attribute_printf(1, 2);
 
-bool spi_ensure_connected(void);
+bool		spi_ensure_connected(void);
 
-void _PG_init(void);
+void		_PG_init(void);
 
 #include "type/type.h"
 #include "descriptor/descriptor.h"

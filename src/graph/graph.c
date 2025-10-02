@@ -1,24 +1,26 @@
 #include "../onesparse.h"
 
-static void context_callback_graph_free(void*);
+static void context_callback_graph_free(void *);
 static Size graph_get_flat_size(ExpandedObjectHeader *eohptr);
 
 static void flatten_graph(
-	ExpandedObjectHeader *eohptr,
-	void *result,
-	Size allocated_size);
+						  ExpandedObjectHeader *eohptr,
+						  void *result,
+						  Size allocated_size);
 
 static const ExpandedObjectMethods graph_methods = {
 	graph_get_flat_size,
 	flatten_graph
 };
 
-static Size graph_get_flat_size(ExpandedObjectHeader *eohptr) {
-	os_Graph *graph;
-	void *serialized_data;
-	GrB_Index serialized_size;
+static Size
+graph_get_flat_size(ExpandedObjectHeader *eohptr)
+{
+	os_Graph   *graph;
+	void	   *serialized_data;
+	GrB_Index	serialized_size;
 
-	graph = (os_Graph*) eohptr;
+	graph = (os_Graph *) eohptr;
 	Assert(graph->em_magic == graph_MAGIC);
 
 	if (graph->flat_size)
@@ -29,9 +31,9 @@ static Size graph_get_flat_size(ExpandedObjectHeader *eohptr) {
 	}
 
 	OS_CHECK(GxB_Matrix_serialize(
-				 &serialized_data,
-				 &serialized_size,
-				 graph->graph->A, NULL),
+								  &serialized_data,
+								  &serialized_size,
+								  graph->graph->A, NULL),
 			 graph->graph->A,
 			 "Error serializing graph");
 
@@ -43,15 +45,17 @@ static Size graph_get_flat_size(ExpandedObjectHeader *eohptr) {
 
 /* Flatten graph into a pre-allocated result buffer that is
    allocated_size in bytes.	 */
-static void flatten_graph(
-	ExpandedObjectHeader *eohptr,
-	void *result,
-	Size allocated_size)
+static void
+flatten_graph(
+			  ExpandedObjectHeader *eohptr,
+			  void *result,
+			  Size allocated_size)
 {
-	os_Graph *graph;
+	os_Graph   *graph;
 	os_FlatGraph *flat;
-	void* data;
-    struct timeval start, end;
+	void	   *data;
+	struct timeval start,
+				end;
 
 	OS_START_BENCH();
 
@@ -66,9 +70,9 @@ static void flatten_graph(
 	memset(flat, 0, allocated_size);
 
 	OS_CHECK(GrB_get(
-				 graph->graph->A,
-				 &flat->type_code,
-				 GrB_EL_TYPE_CODE),
+					 graph->graph->A,
+					 &flat->type_code,
+					 GrB_EL_TYPE_CODE),
 			 graph->graph->A,
 			 "Cannot get Graph Type code.");
 
@@ -86,8 +90,12 @@ static void flatten_graph(
 	flat->serialized_size = graph->serialized_size;
 
 	/* free_function = NULL; */
-	/* ERRORIF(GrB_get(GrB_Global, (void*)free_function, GxB_FREE_FUNCTION) != GrB_SUCCESS, */
-	/*		"Cannot get SuiteSparse free function."); */
+
+	/*
+	 * ERRORIF(GrB_get(GrB_Global, (void*)free_function, GxB_FREE_FUNCTION) !=
+	 * GrB_SUCCESS,
+	 */
+	/* "Cannot get SuiteSparse free function."); */
 
 	/* free_function(graph->serialized_data); */
 	SET_VARSIZE(flat, allocated_size);
@@ -95,15 +103,17 @@ static void flatten_graph(
 }
 
 /* Construct an empty expanded graph. */
-os_Graph* new_graph(
-	GrB_Matrix matrix,
-	LAGraph_Kind kind,
-	MemoryContext parentcontext)
+os_Graph *
+new_graph(
+		  GrB_Matrix matrix,
+		  LAGraph_Kind kind,
+		  MemoryContext parentcontext)
 {
-	os_Graph *graph;
-	char msg [LAGRAPH_MSG_LEN] ;
+	os_Graph   *graph;
+	char		msg[LAGRAPH_MSG_LEN];
 
-	MemoryContext objcxt, oldcxt;
+	MemoryContext objcxt,
+				oldcxt;
 	MemoryContextCallback *ctxcb;
 
 	LOGF();
@@ -111,7 +121,7 @@ os_Graph* new_graph(
 								   "expanded graph",
 								   ALLOCSET_DEFAULT_SIZES);
 
-	graph = MemoryContextAllocZero(objcxt,	sizeof(os_Graph));
+	graph = MemoryContextAllocZero(objcxt, sizeof(os_Graph));
 
 	EOH_init_header(&graph->hdr, &graph_methods, objcxt);
 
@@ -136,13 +146,15 @@ os_Graph* new_graph(
 }
 
 /* Expand a flat graph in to an Expanded one, return as Postgres Datum. */
-Datum expand_graph(os_FlatGraph *flat, MemoryContext parentcontext)
+Datum
+expand_graph(os_FlatGraph * flat, MemoryContext parentcontext)
 {
-	GrB_Type type;
-	GrB_Matrix matrix;
-	os_Graph *graph;
-	void* data;
-    struct timeval start, end;
+	GrB_Type	type;
+	GrB_Matrix	matrix;
+	os_Graph   *graph;
+	void	   *data;
+	struct timeval start,
+				end;
 
 	OS_START_BENCH();
 
@@ -150,10 +162,10 @@ Datum expand_graph(os_FlatGraph *flat, MemoryContext parentcontext)
 	data = OS_GRAPH_DATA(flat);
 
 	OS_CHECK(GxB_Matrix_deserialize(
-				 &matrix,
-				 type,
-				 data,
-				 flat->serialized_size, NULL),
+									&matrix,
+									type,
+									data,
+									flat->serialized_size, NULL),
 			 matrix,
 			 "Error deserializing graph");
 
@@ -163,25 +175,28 @@ Datum expand_graph(os_FlatGraph *flat, MemoryContext parentcontext)
 }
 
 static void
-context_callback_graph_free(void* ptr)
+context_callback_graph_free(void *ptr)
 {
-	char msg [LAGRAPH_MSG_LEN] ;
-	os_Graph *graph = (os_Graph *) ptr;
+	char		msg[LAGRAPH_MSG_LEN];
+	os_Graph   *graph = (os_Graph *) ptr;
+
 	LAGraph_Delete(&graph->graph, msg);
 }
 
 /* Helper function to always expand datum
 
    This is used by PG_GETARG_GRAPH */
-os_Graph* DatumGetGraph(Datum datum)
+os_Graph *
+DatumGetGraph(Datum datum)
 {
-	os_Graph *graph;
+	os_Graph   *graph;
 	os_FlatGraph *flat;
-	Pointer flat_datum_pointer;
+	Pointer		flat_datum_pointer;
 
 	flat_datum_pointer = DatumGetPointer(datum);
 
-	if (VARATT_IS_EXTERNAL_EXPANDED(flat_datum_pointer)) {
+	if (VARATT_IS_EXTERNAL_EXPANDED(flat_datum_pointer))
+	{
 		graph = GraphGetEOHP(datum);
 		Assert(graph->em_magic == graph_MAGIC);
 		return graph;

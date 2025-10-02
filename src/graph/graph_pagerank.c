@@ -1,24 +1,26 @@
 #include "../onesparse.h"
 
 PG_FUNCTION_INFO_V1(graph_pagerank);
-Datum graph_pagerank(PG_FUNCTION_ARGS)
+Datum
+graph_pagerank(PG_FUNCTION_ARGS)
 {
-	GrB_Type type;
-	os_Graph *graph;
-	GrB_Vector output;
-	GrB_Index vsize;
-    float damping;
-    float tol;
-    int itermax;
-	int iters;
-    struct timeval start, end;
+	GrB_Type	type;
+	os_Graph   *graph;
+	GrB_Vector	output;
+	GrB_Index	vsize;
+	float		damping;
+	float		tol;
+	int			itermax;
+	int			iters;
+	struct timeval start,
+				end;
 
-	char msg [LAGRAPH_MSG_LEN];
+	char		msg[LAGRAPH_MSG_LEN];
 
 	graph = OS_GETARG_GRAPH(0);
 	damping = PG_GETARG_FLOAT8(1);
 	tol = PG_GETARG_FLOAT8(2);
-    itermax = PG_GETARG_INT32(3);
+	itermax = PG_GETARG_INT32(3);
 
 	LA_CHECK(LAGraph_Cached_OutDegree(graph->graph, msg));
 	LA_CHECK(LAGraph_Cached_AT(graph->graph, msg));
@@ -43,4 +45,3 @@ Datum graph_pagerank(PG_FUNCTION_ARGS)
 
 	OS_RETURN_VECTOR(new_vector(type, vsize, CurrentMemoryContext, output));
 }
-

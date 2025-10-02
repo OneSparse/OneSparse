@@ -1,21 +1,24 @@
 #include "../onesparse.h"
 
 PG_FUNCTION_INFO_V1(vector_elements);
-Datum vector_elements(PG_FUNCTION_ARGS)
+Datum
+vector_elements(PG_FUNCTION_ARGS)
 {
-	FuncCallContext  *funcctx;
-	TupleDesc tupdesc;
-	Datum result;
+	FuncCallContext *funcctx;
+	TupleDesc	tupdesc;
+	Datum		result;
 
-	Datum values[2];
-	bool nulls[2] = {false, false};
-	HeapTuple tuple;
-	GrB_Index nvals, i;
-	os_Vector *vector;
-	os_Scalar *scalar;
+	Datum		values[2];
+	bool		nulls[2] = {false, false};
+	HeapTuple	tuple;
+	GrB_Index	nvals,
+				i;
+	os_Vector  *vector;
+	os_Scalar  *scalar;
 	os_Vector_ExtractState *state;
 
-	if (SRF_IS_FIRSTCALL()) {
+	if (SRF_IS_FIRSTCALL())
+	{
 		MemoryContext oldcontext;
 
 		LOGF();
@@ -23,7 +26,7 @@ Datum vector_elements(PG_FUNCTION_ARGS)
 		oldcontext = MemoryContextSwitchTo(funcctx->multi_call_memory_ctx);
 		vector = OS_GETARG_VECTOR(0);
 
-		state = (os_Vector_ExtractState*)palloc(sizeof(os_Vector_ExtractState));
+		state = (os_Vector_ExtractState *) palloc(sizeof(os_Vector_ExtractState));
 		OS_VNVALS(nvals, vector);
 
 		state->vector = vector;
@@ -34,7 +37,7 @@ Datum vector_elements(PG_FUNCTION_ARGS)
 		OS_VTYPE(state->type, vector);
 		state->info = GxB_Vector_Iterator_seek(state->iterator, 0);
 		funcctx->max_calls = nvals;
-		funcctx->user_fctx = (void*)state;
+		funcctx->user_fctx = (void *) state;
 
 		if (get_call_result_type(fcinfo, NULL, &tupdesc) != TYPEFUNC_COMPOSITE)
 			ereport(ERROR,
@@ -47,7 +50,7 @@ Datum vector_elements(PG_FUNCTION_ARGS)
 	}
 
 	funcctx = SRF_PERCALL_SETUP();
-	state = (os_Vector_ExtractState*)funcctx->user_fctx;
+	state = (os_Vector_ExtractState *) funcctx->user_fctx;
 	vector = state->vector;
 	if (state->info == GxB_EXHAUSTED || funcctx->call_cntr > funcctx->max_calls)
 	{
@@ -68,4 +71,3 @@ Datum vector_elements(PG_FUNCTION_ARGS)
 		SRF_RETURN_NEXT(funcctx, result);
 	}
 }
-

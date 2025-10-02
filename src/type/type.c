@@ -1,12 +1,12 @@
 #include "../onesparse.h"
 
-static void context_callback_type_free(void*);
+static void context_callback_type_free(void *);
 static Size type_get_flat_size(ExpandedObjectHeader *eohptr);
 
 static void flatten_type(
-	ExpandedObjectHeader *eohptr,
-	void *result,
-	Size allocated_size);
+						 ExpandedObjectHeader *eohptr,
+						 void *result,
+						 Size allocated_size);
 
 static const ExpandedObjectMethods type_methods = {
 	type_get_flat_size,
@@ -18,10 +18,12 @@ PG_FUNCTION_INFO_V1(type_out);
 
 #include "type_header.h"
 
-static Size type_get_flat_size(ExpandedObjectHeader *eohptr) {
-	os_Type *type;
+static Size
+type_get_flat_size(ExpandedObjectHeader *eohptr)
+{
+	os_Type    *type;
 
-	type = (os_Type*) eohptr;
+	type = (os_Type *) eohptr;
 	Assert(type->em_magic == type_MAGIC);
 
 	if (type->flat_size)
@@ -33,12 +35,13 @@ static Size type_get_flat_size(ExpandedObjectHeader *eohptr) {
 
 /* Flatten type into a pre-allocated result buffer that is
    allocated_size in bytes.  */
-static void flatten_type(
-	ExpandedObjectHeader *eohptr,
-	void *result,
-	Size allocated_size)
+static void
+flatten_type(
+			 ExpandedObjectHeader *eohptr,
+			 void *result,
+			 Size allocated_size)
 {
-	os_Type *type;
+	os_Type    *type;
 	os_FlatType *flat;
 
 	LOGF();
@@ -49,19 +52,21 @@ static void flatten_type(
 	Assert(type->em_magic == type_MAGIC);
 	Assert(allocated_size == type->flat_size);
 	memset(flat, 0, allocated_size);
-	strncpy(flat->name, type->name, strlen(type->name)+1);
+	strncpy(flat->name, type->name, strlen(type->name) + 1);
 	SET_VARSIZE(flat, allocated_size);
 }
 
 /* Construct an empty expanded type. */
-os_Type* new_type(
-	char* name,
-	MemoryContext parentcontext)
+os_Type *
+new_type(
+		 char *name,
+		 MemoryContext parentcontext)
 {
-	GrB_Type binop;
-	os_Type *type;
+	GrB_Type	binop;
+	os_Type    *type;
 
-	MemoryContext objcxt, oldcxt;
+	MemoryContext objcxt,
+				oldcxt;
 	MemoryContextCallback *ctxcb;
 
 	LOGF();
@@ -82,8 +87,8 @@ os_Type* new_type(
 
 	type->em_magic = type_MAGIC;
 	type->flat_size = 0;
-	type->name = palloc(strlen(name)+1);
-	strncpy(type->name, name, strlen(name)+1);
+	type->name = palloc(strlen(name) + 1);
+	strncpy(type->name, name, strlen(name) + 1);
 	type->type = binop;
 
 	ctxcb = MemoryContextAlloc(objcxt, sizeof(MemoryContextCallback));
@@ -98,9 +103,10 @@ os_Type* new_type(
 }
 
 /* Expand a flat type in to an Expanded one, return as Postgres Datum. */
-Datum expand_type(os_FlatType *flat, MemoryContext parentcontext)
+Datum
+expand_type(os_FlatType * flat, MemoryContext parentcontext)
 {
-	os_Type *type;
+	os_Type    *type;
 
 	LOGF();
 
@@ -109,22 +115,26 @@ Datum expand_type(os_FlatType *flat, MemoryContext parentcontext)
 }
 
 static void
-context_callback_type_free(void* ptr)
+context_callback_type_free(void *ptr)
 {
-	os_Type *type = (os_Type *) ptr;
+	os_Type    *type = (os_Type *) ptr;
+
 	OS_CHECK(GrB_Type_free(&type->type),
-		  type->type,
-		  "Cannot GrB_Free Type");
+			 type->type,
+			 "Cannot GrB_Free Type");
 }
 
 /* Helper function to always expand datum
 
    This is used by PG_GETARG_TYPE */
-os_Type* DatumGetType(Datum datum)
+os_Type *
+DatumGetType(Datum datum)
 {
-	os_Type *type;
+	os_Type    *type;
 	os_FlatType *flat;
-	if (VARATT_IS_EXTERNAL_EXPANDED(DatumGetPointer(datum))) {
+
+	if (VARATT_IS_EXTERNAL_EXPANDED(DatumGetPointer(datum)))
+	{
 		type = TypeGetEOHP(datum);
 		Assert(type->em_magic == type_MAGIC);
 		return type;
@@ -134,23 +144,26 @@ os_Type* DatumGetType(Datum datum)
 	return TypeGetEOHP(datum);
 }
 
-Datum type_in(PG_FUNCTION_ARGS)
+Datum
+type_in(PG_FUNCTION_ARGS)
 {
-	os_Type *type;
-	char* input;
+	os_Type    *type;
+	char	   *input;
 
 	input = PG_GETARG_CSTRING(0);
 	type = new_type(input, CurrentMemoryContext);
 	OS_RETURN_TYPE(type);
 }
 
-Datum type_out(PG_FUNCTION_ARGS)
+Datum
+type_out(PG_FUNCTION_ARGS)
 {
-	char *result;
-	os_Type *type;
+	char	   *result;
+	os_Type    *type;
+
 	type = OS_GETARG_TYPE(0);
 
-	result = palloc(strlen(type->name)+1);
-	snprintf(result, strlen(type->name)+1, "%s", type->name);
+	result = palloc(strlen(type->name) + 1);
+	snprintf(result, strlen(type->name) + 1, "%s", type->name);
 	PG_RETURN_CSTRING(result);
 }

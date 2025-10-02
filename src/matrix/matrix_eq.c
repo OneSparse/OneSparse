@@ -1,13 +1,23 @@
 #include "../onesparse.h"
 
 PG_FUNCTION_INFO_V1(matrix_eq);
-Datum matrix_eq(PG_FUNCTION_ARGS)
+Datum
+matrix_eq(PG_FUNCTION_ARGS)
 {
-	GrB_Type atype, btype;
-	os_Matrix *a, *b, *c;
-	GrB_Index anrows, ancols, anvals, bnrows, bncols, bnvals;
-	bool result;
-    struct timeval start, end;
+	GrB_Type	atype,
+				btype;
+	os_Matrix  *a,
+			   *b,
+			   *c;
+	GrB_Index	anrows,
+				ancols,
+				anvals,
+				bnrows,
+				bncols,
+				bnvals;
+	bool		result;
+	struct timeval start,
+				end;
 
 	OS_START_BENCH();
 	ERRORNULL(0);
@@ -40,12 +50,12 @@ Datum matrix_eq(PG_FUNCTION_ARGS)
 
 	c = new_matrix(GrB_BOOL, anrows, ancols, CurrentMemoryContext, NULL);
 	OS_CHECK(GrB_eWiseMult(c->matrix,
-						  NULL,
-						  NULL,
-						  GrB_EQ_BOOL,
-						  a->matrix,
-						  b->matrix,
-						  NULL),
+						   NULL,
+						   NULL,
+						   GrB_EQ_BOOL,
+						   a->matrix,
+						   b->matrix,
+						   NULL),
 			 c->matrix,
 			 "Error matrix eWiseAdd in eq.");
 
@@ -55,14 +65,13 @@ Datum matrix_eq(PG_FUNCTION_ARGS)
 		PG_RETURN_BOOL(false);
 
 	OS_CHECK(GrB_Matrix_reduce_BOOL(
-			  &result,
-			  NULL,
-			  GrB_LAND_MONOID_BOOL,
-			  c->matrix,
-			  NULL),
+									&result,
+									NULL,
+									GrB_LAND_MONOID_BOOL,
+									c->matrix,
+									NULL),
 			 c->matrix,
 			 "Cannot reduce matrix to scalar in eq");
 	OS_END_BENCH();
 	PG_RETURN_BOOL(result);
 }
-

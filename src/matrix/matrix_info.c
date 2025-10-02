@@ -1,13 +1,17 @@
 #include "../onesparse.h"
 
 PG_FUNCTION_INFO_V1(matrix_info);
-Datum matrix_info(PG_FUNCTION_ARGS) {
-	os_Matrix *A;
-	char *result, *buf;
-	size_t size;
-	FILE *fp;
-	int level;
-    struct timeval start, end;
+Datum
+matrix_info(PG_FUNCTION_ARGS)
+{
+	os_Matrix  *A;
+	char	   *result,
+			   *buf;
+	size_t		size;
+	FILE	   *fp;
+	int			level;
+	struct timeval start,
+				end;
 
 	OS_START_BENCH();
 	A = OS_GETARG_MATRIX(0);
@@ -23,10 +27,8 @@ Datum matrix_info(PG_FUNCTION_ARGS) {
 	GxB_fprint(A->matrix, level, fp);
 	fflush(fp);
 	result = palloc(size + 1);
-	memcpy(result, buf, size+1);
+	memcpy(result, buf, size + 1);
 	free(buf);
 	OS_END_BENCH();
-	PG_RETURN_TEXT_P(cstring_to_text_with_len(result, size+1));
+	PG_RETURN_TEXT_P(cstring_to_text_with_len(result, size + 1));
 }
-
-

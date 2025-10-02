@@ -1,11 +1,13 @@
 #include "../onesparse.h"
 
 PG_FUNCTION_INFO_V1(matrix_nrows);
-Datum matrix_nrows(PG_FUNCTION_ARGS)
+Datum
+matrix_nrows(PG_FUNCTION_ARGS)
 {
-	GrB_Index result;
-	os_Matrix *matrix;
-    struct timeval start, end;
+	GrB_Index	result;
+	os_Matrix  *matrix;
+	struct timeval start,
+				end;
 
 	OS_START_BENCH();
 	ERRORNULL(0);
@@ -14,4 +16,3 @@ Datum matrix_nrows(PG_FUNCTION_ARGS)
 	OS_END_BENCH();
 	PG_RETURN_INT64(result);
 }
-

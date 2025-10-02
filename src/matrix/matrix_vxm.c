@@ -1,18 +1,23 @@
 #include "../onesparse.h"
 
 PG_FUNCTION_INFO_V1(matrix_vxm);
-Datum matrix_vxm(PG_FUNCTION_ARGS)
+Datum
+matrix_vxm(PG_FUNCTION_ARGS)
 {
-	GrB_Type atype, btype, ctype;
-	os_Vector *a, *c;
-	os_Matrix *b;
-	GrB_Vector mask;
+	GrB_Type	atype,
+				btype,
+				ctype;
+	os_Vector  *a,
+			   *c;
+	os_Matrix  *b;
+	GrB_Vector	mask;
 	GrB_Descriptor descriptor;
 	GrB_BinaryOp accum;
 	GrB_Semiring semiring;
-	GrB_Index asize;
-	int nargs;
-    struct timeval start, end;
+	GrB_Index	asize;
+	int			nargs;
+	struct timeval start,
+				end;
 
 	ERRORNULL(0);
 	ERRORNULL(1);
@@ -51,12 +56,11 @@ Datum matrix_vxm(PG_FUNCTION_ARGS)
 					 a->vector,
 					 b->matrix,
 					 descriptor),
-		  c->vector,
-		  "Error matrix mxv.");
+			 c->vector,
+			 "Error matrix mxv.");
 
 	OS_END_BENCH();
 	OS_RETURN_VECTOR(c);
 }
 
 SUPPORT_FN(matrix_vxm, lfourth);
-

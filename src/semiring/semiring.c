@@ -1,12 +1,12 @@
 #include "../onesparse.h"
 
-static void context_callback_semiring_free(void*);
+static void context_callback_semiring_free(void *);
 static Size semiring_get_flat_size(ExpandedObjectHeader *eohptr);
 
 static void flatten_semiring(
-	ExpandedObjectHeader *eohptr,
-	void *result,
-	Size allocated_size);
+							 ExpandedObjectHeader *eohptr,
+							 void *result,
+							 Size allocated_size);
 
 static const ExpandedObjectMethods semiring_methods = {
 	semiring_get_flat_size,
@@ -19,10 +19,12 @@ PG_FUNCTION_INFO_V1(semiring_name);
 
 #include "semiring_header.h"
 
-static Size semiring_get_flat_size(ExpandedObjectHeader *eohptr) {
+static Size
+semiring_get_flat_size(ExpandedObjectHeader *eohptr)
+{
 	os_Semiring *semiring;
 
-	semiring = (os_Semiring*) eohptr;
+	semiring = (os_Semiring *) eohptr;
 	Assert(semiring->em_magic == semiring_MAGIC);
 
 	if (semiring->flat_size)
@@ -34,10 +36,11 @@ static Size semiring_get_flat_size(ExpandedObjectHeader *eohptr) {
 
 /* Flatten semiring into a pre-allocated result buffer that is
    allocated_size in bytes.  */
-static void flatten_semiring(
-	ExpandedObjectHeader *eohptr,
-	void *result,
-	Size allocated_size)
+static void
+flatten_semiring(
+				 ExpandedObjectHeader *eohptr,
+				 void *result,
+				 Size allocated_size)
 {
 	os_Semiring *semiring;
 	os_FlatSemiring *flat;
@@ -50,19 +53,21 @@ static void flatten_semiring(
 	Assert(semiring->em_magic == semiring_MAGIC);
 	Assert(allocated_size == semiring->flat_size);
 	memset(flat, 0, allocated_size);
-	strncpy(flat->name, semiring->name, strlen(semiring->name)+1);
+	strncpy(flat->name, semiring->name, strlen(semiring->name) + 1);
 	SET_VARSIZE(flat, allocated_size);
 }
 
 /* Construct an empty expanded semiring. */
-os_Semiring* new_semiring(
-	char* name,
-	MemoryContext parentcontext)
+os_Semiring *
+new_semiring(
+			 char *name,
+			 MemoryContext parentcontext)
 {
 	GrB_Semiring sring;
 	os_Semiring *semiring;
 
-	MemoryContext objcxt, oldcxt;
+	MemoryContext objcxt,
+				oldcxt;
 	MemoryContextCallback *ctxcb;
 
 	LOGF();
@@ -83,8 +88,8 @@ os_Semiring* new_semiring(
 
 	semiring->em_magic = semiring_MAGIC;
 	semiring->flat_size = 0;
-	semiring->name = palloc(strlen(name)+1);
-	strncpy(semiring->name, name, strlen(name)+1);
+	semiring->name = palloc(strlen(name) + 1);
+	strncpy(semiring->name, name, strlen(name) + 1);
 	semiring->semiring = sring;
 
 	ctxcb = MemoryContextAlloc(objcxt, sizeof(MemoryContextCallback));
@@ -99,7 +104,8 @@ os_Semiring* new_semiring(
 }
 
 /* Expand a flat semiring in to an Expanded one, return as Postgres Datum. */
-Datum expand_semiring(os_FlatSemiring *flat, MemoryContext parentcontext)
+Datum
+expand_semiring(os_FlatSemiring * flat, MemoryContext parentcontext)
 {
 	os_Semiring *semiring;
 
@@ -110,22 +116,26 @@ Datum expand_semiring(os_FlatSemiring *flat, MemoryContext parentcontext)
 }
 
 static void
-context_callback_semiring_free(void* ptr)
+context_callback_semiring_free(void *ptr)
 {
 	os_Semiring *semiring = (os_Semiring *) ptr;
+
 	OS_CHECK(GrB_Semiring_free(&semiring->semiring),
-		  semiring->semiring,
-		  "Cannot GrB_Free Semiring");
+			 semiring->semiring,
+			 "Cannot GrB_Free Semiring");
 }
 
 /* Helper function to always expand datum
 
    This is used by PG_GETARG_SEMIRING */
-os_Semiring* DatumGetSemiring(Datum datum)
+os_Semiring *
+DatumGetSemiring(Datum datum)
 {
 	os_Semiring *semiring;
 	os_FlatSemiring *flat;
-	if (VARATT_IS_EXTERNAL_EXPANDED(DatumGetPointer(datum))) {
+
+	if (VARATT_IS_EXTERNAL_EXPANDED(DatumGetPointer(datum)))
+	{
 		semiring = SemiringGetEOHP(datum);
 		Assert(semiring->em_magic == semiring_MAGIC);
 		return semiring;
@@ -135,30 +145,35 @@ os_Semiring* DatumGetSemiring(Datum datum)
 	return SemiringGetEOHP(datum);
 }
 
-Datum semiring_in(PG_FUNCTION_ARGS)
+Datum
+semiring_in(PG_FUNCTION_ARGS)
 {
 	os_Semiring *semiring;
-	char* input;
+	char	   *input;
 
 	input = PG_GETARG_CSTRING(0);
 	semiring = new_semiring(input, CurrentMemoryContext);
 	OS_RETURN_SEMIRING(semiring);
 }
 
-Datum semiring_out(PG_FUNCTION_ARGS)
+Datum
+semiring_out(PG_FUNCTION_ARGS)
 {
-	char *result;
+	char	   *result;
 	os_Semiring *semiring;
+
 	semiring = OS_GETARG_SEMIRING(0);
 
-	result = palloc(strlen(semiring->name)+1);
-	snprintf(result, strlen(semiring->name)+1, "%s", semiring->name);
+	result = palloc(strlen(semiring->name) + 1);
+	snprintf(result, strlen(semiring->name) + 1, "%s", semiring->name);
 	PG_RETURN_CSTRING(result);
 }
 
-Datum semiring_name(PG_FUNCTION_ARGS)
+Datum
+semiring_name(PG_FUNCTION_ARGS)
 {
 	os_Semiring *semiring;
+
 	semiring = OS_GETARG_SEMIRING(0);
 	PG_RETURN_TEXT_P(cstring_to_text(semiring->name));
 }

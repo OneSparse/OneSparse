@@ -1,10 +1,11 @@
 #include "../onesparse.h"
 
 PG_FUNCTION_INFO_V1(vector_resize);
-Datum vector_resize(PG_FUNCTION_ARGS)
+Datum
+vector_resize(PG_FUNCTION_ARGS)
 {
-	os_Vector *a;
-	GrB_Index i;
+	os_Vector  *a;
+	GrB_Index	i;
 
 	LOGF();
 	ERRORNULL(0);
@@ -16,11 +17,10 @@ Datum vector_resize(PG_FUNCTION_ARGS)
 	if (i == -1)
 		i = GxB_INDEX_MAX;
 
-	OS_CHECK(GrB_Matrix_resize((GrB_Matrix)a->vector, i, 1),
-		  a->vector,
-		  "Error resizing vector.");
+	OS_CHECK(GrB_Matrix_resize((GrB_Matrix) a->vector, i, 1),
+			 a->vector,
+			 "Error resizing vector.");
 	OS_RETURN_VECTOR(a);
 }
 
 SUPPORT_FN(vector_resize, linitial);
-

@@ -1,15 +1,17 @@
 #include "../onesparse.h"
 
 PG_FUNCTION_INFO_V1(graph_connected_components);
-Datum graph_connected_components(PG_FUNCTION_ARGS)
+Datum
+graph_connected_components(PG_FUNCTION_ARGS)
 {
-	GrB_Type type;
-	os_Graph *graph;
-	GrB_Vector output;
-	GrB_Index vsize;
-    struct timeval start, end;
+	GrB_Type	type;
+	os_Graph   *graph;
+	GrB_Vector	output;
+	GrB_Index	vsize;
+	struct timeval start,
+				end;
 
-	char msg [LAGRAPH_MSG_LEN];
+	char		msg[LAGRAPH_MSG_LEN];
 
 	graph = OS_GETARG_GRAPH(0);
 
@@ -29,4 +31,3 @@ Datum graph_connected_components(PG_FUNCTION_ARGS)
 
 	OS_RETURN_VECTOR(new_vector(type, vsize, CurrentMemoryContext, output));
 }
-

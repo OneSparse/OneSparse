@@ -1,24 +1,26 @@
 #include "../onesparse.h"
 
-static void context_callback_matrix_free(void*);
+static void context_callback_matrix_free(void *);
 static Size matrix_get_flat_size(ExpandedObjectHeader *eohptr);
 
 static void flatten_matrix(
-	ExpandedObjectHeader *eohptr,
-	void *result,
-	Size allocated_size);
+						   ExpandedObjectHeader *eohptr,
+						   void *result,
+						   Size allocated_size);
 
 static const ExpandedObjectMethods matrix_methods = {
 	matrix_get_flat_size,
 	flatten_matrix
 };
 
-static Size matrix_get_flat_size(ExpandedObjectHeader *eohptr) {
-	os_Matrix *matrix;
-	void *serialized_data;
-	GrB_Index serialized_size;
+static Size
+matrix_get_flat_size(ExpandedObjectHeader *eohptr)
+{
+	os_Matrix  *matrix;
+	void	   *serialized_data;
+	GrB_Index	serialized_size;
 
-	matrix = (os_Matrix*) eohptr;
+	matrix = (os_Matrix *) eohptr;
 	Assert(matrix->em_magic == matrix_MAGIC);
 
 	if (matrix->flat_size)
@@ -29,11 +31,11 @@ static Size matrix_get_flat_size(ExpandedObjectHeader *eohptr) {
 	}
 
 	OS_CHECK(GxB_Matrix_serialize(
-			  &serialized_data,
-			  &serialized_size,
-			  matrix->matrix, NULL),
-		  matrix->matrix,
-		  "Error serializing matrix");
+								  &serialized_data,
+								  &serialized_size,
+								  matrix->matrix, NULL),
+			 matrix->matrix,
+			 "Error serializing matrix");
 
 	matrix->serialized_data = serialized_data;
 	matrix->serialized_size = serialized_size;
@@ -43,15 +45,17 @@ static Size matrix_get_flat_size(ExpandedObjectHeader *eohptr) {
 
 /* Flatten matrix into a pre-allocated result buffer that is
    allocated_size in bytes.	 */
-static void flatten_matrix(
-	ExpandedObjectHeader *eohptr,
-	void *result,
-	Size allocated_size)
+static void
+flatten_matrix(
+			   ExpandedObjectHeader *eohptr,
+			   void *result,
+			   Size allocated_size)
 {
-	os_Matrix *matrix;
+	os_Matrix  *matrix;
 	os_FlatMatrix *flat;
-	void* data;
-    struct timeval start, end;
+	void	   *data;
+	struct timeval start,
+				end;
 
 	OS_START_BENCH();
 	matrix = (os_Matrix *) eohptr;
@@ -70,8 +74,12 @@ static void flatten_matrix(
 	flat->serialized_size = matrix->serialized_size;
 
 	/* free_function = NULL; */
-	/* ERRORIF(GrB_get(GrB_Global, (void*)free_function, GxB_FREE_FUNCTION) != GrB_SUCCESS, */
-	/*		"Cannot get SuiteSparse free function."); */
+
+	/*
+	 * ERRORIF(GrB_get(GrB_Global, (void*)free_function, GxB_FREE_FUNCTION) !=
+	 * GrB_SUCCESS,
+	 */
+	/* "Cannot get SuiteSparse free function."); */
 
 	/* free_function(matrix->serialized_data); */
 	SET_VARSIZE(flat, allocated_size);
@@ -79,16 +87,18 @@ static void flatten_matrix(
 }
 
 /* Construct an empty expanded matrix. */
-os_Matrix* new_matrix(
-	GrB_Type type,
-	GrB_Index nrows,
-	GrB_Index ncols,
-	MemoryContext parentcontext,
-	GrB_Matrix _matrix)
+os_Matrix *
+new_matrix(
+		   GrB_Type type,
+		   GrB_Index nrows,
+		   GrB_Index ncols,
+		   MemoryContext parentcontext,
+		   GrB_Matrix _matrix)
 {
-	os_Matrix *matrix;
+	os_Matrix  *matrix;
 
-	MemoryContext objcxt, oldcxt;
+	MemoryContext objcxt,
+				oldcxt;
 	MemoryContextCallback *ctxcb;
 
 	LOGF();
@@ -96,7 +106,7 @@ os_Matrix* new_matrix(
 								   "expanded matrix",
 								   ALLOCSET_DEFAULT_SIZES);
 
-	matrix = MemoryContextAllocZero(objcxt,	sizeof(os_Matrix));
+	matrix = MemoryContextAllocZero(objcxt, sizeof(os_Matrix));
 
 	EOH_init_header(&matrix->hdr, &matrix_methods, objcxt);
 
@@ -110,8 +120,8 @@ os_Matrix* new_matrix(
 	if (_matrix == NULL)
 	{
 		OS_CHECK(GrB_Matrix_new(&matrix->matrix, type, nrows, ncols),
-			  matrix->matrix,
-			  "Cannot create new Matrix.");
+				 matrix->matrix,
+				 "Cannot create new Matrix.");
 	}
 	else
 	{
@@ -130,24 +140,26 @@ os_Matrix* new_matrix(
 }
 
 /* Expand a flat matrix in to an Expanded one, return as Postgres Datum. */
-Datum expand_matrix(os_FlatMatrix *flat, MemoryContext parentcontext)
+Datum
+expand_matrix(os_FlatMatrix * flat, MemoryContext parentcontext)
 {
-	os_Matrix *matrix;
-	GrB_Matrix tmp;
-	void* data;
-    struct timeval start, end;
+	os_Matrix  *matrix;
+	GrB_Matrix	tmp;
+	void	   *data;
+	struct timeval start,
+				end;
 
 	OS_START_BENCH();
 	data = OS_MATRIX_DATA(flat);
 
 	OS_CHECK(GxB_Matrix_deserialize(
-			  &tmp,
-			  NULL,
-			  data,
-			  flat->serialized_size,
-			  NULL),
-		  tmp,
-		  "Error deserializing matrix");
+									&tmp,
+									NULL,
+									data,
+									flat->serialized_size,
+									NULL),
+			 tmp,
+			 "Error deserializing matrix");
 
 	matrix = new_matrix(NULL, 0, 0, parentcontext, tmp);
 	OS_END_BENCH();
@@ -155,26 +167,29 @@ Datum expand_matrix(os_FlatMatrix *flat, MemoryContext parentcontext)
 }
 
 static void
-context_callback_matrix_free(void* ptr)
+context_callback_matrix_free(void *ptr)
 {
-	os_Matrix *matrix = (os_Matrix *) ptr;
+	os_Matrix  *matrix = (os_Matrix *) ptr;
+
 	OS_CHECK(GrB_Matrix_free(&matrix->matrix),
-		  matrix->matrix,
-		  "Cannot GrB_Free Matrix");
+			 matrix->matrix,
+			 "Cannot GrB_Free Matrix");
 }
 
 /* Helper function to always expand datum
 
    This is used by PG_GETARG_MATRIX */
-os_Matrix* DatumGetMatrix(Datum datum)
+os_Matrix *
+DatumGetMatrix(Datum datum)
 {
-	os_Matrix *matrix;
+	os_Matrix  *matrix;
 	os_FlatMatrix *flat;
-	Pointer flat_datum_pointer;
+	Pointer		flat_datum_pointer;
 
 	flat_datum_pointer = DatumGetPointer(datum);
 
-	if (VARATT_IS_EXTERNAL_EXPANDED(flat_datum_pointer)) {
+	if (VARATT_IS_EXTERNAL_EXPANDED(flat_datum_pointer))
+	{
 		matrix = MatrixGetEOHP(datum);
 		Assert(matrix->em_magic == matrix_MAGIC);
 		return matrix;
@@ -186,15 +201,17 @@ os_Matrix* DatumGetMatrix(Datum datum)
 	return matrix;
 }
 
-os_Matrix* DatumGetMatrixMaybeA(Datum datum, os_Matrix *A)
+os_Matrix *
+DatumGetMatrixMaybeA(Datum datum, os_Matrix * A)
 {
-	os_Matrix *matrix;
+	os_Matrix  *matrix;
 	os_FlatMatrix *flat;
-	Pointer flat_datum_pointer;
+	Pointer		flat_datum_pointer;
 
 	flat_datum_pointer = DatumGetPointer(datum);
 
-	if (VARATT_IS_EXTERNAL_EXPANDED(flat_datum_pointer)) {
+	if (VARATT_IS_EXTERNAL_EXPANDED(flat_datum_pointer))
+	{
 		matrix = MatrixGetEOHP(datum);
 		Assert(matrix->em_magic == matrix_MAGIC);
 		return matrix;
@@ -212,15 +229,17 @@ os_Matrix* DatumGetMatrixMaybeA(Datum datum, os_Matrix *A)
 	return matrix;
 }
 
-os_Matrix* DatumGetMatrixMaybeAB(Datum datum, os_Matrix *A, os_Matrix *B)
+os_Matrix *
+DatumGetMatrixMaybeAB(Datum datum, os_Matrix * A, os_Matrix * B)
 {
-	os_Matrix *matrix;
+	os_Matrix  *matrix;
 	os_FlatMatrix *flat;
-	Pointer flat_datum_pointer;
+	Pointer		flat_datum_pointer;
 
 	flat_datum_pointer = DatumGetPointer(datum);
 
-	if (VARATT_IS_EXTERNAL_EXPANDED(flat_datum_pointer)) {
+	if (VARATT_IS_EXTERNAL_EXPANDED(flat_datum_pointer))
+	{
 		matrix = MatrixGetEOHP(datum);
 		Assert(matrix->em_magic == matrix_MAGIC);
 		return matrix;
@@ -241,15 +260,17 @@ os_Matrix* DatumGetMatrixMaybeAB(Datum datum, os_Matrix *A, os_Matrix *B)
 	return matrix;
 }
 
-os_Matrix* DatumGetMatrixMaybeABC(Datum datum, os_Matrix *A, os_Matrix *B, os_Matrix *C)
+os_Matrix *
+DatumGetMatrixMaybeABC(Datum datum, os_Matrix * A, os_Matrix * B, os_Matrix * C)
 {
-	os_Matrix *matrix;
+	os_Matrix  *matrix;
 	os_FlatMatrix *flat;
-	Pointer flat_datum_pointer;
+	Pointer		flat_datum_pointer;
 
 	flat_datum_pointer = DatumGetPointer(datum);
 
-	if (VARATT_IS_EXTERNAL_EXPANDED(flat_datum_pointer)) {
+	if (VARATT_IS_EXTERNAL_EXPANDED(flat_datum_pointer))
+	{
 		matrix = MatrixGetEOHP(datum);
 		Assert(matrix->em_magic == matrix_MAGIC);
 		return matrix;

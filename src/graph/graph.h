@@ -1,37 +1,38 @@
-#ifndef OS_GRAPH_H
-#define OS_GRAPH_H
+#pragma once
 
 #define graph_MAGIC 689222813
 
-typedef struct os_FlatGraph {
-    int32 vl_len_;
-	int32_t type_code;
-	GrB_Index nrows;
-	GrB_Index ncols;
-	GrB_Index serialized_size;
+typedef struct os_FlatGraph
+{
+	int32		vl_len_;
+	int32_t		type_code;
+	GrB_Index	nrows;
+	GrB_Index	ncols;
+	GrB_Index	serialized_size;
 	LAGraph_Kind kind;
-	Oid loid;
-} os_FlatGraph;
+	Oid			loid;
+}			os_FlatGraph;
 
-typedef struct os_Graph  {
-    ExpandedObjectHeader hdr;
-    int em_magic;
-    LAGraph_Graph graph;
-	Pointer flat_datum_pointer;
-    Size flat_size;
-    void* serialized_data;
-    GrB_Index serialized_size;
-	Oid loid;
-} os_Graph;
+typedef struct os_Graph
+{
+	ExpandedObjectHeader hdr;
+	int			em_magic;
+	LAGraph_Graph graph;
+	Pointer		flat_datum_pointer;
+	Size		flat_size;
+	void	   *serialized_data;
+	GrB_Index	serialized_size;
+	Oid			loid;
+}			os_Graph;
 
-Datum expand_graph(os_FlatGraph *flat,	MemoryContext parentcontext);
+Datum		expand_graph(os_FlatGraph * flat, MemoryContext parentcontext);
 
-os_Graph* new_graph(
-	GrB_Matrix matrix,
-	LAGraph_Kind kind,
-	MemoryContext parentcontext);
+os_Graph   *new_graph(
+					  GrB_Matrix matrix,
+					  LAGraph_Kind kind,
+					  MemoryContext parentcontext);
 
-os_Graph* DatumGetGraph(Datum d);
+os_Graph   *DatumGetGraph(Datum d);
 
 #define OS_DETOAST_GRAPH(_datum) (os_FlatGraph*)PG_DETOAST_DATUM(datum)
 
@@ -54,5 +55,3 @@ os_Graph* DatumGetGraph(Datum d);
 
 #define OS_GRAPH_DATA(_flat) ((char*)(_flat) + OS_GRAPH_FLATSIZE())
 #define GraphGetEOHP(_datum) (os_Graph *) DatumGetEOHP(_datum)
-
-#endif 

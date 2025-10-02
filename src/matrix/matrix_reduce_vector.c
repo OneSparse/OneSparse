@@ -1,18 +1,20 @@
 #include "../onesparse.h"
 
 PG_FUNCTION_INFO_V1(matrix_reduce_vector);
-Datum matrix_reduce_vector(PG_FUNCTION_ARGS)
+Datum
+matrix_reduce_vector(PG_FUNCTION_ARGS)
 {
-	GrB_Type type;
-	os_Matrix *a;
-	os_Vector *w;
-	GrB_Vector mask;
+	GrB_Type	type;
+	os_Matrix  *a;
+	os_Vector  *w;
+	GrB_Vector	mask;
 	GrB_Descriptor descriptor;
-	GrB_Monoid monoid;
+	GrB_Monoid	monoid;
 	GrB_BinaryOp accum;
-	GrB_Index vsize;
-	int nargs;
-    struct timeval start, end;
+	GrB_Index	vsize;
+	int			nargs;
+	struct timeval start,
+				end;
 
 	OS_START_BENCH();
 	ERRORNULL(0);
@@ -41,12 +43,12 @@ Datum matrix_reduce_vector(PG_FUNCTION_ARGS)
 	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 5);
 
 	OS_CHECK(GrB_Matrix_reduce_Monoid(
-				 w->vector,
-				 mask,
-				 accum,
-				 monoid,
-				 a->matrix,
-				 descriptor),
+									  w->vector,
+									  mask,
+									  accum,
+									  monoid,
+									  a->matrix,
+									  descriptor),
 			 w->vector,
 			 "Error matrix vector reduce.");
 
@@ -55,4 +57,3 @@ Datum matrix_reduce_vector(PG_FUNCTION_ARGS)
 }
 
 SUPPORT_FN(matrix_reduce_vector, lthird);
-

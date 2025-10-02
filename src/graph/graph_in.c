@@ -1,13 +1,15 @@
 #include "../onesparse.h"
 
 PG_FUNCTION_INFO_V1(graph_in);
-Datum graph_in(PG_FUNCTION_ARGS)
+Datum
+graph_in(PG_FUNCTION_ARGS)
 {
-	char *input;
+	char	   *input;
 	LAGraph_Kind kind;
-	os_Matrix *matrix;
-	os_Graph *graph;
-    struct timeval start, end;
+	os_Matrix  *matrix;
+	os_Graph   *graph;
+	struct timeval start,
+				end;
 
 	input = PG_GETARG_CSTRING(0);
 
@@ -25,9 +27,8 @@ Datum graph_in(PG_FUNCTION_ARGS)
 	}
 
 	OS_START_BENCH();
-	matrix = _parse_matrix(pstrdup(input+2));
+	matrix = _parse_matrix(pstrdup(input + 2));
 	graph = new_graph(matrix->matrix, kind, CurrentMemoryContext);
 	OS_END_BENCH();
 	OS_RETURN_GRAPH(graph);
 }
-

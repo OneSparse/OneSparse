@@ -1,11 +1,12 @@
 #include "../onesparse.h"
 
 PG_FUNCTION_INFO_V1(vector_contains);
-Datum vector_contains(PG_FUNCTION_ARGS)
+Datum
+vector_contains(PG_FUNCTION_ARGS)
 {
-	os_Vector *vector;
-	GrB_Index i;
-	GrB_Info info;
+	os_Vector  *vector;
+	GrB_Index	i;
+	GrB_Info	info;
 
 	LOGF();
 	ERRORNULL(0);
@@ -23,4 +24,3 @@ Datum vector_contains(PG_FUNCTION_ARGS)
 		elog(ERROR, "Error checking stored element.");
 	PG_RETURN_BOOL(false);
 }
-

@@ -1,51 +1,59 @@
 #include "onesparse.h"
 PG_MODULE_MAGIC;
 
-uint64_t* get_c_array_from_pg_array(FunctionCallInfo fcinfo, int arg_number, uint64_t *out_nelems) {
-    ArrayType *input_array;
-    Datum *elements;
-    bool *nulls;
-    int nelems;
-    uint64_t *c_array;
-    int i;
-    int64_t temp_value;
+uint64_t *
+get_c_array_from_pg_array(FunctionCallInfo fcinfo, int arg_number, uint64_t *out_nelems)
+{
+	ArrayType  *input_array;
+	Datum	   *elements;
+	bool	   *nulls;
+	int			nelems;
+	uint64_t   *c_array;
+	int			i;
+	int64_t		temp_value;
 
-    input_array = PG_GETARG_ARRAYTYPE_P(arg_number);
+	input_array = PG_GETARG_ARRAYTYPE_P(arg_number);
 
-    deconstruct_array(input_array,
-                      INT8OID,
-                      8,
-                      true,
-                      'd',
-                      &elements,
-                      &nulls,
-                      &nelems);
+	deconstruct_array(input_array,
+					  INT8OID,
+					  8,
+					  true,
+					  'd',
+					  &elements,
+					  &nulls,
+					  &nelems);
 
-    c_array = (uint64_t *) palloc(nelems * sizeof(uint64_t));
+	c_array = (uint64_t *) palloc(nelems * sizeof(uint64_t));
 
-    for (i = 0; i < nelems; i++) {
-        if (!nulls[i]) {
-            temp_value = DatumGetInt64(elements[i]);
+	for (i = 0; i < nelems; i++)
+	{
+		if (!nulls[i])
+		{
+			temp_value = DatumGetInt64(elements[i]);
 
-            if (temp_value < 0) {
-                ereport(ERROR,
-                        (errcode(ERRCODE_NUMERIC_VALUE_OUT_OF_RANGE),
-                         errmsg("Negative values are not allowed in uint64_t array")));
-            }
+			if (temp_value < 0)
+			{
+				ereport(ERROR,
+						(errcode(ERRCODE_NUMERIC_VALUE_OUT_OF_RANGE),
+						 errmsg("Negative values are not allowed in uint64_t array")));
+			}
 
-            c_array[i] = (uint64_t) temp_value;
-        } else {
-            c_array[i] = 0;
-        }
-    }
+			c_array[i] = (uint64_t) temp_value;
+		}
+		else
+		{
+			c_array[i] = 0;
+		}
+	}
 
-    *out_nelems = (uint64_t) nelems;
-    return c_array;
+	*out_nelems = (uint64_t) nelems;
+	return c_array;
 }
 
-char* short_code(GrB_Type_Code code)
+char *
+short_code(GrB_Type_Code code)
 {
-	switch(code)
+	switch (code)
 	{
 		case GrB_BOOL_CODE:
 			return "bool";
@@ -79,9 +87,10 @@ char* short_code(GrB_Type_Code code)
 	elog(ERROR, "Unknown type to code");
 }
 
-GrB_Type code_type(GrB_Type_Code code)
+GrB_Type
+code_type(GrB_Type_Code code)
 {
-	switch(code)
+	switch (code)
 	{
 		case GrB_BOOL_CODE:
 			return GrB_BOOL;
@@ -115,9 +124,10 @@ GrB_Type code_type(GrB_Type_Code code)
 	elog(ERROR, "Unknown code to type");
 }
 
-size_t code_size(GrB_Type_Code code)
+size_t
+code_size(GrB_Type_Code code)
 {
-	switch(code)
+	switch (code)
 	{
 		case GrB_BOOL_CODE:
 			return sizeof(bool);
@@ -147,7 +157,8 @@ size_t code_size(GrB_Type_Code code)
 	elog(ERROR, "Unknown type code size");
 }
 
-GrB_Type short_type(char *name)
+GrB_Type
+short_type(char *name)
 {
 	if (strcmp(name, "bool") == 0)
 		return GrB_BOOL;
@@ -174,9 +185,10 @@ GrB_Type short_type(char *name)
 	elog(ERROR, "Unknown short name %s", name);
 }
 
-const char* error_name(GrB_Info info)
+const char *
+error_name(GrB_Info info)
 {
-	switch(info)
+	switch (info)
 	{
 		case GrB_SUCCESS:
 			return "SUCCESS";
@@ -224,30 +236,36 @@ const char* error_name(GrB_Info info)
 	return "Unknown Info enum value";
 }
 
-GrB_Type type_promote(GrB_Type left, GrB_Type right)
+GrB_Type
+type_promote(GrB_Type left, GrB_Type right)
 {
-	int i, i1, i2;
-	GrB_Type types[] =
-		{GrB_BOOL,
-		 GrB_INT8, GrB_UINT8,
-		 GrB_INT16, GrB_UINT16,
-		 GrB_INT32, GrB_UINT32,
-		 GrB_INT64, GrB_UINT64,
-		 GrB_FP32, GrB_FP64};
+	int			i,
+				i1,
+				i2;
+	GrB_Type	types[] =
+	{GrB_BOOL,
+		GrB_INT8, GrB_UINT8,
+		GrB_INT16, GrB_UINT16,
+		GrB_INT32, GrB_UINT32,
+		GrB_INT64, GrB_UINT64,
+	GrB_FP32, GrB_FP64};
 
 	i1 = i2 = -1;
 	for (i = 0; i < 11; i++)
 	{
-        if (left == types[i]) i1 = i;
-        if (right == types[i]) i2 = i;
-    }
+		if (left == types[i])
+			i1 = i;
+		if (right == types[i])
+			i2 = i;
+	}
 	if (i1 == -1 || i2 == -1)
 		elog(ERROR, "Cannot promote types");
 
-    return (i1 > i2) ? left : right;
+	return (i1 > i2) ? left : right;
 }
 
-GrB_BinaryOp default_binaryop(GrB_Type type)
+GrB_BinaryOp
+default_binaryop(GrB_Type type)
 {
 	if (type == GrB_INT64)
 		return GrB_TIMES_INT64;
@@ -274,7 +292,8 @@ GrB_BinaryOp default_binaryop(GrB_Type type)
 	return NULL;
 }
 
-GrB_Monoid default_monoid(GrB_Type type)
+GrB_Monoid
+default_monoid(GrB_Type type)
 {
 	if (type == GrB_INT64)
 		return GrB_PLUS_MONOID_INT64;
@@ -301,7 +320,8 @@ GrB_Monoid default_monoid(GrB_Type type)
 	return NULL;
 }
 
-GrB_Semiring default_semiring(GrB_Type type)
+GrB_Semiring
+default_semiring(GrB_Type type)
 {
 	if (type == GrB_INT64)
 		return GrB_PLUS_TIMES_SEMIRING_INT64;
@@ -331,25 +351,27 @@ GrB_Semiring default_semiring(GrB_Type type)
 bool
 spi_ensure_connected(void)
 {
-    int rc;
+	int			rc;
 
-    rc = SPI_connect();
-    if (rc == SPI_OK_CONNECT)
-    {
-        return true;   /* we connected */
-    }
-    if (rc == SPI_ERROR_CONNECT)
-    {
-        return false;  /* already connected by our caller */
-    }
+	rc = SPI_connect();
+	if (rc == SPI_OK_CONNECT)
+	{
+		return true;			/* we connected */
+	}
+	if (rc == SPI_ERROR_CONNECT)
+	{
+		return false;			/* already connected by our caller */
+	}
 
-    elog(ERROR, "spi_ensure_connected: SPI_connect failed with code %d", rc);
-    pg_unreachable();
+	elog(ERROR, "spi_ensure_connected: SPI_connect failed with code %d", rc);
+	pg_unreachable();
 }
 
-void _PG_init(void)
+void
+_PG_init(void)
 {
-	char msg [LAGRAPH_MSG_LEN];
+	char		msg[LAGRAPH_MSG_LEN];
+
 	LAGraph_Init(msg);
 	initialize_types();
 	initialize_descriptors();

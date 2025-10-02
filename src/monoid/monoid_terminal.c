@@ -2,18 +2,19 @@
 
 PG_FUNCTION_INFO_V1(monoid_terminal);
 
-Datum monoid_terminal(PG_FUNCTION_ARGS)
+Datum
+monoid_terminal(PG_FUNCTION_ARGS)
 {
-	os_Monoid *monoid;
-	os_Scalar *scalar;
+	os_Monoid  *monoid;
+	os_Scalar  *scalar;
 	GrB_Type_Code code;
-	GrB_Type type;
-	GrB_Scalar tmp;
+	GrB_Type	type;
+	GrB_Scalar	tmp;
 
 	monoid = OS_GETARG_MONOID(0);
 
 	OS_CHECK(GrB_get(monoid->monoid,
-					 (int32_t*)&code,
+					 (int32_t *) &code,
 					 GrB_OUTP_TYPE_CODE),
 			 monoid->monoid,
 			 "Error getting monoid type code");
@@ -25,10 +26,10 @@ Datum monoid_terminal(PG_FUNCTION_ARGS)
 			 "Error creating new monoid terminal scalar.");
 
 	OS_CHECK(GrB_get(monoid->monoid,
-                     tmp,
-                     GxB_MONOID_TERMINAL),
-             monoid->monoid,
-             "Error extracting monoid terminal.");
+					 tmp,
+					 GxB_MONOID_TERMINAL),
+			 monoid->monoid,
+			 "Error extracting monoid terminal.");
 
 	scalar = new_scalar(type, CurrentMemoryContext, tmp);
 

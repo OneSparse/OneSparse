@@ -1,27 +1,28 @@
 #include "../onesparse.h"
 
 PG_FUNCTION_INFO_V1(scalar_out);
-Datum scalar_out(PG_FUNCTION_ARGS)
+Datum
+scalar_out(PG_FUNCTION_ARGS)
 {
-	char *result;
-	char *type_name;
-	size_t type_name_len;
-	int32_t type_code;
-	os_Scalar *scalar;
-	GrB_Index nvals;
-	GrB_Type type;
+	char	   *result;
+	char	   *type_name;
+	size_t		type_name_len;
+	int32_t		type_code;
+	os_Scalar  *scalar;
+	GrB_Index	nvals;
+	GrB_Type	type;
 
 	LOGF();
 	scalar = OS_GETARG_SCALAR(0);
 
 	nvals = 0;
 	OS_CHECK(GrB_Scalar_nvals(&nvals, scalar->scalar),
-		  scalar->scalar,
-		  "Error extracting scalar nvals.");
+			 scalar->scalar,
+			 "Error extracting scalar nvals.");
 
 	OS_CHECK(GrB_get(scalar->scalar, &type_code, GrB_EL_TYPE_CODE),
-		  scalar->scalar,
-		  "Cannot get Scalar Type code.");
+			 scalar->scalar,
+			 "Cannot get Scalar Type code.");
 
 	if (type_code == GrB_UDT_CODE)
 	{
@@ -48,111 +49,122 @@ Datum scalar_out(PG_FUNCTION_ARGS)
 	{
 		if (type_code == GrB_INT64_CODE)
 		{
-			int64_t value;
+			int64_t		value;
+
 			OS_CHECK(GrB_Scalar_extractElement(&value, scalar->scalar),
-				  scalar->scalar,
-				  "Error extracting scalar element.");
+					 scalar->scalar,
+					 "Error extracting scalar element.");
 			result = palloc(GxB_MAX_NAME_LEN);
 			snprintf(result, GxB_MAX_NAME_LEN, "%s:" "%" PRIi64, type_name, value);
 		}
 		else if (type_code == GrB_UINT64_CODE)
 		{
-			uint64_t value;
+			uint64_t	value;
+
 			OS_CHECK(GrB_Scalar_extractElement(&value, scalar->scalar),
-				  scalar->scalar,
-				  "Error extracting scalar element.");
+					 scalar->scalar,
+					 "Error extracting scalar element.");
 			result = palloc(GxB_MAX_NAME_LEN);
 			snprintf(result, GxB_MAX_NAME_LEN, "%s:" "%" PRIu64, type_name, value);
 		}
 		else if (type_code == GrB_INT32_CODE)
 		{
-			int32_t value;
+			int32_t		value;
+
 			OS_CHECK(GrB_Scalar_extractElement(&value, scalar->scalar),
-				  scalar->scalar,
-				  "Error extracting scalar element.");
+					 scalar->scalar,
+					 "Error extracting scalar element.");
 			result = palloc(GxB_MAX_NAME_LEN);
 			snprintf(result, GxB_MAX_NAME_LEN, "%s:" "%" PRIi32, type_name, value);
 		}
 		else if (type_code == GrB_UINT32_CODE)
 		{
-			uint32_t value;
+			uint32_t	value;
+
 			OS_CHECK(GrB_Scalar_extractElement(&value, scalar->scalar),
-				  scalar->scalar,
-				  "Error extracting scalar element.");
+					 scalar->scalar,
+					 "Error extracting scalar element.");
 			result = palloc(GxB_MAX_NAME_LEN);
 			snprintf(result, GxB_MAX_NAME_LEN, "%s:" "%" PRIu32, type_name, value);
 		}
 		else if (type_code == GrB_INT16_CODE)
 		{
-			int16_t value;
+			int16_t		value;
+
 			OS_CHECK(GrB_Scalar_extractElement(&value, scalar->scalar),
-				  scalar->scalar,
-				  "Error extracting scalar element.");
+					 scalar->scalar,
+					 "Error extracting scalar element.");
 			result = palloc(GxB_MAX_NAME_LEN);
 			snprintf(result, GxB_MAX_NAME_LEN, "%s:" "%" PRIi16, type_name, value);
 		}
 		else if (type_code == GrB_INT8_CODE)
 		{
-			int8_t value;
+			int8_t		value;
+
 			OS_CHECK(GrB_Scalar_extractElement(&value, scalar->scalar),
-				  scalar->scalar,
-				  "Error extracting scalar element.");
+					 scalar->scalar,
+					 "Error extracting scalar element.");
 			result = palloc(GxB_MAX_NAME_LEN);
 			snprintf(result, GxB_MAX_NAME_LEN, "%s:" "%" PRIi8, type_name, value);
 		}
 		else if (type_code == GrB_UINT16_CODE)
 		{
-			uint16_t value;
+			uint16_t	value;
+
 			OS_CHECK(GrB_Scalar_extractElement(&value, scalar->scalar),
-				  scalar->scalar,
-				  "Error extracting scalar element.");
+					 scalar->scalar,
+					 "Error extracting scalar element.");
 			result = palloc(GxB_MAX_NAME_LEN);
 			snprintf(result, GxB_MAX_NAME_LEN, "%s:" "%" PRIu16, type_name, value);
 		}
 		else if (type_code == GrB_UINT8_CODE)
 		{
-			uint8_t value;
+			uint8_t		value;
+
 			OS_CHECK(GrB_Scalar_extractElement(&value, scalar->scalar),
-				  scalar->scalar,
-				  "Error extracting scalar element.");
+					 scalar->scalar,
+					 "Error extracting scalar element.");
 			result = palloc(GxB_MAX_NAME_LEN);
 			snprintf(result, GxB_MAX_NAME_LEN, "%s:" "%" PRIu8, type_name, value);
 		}
 		else if (type_code == GrB_FP64_CODE)
 		{
-			double value;
+			double		value;
+
 			OS_CHECK(GrB_Scalar_extractElement(&value, scalar->scalar),
-				  scalar->scalar,
-				  "Error extracting scalar element.");
+					 scalar->scalar,
+					 "Error extracting scalar element.");
 			result = palloc(GxB_MAX_NAME_LEN);
 			snprintf(result, GxB_MAX_NAME_LEN, "%s:%f", type_name, value);
 		}
 		else if (type_code == GrB_FP32_CODE)
 		{
-			float value;
+			float		value;
+
 			OS_CHECK(GrB_Scalar_extractElement(&value, scalar->scalar),
-				  scalar->scalar,
-				  "Error extracting scalar element.");
+					 scalar->scalar,
+					 "Error extracting scalar element.");
 			result = palloc(GxB_MAX_NAME_LEN);
 			snprintf(result, GxB_MAX_NAME_LEN, "%s:%f", type_name, value);
 		}
 		else if (type_code == GrB_BOOL_CODE)
 		{
-			bool value;
+			bool		value;
+
 			OS_CHECK(GrB_Scalar_extractElement(&value, scalar->scalar),
-				   scalar->scalar,
-				   "Error extracting scalar element.");
+					 scalar->scalar,
+					 "Error extracting scalar element.");
 			result = palloc(GxB_MAX_NAME_LEN);
 			snprintf(result, GxB_MAX_NAME_LEN, "%s:%s", type_name, value ? "t" : "f");
 		}
 		else if (type_code == GrB_UDT_CODE)
 		{
-			size_t ssize;
-			void *value;
-			int      enc_len;
-			int      out_len;
-			size_t   tlen;
-			size_t result_len;
+			size_t		ssize;
+			void	   *value;
+			int			enc_len;
+			int			out_len;
+			size_t		tlen;
+			size_t		result_len;
 
 			OS_CHECK(GxB_Type_size(&ssize, type),
 					 type,
@@ -160,8 +172,8 @@ Datum scalar_out(PG_FUNCTION_ARGS)
 
 			value = palloc(ssize);
 			OS_CHECK(GxB_Scalar_extractElement_UDT(value, scalar->scalar),
-				   scalar->scalar,
-				   "Error extracting scalar element.");
+					 scalar->scalar,
+					 "Error extracting scalar element.");
 
 			enc_len = pg_b64_enc_len((int) ssize);
 			tlen = strlen(type_name);
@@ -185,4 +197,3 @@ Datum scalar_out(PG_FUNCTION_ARGS)
 	}
 	PG_RETURN_CSTRING(result);
 }
-

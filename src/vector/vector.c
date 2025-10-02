@@ -1,24 +1,26 @@
 #include "../onesparse.h"
 
-static void context_callback_vector_free(void*);
+static void context_callback_vector_free(void *);
 static Size vector_get_flat_size(ExpandedObjectHeader *eohptr);
 
 static void flatten_vector(
-	ExpandedObjectHeader *eohptr,
-	void *result,
-	Size allocated_size);
+						   ExpandedObjectHeader *eohptr,
+						   void *result,
+						   Size allocated_size);
 
 static const ExpandedObjectMethods vector_methods = {
 	vector_get_flat_size,
 	flatten_vector
 };
 
-static Size vector_get_flat_size(ExpandedObjectHeader *eohptr) {
-	os_Vector *vector;
-	void *serialized_data;
-	GrB_Index serialized_size;
+static Size
+vector_get_flat_size(ExpandedObjectHeader *eohptr)
+{
+	os_Vector  *vector;
+	void	   *serialized_data;
+	GrB_Index	serialized_size;
 
-	vector = (os_Vector*) eohptr;
+	vector = (os_Vector *) eohptr;
 	Assert(vector->em_magic == vector_MAGIC);
 
 	if (vector->flat_size)
@@ -29,8 +31,8 @@ static Size vector_get_flat_size(ExpandedObjectHeader *eohptr) {
 	}
 
 	OS_CHECK(GxB_Vector_serialize(&serialized_data, &serialized_size, vector->vector, NULL),
-		  vector->vector,
-		  "Error serializing vector");
+			 vector->vector,
+			 "Error serializing vector");
 
 	vector->serialized_data = serialized_data;
 	vector->serialized_size = serialized_size;
@@ -40,14 +42,15 @@ static Size vector_get_flat_size(ExpandedObjectHeader *eohptr) {
 
 /* Flatten vector into a pre-allocated result buffer that is
    allocated_size in bytes.  */
-static void flatten_vector(
-	ExpandedObjectHeader *eohptr,
-	void *result,
-	Size allocated_size)
+static void
+flatten_vector(
+			   ExpandedObjectHeader *eohptr,
+			   void *result,
+			   Size allocated_size)
 {
-	os_Vector *vector;
+	os_Vector  *vector;
 	os_FlatVector *flat;
-	void* data;
+	void	   *data;
 
 	LOGF();
 
@@ -62,8 +65,8 @@ static void flatten_vector(
 	memset(flat, 0, allocated_size);
 
 	OS_CHECK(GrB_get(vector->vector, &flat->type_code, GrB_EL_TYPE_CODE),
-		  vector->vector,
-		  "Cannot get Vector Type code.");
+			 vector->vector,
+			 "Cannot get Vector Type code.");
 
 	OS_VSIZE(flat->size, vector);
 	data = OS_VECTOR_DATA(flat);
@@ -72,23 +75,29 @@ static void flatten_vector(
 	flat->serialized_size = vector->serialized_size;
 
 	/* free_function = NULL; */
-	/* ERRORIF(GrB_get(GrB_Global, (void*)free_function, GxB_FREE_FUNCTION) != GrB_SUCCESS, */
-	/* 		"Cannot get SuiteSparse free function."); */
+
+	/*
+	 * ERRORIF(GrB_get(GrB_Global, (void*)free_function, GxB_FREE_FUNCTION) !=
+	 * GrB_SUCCESS,
+	 */
+	/* "Cannot get SuiteSparse free function."); */
 
 	/* free_function(vector->serialized_data); */
 	SET_VARSIZE(flat, allocated_size);
 }
 
 /* Construct an empty expanded vector. */
-os_Vector* new_vector(
-	GrB_Type type,
-	GrB_Index size,
-	MemoryContext parentcontext,
-	GrB_Vector _vector)
+os_Vector *
+new_vector(
+		   GrB_Type type,
+		   GrB_Index size,
+		   MemoryContext parentcontext,
+		   GrB_Vector _vector)
 {
-	os_Vector *vector;
+	os_Vector  *vector;
 
-	MemoryContext objcxt, oldcxt;
+	MemoryContext objcxt,
+				oldcxt;
 	MemoryContextCallback *ctxcb;
 
 	LOGF();
@@ -96,7 +105,7 @@ os_Vector* new_vector(
 								   "expanded vector",
 								   ALLOCSET_DEFAULT_SIZES);
 
-	vector = MemoryContextAllocZero(objcxt,	sizeof(os_Vector));
+	vector = MemoryContextAllocZero(objcxt, sizeof(os_Vector));
 
 	EOH_init_header(&vector->hdr, &vector_methods, objcxt);
 
@@ -110,8 +119,8 @@ os_Vector* new_vector(
 	if (_vector == NULL)
 	{
 		OS_CHECK(GrB_Vector_new(&vector->vector, type, size),
-			  vector->vector,
-			  "Cannot create new Vector.");
+				 vector->vector,
+				 "Cannot create new Vector.");
 	}
 	else
 	{
@@ -130,11 +139,12 @@ os_Vector* new_vector(
 }
 
 /* Expand a flat vector in to an Expanded one, return as Postgres Datum. */
-Datum expand_vector(os_FlatVector *flat, MemoryContext parentcontext)
+Datum
+expand_vector(os_FlatVector * flat, MemoryContext parentcontext)
 {
-	GrB_Type type;
-	os_Vector *vector;
-	void* data;
+	GrB_Type	type;
+	os_Vector  *vector;
+	void	   *data;
 
 	LOGF();
 
@@ -142,31 +152,34 @@ Datum expand_vector(os_FlatVector *flat, MemoryContext parentcontext)
 	vector = new_vector(type, flat->size, parentcontext, NULL);
 	data = OS_VECTOR_DATA(flat);
 	OS_CHECK(GxB_Vector_deserialize(&vector->vector, type, data, flat->serialized_size, NULL),
-		  vector->vector,
-		  "Error deserializing vector");
+			 vector->vector,
+			 "Error deserializing vector");
 	OS_RETURN_VECTOR(vector);
 }
 
 static void
-context_callback_vector_free(void* ptr)
+context_callback_vector_free(void *ptr)
 {
-	os_Vector *vector = (os_Vector *) ptr;
+	os_Vector  *vector = (os_Vector *) ptr;
+
 	OS_CHECK(GrB_Vector_free(&vector->vector),
-		  vector->vector,
-		  "Cannot GrB_Free Vector");
+			 vector->vector,
+			 "Cannot GrB_Free Vector");
 }
 
 /* Helper function to always expand datum
 
    This is used by PG_GETARG_VECTOR */
-os_Vector* DatumGetVector(Datum datum)
+os_Vector *
+DatumGetVector(Datum datum)
 {
-	os_Vector *vector;
+	os_Vector  *vector;
 	os_FlatVector *flat;
-	Pointer flat_datum_pointer;
+	Pointer		flat_datum_pointer;
 
 	flat_datum_pointer = DatumGetPointer(datum);
-	if (VARATT_IS_EXTERNAL_EXPANDED(flat_datum_pointer)) {
+	if (VARATT_IS_EXTERNAL_EXPANDED(flat_datum_pointer))
+	{
 		vector = VectorGetEOHP(datum);
 		Assert(vector->em_magic == vector_MAGIC);
 		return vector;
@@ -178,14 +191,16 @@ os_Vector* DatumGetVector(Datum datum)
 	return vector;
 }
 
-os_Vector* DatumGetVectorMaybeA(Datum datum, os_Vector *A)
+os_Vector *
+DatumGetVectorMaybeA(Datum datum, os_Vector * A)
 {
-	os_Vector *vector;
+	os_Vector  *vector;
 	os_FlatVector *flat;
-	Pointer flat_datum_pointer;
+	Pointer		flat_datum_pointer;
 
 	flat_datum_pointer = DatumGetPointer(datum);
-	if (VARATT_IS_EXTERNAL_EXPANDED(flat_datum_pointer)) {
+	if (VARATT_IS_EXTERNAL_EXPANDED(flat_datum_pointer))
+	{
 		vector = VectorGetEOHP(datum);
 		Assert(vector->em_magic == vector_MAGIC);
 		return vector;
@@ -203,14 +218,16 @@ os_Vector* DatumGetVectorMaybeA(Datum datum, os_Vector *A)
 	return vector;
 }
 
-os_Vector* DatumGetVectorMaybeAB(Datum datum, os_Vector *A, os_Vector *B)
+os_Vector *
+DatumGetVectorMaybeAB(Datum datum, os_Vector * A, os_Vector * B)
 {
-	os_Vector *vector;
+	os_Vector  *vector;
 	os_FlatVector *flat;
-	Pointer flat_datum_pointer;
+	Pointer		flat_datum_pointer;
 
 	flat_datum_pointer = DatumGetPointer(datum);
-	if (VARATT_IS_EXTERNAL_EXPANDED(flat_datum_pointer)) {
+	if (VARATT_IS_EXTERNAL_EXPANDED(flat_datum_pointer))
+	{
 		vector = VectorGetEOHP(datum);
 		Assert(vector->em_magic == vector_MAGIC);
 		return vector;
@@ -231,14 +248,16 @@ os_Vector* DatumGetVectorMaybeAB(Datum datum, os_Vector *A, os_Vector *B)
 	return vector;
 }
 
-os_Vector* DatumGetVectorMaybeABC(Datum datum, os_Vector *A, os_Vector *B, os_Vector *C)
+os_Vector *
+DatumGetVectorMaybeABC(Datum datum, os_Vector * A, os_Vector * B, os_Vector * C)
 {
-	os_Vector *vector;
+	os_Vector  *vector;
 	os_FlatVector *flat;
-	Pointer flat_datum_pointer;
+	Pointer		flat_datum_pointer;
 
 	flat_datum_pointer = DatumGetPointer(datum);
-	if (VARATT_IS_EXTERNAL_EXPANDED(flat_datum_pointer)) {
+	if (VARATT_IS_EXTERNAL_EXPANDED(flat_datum_pointer))
+	{
 		vector = VectorGetEOHP(datum);
 		Assert(vector->em_magic == vector_MAGIC);
 		return vector;

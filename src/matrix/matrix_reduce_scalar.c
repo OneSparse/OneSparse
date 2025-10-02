@@ -4,14 +4,15 @@ PG_FUNCTION_INFO_V1(matrix_reduce_scalar);
 Datum
 matrix_reduce_scalar(PG_FUNCTION_ARGS)
 {
-	GrB_Type type;
-	os_Matrix *A;
-	GrB_Monoid monoid;
+	GrB_Type	type;
+	os_Matrix  *A;
+	GrB_Monoid	monoid;
 	GrB_BinaryOp accum;
 	GrB_Descriptor descriptor;
-	os_Scalar *result;
-	int nargs;
-    struct timeval start, end;
+	os_Scalar  *result;
+	int			nargs;
+	struct timeval start,
+				end;
 
 	OS_START_BENCH();
 
@@ -31,15 +32,14 @@ matrix_reduce_scalar(PG_FUNCTION_ARGS)
 	result = new_scalar(type, CurrentMemoryContext, NULL);
 
 	OS_CHECK(GrB_Matrix_reduce_Monoid_Scalar(
-				 result->scalar,
-				 accum,
-				 monoid,
-				 A->matrix,
-				 descriptor),
+											 result->scalar,
+											 accum,
+											 monoid,
+											 A->matrix,
+											 descriptor),
 			 result->scalar,
 			 "Cannot reduce matrix to scalar");
 
 	OS_END_BENCH();
 	OS_RETURN_SCALAR(result);
 }
-

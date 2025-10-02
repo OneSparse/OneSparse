@@ -4,13 +4,16 @@ PG_FUNCTION_INFO_V1(vector_assign);
 Datum
 vector_assign(PG_FUNCTION_ARGS)
 {
-	GrB_Type type;
-	os_Vector *u, *v;
-	GrB_Vector mask;
+	GrB_Type	type;
+	os_Vector  *u,
+			   *v;
+	GrB_Vector	mask;
 	GrB_BinaryOp accum;
 	GrB_Descriptor descriptor;
-	GrB_Index size, ni = 0, *indexes = NULL;
-	int nargs;
+	GrB_Index	size,
+				ni = 0,
+			   *indexes = NULL;
+	int			nargs;
 
 	LOGF();
 	nargs = PG_NARGS();
@@ -44,4 +47,3 @@ vector_assign(PG_FUNCTION_ARGS)
 }
 
 SUPPORT_FN(vector_assign, linitial);
-

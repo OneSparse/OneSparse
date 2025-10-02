@@ -1,18 +1,26 @@
 #include "../onesparse.h"
 
 PG_FUNCTION_INFO_V1(matrix_eunion);
-Datum matrix_eunion(PG_FUNCTION_ARGS)
+Datum
+matrix_eunion(PG_FUNCTION_ARGS)
 {
-	GrB_Type atype, btype, ctype;
-	os_Matrix *a, *b, *c;
-	GrB_Matrix mask;
-	os_Scalar *alpha, *beta;
+	GrB_Type	atype,
+				btype,
+				ctype;
+	os_Matrix  *a,
+			   *b,
+			   *c;
+	GrB_Matrix	mask;
+	os_Scalar  *alpha,
+			   *beta;
 	GrB_Descriptor descriptor;
 	GrB_BinaryOp op;
 	GrB_BinaryOp accum;
-	GrB_Index nrows, ncols;
-	int nargs;
-    struct timeval start, end;
+	GrB_Index	nrows,
+				ncols;
+	int			nargs;
+	struct timeval start,
+				end;
 
 	OS_START_BENCH();
 	ERRORNULL(0);
@@ -66,4 +74,3 @@ Datum matrix_eunion(PG_FUNCTION_ARGS)
 #define lsixth(l) lfirst(list_nth_cell(l, 5))
 SUPPORT_FN(matrix_eunion, lsixth);
 #undef lsixth
-

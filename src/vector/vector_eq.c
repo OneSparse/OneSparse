@@ -1,12 +1,19 @@
 #include "../onesparse.h"
 
 PG_FUNCTION_INFO_V1(vector_eq);
-Datum vector_eq(PG_FUNCTION_ARGS)
+Datum
+vector_eq(PG_FUNCTION_ARGS)
 {
-	GrB_Type utype, vtype;
-	os_Vector *u, *v, *w;
-	GrB_Index usize, vsize, unvals, vnvals;
-	bool result;
+	GrB_Type	utype,
+				vtype;
+	os_Vector  *u,
+			   *v,
+			   *w;
+	GrB_Index	usize,
+				vsize,
+				unvals,
+				vnvals;
+	bool		result;
 
 	LOGF();
 	ERRORNULL(0);
@@ -34,12 +41,12 @@ Datum vector_eq(PG_FUNCTION_ARGS)
 
 	w = new_vector(GrB_BOOL, usize, CurrentMemoryContext, NULL);
 	OS_CHECK(GrB_eWiseMult(w->vector,
-						  NULL,
-						  NULL,
-						  GrB_EQ_BOOL,
-						  u->vector,
-						  v->vector,
-						  NULL),
+						   NULL,
+						   NULL,
+						   GrB_EQ_BOOL,
+						   u->vector,
+						   v->vector,
+						   NULL),
 			 w->vector,
 			 "Error vector eWiseAdd.");
 
@@ -49,14 +56,13 @@ Datum vector_eq(PG_FUNCTION_ARGS)
 		PG_RETURN_BOOL(false);
 
 	OS_CHECK(GrB_Vector_reduce_BOOL(
-			  &result,
-			  NULL,
-			  GrB_LAND_MONOID_BOOL,
-			  w->vector,
-			  NULL),
+									&result,
+									NULL,
+									GrB_LAND_MONOID_BOOL,
+									w->vector,
+									NULL),
 			 w->vector,
 			 "Cannot reduce vector to scalar in eq");
 
 	PG_RETURN_BOOL(result);
 }
-

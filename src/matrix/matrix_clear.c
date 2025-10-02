@@ -1,10 +1,12 @@
 #include "../onesparse.h"
 
 PG_FUNCTION_INFO_V1(matrix_clear);
-Datum matrix_clear(PG_FUNCTION_ARGS)
+Datum
+matrix_clear(PG_FUNCTION_ARGS)
 {
-	os_Matrix *A;
-    struct timeval start, end;
+	os_Matrix  *A;
+	struct timeval start,
+				end;
 
 	OS_START_BENCH();
 	ERRORNULL(0);
@@ -19,4 +21,3 @@ Datum matrix_clear(PG_FUNCTION_ARGS)
 }
 
 SUPPORT_FN(matrix_clear, linitial);
-

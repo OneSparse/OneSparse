@@ -1,17 +1,21 @@
 #include "../onesparse.h"
 
 PG_FUNCTION_INFO_V1(matrix_apply);
-Datum matrix_apply(PG_FUNCTION_ARGS)
+Datum
+matrix_apply(PG_FUNCTION_ARGS)
 {
-	GrB_Type type;
-	os_Matrix *A, *C;
+	GrB_Type	type;
+	os_Matrix  *A,
+			   *C;
 	os_UnaryOp *op;
-	GrB_Matrix mask;
+	GrB_Matrix	mask;
 	GrB_Descriptor descriptor;
 	GrB_BinaryOp accum;
-	GrB_Index nrows, ncols;
-	int nargs;
-    struct timeval start, end;
+	GrB_Index	nrows,
+				ncols;
+	int			nargs;
+	struct timeval start,
+				end;
 
 	OS_START_BENCH();
 	ERRORNULL(0);
@@ -43,12 +47,11 @@ Datum matrix_apply(PG_FUNCTION_ARGS)
 					   op->unaryop,
 					   A->matrix,
 					   descriptor),
-		  C->matrix,
-		  "Error in GrB_Matrix_apply");
+			 C->matrix,
+			 "Error in GrB_Matrix_apply");
 
 	OS_END_BENCH();
 	OS_RETURN_MATRIX(C);
 }
 
 SUPPORT_FN(matrix_apply, lthird);
-

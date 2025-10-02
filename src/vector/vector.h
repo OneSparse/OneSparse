@@ -1,45 +1,47 @@
-#ifndef OS_VECTOR_H
-#define OS_VECTOR_H
+#pragma once
 
 #define vector_MAGIC 689276814
 
-typedef struct os_FlatVector {
-    int32 vl_len_;
-	int32_t type_code;
-	GrB_Index size;
-	GrB_Index serialized_size;
-} os_FlatVector;
+typedef struct os_FlatVector
+{
+	int32		vl_len_;
+	int32_t		type_code;
+	GrB_Index	size;
+	GrB_Index	serialized_size;
+}			os_FlatVector;
 
-typedef struct os_Vector  {
-    ExpandedObjectHeader hdr;
-    int em_magic;
-    GrB_Vector vector;
-	Pointer flat_datum_pointer;
-    Size flat_size;
-    void* serialized_data;
-    GrB_Index serialized_size;
-} os_Vector;
+typedef struct os_Vector
+{
+	ExpandedObjectHeader hdr;
+	int			em_magic;
+	GrB_Vector	vector;
+	Pointer		flat_datum_pointer;
+	Size		flat_size;
+	void	   *serialized_data;
+	GrB_Index	serialized_size;
+}			os_Vector;
 
-typedef struct os_Vector_ExtractState {
-	GrB_Type type;
-	GrB_Info info;
-	os_Vector *vector;
+typedef struct os_Vector_ExtractState
+{
+	GrB_Type	type;
+	GrB_Info	info;
+	os_Vector  *vector;
 	GxB_Iterator iterator;
-} os_Vector_ExtractState;
+}			os_Vector_ExtractState;
 
-Datum expand_vector(os_FlatVector *flat,	MemoryContext parentcontext);
+Datum		expand_vector(os_FlatVector * flat, MemoryContext parentcontext);
 
-os_Vector* new_vector(
-	GrB_Type type,
-	GrB_Index size,
-	MemoryContext parentcontext,
-	GrB_Vector _vector);
+os_Vector  *new_vector(
+					   GrB_Type type,
+					   GrB_Index size,
+					   MemoryContext parentcontext,
+					   GrB_Vector _vector);
 
-os_Vector* DatumGetVector(Datum d);
+os_Vector  *DatumGetVector(Datum d);
 
-os_Vector* DatumGetVectorMaybeA(Datum d, os_Vector *A);
-os_Vector* DatumGetVectorMaybeAB(Datum d, os_Vector *A, os_Vector *B);
-os_Vector* DatumGetVectorMaybeABC(Datum d, os_Vector *A, os_Vector *B, os_Vector *C);
+os_Vector  *DatumGetVectorMaybeA(Datum d, os_Vector * A);
+os_Vector  *DatumGetVectorMaybeAB(Datum d, os_Vector * A, os_Vector * B);
+os_Vector  *DatumGetVectorMaybeABC(Datum d, os_Vector * A, os_Vector * B, os_Vector * C);
 
 #define OS_DETOAST_VECTOR(_datum) (os_FlatVector*)PG_DETOAST_DATUM(datum)
 
@@ -63,5 +65,3 @@ os_Vector* DatumGetVectorMaybeABC(Datum d, os_Vector *A, os_Vector *B, os_Vector
 
 #define OS_VECTOR_DATA(_flat) ((char*)(_flat) + OS_VECTOR_FLATSIZE())
 #define VectorGetEOHP(_datum) (os_Vector *) DatumGetEOHP(_datum)
-
-#endif 

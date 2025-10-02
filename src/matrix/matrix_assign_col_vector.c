@@ -1,16 +1,21 @@
 #include "../onesparse.h"
 
 PG_FUNCTION_INFO_V1(matrix_assign_col_vector);
-Datum matrix_assign_col_vector(PG_FUNCTION_ARGS)
+Datum
+matrix_assign_col_vector(PG_FUNCTION_ARGS)
 {
-	GrB_Type type;
-	os_Matrix *C;
-	os_Vector *v;
-	GrB_Vector mask;
+	GrB_Type	type;
+	os_Matrix  *C;
+	os_Vector  *v;
+	GrB_Vector	mask;
 	GrB_BinaryOp accum;
 	GrB_Descriptor descriptor;
-	GrB_Index nrows, ncols, ni = 0, j, *rows = NULL;
-	int nargs;
+	GrB_Index	nrows,
+				ncols,
+				ni = 0,
+				j,
+			   *rows = NULL;
+	int			nargs;
 
 	nargs = PG_NARGS();
 	C = OS_GETARG_MATRIX(0);
@@ -46,4 +51,3 @@ Datum matrix_assign_col_vector(PG_FUNCTION_ARGS)
 }
 
 SUPPORT_FN(matrix_assign_col_vector, linitial);
-

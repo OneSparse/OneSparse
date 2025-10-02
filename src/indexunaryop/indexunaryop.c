@@ -1,12 +1,12 @@
 #include "../onesparse.h"
 
-static void context_callback_indexunaryop_free(void*);
+static void context_callback_indexunaryop_free(void *);
 static Size indexunaryop_get_flat_size(ExpandedObjectHeader *eohptr);
 
 static void flatten_indexunaryop(
-	ExpandedObjectHeader *eohptr,
-	void *result,
-	Size allocated_size);
+								 ExpandedObjectHeader *eohptr,
+								 void *result,
+								 Size allocated_size);
 
 static const ExpandedObjectMethods indexunaryop_methods = {
 	indexunaryop_get_flat_size,
@@ -19,10 +19,12 @@ PG_FUNCTION_INFO_V1(indexunaryop_name);
 
 #include "indexunaryop_header.h"
 
-static Size indexunaryop_get_flat_size(ExpandedObjectHeader *eohptr) {
+static Size
+indexunaryop_get_flat_size(ExpandedObjectHeader *eohptr)
+{
 	os_IndexUnaryOp *indexunaryop;
 
-	indexunaryop = (os_IndexUnaryOp*) eohptr;
+	indexunaryop = (os_IndexUnaryOp *) eohptr;
 	Assert(indexunaryop->em_magic == indexunaryop_MAGIC);
 
 	if (indexunaryop->flat_size)
@@ -34,10 +36,11 @@ static Size indexunaryop_get_flat_size(ExpandedObjectHeader *eohptr) {
 
 /* Flatten indexunaryop into a pre-allocated result buffer that is
    allocated_size in bytes.  */
-static void flatten_indexunaryop(
-	ExpandedObjectHeader *eohptr,
-	void *result,
-	Size allocated_size)
+static void
+flatten_indexunaryop(
+					 ExpandedObjectHeader *eohptr,
+					 void *result,
+					 Size allocated_size)
 {
 	os_IndexUnaryOp *indexunaryop;
 	os_FlatIndexUnaryOp *flat;
@@ -50,19 +53,21 @@ static void flatten_indexunaryop(
 	Assert(indexunaryop->em_magic == indexunaryop_MAGIC);
 	Assert(allocated_size == indexunaryop->flat_size);
 	memset(flat, 0, allocated_size);
-	strncpy(flat->name, indexunaryop->name, strlen(indexunaryop->name)+1);
+	strncpy(flat->name, indexunaryop->name, strlen(indexunaryop->name) + 1);
 	SET_VARSIZE(flat, allocated_size);
 }
 
 /* Construct an empty expanded indexunaryop. */
-os_IndexUnaryOp* new_indexunaryop(
-	char* name,
-	MemoryContext parentcontext)
+os_IndexUnaryOp *
+new_indexunaryop(
+				 char *name,
+				 MemoryContext parentcontext)
 {
 	GrB_IndexUnaryOp iuop;
 	os_IndexUnaryOp *indexunaryop;
 
-	MemoryContext objcxt, oldcxt;
+	MemoryContext objcxt,
+				oldcxt;
 	MemoryContextCallback *ctxcb;
 
 	LOGF();
@@ -83,8 +88,8 @@ os_IndexUnaryOp* new_indexunaryop(
 
 	indexunaryop->em_magic = indexunaryop_MAGIC;
 	indexunaryop->flat_size = 0;
-	indexunaryop->name = palloc(strlen(name)+1);
-	strncpy(indexunaryop->name, name, strlen(name)+1);
+	indexunaryop->name = palloc(strlen(name) + 1);
+	strncpy(indexunaryop->name, name, strlen(name) + 1);
 	indexunaryop->indexunaryop = iuop;
 
 	ctxcb = MemoryContextAlloc(objcxt, sizeof(MemoryContextCallback));
@@ -99,7 +104,8 @@ os_IndexUnaryOp* new_indexunaryop(
 }
 
 /* Expand a flat indexunaryop in to an Expanded one, return as Postgres Datum. */
-Datum expand_indexunaryop(os_FlatIndexUnaryOp *flat, MemoryContext parentcontext)
+Datum
+expand_indexunaryop(os_FlatIndexUnaryOp * flat, MemoryContext parentcontext)
 {
 	os_IndexUnaryOp *indexunaryop;
 
@@ -110,23 +116,26 @@ Datum expand_indexunaryop(os_FlatIndexUnaryOp *flat, MemoryContext parentcontext
 }
 
 static void
-context_callback_indexunaryop_free(void* ptr)
+context_callback_indexunaryop_free(void *ptr)
 {
 	os_IndexUnaryOp *indexunaryop = (os_IndexUnaryOp *) ptr;
+
 	OS_CHECK(GrB_IndexUnaryOp_free(&indexunaryop->indexunaryop),
-		  indexunaryop->indexunaryop,
-		  "Cannot GrB_Free IndexUnaryOp");
+			 indexunaryop->indexunaryop,
+			 "Cannot GrB_Free IndexUnaryOp");
 }
 
 /* Helper function to always expand datum
 
    This is used by PG_GETARG_INDEXUNARYOP */
-os_IndexUnaryOp* DatumGetIndexUnaryOp(Datum datum)
+os_IndexUnaryOp *
+DatumGetIndexUnaryOp(Datum datum)
 {
 	os_IndexUnaryOp *indexunaryop;
 	os_FlatIndexUnaryOp *flat;
 
-	if (VARATT_IS_EXTERNAL_EXPANDED(DatumGetPointer(datum))) {
+	if (VARATT_IS_EXTERNAL_EXPANDED(DatumGetPointer(datum)))
+	{
 		indexunaryop = IndexUnaryOpGetEOHP(datum);
 		Assert(indexunaryop->em_magic == indexunaryop_MAGIC);
 		return indexunaryop;
@@ -136,31 +145,35 @@ os_IndexUnaryOp* DatumGetIndexUnaryOp(Datum datum)
 	return IndexUnaryOpGetEOHP(datum);
 }
 
-Datum indexunaryop_in(PG_FUNCTION_ARGS)
+Datum
+indexunaryop_in(PG_FUNCTION_ARGS)
 {
 	os_IndexUnaryOp *indexunaryop;
-	char* input;
+	char	   *input;
 
 	input = PG_GETARG_CSTRING(0);
 	indexunaryop = new_indexunaryop(input, CurrentMemoryContext);
 	OS_RETURN_INDEXUNARYOP(indexunaryop);
 }
 
-Datum indexunaryop_out(PG_FUNCTION_ARGS)
+Datum
+indexunaryop_out(PG_FUNCTION_ARGS)
 {
-	char *result;
+	char	   *result;
 	os_IndexUnaryOp *indexunaryop;
 
 	indexunaryop = OS_GETARG_INDEXUNARYOP(0);
 
-	result = palloc(strlen(indexunaryop->name)+1);
-	snprintf(result, strlen(indexunaryop->name)+1, "%s", indexunaryop->name);
+	result = palloc(strlen(indexunaryop->name) + 1);
+	snprintf(result, strlen(indexunaryop->name) + 1, "%s", indexunaryop->name);
 	PG_RETURN_CSTRING(result);
 }
 
-Datum indexunaryop_name(PG_FUNCTION_ARGS)
+Datum
+indexunaryop_name(PG_FUNCTION_ARGS)
 {
 	os_IndexUnaryOp *indexunaryop;
+
 	indexunaryop = OS_GETARG_INDEXUNARYOP(0);
 	PG_RETURN_TEXT_P(cstring_to_text(indexunaryop->name));
 }
