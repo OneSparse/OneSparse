@@ -1,13 +1,15 @@
 #include "../onesparse.h"
 
 PG_FUNCTION_INFO_V1(graph_out);
-Datum graph_out(PG_FUNCTION_ARGS)
+Datum
+graph_out(PG_FUNCTION_ARGS)
 {
-	os_Graph *graph;
-	size_t len;
-	char *printed;
-	char *output;
-    struct timeval start, end;
+	os_Graph   *graph;
+	size_t		len;
+	char	   *printed;
+	char	   *output;
+	struct timeval start,
+				end;
 
 	graph = OS_GETARG_GRAPH(0);
 	OS_START_BENCH();
@@ -30,4 +32,3 @@ Datum graph_out(PG_FUNCTION_ARGS)
 	OS_END_BENCH();
 	PG_RETURN_CSTRING(output);
 }
-

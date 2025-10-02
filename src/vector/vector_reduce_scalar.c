@@ -4,13 +4,13 @@ PG_FUNCTION_INFO_V1(vector_reduce_scalar);
 Datum
 vector_reduce_scalar(PG_FUNCTION_ARGS)
 {
-	os_Vector *A;
-	GrB_Monoid monoid;
+	os_Vector  *A;
+	GrB_Monoid	monoid;
 	GrB_BinaryOp accum;
 	GrB_Descriptor descriptor;
-	os_Scalar *result;
-	GrB_Type type;
-	int nargs;
+	os_Scalar  *result;
+	GrB_Type	type;
+	int			nargs;
 
 	LOGF();
 	nargs = PG_NARGS();
@@ -35,15 +35,14 @@ vector_reduce_scalar(PG_FUNCTION_ARGS)
 	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 4);
 
 	OS_CHECK(GrB_Vector_reduce_Monoid_Scalar(
-			  result->scalar,
-			  accum,
-			  monoid,
-			  A->vector,
-			  descriptor),
-		  result->scalar,
-		  "Cannot reduce vector to scalar");
+											 result->scalar,
+											 accum,
+											 monoid,
+											 A->vector,
+											 descriptor),
+			 result->scalar,
+			 "Cannot reduce vector to scalar");
 	OS_RETURN_SCALAR(result);
 }
 
 SUPPORT_FN(vector_reduce_scalar, lthird);
-

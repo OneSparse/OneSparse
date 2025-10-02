@@ -1,3 +1,7 @@
+```
+\pset linestyle unicode
+\pset border 2
+```
 # Monoid
 
 In [abstract
@@ -14,78 +18,24 @@ addition form a monoid, the identity element being 0.
 
 ## Monoid identity
 
-``` postgres-console
+```
 select ident('plus_monoid_int8');
-┌────────┐
-│ ident  │
-├────────┤
-│ int8:0 │
-└────────┘
-(1 row)
 
 select ident('plus_monoid_int16');
-┌─────────┐
-│  ident  │
-├─────────┤
-│ int16:0 │
-└─────────┘
-(1 row)
 
 select ident('plus_monoid_fp32');
-┌───────────────┐
-│     ident     │
-├───────────────┤
-│ fp32:0.000000 │
-└───────────────┘
-(1 row)
 
 select ident('min_monoid_int8');
-┌──────────┐
-│  ident   │
-├──────────┤
-│ int8:127 │
-└──────────┘
-(1 row)
 
 select ident('min_monoid_int16');
-┌─────────────┐
-│    ident    │
-├─────────────┤
-│ int16:32767 │
-└─────────────┘
-(1 row)
 
 select ident('min_monoid_fp32');
-┌───────────────┐
-│     ident     │
-├───────────────┤
-│ fp32:Infinity │
-└───────────────┘
-(1 row)
 
 select ident('max_monoid_int8');
-┌───────────┐
-│   ident   │
-├───────────┤
-│ int8:-128 │
-└───────────┘
-(1 row)
 
 select ident('max_monoid_int16');
-┌──────────────┐
-│    ident     │
-├──────────────┤
-│ int16:-32768 │
-└──────────────┘
-(1 row)
 
 select ident('max_monoid_fp32');
-┌────────────────┐
-│     ident      │
-├────────────────┤
-│ fp32:-Infinity │
-└────────────────┘
-(1 row)
 
 ```
 ## Monoid terminal
@@ -93,70 +43,22 @@ select ident('max_monoid_fp32');
 Monoid terminals tell SuiteSparse when it can terminate a large
 array operation because the terminal value has been found.
 
-``` postgres-console
+```
 select terminal('plus_monoid_int8');
-┌──────────┐
-│ terminal │
-├──────────┤
-│ int      │
-└──────────┘
-(1 row)
 
 select terminal('plus_monoid_int16');
-┌──────────┐
-│ terminal │
-├──────────┤
-│ int      │
-└──────────┘
-(1 row)
 
 select terminal('min_monoid_int8');
-┌───────────┐
-│ terminal  │
-├───────────┤
-│ int8:-128 │
-└───────────┘
-(1 row)
 
 select terminal('min_monoid_int16');
-┌──────────────┐
-│   terminal   │
-├──────────────┤
-│ int16:-32768 │
-└──────────────┘
-(1 row)
 
 select terminal('max_monoid_int8');
-┌──────────┐
-│ terminal │
-├──────────┤
-│ int8:127 │
-└──────────┘
-(1 row)
 
 select terminal('max_monoid_int16');
-┌─────────────┐
-│  terminal   │
-├─────────────┤
-│ int16:32767 │
-└─────────────┘
-(1 row)
 
 select terminal('land_monoid_bool');
-┌──────────┐
-│ terminal │
-├──────────┤
-│ bool:f   │
-└──────────┘
-(1 row)
 
 select terminal('lor_monoid_bool');
-┌──────────┐
-│ terminal │
-├──────────┤
-│ bool:t   │
-└──────────┘
-(1 row)
 
 ```
 ## Builtin SuiteSparse Monoids

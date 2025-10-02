@@ -1,16 +1,18 @@
 #include "../onesparse.h"
 
 PG_FUNCTION_INFO_V1(graph_sssp);
-Datum graph_sssp(PG_FUNCTION_ARGS)
+Datum
+graph_sssp(PG_FUNCTION_ARGS)
 {
-	GrB_Type type;
-	os_Graph *graph;
-	GrB_Index source;
-	os_Scalar *delta;
-	GrB_Vector output;
-	GrB_Index vsize;
-	char msg [LAGRAPH_MSG_LEN];
-    struct timeval start, end;
+	GrB_Type	type;
+	os_Graph   *graph;
+	GrB_Index	source;
+	os_Scalar  *delta;
+	GrB_Vector	output;
+	GrB_Index	vsize;
+	char		msg[LAGRAPH_MSG_LEN];
+	struct timeval start,
+				end;
 
 	graph = OS_GETARG_GRAPH(0);
 	source = PG_GETARG_INT64(1);
@@ -28,14 +30,13 @@ Datum graph_sssp(PG_FUNCTION_ARGS)
 
 	OS_START_BENCH();
 	LA_CHECK(LAGr_SingleSourceShortestPath(
-				 &output,
-				 graph->graph,
-				 source,
-				 delta->scalar,
-				 msg
-				 ));
+										   &output,
+										   graph->graph,
+										   source,
+										   delta->scalar,
+										   msg
+										   ));
 	OS_END_BENCH();
 
 	OS_RETURN_VECTOR(new_vector(type, vsize, CurrentMemoryContext, output));
 }
-

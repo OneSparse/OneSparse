@@ -1,12 +1,15 @@
 #include "../onesparse.h"
 
 PG_FUNCTION_INFO_V1(matrix_set_element);
-Datum matrix_set_element(PG_FUNCTION_ARGS)
+Datum
+matrix_set_element(PG_FUNCTION_ARGS)
 {
-	os_Matrix *matrix;
-	os_Scalar *scalar;
-	GrB_Index i, j;
-    struct timeval start, end;
+	os_Matrix  *matrix;
+	os_Scalar  *scalar;
+	GrB_Index	i,
+				j;
+	struct timeval start,
+				end;
 
 	OS_START_BENCH();
 	ERRORNULL(0);
@@ -20,12 +23,11 @@ Datum matrix_set_element(PG_FUNCTION_ARGS)
 	scalar = OS_GETARG_SCALAR(3);
 
 	OS_CHECK(GrB_Matrix_setElement(matrix->matrix, scalar->scalar, i, j),
-		  matrix->matrix,
-		  "Error setting matrix element.");
+			 matrix->matrix,
+			 "Error setting matrix element.");
 
 	OS_END_BENCH();
 	OS_RETURN_MATRIX(matrix);
 }
 
 SUPPORT_FN(matrix_set_element, linitial);
-

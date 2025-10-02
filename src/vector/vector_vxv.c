@@ -1,18 +1,25 @@
 #include "../onesparse.h"
 
 PG_FUNCTION_INFO_V1(vector_vxv);
-Datum vector_vxv(PG_FUNCTION_ARGS)
+Datum
+vector_vxv(PG_FUNCTION_ARGS)
 {
-	GrB_Type atype, btype, ctype;
-	os_Vector *a, *b, *c;
-	GrB_Matrix tmp;
-	GrB_Vector mask;
-	// GrB_Descriptor descriptor;
+	GrB_Type	atype,
+				btype,
+				ctype;
+	os_Vector  *a,
+			   *b,
+			   *c;
+	GrB_Matrix	tmp;
+	GrB_Vector	mask;
+
+	/* GrB_Descriptor descriptor; */
 	GrB_BinaryOp accum;
 	GrB_Semiring semiring;
-	GrB_Index asize;
-	int nargs;
-    struct timeval start, end;
+	GrB_Index	asize;
+	int			nargs;
+	struct timeval start,
+				end;
 
 	ERRORNULL(0);
 	ERRORNULL(1);
@@ -41,7 +48,7 @@ Datum vector_vxv(PG_FUNCTION_ARGS)
 
 	mask = OS_GETARG_VECTOR_HANDLE_OR_NULL(nargs, 4);
 	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 5);
-	//descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 6);
+	/* descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 6); */
 
 	OS_CHECK(GrB_Matrix_new(&tmp, ctype, asize, asize),
 			 tmp,
@@ -49,27 +56,27 @@ Datum vector_vxv(PG_FUNCTION_ARGS)
 
 	OS_START_BENCH();
 	OS_CHECK(GrB_mxm(
-				 tmp,
-				 (GrB_Matrix)mask,
-				 accum,
-				 semiring,
-				 (GrB_Matrix)a->vector,
-				 (GrB_Matrix)b->vector,
-				 GrB_DESC_T0
-				 ),
+					 tmp,
+					 (GrB_Matrix) mask,
+					 accum,
+					 semiring,
+					 (GrB_Matrix) a->vector,
+					 (GrB_Matrix) b->vector,
+					 GrB_DESC_T0
+					 ),
 			 c->vector,
 			 "Error vector_vxv.");
 
 	OS_CHECK(GrB_Col_extract(
-				 c->vector,
-				 NULL,
-				 NULL,
-				 tmp,
-				 GrB_ALL,
-				 0,
-				 0,
-				 NULL
-				 ),
+							 c->vector,
+							 NULL,
+							 NULL,
+							 tmp,
+							 GrB_ALL,
+							 0,
+							 0,
+							 NULL
+							 ),
 			 c->vector,
 			 "Error extracting vxv vector");
 
@@ -78,4 +85,3 @@ Datum vector_vxv(PG_FUNCTION_ARGS)
 }
 
 SUPPORT_FN(vector_vxv, lfourth);
-

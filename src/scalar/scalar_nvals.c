@@ -1,10 +1,11 @@
 #include "../onesparse.h"
 
 PG_FUNCTION_INFO_V1(scalar_nvals);
-Datum scalar_nvals(PG_FUNCTION_ARGS)
+Datum
+scalar_nvals(PG_FUNCTION_ARGS)
 {
-	GrB_Index result;
-	os_Scalar *scalar;
+	GrB_Index	result;
+	os_Scalar  *scalar;
 
 	LOGF();
 	ERRORNULL(0);
@@ -17,4 +18,3 @@ Datum scalar_nvals(PG_FUNCTION_ARGS)
 
 	PG_RETURN_INT16(result ? 1 : 0);
 }
-

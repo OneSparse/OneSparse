@@ -1,49 +1,52 @@
-#ifndef OS_MATRIX_H
-#define OS_MATRIX_H
+#pragma once
 
 #define matrix_MAGIC 689276813
 
-typedef struct os_FlatMatrix {
-    int32 vl_len_;
-	GrB_Index serialized_size;
-} os_FlatMatrix;
+typedef struct os_FlatMatrix
+{
+	int32		vl_len_;
+	GrB_Index	serialized_size;
+}			os_FlatMatrix;
 
-typedef struct os_Matrix  {
-    ExpandedObjectHeader hdr;
-    int em_magic;
-    GrB_Matrix matrix;
-	Pointer flat_datum_pointer;
-    Size flat_size;
-    void* serialized_data;
-    GrB_Index serialized_size;
-} os_Matrix;
+typedef struct os_Matrix
+{
+	ExpandedObjectHeader hdr;
+	int			em_magic;
+	GrB_Matrix	matrix;
+	Pointer		flat_datum_pointer;
+	Size		flat_size;
+	void	   *serialized_data;
+	GrB_Index	serialized_size;
+}			os_Matrix;
 
-typedef struct os_Matrix_ExtractState {
-	GrB_Type type;
-	GrB_Info info;
-	os_Matrix *matrix;
+typedef struct os_Matrix_ExtractState
+{
+	GrB_Type	type;
+	GrB_Info	info;
+	os_Matrix  *matrix;
 	GxB_Iterator iterator;
-} os_Matrix_ExtractState;
+}			os_Matrix_ExtractState;
 
-typedef struct os_Matrix_BuildState {
+typedef struct os_Matrix_BuildState
+{
 	MemoryContext context;
-	os_Matrix *matrix;
-} os_Matrix_BuildState;
+	os_Matrix  *matrix;
+}			os_Matrix_BuildState;
 
-Datum expand_matrix(os_FlatMatrix *flat,	MemoryContext parentcontext);
+Datum		expand_matrix(os_FlatMatrix * flat, MemoryContext parentcontext);
 
-os_Matrix* new_matrix(
-	GrB_Type type,
-	GrB_Index nrows,
-	GrB_Index ncols,
-	MemoryContext parentcontext,
-	GrB_Matrix _matrix);
+os_Matrix  *new_matrix(
+					   GrB_Type type,
+					   GrB_Index nrows,
+					   GrB_Index ncols,
+					   MemoryContext parentcontext,
+					   GrB_Matrix _matrix);
 
-os_Matrix* DatumGetMatrix(Datum d);
+os_Matrix  *DatumGetMatrix(Datum d);
 
-os_Matrix* DatumGetMatrixMaybeA(Datum d, os_Matrix *A);
-os_Matrix* DatumGetMatrixMaybeAB(Datum d, os_Matrix *A, os_Matrix *B);
-os_Matrix* DatumGetMatrixMaybeABC(Datum d, os_Matrix *A, os_Matrix *B, os_Matrix *C);
+os_Matrix  *DatumGetMatrixMaybeA(Datum d, os_Matrix * A);
+os_Matrix  *DatumGetMatrixMaybeAB(Datum d, os_Matrix * A, os_Matrix * B);
+os_Matrix  *DatumGetMatrixMaybeABC(Datum d, os_Matrix * A, os_Matrix * B, os_Matrix * C);
 
 #define OS_DETOAST_MATRIX(_datum) (os_FlatMatrix*)PG_DETOAST_DATUM(datum)
 
@@ -67,7 +70,6 @@ os_Matrix* DatumGetMatrixMaybeABC(Datum d, os_Matrix *A, os_Matrix *B, os_Matrix
 #define OS_MATRIX_DATA(_flat) ((char*)(_flat) + OS_MATRIX_FLATSIZE())
 #define MatrixGetEOHP(_datum) (os_Matrix *) DatumGetEOHP(_datum)
 
-os_Matrix* _parse_matrix(char *input);
-char* _print_matrix(GrB_Matrix matrix);
+os_Matrix  *_parse_matrix(char *input);
+char	   *_print_matrix(GrB_Matrix matrix);
 
-#endif

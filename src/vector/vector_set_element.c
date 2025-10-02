@@ -1,11 +1,12 @@
 #include "../onesparse.h"
 
 PG_FUNCTION_INFO_V1(vector_set_element);
-Datum vector_set_element(PG_FUNCTION_ARGS)
+Datum
+vector_set_element(PG_FUNCTION_ARGS)
 {
-	os_Vector *vector;
-	os_Scalar *scalar;
-	GrB_Index i;
+	os_Vector  *vector;
+	os_Scalar  *scalar;
+	GrB_Index	i;
 
 	LOGF();
 	ERRORNULL(0);
@@ -17,11 +18,10 @@ Datum vector_set_element(PG_FUNCTION_ARGS)
 	scalar = OS_GETARG_SCALAR(2);
 
 	OS_CHECK(GrB_Vector_setElement(vector->vector, scalar->scalar, i),
-		  vector->vector,
-		  "Error setting vector element.");
+			 vector->vector,
+			 "Error setting vector element.");
 
 	OS_RETURN_VECTOR(vector);
 }
 
 SUPPORT_FN(vector_set_element, linitial);
-

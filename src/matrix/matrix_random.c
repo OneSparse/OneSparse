@@ -1,16 +1,19 @@
 #include "../onesparse.h"
 
 PG_FUNCTION_INFO_V1(matrix_random);
-Datum matrix_random(PG_FUNCTION_ARGS)
+Datum
+matrix_random(PG_FUNCTION_ARGS)
 {
-	os_Type *type;
-	GrB_Index nrows, ncols;
-	double density;
-	uint64_t seed;
-	os_Matrix *A;
-	GrB_Matrix result;
-	char msg [LAGRAPH_MSG_LEN];
-    struct timeval start, end;
+	os_Type    *type;
+	GrB_Index	nrows,
+				ncols;
+	double		density;
+	uint64_t	seed;
+	os_Matrix  *A;
+	GrB_Matrix	result;
+	char		msg[LAGRAPH_MSG_LEN];
+	struct timeval start,
+				end;
 
 	type = OS_GETARG_TYPE(0);
 	nrows = PG_GETARG_INT64(1);
@@ -30,23 +33,23 @@ Datum matrix_random(PG_FUNCTION_ARGS)
 	}
 	if (nrows == -1)
 	{
-		nrows = GrB_INDEX_MAX+1;
+		nrows = GrB_INDEX_MAX + 1;
 	}
 	if (ncols == -1)
 	{
-		ncols = GrB_INDEX_MAX+1;
+		ncols = GrB_INDEX_MAX + 1;
 	}
 
 	OS_START_BENCH();
 	LA_CHECK(LAGraph_Random_Matrix(
-				 &result,
-				 type->type,
-				 nrows,
-				 ncols,
-				 density,
-				 seed,
-				 msg
-				 ));
+								   &result,
+								   type->type,
+								   nrows,
+								   ncols,
+								   density,
+								   seed,
+								   msg
+								   ));
 	OS_END_BENCH();
 
 	A = new_matrix(NULL, nrows, ncols, CurrentMemoryContext, result);

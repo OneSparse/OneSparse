@@ -1,17 +1,19 @@
 #include "../onesparse.h"
 
 PG_FUNCTION_INFO_V1(vector_select);
-Datum vector_select(PG_FUNCTION_ARGS)
+Datum
+vector_select(PG_FUNCTION_ARGS)
 {
-	GrB_Type type;
-	os_Vector *u, *w;
-	os_Scalar *y;
+	GrB_Type	type;
+	os_Vector  *u,
+			   *w;
+	os_Scalar  *y;
 	os_IndexUnaryOp *op;
-	GrB_Vector mask;
+	GrB_Vector	mask;
 	GrB_BinaryOp accum;
 	GrB_Descriptor descriptor;
-	GrB_Index usize;
-	int nargs;
+	GrB_Index	usize;
+	int			nargs;
 
 	LOGF();
 	ERRORNULL(0);
@@ -54,4 +56,3 @@ Datum vector_select(PG_FUNCTION_ARGS)
 }
 
 SUPPORT_FN(vector_select, lfourth);
-

@@ -1,28 +1,32 @@
 #include "../onesparse.h"
 
 PG_FUNCTION_INFO_V1(matrix_elements);
-Datum matrix_elements(PG_FUNCTION_ARGS)
+Datum
+matrix_elements(PG_FUNCTION_ARGS)
 {
-	FuncCallContext  *funcctx;
-	TupleDesc tupdesc;
-	Datum result;
+	FuncCallContext *funcctx;
+	TupleDesc	tupdesc;
+	Datum		result;
 
-	Datum values[3];
-	bool nulls[3] = {false, false, false};
-	HeapTuple tuple;
-	GrB_Index nvals, row, col;
-	os_Matrix *matrix;
-	os_Scalar *scalar;
+	Datum		values[3];
+	bool		nulls[3] = {false, false, false};
+	HeapTuple	tuple;
+	GrB_Index	nvals,
+				row,
+				col;
+	os_Matrix  *matrix;
+	os_Scalar  *scalar;
 	os_Matrix_ExtractState *state;
 
-	if (SRF_IS_FIRSTCALL()) {
+	if (SRF_IS_FIRSTCALL())
+	{
 		MemoryContext oldcontext;
 
 		funcctx = SRF_FIRSTCALL_INIT();
 		oldcontext = MemoryContextSwitchTo(funcctx->multi_call_memory_ctx);
 		matrix = OS_GETARG_MATRIX(0);
 
-		state = (os_Matrix_ExtractState*)palloc(sizeof(os_Matrix_ExtractState));
+		state = (os_Matrix_ExtractState *) palloc(sizeof(os_Matrix_ExtractState));
 		OS_MNVALS(nvals, matrix);
 
 		state->matrix = matrix;
@@ -33,7 +37,7 @@ Datum matrix_elements(PG_FUNCTION_ARGS)
 		OS_MTYPE(state->type, matrix);
 		state->info = GxB_Matrix_Iterator_seek(state->iterator, 0);
 		funcctx->max_calls = nvals;
-		funcctx->user_fctx = (void*)state;
+		funcctx->user_fctx = (void *) state;
 
 		if (get_call_result_type(fcinfo, NULL, &tupdesc) != TYPEFUNC_COMPOSITE)
 			ereport(ERROR,
@@ -46,7 +50,7 @@ Datum matrix_elements(PG_FUNCTION_ARGS)
 	}
 
 	funcctx = SRF_PERCALL_SETUP();
-	state = (os_Matrix_ExtractState*)funcctx->user_fctx;
+	state = (os_Matrix_ExtractState *) funcctx->user_fctx;
 	if (state->info == GxB_EXHAUSTED || funcctx->call_cntr > funcctx->max_calls)
 	{
 		SRF_RETURN_DONE(funcctx);
@@ -68,4 +72,3 @@ Datum matrix_elements(PG_FUNCTION_ARGS)
 		SRF_RETURN_NEXT(funcctx, result);
 	}
 }
-

@@ -1,12 +1,12 @@
 #include "../onesparse.h"
 
-static void context_callback_binaryop_free(void*);
+static void context_callback_binaryop_free(void *);
 static Size binaryop_get_flat_size(ExpandedObjectHeader *eohptr);
 
 static void flatten_binaryop(
-	ExpandedObjectHeader *eohptr,
-	void *result,
-	Size allocated_size);
+							 ExpandedObjectHeader *eohptr,
+							 void *result,
+							 Size allocated_size);
 
 static const ExpandedObjectMethods binaryop_methods = {
 	binaryop_get_flat_size,
@@ -17,14 +17,16 @@ PG_FUNCTION_INFO_V1(binaryop_in);
 PG_FUNCTION_INFO_V1(binaryop_out);
 PG_FUNCTION_INFO_V1(binaryop_name);
 
-void initialize_binaryops(void);
+void		initialize_binaryops(void);
 
 #include "binaryop_header.h"
 
-static Size binaryop_get_flat_size(ExpandedObjectHeader *eohptr) {
+static Size
+binaryop_get_flat_size(ExpandedObjectHeader *eohptr)
+{
 	os_BinaryOp *binaryop;
 
-	binaryop = (os_BinaryOp*) eohptr;
+	binaryop = (os_BinaryOp *) eohptr;
 	Assert(binaryop->em_magic == binaryop_MAGIC);
 
 	if (binaryop->flat_size)
@@ -36,10 +38,11 @@ static Size binaryop_get_flat_size(ExpandedObjectHeader *eohptr) {
 
 /* Flatten binaryop into a pre-allocated result buffer that is
    allocated_size in bytes.  */
-static void flatten_binaryop(
-	ExpandedObjectHeader *eohptr,
-	void *result,
-	Size allocated_size)
+static void
+flatten_binaryop(
+				 ExpandedObjectHeader *eohptr,
+				 void *result,
+				 Size allocated_size)
 {
 	os_BinaryOp *binaryop;
 	os_FlatBinaryOp *flat;
@@ -52,21 +55,23 @@ static void flatten_binaryop(
 	Assert(binaryop->em_magic == binaryop_MAGIC);
 	Assert(allocated_size == binaryop->flat_size);
 	memset(flat, 0, allocated_size);
-	strncpy(flat->name, binaryop->name, strlen(binaryop->name)+1);
+	strncpy(flat->name, binaryop->name, strlen(binaryop->name) + 1);
 	SET_VARSIZE(flat, allocated_size);
 }
 
 /* Construct an empty expanded binaryop. */
-os_BinaryOp* new_binaryop(
-	char* name,
-	MemoryContext parentcontext,
-	GrB_BinaryOp binop)
+os_BinaryOp *
+new_binaryop(
+			 char *name,
+			 MemoryContext parentcontext,
+			 GrB_BinaryOp binop)
 {
 	os_BinaryOp *binaryop;
 
-	MemoryContext objcxt, oldcxt;
+	MemoryContext objcxt,
+				oldcxt;
 	MemoryContextCallback *ctxcb;
-	size_t len;
+	size_t		len;
 
 	LOGF();
 	if (binop == NULL)
@@ -83,7 +88,7 @@ os_BinaryOp* new_binaryop(
 				 binop,
 				 "Error extracting binop name len.");
 
-		name = palloc(len+1);
+		name = palloc(len + 1);
 		OS_CHECK(GrB_get(binop,
 						 name,
 						 GrB_NAME),
@@ -103,8 +108,8 @@ os_BinaryOp* new_binaryop(
 
 	binaryop->em_magic = binaryop_MAGIC;
 	binaryop->flat_size = 0;
-	binaryop->name = palloc(strlen(name)+1);
-	strncpy(binaryop->name, name, strlen(name)+1);
+	binaryop->name = palloc(strlen(name) + 1);
+	strncpy(binaryop->name, name, strlen(name) + 1);
 	binaryop->binaryop = binop;
 
 	ctxcb = MemoryContextAlloc(objcxt, sizeof(MemoryContextCallback));
@@ -119,7 +124,8 @@ os_BinaryOp* new_binaryop(
 }
 
 /* Expand a flat binaryop in to an Expanded one, return as Postgres Datum. */
-Datum expand_binaryop(os_FlatBinaryOp *flat, MemoryContext parentcontext)
+Datum
+expand_binaryop(os_FlatBinaryOp * flat, MemoryContext parentcontext)
 {
 	os_BinaryOp *binaryop;
 
@@ -130,24 +136,26 @@ Datum expand_binaryop(os_FlatBinaryOp *flat, MemoryContext parentcontext)
 }
 
 static void
-context_callback_binaryop_free(void* ptr)
+context_callback_binaryop_free(void *ptr)
 {
 	os_BinaryOp *binaryop = (os_BinaryOp *) ptr;
 
 	OS_CHECK(GrB_BinaryOp_free(&binaryop->binaryop),
-		  binaryop->binaryop,
-		  "Cannot GrB_Free BinaryOp");
+			 binaryop->binaryop,
+			 "Cannot GrB_Free BinaryOp");
 }
 
 /* Helper function to always expand datum
 
    This is used by PG_GETARG_BINARYOP */
-os_BinaryOp* DatumGetBinaryOp(Datum datum)
+os_BinaryOp *
+DatumGetBinaryOp(Datum datum)
 {
 	os_BinaryOp *binaryop;
 	os_FlatBinaryOp *flat;
 
-	if (VARATT_IS_EXTERNAL_EXPANDED(DatumGetPointer(datum))) {
+	if (VARATT_IS_EXTERNAL_EXPANDED(DatumGetPointer(datum)))
+	{
 		binaryop = BinaryOpGetEOHP(datum);
 		Assert(binaryop->em_magic == binaryop_MAGIC);
 		return binaryop;
@@ -157,31 +165,35 @@ os_BinaryOp* DatumGetBinaryOp(Datum datum)
 	return BinaryOpGetEOHP(datum);
 }
 
-Datum binaryop_in(PG_FUNCTION_ARGS)
+Datum
+binaryop_in(PG_FUNCTION_ARGS)
 {
 	os_BinaryOp *binaryop;
-	char* input;
+	char	   *input;
 
 	input = PG_GETARG_CSTRING(0);
 	binaryop = new_binaryop(input, CurrentMemoryContext, NULL);
 	OS_RETURN_BINARYOP(binaryop);
 }
 
-Datum binaryop_out(PG_FUNCTION_ARGS)
+Datum
+binaryop_out(PG_FUNCTION_ARGS)
 {
-	char *result;
+	char	   *result;
 	os_BinaryOp *binaryop;
 
 	binaryop = OS_GETARG_BINARYOP(0);
 
-	result = palloc(strlen(binaryop->name)+1);
-	snprintf(result, strlen(binaryop->name)+1, "%s", binaryop->name);
+	result = palloc(strlen(binaryop->name) + 1);
+	snprintf(result, strlen(binaryop->name) + 1, "%s", binaryop->name);
 	PG_RETURN_CSTRING(result);
 }
 
-Datum binaryop_name(PG_FUNCTION_ARGS)
+Datum
+binaryop_name(PG_FUNCTION_ARGS)
 {
 	os_BinaryOp *binaryop;
+
 	binaryop = OS_GETARG_BINARYOP(0);
 	PG_RETURN_TEXT_P(cstring_to_text(binaryop->name));
 }

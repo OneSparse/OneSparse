@@ -1,12 +1,15 @@
 #include "../onesparse.h"
 
 PG_FUNCTION_INFO_V1(matrix_contains);
-Datum matrix_contains(PG_FUNCTION_ARGS)
+Datum
+matrix_contains(PG_FUNCTION_ARGS)
 {
-	os_Matrix *matrix;
-	GrB_Index i, j;
-	GrB_Info info;
-    struct timeval start, end;
+	os_Matrix  *matrix;
+	GrB_Index	i,
+				j;
+	GrB_Info	info;
+	struct timeval start,
+				end;
 
 	ERRORNULL(0);
 	ERRORNULL(1);
@@ -28,4 +31,3 @@ Datum matrix_contains(PG_FUNCTION_ARGS)
 	OS_END_BENCH();
 	PG_RETURN_BOOL(false);
 }
-

@@ -2,18 +2,19 @@
 
 PG_FUNCTION_INFO_V1(monoid_identity);
 
-Datum monoid_identity(PG_FUNCTION_ARGS)
+Datum
+monoid_identity(PG_FUNCTION_ARGS)
 {
-	os_Monoid *monoid;
-	os_Scalar *scalar;
+	os_Monoid  *monoid;
+	os_Scalar  *scalar;
 	GrB_Type_Code code;
-	GrB_Type type;
-	GrB_Scalar tmp;
+	GrB_Type	type;
+	GrB_Scalar	tmp;
 
 	monoid = OS_GETARG_MONOID(0);
 
 	OS_CHECK(GrB_get(monoid->monoid,
-					 (int32_t*)&code,
+					 (int32_t *) &code,
 					 GrB_OUTP_TYPE_CODE),
 			 monoid->monoid,
 			 "Error getting monoid type code");
@@ -25,10 +26,10 @@ Datum monoid_identity(PG_FUNCTION_ARGS)
 			 "Error creating new monoid identity scalar.");
 
 	OS_CHECK(GrB_get(monoid->monoid,
-                     tmp,
-                     GxB_MONOID_IDENTITY),
-             monoid->monoid,
-             "Error extracting monoid identity.");
+					 tmp,
+					 GxB_MONOID_IDENTITY),
+			 monoid->monoid,
+			 "Error extracting monoid identity.");
 
 	scalar = new_scalar(type, CurrentMemoryContext, tmp);
 

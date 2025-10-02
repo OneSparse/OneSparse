@@ -1,16 +1,23 @@
 #include "../onesparse.h"
 
 PG_FUNCTION_INFO_V1(vector_eunion);
-Datum vector_eunion(PG_FUNCTION_ARGS)
+Datum
+vector_eunion(PG_FUNCTION_ARGS)
 {
-	GrB_Type wtype, utype, vtype;
-	os_Vector *u, *v, *w;
-	GrB_Vector mask;
-	os_Scalar *a, *b;
+	GrB_Type	wtype,
+				utype,
+				vtype;
+	os_Vector  *u,
+			   *v,
+			   *w;
+	GrB_Vector	mask;
+	os_Scalar  *a,
+			   *b;
 	GrB_Descriptor descriptor;
-	GrB_BinaryOp op, accum;
-	GrB_Index usize;
-	int nargs;
+	GrB_BinaryOp op,
+				accum;
+	GrB_Index	usize;
+	int			nargs;
 
 	LOGF();
 	ERRORNULL(0);
@@ -63,4 +70,3 @@ Datum vector_eunion(PG_FUNCTION_ARGS)
 #define lsixth(l) lfirst(list_nth_cell(l, 5))
 SUPPORT_FN(vector_eunion, lsixth);
 #undef lsixth
-

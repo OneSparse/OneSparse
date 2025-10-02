@@ -4,14 +4,19 @@ PG_FUNCTION_INFO_V1(matrix_assign_scalar);
 Datum
 matrix_assign_scalar(PG_FUNCTION_ARGS)
 {
-	GrB_Type type;
-	os_Matrix *C;
-	os_Scalar *s;
-	GrB_Matrix mask;
+	GrB_Type	type;
+	os_Matrix  *C;
+	os_Scalar  *s;
+	GrB_Matrix	mask;
 	GrB_BinaryOp accum;
 	GrB_Descriptor descriptor;
-	GrB_Index nrows, ncols, ni = 0, nj = 0, *rows = NULL, *cols = NULL;
-	int nargs;
+	GrB_Index	nrows,
+				ncols,
+				ni = 0,
+				nj = 0,
+			   *rows = NULL,
+			   *cols = NULL;
+	int			nargs;
 
 	nargs = PG_NARGS();
 	C = OS_GETARG_MATRIX(0);
@@ -51,5 +56,5 @@ matrix_assign_scalar(PG_FUNCTION_ARGS)
 
 	OS_RETURN_MATRIX(C);
 }
-SUPPORT_FN(matrix_assign_scalar, linitial);
 
+SUPPORT_FN(matrix_assign_scalar, linitial);

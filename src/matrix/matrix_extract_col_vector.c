@@ -4,14 +4,17 @@ PG_FUNCTION_INFO_V1(matrix_extract_col_vector);
 Datum
 matrix_extract_col_vector(PG_FUNCTION_ARGS)
 {
-	GrB_Type type;
-	os_Matrix *A;
-	os_Vector *C;
-	GrB_Vector mask;
+	GrB_Type	type;
+	os_Matrix  *A;
+	os_Vector  *C;
+	GrB_Vector	mask;
 	GrB_BinaryOp accum;
 	GrB_Descriptor descriptor;
-	GrB_Index size, col, nj, *indexes = NULL;
-	int nargs;
+	GrB_Index	size,
+				col,
+				nj,
+			   *indexes = NULL;
+	int			nargs;
 
 	nargs = PG_NARGS();
 	A = OS_GETARG_MATRIX(0);
@@ -53,4 +56,3 @@ matrix_extract_col_vector(PG_FUNCTION_ARGS)
 }
 
 SUPPORT_FN(matrix_extract_col_vector, lfourth);
-

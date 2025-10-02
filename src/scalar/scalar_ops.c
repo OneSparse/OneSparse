@@ -42,4 +42,3 @@
 #define PG_RETURN PG_RETURN_BOOL
 #define NO_SCALAR_MATH
 #include "scalar_ops.h"
-

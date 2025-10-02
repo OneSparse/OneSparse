@@ -1,12 +1,12 @@
 #include "../onesparse.h"
 
-static void context_callback_monoid_free(void*);
+static void context_callback_monoid_free(void *);
 static Size monoid_get_flat_size(ExpandedObjectHeader *eohptr);
 
 static void flatten_monoid(
-	ExpandedObjectHeader *eohptr,
-	void *result,
-	Size allocated_size);
+						   ExpandedObjectHeader *eohptr,
+						   void *result,
+						   Size allocated_size);
 
 static const ExpandedObjectMethods monoid_methods = {
 	monoid_get_flat_size,
@@ -19,11 +19,13 @@ PG_FUNCTION_INFO_V1(monoid_name);
 
 #include "monoid_header.h"
 
-static Size monoid_get_flat_size(ExpandedObjectHeader *eohptr) {
-	os_Monoid *monoid;
+static Size
+monoid_get_flat_size(ExpandedObjectHeader *eohptr)
+{
+	os_Monoid  *monoid;
 
 
-	monoid = (os_Monoid*) eohptr;
+	monoid = (os_Monoid *) eohptr;
 	Assert(monoid->em_magic == monoid_MAGIC);
 
 	if (monoid->flat_size)
@@ -35,12 +37,13 @@ static Size monoid_get_flat_size(ExpandedObjectHeader *eohptr) {
 
 /* Flatten monoid into a pre-allocated result buffer that is
    allocated_size in bytes.  */
-static void flatten_monoid(
-	ExpandedObjectHeader *eohptr,
-	void *result,
-	Size allocated_size)
+static void
+flatten_monoid(
+			   ExpandedObjectHeader *eohptr,
+			   void *result,
+			   Size allocated_size)
 {
-	os_Monoid *monoid;
+	os_Monoid  *monoid;
 	os_FlatMonoid *flat;
 
 	LOGF();
@@ -51,19 +54,21 @@ static void flatten_monoid(
 	Assert(monoid->em_magic == monoid_MAGIC);
 	Assert(allocated_size == monoid->flat_size);
 	memset(flat, 0, allocated_size);
-	strncpy(flat->name, monoid->name, strlen(monoid->name)+1);
+	strncpy(flat->name, monoid->name, strlen(monoid->name) + 1);
 	SET_VARSIZE(flat, allocated_size);
 }
 
 /* Construct an empty expanded monoid. */
-os_Monoid* new_monoid(
-	char* name,
-	MemoryContext parentcontext)
+os_Monoid *
+new_monoid(
+		   char *name,
+		   MemoryContext parentcontext)
 {
-	GrB_Monoid binop;
-	os_Monoid *monoid;
+	GrB_Monoid	binop;
+	os_Monoid  *monoid;
 
-	MemoryContext objcxt, oldcxt;
+	MemoryContext objcxt,
+				oldcxt;
 	MemoryContextCallback *ctxcb;
 
 	LOGF();
@@ -84,8 +89,8 @@ os_Monoid* new_monoid(
 
 	monoid->em_magic = monoid_MAGIC;
 	monoid->flat_size = 0;
-	monoid->name = palloc(strlen(name)+1);
-	strncpy(monoid->name, name, strlen(name)+1);
+	monoid->name = palloc(strlen(name) + 1);
+	strncpy(monoid->name, name, strlen(name) + 1);
 	monoid->monoid = binop;
 
 	ctxcb = MemoryContextAlloc(objcxt, sizeof(MemoryContextCallback));
@@ -100,9 +105,10 @@ os_Monoid* new_monoid(
 }
 
 /* Expand a flat monoid in to an Expanded one, return as Postgres Datum. */
-Datum expand_monoid(os_FlatMonoid *flat, MemoryContext parentcontext)
+Datum
+expand_monoid(os_FlatMonoid * flat, MemoryContext parentcontext)
 {
-	os_Monoid *monoid;
+	os_Monoid  *monoid;
 
 	LOGF();
 
@@ -111,23 +117,26 @@ Datum expand_monoid(os_FlatMonoid *flat, MemoryContext parentcontext)
 }
 
 static void
-context_callback_monoid_free(void* ptr)
+context_callback_monoid_free(void *ptr)
 {
-	os_Monoid *monoid = (os_Monoid *) ptr;
+	os_Monoid  *monoid = (os_Monoid *) ptr;
+
 	OS_CHECK(GrB_Monoid_free(&monoid->monoid),
-		  monoid->monoid,
-		  "Cannot GrB_Free Monoid");
+			 monoid->monoid,
+			 "Cannot GrB_Free Monoid");
 }
 
 /* Helper function to always expand datum
 
    This is used by PG_GETARG_MONOID */
-os_Monoid* DatumGetMonoid(Datum datum)
+os_Monoid *
+DatumGetMonoid(Datum datum)
 {
-	os_Monoid *monoid;
+	os_Monoid  *monoid;
 	os_FlatMonoid *flat;
 
-	if (VARATT_IS_EXTERNAL_EXPANDED(DatumGetPointer(datum))) {
+	if (VARATT_IS_EXTERNAL_EXPANDED(DatumGetPointer(datum)))
+	{
 		monoid = MonoidGetEOHP(datum);
 		Assert(monoid->em_magic == monoid_MAGIC);
 		return monoid;
@@ -137,31 +146,35 @@ os_Monoid* DatumGetMonoid(Datum datum)
 	return MonoidGetEOHP(datum);
 }
 
-Datum monoid_in(PG_FUNCTION_ARGS)
+Datum
+monoid_in(PG_FUNCTION_ARGS)
 {
-	os_Monoid *monoid;
-	char* input;
+	os_Monoid  *monoid;
+	char	   *input;
 
 	input = PG_GETARG_CSTRING(0);
 	monoid = new_monoid(input, CurrentMemoryContext);
 	OS_RETURN_MONOID(monoid);
 }
 
-Datum monoid_out(PG_FUNCTION_ARGS)
+Datum
+monoid_out(PG_FUNCTION_ARGS)
 {
-	char *result;
-	os_Monoid *monoid;
+	char	   *result;
+	os_Monoid  *monoid;
 
 	monoid = OS_GETARG_MONOID(0);
 
-	result = palloc(strlen(monoid->name)+1);
-	snprintf(result, strlen(monoid->name)+1, "%s", monoid->name);
+	result = palloc(strlen(monoid->name) + 1);
+	snprintf(result, strlen(monoid->name) + 1, "%s", monoid->name);
 	PG_RETURN_CSTRING(result);
 }
 
-Datum monoid_name(PG_FUNCTION_ARGS)
+Datum
+monoid_name(PG_FUNCTION_ARGS)
 {
-	os_Monoid *monoid;
+	os_Monoid  *monoid;
+
 	monoid = OS_GETARG_MONOID(0);
 	PG_RETURN_TEXT_P(cstring_to_text(monoid->name));
 }

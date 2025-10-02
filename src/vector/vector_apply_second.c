@@ -1,17 +1,19 @@
 #include "../onesparse.h"
 
 PG_FUNCTION_INFO_V1(vector_apply_second);
-Datum vector_apply_second(PG_FUNCTION_ARGS)
+Datum
+vector_apply_second(PG_FUNCTION_ARGS)
 {
-	GrB_Type type;
-	os_Vector *u, *w;
-	os_Scalar *s;
-	GrB_Vector mask;
+	GrB_Type	type;
+	os_Vector  *u,
+			   *w;
+	os_Scalar  *s;
+	GrB_Vector	mask;
 	GrB_Descriptor descriptor;
 	GrB_BinaryOp accum;
 	GrB_BinaryOp binaryop;
-	GrB_Index usize;
-	int nargs;
+	GrB_Index	usize;
+	int			nargs;
 
 	LOGF();
 	ERRORNULL(0);
@@ -41,18 +43,17 @@ Datum vector_apply_second(PG_FUNCTION_ARGS)
 	accum = OS_GETARG_BINARYOP_HANDLE_OR_NULL(nargs, 5);
 	descriptor = OS_GETARG_DESCRIPTOR_HANDLE_OR_NULL(nargs, 6);
 
-	OS_CHECK( GrB_Vector_apply_BinaryOp2nd_Scalar(
-				  w->vector,
-				  mask,
-				  accum,
-				  binaryop,
-				  u->vector,
-				  s->scalar,
-				  descriptor),
-			  w->vector,
-			  "Error in grb_vector_apply_binaryop2nd");
+	OS_CHECK(GrB_Vector_apply_BinaryOp2nd_Scalar(
+												 w->vector,
+												 mask,
+												 accum,
+												 binaryop,
+												 u->vector,
+												 s->scalar,
+												 descriptor),
+			 w->vector,
+			 "Error in grb_vector_apply_binaryop2nd");
 	OS_RETURN_VECTOR(w);
 }
 
 SUPPORT_FN(vector_apply_second, lfourth);
-
