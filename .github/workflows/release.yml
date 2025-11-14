@@ -48,7 +48,7 @@ jobs:
           push: true
           tags: |
             onesparse/onesparse-slim:${{ steps.version.outputs.VERSION }}
-            onesparse/onesparse-slim:latest
+            ${{ !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc') && 'onesparse/onesparse-slim:latest' || '' }}
           cache-from: type=registry,ref=onesparse/onesparse-slim:latest
           cache-to: type=inline
 
