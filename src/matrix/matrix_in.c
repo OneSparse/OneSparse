@@ -165,9 +165,9 @@ _parse_matrix(char *input_copy)
 		{
 			bool		num;
 
-			if (strcmp(number_token, "t") == 0)
+			if (strcmp(number_token, "t") == 0 || strcmp(number_token, "true") == 0)
 				num = true;
-			else if (strcmp(number_token, "f") == 0)
+			else if (strcmp(number_token, "f") == 0 || strcmp(number_token, "false") == 0)
 				num = false;
 			else
 				elog(ERROR, "Invalid BOOL %s", number_token);

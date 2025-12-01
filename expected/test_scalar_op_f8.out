@@ -2,16 +2,11 @@
 -- ## Scalar `float8`
 --
 -- Test various scalar math operations with native Postgres types
+-- Scalar-native arithmetic (scalar op native)
 select (1::float8)::scalar + -1::float8;
    ?column?    
 ---------------
  fp64:0.000000
-(1 row)
-
-select 1::float8 + (-1::float8)::scalar;
- ?column? 
-----------
-        0
 (1 row)
 
 select (1::float8)::scalar - 1::float8;
@@ -20,22 +15,10 @@ select (1::float8)::scalar - 1::float8;
  fp64:0.000000
 (1 row)
 
-select 1::float8 - (1::float8)::scalar;
- ?column? 
-----------
-        0
-(1 row)
-
 select (1::float8)::scalar * -1::float8;
     ?column?    
 ----------------
  fp64:-1.000000
-(1 row)
-
-select 1::float8 * (-1::float8)::scalar;
- ?column? 
-----------
-       -1
 (1 row)
 
 select (1::float8)::scalar / 1::float8;
@@ -44,7 +27,51 @@ select (1::float8)::scalar / 1::float8;
  fp64:1.000000
 (1 row)
 
+-- Native-scalar arithmetic (native op scalar)
+select 1::float8 + (-1::float8)::scalar;
+ ?column? 
+----------
+        0
+(1 row)
+
+select 1::float8 - (1::float8)::scalar;
+ ?column? 
+----------
+        0
+(1 row)
+
+select 1::float8 * (-1::float8)::scalar;
+ ?column? 
+----------
+       -1
+(1 row)
+
 select 1::float8 / (1::float8)::scalar;
+ ?column? 
+----------
+        1
+(1 row)
+
+-- Scalar-scalar arithmetic (via native extraction)
+select ((1::float8)::scalar)::float8 + ((-1::float8)::scalar)::float8;
+ ?column? 
+----------
+        0
+(1 row)
+
+select ((1::float8)::scalar)::float8 - ((0::float8)::scalar)::float8;
+ ?column? 
+----------
+        1
+(1 row)
+
+select ((1::float8)::scalar)::float8 * ((-1::float8)::scalar)::float8;
+ ?column? 
+----------
+       -1
+(1 row)
+
+select ((1::float8)::scalar)::float8 / ((1::float8)::scalar)::float8;
  ?column? 
 ----------
         1
@@ -74,6 +101,143 @@ select set('1'::float8::scalar, 2);
       set      
 ---------------
  fp64:2.000000
+(1 row)
+
+-- Test setting to min, zero, max
+select set('0'::float8::scalar, -1::float8);
+      set       
+----------------
+ fp64:-1.000000
+(1 row)
+
+select set('1'::float8::scalar, 0::float8);
+      set      
+---------------
+ fp64:0.000000
+(1 row)
+
+select set('-1'::float8::scalar, 1::float8);
+      set      
+---------------
+ fp64:1.000000
+(1 row)
+
+-- Comparison operations (via extraction)
+select ((1::float8)::scalar)::float8 = 1::float8;
+ ?column? 
+----------
+ t
+(1 row)
+
+select ((-1::float8)::scalar)::float8 = -1::float8;
+ ?column? 
+----------
+ t
+(1 row)
+
+select ((0::float8)::scalar)::float8 = 0::float8;
+ ?column? 
+----------
+ t
+(1 row)
+
+select ((1::float8)::scalar)::float8 > -1::float8;
+ ?column? 
+----------
+ t
+(1 row)
+
+select ((-1::float8)::scalar)::float8 < 1::float8;
+ ?column? 
+----------
+ t
+(1 row)
+
+select ((1::float8)::scalar)::float8 >= 1::float8;
+ ?column? 
+----------
+ t
+(1 row)
+
+select ((-1::float8)::scalar)::float8 <= -1::float8;
+ ?column? 
+----------
+ t
+(1 row)
+
+select ((1::float8)::scalar)::float8 != -1::float8;
+ ?column? 
+----------
+ t
+(1 row)
+
+-- Compare two scalar values (via extraction)
+select ((1::float8)::scalar)::float8 = ((1::float8)::scalar)::float8;
+ ?column? 
+----------
+ t
+(1 row)
+
+select ((1::float8)::scalar)::float8 > ((-1::float8)::scalar)::float8;
+ ?column? 
+----------
+ t
+(1 row)
+
+select ((-1::float8)::scalar)::float8 < ((1::float8)::scalar)::float8;
+ ?column? 
+----------
+ t
+(1 row)
+
+-- Edge case: operations with zero
+select (0::float8)::scalar + 1::float8;
+   ?column?    
+---------------
+ fp64:1.000000
+(1 row)
+
+select (1::float8)::scalar - 0::float8;
+   ?column?    
+---------------
+ fp64:1.000000
+(1 row)
+
+select (0::float8)::scalar * 1::float8;
+   ?column?    
+---------------
+ fp64:0.000000
+(1 row)
+
+select (1::float8)::scalar * 0::float8;
+   ?column?    
+---------------
+ fp64:0.000000
+(1 row)
+
+-- Edge case: operations at boundaries
+select (1::float8)::scalar + 0::float8;
+   ?column?    
+---------------
+ fp64:1.000000
+(1 row)
+
+select (-1::float8)::scalar - 0::float8;
+    ?column?    
+----------------
+ fp64:-1.000000
+(1 row)
+
+select (1::float8)::scalar / 1::float8;
+   ?column?    
+---------------
+ fp64:1.000000
+(1 row)
+
+select (-1::float8)::scalar * 1::float8;
+    ?column?    
+----------------
+ fp64:-1.000000
 (1 row)
 
 -- Test various casting functions used by the CREATE CAST machinery:
@@ -151,5 +315,93 @@ select cast((1::float8)::scalar as scalar);
     scalar     
 ---------------
  fp64:1.000000
+(1 row)
+
+-- Round-trip conversion tests (value should be preserved)
+select (-1::float8)::scalar::float8 = -1::float8;
+ ?column? 
+----------
+ t
+(1 row)
+
+select (0::float8)::scalar::float8 = 0::float8;
+ ?column? 
+----------
+ t
+(1 row)
+
+select (1::float8)::scalar::float8 = 1::float8;
+ ?column? 
+----------
+ t
+(1 row)
+
+-- Multiple round-trips should preserve value
+select ((-1::float8)::scalar::float8)::scalar::float8 = -1::float8;
+ ?column? 
+----------
+ t
+(1 row)
+
+select ((1::float8)::scalar::float8)::scalar::float8 = 1::float8;
+ ?column? 
+----------
+ t
+(1 row)
+
+-- NULL handling
+select NULL::float8::scalar;
+ scalar 
+--------
+ fp64
+(1 row)
+
+select (1::float8)::scalar + NULL::float8;
+ERROR:  Cannot pass NULL to scalar_plus_fp64
+select NULL::float8 + (1::float8)::scalar;
+ERROR:  Cannot pass NULL to plus_scalar_fp64
+select NULL::float8 * (0::float8)::scalar;
+ERROR:  Cannot pass NULL to mult_scalar_fp64
+-- Utility functions
+select nvals((1::float8)::scalar) as has_value;
+ has_value 
+-----------
+         1
+(1 row)
+
+select nvals(('fp64')::scalar) as empty_scalar;
+ empty_scalar 
+--------------
+            0
+(1 row)
+
+select type((1::float8)::scalar);
+ type 
+------
+ fp64
+(1 row)
+
+select print((1::float8)::scalar);
+  print   
+----------
+ 1.000000
+(1 row)
+
+select dup((1::float8)::scalar)::float8;
+ dup 
+-----
+   1
+(1 row)
+
+select wait((1::float8)::scalar)::float8;
+ wait 
+------
+    1
+(1 row)
+
+select nvals(clear((1::float8)::scalar)) as cleared;
+ cleared 
+---------
+       0
 (1 row)
 

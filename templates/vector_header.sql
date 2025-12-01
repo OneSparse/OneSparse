@@ -238,7 +238,7 @@ RETURNS internal
 AS '$libdir/onesparse', 'vector_extract_vector_support'
 LANGUAGE C;
 
-CREATE FUNCTION xtract(
+CREATE FUNCTION extract_vector(
     a vector,
     i bigint[] default null,
     c vector default null,

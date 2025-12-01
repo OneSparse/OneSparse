@@ -17,15 +17,21 @@ Datum
 _scalar_in(char *input)
 {
 	os_Scalar  *scalar;
-	size_t		len;
 	GrB_Type	typ;
-	char		str_val[GxB_MAX_NAME_LEN];
+	char		str_val[GxB_MAX_NAME_LEN] = "";
 	char		str_type[GxB_MAX_NAME_LEN];
+	char	   *colon_pos;
 	char	   *fmt = "";
 
-	len = strlen(input);
-
-	sscanf(input, "%[^:]:%s", str_type, str_val);
+	colon_pos = strchr(input, ':');
+	if (colon_pos != NULL)
+	{
+		sscanf(input, "%[^:]:%s", str_type, str_val);
+	}
+	else
+	{
+		sscanf(input, "%s", str_type);
+	}
 
 	typ = lookup_type(str_type);
 	scalar = new_scalar(typ, CurrentMemoryContext, NULL);
@@ -35,7 +41,7 @@ _scalar_in(char *input)
 		int64_t		value;
 
 		fmt = "%ld";
-		if (len)
+		if (colon_pos != NULL)
 		{
 			if (sscanf(str_val, fmt, &value) == 1)
 			{
@@ -52,7 +58,7 @@ _scalar_in(char *input)
 		uint64_t	value;
 
 		fmt = "%llu";
-		if (len)
+		if (colon_pos != NULL)
 		{
 			if (sscanf(str_val, fmt, &value) == 1)
 			{
@@ -69,7 +75,7 @@ _scalar_in(char *input)
 		int32_t		value;
 
 		fmt = "%i";
-		if (len)
+		if (colon_pos != NULL)
 		{
 			if (sscanf(str_val, fmt, &value) == 1)
 			{
@@ -86,7 +92,7 @@ _scalar_in(char *input)
 		uint32_t	value;
 
 		fmt = "%u";
-		if (len)
+		if (colon_pos != NULL)
 		{
 			if (sscanf(str_val, fmt, &value) == 1)
 			{
@@ -103,7 +109,7 @@ _scalar_in(char *input)
 		int16_t		value;
 
 		fmt = "%i";
-		if (len)
+		if (colon_pos != NULL)
 		{
 			if (sscanf(str_val, fmt, &value) == 1)
 			{
@@ -120,7 +126,7 @@ _scalar_in(char *input)
 		uint16_t	value;
 
 		fmt = "%hu";
-		if (len)
+		if (colon_pos != NULL)
 		{
 			if (sscanf(str_val, fmt, &value) == 1)
 			{
@@ -137,7 +143,7 @@ _scalar_in(char *input)
 		double		value;
 
 		fmt = "%lf";
-		if (len)
+		if (colon_pos != NULL)
 		{
 			if (sscanf(str_val, fmt, &value) == 1)
 			{
@@ -154,7 +160,7 @@ _scalar_in(char *input)
 		float		value;
 
 		fmt = "%f";
-		if (len)
+		if (colon_pos != NULL)
 		{
 			if (sscanf(str_val, fmt, &value) == 1)
 			{
@@ -171,7 +177,7 @@ _scalar_in(char *input)
 		char		value;
 
 		fmt = "%c";
-		if (len)
+		if (colon_pos != NULL)
 		{
 			if (sscanf(str_val, fmt, &value) == 1)
 			{
@@ -194,22 +200,25 @@ _scalar_in(char *input)
 	else
 	{
 		/* UDT */
-		size_t		b64len;
-		int			out_len;
-		size_t		max_bytes;
-		void	   *_value;
+		if (colon_pos != NULL)
+		{
+			size_t		b64len;
+			int			out_len;
+			size_t		max_bytes;
+			void	   *_value;
 
-		b64len = strlen(str_val);
-		max_bytes = pg_b64_dec_len((int) b64len);
-		_value = palloc(max_bytes);
+			b64len = strlen(str_val);
+			max_bytes = pg_b64_dec_len((int) b64len);
+			_value = palloc(max_bytes);
 
-		out_len = pg_b64_decode((const char *) str_val, (int) b64len,
-								(uint8 *) _value, (int) max_bytes);
-		if (out_len < 0)
-			elog(ERROR, "scalar_in: invalid base64 data");
-		OS_CHECK(GrB_Scalar_setElement(scalar->scalar, _value),
-				 scalar->scalar,
-				 "Cannot set scalar element UDT.");
+			out_len = pg_b64_decode((const char *) str_val, (int) b64len,
+									(uint8 *) _value, (int) max_bytes);
+			if (out_len < 0)
+				elog(ERROR, "scalar_in: invalid base64 data");
+			OS_CHECK(GrB_Scalar_setElement(scalar->scalar, _value),
+					 scalar->scalar,
+					 "Cannot set scalar element UDT.");
+		}
 	}
 	OS_RETURN_SCALAR(scalar);
 }

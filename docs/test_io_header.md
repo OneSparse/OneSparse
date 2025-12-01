@@ -1,0 +1,131 @@
+# Input/Output Operations
+
+OneSparse comes with several functions to read and write different
+text and binary formats for graph data.
+
+## SuiteSparse Binaries
+
+SuiteSparse provides a very efficient compressed binary
+representation for matrix and vector objects.
+``` postgres-console
+select serialize(random_matrix('int8', 10, 10, seed=>42)) as matrixbytes \gset
+select deserialize(:'matrixbytes') = random_matrix('int8', 10, 10, seed=>42);
+ ?column? 
+----------
+ t
+(1 row)
+
+select serialize_file(random_matrix('int8', 10, 10, seed=>42), :'grbfile');
+ serialize_file 
+----------------
+ t
+(1 row)
+
+select deserialize_file(:'grbfile') = random_matrix('int8', 10, 10, seed=>42);
+ ?column? 
+----------
+ t
+(1 row)
+
+```
+## MatrixMarket Format
+
+The Matrix Market format is a standard graph distribution format
+used by the SuiteSparse Matrix Library.  OneSparse can read these
+files and return matrix objects.
+``` postgres-console
+create materialized view if not exists karate
+    as select mmread('/home/postgres/onesparse/demo/karate.mtx') as graph;
+NOTICE:  relation "karate" already exists, skipping
+select print(graph) from karate;
+                                                                      print                                                                       
+--------------------------------------------------------------------------------------------------------------------------------------------------
+        0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18  19  20  21  22  23  24  25  26  27  28  29  30  31  32  33    +
+     ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────    +
+   0│       t   t   t   t   t   t   t   t       t   t   t   t               t       t       t                                       t            +
+   1│   t       t   t               t                       t               t       t       t                                   t                +
+   2│   t   t       t               t   t   t               t                                                       t   t               t        +
+   3│   t   t   t                   t                   t   t                                                                                    +
+   4│   t                       t               t                                                                                                +
+   5│   t                       t               t                       t                                                                        +
+   6│   t               t   t                                           t                                                                        +
+   7│   t   t   t   t                                                                                                                            +
+   8│   t       t                                                                                                               t       t   t    +
+   9│           t                                                                                                                           t    +
+  10│   t               t   t                                                                                                                    +
+  11│   t                                                                                                                                        +
+  12│   t           t                                                                                                                            +
+  13│   t   t   t   t                                                                                                                       t    +
+  14│                                                                                                                                   t   t    +
+  15│                                                                                                                                   t   t    +
+  16│                       t   t                                                                                                                +
+  17│   t   t                                                                                                                                    +
+  18│                                                                                                                                   t   t    +
+  19│   t   t                                                                                                                               t    +
+  20│                                                                                                                                   t   t    +
+  21│   t   t                                                                                                                                    +
+  22│                                                                                                                                   t   t    +
+  23│                                                                                                       t       t       t           t   t    +
+  24│                                                                                                       t       t               t            +
+  25│                                                                                               t   t                           t            +
+  26│                                                                                                                       t               t    +
+  27│           t                                                                                   t   t                                   t    +
+  28│           t                                                                                                                   t       t    +
+  29│                                                                                               t           t                       t   t    +
+  30│       t                           t                                                                                               t   t    +
+  31│   t                                                                                               t   t           t               t   t    +
+  32│           t                       t                       t   t           t       t       t   t                       t   t   t       t    +
+  33│                                   t   t               t   t   t           t   t   t       t   t           t   t   t   t   t   t   t        +
+ 
+(1 row)
+
+```
+## Large Object Storage
+
+Matrices bigger than the 1GB TOAST limit can be stored in the Large
+Object table in Postgres, which supports storage up to 4TB.
+``` postgres-console
+select save(graph) as karate_loid from karate \gset
+select print(load(:karate_loid));
+                                                                      print                                                                       
+--------------------------------------------------------------------------------------------------------------------------------------------------
+        0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18  19  20  21  22  23  24  25  26  27  28  29  30  31  32  33    +
+     ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────    +
+   0│       t   t   t   t   t   t   t   t       t   t   t   t               t       t       t                                       t            +
+   1│   t       t   t               t                       t               t       t       t                                   t                +
+   2│   t   t       t               t   t   t               t                                                       t   t               t        +
+   3│   t   t   t                   t                   t   t                                                                                    +
+   4│   t                       t               t                                                                                                +
+   5│   t                       t               t                       t                                                                        +
+   6│   t               t   t                                           t                                                                        +
+   7│   t   t   t   t                                                                                                                            +
+   8│   t       t                                                                                                               t       t   t    +
+   9│           t                                                                                                                           t    +
+  10│   t               t   t                                                                                                                    +
+  11│   t                                                                                                                                        +
+  12│   t           t                                                                                                                            +
+  13│   t   t   t   t                                                                                                                       t    +
+  14│                                                                                                                                   t   t    +
+  15│                                                                                                                                   t   t    +
+  16│                       t   t                                                                                                                +
+  17│   t   t                                                                                                                                    +
+  18│                                                                                                                                   t   t    +
+  19│   t   t                                                                                                                               t    +
+  20│                                                                                                                                   t   t    +
+  21│   t   t                                                                                                                                    +
+  22│                                                                                                                                   t   t    +
+  23│                                                                                                       t       t       t           t   t    +
+  24│                                                                                                       t       t               t            +
+  25│                                                                                               t   t                           t            +
+  26│                                                                                                                       t               t    +
+  27│           t                                                                                   t   t                                   t    +
+  28│           t                                                                                                                   t       t    +
+  29│                                                                                               t           t                       t   t    +
+  30│       t                           t                                                                                               t   t    +
+  31│   t                                                                                               t   t           t               t   t    +
+  32│           t                       t                       t   t           t       t       t   t                       t   t   t       t    +
+  33│                                   t   t               t   t   t           t   t   t       t   t           t   t   t   t   t   t   t        +
+ 
+(1 row)
+
+```

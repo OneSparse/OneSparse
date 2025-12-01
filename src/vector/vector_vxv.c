@@ -62,7 +62,7 @@ vector_vxv(PG_FUNCTION_ARGS)
 					 semiring,
 					 (GrB_Matrix) a->vector,
 					 (GrB_Matrix) b->vector,
-					 GrB_DESC_T0
+					 GrB_DESC_T1
 					 ),
 			 c->vector,
 			 "Error vector_vxv.");

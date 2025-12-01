@@ -2,16 +2,11 @@
 -- ## Scalar `smallint`
 --
 -- Test various scalar math operations with native Postgres types
+-- Scalar-native arithmetic (scalar op native)
 select (1::smallint)::scalar + -1::smallint;
  ?column? 
 ----------
  int16:0
-(1 row)
-
-select 1::smallint + (-1::smallint)::scalar;
- ?column? 
-----------
-        0
 (1 row)
 
 select (1::smallint)::scalar - 1::smallint;
@@ -20,22 +15,10 @@ select (1::smallint)::scalar - 1::smallint;
  int16:0
 (1 row)
 
-select 1::smallint - (1::smallint)::scalar;
- ?column? 
-----------
-        0
-(1 row)
-
 select (1::smallint)::scalar * -1::smallint;
  ?column? 
 ----------
  int16:-1
-(1 row)
-
-select 1::smallint * (-1::smallint)::scalar;
- ?column? 
-----------
-       -1
 (1 row)
 
 select (1::smallint)::scalar / 1::smallint;
@@ -44,7 +27,51 @@ select (1::smallint)::scalar / 1::smallint;
  int16:1
 (1 row)
 
+-- Native-scalar arithmetic (native op scalar)
+select 1::smallint + (-1::smallint)::scalar;
+ ?column? 
+----------
+        0
+(1 row)
+
+select 1::smallint - (1::smallint)::scalar;
+ ?column? 
+----------
+        0
+(1 row)
+
+select 1::smallint * (-1::smallint)::scalar;
+ ?column? 
+----------
+       -1
+(1 row)
+
 select 1::smallint / (1::smallint)::scalar;
+ ?column? 
+----------
+        1
+(1 row)
+
+-- Scalar-scalar arithmetic (via native extraction)
+select ((1::smallint)::scalar)::smallint + ((-1::smallint)::scalar)::smallint;
+ ?column? 
+----------
+        0
+(1 row)
+
+select ((1::smallint)::scalar)::smallint - ((0::smallint)::scalar)::smallint;
+ ?column? 
+----------
+        1
+(1 row)
+
+select ((1::smallint)::scalar)::smallint * ((-1::smallint)::scalar)::smallint;
+ ?column? 
+----------
+       -1
+(1 row)
+
+select ((1::smallint)::scalar)::smallint / ((1::smallint)::scalar)::smallint;
  ?column? 
 ----------
         1
@@ -74,6 +101,143 @@ select set('1'::smallint::scalar, 2);
    set   
 ---------
  int16:2
+(1 row)
+
+-- Test setting to min, zero, max
+select set('0'::smallint::scalar, -1::smallint);
+   set    
+----------
+ int16:-1
+(1 row)
+
+select set('1'::smallint::scalar, 0::smallint);
+   set   
+---------
+ int16:0
+(1 row)
+
+select set('-1'::smallint::scalar, 1::smallint);
+   set   
+---------
+ int16:1
+(1 row)
+
+-- Comparison operations (via extraction)
+select ((1::smallint)::scalar)::smallint = 1::smallint;
+ ?column? 
+----------
+ t
+(1 row)
+
+select ((-1::smallint)::scalar)::smallint = -1::smallint;
+ ?column? 
+----------
+ t
+(1 row)
+
+select ((0::smallint)::scalar)::smallint = 0::smallint;
+ ?column? 
+----------
+ t
+(1 row)
+
+select ((1::smallint)::scalar)::smallint > -1::smallint;
+ ?column? 
+----------
+ t
+(1 row)
+
+select ((-1::smallint)::scalar)::smallint < 1::smallint;
+ ?column? 
+----------
+ t
+(1 row)
+
+select ((1::smallint)::scalar)::smallint >= 1::smallint;
+ ?column? 
+----------
+ t
+(1 row)
+
+select ((-1::smallint)::scalar)::smallint <= -1::smallint;
+ ?column? 
+----------
+ t
+(1 row)
+
+select ((1::smallint)::scalar)::smallint != -1::smallint;
+ ?column? 
+----------
+ t
+(1 row)
+
+-- Compare two scalar values (via extraction)
+select ((1::smallint)::scalar)::smallint = ((1::smallint)::scalar)::smallint;
+ ?column? 
+----------
+ t
+(1 row)
+
+select ((1::smallint)::scalar)::smallint > ((-1::smallint)::scalar)::smallint;
+ ?column? 
+----------
+ t
+(1 row)
+
+select ((-1::smallint)::scalar)::smallint < ((1::smallint)::scalar)::smallint;
+ ?column? 
+----------
+ t
+(1 row)
+
+-- Edge case: operations with zero
+select (0::smallint)::scalar + 1::smallint;
+ ?column? 
+----------
+ int16:1
+(1 row)
+
+select (1::smallint)::scalar - 0::smallint;
+ ?column? 
+----------
+ int16:1
+(1 row)
+
+select (0::smallint)::scalar * 1::smallint;
+ ?column? 
+----------
+ int16:0
+(1 row)
+
+select (1::smallint)::scalar * 0::smallint;
+ ?column? 
+----------
+ int16:0
+(1 row)
+
+-- Edge case: operations at boundaries
+select (1::smallint)::scalar + 0::smallint;
+ ?column? 
+----------
+ int16:1
+(1 row)
+
+select (-1::smallint)::scalar - 0::smallint;
+ ?column? 
+----------
+ int16:-1
+(1 row)
+
+select (1::smallint)::scalar / 1::smallint;
+ ?column? 
+----------
+ int16:1
+(1 row)
+
+select (-1::smallint)::scalar * 1::smallint;
+ ?column? 
+----------
+ int16:-1
 (1 row)
 
 -- Test various casting functions used by the CREATE CAST machinery:
@@ -151,5 +315,93 @@ select cast((1::smallint)::scalar as scalar);
  scalar  
 ---------
  int16:1
+(1 row)
+
+-- Round-trip conversion tests (value should be preserved)
+select (-1::smallint)::scalar::smallint = -1::smallint;
+ ?column? 
+----------
+ t
+(1 row)
+
+select (0::smallint)::scalar::smallint = 0::smallint;
+ ?column? 
+----------
+ t
+(1 row)
+
+select (1::smallint)::scalar::smallint = 1::smallint;
+ ?column? 
+----------
+ t
+(1 row)
+
+-- Multiple round-trips should preserve value
+select ((-1::smallint)::scalar::smallint)::scalar::smallint = -1::smallint;
+ ?column? 
+----------
+ t
+(1 row)
+
+select ((1::smallint)::scalar::smallint)::scalar::smallint = 1::smallint;
+ ?column? 
+----------
+ t
+(1 row)
+
+-- NULL handling
+select NULL::smallint::scalar;
+ scalar 
+--------
+ int16
+(1 row)
+
+select (1::smallint)::scalar + NULL::smallint;
+ERROR:  Cannot pass NULL to scalar_plus_int16
+select NULL::smallint + (1::smallint)::scalar;
+ERROR:  Cannot pass NULL to plus_scalar_int16
+select NULL::smallint * (0::smallint)::scalar;
+ERROR:  Cannot pass NULL to mult_scalar_int16
+-- Utility functions
+select nvals((1::smallint)::scalar) as has_value;
+ has_value 
+-----------
+         1
+(1 row)
+
+select nvals(('int16')::scalar) as empty_scalar;
+ empty_scalar 
+--------------
+            0
+(1 row)
+
+select type((1::smallint)::scalar);
+ type  
+-------
+ int16
+(1 row)
+
+select print((1::smallint)::scalar);
+ print 
+-------
+ 1
+(1 row)
+
+select dup((1::smallint)::scalar)::smallint;
+ dup 
+-----
+   1
+(1 row)
+
+select wait((1::smallint)::scalar)::smallint;
+ wait 
+------
+    1
+(1 row)
+
+select nvals(clear((1::smallint)::scalar)) as cleared;
+ cleared 
+---------
+       0
 (1 row)
 

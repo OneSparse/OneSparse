@@ -97,7 +97,7 @@ select terminal('plus_monoid_int8');
 ┌──────────┐
 │ terminal │
 ├──────────┤
-│ int      │
+│ int8     │
 └──────────┘
 (1 row)
 
@@ -105,7 +105,7 @@ select terminal('plus_monoid_int16');
 ┌──────────┐
 │ terminal │
 ├──────────┤
-│ int      │
+│ int16    │
 └──────────┘
 (1 row)
 

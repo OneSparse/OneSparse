@@ -7,11 +7,19 @@ scalar_print(PG_FUNCTION_ARGS)
 	int32		type_code;
 	os_Scalar  *s;
 	GrB_Type	type;
+	GrB_Index	nvals;
 	StringInfoData buf;
 
 	s = OS_GETARG_SCALAR(0);
 	OS_STYPE(type, s);
 	initStringInfo(&buf);
+
+	OS_CHECK(GrB_Scalar_nvals(&nvals, s->scalar),
+			 s->scalar,
+			 "Error extracting scalar nvals.");
+
+	if (nvals == 0)
+		PG_RETURN_TEXT_P(cstring_to_text(""));
 
 	OS_CHECK(GrB_get(s->scalar, &type_code, GrB_EL_TYPE_CODE),
 			 s->scalar,

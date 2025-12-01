@@ -192,8 +192,7 @@ scalar_out(PG_FUNCTION_ARGS)
 	}
 	else
 	{
-		result = palloc(4);
-		snprintf(result, 4, "%s:", type_name);
+		result = pstrdup(type_name);
 	}
 	PG_RETURN_CSTRING(result);
 }

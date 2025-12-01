@@ -8,7 +8,7 @@ from pyclibrary import CLibrary, CParser
 parser = CParser(['/usr/local/include/suitesparse/GraphBLAS.h'])
 suitesparse = CLibrary('/usr/local/lib/libgraphblas.so', parser)
 
-VERSION = '0.1.0'
+VERSION = '1.0.1'
 
 def doctestify(test):
     lines = test.splitlines()
@@ -274,4 +274,9 @@ def write_source(outfile):
             b.write()
 
 if __name__ == '__main__':
-    write_source(outfile=sys.stdout if sys.argv[1] == '-' else open(sys.argv[1], 'w+'))
+    if len(sys.argv) > 1 and sys.argv[1] == '-':
+        write_source(outfile=sys.stdout)
+    else:
+        output_path = f'onesparse/onesparse--{VERSION}.sql'
+        write_source(outfile=open(output_path, 'w+'))
+        print(f'Generated {output_path}')

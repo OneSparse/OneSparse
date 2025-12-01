@@ -3,7 +3,7 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from pathlib import Path
 
-VERSION = '0.1.0'
+from generate import VERSION
 
 def doctestify(test):
     lines = test.splitlines()

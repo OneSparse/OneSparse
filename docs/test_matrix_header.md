@@ -667,27 +667,1094 @@ These tests run the documentation against a live server, all the
 above results are automatically generated.
 ```
 
+```
+Get number of rows from a matrix with row-only dimension specified.
+```
 select nrows('int32(10)[1:1:1 2:2:2 3:3:3]'::matrix);
 
+```
+Get number of columns from a matrix with row-only dimension specified.
+```
 select ncols('int32(10)[1:1:1 2:2:2 3:3:3]'::matrix);
 
+```
+Get number of stored values from a matrix with row-only dimension specified.
+```
 select nvals('int32(10)[1:1:1 2:2:2 3:3:3]'::matrix);
 
+```
+Get number of rows from a matrix with bounded rows and unbounded columns.
+```
 select nrows('int32(10:)[1:1:1 2:2:2 3:3:3]'::matrix);
 
+```
+Get number of columns from a matrix with bounded rows and unbounded columns.
+```
 select ncols('int32(10:)[1:1:1 2:2:2 3:3:3]'::matrix);
 
+```
+Get number of stored values from a matrix with bounded rows and unbounded columns.
+```
 select nvals('int32(10:)[1:1:1 2:2:2 3:3:3]'::matrix);
 
+```
+Get number of rows from a matrix with unbounded rows and bounded columns.
+```
 select nrows('int32(:10)[1:1:1 2:2:2 3:3:3]'::matrix);
 
+```
+Get number of columns from a matrix with unbounded rows and bounded columns.
+```
 select ncols('int32(:10)[1:1:1 2:2:2 3:3:3]'::matrix);
 
+```
+Get number of stored values from a matrix with unbounded rows and bounded columns.
+```
 select nvals('int32(:10)[1:1:1 2:2:2 3:3:3]'::matrix);
 
+```
+Get number of rows from a fully bounded matrix.
+```
 select nrows('int32(10:10)[1:1:1 2:2:2 3:3:3]'::matrix);
 
+```
+Get number of columns from a fully bounded matrix.
+```
 select ncols('int32(10:10)[1:1:1 2:2:2 3:3:3]'::matrix);
 
+```
+Get number of stored values from a fully bounded matrix.
+```
 select nvals('int32(10:10)[1:1:1 2:2:2 3:3:3]'::matrix);
+
+```
+## Matrix Assignment
+
+The assign operation allows setting a submatrix within a matrix.
+```
+
+```
+Basic assign: replace elements at specific indices
+```
+select print(assign('int32(10:10)[0:0:1 2:2:3 4:4:5]'::matrix, 'int32(3:3)[0:0:10 1:1:20 2:2:30]'::matrix, array[5,6,7]::bigint[], array[5,6,7]::bigint[]));
+
+```
+Assign with mask
+```
+select print(assign('int32(10:10)[0:0:1 2:2:3 4:4:5]'::matrix, 'int32(3:3)[0:0:10 1:1:20 2:2:30]'::matrix, array[1,3,5]::bigint[], array[1,3,5]::bigint[], mask=>'int32(10:10)[1:1:1 3:3:1 5:5:1]'::matrix, descr=>'r'));
+
+```
+Assign scalar to indices
+```
+select print(assign('int32(10:10)[0:0:1 2:2:3 4:4:5]'::matrix, 99::int, array[2,4,6]::bigint[], array[2,4,6]::bigint[]));
+
+```
+Assign with accumulator
+```
+select print(assign('int32(10:10)[0:0:1 2:2:3 4:4:5 6:6:7]'::matrix, 'int32(3:3)[0:0:10 1:1:20 2:2:30]'::matrix, array[0,2,4]::bigint[], array[0,2,4]::bigint[], accum=>'plus_int32'::binaryop));
+
+```
+Assign empty submatrix
+```
+select print(assign('int32(10:10)[0:0:1 2:2:3 4:4:5]'::matrix, 'int32(0:0)[]'::matrix, array[]::bigint[], array[]::bigint[]));
+
+```
+Assign to empty matrix
+```
+select print(assign('int32(10:10)[]'::matrix, 'int32(3:3)[0:0:10 1:1:20 2:2:30]'::matrix, array[1,3,5]::bigint[], array[1,3,5]::bigint[]));
+
+```
+## Matrix Extraction
+
+The extract operation extracts a submatrix from a matrix.
+```
+
+```
+Basic extract: get specific row/column indices
+```
+select print(extract_matrix('int32(5:5)[0:0:10 1:1:20 2:2:30 3:3:40 4:4:50]'::matrix, array[1,3]::bigint[], array[1,3]::bigint[]));
+
+```
+Extract with indices array
+```
+select print(extract_matrix('int32(5:5)[0:0:1 1:1:2 2:2:3 3:3:4 4:4:5]'::matrix, array[0,2,4]::bigint[], array[0,2,4]::bigint[]));
+
+```
+Extract single element as matrix
+```
+select print(extract_matrix('int32(5:5)[0:0:10 1:1:20 2:2:30]'::matrix, array[1]::bigint[], array[1]::bigint[]));
+
+```
+Extract all diagonal elements
+```
+select print(extract_matrix('int32(5:5)[0:0:10 1:1:20 2:2:30 3:3:40 4:4:50]'::matrix, array[0,1,2,3,4]::bigint[], array[0,1,2,3,4]::bigint[]));
+
+```
+Extract with mask
+```
+select print(extract_matrix('int32(5:5)[0:0:10 1:1:20 2:2:30 3:3:40 4:4:50]'::matrix, array[0,1,2,3,4]::bigint[], array[0,1,2,3,4]::bigint[], mask=>'int32(5:5)[0:0:1 2:2:1 4:4:1]'::matrix));
+
+```
+Extract from sparse matrix
+```
+select print(extract_matrix('int32(20:20)[5:5:100 10:10:200 15:15:300]'::matrix, array[5,10,15]::bigint[], array[5,10,15]::bigint[]));
+
+```
+## Element Manipulation
+
+Operations for checking and removing individual elements.
+```
+
+```
+Check if matrix contains element at position
+```
+select contains('int32(5:5)[0:0:1 2:2:3 4:4:5]'::matrix, 0, 0);
+select contains('int32(5:5)[0:0:1 2:2:3 4:4:5]'::matrix, 1, 1);
+select contains('int32(5:5)[0:0:1 2:2:3 4:4:5]'::matrix, 2, 2);
+
+```
+Check multiple positions
+```
+select i, j, contains('int32(5:5)[0:0:1 2:2:3 4:4:5]'::matrix, i, j) as present
+from generate_series(0, 4) as i, generate_series(0, 4) as j
+where i = j;
+
+```
+Remove element from matrix
+```
+select print(remove_element('int32(5:5)[0:0:1 1:1:2 2:2:3 3:3:4]'::matrix, 1, 1));
+
+```
+Remove multiple elements
+```
+select print(remove_element(
+    remove_element('int32(5:5)[0:0:1 1:1:2 2:2:3 3:3:4]'::matrix, 1, 1),
+    3, 3
+));
+
+```
+Remove non-existent element (no-op)
+```
+select print(remove_element('int32(5:5)[0:0:1 2:2:3 4:4:5]'::matrix, 1, 1));
+
+```
+## Matrix Norms
+
+Calculate various norms of matrices.
+```
+
+select norm('fp64(3:3)[0:0:3.0 1:1:-4.0 2:2:5.0]'::matrix);
+
+```
+Norm of sparse matrix
+```
+select norm('fp64(100:100)[10:10:3.0 50:50:4.0 90:90:5.0]'::matrix);
+
+```
+Norm of empty matrix
+```
+select norm('fp64(5:5)[]'::matrix);
+
+```
+Norm of single element
+```
+select norm('fp64(3:3)[1:1:5.0]'::matrix);
+
+```
+## Matrix Comparison Select
+
+Use comparison operators with choose/select operations.
+```
+
+```
+Select elements greater than threshold
+```
+select print(choose('int32(5:5)[0:0:10 1:1:20 2:2:5 3:3:30 4:4:15]'::matrix, 'valuegt_int32'::indexunaryop, 10::int));
+
+```
+Select elements less than threshold
+```
+select print(choose('int32(5:5)[0:0:10 1:1:20 2:2:5 3:3:30 4:4:15]'::matrix, 'valuelt_int32'::indexunaryop, 10::int));
+
+```
+Select elements greater than or equal to threshold
+```
+select print(choose('int32(5:5)[0:0:10 1:1:20 2:2:15 3:3:30 4:4:15]'::matrix, 'valuege_int32'::indexunaryop, 20::int));
+
+```
+Select elements less than or equal to threshold
+```
+select print(choose('int32(5:5)[0:0:10 1:1:20 2:2:15 3:3:30 4:4:15]'::matrix, 'valuele_int32'::indexunaryop, 20::int));
+
+```
+Select non-zero elements
+```
+select print(choose('int32(5:5)[0:0:10 1:1:0 2:2:5 3:3:0 4:4:15]'::matrix, 'valuene_int32'::indexunaryop, 0::int));
+
+```
+Select equal elements
+```
+select print(choose('int32(5:5)[0:0:10 1:1:20 2:2:15 3:3:30 4:4:15]'::matrix, 'valueeq_int32'::indexunaryop, 15::int));
+
+```
+Comparison with float matrices
+```
+select print(choose('fp64(4:4)[0:0:1.5 1:1:2.5 2:2:1.0 3:3:3.5]'::matrix, 'valuegt_fp64'::indexunaryop, 2.0::double precision));
+
+```
+## Matrix Cast
+
+Type conversion between matrix types.
+```
+
+```
+Cast int32 to int64
+```
+select cast_to('int32(3:3)[0:0:1 1:1:2 2:2:3]'::matrix, 'int64');
+
+```
+Cast int32 to float
+```
+select cast_to('int32(3:3)[0:0:1 1:1:2 2:2:3]'::matrix, 'fp64');
+
+```
+Cast float to int (truncates)
+```
+select cast_to('fp64(3:3)[0:0:1.7 1:1:2.3 2:2:3.9]'::matrix, 'int32');
+
+```
+Cast between integer sizes
+```
+select cast_to('int64(3:3)[0:0:100 1:1:200 2:2:300]'::matrix, 'int32');
+select cast_to('int32(3:3)[0:0:1 1:1:2 2:2:3]'::matrix, 'int16');
+
+```
+Cast bool to int
+```
+select cast_to('bool(3:3)[0:0:true 1:1:false 2:2:true]'::matrix, 'int32');
+
+```
+Cast int to bool (0=false, non-zero=true)
+```
+select cast_to('int32(4:4)[0:0:0 1:1:1 2:2:5 3:3:0]'::matrix, 'bool');
+
+```
+Cast preserves sparsity
+```
+select nrows(cast_to('int32(100:100)[10:10:5 50:50:10 90:90:15]'::matrix, 'fp64'));
+
+```
+## Matrix Resize
+
+Change the dimension bounds of a matrix.
+```
+
+```
+Resize to larger size
+```
+select nrows(resize('int32(10:10)[0:0:1 2:2:3 4:4:5]'::matrix, 20, 20));
+
+```
+Resize to smaller size (keeps elements that fit)
+```
+select print(resize('int32(10:10)[0:0:1 2:2:3 4:4:5 8:8:9]'::matrix, 5, 5));
+
+```
+Resize unbounded matrix
+```
+select nrows(resize('int32[0:0:1 2:2:3 4:4:5]'::matrix, 10, 10));
+
+```
+Resize to same size (no-op)
+```
+select print(resize('int32(10:10)[0:0:1 2:2:3 4:4:5]'::matrix, 10, 10));
+
+```
+Resize empty matrix
+```
+select nrows(resize('int32(10:10)[]'::matrix, 20, 20));
+
+```
+## Matrix Info
+
+Get internal SuiteSparse information about matrices.
+```
+
+```
+Basic info
+```
+select info('int32(5:5)[0:0:1 1:1:2 2:2:3]'::matrix);
+
+```
+Info on sparse matrix
+```
+select info('int32(1000:1000)[10:10:5 500:500:10 990:990:15]'::matrix);
+
+```
+Info on empty matrix
+```
+select info('int32(10:10)[]'::matrix);
+
+```
+## Matrix Aggregation
+
+Aggregate table data into matrices.
+```
+
+```
+Create test table for aggregation
+```
+create temporary table mat_agg_test (row_idx bigint, col_idx bigint, val integer);
+insert into mat_agg_test values (0, 0, 10), (1, 1, 20), (2, 2, 30), (0, 1, 15);
+
+```
+Aggregate into matrix
+```
+select matrix_agg(row_idx, col_idx, val) from mat_agg_test;
+
+```
+Aggregate empty table
+```
+delete from mat_agg_test;
+select matrix_agg(row_idx, col_idx, val) from mat_agg_test;
+
+```
+Aggregate with different types
+```
+create temporary table mat_agg_float (row_idx bigint, col_idx bigint, val double precision);
+insert into mat_agg_float values (0, 0, 1.5), (1, 1, 2.5), (2, 2, 3.5);
+select matrix_agg(row_idx, col_idx, val) from mat_agg_float;
+
+```
+Aggregate bool values
+```
+create temporary table mat_agg_bool (row_idx bigint, col_idx bigint, val boolean);
+insert into mat_agg_bool values (0, 0, true), (1, 1, false), (2, 2, true), (0, 1, false);
+select matrix_agg(row_idx, col_idx, val) from mat_agg_bool;
+
+drop table mat_agg_test;
+drop table mat_agg_float;
+drop table mat_agg_bool;
+
+```
+## Descriptor Basics
+
+Test basic descriptor construction and properties.
+```
+
+```
+Get descriptor name
+```
+select name('s'::descriptor);
+select name('c'::descriptor);
+select name('r'::descriptor);
+
+```
+## Structural Mask Descriptor (s)
+
+Structural masks use only the pattern (which indices exist),
+ignoring actual values.
+```
+
+```
+Value mask (default): false values block updates
+```
+select print(apply('int32(5:5)[0:0:10 1:1:20 2:2:30 3:3:40 4:4:50]'::matrix,
+    'ainv_int32'::unaryop,
+    mask=>'bool(5:5)[0:0:true 1:1:false 2:2:true 3:3:false 4:4:true]'::matrix));
+
+```
+Structural mask (s): all existing positions allow updates, regardless of value
+```
+select print(apply('int32(5:5)[0:0:10 1:1:20 2:2:30 3:3:40 4:4:50]'::matrix,
+    'ainv_int32'::unaryop,
+    mask=>'bool(5:5)[0:0:true 1:1:false 2:2:true 3:3:false 4:4:true]'::matrix,
+    descr=>'s'::descriptor));
+
+```
+Structural mask with integer values (all non-empty positions)
+```
+select print(apply('int32(5:5)[0:0:10 1:1:20 2:2:30 3:3:40 4:4:50]'::matrix,
+    'abs_int32'::unaryop,
+    mask=>'int32(5:5)[0:0:0 1:1:100 2:2:0 3:3:200 4:4:0]'::matrix,
+    descr=>'s'::descriptor));
+
+```
+Compare: without structural, zeros might block
+```
+select print(apply('int32(5:5)[0:0:10 1:1:20 2:2:30 3:3:40 4:4:50]'::matrix,
+    'abs_int32'::unaryop,
+    mask=>'int32(5:5)[0:0:0 1:1:100 2:2:0 3:3:200 4:4:0]'::matrix));
+
+```
+Structural mask with eadd
+```
+select print(eadd('int32(5:5)[0:0:10 1:1:20 2:2:30]'::matrix,
+    'int32(5:5)[1:1:5 2:2:6 3:3:7]'::matrix,
+    'plus_int32'::binaryop,
+    mask=>'int32(5:5)[0:0:0 1:1:1 2:2:0 3:3:1]'::matrix,
+    descr=>'s'::descriptor));
+
+```
+Structural mask with emult
+```
+select print(emult('int32(5:5)[0:0:2 1:1:3 2:2:4 3:3:5 4:4:6]'::matrix,
+    'int32(5:5)[0:0:10 1:1:20 2:2:30 3:3:40 4:4:50]'::matrix,
+    'times_int32'::binaryop,
+    mask=>'bool(5:5)[0:0:false 1:1:true 2:2:false 3:3:true 4:4:false]'::matrix,
+    descr=>'s'::descriptor));
+
+```
+## Complement Mask Descriptor (c)
+
+Complement inverts the mask: masked positions become unmasked and vice versa.
+```
+
+```
+Normal mask: update positions 0, 2, 4
+```
+select print(apply('int32(5:5)[0:0:10 1:1:20 2:2:30 3:3:40 4:4:50]'::matrix,
+    'ainv_int32'::unaryop,
+    mask=>'int32(5:5)[0:0:1 2:2:1 4:4:1]'::matrix));
+
+```
+Complement mask: update positions 1, 3 (opposite of normal)
+```
+select print(apply('int32(5:5)[0:0:10 1:1:20 2:2:30 3:3:40 4:4:50]'::matrix,
+    'ainv_int32'::unaryop,
+    mask=>'int32(5:5)[0:0:1 2:2:1 4:4:1]'::matrix,
+    descr=>'c'::descriptor));
+
+```
+Complement with boolean mask
+```
+select print(apply('int32(5:5)[0:0:10 1:1:20 2:2:30 3:3:40 4:4:50]'::matrix,
+    'abs_int32'::unaryop,
+    mask=>'bool(5:5)[0:0:true 1:1:true 2:2:false 3:3:false 4:4:true]'::matrix,
+    descr=>'c'::descriptor));
+
+```
+Complement with empty mask (all positions updated)
+```
+select print(apply('int32(5:5)[0:0:10 1:1:20 2:2:30]'::matrix,
+    'abs_int32'::unaryop,
+    mask=>'int32(5:5)[]'::matrix,
+    descr=>'c'::descriptor));
+
+```
+Complement with full mask (no positions updated)
+```
+select print(apply('int32(5:5)[0:0:10 1:1:20 2:2:30 3:3:40 4:4:50]'::matrix,
+    'abs_int32'::unaryop,
+    mask=>'int32(5:5)[0:0:1 1:1:1 2:2:1 3:3:1 4:4:1]'::matrix,
+    descr=>'c'::descriptor));
+
+```
+Complement mask with eadd
+```
+select print(eadd('int32(5:5)[0:0:10 1:1:20 2:2:30]'::matrix,
+    'int32(5:5)[1:1:5 2:2:6 3:3:7]'::matrix,
+    'plus_int32'::binaryop,
+    mask=>'int32(5:5)[1:1:1 2:2:1]'::matrix,
+    descr=>'c'::descriptor));
+
+```
+Complement mask with emult
+```
+select print(emult('int32(5:5)[0:0:2 1:1:3 2:2:4 3:3:5 4:4:6]'::matrix,
+    'int32(5:5)[0:0:10 1:1:20 2:2:30 3:3:40 4:4:50]'::matrix,
+    'times_int32'::binaryop,
+    mask=>'int32(5:5)[0:0:1 2:2:1 4:4:1]'::matrix,
+    descr=>'c'::descriptor));
+
+```
+## Structural Complement Descriptor (sc)
+
+Combine structural and complement: use pattern (not values) and invert.
+```
+
+```
+sc descriptor: structural interpretation then complement
+```
+select print(apply('int32(5:5)[0:0:10 1:1:20 2:2:30 3:3:40 4:4:50]'::matrix,
+    'ainv_int32'::unaryop,
+    mask=>'int32(5:5)[0:0:0 2:2:0 4:4:100]'::matrix,
+    descr=>'sc'::descriptor));
+
+```
+Compare with just structural
+```
+select print(apply('int32(5:5)[0:0:10 1:1:20 2:2:30 3:3:40 4:4:50]'::matrix,
+    'ainv_int32'::unaryop,
+    mask=>'int32(5:5)[0:0:0 2:2:0 4:4:100]'::matrix,
+    descr=>'s'::descriptor));
+
+```
+Compare with just complement
+```
+select print(apply('int32(5:5)[0:0:10 1:1:20 2:2:30 3:3:40 4:4:50]'::matrix,
+    'ainv_int32'::unaryop,
+    mask=>'int32(5:5)[0:0:0 2:2:0 4:4:100]'::matrix,
+    descr=>'c'::descriptor));
+
+```
+sc with eadd
+```
+select print(eadd('int32(5:5)[0:0:10 1:1:20 2:2:30]'::matrix,
+    'int32(5:5)[1:1:5 2:2:6 3:3:7]'::matrix,
+    'plus_int32'::binaryop,
+    mask=>'int32(5:5)[0:0:0 1:1:0 2:2:1]'::matrix,
+    descr=>'sc'::descriptor));
+
+```
+## Replace Descriptor (r)
+
+Replace clears the output matrix before the operation, removing all
+existing values not produced by the operation.
+```
+
+```
+Without replace: existing values at unmasked positions remain
+```
+select print(apply('int32(5:5)[0:0:10 1:1:20 2:2:30 3:3:40 4:4:50]'::matrix,
+    'ainv_int32'::unaryop,
+    mask=>'int32(5:5)[0:0:1 2:2:1]'::matrix));
+
+```
+With replace: only masked result positions remain
+```
+select print(apply('int32(5:5)[0:0:10 1:1:20 2:2:30 3:3:40 4:4:50]'::matrix,
+    'ainv_int32'::unaryop,
+    mask=>'int32(5:5)[0:0:1 2:2:1]'::matrix,
+    descr=>'r'::descriptor));
+
+```
+Replace with sparse mask
+```
+select print(apply('int32(5:5)[0:0:10 1:1:20 2:2:30 3:3:40 4:4:50]'::matrix,
+    'abs_int32'::unaryop,
+    mask=>'int32(5:5)[1:1:1]'::matrix,
+    descr=>'r'::descriptor));
+
+```
+Replace with full mask (all results kept)
+```
+select print(apply('int32(5:5)[0:0:10 1:1:20 2:2:30 3:3:40 4:4:50]'::matrix,
+    'ainv_int32'::unaryop,
+    mask=>'int32(5:5)[0:0:1 1:1:1 2:2:1 3:3:1 4:4:1]'::matrix,
+    descr=>'r'::descriptor));
+
+```
+Replace with eadd
+```
+select print(eadd('int32(5:5)[0:0:10 1:1:20 2:2:30 3:3:40 4:4:50]'::matrix,
+    'int32(5:5)[1:1:5 2:2:6 3:3:7]'::matrix,
+    'plus_int32'::binaryop,
+    mask=>'int32(5:5)[1:1:1 2:2:1]'::matrix,
+    descr=>'r'::descriptor));
+
+```
+Replace with emult
+```
+select print(emult('int32(5:5)[0:0:2 1:1:3 2:2:4 3:3:5 4:4:6]'::matrix,
+    'int32(5:5)[0:0:10 1:1:20 2:2:30 3:3:40 4:4:50]'::matrix,
+    'times_int32'::binaryop,
+    mask=>'int32(5:5)[0:0:1 2:2:1 4:4:1]'::matrix,
+    descr=>'r'::descriptor));
+
+```
+## Combined Descriptors (rc, rs, rsc)
+
+Test combinations of replace with other descriptors.
+```
+
+```
+rc: replace + complement
+```
+select print(apply('int32(5:5)[0:0:10 1:1:20 2:2:30 3:3:40 4:4:50]'::matrix,
+    'ainv_int32'::unaryop,
+    mask=>'int32(5:5)[0:0:1 2:2:1]'::matrix,
+    descr=>'rc'::descriptor));
+
+```
+rs: replace + structural
+```
+select print(apply('int32(5:5)[0:0:10 1:1:20 2:2:30 3:3:40 4:4:50]'::matrix,
+    'abs_int32'::unaryop,
+    mask=>'int32(5:5)[0:0:0 2:2:100 4:4:0]'::matrix,
+    descr=>'rs'::descriptor));
+
+```
+rsc: replace + structural + complement
+```
+select print(apply('int32(5:5)[0:0:10 1:1:20 2:2:30 3:3:40 4:4:50]'::matrix,
+    'ainv_int32'::unaryop,
+    mask=>'int32(5:5)[1:1:0 3:3:0]'::matrix,
+    descr=>'rsc'::descriptor));
+
+```
+## Descriptors with Accumulators
+
+Test how descriptors interact with accumulator operations.
+```
+
+```
+Normal accumulation with mask
+```
+select print(apply('int32(5:5)[0:0:10 1:1:20 2:2:30 3:3:40 4:4:50]'::matrix,
+    'ainv_int32'::unaryop,
+    mask=>'int32(5:5)[0:0:1 2:2:1 4:4:1]'::matrix,
+    accum=>'plus_int32'::binaryop));
+
+```
+Accumulation with complement mask
+```
+select print(apply('int32(5:5)[0:0:10 1:1:20 2:2:30 3:3:40 4:4:50]'::matrix,
+    'ainv_int32'::unaryop,
+    mask=>'int32(5:5)[0:0:1 2:2:1 4:4:1]'::matrix,
+    accum=>'plus_int32'::binaryop,
+    descr=>'c'::descriptor));
+
+```
+Accumulation with structural mask
+```
+select print(apply('int32(5:5)[0:0:10 1:1:20 2:2:30 3:3:40 4:4:50]'::matrix,
+    'abs_int32'::unaryop,
+    mask=>'int32(5:5)[0:0:0 2:2:1 4:4:0]'::matrix,
+    accum=>'times_int32'::binaryop,
+    descr=>'s'::descriptor));
+
+```
+Accumulation with replace
+```
+select print(apply('int32(5:5)[0:0:10 1:1:20 2:2:30 3:3:40 4:4:50]'::matrix,
+    'ainv_int32'::unaryop,
+    mask=>'int32(5:5)[0:0:1 2:2:1]'::matrix,
+    accum=>'plus_int32'::binaryop,
+    descr=>'r'::descriptor));
+
+```
+## Basic Masking with apply()
+
+The mask parameter controls which elements of the output are written.
+```
+
+```
+Apply with mask: only masked positions are updated
+```
+select print(apply('int32(5:5)[0:0:1 1:1:2 2:2:3 3:3:4 4:4:5]'::matrix, 'abs_int32'::unaryop,
+    mask=>'int32(5:5)[0:0:1 2:2:1 4:4:1]'::matrix));
+
+```
+Apply with dense mask
+```
+select print(apply('int32(5:5)[0:0:10 1:1:20 2:2:30 3:3:40 4:4:50]'::matrix, 'ainv_int32'::unaryop,
+    mask=>'int32(5:5)[0:0:1 1:1:1 2:2:1 3:3:1 4:4:1]'::matrix));
+
+```
+Apply with empty mask (nothing updated)
+```
+select print(apply('int32(5:5)[0:0:10 1:1:20 2:2:30]'::matrix, 'abs_int32'::unaryop,
+    mask=>'int32(5:5)[]'::matrix));
+
+```
+Apply with sparse mask
+```
+select print(apply('int32(5:5)[0:0:1 1:1:2 2:2:3 3:3:4 4:4:5]'::matrix, 'minv_int32'::unaryop,
+    mask=>'int32(5:5)[1:1:1 3:3:1]'::matrix));
+
+```
+Apply with boolean mask
+```
+select print(apply('int32(5:5)[0:0:10 1:1:20 2:2:30 3:3:40 4:4:50]'::matrix, 'abs_int32'::unaryop,
+    mask=>'bool(5:5)[0:0:true 2:2:true 4:4:true]'::matrix));
+
+```
+## Masking with eadd()
+
+Mask controls which elements participate in the element-wise operation.
+```
+
+```
+Element-wise add with mask
+```
+select print(eadd('int32(5:5)[0:0:10 1:1:20 2:2:30]'::matrix,
+    'int32(5:5)[1:1:5 2:2:6 3:3:7]'::matrix,
+    'plus_int32'::binaryop,
+    mask=>'int32(5:5)[1:1:1 2:2:1]'::matrix));
+
+```
+Element-wise add with full mask
+```
+select print(eadd('int32(5:5)[0:0:1 1:1:2 2:2:3 3:3:4 4:4:5]'::matrix,
+    'int32(5:5)[0:0:10 1:1:20 2:2:30 3:3:40 4:4:50]'::matrix,
+    'times_int32'::binaryop,
+    mask=>'int32(5:5)[0:0:1 1:1:1 2:2:1 3:3:1 4:4:1]'::matrix));
+
+```
+## Masking with emult()
+
+Mask filters the element-wise multiplication result.
+```
+
+```
+Element-wise multiply with mask
+```
+select print(emult('int32(5:5)[0:0:2 1:1:3 2:2:4 3:3:5 4:4:6]'::matrix,
+    'int32(5:5)[0:0:10 1:1:20 2:2:30 3:3:40 4:4:50]'::matrix,
+    'times_int32'::binaryop,
+    mask=>'int32(5:5)[0:0:1 2:2:1 4:4:1]'::matrix));
+
+```
+Element-wise multiply with boolean mask
+```
+select print(emult('fp64(5:5)[0:0:1.5 1:1:2.5 2:2:3.5 3:3:4.5 4:4:5.5]'::matrix,
+    'fp64(5:5)[0:0:2.0 1:1:3.0 2:2:4.0 3:3:5.0 4:4:6.0]'::matrix,
+    'times_fp64'::binaryop,
+    mask=>'bool(5:5)[0:0:true 1:1:true 2:2:false 3:3:true 4:4:false]'::matrix));
+
+```
+Element-wise multiply with min operator and mask
+```
+select print(emult('int32(5:5)[0:0:100 1:1:200 2:2:50 3:3:300 4:4:25]'::matrix,
+    'int32(5:5)[0:0:150 1:1:100 2:2:75 3:3:250 4:4:50]'::matrix,
+    'min_int32'::binaryop,
+    mask=>'int32(5:5)[1:1:1 3:3:1]'::matrix));
+
+```
+## Masking with eunion()
+
+eunion uses default values for missing elements.
+```
+
+```
+Element-wise union with mask
+```
+select print(eunion('int32(5:5)[0:0:10 2:2:30]'::matrix,
+    0::int,
+    'int32(5:5)[1:1:20 3:3:40]'::matrix,
+    0::int,
+    'plus_int32'::binaryop,
+    mask=>'int32(5:5)[0:0:1 1:1:1 2:2:1]'::matrix));
+
+```
+## Masking with select/choose()
+
+Combine selection with masking for complex filtering.
+```
+
+```
+Select with mask
+```
+select print(choose('int32(5:5)[0:0:10 1:1:20 2:2:5 3:3:30 4:4:15]'::matrix,
+    'valuegt_int32'::indexunaryop,
+    15::int,
+    mask=>'int32(5:5)[0:0:1 1:1:1 2:2:1 3:3:1 4:4:1]'::matrix));
+
+```
+Select with boolean mask
+```
+select print(choose('fp64(5:5)[0:0:1.5 1:1:2.5 2:2:1.0 3:3:3.5 4:4:2.0]'::matrix,
+    'valuege_fp64'::indexunaryop,
+    2.0::double precision,
+    mask=>'bool(5:5)[0:0:true 2:2:true 4:4:true]'::matrix));
+
+```
+## Structural vs Value Masks
+
+Structural masks consider only the pattern (which indices exist),
+not the actual values.
+```
+
+```
+Structural mask: only considers which positions exist
+```
+select print(apply('int32(5:5)[0:0:10 1:1:20 2:2:30 3:3:40 4:4:50]'::matrix,
+    'ainv_int32'::unaryop,
+    mask=>'bool(5:5)[0:0:true 2:2:true 4:4:true]'::matrix,
+    descr=>'s'::descriptor));
+
+```
+Structural mask with integer matrix
+```
+select print(apply('int32(5:5)[0:0:10 1:1:20 2:2:30 3:3:40 4:4:50]'::matrix,
+    'abs_int32'::unaryop,
+    mask=>'int32(5:5)[1:1:100 3:3:200 4:4:0]'::matrix,
+    descr=>'s'::descriptor));
+
+```
+## Mask Type Compatibility
+
+Test masks of different types with matrices.
+```
+
+```
+int32 matrix with int64 mask
+```
+select print(apply('int32(5:5)[0:0:10 1:1:20 2:2:30 3:3:40 4:4:50]'::matrix,
+    'abs_int32'::unaryop,
+    mask=>'int64(5:5)[0:0:1 2:2:1 4:4:1]'::matrix));
+
+```
+fp64 matrix with bool mask
+```
+select print(apply('fp64(5:5)[0:0:1.5 1:1:2.5 2:2:3.5 3:3:4.5 4:4:5.5]'::matrix,
+    'abs_fp64'::unaryop,
+    mask=>'bool(5:5)[0:0:true 2:2:true 4:4:true]'::matrix));
+
+```
+fp64 matrix with int32 mask
+```
+select print(apply('fp64(5:5)[0:0:1.5 1:1:2.5 2:2:3.5 3:3:4.5 4:4:5.5]'::matrix,
+    'ainv_fp64'::unaryop,
+    mask=>'int32(5:5)[1:1:1 3:3:1]'::matrix));
+
+```
+## Edge Cases
+
+Test boundary conditions for masks.
+```
+
+```
+Empty matrix with non-empty mask
+```
+select print(apply('int32(5:5)[]'::matrix,
+    'abs_int32'::unaryop,
+    mask=>'int32(5:5)[0:0:1 2:2:1 4:4:1]'::matrix));
+
+```
+Non-empty matrix with empty mask
+```
+select print(apply('int32(5:5)[0:0:10 1:1:20 2:2:30]'::matrix,
+    'abs_int32'::unaryop,
+    mask=>'int32(5:5)[]'::matrix));
+
+```
+## Boolean Matrix Operations
+
+Test boolean-specific operations and logic.
+```
+
+```
+Boolean construction
+```
+select 'bool(5:5)[0:0:true 1:1:false 2:2:true 3:3:false 4:4:true]'::matrix;
+select 'bool(5:5)[0:0:t 1:1:f 2:2:t 3:3:f 4:4:t]'::matrix;
+
+```
+Boolean element-wise OR
+```
+select print(eadd('bool(5:5)[0:0:true 1:1:false 2:2:true]'::matrix,
+    'bool(5:5)[0:0:false 1:1:true 2:2:true]'::matrix,
+    'lor'::binaryop));
+
+```
+Boolean element-wise AND
+```
+select print(emult('bool(5:5)[0:0:true 1:1:false 2:2:true 3:3:true 4:4:false]'::matrix,
+    'bool(5:5)[0:0:true 1:1:true 2:2:false 3:3:true 4:4:false]'::matrix,
+    'land'::binaryop));
+
+```
+Boolean element-wise XOR
+```
+select print(eadd('bool(5:5)[0:0:true 1:1:false 2:2:true]'::matrix,
+    'bool(5:5)[0:0:false 1:1:false 2:2:true]'::matrix,
+    'lxor'::binaryop));
+
+```
+Boolean element-wise XNOR
+```
+select print(eadd('bool(5:5)[0:0:true 1:1:false 2:2:true]'::matrix,
+    'bool(5:5)[0:0:false 1:1:false 2:2:true]'::matrix,
+    'eq_bool'::binaryop));
+
+```
+Boolean NOT (unary complement)
+```
+select print(apply('bool(5:5)[0:0:true 1:1:false 2:2:true 3:3:false 4:4:true]'::matrix,
+    'lnot'::unaryop));
+
+```
+Boolean reduction with OR (any true?)
+```
+select reduce_scalar('bool(3:3)[0:0:false 1:1:false 2:2:true]'::matrix,
+    'lor_monoid_bool'::monoid);
+select reduce_scalar('bool(3:3)[0:0:false 1:1:false 2:2:false]'::matrix,
+    'lor_monoid_bool'::monoid);
+
+```
+Boolean reduction with AND (all true?)
+```
+select reduce_scalar('bool(3:3)[0:0:true 1:1:true 2:2:true]'::matrix,
+    'land_monoid_bool'::monoid);
+select reduce_scalar('bool(3:3)[0:0:true 1:1:false 2:2:true]'::matrix,
+    'land_monoid_bool'::monoid);
+
+```
+Boolean reduction with XOR (parity)
+```
+select reduce_scalar('bool(3:3)[0:0:true 1:1:true 2:2:true]'::matrix,
+    'lxor_monoid_bool'::monoid);
+select reduce_scalar('bool(3:3)[0:0:true 1:1:false 2:2:true]'::matrix,
+    'lxor_monoid_bool'::monoid);
+
+```
+Boolean to integer conversion
+```
+select cast_to('bool(4:4)[0:0:true 1:1:false 2:2:true 3:3:false]'::matrix, 'int32');
+
+```
+Integer to boolean conversion
+```
+select cast_to('int32(5:5)[0:0:0 1:1:1 2:2:5 3:3:0 4:4:-1]'::matrix, 'bool');
+
+```
+Boolean comparisons (equal/not equal)
+```
+select print(eadd('bool(5:5)[0:0:true 1:1:false 2:2:true]'::matrix,
+    'bool(5:5)[0:0:true 1:1:true 2:2:false]'::matrix,
+    'eq_bool'::binaryop));
+
+```
+## Float32 (fp32) Special Values
+
+Test float-specific edge cases and special values.
+```
+
+```
+Infinity values
+```
+select 'fp32(5:5)[0:0:Infinity 1:1:-Infinity 2:2:1.5]'::matrix;
+
+```
+NaN (Not a Number)
+```
+select 'fp32(5:5)[0:0:NaN 1:1:1.5 2:2:2.5]'::matrix;
+
+```
+Signed zeros
+```
+select 'fp32(5:5)[0:0:0.0 1:1:-0.0 2:2:1.5]'::matrix;
+
+```
+Very large values (near max)
+```
+select 'fp32(3:3)[0:0:3.40282e+38 1:1:-3.40282e+38 2:2:1.0]'::matrix;
+
+```
+Operations with Infinity
+```
+select print(apply('fp32(3:3)[0:0:1.0 1:1:2.0 2:2:3.0]'::matrix,
+    'Infinity'::float4::scalar::float4,
+    'plus_fp32'::binaryop));
+select print(apply('fp32(3:3)[0:0:1.0 1:1:2.0 2:2:3.0]'::matrix,
+    'Infinity'::float4::scalar::float4,
+    'times_fp32'::binaryop));
+
+```
+Operations with NaN (NaN propagates)
+```
+select print(apply('fp32(3:3)[0:0:1.0 1:1:2.0 2:2:3.0]'::matrix,
+    'NaN'::float4::scalar::float4,
+    'plus_fp32'::binaryop));
+
+```
+Reduction with NaN
+```
+select reduce_scalar('fp32(3:3)[0:0:1.0 1:1:NaN 2:2:3.0]'::matrix,
+    'plus_monoid_fp32'::monoid);
+
+```
+Min/max with special values
+```
+select reduce_scalar('fp32(3:3)[0:0:-Infinity 1:1:1.0 2:2:Infinity]'::matrix,
+    'max_monoid_fp32'::monoid);
+select reduce_scalar('fp32(3:3)[0:0:-Infinity 1:1:1.0 2:2:Infinity]'::matrix,
+    'min_monoid_fp32'::monoid);
+
+```
+## Float64 (fp64) Special Values
+
+Test double-precision float edge cases.
+```
+
+```
+Infinity values
+```
+select 'fp64(5:5)[0:0:Infinity 1:1:-Infinity 2:2:1.5 3:3:2.5 4:4:3.5]'::matrix;
+
+```
+NaN values
+```
+select 'fp64(5:5)[0:0:NaN 1:1:1.5 2:2:2.5 3:3:3.5 4:4:4.5]'::matrix;
+
+```
+Signed zeros
+```
+select 'fp64(5:5)[0:0:0.0 1:1:-0.0 2:2:1.5]'::matrix;
+
+```
+Very large values (near max)
+```
+select 'fp64(3:3)[0:0:1.7976931348623157e+308 1:1:-1.7976931348623157e+308 2:2:1.0]'::matrix;
+
+```
+Very small values (near min positive)
+```
+select 'fp64(3:3)[0:0:2.2250738585072014e-308 1:1:1.0 2:2:2.0]'::matrix;
+
+```
+High precision values
+```
+select 'fp64(3:3)[0:0:3.141592653589793 1:1:2.718281828459045 2:2:1.414213562373095]'::matrix;
+
+```
+Operations with Infinity
+```
+select print(eadd('fp64(3:3)[0:0:1.0 1:1:Infinity 2:2:3.0]'::matrix,
+    'fp64(3:3)[0:0:2.0 1:1:4.0 2:2:-Infinity]'::matrix,
+    'plus_fp64'::binaryop));
+
+```
+Very large number operations
+```
+select reduce_scalar('fp64(3:3)[0:0:1e100 1:1:1e100 2:2:1e100]'::matrix,
+    'plus_fp64'::monoid);
+
+```
+## Type Casting and Promotion
+
+Test type conversions between matrix types.
+```
+
+```
+Int to float (exact for small ints)
+```
+select cast_to('int32(5:5)[0:0:1 1:1:2 2:2:3 3:3:4 4:4:5]'::matrix, 'fp64');
+select cast_to('int32(3:3)[0:0:100 1:1:200 2:2:300]'::matrix, 'fp32');
+
+```
+Float to int (truncation)
+```
+select cast_to('fp64(5:5)[0:0:1.9 1:1:2.1 2:2:3.5 3:3:-1.9 4:4:-2.1]'::matrix, 'int32');
+select cast_to('fp32(3:3)[0:0:3.7 1:1:-3.7 2:2:0.5]'::matrix, 'int32');
+
+```
+Large int to float (may lose precision)
+```
+select cast_to('int64(2:2)[0:0:9007199254740992 1:1:9007199254740993]'::matrix, 'fp64');
+
+```
+Int size conversions
+```
+select cast_to('int32(3:3)[0:0:100 1:1:200 2:2:300]'::matrix, 'int64');
+select cast_to('int32(3:3)[0:0:100 1:1:200 2:2:300]'::matrix, 'int16');
+select cast_to('int64(3:3)[0:0:1000 1:1:2000 2:2:3000]'::matrix, 'int32');
+
+```
+Float precision conversions
+```
+select cast_to('fp64(2:2)[0:0:3.141592653589793 1:1:2.718281828459045]'::matrix, 'fp32');
+select cast_to('fp32(2:2)[0:0:3.14159 1:1:2.71828]'::matrix, 'fp64');
 ```
