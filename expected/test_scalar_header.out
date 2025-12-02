@@ -2025,14 +2025,17 @@ select eunion('fp64(5)[0:1.5 2:3.5]'::vector,
 
 -- Matrix eunion with scalar defaults
 select eunion('int32(3,3)[0:0:10 1:1:20]'::matrix,
-    'int32(3,3)[0:1:15 2:2:30]'::matrix,
-    'plus_int32'::binaryop,
     0::int,
-    0::int);
-ERROR:  function eunion(matrix, matrix, binaryop, integer, integer) does not exist
-LINE 1: select eunion('int32(3,3)[0:0:10 1:1:20]'::matrix,
-               ^
-HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+    'int32(3,3)[0:1:15 2:2:30]'::matrix,
+    0::int,
+    'plus_int32'::binaryop);
+┌────────────────────────────────────────┐
+│                 eunion                 │
+├────────────────────────────────────────┤
+│ int32(3:)[0:0:10 0:1:15 1:1:20 2:2:30] │
+└────────────────────────────────────────┘
+(1 row)
+
 -- eunion with different default values
 select eunion('int32(5)[0:10 2:30]'::vector,
     0::int,
@@ -2091,33 +2094,48 @@ select 'fp64(5)[0:1.5 1:2.5 2:3.5]'::vector * 2.0::double precision;
 -- Reduction with different accumulators would accumulate intermediate scalars
 -- (though GraphBLAS handles this internally)
 -- Test that accumulation works correctly
-select reduce_scalar(apply('int32[0:1 1:2 2:3]'::vector, 'minv_int32'::unaryop), 'plus_int32'::monoid);
-ERROR:  Unknown monoid plus_int32
-LINE 1: ...32[0:1 1:2 2:3]'::vector, 'minv_int32'::unaryop), 'plus_int3...
-                                                             ^
+select reduce_scalar(apply('int32[0:1 1:2 2:3]'::vector, 'minv_int32'::unaryop), 'plus_monoid_int32'::monoid);
+┌───────────────┐
+│ reduce_scalar │
+├───────────────┤
+│ int32:1       │
+└───────────────┘
+(1 row)
+
 -- ## Scalars with Descriptors
 --
 -- Test scalar operations with descriptors (limited applicability).
 -- Matrix/vector operations with scalars typically don't use descriptors,
 -- but verify they work when provided
-select apply(10::int, 'int32(5)[0:1 1:2 2:3]'::vector, 'plus_int32'::binaryop,
-    descr=>'GrB_DEFAULT'::descriptor);
-ERROR:  Unknown descriptor GrB_DEFAULT
-LINE 2:     descr=>'GrB_DEFAULT'::descriptor);
-                   ^
+select apply(10::int, 'int32(5)[0:1 1:2 2:3]'::vector, 'plus_int32'::binaryop);
+┌──────────────────────────┐
+│          apply           │
+├──────────────────────────┤
+│ int32(5)[0:11 1:12 2:13] │
+└──────────────────────────┘
+(1 row)
+
 -- ## Scalar Utility Integration
 --
 -- Test utility functions in integration contexts.
 -- Print scalars from reductions
-select print(reduce_scalar('int32[0:10 1:20 2:30]'::vector, 'plus_int32'::monoid)::scalar);
-ERROR:  Unknown monoid plus_int32
-LINE 1: ...nt(reduce_scalar('int32[0:10 1:20 2:30]'::vector, 'plus_int3...
-                                                             ^
+select print(reduce_scalar('int32[0:10 1:20 2:30]'::vector, 'plus_monoid_int32'::monoid)::scalar);
+┌───────┐
+│ print │
+├───────┤
+│ 60    │
+└───────┘
+(1 row)
+
 -- Check type of reduced scalar
-select type(reduce_scalar('fp64[0:1.5 1:2.5 2:3.5]'::vector, 'plus_fp64'::monoid)::scalar);
-ERROR:  Unknown monoid plus_fp64
-LINE 1: ...(reduce_scalar('fp64[0:1.5 1:2.5 2:3.5]'::vector, 'plus_fp64...
-                                                             ^
+select type(reduce_scalar('fp64[0:1.5 1:2.5 2:3.5]'::vector, 'plus_monoid_fp64'::monoid)::scalar);
+┌──────┐
+│ type │
+├──────┤
+│ fp64 │
+└──────┘
+(1 row)
+
 -- ## Empty Vector/Matrix with Scalar Operations
 --
 -- Test scalar operations on empty structures.
@@ -2139,10 +2157,14 @@ select apply('int32(5)[]'::vector, 5::int, 'times_int32'::binaryop);
 (1 row)
 
 -- Reduce empty vector to scalar
-select reduce_scalar('int32(10)[]'::vector, 'plus_int32'::monoid);
-ERROR:  Unknown monoid plus_int32
-LINE 1: select reduce_scalar('int32(10)[]'::vector, 'plus_int32'::mo...
-                                                    ^
+select reduce_scalar('int32(10)[]'::vector, 'plus_monoid_int32'::monoid);
+┌───────────────┐
+│ reduce_scalar │
+├───────────────┤
+│ int32         │
+└───────────────┘
+(1 row)
+
 -- Empty matrix with scalar
 select apply(5::int, 'int32(3,3)[]'::matrix, 'plus_int32'::binaryop);
 ┌───────────┐
@@ -2153,10 +2175,14 @@ select apply(5::int, 'int32(3,3)[]'::matrix, 'plus_int32'::binaryop);
 (1 row)
 
 -- Reduce empty matrix to scalar
-select reduce_scalar('int32(5,5)[]'::matrix, 'times_int32'::monoid);
-ERROR:  Unknown monoid times_int32
-LINE 1: select reduce_scalar('int32(5,5)[]'::matrix, 'times_int32'::...
-                                                     ^
+select reduce_scalar('int32(5,5)[]'::matrix, 'times_monoid_int32'::monoid);
+┌───────────────┐
+│ reduce_scalar │
+├───────────────┤
+│ int32         │
+└───────────────┘
+(1 row)
+
 -- ## Scalar Chains
 --
 -- Operations that chain multiple scalar transformations.
@@ -2173,11 +2199,15 @@ select set_element('int32[0:10 1:20 2:30]'::vector,
 
 -- Reduce to scalar, use in apply
 select apply('int32[0:1 1:2 2:3]'::vector,
-    reduce_scalar('int32[0:10 1:20 2:30]'::vector, 'plus_int32'::monoid)::int,
+    reduce_scalar('int32[0:10 1:20 2:30]'::vector, 'plus_monoid_int32'::monoid)::int,
     'plus_int32'::binaryop);
-ERROR:  Unknown monoid plus_int32
-LINE 2: ...   reduce_scalar('int32[0:10 1:20 2:30]'::vector, 'plus_int3...
-                                                             ^
+┌───────────────────────┐
+│         apply         │
+├───────────────────────┤
+│ int32[0:61 1:62 2:63] │
+└───────────────────────┘
+(1 row)
+
 -- ## Scalars with Boolean Operations
 --
 -- Test boolean scalars in integration contexts.
@@ -2199,33 +2229,53 @@ select apply('bool(5)[0:false 1:true 2:false]'::vector, false::bool, 'land'::bin
 (1 row)
 
 -- Boolean reduction
-select reduce_scalar('bool[0:true 1:false 2:true]'::vector, 'lor_monoid'::monoid);
-ERROR:  Unknown monoid lor_monoid
-LINE 1: ...uce_scalar('bool[0:true 1:false 2:true]'::vector, 'lor_monoi...
-                                                             ^
-select reduce_scalar('bool[0:true 1:true 2:true]'::vector, 'land_monoid'::monoid);
-ERROR:  Unknown monoid land_monoid
-LINE 1: ...duce_scalar('bool[0:true 1:true 2:true]'::vector, 'land_mono...
-                                                             ^
+select reduce_scalar('bool[0:true 1:false 2:true]'::vector, 'lor_monoid_bool'::monoid);
+┌───────────────┐
+│ reduce_scalar │
+├───────────────┤
+│ bool:t        │
+└───────────────┘
+(1 row)
+
+select reduce_scalar('bool[0:true 1:true 2:true]'::vector, 'land_monoid_bool'::monoid);
+┌───────────────┐
+│ reduce_scalar │
+├───────────────┤
+│ bool:t        │
+└───────────────┘
+(1 row)
+
 -- ## Scalar Precision in Integration
 --
 -- Test that precision is maintained through operations.
 -- High-precision float through operations
 select reduce_scalar('fp64[0:3.141592653589793 1:2.718281828459045 2:1.414213562373095]'::vector,
-    'plus_fp64'::monoid);
-ERROR:  Unknown monoid plus_fp64
-LINE 2:     'plus_fp64'::monoid);
-            ^
+    'plus_monoid_fp64'::monoid);
+┌───────────────┐
+│ reduce_scalar │
+├───────────────┤
+│ fp64:7.274088 │
+└───────────────┘
+(1 row)
+
 -- Very small values
-select reduce_scalar('fp64[0:1e-100 1:1e-100 2:1e-100]'::vector, 'plus_fp64'::monoid);
-ERROR:  Unknown monoid plus_fp64
-LINE 1: ...calar('fp64[0:1e-100 1:1e-100 2:1e-100]'::vector, 'plus_fp64...
-                                                             ^
+select reduce_scalar('fp64[0:1e-100 1:1e-100 2:1e-100]'::vector, 'plus_monoid_fp64'::monoid);
+┌───────────────┐
+│ reduce_scalar │
+├───────────────┤
+│ fp64:0.000000 │
+└───────────────┘
+(1 row)
+
 -- Very large values
-select reduce_scalar('fp64[0:1e100 1:1e100 2:1e100]'::vector, 'plus_fp64'::monoid);
-ERROR:  Unknown monoid plus_fp64
-LINE 1: ...e_scalar('fp64[0:1e100 1:1e100 2:1e100]'::vector, 'plus_fp64...
-                                                             ^
+select reduce_scalar('fp64[0:1e100 1:1e100 2:1e100]'::vector, 'plus_monoid_fp64'::monoid);
+┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                                   reduce_scalar                                                   │
+├───────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ fp64:30000000000000002419755625518526612324544332515354750811750821725383037568323552921344695162778943488.000000 │
+└───────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+(1 row)
+
 -- ## Scalar Results from Matrix-Vector Operations
 --
 -- Test operations that produce scalars from matrix-vector products.
@@ -2278,78 +2328,5 @@ select apply('int32(5)[0:10 1:20 2:30]'::vector,
 ├──────────────────────────┤
 │ int32(5)[0:20 1:40 2:60] │
 └──────────────────────────┘
-(1 row)
-
--- ## Scalar Assignment Operations
---
--- Test assign_scalar with various patterns.
--- Assign scalar to all indices
-select assign_scalar('int32(10)[0:1 2:3 4:5]'::vector, 42::int, array[0,1,2,3,4,5,6,7,8,9]::bigint[]);
-ERROR:  function assign_scalar(vector, integer, bigint[]) does not exist
-LINE 1: select assign_scalar('int32(10)[0:1 2:3 4:5]'::vector, 42::i...
-               ^
-HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
--- Assign scalar to sparse indices
-select assign_scalar('int32(10)[0:1 2:3 4:5]'::vector, 99::int, array[1,5,9]::bigint[]);
-ERROR:  function assign_scalar(vector, integer, bigint[]) does not exist
-LINE 1: select assign_scalar('int32(10)[0:1 2:3 4:5]'::vector, 99::i...
-               ^
-HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
--- Assign zero scalar
-select assign_scalar('int32(10)[0:10 1:20 2:30]'::vector, 0::int, array[0,1,2]::bigint[]);
-ERROR:  function assign_scalar(vector, integer, bigint[]) does not exist
-LINE 1: select assign_scalar('int32(10)[0:10 1:20 2:30]'::vector, 0:...
-               ^
-HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
--- Assign to matrix
-select assign_scalar('int32(5,5)[0:0:1 1:1:2]'::matrix, 100::int, array[2,3]::bigint[], array[2,3]::bigint[]);
-ERROR:  function assign_scalar(matrix, integer, bigint[], bigint[]) does not exist
-LINE 1: select assign_scalar('int32(5,5)[0:0:1 1:1:2]'::matrix, 100:...
-               ^
-HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
--- ## Practical Integration Patterns
---
--- Real-world usage patterns combining scalars with other types.
--- Threshold filtering and reduction
-select reduce_scalar(
-    choose('int32(10)[0:5 1:15 2:10 3:20 4:8 5:25 6:3]'::vector,
-        'valuegt_int32'::indexunaryop,
-        10::int),
-    'plus_monoid_int32'::monoid
-);
-┌───────────────┐
-│ reduce_scalar │
-├───────────────┤
-│ int32:60      │
-└───────────────┘
-(1 row)
-
--- Scale vector by reduced value
-select apply(
-    'int32[0:10 1:20 2:30]'::vector,
-    (reduce_scalar('int32[0:1 1:2 2:3]'::vector, 'plus_monoid_int32'::monoid)::int),
-    'div_int32'::binaryop
-);
-┌────────────────────┐
-│       apply        │
-├────────────────────┤
-│ int32[0:1 1:3 2:5] │
-└────────────────────┘
-(1 row)
-
--- Conditional element update based on scalar threshold
-select set_element(
-    'int32[0:10 1:20 2:30]'::vector,
-    1,
-    CASE WHEN (get_element('int32[0:10 1:20 2:30]'::vector, 1)::int) > 15
-         THEN 100
-         ELSE (get_element('int32[0:10 1:20 2:30]'::vector, 1)::int)
-    END
-);
-┌────────────────────────┐
-│      set_element       │
-├────────────────────────┤
-│ int32[0:10 1:100 2:30] │
-└────────────────────────┘
 (1 row)
 

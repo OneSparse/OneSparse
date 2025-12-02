@@ -1042,10 +1042,10 @@ create or replace function draw(
         edge text;
     begin
         if directed then
-            result = format(E'digraph {{\n node [shape=%s];\n rankdir=LR;\n', shape);
+            result = format(E'digraph {{\n node [shape=%s fontcolor="currentColor"];\n edge [fontcolor="currentColor"];\n rankdir=LR;\n', shape);
             edge = '->';
         else
-            result = format(E'graph {{\n  node [shape=%s];\n', shape);
+            result = format(E'graph {{\n  node [shape=%s fontcolor="currentColor"];\n edge [fontcolor="currentColor"];\n', shape);
             edge = '--';
         end if;
         if node_labels is not null then
@@ -1076,7 +1076,7 @@ create or replace function draw(
             end if;
         end loop;
         if label is not null then
-            result = result || format(E'graph [label="%s", labelloc="b", labeljust="c", fontsize=12]\n', label);
+            result = result || format(E'graph [label="%s", labelloc="b", labeljust="c", fontsize=12, fontcolor="currentColor"]\n', label);
         end if;
         result = result || E'}}\n';
         return result;
@@ -1100,7 +1100,7 @@ CREATE OR REPLACE FUNCTION hyperdraw(
     )
 RETURNS text LANGUAGE plpgsql AS $$
 DECLARE
-    dot text := format(E'digraph G {{\n  nodesep=0.2;\n  ranksep=0.2;\n node [shape=%s];\n edge [splines=false];\n', a_shape);
+    dot text := format(E'digraph G {{\n  nodesep=0.2;\n  ranksep=0.2;\n node [shape=%s fontcolor="currentColor"];\n edge [splines=false fontcolor="currentColor"];\n', a_shape);
     i bigint;
     rec record;
 BEGIN

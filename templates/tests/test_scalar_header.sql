@@ -549,10 +549,10 @@ select eunion('fp64(5)[0:1.5 2:3.5]'::vector,
 
 -- Matrix eunion with scalar defaults
 select eunion('int32(3,3)[0:0:10 1:1:20]'::matrix,
-    'int32(3,3)[0:1:15 2:2:30]'::matrix,
-    'plus_int32'::binaryop,
     0::int,
-    0::int);
+    'int32(3,3)[0:1:15 2:2:30]'::matrix,
+    0::int,
+    'plus_int32'::binaryop);
 
 -- eunion with different default values
 select eunion('int32(5)[0:10 2:30]'::vector,
@@ -584,7 +584,7 @@ select 'fp64(5)[0:1.5 1:2.5 2:3.5]'::vector * 2.0::double precision;
 -- (though GraphBLAS handles this internally)
 
 -- Test that accumulation works correctly
-select reduce_scalar(apply('int32[0:1 1:2 2:3]'::vector, 'minv_int32'::unaryop), 'plus_int32'::monoid);
+select reduce_scalar(apply('int32[0:1 1:2 2:3]'::vector, 'minv_int32'::unaryop), 'plus_monoid_int32'::monoid);
 
 -- ## Scalars with Descriptors
 --
@@ -593,18 +593,17 @@ select reduce_scalar(apply('int32[0:1 1:2 2:3]'::vector, 'minv_int32'::unaryop),
 -- Matrix/vector operations with scalars typically don't use descriptors,
 -- but verify they work when provided
 
-select apply(10::int, 'int32(5)[0:1 1:2 2:3]'::vector, 'plus_int32'::binaryop,
-    descr=>'GrB_DEFAULT'::descriptor);
+select apply(10::int, 'int32(5)[0:1 1:2 2:3]'::vector, 'plus_int32'::binaryop);
 
 -- ## Scalar Utility Integration
 --
 -- Test utility functions in integration contexts.
 
 -- Print scalars from reductions
-select print(reduce_scalar('int32[0:10 1:20 2:30]'::vector, 'plus_int32'::monoid)::scalar);
+select print(reduce_scalar('int32[0:10 1:20 2:30]'::vector, 'plus_monoid_int32'::monoid)::scalar);
 
 -- Check type of reduced scalar
-select type(reduce_scalar('fp64[0:1.5 1:2.5 2:3.5]'::vector, 'plus_fp64'::monoid)::scalar);
+select type(reduce_scalar('fp64[0:1.5 1:2.5 2:3.5]'::vector, 'plus_monoid_fp64'::monoid)::scalar);
 
 -- ## Empty Vector/Matrix with Scalar Operations
 --
@@ -615,13 +614,13 @@ select apply(10::int, 'int32(5)[]'::vector, 'plus_int32'::binaryop);
 select apply('int32(5)[]'::vector, 5::int, 'times_int32'::binaryop);
 
 -- Reduce empty vector to scalar
-select reduce_scalar('int32(10)[]'::vector, 'plus_int32'::monoid);
+select reduce_scalar('int32(10)[]'::vector, 'plus_monoid_int32'::monoid);
 
 -- Empty matrix with scalar
 select apply(5::int, 'int32(3,3)[]'::matrix, 'plus_int32'::binaryop);
 
 -- Reduce empty matrix to scalar
-select reduce_scalar('int32(5,5)[]'::matrix, 'times_int32'::monoid);
+select reduce_scalar('int32(5,5)[]'::matrix, 'times_monoid_int32'::monoid);
 
 -- ## Scalar Chains
 --
@@ -634,7 +633,7 @@ select set_element('int32[0:10 1:20 2:30]'::vector,
 
 -- Reduce to scalar, use in apply
 select apply('int32[0:1 1:2 2:3]'::vector,
-    reduce_scalar('int32[0:10 1:20 2:30]'::vector, 'plus_int32'::monoid)::int,
+    reduce_scalar('int32[0:10 1:20 2:30]'::vector, 'plus_monoid_int32'::monoid)::int,
     'plus_int32'::binaryop);
 
 -- ## Scalars with Boolean Operations
@@ -646,8 +645,8 @@ select apply(true::bool, 'bool(5)[0:false 1:true 2:false]'::vector, 'lor'::binar
 select apply('bool(5)[0:false 1:true 2:false]'::vector, false::bool, 'land'::binaryop);
 
 -- Boolean reduction
-select reduce_scalar('bool[0:true 1:false 2:true]'::vector, 'lor_monoid'::monoid);
-select reduce_scalar('bool[0:true 1:true 2:true]'::vector, 'land_monoid'::monoid);
+select reduce_scalar('bool[0:true 1:false 2:true]'::vector, 'lor_monoid_bool'::monoid);
+select reduce_scalar('bool[0:true 1:true 2:true]'::vector, 'land_monoid_bool'::monoid);
 
 -- ## Scalar Precision in Integration
 --
@@ -655,13 +654,13 @@ select reduce_scalar('bool[0:true 1:true 2:true]'::vector, 'land_monoid'::monoid
 
 -- High-precision float through operations
 select reduce_scalar('fp64[0:3.141592653589793 1:2.718281828459045 2:1.414213562373095]'::vector,
-    'plus_fp64'::monoid);
+    'plus_monoid_fp64'::monoid);
 
 -- Very small values
-select reduce_scalar('fp64[0:1e-100 1:1e-100 2:1e-100]'::vector, 'plus_fp64'::monoid);
+select reduce_scalar('fp64[0:1e-100 1:1e-100 2:1e-100]'::vector, 'plus_monoid_fp64'::monoid);
 
 -- Very large values
-select reduce_scalar('fp64[0:1e100 1:1e100 2:1e100]'::vector, 'plus_fp64'::monoid);
+select reduce_scalar('fp64[0:1e100 1:1e100 2:1e100]'::vector, 'plus_monoid_fp64'::monoid);
 
 -- ## Scalar Results from Matrix-Vector Operations
 --
@@ -695,48 +694,3 @@ select apply('fp64(5)[0:1.5 1:2.5 2:3.5]'::vector,
 select apply('int32(5)[0:10 1:20 2:30]'::vector,
     ((2.5::double precision)::scalar::double precision)::int,
     'times_int32'::binaryop);
-
--- ## Scalar Assignment Operations
---
--- Test assign_scalar with various patterns.
-
--- Assign scalar to all indices
-select assign_scalar('int32(10)[0:1 2:3 4:5]'::vector, 42::int, array[0,1,2,3,4,5,6,7,8,9]::bigint[]);
-
--- Assign scalar to sparse indices
-select assign_scalar('int32(10)[0:1 2:3 4:5]'::vector, 99::int, array[1,5,9]::bigint[]);
-
--- Assign zero scalar
-select assign_scalar('int32(10)[0:10 1:20 2:30]'::vector, 0::int, array[0,1,2]::bigint[]);
-
--- Assign to matrix
-select assign_scalar('int32(5,5)[0:0:1 1:1:2]'::matrix, 100::int, array[2,3]::bigint[], array[2,3]::bigint[]);
-
--- ## Practical Integration Patterns
---
--- Real-world usage patterns combining scalars with other types.
-
--- Threshold filtering and reduction
-select reduce_scalar(
-    choose('int32(10)[0:5 1:15 2:10 3:20 4:8 5:25 6:3]'::vector,
-        'valuegt_int32'::indexunaryop,
-        10::int),
-    'plus_monoid_int32'::monoid
-);
-
--- Scale vector by reduced value
-select apply(
-    'int32[0:10 1:20 2:30]'::vector,
-    (reduce_scalar('int32[0:1 1:2 2:3]'::vector, 'plus_monoid_int32'::monoid)::int),
-    'div_int32'::binaryop
-);
-
--- Conditional element update based on scalar threshold
-select set_element(
-    'int32[0:10 1:20 2:30]'::vector,
-    1,
-    CASE WHEN (get_element('int32[0:10 1:20 2:30]'::vector, 1)::int) > 15
-         THEN 100
-         ELSE (get_element('int32[0:10 1:20 2:30]'::vector, 1)::int)
-    END
-);

@@ -103,7 +103,7 @@ select draw(graph, label:='Graph') as twocol_a_source, print(graph) as twocol_b_
 \set draw_source :twocol_a_source
 \i sql/draw_sfdp.sql
 \setenv draw_source :draw_source
-\! echo $draw_source | dot -Ksfdp -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
+\! echo $draw_source | dot -Ksfdp -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 2>/dev/null | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
 -- <div>
 -- <!-- Title: %3 Pages: 1 -->
 -- <svg width="412pt" height="258pt"
@@ -111,132 +111,132 @@ select draw(graph, label:='Graph') as twocol_a_source, print(graph) as twocol_b_
 -- <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 253.75)">
 -- <title>%3</title>
 -- <polygon fill="white" stroke="transparent" points="-4,4 -4,-253.75 407.99,-253.75 407.99,4 -4,4"/>
--- <text text-anchor="middle" x="202" y="-7.4" font-family="Times,serif" font-size="12.00">Graph</text>
+-- <text text-anchor="middle" x="202" y="-7.4" font-family="Times,serif" font-size="12.00" fill="#000000">Graph</text>
 -- <!-- 0 -->
 -- <g id="node1" class="node">
 -- <title>0</title>
 -- <ellipse fill="none" stroke="black" cx="388.43" cy="-135.47" rx="15.61" ry="15.61"/>
--- <text text-anchor="middle" x="388.43" y="-133.57" font-family="Times,serif" font-size="8.00">0</text>
+-- <text text-anchor="middle" x="388.43" y="-133.57" font-family="Times,serif" font-size="8.00" fill="#000000">0</text>
 -- </g>
 -- <!-- 1 -->
 -- <g id="node2" class="node">
 -- <title>1</title>
 -- <ellipse fill="none" stroke="black" cx="278.17" cy="-36.56" rx="15.61" ry="15.61"/>
--- <text text-anchor="middle" x="278.17" y="-34.66" font-family="Times,serif" font-size="8.00">1</text>
+-- <text text-anchor="middle" x="278.17" y="-34.66" font-family="Times,serif" font-size="8.00" fill="#000000">1</text>
 -- </g>
 -- <!-- 0&#45;&gt;1 -->
 -- <g id="edge1" class="edge">
 -- <title>0&#45;&gt;1</title>
 -- <path fill="none" stroke="black" d="M376.63,-124.88C357.73,-107.93 320.47,-74.51 297.6,-53.99"/>
 -- <polygon fill="black" stroke="black" points="299.67,-51.14 289.88,-47.07 294.99,-56.35 299.67,-51.14"/>
--- <text text-anchor="middle" x="335.12" y="-92.04" font-family="Times,serif" font-size="8.00">t</text>
+-- <text text-anchor="middle" x="335.12" y="-92.04" font-family="Times,serif" font-size="8.00" fill="#000000">t</text>
 -- </g>
 -- <!-- 3 -->
 -- <g id="node3" class="node">
 -- <title>3</title>
 -- <ellipse fill="none" stroke="black" cx="277.9" cy="-234.19" rx="15.61" ry="15.61"/>
--- <text text-anchor="middle" x="277.9" y="-232.29" font-family="Times,serif" font-size="8.00">3</text>
+-- <text text-anchor="middle" x="277.9" y="-232.29" font-family="Times,serif" font-size="8.00" fill="#000000">3</text>
 -- </g>
 -- <!-- 0&#45;&gt;3 -->
 -- <g id="edge2" class="edge">
 -- <title>0&#45;&gt;3</title>
 -- <path fill="none" stroke="black" d="M374.15,-142.45C353.16,-157.28 314.52,-191.39 293.06,-213.67"/>
 -- <polygon fill="black" stroke="black" points="290.49,-211.31 286.24,-221.01 295.61,-216.07 290.49,-211.31"/>
--- <text text-anchor="middle" x="331.61" y="-180.66" font-family="Times,serif" font-size="8.00">t</text>
+-- <text text-anchor="middle" x="331.61" y="-180.66" font-family="Times,serif" font-size="8.00" fill="#000000">t</text>
 -- </g>
 -- <!-- 4 -->
 -- <g id="node4" class="node">
 -- <title>4</title>
 -- <ellipse fill="none" stroke="black" cx="126.38" cy="-36.63" rx="15.61" ry="15.61"/>
--- <text text-anchor="middle" x="126.38" y="-34.73" font-family="Times,serif" font-size="8.00">4</text>
+-- <text text-anchor="middle" x="126.38" y="-34.73" font-family="Times,serif" font-size="8.00" fill="#000000">4</text>
 -- </g>
 -- <!-- 1&#45;&gt;4 -->
 -- <g id="edge3" class="edge">
 -- <title>1&#45;&gt;4</title>
 -- <path fill="none" stroke="black" d="M262.5,-36.56C236.48,-36.58 184.11,-36.6 152.45,-36.62"/>
 -- <polygon fill="black" stroke="black" points="152.19,-33.12 142.2,-36.63 152.2,-40.12 152.19,-33.12"/>
--- <text text-anchor="middle" x="205.47" y="-39.19" font-family="Times,serif" font-size="8.00">t</text>
+-- <text text-anchor="middle" x="205.47" y="-39.19" font-family="Times,serif" font-size="8.00" fill="#000000">t</text>
 -- </g>
 -- <!-- 6 -->
 -- <g id="node5" class="node">
 -- <title>6</title>
 -- <ellipse fill="none" stroke="black" cx="202.16" cy="-135.46" rx="15.61" ry="15.61"/>
--- <text text-anchor="middle" x="202.16" y="-133.56" font-family="Times,serif" font-size="8.00">6</text>
+-- <text text-anchor="middle" x="202.16" y="-133.56" font-family="Times,serif" font-size="8.00" fill="#000000">6</text>
 -- </g>
 -- <!-- 1&#45;&gt;6 -->
 -- <g id="edge4" class="edge">
 -- <title>1&#45;&gt;6</title>
 -- <path fill="none" stroke="black" d="M268.54,-49.08C255.81,-65.65 233.19,-95.08 217.94,-114.93"/>
 -- <polygon fill="black" stroke="black" points="215.03,-112.97 211.71,-123.03 220.58,-117.24 215.03,-112.97"/>
--- <text text-anchor="middle" x="241.24" y="-84.6" font-family="Times,serif" font-size="8.00">t</text>
+-- <text text-anchor="middle" x="241.24" y="-84.6" font-family="Times,serif" font-size="8.00" fill="#000000">t</text>
 -- </g>
 -- <!-- 3&#45;&gt;0 -->
 -- <g id="edge6" class="edge">
 -- <title>3&#45;&gt;0</title>
 -- <path fill="none" stroke="black" d="M292.19,-227.21C313.18,-212.38 351.81,-178.27 373.28,-155.99"/>
 -- <polygon fill="black" stroke="black" points="375.85,-158.36 380.09,-148.65 370.72,-153.59 375.85,-158.36"/>
--- <text text-anchor="middle" x="330.73" y="-194.2" font-family="Times,serif" font-size="8.00">t</text>
+-- <text text-anchor="middle" x="330.73" y="-194.2" font-family="Times,serif" font-size="8.00" fill="#000000">t</text>
 -- </g>
 -- <!-- 2 -->
 -- <g id="node6" class="node">
 -- <title>2</title>
 -- <ellipse fill="none" stroke="black" cx="125.67" cy="-234" rx="15.61" ry="15.61"/>
--- <text text-anchor="middle" x="125.67" y="-232.1" font-family="Times,serif" font-size="8.00">2</text>
+-- <text text-anchor="middle" x="125.67" y="-232.1" font-family="Times,serif" font-size="8.00" fill="#000000">2</text>
 -- </g>
 -- <!-- 3&#45;&gt;2 -->
 -- <g id="edge7" class="edge">
 -- <title>3&#45;&gt;2</title>
 -- <path fill="none" stroke="black" d="M262.19,-234.17C236.09,-234.14 183.57,-234.07 151.82,-234.03"/>
 -- <polygon fill="black" stroke="black" points="151.54,-230.53 141.53,-234.02 151.53,-237.53 151.54,-230.53"/>
--- <text text-anchor="middle" x="205" y="-236.7" font-family="Times,serif" font-size="8.00">t</text>
+-- <text text-anchor="middle" x="205" y="-236.7" font-family="Times,serif" font-size="8.00" fill="#000000">t</text>
 -- </g>
 -- <!-- 5 -->
 -- <g id="node7" class="node">
 -- <title>5</title>
 -- <ellipse fill="none" stroke="black" cx="15.56" cy="-135" rx="15.61" ry="15.61"/>
--- <text text-anchor="middle" x="15.56" y="-133.1" font-family="Times,serif" font-size="8.00">5</text>
+-- <text text-anchor="middle" x="15.56" y="-133.1" font-family="Times,serif" font-size="8.00" fill="#000000">5</text>
 -- </g>
 -- <!-- 4&#45;&gt;5 -->
 -- <g id="edge8" class="edge">
 -- <title>4&#45;&gt;5</title>
 -- <path fill="none" stroke="black" d="M114.52,-47.16C95.52,-64.02 58.08,-97.26 35.09,-117.67"/>
 -- <polygon fill="black" stroke="black" points="32.49,-115.29 27.33,-124.55 37.13,-120.53 32.49,-115.29"/>
--- <text text-anchor="middle" x="72.8" y="-85.01" font-family="Times,serif" font-size="8.00">t</text>
+-- <text text-anchor="middle" x="72.8" y="-85.01" font-family="Times,serif" font-size="8.00" fill="#000000">t</text>
 -- </g>
 -- <!-- 6&#45;&gt;3 -->
 -- <g id="edge11" class="edge">
 -- <title>6&#45;&gt;3</title>
 -- <path fill="none" stroke="black" d="M211.76,-147.96C224.45,-164.51 246.98,-193.88 262.18,-213.69"/>
 -- <polygon fill="black" stroke="black" points="259.53,-215.98 268.39,-221.79 265.08,-211.72 259.53,-215.98"/>
--- <text text-anchor="middle" x="234.97" y="-183.43" font-family="Times,serif" font-size="8.00">t</text>
+-- <text text-anchor="middle" x="234.97" y="-183.43" font-family="Times,serif" font-size="8.00" fill="#000000">t</text>
 -- </g>
 -- <!-- 6&#45;&gt;4 -->
 -- <g id="edge12" class="edge">
 -- <title>6&#45;&gt;4</title>
 -- <path fill="none" stroke="black" d="M192.57,-122.94C179.87,-106.38 157.32,-76.98 142.12,-57.15"/>
 -- <polygon fill="black" stroke="black" points="144.76,-54.85 135.9,-49.05 139.21,-59.11 144.76,-54.85"/>
--- <text text-anchor="middle" x="165.34" y="-92.65" font-family="Times,serif" font-size="8.00">t</text>
+-- <text text-anchor="middle" x="165.34" y="-92.65" font-family="Times,serif" font-size="8.00" fill="#000000">t</text>
 -- </g>
 -- <!-- 6&#45;&gt;2 -->
 -- <g id="edge10" class="edge">
 -- <title>6&#45;&gt;2</title>
 -- <path fill="none" stroke="black" d="M192.48,-147.94C179.66,-164.45 156.9,-193.77 141.55,-213.54"/>
 -- <polygon fill="black" stroke="black" points="138.65,-211.58 135.28,-221.62 144.18,-215.87 138.65,-211.58"/>
--- <text text-anchor="middle" x="165.02" y="-183.34" font-family="Times,serif" font-size="8.00">t</text>
+-- <text text-anchor="middle" x="165.02" y="-183.34" font-family="Times,serif" font-size="8.00" fill="#000000">t</text>
 -- </g>
 -- <!-- 2&#45;&gt;5 -->
 -- <g id="edge5" class="edge">
 -- <title>2&#45;&gt;5</title>
 -- <path fill="none" stroke="black" d="M117.18,-220.58C100.16,-201.34 62.07,-166.69 37.59,-147.81"/>
 -- <polygon fill="black" stroke="black" points="39.67,-145 29.56,-141.84 35.5,-150.62 39.67,-145"/>
--- <text text-anchor="middle" x="75.39" y="-186.79" font-family="Times,serif" font-size="8.00">t</text>
+-- <text text-anchor="middle" x="75.39" y="-186.79" font-family="Times,serif" font-size="8.00" fill="#000000">t</text>
 -- </g>
 -- <!-- 5&#45;&gt;2 -->
 -- <g id="edge9" class="edge">
 -- <title>5&#45;&gt;2</title>
 -- <path fill="none" stroke="black" d="M24.05,-148.43C41.07,-167.66 79.16,-202.31 103.64,-221.19"/>
 -- <polygon fill="black" stroke="black" points="101.56,-224 111.67,-227.16 105.73,-218.39 101.56,-224"/>
--- <text text-anchor="middle" x="61.84" y="-187.41" font-family="Times,serif" font-size="8.00">t</text>
+-- <text text-anchor="middle" x="61.84" y="-187.41" font-family="Times,serif" font-size="8.00" fill="#000000">t</text>
 -- </g>
 -- </g>
 -- </svg>
@@ -326,7 +326,7 @@ select draw(triu(graph),
             label:='Level BFS') as draw_source from karate \gset
 \i sql/draw_sfdp.sql
 \setenv draw_source :draw_source
-\! echo $draw_source | dot -Ksfdp -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
+\! echo $draw_source | dot -Ksfdp -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 2>/dev/null | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
 -- <div>
 -- <!-- Title: %3 Pages: 1 -->
 -- <svg width="1000pt" height="497pt"
@@ -334,18 +334,18 @@ select draw(triu(graph),
 -- <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 493.48)">
 -- <title>%3</title>
 -- <polygon fill="white" stroke="transparent" points="-4,4 -4,-493.48 996.22,-493.48 996.22,4 -4,4"/>
--- <text text-anchor="middle" x="496.11" y="-7.4" font-family="Times,serif" font-size="12.00">Level BFS</text>
+-- <text text-anchor="middle" x="496.11" y="-7.4" font-family="Times,serif" font-size="12.00" fill="#000000">Level BFS</text>
 -- <!-- 0 -->
 -- <g id="node1" class="node">
 -- <title>0</title>
 -- <ellipse fill="#00d4ff" fill-opacity="0.498039" stroke="black" cx="581.65" cy="-263.76" rx="25" ry="25"/>
--- <text text-anchor="middle" x="581.65" y="-261.86" font-family="Times,serif" font-size="8.00">0 : 1</text>
+-- <text text-anchor="middle" x="581.65" y="-261.86" font-family="Times,serif" font-size="8.00" fill="#000000">0 : 1</text>
 -- </g>
 -- <!-- 1 -->
 -- <g id="node2" class="node">
 -- <title>1</title>
 -- <ellipse fill="#00007f" fill-opacity="0.498039" stroke="black" cx="507.23" cy="-255.6" rx="25" ry="25"/>
--- <text text-anchor="middle" x="507.23" y="-253.7" font-family="Times,serif" font-size="8.00">1 : 0</text>
+-- <text text-anchor="middle" x="507.23" y="-253.7" font-family="Times,serif" font-size="8.00" fill="#000000">1 : 0</text>
 -- </g>
 -- <!-- 0&#45;&#45;1 -->
 -- <g id="edge1" class="edge">
@@ -356,7 +356,7 @@ select draw(triu(graph),
 -- <g id="node3" class="node">
 -- <title>2</title>
 -- <ellipse fill="#00d4ff" fill-opacity="0.498039" stroke="black" cx="381.59" cy="-211.79" rx="25" ry="25"/>
--- <text text-anchor="middle" x="381.59" y="-209.89" font-family="Times,serif" font-size="8.00">2 : 1</text>
+-- <text text-anchor="middle" x="381.59" y="-209.89" font-family="Times,serif" font-size="8.00" fill="#000000">2 : 1</text>
 -- </g>
 -- <!-- 0&#45;&#45;2 -->
 -- <g id="edge2" class="edge">
@@ -367,7 +367,7 @@ select draw(triu(graph),
 -- <g id="node4" class="node">
 -- <title>3</title>
 -- <ellipse fill="#00d4ff" fill-opacity="0.498039" stroke="black" cx="535.8" cy="-172.74" rx="25" ry="25"/>
--- <text text-anchor="middle" x="535.8" y="-170.84" font-family="Times,serif" font-size="8.00">3 : 1</text>
+-- <text text-anchor="middle" x="535.8" y="-170.84" font-family="Times,serif" font-size="8.00" fill="#000000">3 : 1</text>
 -- </g>
 -- <!-- 0&#45;&#45;3 -->
 -- <g id="edge3" class="edge">
@@ -378,7 +378,7 @@ select draw(triu(graph),
 -- <g id="node5" class="node">
 -- <title>4</title>
 -- <ellipse fill="#ffd400" fill-opacity="0.498039" stroke="black" cx="751.58" cy="-334.38" rx="25" ry="25"/>
--- <text text-anchor="middle" x="751.58" y="-332.48" font-family="Times,serif" font-size="8.00">4 : 2</text>
+-- <text text-anchor="middle" x="751.58" y="-332.48" font-family="Times,serif" font-size="8.00" fill="#000000">4 : 2</text>
 -- </g>
 -- <!-- 0&#45;&#45;4 -->
 -- <g id="edge4" class="edge">
@@ -389,7 +389,7 @@ select draw(triu(graph),
 -- <g id="node6" class="node">
 -- <title>5</title>
 -- <ellipse fill="#ffd400" fill-opacity="0.498039" stroke="black" cx="820.59" cy="-323.79" rx="25" ry="25"/>
--- <text text-anchor="middle" x="820.59" y="-321.89" font-family="Times,serif" font-size="8.00">5 : 2</text>
+-- <text text-anchor="middle" x="820.59" y="-321.89" font-family="Times,serif" font-size="8.00" fill="#000000">5 : 2</text>
 -- </g>
 -- <!-- 0&#45;&#45;5 -->
 -- <g id="edge5" class="edge">
@@ -400,7 +400,7 @@ select draw(triu(graph),
 -- <g id="node7" class="node">
 -- <title>6</title>
 -- <ellipse fill="#ffd400" fill-opacity="0.498039" stroke="black" cx="826.76" cy="-275.34" rx="25" ry="25"/>
--- <text text-anchor="middle" x="826.76" y="-273.44" font-family="Times,serif" font-size="8.00">6 : 2</text>
+-- <text text-anchor="middle" x="826.76" y="-273.44" font-family="Times,serif" font-size="8.00" fill="#000000">6 : 2</text>
 -- </g>
 -- <!-- 0&#45;&#45;6 -->
 -- <g id="edge6" class="edge">
@@ -411,7 +411,7 @@ select draw(triu(graph),
 -- <g id="node8" class="node">
 -- <title>7</title>
 -- <ellipse fill="#00d4ff" fill-opacity="0.498039" stroke="black" cx="505.02" cy="-139.87" rx="25" ry="25"/>
--- <text text-anchor="middle" x="505.02" y="-137.97" font-family="Times,serif" font-size="8.00">7 : 1</text>
+-- <text text-anchor="middle" x="505.02" y="-137.97" font-family="Times,serif" font-size="8.00" fill="#000000">7 : 1</text>
 -- </g>
 -- <!-- 0&#45;&#45;7 -->
 -- <g id="edge7" class="edge">
@@ -422,7 +422,7 @@ select draw(triu(graph),
 -- <g id="node9" class="node">
 -- <title>8</title>
 -- <ellipse fill="#ffd400" fill-opacity="0.498039" stroke="black" cx="362.59" cy="-311.46" rx="25" ry="25"/>
--- <text text-anchor="middle" x="362.59" y="-309.56" font-family="Times,serif" font-size="8.00">8 : 2</text>
+-- <text text-anchor="middle" x="362.59" y="-309.56" font-family="Times,serif" font-size="8.00" fill="#000000">8 : 2</text>
 -- </g>
 -- <!-- 0&#45;&#45;8 -->
 -- <g id="edge8" class="edge">
@@ -433,7 +433,7 @@ select draw(triu(graph),
 -- <g id="node11" class="node">
 -- <title>10</title>
 -- <ellipse fill="#ffd400" fill-opacity="0.498039" stroke="black" cx="762.87" cy="-260.86" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="762.87" y="-258.96" font-family="Times,serif" font-size="8.00">10 : 2</text>
+-- <text text-anchor="middle" x="762.87" y="-258.96" font-family="Times,serif" font-size="8.00" fill="#000000">10 : 2</text>
 -- </g>
 -- <!-- 0&#45;&#45;10 -->
 -- <g id="edge9" class="edge">
@@ -444,7 +444,7 @@ select draw(triu(graph),
 -- <g id="node12" class="node">
 -- <title>11</title>
 -- <ellipse fill="#ffd400" fill-opacity="0.498039" stroke="black" cx="676.34" cy="-438.07" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="676.34" y="-436.17" font-family="Times,serif" font-size="8.00">11 : 2</text>
+-- <text text-anchor="middle" x="676.34" y="-436.17" font-family="Times,serif" font-size="8.00" fill="#000000">11 : 2</text>
 -- </g>
 -- <!-- 0&#45;&#45;11 -->
 -- <g id="edge10" class="edge">
@@ -455,7 +455,7 @@ select draw(triu(graph),
 -- <g id="node13" class="node">
 -- <title>12</title>
 -- <ellipse fill="#ffd400" fill-opacity="0.498039" stroke="black" cx="649.1" cy="-99.14" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="649.1" y="-97.24" font-family="Times,serif" font-size="8.00">12 : 2</text>
+-- <text text-anchor="middle" x="649.1" y="-97.24" font-family="Times,serif" font-size="8.00" fill="#000000">12 : 2</text>
 -- </g>
 -- <!-- 0&#45;&#45;12 -->
 -- <g id="edge11" class="edge">
@@ -466,7 +466,7 @@ select draw(triu(graph),
 -- <g id="node14" class="node">
 -- <title>13</title>
 -- <ellipse fill="#00d4ff" fill-opacity="0.498039" stroke="black" cx="430.57" cy="-249.21" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="430.57" y="-247.31" font-family="Times,serif" font-size="8.00">13 : 1</text>
+-- <text text-anchor="middle" x="430.57" y="-247.31" font-family="Times,serif" font-size="8.00" fill="#000000">13 : 1</text>
 -- </g>
 -- <!-- 0&#45;&#45;13 -->
 -- <g id="edge12" class="edge">
@@ -477,7 +477,7 @@ select draw(triu(graph),
 -- <g id="node18" class="node">
 -- <title>17</title>
 -- <ellipse fill="#00d4ff" fill-opacity="0.498039" stroke="black" cx="656.05" cy="-272.54" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="656.05" y="-270.64" font-family="Times,serif" font-size="8.00">17 : 1</text>
+-- <text text-anchor="middle" x="656.05" y="-270.64" font-family="Times,serif" font-size="8.00" fill="#000000">17 : 1</text>
 -- </g>
 -- <!-- 0&#45;&#45;17 -->
 -- <g id="edge13" class="edge">
@@ -488,7 +488,7 @@ select draw(triu(graph),
 -- <g id="node20" class="node">
 -- <title>19</title>
 -- <ellipse fill="#00d4ff" fill-opacity="0.498039" stroke="black" cx="430.58" cy="-344.22" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="430.58" y="-342.32" font-family="Times,serif" font-size="8.00">19 : 1</text>
+-- <text text-anchor="middle" x="430.58" y="-342.32" font-family="Times,serif" font-size="8.00" fill="#000000">19 : 1</text>
 -- </g>
 -- <!-- 0&#45;&#45;19 -->
 -- <g id="edge14" class="edge">
@@ -499,7 +499,7 @@ select draw(triu(graph),
 -- <g id="node22" class="node">
 -- <title>21</title>
 -- <ellipse fill="#00d4ff" fill-opacity="0.498039" stroke="black" cx="650.75" cy="-181.49" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="650.75" y="-179.59" font-family="Times,serif" font-size="8.00">21 : 1</text>
+-- <text text-anchor="middle" x="650.75" y="-179.59" font-family="Times,serif" font-size="8.00" fill="#000000">21 : 1</text>
 -- </g>
 -- <!-- 0&#45;&#45;21 -->
 -- <g id="edge15" class="edge">
@@ -510,7 +510,7 @@ select draw(triu(graph),
 -- <g id="node32" class="node">
 -- <title>31</title>
 -- <ellipse fill="#ffd400" fill-opacity="0.498039" stroke="black" cx="289.06" cy="-193.37" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="289.06" y="-191.47" font-family="Times,serif" font-size="8.00">31 : 2</text>
+-- <text text-anchor="middle" x="289.06" y="-191.47" font-family="Times,serif" font-size="8.00" fill="#000000">31 : 2</text>
 -- </g>
 -- <!-- 0&#45;&#45;31 -->
 -- <g id="edge16" class="edge">
@@ -556,7 +556,7 @@ select draw(triu(graph),
 -- <g id="node31" class="node">
 -- <title>30</title>
 -- <ellipse fill="#00d4ff" fill-opacity="0.498039" stroke="black" cx="323.04" cy="-345.91" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="323.04" y="-344.01" font-family="Times,serif" font-size="8.00">30 : 1</text>
+-- <text text-anchor="middle" x="323.04" y="-344.01" font-family="Times,serif" font-size="8.00" fill="#000000">30 : 1</text>
 -- </g>
 -- <!-- 1&#45;&#45;30 -->
 -- <g id="edge24" class="edge">
@@ -582,7 +582,7 @@ select draw(triu(graph),
 -- <g id="node10" class="node">
 -- <title>9</title>
 -- <ellipse fill="#ffd400" fill-opacity="0.498039" stroke="black" cx="276.28" cy="-124.03" rx="25" ry="25"/>
--- <text text-anchor="middle" x="276.28" y="-122.13" font-family="Times,serif" font-size="8.00">9 : 2</text>
+-- <text text-anchor="middle" x="276.28" y="-122.13" font-family="Times,serif" font-size="8.00" fill="#000000">9 : 2</text>
 -- </g>
 -- <!-- 2&#45;&#45;9 -->
 -- <g id="edge28" class="edge">
@@ -598,7 +598,7 @@ select draw(triu(graph),
 -- <g id="node28" class="node">
 -- <title>27</title>
 -- <ellipse fill="#ffd400" fill-opacity="0.498039" stroke="black" cx="203.25" cy="-153.65" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="203.25" y="-151.75" font-family="Times,serif" font-size="8.00">27 : 2</text>
+-- <text text-anchor="middle" x="203.25" y="-151.75" font-family="Times,serif" font-size="8.00" fill="#000000">27 : 2</text>
 -- </g>
 -- <!-- 2&#45;&#45;27 -->
 -- <g id="edge30" class="edge">
@@ -609,7 +609,7 @@ select draw(triu(graph),
 -- <g id="node29" class="node">
 -- <title>28</title>
 -- <ellipse fill="#ffd400" fill-opacity="0.498039" stroke="black" cx="275.48" cy="-256.27" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="275.48" y="-254.37" font-family="Times,serif" font-size="8.00">28 : 2</text>
+-- <text text-anchor="middle" x="275.48" y="-254.37" font-family="Times,serif" font-size="8.00" fill="#000000">28 : 2</text>
 -- </g>
 -- <!-- 2&#45;&#45;28 -->
 -- <g id="edge31" class="edge">
@@ -620,7 +620,7 @@ select draw(triu(graph),
 -- <g id="node33" class="node">
 -- <title>32</title>
 -- <ellipse fill="#ffd400" fill-opacity="0.498039" stroke="black" cx="187.73" cy="-333.47" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="187.73" y="-331.57" font-family="Times,serif" font-size="8.00">32 : 2</text>
+-- <text text-anchor="middle" x="187.73" y="-331.57" font-family="Times,serif" font-size="8.00" fill="#000000">32 : 2</text>
 -- </g>
 -- <!-- 2&#45;&#45;32 -->
 -- <g id="edge32" class="edge">
@@ -666,7 +666,7 @@ select draw(triu(graph),
 -- <g id="node17" class="node">
 -- <title>16</title>
 -- <ellipse fill="#7f0000" fill-opacity="0.498039" stroke="black" cx="963.94" cy="-321.61" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="963.94" y="-319.71" font-family="Times,serif" font-size="8.00">16 : 3</text>
+-- <text text-anchor="middle" x="963.94" y="-319.71" font-family="Times,serif" font-size="8.00" fill="#000000">16 : 3</text>
 -- </g>
 -- <!-- 5&#45;&#45;16 -->
 -- <g id="edge40" class="edge">
@@ -692,7 +692,7 @@ select draw(triu(graph),
 -- <g id="node34" class="node">
 -- <title>33</title>
 -- <ellipse fill="#ffd400" fill-opacity="0.498039" stroke="black" cx="204.47" cy="-296.38" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="204.47" y="-294.48" font-family="Times,serif" font-size="8.00">33 : 2</text>
+-- <text text-anchor="middle" x="204.47" y="-294.48" font-family="Times,serif" font-size="8.00" fill="#000000">33 : 2</text>
 -- </g>
 -- <!-- 8&#45;&#45;33 -->
 -- <g id="edge44" class="edge">
@@ -713,7 +713,7 @@ select draw(triu(graph),
 -- <g id="node15" class="node">
 -- <title>14</title>
 -- <ellipse fill="#7f0000" fill-opacity="0.498039" stroke="black" cx="55.34" cy="-390.9" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="55.34" y="-389" font-family="Times,serif" font-size="8.00">14 : 3</text>
+-- <text text-anchor="middle" x="55.34" y="-389" font-family="Times,serif" font-size="8.00" fill="#000000">14 : 3</text>
 -- </g>
 -- <!-- 14&#45;&#45;32 -->
 -- <g id="edge47" class="edge">
@@ -729,7 +729,7 @@ select draw(triu(graph),
 -- <g id="node16" class="node">
 -- <title>15</title>
 -- <ellipse fill="#7f0000" fill-opacity="0.498039" stroke="black" cx="197.98" cy="-461.2" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="197.98" y="-459.3" font-family="Times,serif" font-size="8.00">15 : 3</text>
+-- <text text-anchor="middle" x="197.98" y="-459.3" font-family="Times,serif" font-size="8.00" fill="#000000">15 : 3</text>
 -- </g>
 -- <!-- 15&#45;&#45;32 -->
 -- <g id="edge49" class="edge">
@@ -745,7 +745,7 @@ select draw(triu(graph),
 -- <g id="node19" class="node">
 -- <title>18</title>
 -- <ellipse fill="#7f0000" fill-opacity="0.498039" stroke="black" cx="92.09" cy="-429.44" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="92.09" y="-427.54" font-family="Times,serif" font-size="8.00">18 : 3</text>
+-- <text text-anchor="middle" x="92.09" y="-427.54" font-family="Times,serif" font-size="8.00" fill="#000000">18 : 3</text>
 -- </g>
 -- <!-- 18&#45;&#45;32 -->
 -- <g id="edge51" class="edge">
@@ -766,7 +766,7 @@ select draw(triu(graph),
 -- <g id="node21" class="node">
 -- <title>20</title>
 -- <ellipse fill="#7f0000" fill-opacity="0.498039" stroke="black" cx="137.67" cy="-459.59" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="137.67" y="-457.69" font-family="Times,serif" font-size="8.00">20 : 3</text>
+-- <text text-anchor="middle" x="137.67" y="-457.69" font-family="Times,serif" font-size="8.00" fill="#000000">20 : 3</text>
 -- </g>
 -- <!-- 20&#45;&#45;32 -->
 -- <g id="edge54" class="edge">
@@ -782,7 +782,7 @@ select draw(triu(graph),
 -- <g id="node23" class="node">
 -- <title>22</title>
 -- <ellipse fill="#7f0000" fill-opacity="0.498039" stroke="black" cx="42.82" cy="-337.59" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="42.82" y="-335.69" font-family="Times,serif" font-size="8.00">22 : 3</text>
+-- <text text-anchor="middle" x="42.82" y="-335.69" font-family="Times,serif" font-size="8.00" fill="#000000">22 : 3</text>
 -- </g>
 -- <!-- 22&#45;&#45;32 -->
 -- <g id="edge56" class="edge">
@@ -798,13 +798,13 @@ select draw(triu(graph),
 -- <g id="node24" class="node">
 -- <title>23</title>
 -- <ellipse fill="#7f0000" fill-opacity="0.498039" stroke="black" cx="108.54" cy="-217.57" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="108.54" y="-215.67" font-family="Times,serif" font-size="8.00">23 : 3</text>
+-- <text text-anchor="middle" x="108.54" y="-215.67" font-family="Times,serif" font-size="8.00" fill="#000000">23 : 3</text>
 -- </g>
 -- <!-- 25 -->
 -- <g id="node26" class="node">
 -- <title>25</title>
 -- <ellipse fill="#7f0000" fill-opacity="0.498039" stroke="black" cx="111.77" cy="-118.05" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="111.77" y="-116.15" font-family="Times,serif" font-size="8.00">25 : 3</text>
+-- <text text-anchor="middle" x="111.77" y="-116.15" font-family="Times,serif" font-size="8.00" fill="#000000">25 : 3</text>
 -- </g>
 -- <!-- 23&#45;&#45;25 -->
 -- <g id="edge58" class="edge">
@@ -820,7 +820,7 @@ select draw(triu(graph),
 -- <g id="node30" class="node">
 -- <title>29</title>
 -- <ellipse fill="#7f0000" fill-opacity="0.498039" stroke="black" cx="51.19" cy="-263.12" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="51.19" y="-261.22" font-family="Times,serif" font-size="8.00">29 : 3</text>
+-- <text text-anchor="middle" x="51.19" y="-261.22" font-family="Times,serif" font-size="8.00" fill="#000000">29 : 3</text>
 -- </g>
 -- <!-- 23&#45;&#45;29 -->
 -- <g id="edge60" class="edge">
@@ -841,7 +841,7 @@ select draw(triu(graph),
 -- <g id="node25" class="node">
 -- <title>24</title>
 -- <ellipse fill="#7f0000" fill-opacity="0.498039" stroke="black" cx="171.82" cy="-49.28" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="171.82" y="-47.38" font-family="Times,serif" font-size="8.00">24 : 3</text>
+-- <text text-anchor="middle" x="171.82" y="-47.38" font-family="Times,serif" font-size="8.00" fill="#000000">24 : 3</text>
 -- </g>
 -- <!-- 24&#45;&#45;25 -->
 -- <g id="edge63" class="edge">
@@ -867,7 +867,7 @@ select draw(triu(graph),
 -- <g id="node27" class="node">
 -- <title>26</title>
 -- <ellipse fill="#7f0000" fill-opacity="0.498039" stroke="black" cx="28.28" cy="-165.62" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="28.28" y="-163.72" font-family="Times,serif" font-size="8.00">26 : 3</text>
+-- <text text-anchor="middle" x="28.28" y="-163.72" font-family="Times,serif" font-size="8.00" fill="#000000">26 : 3</text>
 -- </g>
 -- <!-- 26&#45;&#45;29 -->
 -- <g id="edge67" class="edge">
@@ -948,7 +948,7 @@ select draw(triu(graph),
             0.5) as draw_source from karate \gset
 \i sql/draw_sfdp.sql
 \setenv draw_source :draw_source
-\! echo $draw_source | dot -Ksfdp -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
+\! echo $draw_source | dot -Ksfdp -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 2>/dev/null | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
 -- <div>
 -- <!-- Title: %3 Pages: 1 -->
 -- <svg width="1038pt" height="499pt"
@@ -960,13 +960,13 @@ select draw(triu(graph),
 -- <g id="node1" class="node">
 -- <title>0</title>
 -- <ellipse fill="#00009e" fill-opacity="0.498039" stroke="black" cx="605.44" cy="-254.14" rx="25" ry="25"/>
--- <text text-anchor="middle" x="605.44" y="-252.24" font-family="Times,serif" font-size="8.00">0 : 1</text>
+-- <text text-anchor="middle" x="605.44" y="-252.24" font-family="Times,serif" font-size="8.00" fill="#000000">0 : 1</text>
 -- </g>
 -- <!-- 1 -->
 -- <g id="node2" class="node">
 -- <title>1</title>
 -- <ellipse fill="#00009e" fill-opacity="0.498039" stroke="black" cx="528.3" cy="-245.69" rx="25" ry="25"/>
--- <text text-anchor="middle" x="528.3" y="-243.79" font-family="Times,serif" font-size="8.00">1 : 1</text>
+-- <text text-anchor="middle" x="528.3" y="-243.79" font-family="Times,serif" font-size="8.00" fill="#000000">1 : 1</text>
 -- </g>
 -- <!-- 0&#45;&#45;1 -->
 -- <g id="edge1" class="edge">
@@ -977,7 +977,7 @@ select draw(triu(graph),
 -- <g id="node3" class="node">
 -- <title>2</title>
 -- <ellipse fill="#00009e" fill-opacity="0.498039" stroke="black" cx="398.07" cy="-200.27" rx="25" ry="25"/>
--- <text text-anchor="middle" x="398.07" y="-198.37" font-family="Times,serif" font-size="8.00">2 : 1</text>
+-- <text text-anchor="middle" x="398.07" y="-198.37" font-family="Times,serif" font-size="8.00" fill="#000000">2 : 1</text>
 -- </g>
 -- <!-- 0&#45;&#45;2 -->
 -- <g id="edge2" class="edge">
@@ -988,7 +988,7 @@ select draw(triu(graph),
 -- <g id="node4" class="node">
 -- <title>3</title>
 -- <ellipse fill="#00009e" fill-opacity="0.498039" stroke="black" cx="557.92" cy="-159.8" rx="25" ry="25"/>
--- <text text-anchor="middle" x="557.92" y="-157.9" font-family="Times,serif" font-size="8.00">3 : 1</text>
+-- <text text-anchor="middle" x="557.92" y="-157.9" font-family="Times,serif" font-size="8.00" fill="#000000">3 : 1</text>
 -- </g>
 -- <!-- 0&#45;&#45;3 -->
 -- <g id="edge3" class="edge">
@@ -999,7 +999,7 @@ select draw(triu(graph),
 -- <g id="node5" class="node">
 -- <title>4</title>
 -- <ellipse fill="#00007f" fill-opacity="0.498039" stroke="black" cx="781.6" cy="-327.35" rx="25" ry="25"/>
--- <text text-anchor="middle" x="781.6" y="-325.45" font-family="Times,serif" font-size="8.00">4 : 0</text>
+-- <text text-anchor="middle" x="781.6" y="-325.45" font-family="Times,serif" font-size="8.00" fill="#000000">4 : 0</text>
 -- </g>
 -- <!-- 0&#45;&#45;4 -->
 -- <g id="edge4" class="edge">
@@ -1010,7 +1010,7 @@ select draw(triu(graph),
 -- <g id="node6" class="node">
 -- <title>5</title>
 -- <ellipse fill="#00007f" fill-opacity="0.498039" stroke="black" cx="853.13" cy="-316.38" rx="25" ry="25"/>
--- <text text-anchor="middle" x="853.13" y="-314.48" font-family="Times,serif" font-size="8.00">5 : 0</text>
+-- <text text-anchor="middle" x="853.13" y="-314.48" font-family="Times,serif" font-size="8.00" fill="#000000">5 : 0</text>
 -- </g>
 -- <!-- 0&#45;&#45;5 -->
 -- <g id="edge5" class="edge">
@@ -1021,7 +1021,7 @@ select draw(triu(graph),
 -- <g id="node7" class="node">
 -- <title>6</title>
 -- <ellipse fill="#00007f" fill-opacity="0.498039" stroke="black" cx="859.52" cy="-266.15" rx="25" ry="25"/>
--- <text text-anchor="middle" x="859.52" y="-264.25" font-family="Times,serif" font-size="8.00">6 : 0</text>
+-- <text text-anchor="middle" x="859.52" y="-264.25" font-family="Times,serif" font-size="8.00" fill="#000000">6 : 0</text>
 -- </g>
 -- <!-- 0&#45;&#45;6 -->
 -- <g id="edge6" class="edge">
@@ -1032,7 +1032,7 @@ select draw(triu(graph),
 -- <g id="node8" class="node">
 -- <title>7</title>
 -- <ellipse fill="#00009e" fill-opacity="0.498039" stroke="black" cx="526.01" cy="-125.72" rx="25" ry="25"/>
--- <text text-anchor="middle" x="526.01" y="-123.82" font-family="Times,serif" font-size="8.00">7 : 1</text>
+-- <text text-anchor="middle" x="526.01" y="-123.82" font-family="Times,serif" font-size="8.00" fill="#000000">7 : 1</text>
 -- </g>
 -- <!-- 0&#45;&#45;7 -->
 -- <g id="edge7" class="edge">
@@ -1043,7 +1043,7 @@ select draw(triu(graph),
 -- <g id="node9" class="node">
 -- <title>8</title>
 -- <ellipse fill="#00007f" fill-opacity="0.498039" stroke="black" cx="378.36" cy="-303.6" rx="25" ry="25"/>
--- <text text-anchor="middle" x="378.36" y="-301.7" font-family="Times,serif" font-size="8.00">8 : 0</text>
+-- <text text-anchor="middle" x="378.36" y="-301.7" font-family="Times,serif" font-size="8.00" fill="#000000">8 : 0</text>
 -- </g>
 -- <!-- 0&#45;&#45;8 -->
 -- <g id="edge8" class="edge">
@@ -1054,7 +1054,7 @@ select draw(triu(graph),
 -- <g id="node11" class="node">
 -- <title>10</title>
 -- <ellipse fill="#00007f" fill-opacity="0.498039" stroke="black" cx="793.3" cy="-251.15" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="793.3" y="-249.25" font-family="Times,serif" font-size="8.00">10 : 0</text>
+-- <text text-anchor="middle" x="793.3" y="-249.25" font-family="Times,serif" font-size="8.00" fill="#000000">10 : 0</text>
 -- </g>
 -- <!-- 0&#45;&#45;10 -->
 -- <g id="edge9" class="edge">
@@ -1065,7 +1065,7 @@ select draw(triu(graph),
 -- <g id="node12" class="node">
 -- <title>11</title>
 -- <ellipse fill="#00007f" fill-opacity="0.498039" stroke="black" cx="703.6" cy="-434.84" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="703.6" y="-432.94" font-family="Times,serif" font-size="8.00">11 : 0</text>
+-- <text text-anchor="middle" x="703.6" y="-432.94" font-family="Times,serif" font-size="8.00" fill="#000000">11 : 0</text>
 -- </g>
 -- <!-- 0&#45;&#45;11 -->
 -- <g id="edge10" class="edge">
@@ -1076,7 +1076,7 @@ select draw(triu(graph),
 -- <g id="node13" class="node">
 -- <title>12</title>
 -- <ellipse fill="#00007f" fill-opacity="0.498039" stroke="black" cx="675.36" cy="-83.5" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="675.36" y="-81.6" font-family="Times,serif" font-size="8.00">12 : 0</text>
+-- <text text-anchor="middle" x="675.36" y="-81.6" font-family="Times,serif" font-size="8.00" fill="#000000">12 : 0</text>
 -- </g>
 -- <!-- 0&#45;&#45;12 -->
 -- <g id="edge11" class="edge">
@@ -1087,7 +1087,7 @@ select draw(triu(graph),
 -- <g id="node14" class="node">
 -- <title>13</title>
 -- <ellipse fill="#00009e" fill-opacity="0.498039" stroke="black" cx="448.83" cy="-239.07" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="448.83" y="-237.17" font-family="Times,serif" font-size="8.00">13 : 1</text>
+-- <text text-anchor="middle" x="448.83" y="-237.17" font-family="Times,serif" font-size="8.00" fill="#000000">13 : 1</text>
 -- </g>
 -- <!-- 0&#45;&#45;13 -->
 -- <g id="edge12" class="edge">
@@ -1098,7 +1098,7 @@ select draw(triu(graph),
 -- <g id="node18" class="node">
 -- <title>17</title>
 -- <ellipse fill="#00009e" fill-opacity="0.498039" stroke="black" cx="682.56" cy="-263.25" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="682.56" y="-261.35" font-family="Times,serif" font-size="8.00">17 : 1</text>
+-- <text text-anchor="middle" x="682.56" y="-261.35" font-family="Times,serif" font-size="8.00" fill="#000000">17 : 1</text>
 -- </g>
 -- <!-- 0&#45;&#45;17 -->
 -- <g id="edge13" class="edge">
@@ -1109,7 +1109,7 @@ select draw(triu(graph),
 -- <g id="node20" class="node">
 -- <title>19</title>
 -- <ellipse fill="#00009e" fill-opacity="0.498039" stroke="black" cx="448.84" cy="-337.55" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="448.84" y="-335.65" font-family="Times,serif" font-size="8.00">19 : 1</text>
+-- <text text-anchor="middle" x="448.84" y="-335.65" font-family="Times,serif" font-size="8.00" fill="#000000">19 : 1</text>
 -- </g>
 -- <!-- 0&#45;&#45;19 -->
 -- <g id="edge14" class="edge">
@@ -1120,7 +1120,7 @@ select draw(triu(graph),
 -- <g id="node22" class="node">
 -- <title>21</title>
 -- <ellipse fill="#00009e" fill-opacity="0.498039" stroke="black" cx="677.07" cy="-168.86" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="677.07" y="-166.96" font-family="Times,serif" font-size="8.00">21 : 1</text>
+-- <text text-anchor="middle" x="677.07" y="-166.96" font-family="Times,serif" font-size="8.00" fill="#000000">21 : 1</text>
 -- </g>
 -- <!-- 0&#45;&#45;21 -->
 -- <g id="edge15" class="edge">
@@ -1131,7 +1131,7 @@ select draw(triu(graph),
 -- <g id="node32" class="node">
 -- <title>31</title>
 -- <ellipse fill="#00007f" fill-opacity="0.498039" stroke="black" cx="302.14" cy="-181.18" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="302.14" y="-179.28" font-family="Times,serif" font-size="8.00">31 : 0</text>
+-- <text text-anchor="middle" x="302.14" y="-179.28" font-family="Times,serif" font-size="8.00" fill="#000000">31 : 0</text>
 -- </g>
 -- <!-- 0&#45;&#45;31 -->
 -- <g id="edge16" class="edge">
@@ -1177,7 +1177,7 @@ select draw(triu(graph),
 -- <g id="node31" class="node">
 -- <title>30</title>
 -- <ellipse fill="#00009e" fill-opacity="0.498039" stroke="black" cx="337.37" cy="-339.31" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="337.37" y="-337.41" font-family="Times,serif" font-size="8.00">30 : 1</text>
+-- <text text-anchor="middle" x="337.37" y="-337.41" font-family="Times,serif" font-size="8.00" fill="#000000">30 : 1</text>
 -- </g>
 -- <!-- 1&#45;&#45;30 -->
 -- <g id="edge24" class="edge">
@@ -1203,7 +1203,7 @@ select draw(triu(graph),
 -- <g id="node10" class="node">
 -- <title>9</title>
 -- <ellipse fill="#0000bd" fill-opacity="0.498039" stroke="black" cx="288.9" cy="-109.3" rx="25" ry="25"/>
--- <text text-anchor="middle" x="288.9" y="-107.4" font-family="Times,serif" font-size="8.00">9 : 2</text>
+-- <text text-anchor="middle" x="288.9" y="-107.4" font-family="Times,serif" font-size="8.00" fill="#000000">9 : 2</text>
 -- </g>
 -- <!-- 2&#45;&#45;9 -->
 -- <g id="edge28" class="edge">
@@ -1219,7 +1219,7 @@ select draw(triu(graph),
 -- <g id="node28" class="node">
 -- <title>27</title>
 -- <ellipse fill="#0000bd" fill-opacity="0.498039" stroke="black" cx="213.19" cy="-140.01" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="213.19" y="-138.11" font-family="Times,serif" font-size="8.00">27 : 2</text>
+-- <text text-anchor="middle" x="213.19" y="-138.11" font-family="Times,serif" font-size="8.00" fill="#000000">27 : 2</text>
 -- </g>
 -- <!-- 2&#45;&#45;27 -->
 -- <g id="edge30" class="edge">
@@ -1230,7 +1230,7 @@ select draw(triu(graph),
 -- <g id="node29" class="node">
 -- <title>28</title>
 -- <ellipse fill="#0000bd" fill-opacity="0.498039" stroke="black" cx="288.06" cy="-246.39" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="288.06" y="-244.49" font-family="Times,serif" font-size="8.00">28 : 2</text>
+-- <text text-anchor="middle" x="288.06" y="-244.49" font-family="Times,serif" font-size="8.00" fill="#000000">28 : 2</text>
 -- </g>
 -- <!-- 2&#45;&#45;28 -->
 -- <g id="edge31" class="edge">
@@ -1241,7 +1241,7 @@ select draw(triu(graph),
 -- <g id="node33" class="node">
 -- <title>32</title>
 -- <ellipse fill="#0000bd" fill-opacity="0.498039" stroke="black" cx="197.1" cy="-326.41" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="197.1" y="-324.51" font-family="Times,serif" font-size="8.00">32 : 2</text>
+-- <text text-anchor="middle" x="197.1" y="-324.51" font-family="Times,serif" font-size="8.00" fill="#000000">32 : 2</text>
 -- </g>
 -- <!-- 2&#45;&#45;32 -->
 -- <g id="edge32" class="edge">
@@ -1287,7 +1287,7 @@ select draw(triu(graph),
 -- <g id="node17" class="node">
 -- <title>16</title>
 -- <ellipse fill="#001bff" fill-opacity="0.498039" stroke="black" cx="1001.72" cy="-314.11" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="1001.72" y="-312.21" font-family="Times,serif" font-size="8.00">16 : 5</text>
+-- <text text-anchor="middle" x="1001.72" y="-312.21" font-family="Times,serif" font-size="8.00" fill="#000000">16 : 5</text>
 -- </g>
 -- <!-- 5&#45;&#45;16 -->
 -- <g id="edge40" class="edge">
@@ -1313,7 +1313,7 @@ select draw(triu(graph),
 -- <g id="node34" class="node">
 -- <title>33</title>
 -- <ellipse fill="#13ffeb" fill-opacity="0.498039" stroke="black" cx="214.46" cy="-287.96" rx="31.64" ry="31.64"/>
--- <text text-anchor="middle" x="214.46" y="-286.06" font-family="Times,serif" font-size="8.00">33 : 13</text>
+-- <text text-anchor="middle" x="214.46" y="-286.06" font-family="Times,serif" font-size="8.00" fill="#000000">33 : 13</text>
 -- </g>
 -- <!-- 8&#45;&#45;33 -->
 -- <g id="edge44" class="edge">
@@ -1334,7 +1334,7 @@ select draw(triu(graph),
 -- <g id="node15" class="node">
 -- <title>14</title>
 -- <ellipse fill="#9e0000" fill-opacity="0.498039" stroke="black" cx="59.86" cy="-385.94" rx="31.64" ry="31.64"/>
--- <text text-anchor="middle" x="59.86" y="-384.04" font-family="Times,serif" font-size="8.00">14 : 32</text>
+-- <text text-anchor="middle" x="59.86" y="-384.04" font-family="Times,serif" font-size="8.00" fill="#000000">14 : 32</text>
 -- </g>
 -- <!-- 14&#45;&#45;32 -->
 -- <g id="edge47" class="edge">
@@ -1350,7 +1350,7 @@ select draw(triu(graph),
 -- <g id="node16" class="node">
 -- <title>15</title>
 -- <ellipse fill="#9e0000" fill-opacity="0.498039" stroke="black" cx="207.73" cy="-458.81" rx="31.64" ry="31.64"/>
--- <text text-anchor="middle" x="207.73" y="-456.91" font-family="Times,serif" font-size="8.00">15 : 32</text>
+-- <text text-anchor="middle" x="207.73" y="-456.91" font-family="Times,serif" font-size="8.00" fill="#000000">15 : 32</text>
 -- </g>
 -- <!-- 15&#45;&#45;32 -->
 -- <g id="edge49" class="edge">
@@ -1366,7 +1366,7 @@ select draw(triu(graph),
 -- <g id="node19" class="node">
 -- <title>18</title>
 -- <ellipse fill="#9e0000" fill-opacity="0.498039" stroke="black" cx="97.96" cy="-425.89" rx="31.64" ry="31.64"/>
--- <text text-anchor="middle" x="97.96" y="-423.99" font-family="Times,serif" font-size="8.00">18 : 32</text>
+-- <text text-anchor="middle" x="97.96" y="-423.99" font-family="Times,serif" font-size="8.00" fill="#000000">18 : 32</text>
 -- </g>
 -- <!-- 18&#45;&#45;32 -->
 -- <g id="edge51" class="edge">
@@ -1387,7 +1387,7 @@ select draw(triu(graph),
 -- <g id="node21" class="node">
 -- <title>20</title>
 -- <ellipse fill="#9e0000" fill-opacity="0.498039" stroke="black" cx="145.21" cy="-457.15" rx="31.64" ry="31.64"/>
--- <text text-anchor="middle" x="145.21" y="-455.25" font-family="Times,serif" font-size="8.00">20 : 32</text>
+-- <text text-anchor="middle" x="145.21" y="-455.25" font-family="Times,serif" font-size="8.00" fill="#000000">20 : 32</text>
 -- </g>
 -- <!-- 20&#45;&#45;32 -->
 -- <g id="edge54" class="edge">
@@ -1403,7 +1403,7 @@ select draw(triu(graph),
 -- <g id="node23" class="node">
 -- <title>22</title>
 -- <ellipse fill="#9e0000" fill-opacity="0.498039" stroke="black" cx="46.89" cy="-330.68" rx="31.64" ry="31.64"/>
--- <text text-anchor="middle" x="46.89" y="-328.78" font-family="Times,serif" font-size="8.00">22 : 32</text>
+-- <text text-anchor="middle" x="46.89" y="-328.78" font-family="Times,serif" font-size="8.00" fill="#000000">22 : 32</text>
 -- </g>
 -- <!-- 22&#45;&#45;32 -->
 -- <g id="edge56" class="edge">
@@ -1419,13 +1419,13 @@ select draw(triu(graph),
 -- <g id="node24" class="node">
 -- <title>23</title>
 -- <ellipse fill="#ff3900" fill-opacity="0.498039" stroke="black" cx="115.01" cy="-206.27" rx="31.64" ry="31.64"/>
--- <text text-anchor="middle" x="115.01" y="-204.37" font-family="Times,serif" font-size="8.00">23 : 27</text>
+-- <text text-anchor="middle" x="115.01" y="-204.37" font-family="Times,serif" font-size="8.00" fill="#000000">23 : 27</text>
 -- </g>
 -- <!-- 25 -->
 -- <g id="node26" class="node">
 -- <title>25</title>
 -- <ellipse fill="#bd0000" fill-opacity="0.498039" stroke="black" cx="118.37" cy="-103.1" rx="31.64" ry="31.64"/>
--- <text text-anchor="middle" x="118.37" y="-101.2" font-family="Times,serif" font-size="8.00">25 : 31</text>
+-- <text text-anchor="middle" x="118.37" y="-101.2" font-family="Times,serif" font-size="8.00" fill="#000000">25 : 31</text>
 -- </g>
 -- <!-- 23&#45;&#45;25 -->
 -- <g id="edge58" class="edge">
@@ -1441,7 +1441,7 @@ select draw(triu(graph),
 -- <g id="node30" class="node">
 -- <title>29</title>
 -- <ellipse fill="#9e0000" fill-opacity="0.498039" stroke="black" cx="55.57" cy="-253.49" rx="31.64" ry="31.64"/>
--- <text text-anchor="middle" x="55.57" y="-251.59" font-family="Times,serif" font-size="8.00">29 : 32</text>
+-- <text text-anchor="middle" x="55.57" y="-251.59" font-family="Times,serif" font-size="8.00" fill="#000000">29 : 32</text>
 -- </g>
 -- <!-- 23&#45;&#45;29 -->
 -- <g id="edge60" class="edge">
@@ -1462,7 +1462,7 @@ select draw(triu(graph),
 -- <g id="node25" class="node">
 -- <title>24</title>
 -- <ellipse fill="#ff3900" fill-opacity="0.498039" stroke="black" cx="180.61" cy="-31.82" rx="31.64" ry="31.64"/>
--- <text text-anchor="middle" x="180.61" y="-29.92" font-family="Times,serif" font-size="8.00">24 : 27</text>
+-- <text text-anchor="middle" x="180.61" y="-29.92" font-family="Times,serif" font-size="8.00" fill="#000000">24 : 27</text>
 -- </g>
 -- <!-- 24&#45;&#45;25 -->
 -- <g id="edge63" class="edge">
@@ -1488,7 +1488,7 @@ select draw(triu(graph),
 -- <g id="node27" class="node">
 -- <title>26</title>
 -- <ellipse fill="#7f0000" fill-opacity="0.498039" stroke="black" cx="31.82" cy="-152.42" rx="31.64" ry="31.64"/>
--- <text text-anchor="middle" x="31.82" y="-150.52" font-family="Times,serif" font-size="8.00">26 : 33</text>
+-- <text text-anchor="middle" x="31.82" y="-150.52" font-family="Times,serif" font-size="8.00" fill="#000000">26 : 33</text>
 -- </g>
 -- <!-- 26&#45;&#45;29 -->
 -- <g id="edge67" class="edge">
@@ -1612,7 +1612,7 @@ select draw(triu(graph),
     as draw_source from karate \gset
 \i sql/draw_sfdp.sql
 \setenv draw_source :draw_source
-\! echo $draw_source | dot -Ksfdp -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
+\! echo $draw_source | dot -Ksfdp -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 2>/dev/null | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
 -- <div>
 -- <!-- Title: %3 Pages: 1 -->
 -- <svg width="1013pt" height="503pt"
@@ -1620,18 +1620,18 @@ select draw(triu(graph),
 -- <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 498.97)">
 -- <title>%3</title>
 -- <polygon fill="white" stroke="transparent" points="-4,4 -4,-498.97 1008.68,-498.97 1008.68,4 -4,4"/>
--- <text text-anchor="middle" x="502.34" y="-7.4" font-family="Times,serif" font-size="12.00">Degree of Karate Graph</text>
+-- <text text-anchor="middle" x="502.34" y="-7.4" font-family="Times,serif" font-size="12.00" fill="#000000">Degree of Karate Graph</text>
 -- <!-- 0 -->
 -- <g id="node1" class="node">
 -- <title>0</title>
 -- <ellipse fill="#bf0000" fill-opacity="0.498039" stroke="black" cx="589.01" cy="-266.61" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="589.01" y="-264.71" font-family="Times,serif" font-size="8.00">0 : 16</text>
+-- <text text-anchor="middle" x="589.01" y="-264.71" font-family="Times,serif" font-size="8.00" fill="#000000">0 : 16</text>
 -- </g>
 -- <!-- 1 -->
 -- <g id="node2" class="node">
 -- <title>1</title>
 -- <ellipse fill="#7fff7f" fill-opacity="0.498039" stroke="black" cx="513.6" cy="-258.35" rx="25" ry="25"/>
--- <text text-anchor="middle" x="513.6" y="-256.45" font-family="Times,serif" font-size="8.00">1 : 9</text>
+-- <text text-anchor="middle" x="513.6" y="-256.45" font-family="Times,serif" font-size="8.00" fill="#000000">1 : 9</text>
 -- </g>
 -- <!-- 0&#45;&#45;1 -->
 -- <g id="edge1" class="edge">
@@ -1642,7 +1642,7 @@ select draw(triu(graph),
 -- <g id="node3" class="node">
 -- <title>2</title>
 -- <ellipse fill="#bfff3f" fill-opacity="0.498039" stroke="black" cx="386.3" cy="-213.95" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="386.3" y="-212.05" font-family="Times,serif" font-size="8.00">2 : 10</text>
+-- <text text-anchor="middle" x="386.3" y="-212.05" font-family="Times,serif" font-size="8.00" fill="#000000">2 : 10</text>
 -- </g>
 -- <!-- 0&#45;&#45;2 -->
 -- <g id="edge2" class="edge">
@@ -1653,7 +1653,7 @@ select draw(triu(graph),
 -- <g id="node4" class="node">
 -- <title>3</title>
 -- <ellipse fill="#00bfff" fill-opacity="0.498039" stroke="black" cx="542.56" cy="-174.39" rx="25" ry="25"/>
--- <text text-anchor="middle" x="542.56" y="-172.49" font-family="Times,serif" font-size="8.00">3 : 6</text>
+-- <text text-anchor="middle" x="542.56" y="-172.49" font-family="Times,serif" font-size="8.00" fill="#000000">3 : 6</text>
 -- </g>
 -- <!-- 0&#45;&#45;3 -->
 -- <g id="edge3" class="edge">
@@ -1664,7 +1664,7 @@ select draw(triu(graph),
 -- <g id="node5" class="node">
 -- <title>4</title>
 -- <ellipse fill="#0000ff" fill-opacity="0.498039" stroke="black" cx="761.21" cy="-338.17" rx="25" ry="25"/>
--- <text text-anchor="middle" x="761.21" y="-336.27" font-family="Times,serif" font-size="8.00">4 : 3</text>
+-- <text text-anchor="middle" x="761.21" y="-336.27" font-family="Times,serif" font-size="8.00" fill="#000000">4 : 3</text>
 -- </g>
 -- <!-- 0&#45;&#45;4 -->
 -- <g id="edge4" class="edge">
@@ -1675,7 +1675,7 @@ select draw(triu(graph),
 -- <g id="node6" class="node">
 -- <title>5</title>
 -- <ellipse fill="#003fff" fill-opacity="0.498039" stroke="black" cx="831.14" cy="-327.45" rx="25" ry="25"/>
--- <text text-anchor="middle" x="831.14" y="-325.55" font-family="Times,serif" font-size="8.00">5 : 4</text>
+-- <text text-anchor="middle" x="831.14" y="-325.55" font-family="Times,serif" font-size="8.00" fill="#000000">5 : 4</text>
 -- </g>
 -- <!-- 0&#45;&#45;5 -->
 -- <g id="edge5" class="edge">
@@ -1686,7 +1686,7 @@ select draw(triu(graph),
 -- <g id="node7" class="node">
 -- <title>6</title>
 -- <ellipse fill="#003fff" fill-opacity="0.498039" stroke="black" cx="837.39" cy="-278.35" rx="25" ry="25"/>
--- <text text-anchor="middle" x="837.39" y="-276.45" font-family="Times,serif" font-size="8.00">6 : 4</text>
+-- <text text-anchor="middle" x="837.39" y="-276.45" font-family="Times,serif" font-size="8.00" fill="#000000">6 : 4</text>
 -- </g>
 -- <!-- 0&#45;&#45;6 -->
 -- <g id="edge6" class="edge">
@@ -1697,7 +1697,7 @@ select draw(triu(graph),
 -- <g id="node8" class="node">
 -- <title>7</title>
 -- <ellipse fill="#003fff" fill-opacity="0.498039" stroke="black" cx="511.36" cy="-141.07" rx="25" ry="25"/>
--- <text text-anchor="middle" x="511.36" y="-139.17" font-family="Times,serif" font-size="8.00">7 : 4</text>
+-- <text text-anchor="middle" x="511.36" y="-139.17" font-family="Times,serif" font-size="8.00" fill="#000000">7 : 4</text>
 -- </g>
 -- <!-- 0&#45;&#45;7 -->
 -- <g id="edge7" class="edge">
@@ -1708,7 +1708,7 @@ select draw(triu(graph),
 -- <g id="node9" class="node">
 -- <title>8</title>
 -- <ellipse fill="#007fff" fill-opacity="0.498039" stroke="black" cx="367.04" cy="-314.95" rx="25" ry="25"/>
--- <text text-anchor="middle" x="367.04" y="-313.05" font-family="Times,serif" font-size="8.00">8 : 5</text>
+-- <text text-anchor="middle" x="367.04" y="-313.05" font-family="Times,serif" font-size="8.00" fill="#000000">8 : 5</text>
 -- </g>
 -- <!-- 0&#45;&#45;8 -->
 -- <g id="edge8" class="edge">
@@ -1719,7 +1719,7 @@ select draw(triu(graph),
 -- <g id="node11" class="node">
 -- <title>10</title>
 -- <ellipse fill="#0000ff" fill-opacity="0.498039" stroke="black" cx="772.65" cy="-263.68" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="772.65" y="-261.78" font-family="Times,serif" font-size="8.00">10 : 3</text>
+-- <text text-anchor="middle" x="772.65" y="-261.78" font-family="Times,serif" font-size="8.00" fill="#000000">10 : 3</text>
 -- </g>
 -- <!-- 0&#45;&#45;10 -->
 -- <g id="edge9" class="edge">
@@ -1730,7 +1730,7 @@ select draw(triu(graph),
 -- <g id="node12" class="node">
 -- <title>11</title>
 -- <ellipse fill="#00007f" fill-opacity="0.498039" stroke="black" cx="684.96" cy="-443.24" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="684.96" y="-441.34" font-family="Times,serif" font-size="8.00">11 : 1</text>
+-- <text text-anchor="middle" x="684.96" y="-441.34" font-family="Times,serif" font-size="8.00" fill="#000000">11 : 1</text>
 -- </g>
 -- <!-- 0&#45;&#45;11 -->
 -- <g id="edge10" class="edge">
@@ -1741,7 +1741,7 @@ select draw(triu(graph),
 -- <g id="node13" class="node">
 -- <title>12</title>
 -- <ellipse fill="#0000bf" fill-opacity="0.498039" stroke="black" cx="657.36" cy="-99.8" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="657.36" y="-97.9" font-family="Times,serif" font-size="8.00">12 : 2</text>
+-- <text text-anchor="middle" x="657.36" y="-97.9" font-family="Times,serif" font-size="8.00" fill="#000000">12 : 2</text>
 -- </g>
 -- <!-- 0&#45;&#45;12 -->
 -- <g id="edge11" class="edge">
@@ -1752,7 +1752,7 @@ select draw(triu(graph),
 -- <g id="node14" class="node">
 -- <title>13</title>
 -- <ellipse fill="#007fff" fill-opacity="0.498039" stroke="black" cx="435.93" cy="-251.88" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="435.93" y="-249.98" font-family="Times,serif" font-size="8.00">13 : 5</text>
+-- <text text-anchor="middle" x="435.93" y="-249.98" font-family="Times,serif" font-size="8.00" fill="#000000">13 : 5</text>
 -- </g>
 -- <!-- 0&#45;&#45;13 -->
 -- <g id="edge12" class="edge">
@@ -1763,7 +1763,7 @@ select draw(triu(graph),
 -- <g id="node18" class="node">
 -- <title>17</title>
 -- <ellipse fill="#0000bf" fill-opacity="0.498039" stroke="black" cx="664.4" cy="-275.52" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="664.4" y="-273.62" font-family="Times,serif" font-size="8.00">17 : 2</text>
+-- <text text-anchor="middle" x="664.4" y="-273.62" font-family="Times,serif" font-size="8.00" fill="#000000">17 : 2</text>
 -- </g>
 -- <!-- 0&#45;&#45;17 -->
 -- <g id="edge13" class="edge">
@@ -1774,7 +1774,7 @@ select draw(triu(graph),
 -- <g id="node20" class="node">
 -- <title>19</title>
 -- <ellipse fill="#0000ff" fill-opacity="0.498039" stroke="black" cx="435.94" cy="-348.14" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="435.94" y="-346.24" font-family="Times,serif" font-size="8.00">19 : 3</text>
+-- <text text-anchor="middle" x="435.94" y="-346.24" font-family="Times,serif" font-size="8.00" fill="#000000">19 : 3</text>
 -- </g>
 -- <!-- 0&#45;&#45;19 -->
 -- <g id="edge14" class="edge">
@@ -1785,7 +1785,7 @@ select draw(triu(graph),
 -- <g id="node22" class="node">
 -- <title>21</title>
 -- <ellipse fill="#0000bf" fill-opacity="0.498039" stroke="black" cx="659.03" cy="-183.25" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="659.03" y="-181.35" font-family="Times,serif" font-size="8.00">21 : 2</text>
+-- <text text-anchor="middle" x="659.03" y="-181.35" font-family="Times,serif" font-size="8.00" fill="#000000">21 : 2</text>
 -- </g>
 -- <!-- 0&#45;&#45;21 -->
 -- <g id="edge15" class="edge">
@@ -1796,7 +1796,7 @@ select draw(triu(graph),
 -- <g id="node32" class="node">
 -- <title>31</title>
 -- <ellipse fill="#00bfff" fill-opacity="0.498039" stroke="black" cx="292.53" cy="-195.28" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="292.53" y="-193.38" font-family="Times,serif" font-size="8.00">31 : 6</text>
+-- <text text-anchor="middle" x="292.53" y="-193.38" font-family="Times,serif" font-size="8.00" fill="#000000">31 : 6</text>
 -- </g>
 -- <!-- 0&#45;&#45;31 -->
 -- <g id="edge16" class="edge">
@@ -1842,7 +1842,7 @@ select draw(triu(graph),
 -- <g id="node31" class="node">
 -- <title>30</title>
 -- <ellipse fill="#003fff" fill-opacity="0.498039" stroke="black" cx="326.96" cy="-349.86" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="326.96" y="-347.96" font-family="Times,serif" font-size="8.00">30 : 4</text>
+-- <text text-anchor="middle" x="326.96" y="-347.96" font-family="Times,serif" font-size="8.00" fill="#000000">30 : 4</text>
 -- </g>
 -- <!-- 1&#45;&#45;30 -->
 -- <g id="edge24" class="edge">
@@ -1868,7 +1868,7 @@ select draw(triu(graph),
 -- <g id="node10" class="node">
 -- <title>9</title>
 -- <ellipse fill="#0000bf" fill-opacity="0.498039" stroke="black" cx="279.58" cy="-125.02" rx="25" ry="25"/>
--- <text text-anchor="middle" x="279.58" y="-123.12" font-family="Times,serif" font-size="8.00">9 : 2</text>
+-- <text text-anchor="middle" x="279.58" y="-123.12" font-family="Times,serif" font-size="8.00" fill="#000000">9 : 2</text>
 -- </g>
 -- <!-- 2&#45;&#45;9 -->
 -- <g id="edge28" class="edge">
@@ -1884,7 +1884,7 @@ select draw(triu(graph),
 -- <g id="node28" class="node">
 -- <title>27</title>
 -- <ellipse fill="#003fff" fill-opacity="0.498039" stroke="black" cx="205.58" cy="-155.04" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="205.58" y="-153.14" font-family="Times,serif" font-size="8.00">27 : 4</text>
+-- <text text-anchor="middle" x="205.58" y="-153.14" font-family="Times,serif" font-size="8.00" fill="#000000">27 : 4</text>
 -- </g>
 -- <!-- 2&#45;&#45;27 -->
 -- <g id="edge30" class="edge">
@@ -1895,7 +1895,7 @@ select draw(triu(graph),
 -- <g id="node29" class="node">
 -- <title>28</title>
 -- <ellipse fill="#0000ff" fill-opacity="0.498039" stroke="black" cx="278.77" cy="-259.03" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="278.77" y="-257.13" font-family="Times,serif" font-size="8.00">28 : 3</text>
+-- <text text-anchor="middle" x="278.77" y="-257.13" font-family="Times,serif" font-size="8.00" fill="#000000">28 : 3</text>
 -- </g>
 -- <!-- 2&#45;&#45;28 -->
 -- <g id="edge31" class="edge">
@@ -1906,7 +1906,7 @@ select draw(triu(graph),
 -- <g id="node33" class="node">
 -- <title>32</title>
 -- <ellipse fill="#ffbf00" fill-opacity="0.498039" stroke="black" cx="189.85" cy="-337.25" rx="31.64" ry="31.64"/>
--- <text text-anchor="middle" x="189.85" y="-335.35" font-family="Times,serif" font-size="8.00">32 : 12</text>
+-- <text text-anchor="middle" x="189.85" y="-335.35" font-family="Times,serif" font-size="8.00" fill="#000000">32 : 12</text>
 -- </g>
 -- <!-- 2&#45;&#45;32 -->
 -- <g id="edge32" class="edge">
@@ -1952,7 +1952,7 @@ select draw(triu(graph),
 -- <g id="node17" class="node">
 -- <title>16</title>
 -- <ellipse fill="#0000bf" fill-opacity="0.498039" stroke="black" cx="976.39" cy="-325.23" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="976.39" y="-323.33" font-family="Times,serif" font-size="8.00">16 : 2</text>
+-- <text text-anchor="middle" x="976.39" y="-323.33" font-family="Times,serif" font-size="8.00" fill="#000000">16 : 2</text>
 -- </g>
 -- <!-- 5&#45;&#45;16 -->
 -- <g id="edge40" class="edge">
@@ -1978,7 +1978,7 @@ select draw(triu(graph),
 -- <g id="node34" class="node">
 -- <title>33</title>
 -- <ellipse fill="#7f0000" fill-opacity="0.498039" stroke="black" cx="206.82" cy="-299.66" rx="31.64" ry="31.64"/>
--- <text text-anchor="middle" x="206.82" y="-297.76" font-family="Times,serif" font-size="8.00">33 : 17</text>
+-- <text text-anchor="middle" x="206.82" y="-297.76" font-family="Times,serif" font-size="8.00" fill="#000000">33 : 17</text>
 -- </g>
 -- <!-- 8&#45;&#45;33 -->
 -- <g id="edge44" class="edge">
@@ -1999,7 +1999,7 @@ select draw(triu(graph),
 -- <g id="node15" class="node">
 -- <title>14</title>
 -- <ellipse fill="#0000bf" fill-opacity="0.498039" stroke="black" cx="55.7" cy="-395.45" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="55.7" y="-393.55" font-family="Times,serif" font-size="8.00">14 : 2</text>
+-- <text text-anchor="middle" x="55.7" y="-393.55" font-family="Times,serif" font-size="8.00" fill="#000000">14 : 2</text>
 -- </g>
 -- <!-- 14&#45;&#45;32 -->
 -- <g id="edge47" class="edge">
@@ -2015,7 +2015,7 @@ select draw(triu(graph),
 -- <g id="node16" class="node">
 -- <title>15</title>
 -- <ellipse fill="#0000bf" fill-opacity="0.498039" stroke="black" cx="200.24" cy="-466.68" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="200.24" y="-464.78" font-family="Times,serif" font-size="8.00">15 : 2</text>
+-- <text text-anchor="middle" x="200.24" y="-464.78" font-family="Times,serif" font-size="8.00" fill="#000000">15 : 2</text>
 -- </g>
 -- <!-- 15&#45;&#45;32 -->
 -- <g id="edge49" class="edge">
@@ -2031,7 +2031,7 @@ select draw(triu(graph),
 -- <g id="node19" class="node">
 -- <title>18</title>
 -- <ellipse fill="#0000bf" fill-opacity="0.498039" stroke="black" cx="92.94" cy="-434.5" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="92.94" y="-432.6" font-family="Times,serif" font-size="8.00">18 : 2</text>
+-- <text text-anchor="middle" x="92.94" y="-432.6" font-family="Times,serif" font-size="8.00" fill="#000000">18 : 2</text>
 -- </g>
 -- <!-- 18&#45;&#45;32 -->
 -- <g id="edge51" class="edge">
@@ -2052,7 +2052,7 @@ select draw(triu(graph),
 -- <g id="node21" class="node">
 -- <title>20</title>
 -- <ellipse fill="#0000bf" fill-opacity="0.498039" stroke="black" cx="139.12" cy="-465.06" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="139.12" y="-463.16" font-family="Times,serif" font-size="8.00">20 : 2</text>
+-- <text text-anchor="middle" x="139.12" y="-463.16" font-family="Times,serif" font-size="8.00" fill="#000000">20 : 2</text>
 -- </g>
 -- <!-- 20&#45;&#45;32 -->
 -- <g id="edge54" class="edge">
@@ -2068,7 +2068,7 @@ select draw(triu(graph),
 -- <g id="node23" class="node">
 -- <title>22</title>
 -- <ellipse fill="#0000bf" fill-opacity="0.498039" stroke="black" cx="43.01" cy="-341.43" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="43.01" y="-339.53" font-family="Times,serif" font-size="8.00">22 : 2</text>
+-- <text text-anchor="middle" x="43.01" y="-339.53" font-family="Times,serif" font-size="8.00" fill="#000000">22 : 2</text>
 -- </g>
 -- <!-- 22&#45;&#45;32 -->
 -- <g id="edge56" class="edge">
@@ -2084,13 +2084,13 @@ select draw(triu(graph),
 -- <g id="node24" class="node">
 -- <title>23</title>
 -- <ellipse fill="#007fff" fill-opacity="0.498039" stroke="black" cx="109.61" cy="-219.81" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="109.61" y="-217.91" font-family="Times,serif" font-size="8.00">23 : 5</text>
+-- <text text-anchor="middle" x="109.61" y="-217.91" font-family="Times,serif" font-size="8.00" fill="#000000">23 : 5</text>
 -- </g>
 -- <!-- 25 -->
 -- <g id="node26" class="node">
 -- <title>25</title>
 -- <ellipse fill="#0000ff" fill-opacity="0.498039" stroke="black" cx="112.89" cy="-118.96" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="112.89" y="-117.06" font-family="Times,serif" font-size="8.00">25 : 3</text>
+-- <text text-anchor="middle" x="112.89" y="-117.06" font-family="Times,serif" font-size="8.00" fill="#000000">25 : 3</text>
 -- </g>
 -- <!-- 23&#45;&#45;25 -->
 -- <g id="edge58" class="edge">
@@ -2106,7 +2106,7 @@ select draw(triu(graph),
 -- <g id="node30" class="node">
 -- <title>29</title>
 -- <ellipse fill="#003fff" fill-opacity="0.498039" stroke="black" cx="51.5" cy="-265.97" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="51.5" y="-264.07" font-family="Times,serif" font-size="8.00">29 : 4</text>
+-- <text text-anchor="middle" x="51.5" y="-264.07" font-family="Times,serif" font-size="8.00" fill="#000000">29 : 4</text>
 -- </g>
 -- <!-- 23&#45;&#45;29 -->
 -- <g id="edge60" class="edge">
@@ -2127,7 +2127,7 @@ select draw(triu(graph),
 -- <g id="node25" class="node">
 -- <title>24</title>
 -- <ellipse fill="#0000ff" fill-opacity="0.498039" stroke="black" cx="173.73" cy="-49.28" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="173.73" y="-47.38" font-family="Times,serif" font-size="8.00">24 : 3</text>
+-- <text text-anchor="middle" x="173.73" y="-47.38" font-family="Times,serif" font-size="8.00" fill="#000000">24 : 3</text>
 -- </g>
 -- <!-- 24&#45;&#45;25 -->
 -- <g id="edge63" class="edge">
@@ -2153,7 +2153,7 @@ select draw(triu(graph),
 -- <g id="node27" class="node">
 -- <title>26</title>
 -- <ellipse fill="#0000bf" fill-opacity="0.498039" stroke="black" cx="28.28" cy="-167.17" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="28.28" y="-165.27" font-family="Times,serif" font-size="8.00">26 : 2</text>
+-- <text text-anchor="middle" x="28.28" y="-165.27" font-family="Times,serif" font-size="8.00" fill="#000000">26 : 2</text>
 -- </g>
 -- <!-- 26&#45;&#45;29 -->
 -- <g id="edge67" class="edge">
@@ -2249,7 +2249,7 @@ select draw(triu(graph),
     as draw_source from karate \gset
 \i sql/draw_sfdp.sql
 \setenv draw_source :draw_source
-\! echo $draw_source | dot -Ksfdp -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
+\! echo $draw_source | dot -Ksfdp -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 2>/dev/null | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
 -- <div>
 -- <!-- Title: %3 Pages: 1 -->
 -- <svg width="1288pt" height="634pt"
@@ -2257,18 +2257,18 @@ select draw(triu(graph),
 -- <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 630.31)">
 -- <title>%3</title>
 -- <polygon fill="white" stroke="transparent" points="-4,4 -4,-630.31 1283.65,-630.31 1283.65,4 -4,4"/>
--- <text text-anchor="middle" x="639.83" y="-7.4" font-family="Times,serif" font-size="12.00">PageRank Karate Graph</text>
+-- <text text-anchor="middle" x="639.83" y="-7.4" font-family="Times,serif" font-size="12.00" fill="#000000">PageRank Karate Graph</text>
 -- <!-- 0 -->
 -- <g id="node1" class="node">
 -- <title>0</title>
 -- <ellipse fill="#ab0000" fill-opacity="0.498039" stroke="black" cx="749.96" cy="-334.62" rx="33.47" ry="33.47"/>
--- <text text-anchor="middle" x="749.96" y="-332.72" font-family="Times,serif" font-size="8.00">0 : 0.09</text>
+-- <text text-anchor="middle" x="749.96" y="-332.72" font-family="Times,serif" font-size="8.00" fill="#000000">0 : 0.09</text>
 -- </g>
 -- <!-- 1 -->
 -- <g id="node2" class="node">
 -- <title>1</title>
 -- <ellipse fill="#65ff99" fill-opacity="0.498039" stroke="black" cx="654.14" cy="-324.12" rx="33.47" ry="33.47"/>
--- <text text-anchor="middle" x="654.14" y="-322.22" font-family="Times,serif" font-size="8.00">1 : 0.05</text>
+-- <text text-anchor="middle" x="654.14" y="-322.22" font-family="Times,serif" font-size="8.00" fill="#000000">1 : 0.05</text>
 -- </g>
 -- <!-- 0&#45;&#45;1 -->
 -- <g id="edge1" class="edge">
@@ -2279,7 +2279,7 @@ select draw(triu(graph),
 -- <g id="node3" class="node">
 -- <title>2</title>
 -- <ellipse fill="#94ff6a" fill-opacity="0.498039" stroke="black" cx="492.38" cy="-267.71" rx="33.47" ry="33.47"/>
--- <text text-anchor="middle" x="492.38" y="-265.81" font-family="Times,serif" font-size="8.00">2 : 0.05</text>
+-- <text text-anchor="middle" x="492.38" y="-265.81" font-family="Times,serif" font-size="8.00" fill="#000000">2 : 0.05</text>
 -- </g>
 -- <!-- 0&#45;&#45;2 -->
 -- <g id="edge2" class="edge">
@@ -2290,7 +2290,7 @@ select draw(triu(graph),
 -- <g id="node4" class="node">
 -- <title>3</title>
 -- <ellipse fill="#00a6ff" fill-opacity="0.498039" stroke="black" cx="690.94" cy="-217.44" rx="33.47" ry="33.47"/>
--- <text text-anchor="middle" x="690.94" y="-215.54" font-family="Times,serif" font-size="8.00">3 : 0.03</text>
+-- <text text-anchor="middle" x="690.94" y="-215.54" font-family="Times,serif" font-size="8.00" fill="#000000">3 : 0.03</text>
 -- </g>
 -- <!-- 0&#45;&#45;3 -->
 -- <g id="edge3" class="edge">
@@ -2301,7 +2301,7 @@ select draw(triu(graph),
 -- <g id="node5" class="node">
 -- <title>4</title>
 -- <ellipse fill="#000bff" fill-opacity="0.498039" stroke="black" cx="968.76" cy="-425.55" rx="33.47" ry="33.47"/>
--- <text text-anchor="middle" x="968.76" y="-423.65" font-family="Times,serif" font-size="8.00">4 : 0.02</text>
+-- <text text-anchor="middle" x="968.76" y="-423.65" font-family="Times,serif" font-size="8.00" fill="#000000">4 : 0.02</text>
 -- </g>
 -- <!-- 0&#45;&#45;4 -->
 -- <g id="edge4" class="edge">
@@ -2312,7 +2312,7 @@ select draw(triu(graph),
 -- <g id="node6" class="node">
 -- <title>5</title>
 -- <ellipse fill="#005aff" fill-opacity="0.498039" stroke="black" cx="1057.61" cy="-411.92" rx="33.47" ry="33.47"/>
--- <text text-anchor="middle" x="1057.61" y="-410.02" font-family="Times,serif" font-size="8.00">5 : 0.02</text>
+-- <text text-anchor="middle" x="1057.61" y="-410.02" font-family="Times,serif" font-size="8.00" fill="#000000">5 : 0.02</text>
 -- </g>
 -- <!-- 0&#45;&#45;5 -->
 -- <g id="edge5" class="edge">
@@ -2323,7 +2323,7 @@ select draw(triu(graph),
 -- <g id="node7" class="node">
 -- <title>6</title>
 -- <ellipse fill="#005aff" fill-opacity="0.498039" stroke="black" cx="1065.55" cy="-349.53" rx="33.47" ry="33.47"/>
--- <text text-anchor="middle" x="1065.55" y="-347.63" font-family="Times,serif" font-size="8.00">6 : 0.02</text>
+-- <text text-anchor="middle" x="1065.55" y="-347.63" font-family="Times,serif" font-size="8.00" fill="#000000">6 : 0.02</text>
 -- </g>
 -- <!-- 0&#45;&#45;6 -->
 -- <g id="edge6" class="edge">
@@ -2334,7 +2334,7 @@ select draw(triu(graph),
 -- <g id="node8" class="node">
 -- <title>7</title>
 -- <ellipse fill="#0027ff" fill-opacity="0.498039" stroke="black" cx="651.29" cy="-175.11" rx="33.47" ry="33.47"/>
--- <text text-anchor="middle" x="651.29" y="-173.21" font-family="Times,serif" font-size="8.00">7 : 0.02</text>
+-- <text text-anchor="middle" x="651.29" y="-173.21" font-family="Times,serif" font-size="8.00" fill="#000000">7 : 0.02</text>
 -- </g>
 -- <!-- 0&#45;&#45;7 -->
 -- <g id="edge7" class="edge">
@@ -2345,7 +2345,7 @@ select draw(triu(graph),
 -- <g id="node9" class="node">
 -- <title>8</title>
 -- <ellipse fill="#0062ff" fill-opacity="0.498039" stroke="black" cx="467.91" cy="-396.05" rx="33.47" ry="33.47"/>
--- <text text-anchor="middle" x="467.91" y="-394.15" font-family="Times,serif" font-size="8.00">8 : 0.02</text>
+-- <text text-anchor="middle" x="467.91" y="-394.15" font-family="Times,serif" font-size="8.00" fill="#000000">8 : 0.02</text>
 -- </g>
 -- <!-- 0&#45;&#45;8 -->
 -- <g id="edge8" class="edge">
@@ -2356,7 +2356,7 @@ select draw(triu(graph),
 -- <g id="node11" class="node">
 -- <title>10</title>
 -- <ellipse fill="#000bff" fill-opacity="0.498039" stroke="black" cx="983.29" cy="-330.9" rx="37.45" ry="37.45"/>
--- <text text-anchor="middle" x="983.29" y="-329" font-family="Times,serif" font-size="8.00">10 : 0.02</text>
+-- <text text-anchor="middle" x="983.29" y="-329" font-family="Times,serif" font-size="8.00" fill="#000000">10 : 0.02</text>
 -- </g>
 -- <!-- 0&#45;&#45;10 -->
 -- <g id="edge9" class="edge">
@@ -2367,7 +2367,7 @@ select draw(triu(graph),
 -- <g id="node12" class="node">
 -- <title>11</title>
 -- <ellipse fill="#00007f" fill-opacity="0.498039" stroke="black" cx="871.88" cy="-559.06" rx="37.45" ry="37.45"/>
--- <text text-anchor="middle" x="871.88" y="-557.16" font-family="Times,serif" font-size="8.00">11 : 0.00</text>
+-- <text text-anchor="middle" x="871.88" y="-557.16" font-family="Times,serif" font-size="8.00" fill="#000000">11 : 0.00</text>
 -- </g>
 -- <!-- 0&#45;&#45;11 -->
 -- <g id="edge10" class="edge">
@@ -2378,7 +2378,7 @@ select draw(triu(graph),
 -- <g id="node13" class="node">
 -- <title>12</title>
 -- <ellipse fill="#0000b8" fill-opacity="0.498039" stroke="black" cx="836.81" cy="-122.67" rx="37.45" ry="37.45"/>
--- <text text-anchor="middle" x="836.81" y="-120.77" font-family="Times,serif" font-size="8.00">12 : 0.01</text>
+-- <text text-anchor="middle" x="836.81" y="-120.77" font-family="Times,serif" font-size="8.00" fill="#000000">12 : 0.01</text>
 -- </g>
 -- <!-- 0&#45;&#45;12 -->
 -- <g id="edge11" class="edge">
@@ -2389,7 +2389,7 @@ select draw(triu(graph),
 -- <g id="node14" class="node">
 -- <title>13</title>
 -- <ellipse fill="#005fff" fill-opacity="0.498039" stroke="black" cx="555.44" cy="-315.9" rx="37.45" ry="37.45"/>
--- <text text-anchor="middle" x="555.44" y="-314" font-family="Times,serif" font-size="8.00">13 : 0.02</text>
+-- <text text-anchor="middle" x="555.44" y="-314" font-family="Times,serif" font-size="8.00" fill="#000000">13 : 0.02</text>
 -- </g>
 -- <!-- 0&#45;&#45;13 -->
 -- <g id="edge12" class="edge">
@@ -2400,7 +2400,7 @@ select draw(triu(graph),
 -- <g id="node18" class="node">
 -- <title>17</title>
 -- <ellipse fill="#0000b7" fill-opacity="0.498039" stroke="black" cx="845.75" cy="-345.93" rx="37.45" ry="37.45"/>
--- <text text-anchor="middle" x="845.75" y="-344.03" font-family="Times,serif" font-size="8.00">17 : 0.01</text>
+-- <text text-anchor="middle" x="845.75" y="-344.03" font-family="Times,serif" font-size="8.00" fill="#000000">17 : 0.01</text>
 -- </g>
 -- <!-- 0&#45;&#45;17 -->
 -- <g id="edge13" class="edge">
@@ -2411,7 +2411,7 @@ select draw(triu(graph),
 -- <g id="node20" class="node">
 -- <title>19</title>
 -- <ellipse fill="#0000ef" fill-opacity="0.498039" stroke="black" cx="555.45" cy="-438.22" rx="37.45" ry="37.45"/>
--- <text text-anchor="middle" x="555.45" y="-436.32" font-family="Times,serif" font-size="8.00">19 : 0.01</text>
+-- <text text-anchor="middle" x="555.45" y="-436.32" font-family="Times,serif" font-size="8.00" fill="#000000">19 : 0.01</text>
 -- </g>
 -- <!-- 0&#45;&#45;19 -->
 -- <g id="edge14" class="edge">
@@ -2422,7 +2422,7 @@ select draw(triu(graph),
 -- <g id="node22" class="node">
 -- <title>21</title>
 -- <ellipse fill="#0000b7" fill-opacity="0.498039" stroke="black" cx="838.93" cy="-228.7" rx="37.45" ry="37.45"/>
--- <text text-anchor="middle" x="838.93" y="-226.8" font-family="Times,serif" font-size="8.00">21 : 0.01</text>
+-- <text text-anchor="middle" x="838.93" y="-226.8" font-family="Times,serif" font-size="8.00" fill="#000000">21 : 0.01</text>
 -- </g>
 -- <!-- 0&#45;&#45;21 -->
 -- <g id="edge15" class="edge">
@@ -2433,7 +2433,7 @@ select draw(triu(graph),
 -- <g id="node32" class="node">
 -- <title>31</title>
 -- <ellipse fill="#00b4ff" fill-opacity="0.498039" stroke="black" cx="373.24" cy="-243.99" rx="37.45" ry="37.45"/>
--- <text text-anchor="middle" x="373.24" y="-242.09" font-family="Times,serif" font-size="8.00">31 : 0.03</text>
+-- <text text-anchor="middle" x="373.24" y="-242.09" font-family="Times,serif" font-size="8.00" fill="#000000">31 : 0.03</text>
 -- </g>
 -- <!-- 0&#45;&#45;31 -->
 -- <g id="edge16" class="edge">
@@ -2479,7 +2479,7 @@ select draw(triu(graph),
 -- <g id="node31" class="node">
 -- <title>30</title>
 -- <ellipse fill="#0028ff" fill-opacity="0.498039" stroke="black" cx="416.99" cy="-440.4" rx="37.45" ry="37.45"/>
--- <text text-anchor="middle" x="416.99" y="-438.5" font-family="Times,serif" font-size="8.00">30 : 0.02</text>
+-- <text text-anchor="middle" x="416.99" y="-438.5" font-family="Times,serif" font-size="8.00" fill="#000000">30 : 0.02</text>
 -- </g>
 -- <!-- 1&#45;&#45;30 -->
 -- <g id="edge24" class="edge">
@@ -2505,7 +2505,7 @@ select draw(triu(graph),
 -- <g id="node10" class="node">
 -- <title>9</title>
 -- <ellipse fill="#0000b4" fill-opacity="0.498039" stroke="black" cx="356.79" cy="-154.71" rx="33.47" ry="33.47"/>
--- <text text-anchor="middle" x="356.79" y="-152.81" font-family="Times,serif" font-size="8.00">9 : 0.01</text>
+-- <text text-anchor="middle" x="356.79" y="-152.81" font-family="Times,serif" font-size="8.00" fill="#000000">9 : 0.01</text>
 -- </g>
 -- <!-- 2&#45;&#45;9 -->
 -- <g id="edge28" class="edge">
@@ -2521,7 +2521,7 @@ select draw(triu(graph),
 -- <g id="node28" class="node">
 -- <title>27</title>
 -- <ellipse fill="#0033ff" fill-opacity="0.498039" stroke="black" cx="262.76" cy="-192.85" rx="37.45" ry="37.45"/>
--- <text text-anchor="middle" x="262.76" y="-190.95" font-family="Times,serif" font-size="8.00">27 : 0.02</text>
+-- <text text-anchor="middle" x="262.76" y="-190.95" font-family="Times,serif" font-size="8.00" fill="#000000">27 : 0.02</text>
 -- </g>
 -- <!-- 2&#45;&#45;27 -->
 -- <g id="edge30" class="edge">
@@ -2532,7 +2532,7 @@ select draw(triu(graph),
 -- <g id="node29" class="node">
 -- <title>28</title>
 -- <ellipse fill="#0000ef" fill-opacity="0.498039" stroke="black" cx="355.75" cy="-324.99" rx="37.45" ry="37.45"/>
--- <text text-anchor="middle" x="355.75" y="-323.09" font-family="Times,serif" font-size="8.00">28 : 0.01</text>
+-- <text text-anchor="middle" x="355.75" y="-323.09" font-family="Times,serif" font-size="8.00" fill="#000000">28 : 0.01</text>
 -- </g>
 -- <!-- 2&#45;&#45;28 -->
 -- <g id="edge31" class="edge">
@@ -2543,7 +2543,7 @@ select draw(triu(graph),
 -- <g id="node33" class="node">
 -- <title>32</title>
 -- <ellipse fill="#ffc600" fill-opacity="0.498039" stroke="black" cx="242.77" cy="-424.38" rx="37.45" ry="37.45"/>
--- <text text-anchor="middle" x="242.77" y="-422.48" font-family="Times,serif" font-size="8.00">32 : 0.07</text>
+-- <text text-anchor="middle" x="242.77" y="-422.48" font-family="Times,serif" font-size="8.00" fill="#000000">32 : 0.07</text>
 -- </g>
 -- <!-- 2&#45;&#45;32 -->
 -- <g id="edge32" class="edge">
@@ -2589,7 +2589,7 @@ select draw(triu(graph),
 -- <g id="node17" class="node">
 -- <title>16</title>
 -- <ellipse fill="#0000d0" fill-opacity="0.498039" stroke="black" cx="1242.18" cy="-409.11" rx="37.45" ry="37.45"/>
--- <text text-anchor="middle" x="1242.18" y="-407.21" font-family="Times,serif" font-size="8.00">16 : 0.01</text>
+-- <text text-anchor="middle" x="1242.18" y="-407.21" font-family="Times,serif" font-size="8.00" fill="#000000">16 : 0.01</text>
 -- </g>
 -- <!-- 5&#45;&#45;16 -->
 -- <g id="edge40" class="edge">
@@ -2615,7 +2615,7 @@ select draw(triu(graph),
 -- <g id="node34" class="node">
 -- <title>33</title>
 -- <ellipse fill="#7f0000" fill-opacity="0.498039" stroke="black" cx="264.33" cy="-376.62" rx="37.45" ry="37.45"/>
--- <text text-anchor="middle" x="264.33" y="-374.72" font-family="Times,serif" font-size="8.00">33 : 0.10</text>
+-- <text text-anchor="middle" x="264.33" y="-374.72" font-family="Times,serif" font-size="8.00" fill="#000000">33 : 0.10</text>
 -- </g>
 -- <!-- 8&#45;&#45;33 -->
 -- <g id="edge44" class="edge">
@@ -2636,7 +2636,7 @@ select draw(triu(graph),
 -- <g id="node15" class="node">
 -- <title>14</title>
 -- <ellipse fill="#0000b7" fill-opacity="0.498039" stroke="black" cx="72.31" cy="-498.33" rx="37.45" ry="37.45"/>
--- <text text-anchor="middle" x="72.31" y="-496.43" font-family="Times,serif" font-size="8.00">14 : 0.01</text>
+-- <text text-anchor="middle" x="72.31" y="-496.43" font-family="Times,serif" font-size="8.00" fill="#000000">14 : 0.01</text>
 -- </g>
 -- <!-- 14&#45;&#45;32 -->
 -- <g id="edge47" class="edge">
@@ -2652,7 +2652,7 @@ select draw(triu(graph),
 -- <g id="node16" class="node">
 -- <title>15</title>
 -- <ellipse fill="#0000b7" fill-opacity="0.498039" stroke="black" cx="255.97" cy="-588.84" rx="37.45" ry="37.45"/>
--- <text text-anchor="middle" x="255.97" y="-586.94" font-family="Times,serif" font-size="8.00">15 : 0.01</text>
+-- <text text-anchor="middle" x="255.97" y="-586.94" font-family="Times,serif" font-size="8.00" fill="#000000">15 : 0.01</text>
 -- </g>
 -- <!-- 15&#45;&#45;32 -->
 -- <g id="edge49" class="edge">
@@ -2668,7 +2668,7 @@ select draw(triu(graph),
 -- <g id="node19" class="node">
 -- <title>18</title>
 -- <ellipse fill="#0000b7" fill-opacity="0.498039" stroke="black" cx="119.63" cy="-547.95" rx="37.45" ry="37.45"/>
--- <text text-anchor="middle" x="119.63" y="-546.05" font-family="Times,serif" font-size="8.00">18 : 0.01</text>
+-- <text text-anchor="middle" x="119.63" y="-546.05" font-family="Times,serif" font-size="8.00" fill="#000000">18 : 0.01</text>
 -- </g>
 -- <!-- 18&#45;&#45;32 -->
 -- <g id="edge51" class="edge">
@@ -2689,7 +2689,7 @@ select draw(triu(graph),
 -- <g id="node21" class="node">
 -- <title>20</title>
 -- <ellipse fill="#0000b7" fill-opacity="0.498039" stroke="black" cx="178.31" cy="-586.77" rx="37.45" ry="37.45"/>
--- <text text-anchor="middle" x="178.31" y="-584.87" font-family="Times,serif" font-size="8.00">20 : 0.01</text>
+-- <text text-anchor="middle" x="178.31" y="-584.87" font-family="Times,serif" font-size="8.00" fill="#000000">20 : 0.01</text>
 -- </g>
 -- <!-- 20&#45;&#45;32 -->
 -- <g id="edge54" class="edge">
@@ -2705,7 +2705,7 @@ select draw(triu(graph),
 -- <g id="node23" class="node">
 -- <title>22</title>
 -- <ellipse fill="#0000b7" fill-opacity="0.498039" stroke="black" cx="56.19" cy="-429.68" rx="37.45" ry="37.45"/>
--- <text text-anchor="middle" x="56.19" y="-427.78" font-family="Times,serif" font-size="8.00">22 : 0.01</text>
+-- <text text-anchor="middle" x="56.19" y="-427.78" font-family="Times,serif" font-size="8.00" fill="#000000">22 : 0.01</text>
 -- </g>
 -- <!-- 22&#45;&#45;32 -->
 -- <g id="edge56" class="edge">
@@ -2721,13 +2721,13 @@ select draw(triu(graph),
 -- <g id="node24" class="node">
 -- <title>23</title>
 -- <ellipse fill="#0075ff" fill-opacity="0.498039" stroke="black" cx="140.81" cy="-275.16" rx="37.45" ry="37.45"/>
--- <text text-anchor="middle" x="140.81" y="-273.26" font-family="Times,serif" font-size="8.00">23 : 0.03</text>
+-- <text text-anchor="middle" x="140.81" y="-273.26" font-family="Times,serif" font-size="8.00" fill="#000000">23 : 0.03</text>
 -- </g>
 -- <!-- 25 -->
 -- <g id="node26" class="node">
 -- <title>25</title>
 -- <ellipse fill="#0000ff" fill-opacity="0.498039" stroke="black" cx="144.98" cy="-147.01" rx="37.45" ry="37.45"/>
--- <text text-anchor="middle" x="144.98" y="-145.11" font-family="Times,serif" font-size="8.00">25 : 0.02</text>
+-- <text text-anchor="middle" x="144.98" y="-145.11" font-family="Times,serif" font-size="8.00" fill="#000000">25 : 0.02</text>
 -- </g>
 -- <!-- 23&#45;&#45;25 -->
 -- <g id="edge58" class="edge">
@@ -2743,7 +2743,7 @@ select draw(triu(graph),
 -- <g id="node30" class="node">
 -- <title>29</title>
 -- <ellipse fill="#003bff" fill-opacity="0.498039" stroke="black" cx="66.97" cy="-333.8" rx="37.45" ry="37.45"/>
--- <text text-anchor="middle" x="66.97" y="-331.9" font-family="Times,serif" font-size="8.00">29 : 0.02</text>
+-- <text text-anchor="middle" x="66.97" y="-331.9" font-family="Times,serif" font-size="8.00" fill="#000000">29 : 0.02</text>
 -- </g>
 -- <!-- 23&#45;&#45;29 -->
 -- <g id="edge60" class="edge">
@@ -2764,7 +2764,7 @@ select draw(triu(graph),
 -- <g id="node25" class="node">
 -- <title>24</title>
 -- <ellipse fill="#0001ff" fill-opacity="0.498039" stroke="black" cx="222.28" cy="-58.48" rx="37.45" ry="37.45"/>
--- <text text-anchor="middle" x="222.28" y="-56.58" font-family="Times,serif" font-size="8.00">24 : 0.02</text>
+-- <text text-anchor="middle" x="222.28" y="-56.58" font-family="Times,serif" font-size="8.00" fill="#000000">24 : 0.02</text>
 -- </g>
 -- <!-- 24&#45;&#45;25 -->
 -- <g id="edge63" class="edge">
@@ -2790,7 +2790,7 @@ select draw(triu(graph),
 -- <g id="node27" class="node">
 -- <title>26</title>
 -- <ellipse fill="#0000bc" fill-opacity="0.498039" stroke="black" cx="37.48" cy="-208.27" rx="37.45" ry="37.45"/>
--- <text text-anchor="middle" x="37.48" y="-206.37" font-family="Times,serif" font-size="8.00">26 : 0.01</text>
+-- <text text-anchor="middle" x="37.48" y="-206.37" font-family="Times,serif" font-size="8.00" fill="#000000">26 : 0.01</text>
 -- </g>
 -- <!-- 26&#45;&#45;29 -->
 -- <g id="edge67" class="edge">
@@ -2877,7 +2877,7 @@ select draw(triu(graph),
     as draw_source from karate \gset
 \i sql/draw_sfdp.sql
 \setenv draw_source :draw_source
-\! echo $draw_source | dot -Ksfdp -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
+\! echo $draw_source | dot -Ksfdp -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 2>/dev/null | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
 -- <div>
 -- <!-- Title: %3 Pages: 1 -->
 -- <svg width="1288pt" height="634pt"
@@ -2885,18 +2885,18 @@ select draw(triu(graph),
 -- <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 630.31)">
 -- <title>%3</title>
 -- <polygon fill="white" stroke="transparent" points="-4,4 -4,-630.31 1283.65,-630.31 1283.65,4 -4,4"/>
--- <text text-anchor="middle" x="639.83" y="-7.4" font-family="Times,serif" font-size="12.00">Triangle Centrality Karate Graph</text>
+-- <text text-anchor="middle" x="639.83" y="-7.4" font-family="Times,serif" font-size="12.00" fill="#000000">Triangle Centrality Karate Graph</text>
 -- <!-- 0 -->
 -- <g id="node1" class="node">
 -- <title>0</title>
 -- <ellipse fill="#f50000" fill-opacity="0.498039" stroke="black" cx="749.96" cy="-334.62" rx="33.47" ry="33.47"/>
--- <text text-anchor="middle" x="749.96" y="-332.72" font-family="Times,serif" font-size="8.00">0 : 0.67</text>
+-- <text text-anchor="middle" x="749.96" y="-332.72" font-family="Times,serif" font-size="8.00" fill="#000000">0 : 0.67</text>
 -- </g>
 -- <!-- 1 -->
 -- <g id="node2" class="node">
 -- <title>1</title>
 -- <ellipse fill="#ffa200" fill-opacity="0.498039" stroke="black" cx="654.14" cy="-324.12" rx="33.47" ry="33.47"/>
--- <text text-anchor="middle" x="654.14" y="-322.22" font-family="Times,serif" font-size="8.00">1 : 0.55</text>
+-- <text text-anchor="middle" x="654.14" y="-322.22" font-family="Times,serif" font-size="8.00" fill="#000000">1 : 0.55</text>
 -- </g>
 -- <!-- 0&#45;&#45;1 -->
 -- <g id="edge1" class="edge">
@@ -2907,7 +2907,7 @@ select draw(triu(graph),
 -- <g id="node3" class="node">
 -- <title>2</title>
 -- <ellipse fill="#ff2100" fill-opacity="0.498039" stroke="black" cx="492.38" cy="-267.71" rx="33.47" ry="33.47"/>
--- <text text-anchor="middle" x="492.38" y="-265.81" font-family="Times,serif" font-size="8.00">2 : 0.64</text>
+-- <text text-anchor="middle" x="492.38" y="-265.81" font-family="Times,serif" font-size="8.00" fill="#000000">2 : 0.64</text>
 -- </g>
 -- <!-- 0&#45;&#45;2 -->
 -- <g id="edge2" class="edge">
@@ -2918,7 +2918,7 @@ select draw(triu(graph),
 -- <g id="node4" class="node">
 -- <title>3</title>
 -- <ellipse fill="#e5ff19" fill-opacity="0.498039" stroke="black" cx="690.94" cy="-217.44" rx="33.47" ry="33.47"/>
--- <text text-anchor="middle" x="690.94" y="-215.54" font-family="Times,serif" font-size="8.00">3 : 0.47</text>
+-- <text text-anchor="middle" x="690.94" y="-215.54" font-family="Times,serif" font-size="8.00" fill="#000000">3 : 0.47</text>
 -- </g>
 -- <!-- 0&#45;&#45;3 -->
 -- <g id="edge3" class="edge">
@@ -2929,7 +2929,7 @@ select draw(triu(graph),
 -- <g id="node5" class="node">
 -- <title>4</title>
 -- <ellipse fill="#0041ff" fill-opacity="0.498039" stroke="black" cx="968.76" cy="-425.55" rx="33.47" ry="33.47"/>
--- <text text-anchor="middle" x="968.76" y="-423.65" font-family="Times,serif" font-size="8.00">4 : 0.18</text>
+-- <text text-anchor="middle" x="968.76" y="-423.65" font-family="Times,serif" font-size="8.00" fill="#000000">4 : 0.18</text>
 -- </g>
 -- <!-- 0&#45;&#45;4 -->
 -- <g id="edge4" class="edge">
@@ -2940,7 +2940,7 @@ select draw(triu(graph),
 -- <g id="node6" class="node">
 -- <title>5</title>
 -- <ellipse fill="#0057ff" fill-opacity="0.498039" stroke="black" cx="1057.61" cy="-411.92" rx="33.47" ry="33.47"/>
--- <text text-anchor="middle" x="1057.61" y="-410.02" font-family="Times,serif" font-size="8.00">5 : 0.20</text>
+-- <text text-anchor="middle" x="1057.61" y="-410.02" font-family="Times,serif" font-size="8.00" fill="#000000">5 : 0.20</text>
 -- </g>
 -- <!-- 0&#45;&#45;5 -->
 -- <g id="edge5" class="edge">
@@ -2951,7 +2951,7 @@ select draw(triu(graph),
 -- <g id="node7" class="node">
 -- <title>6</title>
 -- <ellipse fill="#0057ff" fill-opacity="0.498039" stroke="black" cx="1065.55" cy="-349.53" rx="33.47" ry="33.47"/>
--- <text text-anchor="middle" x="1065.55" y="-347.63" font-family="Times,serif" font-size="8.00">6 : 0.20</text>
+-- <text text-anchor="middle" x="1065.55" y="-347.63" font-family="Times,serif" font-size="8.00" fill="#000000">6 : 0.20</text>
 -- </g>
 -- <!-- 0&#45;&#45;6 -->
 -- <g id="edge6" class="edge">
@@ -2962,7 +2962,7 @@ select draw(triu(graph),
 -- <g id="node8" class="node">
 -- <title>7</title>
 -- <ellipse fill="#9aff64" fill-opacity="0.498039" stroke="black" cx="651.29" cy="-175.11" rx="33.47" ry="33.47"/>
--- <text text-anchor="middle" x="651.29" y="-173.21" font-family="Times,serif" font-size="8.00">7 : 0.42</text>
+-- <text text-anchor="middle" x="651.29" y="-173.21" font-family="Times,serif" font-size="8.00" fill="#000000">7 : 0.42</text>
 -- </g>
 -- <!-- 0&#45;&#45;7 -->
 -- <g id="edge7" class="edge">
@@ -2973,7 +2973,7 @@ select draw(triu(graph),
 -- <g id="node9" class="node">
 -- <title>8</title>
 -- <ellipse fill="#f0ff0e" fill-opacity="0.498039" stroke="black" cx="467.91" cy="-396.05" rx="33.47" ry="33.47"/>
--- <text text-anchor="middle" x="467.91" y="-394.15" font-family="Times,serif" font-size="8.00">8 : 0.48</text>
+-- <text text-anchor="middle" x="467.91" y="-394.15" font-family="Times,serif" font-size="8.00" fill="#000000">8 : 0.48</text>
 -- </g>
 -- <!-- 0&#45;&#45;8 -->
 -- <g id="edge8" class="edge">
@@ -2984,7 +2984,7 @@ select draw(triu(graph),
 -- <g id="node11" class="node">
 -- <title>10</title>
 -- <ellipse fill="#0041ff" fill-opacity="0.498039" stroke="black" cx="983.29" cy="-330.9" rx="37.45" ry="37.45"/>
--- <text text-anchor="middle" x="983.29" y="-329" font-family="Times,serif" font-size="8.00">10 : 0.18</text>
+-- <text text-anchor="middle" x="983.29" y="-329" font-family="Times,serif" font-size="8.00" fill="#000000">10 : 0.18</text>
 -- </g>
 -- <!-- 0&#45;&#45;10 -->
 -- <g id="edge9" class="edge">
@@ -2995,7 +2995,7 @@ select draw(triu(graph),
 -- <g id="node12" class="node">
 -- <title>11</title>
 -- <ellipse fill="#7aff84" fill-opacity="0.498039" stroke="black" cx="871.88" cy="-559.06" rx="37.45" ry="37.45"/>
--- <text text-anchor="middle" x="871.88" y="-557.16" font-family="Times,serif" font-size="8.00">11 : 0.40</text>
+-- <text text-anchor="middle" x="871.88" y="-557.16" font-family="Times,serif" font-size="8.00" fill="#000000">11 : 0.40</text>
 -- </g>
 -- <!-- 0&#45;&#45;11 -->
 -- <g id="edge10" class="edge">
@@ -3006,7 +3006,7 @@ select draw(triu(graph),
 -- <g id="node13" class="node">
 -- <title>12</title>
 -- <ellipse fill="#006cff" fill-opacity="0.498039" stroke="black" cx="836.81" cy="-122.67" rx="37.45" ry="37.45"/>
--- <text text-anchor="middle" x="836.81" y="-120.77" font-family="Times,serif" font-size="8.00">12 : 0.21</text>
+-- <text text-anchor="middle" x="836.81" y="-120.77" font-family="Times,serif" font-size="8.00" fill="#000000">12 : 0.21</text>
 -- </g>
 -- <!-- 0&#45;&#45;12 -->
 -- <g id="edge11" class="edge">
@@ -3017,7 +3017,7 @@ select draw(triu(graph),
 -- <g id="node14" class="node">
 -- <title>13</title>
 -- <ellipse fill="#7f0000" fill-opacity="0.498039" stroke="black" cx="555.44" cy="-315.9" rx="37.45" ry="37.45"/>
--- <text text-anchor="middle" x="555.44" y="-314" font-family="Times,serif" font-size="8.00">13 : 0.75</text>
+-- <text text-anchor="middle" x="555.44" y="-314" font-family="Times,serif" font-size="8.00" fill="#000000">13 : 0.75</text>
 -- </g>
 -- <!-- 0&#45;&#45;13 -->
 -- <g id="edge12" class="edge">
@@ -3028,7 +3028,7 @@ select draw(triu(graph),
 -- <g id="node18" class="node">
 -- <title>17</title>
 -- <ellipse fill="#0082ff" fill-opacity="0.498039" stroke="black" cx="845.75" cy="-345.93" rx="37.45" ry="37.45"/>
--- <text text-anchor="middle" x="845.75" y="-344.03" font-family="Times,serif" font-size="8.00">17 : 0.22</text>
+-- <text text-anchor="middle" x="845.75" y="-344.03" font-family="Times,serif" font-size="8.00" fill="#000000">17 : 0.22</text>
 -- </g>
 -- <!-- 0&#45;&#45;17 -->
 -- <g id="edge13" class="edge">
@@ -3039,7 +3039,7 @@ select draw(triu(graph),
 -- <g id="node20" class="node">
 -- <title>19</title>
 -- <ellipse fill="#ff9700" fill-opacity="0.498039" stroke="black" cx="555.45" cy="-438.22" rx="37.45" ry="37.45"/>
--- <text text-anchor="middle" x="555.45" y="-436.32" font-family="Times,serif" font-size="8.00">19 : 0.56</text>
+-- <text text-anchor="middle" x="555.45" y="-436.32" font-family="Times,serif" font-size="8.00" fill="#000000">19 : 0.56</text>
 -- </g>
 -- <!-- 0&#45;&#45;19 -->
 -- <g id="edge14" class="edge">
@@ -3050,7 +3050,7 @@ select draw(triu(graph),
 -- <g id="node22" class="node">
 -- <title>21</title>
 -- <ellipse fill="#0082ff" fill-opacity="0.498039" stroke="black" cx="838.93" cy="-228.7" rx="37.45" ry="37.45"/>
--- <text text-anchor="middle" x="838.93" y="-226.8" font-family="Times,serif" font-size="8.00">21 : 0.22</text>
+-- <text text-anchor="middle" x="838.93" y="-226.8" font-family="Times,serif" font-size="8.00" fill="#000000">21 : 0.22</text>
 -- </g>
 -- <!-- 0&#45;&#45;21 -->
 -- <g id="edge15" class="edge">
@@ -3061,7 +3061,7 @@ select draw(triu(graph),
 -- <g id="node32" class="node">
 -- <title>31</title>
 -- <ellipse fill="#ff1600" fill-opacity="0.498039" stroke="black" cx="373.24" cy="-243.99" rx="37.45" ry="37.45"/>
--- <text text-anchor="middle" x="373.24" y="-242.09" font-family="Times,serif" font-size="8.00">31 : 0.65</text>
+-- <text text-anchor="middle" x="373.24" y="-242.09" font-family="Times,serif" font-size="8.00" fill="#000000">31 : 0.65</text>
 -- </g>
 -- <!-- 0&#45;&#45;31 -->
 -- <g id="edge16" class="edge">
@@ -3107,7 +3107,7 @@ select draw(triu(graph),
 -- <g id="node31" class="node">
 -- <title>30</title>
 -- <ellipse fill="#ffc200" fill-opacity="0.498039" stroke="black" cx="416.99" cy="-440.4" rx="37.45" ry="37.45"/>
--- <text text-anchor="middle" x="416.99" y="-438.5" font-family="Times,serif" font-size="8.00">30 : 0.53</text>
+-- <text text-anchor="middle" x="416.99" y="-438.5" font-family="Times,serif" font-size="8.00" fill="#000000">30 : 0.53</text>
 -- </g>
 -- <!-- 1&#45;&#45;30 -->
 -- <g id="edge24" class="edge">
@@ -3133,7 +3133,7 @@ select draw(triu(graph),
 -- <g id="node10" class="node">
 -- <title>9</title>
 -- <ellipse fill="#ff8200" fill-opacity="0.498039" stroke="black" cx="356.79" cy="-154.71" rx="33.47" ry="33.47"/>
--- <text text-anchor="middle" x="356.79" y="-152.81" font-family="Times,serif" font-size="8.00">9 : 0.57</text>
+-- <text text-anchor="middle" x="356.79" y="-152.81" font-family="Times,serif" font-size="8.00" fill="#000000">9 : 0.57</text>
 -- </g>
 -- <!-- 2&#45;&#45;9 -->
 -- <g id="edge28" class="edge">
@@ -3149,7 +3149,7 @@ select draw(triu(graph),
 -- <g id="node28" class="node">
 -- <title>27</title>
 -- <ellipse fill="#8fff6f" fill-opacity="0.498039" stroke="black" cx="262.76" cy="-192.85" rx="37.45" ry="37.45"/>
--- <text text-anchor="middle" x="262.76" y="-190.95" font-family="Times,serif" font-size="8.00">27 : 0.41</text>
+-- <text text-anchor="middle" x="262.76" y="-190.95" font-family="Times,serif" font-size="8.00" fill="#000000">27 : 0.41</text>
 -- </g>
 -- <!-- 2&#45;&#45;27 -->
 -- <g id="edge30" class="edge">
@@ -3160,7 +3160,7 @@ select draw(triu(graph),
 -- <g id="node29" class="node">
 -- <title>28</title>
 -- <ellipse fill="#64ff9a" fill-opacity="0.498039" stroke="black" cx="355.75" cy="-324.99" rx="37.45" ry="37.45"/>
--- <text text-anchor="middle" x="355.75" y="-323.09" font-family="Times,serif" font-size="8.00">28 : 0.38</text>
+-- <text text-anchor="middle" x="355.75" y="-323.09" font-family="Times,serif" font-size="8.00" fill="#000000">28 : 0.38</text>
 -- </g>
 -- <!-- 2&#45;&#45;28 -->
 -- <g id="edge31" class="edge">
@@ -3171,7 +3171,7 @@ select draw(triu(graph),
 -- <g id="node33" class="node">
 -- <title>32</title>
 -- <ellipse fill="#daff24" fill-opacity="0.498039" stroke="black" cx="242.77" cy="-424.38" rx="37.45" ry="37.45"/>
--- <text text-anchor="middle" x="242.77" y="-422.48" font-family="Times,serif" font-size="8.00">32 : 0.46</text>
+-- <text text-anchor="middle" x="242.77" y="-422.48" font-family="Times,serif" font-size="8.00" fill="#000000">32 : 0.46</text>
 -- </g>
 -- <!-- 2&#45;&#45;32 -->
 -- <g id="edge32" class="edge">
@@ -3217,7 +3217,7 @@ select draw(triu(graph),
 -- <g id="node17" class="node">
 -- <title>16</title>
 -- <ellipse fill="#00007f" fill-opacity="0.498039" stroke="black" cx="1242.18" cy="-409.11" rx="37.45" ry="37.45"/>
--- <text text-anchor="middle" x="1242.18" y="-407.21" font-family="Times,serif" font-size="8.00">16 : 0.05</text>
+-- <text text-anchor="middle" x="1242.18" y="-407.21" font-family="Times,serif" font-size="8.00" fill="#000000">16 : 0.05</text>
 -- </g>
 -- <!-- 5&#45;&#45;16 -->
 -- <g id="edge40" class="edge">
@@ -3243,7 +3243,7 @@ select draw(triu(graph),
 -- <g id="node34" class="node">
 -- <title>33</title>
 -- <ellipse fill="#ff9700" fill-opacity="0.498039" stroke="black" cx="264.33" cy="-376.62" rx="37.45" ry="37.45"/>
--- <text text-anchor="middle" x="264.33" y="-374.72" font-family="Times,serif" font-size="8.00">33 : 0.56</text>
+-- <text text-anchor="middle" x="264.33" y="-374.72" font-family="Times,serif" font-size="8.00" fill="#000000">33 : 0.56</text>
 -- </g>
 -- <!-- 8&#45;&#45;33 -->
 -- <g id="edge44" class="edge">
@@ -3264,7 +3264,7 @@ select draw(triu(graph),
 -- <g id="node15" class="node">
 -- <title>14</title>
 -- <ellipse fill="#006cff" fill-opacity="0.498039" stroke="black" cx="72.31" cy="-498.33" rx="37.45" ry="37.45"/>
--- <text text-anchor="middle" x="72.31" y="-496.43" font-family="Times,serif" font-size="8.00">14 : 0.21</text>
+-- <text text-anchor="middle" x="72.31" y="-496.43" font-family="Times,serif" font-size="8.00" fill="#000000">14 : 0.21</text>
 -- </g>
 -- <!-- 14&#45;&#45;32 -->
 -- <g id="edge47" class="edge">
@@ -3280,7 +3280,7 @@ select draw(triu(graph),
 -- <g id="node16" class="node">
 -- <title>15</title>
 -- <ellipse fill="#006cff" fill-opacity="0.498039" stroke="black" cx="255.97" cy="-588.84" rx="37.45" ry="37.45"/>
--- <text text-anchor="middle" x="255.97" y="-586.94" font-family="Times,serif" font-size="8.00">15 : 0.21</text>
+-- <text text-anchor="middle" x="255.97" y="-586.94" font-family="Times,serif" font-size="8.00" fill="#000000">15 : 0.21</text>
 -- </g>
 -- <!-- 15&#45;&#45;32 -->
 -- <g id="edge49" class="edge">
@@ -3296,7 +3296,7 @@ select draw(triu(graph),
 -- <g id="node19" class="node">
 -- <title>18</title>
 -- <ellipse fill="#006cff" fill-opacity="0.498039" stroke="black" cx="119.63" cy="-547.95" rx="37.45" ry="37.45"/>
--- <text text-anchor="middle" x="119.63" y="-546.05" font-family="Times,serif" font-size="8.00">18 : 0.21</text>
+-- <text text-anchor="middle" x="119.63" y="-546.05" font-family="Times,serif" font-size="8.00" fill="#000000">18 : 0.21</text>
 -- </g>
 -- <!-- 18&#45;&#45;32 -->
 -- <g id="edge51" class="edge">
@@ -3317,7 +3317,7 @@ select draw(triu(graph),
 -- <g id="node21" class="node">
 -- <title>20</title>
 -- <ellipse fill="#006cff" fill-opacity="0.498039" stroke="black" cx="178.31" cy="-586.77" rx="37.45" ry="37.45"/>
--- <text text-anchor="middle" x="178.31" y="-584.87" font-family="Times,serif" font-size="8.00">20 : 0.21</text>
+-- <text text-anchor="middle" x="178.31" y="-584.87" font-family="Times,serif" font-size="8.00" fill="#000000">20 : 0.21</text>
 -- </g>
 -- <!-- 20&#45;&#45;32 -->
 -- <g id="edge54" class="edge">
@@ -3333,7 +3333,7 @@ select draw(triu(graph),
 -- <g id="node23" class="node">
 -- <title>22</title>
 -- <ellipse fill="#006cff" fill-opacity="0.498039" stroke="black" cx="56.19" cy="-429.68" rx="37.45" ry="37.45"/>
--- <text text-anchor="middle" x="56.19" y="-427.78" font-family="Times,serif" font-size="8.00">22 : 0.21</text>
+-- <text text-anchor="middle" x="56.19" y="-427.78" font-family="Times,serif" font-size="8.00" fill="#000000">22 : 0.21</text>
 -- </g>
 -- <!-- 22&#45;&#45;32 -->
 -- <g id="edge56" class="edge">
@@ -3349,13 +3349,13 @@ select draw(triu(graph),
 -- <g id="node24" class="node">
 -- <title>23</title>
 -- <ellipse fill="#00e2ff" fill-opacity="0.498039" stroke="black" cx="140.81" cy="-275.16" rx="37.45" ry="37.45"/>
--- <text text-anchor="middle" x="140.81" y="-273.26" font-family="Times,serif" font-size="8.00">23 : 0.29</text>
+-- <text text-anchor="middle" x="140.81" y="-273.26" font-family="Times,serif" font-size="8.00" fill="#000000">23 : 0.29</text>
 -- </g>
 -- <!-- 25 -->
 -- <g id="node26" class="node">
 -- <title>25</title>
 -- <ellipse fill="#0000ea" fill-opacity="0.498039" stroke="black" cx="144.98" cy="-147.01" rx="37.45" ry="37.45"/>
--- <text text-anchor="middle" x="144.98" y="-145.11" font-family="Times,serif" font-size="8.00">25 : 0.12</text>
+-- <text text-anchor="middle" x="144.98" y="-145.11" font-family="Times,serif" font-size="8.00" fill="#000000">25 : 0.12</text>
 -- </g>
 -- <!-- 23&#45;&#45;25 -->
 -- <g id="edge58" class="edge">
@@ -3371,7 +3371,7 @@ select draw(triu(graph),
 -- <g id="node30" class="node">
 -- <title>29</title>
 -- <ellipse fill="#00c2ff" fill-opacity="0.498039" stroke="black" cx="66.97" cy="-333.8" rx="37.45" ry="37.45"/>
--- <text text-anchor="middle" x="66.97" y="-331.9" font-family="Times,serif" font-size="8.00">29 : 0.27</text>
+-- <text text-anchor="middle" x="66.97" y="-331.9" font-family="Times,serif" font-size="8.00" fill="#000000">29 : 0.27</text>
 -- </g>
 -- <!-- 23&#45;&#45;29 -->
 -- <g id="edge60" class="edge">
@@ -3392,7 +3392,7 @@ select draw(triu(graph),
 -- <g id="node25" class="node">
 -- <title>24</title>
 -- <ellipse fill="#00008a" fill-opacity="0.498039" stroke="black" cx="222.28" cy="-58.48" rx="37.45" ry="37.45"/>
--- <text text-anchor="middle" x="222.28" y="-56.58" font-family="Times,serif" font-size="8.00">24 : 0.05</text>
+-- <text text-anchor="middle" x="222.28" y="-56.58" font-family="Times,serif" font-size="8.00" fill="#000000">24 : 0.05</text>
 -- </g>
 -- <!-- 24&#45;&#45;25 -->
 -- <g id="edge63" class="edge">
@@ -3418,7 +3418,7 @@ select draw(triu(graph),
 -- <g id="node27" class="node">
 -- <title>26</title>
 -- <ellipse fill="#000cff" fill-opacity="0.498039" stroke="black" cx="37.48" cy="-208.27" rx="37.45" ry="37.45"/>
--- <text text-anchor="middle" x="37.48" y="-206.37" font-family="Times,serif" font-size="8.00">26 : 0.14</text>
+-- <text text-anchor="middle" x="37.48" y="-206.37" font-family="Times,serif" font-size="8.00" fill="#000000">26 : 0.14</text>
 -- </g>
 -- <!-- 26&#45;&#45;29 -->
 -- <g id="edge67" class="edge">
@@ -3536,7 +3536,7 @@ select print(addr_to_txn) as "Address to Transaction", print(txn_to_addr) as "Tr
 select hyperdraw(addr_to_txn, txn_to_addr, 'A', 'T') as draw_source from txn_graph \gset
 \i sql/draw.sql
 \setenv draw_source :draw_source
-\! echo $draw_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
+\! echo $draw_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 2>/dev/null | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
 -- <div>
 -- <!-- Title: G Pages: 1 -->
 -- <svg width="926pt" height="358pt"
@@ -3548,506 +3548,506 @@ select hyperdraw(addr_to_txn, txn_to_addr, 'A', 'T') as draw_source from txn_gra
 -- <g id="node1" class="node">
 -- <title>T:0</title>
 -- <polygon fill="none" stroke="black" points="461.17,-349.52 431.17,-349.52 431.17,-332.52 461.17,-332.52 461.17,-349.52"/>
--- <text text-anchor="middle" x="446.17" y="-339.12" font-family="Times,serif" font-size="8.00">T:0</text>
+-- <text text-anchor="middle" x="446.17" y="-339.12" font-family="Times,serif" font-size="8.00" fill="#000000">T:0</text>
 -- </g>
 -- <!-- A:1 -->
 -- <g id="node14" class="node">
 -- <title>A:1</title>
 -- <ellipse fill="none" stroke="black" cx="307.17" cy="-285.6" rx="21.84" ry="21.84"/>
--- <text text-anchor="middle" x="307.17" y="-283.7" font-family="Times,serif" font-size="8.00">A:1</text>
+-- <text text-anchor="middle" x="307.17" y="-283.7" font-family="Times,serif" font-size="8.00" fill="#000000">A:1</text>
 -- </g>
 -- <!-- T:0&#45;&gt;A:1 -->
 -- <g id="edge39" class="edge">
 -- <title>T:0&#45;&gt;A:1</title>
 -- <path fill="none" stroke="black" d="M431.03,-334.2C408.63,-325.59 366.18,-309.28 337.28,-298.17"/>
 -- <polygon fill="black" stroke="black" points="338.28,-294.81 327.69,-294.48 335.76,-301.34 338.28,-294.81"/>
--- <text text-anchor="middle" x="410.67" y="-318.12" font-family="Times,serif" font-size="8.00">43</text>
+-- <text text-anchor="middle" x="410.67" y="-318.12" font-family="Times,serif" font-size="8.00" fill="#000000">43</text>
 -- </g>
 -- <!-- A:2 -->
 -- <g id="node15" class="node">
 -- <title>A:2</title>
 -- <ellipse fill="none" stroke="black" cx="803.17" cy="-285.6" rx="21.84" ry="21.84"/>
--- <text text-anchor="middle" x="803.17" y="-283.7" font-family="Times,serif" font-size="8.00">A:2</text>
+-- <text text-anchor="middle" x="803.17" y="-283.7" font-family="Times,serif" font-size="8.00" fill="#000000">A:2</text>
 -- </g>
 -- <!-- T:0&#45;&gt;A:2 -->
 -- <g id="edge40" class="edge">
 -- <title>T:0&#45;&gt;A:2</title>
 -- <path fill="none" stroke="black" d="M461.43,-340.14C513.63,-340.4 684.77,-340.01 737.17,-324.52 751.41,-320.31 765.87,-312.49 777.6,-305.04"/>
 -- <polygon fill="black" stroke="black" points="779.6,-307.92 786,-299.49 775.73,-302.09 779.6,-307.92"/>
--- <text text-anchor="middle" x="766.17" y="-318.12" font-family="Times,serif" font-size="8.00">109</text>
+-- <text text-anchor="middle" x="766.17" y="-318.12" font-family="Times,serif" font-size="8.00" fill="#000000">109</text>
 -- </g>
 -- <!-- A:3 -->
 -- <g id="node16" class="node">
 -- <title>A:3</title>
 -- <ellipse fill="none" stroke="black" cx="682.17" cy="-174.76" rx="21.84" ry="21.84"/>
--- <text text-anchor="middle" x="682.17" y="-172.86" font-family="Times,serif" font-size="8.00">A:3</text>
+-- <text text-anchor="middle" x="682.17" y="-172.86" font-family="Times,serif" font-size="8.00" fill="#000000">A:3</text>
 -- </g>
 -- <!-- T:0&#45;&gt;A:3 -->
 -- <g id="edge41" class="edge">
 -- <title>T:0&#45;&gt;A:3</title>
 -- <path fill="none" stroke="black" d="M461.56,-340.11C494.64,-339.73 574.32,-335.69 633.17,-307.52 681.84,-284.23 699.33,-266.53 710.17,-213.68 710.98,-209.76 711.67,-208.39 710.17,-204.68 709.07,-201.95 707.57,-199.33 705.83,-196.86"/>
 -- <polygon fill="black" stroke="black" points="708.39,-194.47 699.25,-189.12 703.05,-199 708.39,-194.47"/>
--- <text text-anchor="middle" x="705.67" y="-249.28" font-family="Times,serif" font-size="8.00">96</text>
+-- <text text-anchor="middle" x="705.67" y="-249.28" font-family="Times,serif" font-size="8.00" fill="#000000">96</text>
 -- </g>
 -- <!-- A:4 -->
 -- <g id="node17" class="node">
 -- <title>A:4</title>
 -- <ellipse fill="none" stroke="black" cx="131.17" cy="-174.76" rx="21.84" ry="21.84"/>
--- <text text-anchor="middle" x="131.17" y="-172.86" font-family="Times,serif" font-size="8.00">A:4</text>
+-- <text text-anchor="middle" x="131.17" y="-172.86" font-family="Times,serif" font-size="8.00" fill="#000000">A:4</text>
 -- </g>
 -- <!-- T:0&#45;&gt;A:4 -->
 -- <g id="edge42" class="edge">
 -- <title>T:0&#45;&gt;A:4</title>
 -- <path fill="none" stroke="black" d="M430.87,-339.57C359.76,-337.13 62.78,-322.99 7.17,-255.68 -22.78,-219.43 54.02,-194.07 99.85,-182.62"/>
 -- <polygon fill="black" stroke="black" points="100.75,-186 109.66,-180.26 99.12,-179.2 100.75,-186"/>
--- <text text-anchor="middle" x="15.17" y="-249.28" font-family="Times,serif" font-size="8.00">104</text>
+-- <text text-anchor="middle" x="15.17" y="-249.28" font-family="Times,serif" font-size="8.00" fill="#000000">104</text>
 -- </g>
 -- <!-- A:5 -->
 -- <g id="node18" class="node">
 -- <title>A:5</title>
 -- <ellipse fill="none" stroke="black" cx="471.17" cy="-174.76" rx="21.84" ry="21.84"/>
--- <text text-anchor="middle" x="471.17" y="-172.86" font-family="Times,serif" font-size="8.00">A:5</text>
+-- <text text-anchor="middle" x="471.17" y="-172.86" font-family="Times,serif" font-size="8.00" fill="#000000">A:5</text>
 -- </g>
 -- <!-- T:0&#45;&gt;A:5 -->
 -- <g id="edge43" class="edge">
 -- <title>T:0&#45;&gt;A:5</title>
 -- <path fill="none" stroke="black" d="M445.97,-332.24C445.6,-311.26 445.84,-251.93 458.17,-204.68 458.2,-204.58 458.23,-204.47 458.26,-204.37"/>
 -- <polygon fill="black" stroke="black" points="461.63,-205.32 461.58,-194.72 455.01,-203.04 461.63,-205.32"/>
--- <text text-anchor="middle" x="456.67" y="-249.28" font-family="Times,serif" font-size="8.00">80</text>
+-- <text text-anchor="middle" x="456.67" y="-249.28" font-family="Times,serif" font-size="8.00" fill="#000000">80</text>
 -- </g>
 -- <!-- T:1 -->
 -- <g id="node2" class="node">
 -- <title>T:1</title>
 -- <polygon fill="none" stroke="black" points="530.17,-238.68 500.17,-238.68 500.17,-221.68 530.17,-221.68 530.17,-238.68"/>
--- <text text-anchor="middle" x="515.17" y="-228.28" font-family="Times,serif" font-size="8.00">T:1</text>
+-- <text text-anchor="middle" x="515.17" y="-228.28" font-family="Times,serif" font-size="8.00" fill="#000000">T:1</text>
 -- </g>
 -- <!-- T:1&#45;&gt;A:5 -->
 -- <g id="edge44" class="edge">
 -- <title>T:1&#45;&gt;A:5</title>
 -- <path fill="none" stroke="black" d="M508.68,-221.3C504.12,-215.76 497.74,-208.02 491.54,-200.49"/>
 -- <polygon fill="black" stroke="black" points="494.03,-198.01 484.97,-192.51 488.63,-202.46 494.03,-198.01"/>
--- <text text-anchor="middle" x="506.67" y="-207.28" font-family="Times,serif" font-size="8.00">13</text>
+-- <text text-anchor="middle" x="506.67" y="-207.28" font-family="Times,serif" font-size="8.00" fill="#000000">13</text>
 -- </g>
 -- <!-- A:6 -->
 -- <g id="node19" class="node">
 -- <title>A:6</title>
 -- <ellipse fill="none" stroke="black" cx="278.17" cy="-174.76" rx="21.84" ry="21.84"/>
--- <text text-anchor="middle" x="278.17" y="-172.86" font-family="Times,serif" font-size="8.00">A:6</text>
+-- <text text-anchor="middle" x="278.17" y="-172.86" font-family="Times,serif" font-size="8.00" fill="#000000">A:6</text>
 -- </g>
 -- <!-- T:1&#45;&gt;A:6 -->
 -- <g id="edge45" class="edge">
 -- <title>T:1&#45;&gt;A:6</title>
 -- <path fill="none" stroke="black" d="M500,-223.71C484.59,-218.31 459.96,-210.09 438.17,-204.68 394.24,-193.77 342.56,-185.18 310.08,-180.28"/>
 -- <polygon fill="black" stroke="black" points="310.25,-176.77 299.84,-178.77 309.22,-183.7 310.25,-176.77"/>
--- <text text-anchor="middle" x="473.67" y="-207.28" font-family="Times,serif" font-size="8.00">84</text>
+-- <text text-anchor="middle" x="473.67" y="-207.28" font-family="Times,serif" font-size="8.00" fill="#000000">84</text>
 -- </g>
 -- <!-- A:7 -->
 -- <g id="node20" class="node">
 -- <title>A:7</title>
 -- <ellipse fill="none" stroke="black" cx="552.17" cy="-63.92" rx="21.84" ry="21.84"/>
--- <text text-anchor="middle" x="552.17" y="-62.02" font-family="Times,serif" font-size="8.00">A:7</text>
+-- <text text-anchor="middle" x="552.17" y="-62.02" font-family="Times,serif" font-size="8.00" fill="#000000">A:7</text>
 -- </g>
 -- <!-- T:1&#45;&gt;A:7 -->
 -- <g id="edge46" class="edge">
 -- <title>T:1&#45;&gt;A:7</title>
 -- <path fill="none" stroke="black" d="M522.4,-221.36C538.24,-204.01 575.11,-162.42 581.17,-144.84 582.48,-141.06 581.95,-139.77 581.17,-135.84 580.72,-133.55 572.03,-112.41 564.28,-93.8"/>
 -- <polygon fill="black" stroke="black" points="567.44,-92.29 560.36,-84.41 560.98,-94.99 567.44,-92.29"/>
--- <text text-anchor="middle" x="584.17" y="-138.44" font-family="Times,serif" font-size="8.00">6</text>
+-- <text text-anchor="middle" x="584.17" y="-138.44" font-family="Times,serif" font-size="8.00" fill="#000000">6</text>
 -- </g>
 -- <!-- T:2 -->
 -- <g id="node3" class="node">
 -- <title>T:2</title>
 -- <polygon fill="none" stroke="black" points="300.17,-238.68 270.17,-238.68 270.17,-221.68 300.17,-221.68 300.17,-238.68"/>
--- <text text-anchor="middle" x="285.17" y="-228.28" font-family="Times,serif" font-size="8.00">T:2</text>
+-- <text text-anchor="middle" x="285.17" y="-228.28" font-family="Times,serif" font-size="8.00" fill="#000000">T:2</text>
 -- </g>
 -- <!-- T:2&#45;&gt;A:5 -->
 -- <g id="edge47" class="edge">
 -- <title>T:2&#45;&gt;A:5</title>
 -- <path fill="none" stroke="black" d="M300.3,-228.79C322.48,-227.86 364.93,-224.65 399.17,-213.68 408.12,-210.82 427.18,-200.71 443.45,-191.64"/>
 -- <polygon fill="black" stroke="black" points="445.6,-194.45 452.6,-186.49 442.17,-188.35 445.6,-194.45"/>
--- <text text-anchor="middle" x="427.17" y="-207.28" font-family="Times,serif" font-size="8.00">255</text>
+-- <text text-anchor="middle" x="427.17" y="-207.28" font-family="Times,serif" font-size="8.00" fill="#000000">255</text>
 -- </g>
 -- <!-- T:2&#45;&gt;A:6 -->
 -- <g id="edge48" class="edge">
 -- <title>T:2&#45;&gt;A:6</title>
 -- <path fill="none" stroke="black" d="M284.14,-221.3C283.62,-217.34 282.96,-212.25 282.26,-206.92"/>
 -- <polygon fill="black" stroke="black" points="285.67,-206.07 280.91,-196.61 278.73,-206.98 285.67,-206.07"/>
--- <text text-anchor="middle" x="288.67" y="-207.28" font-family="Times,serif" font-size="8.00">75</text>
+-- <text text-anchor="middle" x="288.67" y="-207.28" font-family="Times,serif" font-size="8.00" fill="#000000">75</text>
 -- </g>
 -- <!-- T:3 -->
 -- <g id="node4" class="node">
 -- <title>T:3</title>
 -- <polygon fill="none" stroke="black" points="216.17,-238.68 186.17,-238.68 186.17,-221.68 216.17,-221.68 216.17,-238.68"/>
--- <text text-anchor="middle" x="201.17" y="-228.28" font-family="Times,serif" font-size="8.00">T:3</text>
+-- <text text-anchor="middle" x="201.17" y="-228.28" font-family="Times,serif" font-size="8.00" fill="#000000">T:3</text>
 -- </g>
 -- <!-- T:3&#45;&gt;A:4 -->
 -- <g id="edge49" class="edge">
 -- <title>T:3&#45;&gt;A:4</title>
 -- <path fill="none" stroke="black" d="M185.94,-223.06C180.43,-220.53 174.31,-217.33 169.17,-213.68 163.35,-209.55 157.62,-204.49 152.43,-199.44"/>
 -- <polygon fill="black" stroke="black" points="154.78,-196.84 145.28,-192.14 149.78,-201.73 154.78,-196.84"/>
--- <text text-anchor="middle" x="174.67" y="-207.28" font-family="Times,serif" font-size="8.00">68</text>
+-- <text text-anchor="middle" x="174.67" y="-207.28" font-family="Times,serif" font-size="8.00" fill="#000000">68</text>
 -- </g>
 -- <!-- T:3&#45;&gt;A:6 -->
 -- <g id="edge50" class="edge">
 -- <title>T:3&#45;&gt;A:6</title>
 -- <path fill="none" stroke="black" d="M205.75,-221.59C209.21,-216.34 214.35,-209.46 220.17,-204.68 228.59,-197.78 238.93,-191.96 248.54,-187.4"/>
 -- <polygon fill="black" stroke="black" points="250.1,-190.53 257.8,-183.26 247.24,-184.14 250.1,-190.53"/>
--- <text text-anchor="middle" x="225.67" y="-207.28" font-family="Times,serif" font-size="8.00">55</text>
+-- <text text-anchor="middle" x="225.67" y="-207.28" font-family="Times,serif" font-size="8.00" fill="#000000">55</text>
 -- </g>
 -- <!-- T:3&#45;&gt;A:7 -->
 -- <g id="edge51" class="edge">
 -- <title>T:3&#45;&gt;A:7</title>
 -- <path fill="none" stroke="black" d="M202.07,-221.66C205.17,-199.44 217.72,-134.17 260.17,-110.84 304.48,-86.49 453.56,-72.42 519.88,-67.23"/>
 -- <polygon fill="black" stroke="black" points="520.45,-70.7 530.16,-66.45 519.92,-63.72 520.45,-70.7"/>
--- <text text-anchor="middle" x="238.67" y="-138.44" font-family="Times,serif" font-size="8.00">64</text>
+-- <text text-anchor="middle" x="238.67" y="-138.44" font-family="Times,serif" font-size="8.00" fill="#000000">64</text>
 -- </g>
 -- <!-- T:4 -->
 -- <g id="node5" class="node">
 -- <title>T:4</title>
 -- <polygon fill="none" stroke="black" points="608.17,-238.68 578.17,-238.68 578.17,-221.68 608.17,-221.68 608.17,-238.68"/>
--- <text text-anchor="middle" x="593.17" y="-228.28" font-family="Times,serif" font-size="8.00">T:4</text>
+-- <text text-anchor="middle" x="593.17" y="-228.28" font-family="Times,serif" font-size="8.00" fill="#000000">T:4</text>
 -- </g>
 -- <!-- T:4&#45;&gt;A:5 -->
 -- <g id="edge52" class="edge">
 -- <title>T:4&#45;&gt;A:5</title>
 -- <path fill="none" stroke="black" d="M578.02,-222.92C571.31,-220.13 563.33,-216.78 556.17,-213.68 537.63,-205.66 516.92,-196.43 500.59,-189.08"/>
 -- <polygon fill="black" stroke="black" points="501.59,-185.7 491.04,-184.78 498.72,-192.08 501.59,-185.7"/>
--- <text text-anchor="middle" x="561.67" y="-207.28" font-family="Times,serif" font-size="8.00">80</text>
+-- <text text-anchor="middle" x="561.67" y="-207.28" font-family="Times,serif" font-size="8.00" fill="#000000">80</text>
 -- </g>
 -- <!-- T:4&#45;&gt;A:7 -->
 -- <g id="edge53" class="edge">
 -- <title>T:4&#45;&gt;A:7</title>
 -- <path fill="none" stroke="black" d="M601.56,-221.56C618.18,-205.49 652.38,-167.03 636.17,-135.84 624.4,-113.19 608.61,-119.38 589.17,-102.84 583.81,-98.28 578.34,-93.05 573.31,-87.96"/>
 -- <polygon fill="black" stroke="black" points="575.78,-85.48 566.32,-80.71 570.74,-90.34 575.78,-85.48"/>
--- <text text-anchor="middle" x="647.17" y="-138.44" font-family="Times,serif" font-size="8.00">179</text>
+-- <text text-anchor="middle" x="647.17" y="-138.44" font-family="Times,serif" font-size="8.00" fill="#000000">179</text>
 -- </g>
 -- <!-- T:5 -->
 -- <g id="node6" class="node">
 -- <title>T:5</title>
 -- <polygon fill="none" stroke="black" points="810.17,-127.84 780.17,-127.84 780.17,-110.84 810.17,-110.84 810.17,-127.84"/>
--- <text text-anchor="middle" x="795.17" y="-117.44" font-family="Times,serif" font-size="8.00">T:5</text>
+-- <text text-anchor="middle" x="795.17" y="-117.44" font-family="Times,serif" font-size="8.00" fill="#000000">T:5</text>
 -- </g>
 -- <!-- T:5&#45;&gt;A:7 -->
 -- <g id="edge54" class="edge">
 -- <title>T:5&#45;&gt;A:7</title>
 -- <path fill="none" stroke="black" d="M780.02,-118.42C752.08,-118.21 690.75,-116.11 641.17,-102.84 631.76,-100.32 630.11,-97.72 621.17,-93.84 608.2,-88.2 593.78,-82.13 581.49,-77.01"/>
 -- <polygon fill="black" stroke="black" points="582.74,-73.74 572.16,-73.14 580.05,-80.2 582.74,-73.74"/>
--- <text text-anchor="middle" x="649.17" y="-96.44" font-family="Times,serif" font-size="8.00">177</text>
+-- <text text-anchor="middle" x="649.17" y="-96.44" font-family="Times,serif" font-size="8.00" fill="#000000">177</text>
 -- </g>
 -- <!-- T:6 -->
 -- <g id="node7" class="node">
 -- <title>T:6</title>
 -- <polygon fill="none" stroke="black" points="432.17,-127.84 402.17,-127.84 402.17,-110.84 432.17,-110.84 432.17,-127.84"/>
--- <text text-anchor="middle" x="417.17" y="-117.44" font-family="Times,serif" font-size="8.00">T:6</text>
+-- <text text-anchor="middle" x="417.17" y="-117.44" font-family="Times,serif" font-size="8.00" fill="#000000">T:6</text>
 -- </g>
 -- <!-- T:6&#45;&gt;A:7 -->
 -- <g id="edge55" class="edge">
 -- <title>T:6&#45;&gt;A:7</title>
 -- <path fill="none" stroke="black" d="M432.41,-114.47C437.7,-113.21 443.68,-111.87 449.17,-110.84 474.32,-106.14 482.76,-113.14 506.17,-102.84 514.62,-99.13 522.76,-93.4 529.78,-87.52"/>
 -- <polygon fill="black" stroke="black" points="532.34,-89.92 537.47,-80.65 527.68,-84.7 532.34,-89.92"/>
--- <text text-anchor="middle" x="529.17" y="-96.44" font-family="Times,serif" font-size="8.00">144</text>
+-- <text text-anchor="middle" x="529.17" y="-96.44" font-family="Times,serif" font-size="8.00" fill="#000000">144</text>
 -- </g>
 -- <!-- T:7 -->
 -- <g id="node8" class="node">
 -- <title>T:7</title>
 -- <polygon fill="none" stroke="black" points="486.17,-127.84 456.17,-127.84 456.17,-110.84 486.17,-110.84 486.17,-127.84"/>
--- <text text-anchor="middle" x="471.17" y="-117.44" font-family="Times,serif" font-size="8.00">T:7</text>
+-- <text text-anchor="middle" x="471.17" y="-117.44" font-family="Times,serif" font-size="8.00" fill="#000000">T:7</text>
 -- </g>
 -- <!-- T:8 -->
 -- <g id="node9" class="node">
 -- <title>T:8</title>
 -- <polygon fill="none" stroke="black" points="142.17,-17 112.17,-17 112.17,0 142.17,0 142.17,-17"/>
--- <text text-anchor="middle" x="127.17" y="-6.6" font-family="Times,serif" font-size="8.00">T:8</text>
+-- <text text-anchor="middle" x="127.17" y="-6.6" font-family="Times,serif" font-size="8.00" fill="#000000">T:8</text>
 -- </g>
 -- <!-- T:9 -->
 -- <g id="node10" class="node">
 -- <title>T:9</title>
 -- <polygon fill="none" stroke="black" points="611.17,-17 581.17,-17 581.17,0 611.17,0 611.17,-17"/>
--- <text text-anchor="middle" x="596.17" y="-6.6" font-family="Times,serif" font-size="8.00">T:9</text>
+-- <text text-anchor="middle" x="596.17" y="-6.6" font-family="Times,serif" font-size="8.00" fill="#000000">T:9</text>
 -- </g>
 -- <!-- T:10 -->
 -- <g id="node11" class="node">
 -- <title>T:10</title>
 -- <polygon fill="none" stroke="black" points="302.67,-127.84 267.67,-127.84 267.67,-110.84 302.67,-110.84 302.67,-127.84"/>
--- <text text-anchor="middle" x="285.17" y="-117.44" font-family="Times,serif" font-size="8.00">T:10</text>
+-- <text text-anchor="middle" x="285.17" y="-117.44" font-family="Times,serif" font-size="8.00" fill="#000000">T:10</text>
 -- </g>
 -- <!-- T:11 -->
 -- <g id="node12" class="node">
 -- <title>T:11</title>
 -- <polygon fill="none" stroke="black" points="523.67,-17 488.67,-17 488.67,0 523.67,0 523.67,-17"/>
--- <text text-anchor="middle" x="506.17" y="-6.6" font-family="Times,serif" font-size="8.00">T:11</text>
+-- <text text-anchor="middle" x="506.17" y="-6.6" font-family="Times,serif" font-size="8.00" fill="#000000">T:11</text>
 -- </g>
 -- <!-- A:0 -->
 -- <g id="node13" class="node">
 -- <title>A:0</title>
 -- <ellipse fill="none" stroke="black" cx="604.17" cy="-285.6" rx="21.84" ry="21.84"/>
--- <text text-anchor="middle" x="604.17" y="-283.7" font-family="Times,serif" font-size="8.00">A:0</text>
+-- <text text-anchor="middle" x="604.17" y="-283.7" font-family="Times,serif" font-size="8.00" fill="#000000">A:0</text>
 -- </g>
 -- <!-- A:0&#45;&gt;T:1 -->
 -- <g id="edge1" class="edge">
 -- <title>A:0&#45;&gt;T:1</title>
 -- <path fill="none" stroke="black" d="M583.1,-279.04C568.37,-274.45 548.81,-266.84 534.17,-255.68 531.08,-253.33 528.23,-250.35 525.71,-247.29"/>
 -- <polygon fill="black" stroke="black" points="528.34,-244.95 519.65,-238.9 522.67,-249.05 528.34,-244.95"/>
--- <text text-anchor="middle" x="539.67" y="-249.28" font-family="Times,serif" font-size="8.00">53</text>
+-- <text text-anchor="middle" x="539.67" y="-249.28" font-family="Times,serif" font-size="8.00" fill="#000000">53</text>
 -- </g>
 -- <!-- A:0&#45;&gt;T:5 -->
 -- <g id="edge2" class="edge">
 -- <title>A:0&#45;&gt;T:5</title>
 -- <path fill="none" stroke="black" d="M626.03,-283.44C665.47,-280.93 746.34,-273.66 767.17,-255.68 806.49,-221.75 795.84,-196.1 804.17,-144.84 804.57,-142.37 804.88,-140.98 803.93,-137.4"/>
 -- <polygon fill="black" stroke="black" points="807.2,-136.16 800.61,-127.87 800.59,-138.47 807.2,-136.16"/>
--- <text text-anchor="middle" x="805.17" y="-207.28" font-family="Times,serif" font-size="8.00">251</text>
+-- <text text-anchor="middle" x="805.17" y="-207.28" font-family="Times,serif" font-size="8.00" fill="#000000">251</text>
 -- </g>
 -- <!-- A:0&#45;&gt;T:7 -->
 -- <g id="edge3" class="edge">
 -- <title>A:0&#45;&gt;T:7</title>
 -- <path fill="none" stroke="black" d="M589.87,-268.74C583.12,-260.37 575.59,-249.6 571.17,-238.68 565.44,-224.52 576.43,-216 566.17,-204.68 556.33,-193.82 546.45,-204.69 534.17,-196.68 513.52,-183.21 515.95,-171.79 500.17,-152.84 495.41,-147.12 490.02,-140.99 485.2,-135.62"/>
 -- <polygon fill="black" stroke="black" points="487.55,-133.01 478.24,-127.96 482.37,-137.71 487.55,-133.01"/>
--- <text text-anchor="middle" x="578.17" y="-207.28" font-family="Times,serif" font-size="8.00">123</text>
+-- <text text-anchor="middle" x="578.17" y="-207.28" font-family="Times,serif" font-size="8.00" fill="#000000">123</text>
 -- </g>
 -- <!-- A:0&#45;&gt;T:9 -->
 -- <g id="edge4" class="edge">
 -- <title>A:0&#45;&gt;T:9</title>
 -- <path fill="none" stroke="black" d="M626.31,-285.39C651.43,-284.99 691.82,-280.19 714.17,-255.68 729.59,-238.78 722.3,-227.53 721.17,-204.68 717.53,-131 741.93,-92.53 688.17,-42 669.87,-24.79 641.88,-16.61 621.59,-12.78"/>
 -- <polygon fill="black" stroke="black" points="621.93,-9.29 611.49,-11.1 620.78,-16.19 621.93,-9.29"/>
--- <text text-anchor="middle" x="731.17" y="-138.44" font-family="Times,serif" font-size="8.00">118</text>
+-- <text text-anchor="middle" x="731.17" y="-138.44" font-family="Times,serif" font-size="8.00" fill="#000000">118</text>
 -- </g>
 -- <!-- A:0&#45;&gt;T:10 -->
 -- <g id="edge5" class="edge">
 -- <title>A:0&#45;&gt;T:10</title>
 -- <path fill="none" stroke="black" d="M582.88,-279.13C534.1,-266.38 415.74,-234.27 380.17,-213.68 344.96,-193.3 313.27,-156.84 296.9,-136.03"/>
 -- <polygon fill="black" stroke="black" points="299.54,-133.73 290.68,-127.93 293.99,-137.99 299.54,-133.73"/>
--- <text text-anchor="middle" x="388.17" y="-207.28" font-family="Times,serif" font-size="8.00">126</text>
+-- <text text-anchor="middle" x="388.17" y="-207.28" font-family="Times,serif" font-size="8.00" fill="#000000">126</text>
 -- </g>
 -- <!-- A:0&#45;&gt;T:11 -->
 -- <g id="edge6" class="edge">
 -- <title>A:0&#45;&gt;T:11</title>
 -- <path fill="none" stroke="black" d="M612.83,-265.33C617.29,-252.58 620.74,-235.7 615.17,-221.68 588.4,-154.22 529.95,-170.3 503.17,-102.84 493.27,-77.9 497.43,-46.19 501.6,-26.89"/>
 -- <polygon fill="black" stroke="black" points="505.02,-27.65 503.96,-17.11 498.22,-26.01 505.02,-27.65"/>
--- <text text-anchor="middle" x="540.17" y="-138.44" font-family="Times,serif" font-size="8.00">179</text>
+-- <text text-anchor="middle" x="540.17" y="-138.44" font-family="Times,serif" font-size="8.00" fill="#000000">179</text>
 -- </g>
 -- <!-- A:1&#45;&gt;T:2 -->
 -- <g id="edge7" class="edge">
 -- <title>A:1&#45;&gt;T:2</title>
 -- <path fill="none" stroke="black" d="M299.11,-265.01C296.83,-259.5 294.38,-253.54 292.18,-248.19"/>
 -- <polygon fill="black" stroke="black" points="295.4,-246.83 288.36,-238.91 288.93,-249.49 295.4,-246.83"/>
--- <text text-anchor="middle" x="300.67" y="-249.28" font-family="Times,serif" font-size="8.00">67</text>
+-- <text text-anchor="middle" x="300.67" y="-249.28" font-family="Times,serif" font-size="8.00" fill="#000000">67</text>
 -- </g>
 -- <!-- A:1&#45;&gt;T:3 -->
 -- <g id="edge8" class="edge">
 -- <title>A:1&#45;&gt;T:3</title>
 -- <path fill="none" stroke="black" d="M285.51,-280.83C267.14,-276.85 240.73,-269.22 221.17,-255.68 217.82,-253.36 214.72,-250.32 212.02,-247.17"/>
 -- <polygon fill="black" stroke="black" points="214.69,-244.9 205.88,-239.02 209.1,-249.11 214.69,-244.9"/>
--- <text text-anchor="middle" x="229.17" y="-249.28" font-family="Times,serif" font-size="8.00">216</text>
+-- <text text-anchor="middle" x="229.17" y="-249.28" font-family="Times,serif" font-size="8.00" fill="#000000">216</text>
 -- </g>
 -- <!-- A:1&#45;&gt;T:4 -->
 -- <g id="edge9" class="edge">
 -- <title>A:1&#45;&gt;T:4</title>
 -- <path fill="none" stroke="black" d="M327.01,-275.61C347.96,-266.58 382.17,-253.1 413.17,-246.68 467.25,-235.49 482.22,-244.13 537.17,-238.68 547.24,-237.68 558.29,-236.27 567.9,-234.94"/>
 -- <polygon fill="black" stroke="black" points="568.59,-238.38 578,-233.5 567.6,-231.45 568.59,-238.38"/>
--- <text text-anchor="middle" x="421.17" y="-249.28" font-family="Times,serif" font-size="8.00">190</text>
+-- <text text-anchor="middle" x="421.17" y="-249.28" font-family="Times,serif" font-size="8.00" fill="#000000">190</text>
 -- </g>
 -- <!-- A:1&#45;&gt;T:5 -->
 -- <g id="edge10" class="edge">
 -- <title>A:1&#45;&gt;T:5</title>
 -- <path fill="none" stroke="black" d="M329.37,-283.03C391.24,-278.37 564.38,-263.42 615.17,-238.68 637.39,-227.86 636.46,-214.42 659.17,-204.68 680.66,-195.46 689.53,-205.54 711.17,-196.68 747.67,-181.75 757.74,-174.97 783.17,-144.84 785.06,-142.61 786.73,-140.03 788.18,-137.41"/>
 -- <polygon fill="black" stroke="black" points="791.42,-138.74 792.47,-128.2 785.08,-135.78 791.42,-138.74"/>
--- <text text-anchor="middle" x="667.17" y="-207.28" font-family="Times,serif" font-size="8.00">184</text>
+-- <text text-anchor="middle" x="667.17" y="-207.28" font-family="Times,serif" font-size="8.00" fill="#000000">184</text>
 -- </g>
 -- <!-- A:1&#45;&gt;T:7 -->
 -- <g id="edge11" class="edge">
 -- <title>A:1&#45;&gt;T:7</title>
 -- <path fill="none" stroke="black" d="M322.52,-269.48C326.32,-265.25 330.15,-260.48 333.17,-255.68 346.22,-234.93 342.22,-226.08 354.17,-204.68 372.61,-171.67 372.62,-156.68 404.17,-135.84 417.49,-127.05 423.63,-131.44 439.17,-127.84 441.39,-127.33 443.69,-126.79 445.99,-126.26"/>
 -- <polygon fill="black" stroke="black" points="446.94,-129.63 455.88,-123.94 445.34,-122.81 446.94,-129.63"/>
--- <text text-anchor="middle" x="359.67" y="-207.28" font-family="Times,serif" font-size="8.00">84</text>
+-- <text text-anchor="middle" x="359.67" y="-207.28" font-family="Times,serif" font-size="8.00" fill="#000000">84</text>
 -- </g>
 -- <!-- A:1&#45;&gt;T:8 -->
 -- <g id="edge12" class="edge">
 -- <title>A:1&#45;&gt;T:8</title>
 -- <path fill="none" stroke="black" d="M285.11,-282.88C227.99,-278.32 78.35,-265.57 58.17,-255.68 44.49,-248.97 34.17,-246.42 34.17,-231.18 34.17,-231.18 34.17,-231.18 34.17,-62.92 34.17,-31.69 74.1,-18.45 101.63,-13.03"/>
 -- <polygon fill="black" stroke="black" points="102.56,-16.42 111.82,-11.27 101.37,-9.53 102.56,-16.42"/>
--- <text text-anchor="middle" x="42.17" y="-138.44" font-family="Times,serif" font-size="8.00">206</text>
+-- <text text-anchor="middle" x="42.17" y="-138.44" font-family="Times,serif" font-size="8.00" fill="#000000">206</text>
 -- </g>
 -- <!-- A:1&#45;&gt;T:9 -->
 -- <g id="edge13" class="edge">
 -- <title>A:1&#45;&gt;T:9</title>
 -- <path fill="none" stroke="black" d="M308.77,-263.43C311.85,-222.99 318.47,-138.49 320.17,-135.84 377.24,-47.13 513.79,-19.91 570.65,-12.25"/>
 -- <polygon fill="black" stroke="black" points="571.42,-15.68 580.91,-10.97 570.55,-8.73 571.42,-15.68"/>
--- <text text-anchor="middle" x="325.67" y="-138.44" font-family="Times,serif" font-size="8.00">24</text>
+-- <text text-anchor="middle" x="325.67" y="-138.44" font-family="Times,serif" font-size="8.00" fill="#000000">24</text>
 -- </g>
 -- <!-- A:1&#45;&gt;T:10 -->
 -- <g id="edge14" class="edge">
 -- <title>A:1&#45;&gt;T:10</title>
 -- <path fill="none" stroke="black" d="M290.65,-270.72C281.48,-262.26 270.48,-250.78 263.17,-238.68 253.01,-221.83 252.33,-216.1 249.17,-196.68 244.78,-169.63 239.85,-155.27 259.17,-135.84 259.84,-135.17 260.54,-134.52 261.26,-133.89"/>
 -- <polygon fill="black" stroke="black" points="263.59,-136.53 269.68,-127.85 259.51,-130.84 263.59,-136.53"/>
--- <text text-anchor="middle" x="258.67" y="-207.28" font-family="Times,serif" font-size="8.00">84</text>
+-- <text text-anchor="middle" x="258.67" y="-207.28" font-family="Times,serif" font-size="8.00" fill="#000000">84</text>
 -- </g>
 -- <!-- A:1&#45;&gt;T:11 -->
 -- <g id="edge15" class="edge">
 -- <title>A:1&#45;&gt;T:11</title>
 -- <path fill="none" stroke="black" d="M285.37,-283.18C240.94,-278.94 140.87,-262.2 102.17,-196.68 78.45,-156.51 92.66,-129.12 123.17,-93.84 187.43,-19.55 235.66,-36.76 333.17,-25 384.23,-18.84 444.04,-14.01 478.28,-11.47"/>
 -- <polygon fill="black" stroke="black" points="478.74,-14.95 488.45,-10.73 478.23,-7.97 478.74,-14.95"/>
--- <text text-anchor="middle" x="103.17" y="-138.44" font-family="Times,serif" font-size="8.00">177</text>
+-- <text text-anchor="middle" x="103.17" y="-138.44" font-family="Times,serif" font-size="8.00" fill="#000000">177</text>
 -- </g>
 -- <!-- A:2&#45;&gt;T:4 -->
 -- <g id="edge16" class="edge">
 -- <title>A:2&#45;&gt;T:4</title>
 -- <path fill="none" stroke="black" d="M781.88,-279.67C757.86,-274.06 717.63,-264.52 683.17,-255.68 661.15,-250.03 636.2,-243.21 618.17,-238.2"/>
 -- <polygon fill="black" stroke="black" points="619,-234.79 608.43,-235.48 617.12,-241.54 619,-234.79"/>
--- <text text-anchor="middle" x="686.17" y="-249.28" font-family="Times,serif" font-size="8.00">1</text>
+-- <text text-anchor="middle" x="686.17" y="-249.28" font-family="Times,serif" font-size="8.00" fill="#000000">1</text>
 -- </g>
 -- <!-- A:2&#45;&gt;T:5 -->
 -- <g id="edge17" class="edge">
 -- <title>A:2&#45;&gt;T:5</title>
 -- <path fill="none" stroke="black" d="M813.34,-265.66C827.86,-235.77 850.16,-176.87 825.17,-135.84 823.63,-133.31 821.52,-131.17 819.14,-129.37"/>
 -- <polygon fill="black" stroke="black" points="820.8,-126.29 810.36,-124.47 817.39,-132.4 820.8,-126.29"/>
--- <text text-anchor="middle" x="841.17" y="-207.28" font-family="Times,serif" font-size="8.00">196</text>
+-- <text text-anchor="middle" x="841.17" y="-207.28" font-family="Times,serif" font-size="8.00" fill="#000000">196</text>
 -- </g>
 -- <!-- A:2&#45;&gt;T:6 -->
 -- <g id="edge18" class="edge">
 -- <title>A:2&#45;&gt;T:6</title>
 -- <path fill="none" stroke="black" d="M781.26,-282.18C761.04,-278.99 731.08,-271.77 710.17,-255.68 688.97,-239.36 699.31,-221.09 678.17,-204.68 668.96,-197.53 664.22,-200.45 653.17,-196.68 578.01,-171.06 561.43,-158.02 485.17,-135.84 469.44,-131.26 465.15,-131.49 449.17,-127.84 446.96,-127.34 444.66,-126.81 442.35,-126.27"/>
 -- <polygon fill="black" stroke="black" points="443,-122.83 432.47,-123.96 441.41,-129.64 443,-122.83"/>
--- <text text-anchor="middle" x="691.67" y="-207.28" font-family="Times,serif" font-size="8.00">62</text>
+-- <text text-anchor="middle" x="691.67" y="-207.28" font-family="Times,serif" font-size="8.00" fill="#000000">62</text>
 -- </g>
 -- <!-- A:2&#45;&gt;T:9 -->
 -- <g id="edge19" class="edge">
 -- <title>A:2&#45;&gt;T:9</title>
 -- <path fill="none" stroke="black" d="M825.15,-282.43C854.31,-278.19 902.17,-265.94 902.17,-231.18 902.17,-231.18 902.17,-231.18 902.17,-62.92 902.17,-42.97 895.38,-35.1 878.17,-25 856.39,-12.21 686.94,-9.97 621.68,-9.58"/>
 -- <polygon fill="black" stroke="black" points="621.46,-6.08 611.45,-9.53 621.43,-13.08 621.46,-6.08"/>
--- <text text-anchor="middle" x="910.17" y="-138.44" font-family="Times,serif" font-size="8.00">245</text>
+-- <text text-anchor="middle" x="910.17" y="-138.44" font-family="Times,serif" font-size="8.00" fill="#000000">245</text>
 -- </g>
 -- <!-- A:2&#45;&gt;T:11 -->
 -- <g id="edge20" class="edge">
 -- <title>A:2&#45;&gt;T:11</title>
 -- <path fill="none" stroke="black" d="M823.78,-277.32C842.49,-269.23 867.17,-254.19 867.17,-231.18 867.17,-231.18 867.17,-231.18 867.17,-62.92 867.17,-54.51 618.63,-23.28 534,-12.89"/>
 -- <polygon fill="black" stroke="black" points="534.43,-9.41 524.08,-11.67 533.58,-16.36 534.43,-9.41"/>
--- <text text-anchor="middle" x="875.17" y="-138.44" font-family="Times,serif" font-size="8.00">213</text>
+-- <text text-anchor="middle" x="875.17" y="-138.44" font-family="Times,serif" font-size="8.00" fill="#000000">213</text>
 -- </g>
 -- <!-- A:3&#45;&gt;T:5 -->
 -- <g id="edge21" class="edge">
 -- <title>A:3&#45;&gt;T:5</title>
 -- <path fill="none" stroke="black" d="M699.74,-161.13C704.57,-158.08 709.93,-155.07 715.17,-152.84 729.07,-146.94 734.05,-150.15 748.17,-144.84 756.87,-141.58 766.02,-137.08 773.91,-132.82"/>
 -- <polygon fill="black" stroke="black" points="775.77,-135.79 782.79,-127.86 772.35,-129.68 775.77,-135.79"/>
--- <text text-anchor="middle" x="775.17" y="-138.44" font-family="Times,serif" font-size="8.00">108</text>
+-- <text text-anchor="middle" x="775.17" y="-138.44" font-family="Times,serif" font-size="8.00" fill="#000000">108</text>
 -- </g>
 -- <!-- A:3&#45;&gt;T:7 -->
 -- <g id="edge22" class="edge">
 -- <title>A:3&#45;&gt;T:7</title>
 -- <path fill="none" stroke="black" d="M663.14,-163.83C642.62,-153.2 612.08,-137.59 606.17,-135.84 569.2,-124.87 524.4,-121.59 496.84,-120.65"/>
 -- <polygon fill="black" stroke="black" points="496.59,-117.14 486.5,-120.38 496.41,-124.14 496.59,-117.14"/>
--- <text text-anchor="middle" x="629.67" y="-138.44" font-family="Times,serif" font-size="8.00">45</text>
+-- <text text-anchor="middle" x="629.67" y="-138.44" font-family="Times,serif" font-size="8.00" fill="#000000">45</text>
 -- </g>
 -- <!-- A:3&#45;&gt;T:8 -->
 -- <g id="edge23" class="edge">
 -- <title>A:3&#45;&gt;T:8</title>
 -- <path fill="none" stroke="black" d="M679.22,-153.03C675.93,-135.81 669.25,-111.39 656.17,-93.84 631.97,-61.35 619.4,-55.44 581.17,-42 560.83,-34.84 244.84,-16.25 152.4,-10.94"/>
 -- <polygon fill="black" stroke="black" points="152.45,-7.43 142.26,-10.36 152.05,-14.42 152.45,-7.43"/>
--- <text text-anchor="middle" x="666.67" y="-96.44" font-family="Times,serif" font-size="8.00">71</text>
+-- <text text-anchor="middle" x="666.67" y="-96.44" font-family="Times,serif" font-size="8.00" fill="#000000">71</text>
 -- </g>
 -- <!-- A:3&#45;&gt;T:10 -->
 -- <g id="edge24" class="edge">
 -- <title>A:3&#45;&gt;T:10</title>
 -- <path fill="none" stroke="black" d="M660.38,-171.4C611.02,-165.98 491.88,-152.56 452.17,-144.84 436.83,-141.86 433.53,-138.75 418.17,-135.84 382.24,-129.03 340.24,-124.73 313.21,-122.44"/>
 -- <polygon fill="black" stroke="black" points="313.19,-118.92 302.94,-121.6 312.62,-125.9 313.19,-118.92"/>
--- <text text-anchor="middle" x="460.17" y="-138.44" font-family="Times,serif" font-size="8.00">225</text>
+-- <text text-anchor="middle" x="460.17" y="-138.44" font-family="Times,serif" font-size="8.00" fill="#000000">225</text>
 -- </g>
 -- <!-- A:3&#45;&gt;T:11 -->
 -- <g id="edge25" class="edge">
 -- <title>A:3&#45;&gt;T:11</title>
 -- <path fill="none" stroke="black" d="M689.95,-154.07C690.87,-151.03 691.66,-147.88 692.17,-144.84 692.84,-140.9 692.46,-139.83 692.17,-135.84 689.1,-92.55 700.08,-67.79 665.17,-42 648.67,-29.81 593.21,-38.45 573.17,-34 559.38,-30.94 544.58,-25.74 532.41,-20.92"/>
 -- <polygon fill="black" stroke="black" points="533.46,-17.57 522.88,-17.01 530.8,-24.04 533.46,-17.57"/>
--- <text text-anchor="middle" x="699.17" y="-96.44" font-family="Times,serif" font-size="8.00">211</text>
+-- <text text-anchor="middle" x="699.17" y="-96.44" font-family="Times,serif" font-size="8.00" fill="#000000">211</text>
 -- </g>
 -- <!-- A:4&#45;&gt;T:6 -->
 -- <g id="edge26" class="edge">
 -- <title>A:4&#45;&gt;T:6</title>
 -- <path fill="none" stroke="black" d="M152.27,-168.26C183.66,-160.22 244.64,-145.21 297.17,-135.84 329.63,-130.05 367.4,-125.53 391.76,-122.91"/>
 -- <polygon fill="black" stroke="black" points="392.37,-126.36 401.95,-121.83 391.64,-119.4 392.37,-126.36"/>
--- <text text-anchor="middle" x="300.17" y="-138.44" font-family="Times,serif" font-size="8.00">9</text>
+-- <text text-anchor="middle" x="300.17" y="-138.44" font-family="Times,serif" font-size="8.00" fill="#000000">9</text>
 -- </g>
 -- <!-- A:4&#45;&gt;T:8 -->
 -- <g id="edge27" class="edge">
 -- <title>A:4&#45;&gt;T:8</title>
 -- <path fill="none" stroke="black" d="M117.48,-157.36C114.73,-153.45 112.09,-149.15 110.17,-144.84 102.4,-127.41 103.18,-121.82 101.17,-102.84 98.49,-77.46 108.27,-45.65 116.64,-26.2"/>
 -- <polygon fill="black" stroke="black" points="119.86,-27.56 120.92,-17.01 113.52,-24.59 119.86,-27.56"/>
--- <text text-anchor="middle" x="109.17" y="-96.44" font-family="Times,serif" font-size="8.00">104</text>
+-- <text text-anchor="middle" x="109.17" y="-96.44" font-family="Times,serif" font-size="8.00" fill="#000000">104</text>
 -- </g>
 -- <!-- A:4&#45;&gt;T:9 -->
 -- <g id="edge28" class="edge">
 -- <title>A:4&#45;&gt;T:9</title>
 -- <path fill="none" stroke="black" d="M139.49,-154.14C148.34,-135.69 164.12,-108.74 186.17,-93.84 302.03,-15.54 355.73,-50.72 493.17,-25 519.66,-20.04 550.22,-15.61 571.12,-12.76"/>
 -- <polygon fill="black" stroke="black" points="571.66,-16.22 581.11,-11.43 570.73,-9.28 571.66,-16.22"/>
--- <text text-anchor="middle" x="194.17" y="-96.44" font-family="Times,serif" font-size="8.00">107</text>
+-- <text text-anchor="middle" x="194.17" y="-96.44" font-family="Times,serif" font-size="8.00" fill="#000000">107</text>
 -- </g>
 -- <!-- A:4&#45;&gt;T:10 -->
 -- <g id="edge29" class="edge">
 -- <title>A:4&#45;&gt;T:10</title>
 -- <path fill="none" stroke="black" d="M147.97,-160.3C159.26,-151.95 174.83,-141.73 190.17,-135.84 211.89,-127.5 238.09,-123.65 257.46,-121.87"/>
 -- <polygon fill="black" stroke="black" points="257.76,-125.36 267.45,-121.08 257.21,-118.38 257.76,-125.36"/>
--- <text text-anchor="middle" x="198.17" y="-138.44" font-family="Times,serif" font-size="8.00">122</text>
+-- <text text-anchor="middle" x="198.17" y="-138.44" font-family="Times,serif" font-size="8.00" fill="#000000">122</text>
 -- </g>
 -- <!-- A:5&#45;&gt;T:6 -->
 -- <g id="edge30" class="edge">
 -- <title>A:5&#45;&gt;T:6</title>
 -- <path fill="none" stroke="black" d="M449.69,-170.06C435.26,-166.34 417.27,-159.02 408.17,-144.84 406.67,-142.49 406.41,-139.85 406.88,-137.2"/>
 -- <polygon fill="black" stroke="black" points="410.09,-138.59 410.9,-128.02 403.68,-135.78 410.09,-138.59"/>
--- <text text-anchor="middle" x="413.67" y="-138.44" font-family="Times,serif" font-size="8.00">52</text>
+-- <text text-anchor="middle" x="413.67" y="-138.44" font-family="Times,serif" font-size="8.00" fill="#000000">52</text>
 -- </g>
 -- <!-- A:5&#45;&gt;T:7 -->
 -- <g id="edge31" class="edge">
 -- <title>A:5&#45;&gt;T:7</title>
 -- <path fill="none" stroke="black" d="M471.17,-152.65C471.17,-147.86 471.17,-142.83 471.17,-138.19"/>
 -- <polygon fill="black" stroke="black" points="474.67,-137.87 471.17,-127.87 467.67,-137.87 474.67,-137.87"/>
--- <text text-anchor="middle" x="476.67" y="-138.44" font-family="Times,serif" font-size="8.00">30</text>
+-- <text text-anchor="middle" x="476.67" y="-138.44" font-family="Times,serif" font-size="8.00" fill="#000000">30</text>
 -- </g>
 -- <!-- A:5&#45;&gt;T:9 -->
 -- <g id="edge32" class="edge">
 -- <title>A:5&#45;&gt;T:9</title>
 -- <path fill="none" stroke="black" d="M490.24,-163.17C514.63,-148.71 556.62,-120.58 581.17,-85.84 595.25,-65.92 595.12,-58.05 599.17,-34 599.54,-31.82 599.64,-29.53 599.56,-27.25"/>
 -- <polygon fill="black" stroke="black" points="603.02,-26.72 598.27,-17.25 596.08,-27.62 603.02,-26.72"/>
--- <text text-anchor="middle" x="582.17" y="-96.44" font-family="Times,serif" font-size="8.00">126</text>
+-- <text text-anchor="middle" x="582.17" y="-96.44" font-family="Times,serif" font-size="8.00" fill="#000000">126</text>
 -- </g>
 -- <!-- A:6&#45;&gt;T:7 -->
 -- <g id="edge33" class="edge">
 -- <title>A:6&#45;&gt;T:7</title>
 -- <path fill="none" stroke="black" d="M297.41,-163.42C317.37,-152.77 346.46,-137.5 352.17,-135.84 389.46,-125.01 400.85,-134.06 439.17,-127.84 441.42,-127.48 443.74,-127.04 446.05,-126.57"/>
 -- <polygon fill="black" stroke="black" points="446.96,-129.96 455.96,-124.36 445.44,-123.13 446.96,-129.96"/>
--- <text text-anchor="middle" x="360.17" y="-138.44" font-family="Times,serif" font-size="8.00">149</text>
+-- <text text-anchor="middle" x="360.17" y="-138.44" font-family="Times,serif" font-size="8.00" fill="#000000">149</text>
 -- </g>
 -- <!-- A:6&#45;&gt;T:8 -->
 -- <g id="edge34" class="edge">
 -- <title>A:6&#45;&gt;T:8</title>
 -- <path fill="none" stroke="black" d="M255.78,-174.65C228.16,-174.53 181.29,-170.19 152.17,-144.84 118.44,-115.48 120.67,-56.71 124.31,-27.23"/>
 -- <polygon fill="black" stroke="black" points="127.79,-27.57 125.75,-17.17 120.87,-26.57 127.79,-27.57"/>
--- <text text-anchor="middle" x="133.67" y="-96.44" font-family="Times,serif" font-size="8.00">76</text>
+-- <text text-anchor="middle" x="133.67" y="-96.44" font-family="Times,serif" font-size="8.00" fill="#000000">76</text>
 -- </g>
 -- <!-- A:6&#45;&gt;T:11 -->
 -- <g id="edge35" class="edge">
 -- <title>A:6&#45;&gt;T:11</title>
 -- <path fill="none" stroke="black" d="M256.09,-173.52C219.51,-172.29 152.37,-165.99 173.17,-135.84 244.37,-32.68 411.62,-13.68 478.15,-10.23"/>
 -- <polygon fill="black" stroke="black" points="478.46,-13.72 488.29,-9.79 478.15,-6.73 478.46,-13.72"/>
--- <text text-anchor="middle" x="218.17" y="-96.44" font-family="Times,serif" font-size="8.00">158</text>
+-- <text text-anchor="middle" x="218.17" y="-96.44" font-family="Times,serif" font-size="8.00" fill="#000000">158</text>
 -- </g>
 -- <!-- A:7&#45;&gt;T:8 -->
 -- <g id="edge36" class="edge">
 -- <title>A:7&#45;&gt;T:8</title>
 -- <path fill="none" stroke="black" d="M530.51,-60.2C458.77,-51.18 229.1,-22.31 152.39,-12.67"/>
 -- <polygon fill="black" stroke="black" points="152.58,-9.17 142.22,-11.39 151.71,-16.11 152.58,-9.17"/>
--- <text text-anchor="middle" x="320.67" y="-27.6" font-family="Times,serif" font-size="8.00">68</text>
+-- <text text-anchor="middle" x="320.67" y="-27.6" font-family="Times,serif" font-size="8.00" fill="#000000">68</text>
 -- </g>
 -- <!-- A:7&#45;&gt;T:9 -->
 -- <g id="edge37" class="edge">
 -- <title>A:7&#45;&gt;T:9</title>
 -- <path fill="none" stroke="black" d="M565.61,-46.6C571.3,-39.7 577.89,-31.7 583.49,-24.9"/>
 -- <polygon fill="black" stroke="black" points="586.26,-27.04 589.92,-17.1 580.86,-22.59 586.26,-27.04"/>
--- <text text-anchor="middle" x="590.17" y="-27.6" font-family="Times,serif" font-size="8.00">219</text>
+-- <text text-anchor="middle" x="590.17" y="-27.6" font-family="Times,serif" font-size="8.00" fill="#000000">219</text>
 -- </g>
 -- <!-- A:7&#45;&gt;T:11 -->
 -- <g id="edge38" class="edge">
 -- <title>A:7&#45;&gt;T:11</title>
 -- <path fill="none" stroke="black" d="M538.12,-46.6C532.18,-39.7 525.29,-31.7 519.43,-24.9"/>
 -- <polygon fill="black" stroke="black" points="521.89,-22.39 512.72,-17.1 516.59,-26.96 521.89,-22.39"/>
--- <text text-anchor="middle" x="531.67" y="-27.6" font-family="Times,serif" font-size="8.00">76</text>
+-- <text text-anchor="middle" x="531.67" y="-27.6" font-family="Times,serif" font-size="8.00" fill="#000000">76</text>
 -- </g>
 -- </g>
 -- </svg>
@@ -4092,7 +4092,7 @@ select (select draw(ata,
 \set draw_source :twocol_a_source
 \i sql/draw.sql
 \setenv draw_source :draw_source
-\! echo $draw_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
+\! echo $draw_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 2>/dev/null | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
 -- <div>
 -- <!-- Title: %3 Pages: 1 -->
 -- <svg width="263pt" height="409pt"
@@ -4100,138 +4100,138 @@ select (select draw(ata,
 -- <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 404.6)">
 -- <title>%3</title>
 -- <polygon fill="white" stroke="transparent" points="-4,4 -4,-404.6 259.32,-404.6 259.32,4 -4,4"/>
--- <text text-anchor="middle" x="127.66" y="-7.4" font-family="Times,serif" font-size="12.00">Address to Address</text>
+-- <text text-anchor="middle" x="127.66" y="-7.4" font-family="Times,serif" font-size="12.00" fill="#000000">Address to Address</text>
 -- <!-- 4 -->
 -- <g id="node1" class="node">
 -- <title>4</title>
 -- <ellipse fill="#00007f" fill-opacity="0.498039" stroke="black" cx="114.93" cy="-372.31" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="114.93" y="-370.41" font-family="Times,serif" font-size="8.00">4 : 28</text>
+-- <text text-anchor="middle" x="114.93" y="-370.41" font-family="Times,serif" font-size="8.00" fill="#000000">4 : 28</text>
 -- </g>
 -- <!-- 7 -->
 -- <g id="node4" class="node">
 -- <title>7</title>
 -- <ellipse fill="#006cff" fill-opacity="0.498039" stroke="black" cx="227.04" cy="-145.31" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="227.04" y="-143.41" font-family="Times,serif" font-size="8.00">7 : 74</text>
+-- <text text-anchor="middle" x="227.04" y="-143.41" font-family="Times,serif" font-size="8.00" fill="#000000">7 : 74</text>
 -- </g>
 -- <!-- 4&#45;&gt;7 -->
 -- <g id="edge11" class="edge">
 -- <title>4&#45;&gt;7</title>
 -- <path fill="none" stroke="black" d="M141.53,-361.87C155.11,-355.08 170.97,-344.94 180.75,-331.31 212.25,-287.45 222.01,-224.34 224.93,-184.08"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="228.44,-184.06 225.56,-173.87 221.45,-183.63 228.44,-184.06"/>
--- <text text-anchor="middle" x="172.75" y="-347.91" font-family="Times,serif" font-size="8.00">153</text>
+-- <text text-anchor="middle" x="172.75" y="-347.91" font-family="Times,serif" font-size="8.00" fill="#000000">153</text>
 -- </g>
 -- <!-- 5 -->
 -- <g id="node2" class="node">
 -- <title>5</title>
 -- <ellipse fill="#7f0000" fill-opacity="0.498039" stroke="black" cx="114.93" cy="-175.31" rx="31.64" ry="31.64"/>
--- <text text-anchor="middle" x="114.93" y="-173.41" font-family="Times,serif" font-size="8.00">5 : 227</text>
+-- <text text-anchor="middle" x="114.93" y="-173.41" font-family="Times,serif" font-size="8.00" fill="#000000">5 : 227</text>
 -- </g>
 -- <!-- 5&#45;&gt;7 -->
 -- <g id="edge12" class="edge">
 -- <title>5&#45;&gt;7</title>
 -- <path fill="none" stroke="black" d="M145.73,-167.19C159.26,-163.51 175.39,-159.11 189.63,-155.23"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="190.87,-158.52 199.6,-152.51 189.03,-151.77 190.87,-158.52"/>
--- <text text-anchor="middle" x="172.75" y="-162.91" font-family="Times,serif" font-size="8.00">196</text>
+-- <text text-anchor="middle" x="172.75" y="-162.91" font-family="Times,serif" font-size="8.00" fill="#000000">196</text>
 -- </g>
 -- <!-- 6 -->
 -- <g id="node3" class="node">
 -- <title>6</title>
 -- <ellipse fill="#0000b2" fill-opacity="0.498039" stroke="black" cx="114.93" cy="-253.31" rx="28.07" ry="28.07"/>
--- <text text-anchor="middle" x="114.93" y="-251.41" font-family="Times,serif" font-size="8.00">6 : 38</text>
+-- <text text-anchor="middle" x="114.93" y="-251.41" font-family="Times,serif" font-size="8.00" fill="#000000">6 : 38</text>
 -- </g>
 -- <!-- 0 -->
 -- <g id="node5" class="node">
 -- <title>0</title>
 -- <ellipse fill="none" stroke="black" cx="15.56" cy="-175.31" rx="15.61" ry="15.61"/>
--- <text text-anchor="middle" x="15.56" y="-173.41" font-family="Times,serif" font-size="8.00">0</text>
+-- <text text-anchor="middle" x="15.56" y="-173.41" font-family="Times,serif" font-size="8.00" fill="#000000">0</text>
 -- </g>
 -- <!-- 0&#45;&gt;5 -->
 -- <g id="edge1" class="edge">
 -- <title>0&#45;&gt;5</title>
 -- <path fill="none" stroke="black" d="M31.35,-175.31C42.31,-175.31 57.82,-175.31 72.44,-175.31"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="72.85,-178.81 82.85,-175.31 72.85,-171.81 72.85,-178.81"/>
--- <text text-anchor="middle" x="57.11" y="-177.91" font-family="Times,serif" font-size="8.00">66</text>
+-- <text text-anchor="middle" x="57.11" y="-177.91" font-family="Times,serif" font-size="8.00" fill="#000000">66</text>
 -- </g>
 -- <!-- 0&#45;&gt;6 -->
 -- <g id="edge2" class="edge">
 -- <title>0&#45;&gt;6</title>
 -- <path fill="none" stroke="black" d="M28.11,-184.56C41.95,-195.65 65.65,-214.64 84.64,-229.85"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="82.46,-232.58 92.45,-236.1 86.84,-227.12 82.46,-232.58"/>
--- <text text-anchor="middle" x="57.11" y="-213.91" font-family="Times,serif" font-size="8.00">137</text>
+-- <text text-anchor="middle" x="57.11" y="-213.91" font-family="Times,serif" font-size="8.00" fill="#000000">137</text>
 -- </g>
 -- <!-- 0&#45;&gt;7 -->
 -- <g id="edge3" class="edge">
 -- <title>0&#45;&gt;7</title>
 -- <path fill="none" stroke="black" d="M27.01,-163.93C39.13,-151.67 60.36,-132.91 83.11,-125.31 118.62,-113.46 161.35,-122.25 190.79,-131.63"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="190.02,-135.06 200.62,-134.94 192.26,-128.43 190.02,-135.06"/>
--- <text text-anchor="middle" x="114.93" y="-127.91" font-family="Times,serif" font-size="8.00">231</text>
+-- <text text-anchor="middle" x="114.93" y="-127.91" font-family="Times,serif" font-size="8.00" fill="#000000">231</text>
 -- </g>
 -- <!-- 1 -->
 -- <g id="node6" class="node">
 -- <title>1</title>
 -- <ellipse fill="none" stroke="black" cx="15.56" cy="-303.31" rx="15.61" ry="15.61"/>
--- <text text-anchor="middle" x="15.56" y="-301.41" font-family="Times,serif" font-size="8.00">1</text>
+-- <text text-anchor="middle" x="15.56" y="-301.41" font-family="Times,serif" font-size="8.00" fill="#000000">1</text>
 -- </g>
 -- <!-- 1&#45;&gt;4 -->
 -- <g id="edge4" class="edge">
 -- <title>1&#45;&gt;4</title>
 -- <path fill="none" stroke="black" d="M27.67,-313.58C33.81,-319.07 41.68,-325.81 49.11,-331.31 59.31,-338.86 70.9,-346.47 81.44,-353.05"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="79.63,-356.05 89.98,-358.31 83.3,-350.09 79.63,-356.05"/>
--- <text text-anchor="middle" x="57.11" y="-343.91" font-family="Times,serif" font-size="8.00">28</text>
+-- <text text-anchor="middle" x="57.11" y="-343.91" font-family="Times,serif" font-size="8.00" fill="#000000">28</text>
 -- </g>
 -- <!-- 1&#45;&gt;5 -->
 -- <g id="edge5" class="edge">
 -- <title>1&#45;&gt;5</title>
 -- <path fill="none" stroke="black" d="M25.89,-291.04C40.22,-272.21 68.11,-235.55 88.67,-208.51"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="91.53,-210.54 94.8,-200.46 85.96,-206.3 91.53,-210.54"/>
--- <text text-anchor="middle" x="57.11" y="-259.91" font-family="Times,serif" font-size="8.00">80</text>
+-- <text text-anchor="middle" x="57.11" y="-259.91" font-family="Times,serif" font-size="8.00" fill="#000000">80</text>
 -- </g>
 -- <!-- 1&#45;&gt;6 -->
 -- <g id="edge6" class="edge">
 -- <title>1&#45;&gt;6</title>
 -- <path fill="none" stroke="black" d="M29.69,-296.57C42.57,-289.96 62.74,-279.6 80.12,-270.67"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="82.12,-273.58 89.42,-265.9 78.93,-267.35 82.12,-273.58"/>
--- <text text-anchor="middle" x="57.11" y="-287.91" font-family="Times,serif" font-size="8.00">157</text>
+-- <text text-anchor="middle" x="57.11" y="-287.91" font-family="Times,serif" font-size="8.00" fill="#000000">157</text>
 -- </g>
 -- <!-- 1&#45;&gt;7 -->
 -- <g id="edge7" class="edge">
 -- <title>1&#45;&gt;7</title>
 -- <path fill="none" stroke="black" d="M31.29,-305.98C57.05,-309.81 110.96,-314.02 146.75,-290.31 184.31,-265.44 205.62,-216.54 216.49,-182.43"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="219.85,-183.39 219.4,-172.8 213.15,-181.36 219.85,-183.39"/>
--- <text text-anchor="middle" x="114.93" y="-310.91" font-family="Times,serif" font-size="8.00">242</text>
+-- <text text-anchor="middle" x="114.93" y="-310.91" font-family="Times,serif" font-size="8.00" fill="#000000">242</text>
 -- </g>
 -- <!-- 2 -->
 -- <g id="node7" class="node">
 -- <title>2</title>
 -- <ellipse fill="none" stroke="black" cx="15.56" cy="-47.31" rx="15.61" ry="15.61"/>
--- <text text-anchor="middle" x="15.56" y="-45.41" font-family="Times,serif" font-size="8.00">2</text>
+-- <text text-anchor="middle" x="15.56" y="-45.41" font-family="Times,serif" font-size="8.00" fill="#000000">2</text>
 -- </g>
 -- <!-- 2&#45;&gt;5 -->
 -- <g id="edge8" class="edge">
 -- <title>2&#45;&gt;5</title>
 -- <path fill="none" stroke="black" d="M25.89,-59.58C40.22,-78.41 68.11,-115.07 88.67,-142.11"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="85.96,-144.32 94.8,-150.16 91.53,-140.08 85.96,-144.32"/>
--- <text text-anchor="middle" x="57.11" y="-109.91" font-family="Times,serif" font-size="8.00">81</text>
+-- <text text-anchor="middle" x="57.11" y="-109.91" font-family="Times,serif" font-size="8.00" fill="#000000">81</text>
 -- </g>
 -- <!-- 2&#45;&gt;7 -->
 -- <g id="edge9" class="edge">
 -- <title>2&#45;&gt;7</title>
 -- <path fill="none" stroke="black" d="M30.01,-40.68C54.69,-29.52 108.18,-10.12 146.75,-30.31 178.37,-46.86 199.83,-82.38 212.37,-109.59"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="209.21,-111.08 216.44,-118.83 215.61,-108.26 209.21,-111.08"/>
--- <text text-anchor="middle" x="114.93" y="-32.91" font-family="Times,serif" font-size="8.00">247</text>
+-- <text text-anchor="middle" x="114.93" y="-32.91" font-family="Times,serif" font-size="8.00" fill="#000000">247</text>
 -- </g>
 -- <!-- 3 -->
 -- <g id="node8" class="node">
 -- <title>3</title>
 -- <ellipse fill="none" stroke="black" cx="114.93" cy="-64.31" rx="15.61" ry="15.61"/>
--- <text text-anchor="middle" x="114.93" y="-62.41" font-family="Times,serif" font-size="8.00">3</text>
+-- <text text-anchor="middle" x="114.93" y="-62.41" font-family="Times,serif" font-size="8.00" fill="#000000">3</text>
 -- </g>
 -- <!-- 3&#45;&gt;7 -->
 -- <g id="edge10" class="edge">
 -- <title>3&#45;&gt;7</title>
 -- <path fill="none" stroke="black" d="M130.01,-68.62C143.81,-73.28 165,-81.64 180.75,-93.31 188.81,-99.28 196.44,-106.9 203.06,-114.46"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="200.72,-117.13 209.82,-122.56 206.09,-112.64 200.72,-117.13"/>
--- <text text-anchor="middle" x="172.75" y="-95.91" font-family="Times,serif" font-size="8.00">29</text>
+-- <text text-anchor="middle" x="172.75" y="-95.91" font-family="Times,serif" font-size="8.00" fill="#000000">29</text>
 -- </g>
 -- </g>
 -- </svg>
@@ -4243,7 +4243,7 @@ select (select draw(ata,
 \set draw_source :twocol_b_source
 \i sql/draw.sql
 \setenv draw_source :draw_source
-\! echo $draw_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
+\! echo $draw_source | dot -Tsvg -Nnodesep=0.1 -Nranksep=0.1 -Nwidth=0.05 -Nheight=0.05 -Nfontsize=8 -Efontsize=8 2>/dev/null | sed '/<!DOCTYPE/,/>/d; /<?xml/,/>/d' | sed '1i<div>' | sed '$a</div>\n' | sed 's/^/-- /'
 -- <div>
 -- <!-- Title: %3 Pages: 1 -->
 -- <svg width="326pt" height="769pt"
@@ -4251,337 +4251,337 @@ select (select draw(ata,
 -- <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 764.9)">
 -- <title>%3</title>
 -- <polygon fill="white" stroke="transparent" points="-4,4 -4,-764.9 322,-764.9 322,4 -4,4"/>
--- <text text-anchor="middle" x="159" y="-7.4" font-family="Times,serif" font-size="12.00">Transaction to Transaction</text>
+-- <text text-anchor="middle" x="159" y="-7.4" font-family="Times,serif" font-size="12.00" fill="#000000">Transaction to Transaction</text>
 -- <!-- 2 -->
 -- <g id="node1" class="node">
 -- <title>2</title>
 -- <polygon fill="#64ff9a" fill-opacity="0.498039" stroke="black" points="119,-566.4 74,-566.4 74,-549.4 119,-549.4 119,-566.4"/>
--- <text text-anchor="middle" x="96.5" y="-556" font-family="Times,serif" font-size="8.00">2 : 110</text>
+-- <text text-anchor="middle" x="96.5" y="-556" font-family="Times,serif" font-size="8.00" fill="#000000">2 : 110</text>
 -- </g>
 -- <!-- 6 -->
 -- <g id="node5" class="node">
 -- <title>6</title>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="216,-434.4 171,-434.4 171,-417.4 216,-417.4 216,-434.4"/>
--- <text text-anchor="middle" x="193.5" y="-424" font-family="Times,serif" font-size="8.00">6 : 229</text>
+-- <text text-anchor="middle" x="193.5" y="-424" font-family="Times,serif" font-size="8.00" fill="#000000">6 : 229</text>
 -- </g>
 -- <!-- 2&#45;&gt;6 -->
 -- <g id="edge16" class="edge">
 -- <title>2&#45;&gt;6</title>
 -- <path fill="none" stroke="black" d="M106.35,-549.18C118.19,-537.15 139.28,-514.39 153,-491.9 163.79,-474.21 159.75,-466.3 171,-448.9 172.45,-446.65 174.14,-444.42 175.91,-442.28"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="178.72,-444.4 182.9,-434.66 173.56,-439.67 178.72,-444.4"/>
--- <text text-anchor="middle" x="145" y="-515.5" font-family="Times,serif" font-size="8.00">51</text>
+-- <text text-anchor="middle" x="145" y="-515.5" font-family="Times,serif" font-size="8.00" fill="#000000">51</text>
 -- </g>
 -- <!-- 7 -->
 -- <g id="node6" class="node">
 -- <title>7</title>
 -- <polygon fill="#ff1000" fill-opacity="0.498039" stroke="black" points="216,-399.4 171,-399.4 171,-382.4 216,-382.4 216,-399.4"/>
--- <text text-anchor="middle" x="193.5" y="-389" font-family="Times,serif" font-size="8.00">7 : 197</text>
+-- <text text-anchor="middle" x="193.5" y="-389" font-family="Times,serif" font-size="8.00" fill="#000000">7 : 197</text>
 -- </g>
 -- <!-- 2&#45;&gt;7 -->
 -- <g id="edge17" class="edge">
 -- <title>2&#45;&gt;7</title>
 -- <path fill="none" stroke="black" d="M100.18,-549.36C108.04,-525.2 132.95,-455.08 171,-407.9 171.3,-407.53 171.61,-407.16 171.92,-406.8"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="174.51,-409.17 179.38,-399.75 169.7,-404.08 174.51,-409.17"/>
--- <text text-anchor="middle" x="145" y="-460.5" font-family="Times,serif" font-size="8.00">253</text>
+-- <text text-anchor="middle" x="145" y="-460.5" font-family="Times,serif" font-size="8.00" fill="#000000">253</text>
 -- </g>
 -- <!-- 8 -->
 -- <g id="node7" class="node">
 -- <title>8</title>
 -- <polygon fill="#37ffc7" fill-opacity="0.498039" stroke="black" points="315.5,-481.4 270.5,-481.4 270.5,-464.4 315.5,-464.4 315.5,-481.4"/>
--- <text text-anchor="middle" x="293" y="-471" font-family="Times,serif" font-size="8.00">8 : 100</text>
+-- <text text-anchor="middle" x="293" y="-471" font-family="Times,serif" font-size="8.00" fill="#000000">8 : 100</text>
 -- </g>
 -- <!-- 2&#45;&gt;8 -->
 -- <g id="edge18" class="edge">
 -- <title>2&#45;&gt;8</title>
 -- <path fill="none" stroke="black" d="M100.89,-566.44C108.89,-585.26 129.96,-627.48 153,-612.9 168.79,-602.91 157.13,-587.42 171,-574.9 198.65,-549.93 221.45,-570.83 250,-546.9 267.65,-532.11 279.37,-507.9 285.85,-491.22"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="289.25,-492.12 289.35,-481.52 282.66,-489.74 289.25,-492.12"/>
--- <text text-anchor="middle" x="193.5" y="-577.5" font-family="Times,serif" font-size="8.00">151</text>
+-- <text text-anchor="middle" x="193.5" y="-577.5" font-family="Times,serif" font-size="8.00" fill="#000000">151</text>
 -- </g>
 -- <!-- 9 -->
 -- <g id="node8" class="node">
 -- <title>9</title>
 -- <polygon fill="#00c9ff" fill-opacity="0.498039" stroke="black" points="313,-212.4 273,-212.4 273,-195.4 313,-195.4 313,-212.4"/>
--- <text text-anchor="middle" x="293" y="-202" font-family="Times,serif" font-size="8.00">9 : 76</text>
+-- <text text-anchor="middle" x="293" y="-202" font-family="Times,serif" font-size="8.00" fill="#000000">9 : 76</text>
 -- </g>
 -- <!-- 2&#45;&gt;9 -->
 -- <g id="edge19" class="edge">
 -- <title>2&#45;&gt;9</title>
 -- <path fill="none" stroke="black" d="M104.54,-566.76C115.65,-579.69 137.57,-600.87 153,-587.9 188.58,-558 148.87,-525.76 171,-484.9 184.03,-460.84 201.38,-466.02 216,-442.9 262.47,-369.41 282.69,-265.15 289.33,-222.84"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="292.81,-223.24 290.83,-212.83 285.89,-222.2 292.81,-223.24"/>
--- <text text-anchor="middle" x="193.5" y="-487.5" font-family="Times,serif" font-size="8.00">125</text>
+-- <text text-anchor="middle" x="193.5" y="-487.5" font-family="Times,serif" font-size="8.00" fill="#000000">125</text>
 -- </g>
 -- <!-- 11 -->
 -- <g id="node10" class="node">
 -- <title>11</title>
 -- <polygon fill="#ff5000" fill-opacity="0.498039" stroke="black" points="318,-671.4 268,-671.4 268,-654.4 318,-654.4 318,-671.4"/>
--- <text text-anchor="middle" x="293" y="-661" font-family="Times,serif" font-size="8.00">11 : 183</text>
+-- <text text-anchor="middle" x="293" y="-661" font-family="Times,serif" font-size="8.00" fill="#000000">11 : 183</text>
 -- </g>
 -- <!-- 2&#45;&gt;11 -->
 -- <g id="edge20" class="edge">
 -- <title>2&#45;&gt;11</title>
 -- <path fill="none" stroke="black" d="M100.34,-566.54C107.85,-587.67 130.43,-641.54 171,-659.9 198.14,-672.18 232.32,-671.78 257.43,-668.98"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="258.12,-672.42 267.58,-667.66 257.22,-665.48 258.12,-672.42"/>
--- <text text-anchor="middle" x="193.5" y="-672.5" font-family="Times,serif" font-size="8.00">233</text>
+-- <text text-anchor="middle" x="193.5" y="-672.5" font-family="Times,serif" font-size="8.00" fill="#000000">233</text>
 -- </g>
 -- <!-- 3 -->
 -- <g id="node2" class="node">
 -- <title>3</title>
 -- <polygon fill="#00007f" fill-opacity="0.498039" stroke="black" points="114,-229.4 79,-229.4 79,-212.4 114,-212.4 114,-229.4"/>
--- <text text-anchor="middle" x="96.5" y="-219" font-family="Times,serif" font-size="8.00">3 : 3</text>
+-- <text text-anchor="middle" x="96.5" y="-219" font-family="Times,serif" font-size="8.00" fill="#000000">3 : 3</text>
 -- </g>
 -- <!-- 3&#45;&gt;6 -->
 -- <g id="edge21" class="edge">
 -- <title>3&#45;&gt;6</title>
 -- <path fill="none" stroke="black" d="M100.77,-229.51C107.15,-246.11 121.96,-283.57 137,-313.9 143.37,-326.74 147.52,-328.66 153,-341.9 164.64,-369.99 154.59,-382.3 171,-407.9 171.41,-408.54 171.86,-409.18 172.33,-409.8"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="169.94,-412.36 179.41,-417.1 174.96,-407.49 169.94,-412.36"/>
--- <text text-anchor="middle" x="145" y="-344.5" font-family="Times,serif" font-size="8.00">77</text>
+-- <text text-anchor="middle" x="145" y="-344.5" font-family="Times,serif" font-size="8.00" fill="#000000">77</text>
 -- </g>
 -- <!-- 3&#45;&gt;7 -->
 -- <g id="edge22" class="edge">
 -- <title>3&#45;&gt;7</title>
 -- <path fill="none" stroke="black" d="M104.57,-229.71C116.13,-244.47 139.15,-275.48 153,-304.9 164.68,-329.7 158.24,-339.64 171,-363.9 172.84,-367.39 175.15,-370.88 177.58,-374.12"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="174.98,-376.47 184.01,-382.01 180.4,-372.05 174.98,-376.47"/>
--- <text text-anchor="middle" x="145" y="-307.5" font-family="Times,serif" font-size="8.00">204</text>
+-- <text text-anchor="middle" x="145" y="-307.5" font-family="Times,serif" font-size="8.00" fill="#000000">204</text>
 -- </g>
 -- <!-- 3&#45;&gt;8 -->
 -- <g id="edge23" class="edge">
 -- <title>3&#45;&gt;8</title>
 -- <path fill="none" stroke="black" d="M114.2,-215.16C121.16,-213.06 129.38,-210.94 137,-209.9 189.36,-202.74 218.21,-204.68 250,-246.9 274.73,-279.74 286.86,-406.08 290.65,-454.17"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="287.18,-454.67 291.42,-464.37 294.16,-454.14 287.18,-454.67"/>
--- <text text-anchor="middle" x="193.5" y="-218.5" font-family="Times,serif" font-size="8.00">179</text>
+-- <text text-anchor="middle" x="193.5" y="-218.5" font-family="Times,serif" font-size="8.00" fill="#000000">179</text>
 -- </g>
 -- <!-- 3&#45;&gt;9 -->
 -- <g id="edge24" class="edge">
 -- <title>3&#45;&gt;9</title>
 -- <path fill="none" stroke="black" d="M101.1,-211.97C106.9,-198.52 119.46,-172.94 137,-156.9 149.47,-145.5 154.56,-143.78 171,-139.9 205.95,-131.65 221.47,-135.09 250,-156.9 261.32,-165.55 271.98,-177.55 279.73,-187.26"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="277.1,-189.58 285.97,-195.37 282.65,-185.31 277.1,-189.58"/>
--- <text text-anchor="middle" x="193.5" y="-142.5" font-family="Times,serif" font-size="8.00">202</text>
+-- <text text-anchor="middle" x="193.5" y="-142.5" font-family="Times,serif" font-size="8.00" fill="#000000">202</text>
 -- </g>
 -- <!-- 10 -->
 -- <g id="node9" class="node">
 -- <title>10</title>
 -- <polygon fill="#25ffd9" fill-opacity="0.498039" stroke="black" points="216,-89.4 171,-89.4 171,-72.4 216,-72.4 216,-89.4"/>
--- <text text-anchor="middle" x="193.5" y="-79" font-family="Times,serif" font-size="8.00">10 : 96</text>
+-- <text text-anchor="middle" x="193.5" y="-79" font-family="Times,serif" font-size="8.00" fill="#000000">10 : 96</text>
 -- </g>
 -- <!-- 3&#45;&gt;10 -->
 -- <g id="edge25" class="edge">
 -- <title>3&#45;&gt;10</title>
 -- <path fill="none" stroke="black" d="M99.01,-212.39C102.68,-193.72 113.53,-148.52 137,-118.9 144.72,-109.16 155.61,-100.95 165.7,-94.68"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="167.75,-97.54 174.63,-89.48 164.23,-91.49 167.75,-97.54"/>
--- <text text-anchor="middle" x="145" y="-121.5" font-family="Times,serif" font-size="8.00">190</text>
+-- <text text-anchor="middle" x="145" y="-121.5" font-family="Times,serif" font-size="8.00" fill="#000000">190</text>
 -- </g>
 -- <!-- 3&#45;&gt;11 -->
 -- <g id="edge26" class="edge">
 -- <title>3&#45;&gt;11</title>
 -- <path fill="none" stroke="black" d="M114.29,-223.64C139.96,-228.72 188.85,-242.02 216,-272.9 251.47,-313.25 238.35,-336.45 250,-388.9 260.94,-438.14 282.12,-590.45 289.44,-644.03"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="286,-644.71 290.82,-654.14 292.94,-643.76 286,-644.71"/>
--- <text text-anchor="middle" x="193.5" y="-275.5" font-family="Times,serif" font-size="8.00">97</text>
+-- <text text-anchor="middle" x="193.5" y="-275.5" font-family="Times,serif" font-size="8.00" fill="#000000">97</text>
 -- </g>
 -- <!-- 4 -->
 -- <g id="node3" class="node">
 -- <title>4</title>
 -- <polygon fill="#00fbff" fill-opacity="0.498039" stroke="black" points="116.5,-333.4 76.5,-333.4 76.5,-316.4 116.5,-316.4 116.5,-333.4"/>
--- <text text-anchor="middle" x="96.5" y="-323" font-family="Times,serif" font-size="8.00">4 : 87</text>
+-- <text text-anchor="middle" x="96.5" y="-323" font-family="Times,serif" font-size="8.00" fill="#000000">4 : 87</text>
 -- </g>
 -- <!-- 4&#45;&gt;6 -->
 -- <g id="edge27" class="edge">
 -- <title>4&#45;&gt;6</title>
 -- <path fill="none" stroke="black" d="M103.88,-333.67C111.43,-343.88 124.54,-361.11 137,-374.9 151.11,-390.53 155.36,-393.8 171,-407.9 171.98,-408.78 172.99,-409.67 174.01,-410.57"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="171.99,-413.44 181.87,-417.26 176.52,-408.11 171.99,-413.44"/>
--- <text text-anchor="middle" x="145" y="-394.5" font-family="Times,serif" font-size="8.00">132</text>
+-- <text text-anchor="middle" x="145" y="-394.5" font-family="Times,serif" font-size="8.00" fill="#000000">132</text>
 -- </g>
 -- <!-- 4&#45;&gt;7 -->
 -- <g id="edge28" class="edge">
 -- <title>4&#45;&gt;7</title>
 -- <path fill="none" stroke="black" d="M109.92,-333.53C125.64,-344.45 152.93,-363.41 171.82,-376.53"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="169.87,-379.44 180.08,-382.27 173.86,-373.69 169.87,-379.44"/>
--- <text text-anchor="middle" x="145" y="-364.5" font-family="Times,serif" font-size="8.00">110</text>
+-- <text text-anchor="middle" x="145" y="-364.5" font-family="Times,serif" font-size="8.00" fill="#000000">110</text>
 -- </g>
 -- <!-- 4&#45;&gt;8 -->
 -- <g id="edge29" class="edge">
 -- <title>4&#45;&gt;8</title>
 -- <path fill="none" stroke="black" d="M104.6,-316.21C111.79,-308.16 123.73,-296.71 137,-291.9 187.82,-273.46 215.04,-295.67 250,-336.9 279.08,-371.19 288.04,-425.43 290.79,-453.94"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="287.32,-454.46 291.61,-464.15 294.3,-453.9 287.32,-454.46"/>
--- <text text-anchor="middle" x="193.5" y="-305.5" font-family="Times,serif" font-size="8.00">247</text>
+-- <text text-anchor="middle" x="193.5" y="-305.5" font-family="Times,serif" font-size="8.00" fill="#000000">247</text>
 -- </g>
 -- <!-- 4&#45;&gt;9 -->
 -- <g id="edge30" class="edge">
 -- <title>4&#45;&gt;9</title>
 -- <path fill="none" stroke="black" d="M98.92,-316.22C103.64,-290.54 121.43,-214.86 171,-184.9 200.53,-167.05 241.24,-179.46 267.09,-190.94"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="265.68,-194.15 276.22,-195.23 268.66,-187.81 265.68,-194.15"/>
--- <text text-anchor="middle" x="193.5" y="-187.5" font-family="Times,serif" font-size="8.00">92</text>
+-- <text text-anchor="middle" x="193.5" y="-187.5" font-family="Times,serif" font-size="8.00" fill="#000000">92</text>
 -- </g>
 -- <!-- 4&#45;&gt;11 -->
 -- <g id="edge31" class="edge">
 -- <title>4&#45;&gt;11</title>
 -- <path fill="none" stroke="black" d="M116.64,-317.89C127.52,-314.94 141.27,-313 153,-316.9 186.15,-327.9 194.29,-336.53 216,-363.9 239.5,-393.53 238.84,-405.76 250,-441.9 272.55,-514.95 285.17,-605.5 289.86,-644.08"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="286.42,-644.78 291.07,-654.3 293.37,-643.96 286.42,-644.78"/>
--- <text text-anchor="middle" x="193.5" y="-366.5" font-family="Times,serif" font-size="8.00">255</text>
+-- <text text-anchor="middle" x="193.5" y="-366.5" font-family="Times,serif" font-size="8.00" fill="#000000">255</text>
 -- </g>
 -- <!-- 5 -->
 -- <g id="node4" class="node">
 -- <title>5</title>
 -- <polygon fill="#960000" fill-opacity="0.498039" stroke="black" points="216,-650.4 171,-650.4 171,-633.4 216,-633.4 216,-650.4"/>
--- <text text-anchor="middle" x="193.5" y="-640" font-family="Times,serif" font-size="8.00">5 : 224</text>
+-- <text text-anchor="middle" x="193.5" y="-640" font-family="Times,serif" font-size="8.00" fill="#000000">5 : 224</text>
 -- </g>
 -- <!-- 5&#45;&gt;8 -->
 -- <g id="edge32" class="edge">
 -- <title>5&#45;&gt;8</title>
 -- <path fill="none" stroke="black" d="M216.14,-633.6C227.68,-628.16 241.26,-620 250,-608.9 277.81,-573.57 287.31,-519.77 290.47,-491.59"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="293.97,-491.81 291.45,-481.52 287,-491.14 293.97,-491.81"/>
--- <text text-anchor="middle" x="242" y="-625.5" font-family="Times,serif" font-size="8.00">245</text>
+-- <text text-anchor="middle" x="242" y="-625.5" font-family="Times,serif" font-size="8.00" fill="#000000">245</text>
 -- </g>
 -- <!-- 5&#45;&gt;9 -->
 -- <g id="edge33" class="edge">
 -- <title>5&#45;&gt;9</title>
 -- <path fill="none" stroke="black" d="M204.3,-633.26C208.38,-629.23 212.88,-624.17 216,-618.9 240.74,-577.04 239.15,-562.3 250,-514.9 274.99,-405.75 286.93,-271.41 290.66,-222.67"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="294.15,-222.89 291.4,-212.66 287.17,-222.37 294.15,-222.89"/>
--- <text text-anchor="middle" x="242" y="-583.5" font-family="Times,serif" font-size="8.00">140</text>
+-- <text text-anchor="middle" x="242" y="-583.5" font-family="Times,serif" font-size="8.00" fill="#000000">140</text>
 -- </g>
 -- <!-- 5&#45;&gt;11 -->
 -- <g id="edge34" class="edge">
 -- <title>5&#45;&gt;11</title>
 -- <path fill="none" stroke="black" d="M216.14,-646.56C228.3,-649.18 243.76,-652.51 257.55,-655.48"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="257.17,-658.98 267.68,-657.66 258.64,-652.13 257.17,-658.98"/>
--- <text text-anchor="middle" x="242" y="-655.5" font-family="Times,serif" font-size="8.00">253</text>
+-- <text text-anchor="middle" x="242" y="-655.5" font-family="Times,serif" font-size="8.00" fill="#000000">253</text>
 -- </g>
 -- <!-- 6&#45;&gt;8 -->
 -- <g id="edge35" class="edge">
 -- <title>6&#45;&gt;8</title>
 -- <path fill="none" stroke="black" d="M212.38,-434.52C227.09,-441.61 248.16,-451.77 264.93,-459.85"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="263.7,-463.14 274.23,-464.33 266.74,-456.84 263.7,-463.14"/>
--- <text text-anchor="middle" x="242" y="-455.5" font-family="Times,serif" font-size="8.00">212</text>
+-- <text text-anchor="middle" x="242" y="-455.5" font-family="Times,serif" font-size="8.00" fill="#000000">212</text>
 -- </g>
 -- <!-- 6&#45;&gt;9 -->
 -- <g id="edge36" class="edge">
 -- <title>6&#45;&gt;9</title>
 -- <path fill="none" stroke="black" d="M207.91,-417.3C211.04,-414.65 214.03,-411.48 216,-407.9 245.75,-353.67 208.48,-326.24 234,-269.9 243.07,-249.88 260.3,-231.48 273.64,-219.23"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="276.16,-221.68 281.33,-212.43 271.52,-216.43 276.16,-221.68"/>
--- <text text-anchor="middle" x="242" y="-272.5" font-family="Times,serif" font-size="8.00">107</text>
+-- <text text-anchor="middle" x="242" y="-272.5" font-family="Times,serif" font-size="8.00" fill="#000000">107</text>
 -- </g>
 -- <!-- 6&#45;&gt;11 -->
 -- <g id="edge37" class="edge">
 -- <title>6&#45;&gt;11</title>
 -- <path fill="none" stroke="black" d="M203.34,-434.46C207.42,-438.63 212.19,-443.83 216,-448.9 233.73,-472.47 238.52,-478.73 250,-505.9 270.25,-553.84 283.12,-614.19 288.74,-644.19"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="285.31,-644.9 290.53,-654.11 292.19,-643.65 285.31,-644.9"/>
--- <text text-anchor="middle" x="242" y="-508.5" font-family="Times,serif" font-size="8.00">220</text>
+-- <text text-anchor="middle" x="242" y="-508.5" font-family="Times,serif" font-size="8.00" fill="#000000">220</text>
 -- </g>
 -- <!-- 0 -->
 -- <g id="node11" class="node">
 -- <title>0</title>
 -- <polygon fill="none" stroke="black" points="22,-376.4 0,-376.4 0,-359.4 22,-359.4 22,-376.4"/>
--- <text text-anchor="middle" x="11" y="-366" font-family="Times,serif" font-size="8.00">0</text>
+-- <text text-anchor="middle" x="11" y="-366" font-family="Times,serif" font-size="8.00" fill="#000000">0</text>
 -- </g>
 -- <!-- 0&#45;&gt;2 -->
 -- <g id="edge1" class="edge">
 -- <title>0&#45;&gt;2</title>
 -- <path fill="none" stroke="black" d="M13.8,-376.53C17.51,-393.51 26.77,-432.28 40,-462.9 52.38,-491.57 71.59,-522.37 83.85,-540.88"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="81.07,-543.02 89.55,-549.37 86.88,-539.12 81.07,-543.02"/>
--- <text text-anchor="middle" x="48" y="-494.5" font-family="Times,serif" font-size="8.00">110</text>
+-- <text text-anchor="middle" x="48" y="-494.5" font-family="Times,serif" font-size="8.00" fill="#000000">110</text>
 -- </g>
 -- <!-- 0&#45;&gt;3 -->
 -- <g id="edge2" class="edge">
 -- <title>0&#45;&gt;3</title>
 -- <path fill="none" stroke="black" d="M16.97,-359.14C30.41,-335.5 67.61,-270 85.56,-238.4"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="88.76,-239.85 90.66,-229.42 82.67,-236.39 88.76,-239.85"/>
--- <text text-anchor="middle" x="48" y="-319.5" font-family="Times,serif" font-size="8.00">3</text>
+-- <text text-anchor="middle" x="48" y="-319.5" font-family="Times,serif" font-size="8.00" fill="#000000">3</text>
 -- </g>
 -- <!-- 0&#45;&gt;4 -->
 -- <g id="edge3" class="edge">
 -- <title>0&#45;&gt;4</title>
 -- <path fill="none" stroke="black" d="M22.24,-362.63C34.03,-356.55 53.85,-346.35 69.9,-338.08"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="71.54,-341.17 78.83,-333.48 68.34,-334.95 71.54,-341.17"/>
--- <text text-anchor="middle" x="48" y="-355.5" font-family="Times,serif" font-size="8.00">87</text>
+-- <text text-anchor="middle" x="48" y="-355.5" font-family="Times,serif" font-size="8.00" fill="#000000">87</text>
 -- </g>
 -- <!-- 0&#45;&gt;5 -->
 -- <g id="edge4" class="edge">
 -- <title>0&#45;&gt;5</title>
 -- <path fill="none" stroke="black" d="M12.5,-376.41C15.31,-420.98 30.53,-627.08 74,-669.9 99.3,-694.82 121.54,-698.38 153,-681.9 163.21,-676.55 162,-669.07 170.31,-658.27"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="173.12,-660.39 177.36,-650.68 167.99,-655.62 173.12,-660.39"/>
--- <text text-anchor="middle" x="96.5" y="-694.5" font-family="Times,serif" font-size="8.00">224</text>
+-- <text text-anchor="middle" x="96.5" y="-694.5" font-family="Times,serif" font-size="8.00" fill="#000000">224</text>
 -- </g>
 -- <!-- 0&#45;&gt;6 -->
 -- <g id="edge5" class="edge">
 -- <title>0&#45;&gt;6</title>
 -- <path fill="none" stroke="black" d="M22.13,-376.03C27.24,-379.79 33.68,-384.05 40,-386.9 79.73,-404.8 129.14,-415.53 160.75,-421.08"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="160.31,-424.56 170.75,-422.77 161.47,-417.65 160.31,-424.56"/>
--- <text text-anchor="middle" x="96.5" y="-415.5" font-family="Times,serif" font-size="8.00">160</text>
+-- <text text-anchor="middle" x="96.5" y="-415.5" font-family="Times,serif" font-size="8.00" fill="#000000">160</text>
 -- </g>
 -- <!-- 0&#45;&gt;7 -->
 -- <g id="edge6" class="edge">
 -- <title>0&#45;&gt;7</title>
 -- <path fill="none" stroke="black" d="M22.22,-369.2C48.5,-372.55 119.24,-381.56 160.81,-386.86"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="160.6,-390.36 170.96,-388.15 161.48,-383.42 160.6,-390.36"/>
--- <text text-anchor="middle" x="96.5" y="-384.5" font-family="Times,serif" font-size="8.00">122</text>
+-- <text text-anchor="middle" x="96.5" y="-384.5" font-family="Times,serif" font-size="8.00" fill="#000000">122</text>
 -- </g>
 -- <!-- 0&#45;&gt;8 -->
 -- <g id="edge7" class="edge">
 -- <title>0&#45;&gt;8</title>
 -- <path fill="none" stroke="black" d="M11.53,-359.25C10.08,-324.14 9.22,-190.49 74,-113.9 117.3,-62.7 164.35,-20.13 216,-62.9 246.9,-88.48 281.26,-377.05 289.93,-454.09"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="286.47,-454.67 291.06,-464.22 293.43,-453.89 286.47,-454.67"/>
--- <text text-anchor="middle" x="145" y="-58.5" font-family="Times,serif" font-size="8.00">112</text>
+-- <text text-anchor="middle" x="145" y="-58.5" font-family="Times,serif" font-size="8.00" fill="#000000">112</text>
 -- </g>
 -- <!-- 0&#45;&gt;9 -->
 -- <g id="edge8" class="edge">
 -- <title>0&#45;&gt;9</title>
 -- <path fill="none" stroke="black" d="M12.06,-359.31C12.48,-328.54 15.7,-221.13 40,-136.9 49.81,-102.9 48.85,-89.8 74,-64.9 119.43,-19.91 163.73,-5.09 216,-41.9 264.84,-76.29 283.18,-150.4 289.29,-185.17"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="285.89,-186.02 290.92,-195.34 292.8,-184.91 285.89,-186.02"/>
--- <text text-anchor="middle" x="145" y="-27.5" font-family="Times,serif" font-size="8.00">70</text>
+-- <text text-anchor="middle" x="145" y="-27.5" font-family="Times,serif" font-size="8.00" fill="#000000">70</text>
 -- </g>
 -- <!-- 0&#45;&gt;10 -->
 -- <g id="edge9" class="edge">
 -- <title>0&#45;&gt;10</title>
 -- <path fill="none" stroke="black" d="M13.17,-359.16C18.74,-321.24 46.21,-169.65 137,-99.9 144.08,-94.46 152.82,-90.52 161.26,-87.68"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="162.29,-91.03 170.9,-84.84 160.32,-84.31 162.29,-91.03"/>
--- <text text-anchor="middle" x="96.5" y="-176.5" font-family="Times,serif" font-size="8.00">162</text>
+-- <text text-anchor="middle" x="96.5" y="-176.5" font-family="Times,serif" font-size="8.00" fill="#000000">162</text>
 -- </g>
 -- <!-- 0&#45;&gt;11 -->
 -- <g id="edge10" class="edge">
 -- <title>0&#45;&gt;11</title>
 -- <path fill="none" stroke="black" d="M12.01,-376.53C12.25,-409.5 14.9,-530.48 40,-625.9 49.73,-662.87 46.65,-678.2 74,-704.9 120.83,-750.62 154.01,-764.89 216,-743.9 247.08,-733.38 270.42,-701.06 282.58,-680.57"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="285.77,-682.03 287.63,-671.6 279.67,-678.59 285.77,-682.03"/>
--- <text text-anchor="middle" x="145" y="-754.5" font-family="Times,serif" font-size="8.00">81</text>
+-- <text text-anchor="middle" x="145" y="-754.5" font-family="Times,serif" font-size="8.00" fill="#000000">81</text>
 -- </g>
 -- <!-- 1 -->
 -- <g id="node12" class="node">
 -- <title>1</title>
 -- <polygon fill="none" stroke="black" points="107.5,-660.4 85.5,-660.4 85.5,-643.4 107.5,-643.4 107.5,-660.4"/>
--- <text text-anchor="middle" x="96.5" y="-650" font-family="Times,serif" font-size="8.00">1</text>
+-- <text text-anchor="middle" x="96.5" y="-650" font-family="Times,serif" font-size="8.00" fill="#000000">1</text>
 -- </g>
 -- <!-- 1&#45;&gt;6 -->
 -- <g id="edge11" class="edge">
 -- <title>1&#45;&gt;6</title>
 -- <path fill="none" stroke="black" d="M104.01,-643.17C115.78,-626.91 140.55,-590.5 153,-555.9 169.33,-510.52 149.63,-492.13 171,-448.9 172.06,-446.75 173.39,-444.66 174.87,-442.68"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="177.86,-444.57 181.87,-434.77 172.62,-439.93 177.86,-444.57"/>
--- <text text-anchor="middle" x="145" y="-591.5" font-family="Times,serif" font-size="8.00">65</text>
+-- <text text-anchor="middle" x="145" y="-591.5" font-family="Times,serif" font-size="8.00" fill="#000000">65</text>
 -- </g>
 -- <!-- 1&#45;&gt;7 -->
 -- <g id="edge12" class="edge">
 -- <title>1&#45;&gt;7</title>
 -- <path fill="none" stroke="black" d="M99.98,-643.15C105.38,-624.73 119.15,-580.86 137,-546.9 142.79,-535.88 148.37,-535.46 153,-523.9 172.39,-475.47 144.72,-452.97 171,-407.9 171.11,-407.7 171.23,-407.51 171.35,-407.32"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="174.16,-409.43 178.26,-399.66 168.96,-404.74 174.16,-409.43"/>
--- <text text-anchor="middle" x="145" y="-549.5" font-family="Times,serif" font-size="8.00">20</text>
+-- <text text-anchor="middle" x="145" y="-549.5" font-family="Times,serif" font-size="8.00" fill="#000000">20</text>
 -- </g>
 -- <!-- 1&#45;&gt;8 -->
 -- <g id="edge13" class="edge">
 -- <title>1&#45;&gt;8</title>
 -- <path fill="none" stroke="black" d="M107.82,-659.13C119.71,-666.47 139.34,-675.5 153,-665.9 172.32,-652.32 156.3,-634.39 171,-615.9 197,-583.18 222.67,-596.51 250,-564.9 268.99,-542.93 280.97,-510.96 287.08,-491.07"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="290.46,-491.98 289.87,-481.4 283.73,-490.04 290.46,-491.98"/>
--- <text text-anchor="middle" x="193.5" y="-618.5" font-family="Times,serif" font-size="8.00">234</text>
+-- <text text-anchor="middle" x="193.5" y="-618.5" font-family="Times,serif" font-size="8.00" fill="#000000">234</text>
 -- </g>
 -- <!-- 1&#45;&gt;9 -->
 -- <g id="edge14" class="edge">
 -- <title>1&#45;&gt;9</title>
 -- <path fill="none" stroke="black" d="M107.62,-645.7C120.04,-637.58 140.96,-622.21 153,-603.9 167.6,-581.7 158.15,-570.15 171,-546.9 185.95,-519.85 200.16,-520.43 216,-493.9 226.64,-476.08 244.1,-426.8 250,-406.9 269.76,-340.27 283.61,-258.66 289.22,-222.57"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="292.7,-222.95 290.75,-212.54 285.78,-221.89 292.7,-222.95"/>
--- <text text-anchor="middle" x="193.5" y="-549.5" font-family="Times,serif" font-size="8.00">108</text>
+-- <text text-anchor="middle" x="193.5" y="-549.5" font-family="Times,serif" font-size="8.00" fill="#000000">108</text>
 -- </g>
 -- <!-- 1&#45;&gt;11 -->
 -- <g id="edge15" class="edge">
 -- <title>1&#45;&gt;11</title>
 -- <path fill="none" stroke="black" d="M100.12,-660.57C104.87,-674.57 116.38,-701.69 137,-712.9 159.16,-724.95 126.06,-757.63 250,-700.9 260.88,-695.92 270.91,-687.08 278.44,-679.18"/>
 -- <polygon fill="#7f0000" fill-opacity="0.498039" stroke="black" points="281.26,-681.28 285.31,-671.49 276.04,-676.62 281.26,-681.28"/>
--- <text text-anchor="middle" x="193.5" y="-733.5" font-family="Times,serif" font-size="8.00">68</text>
+-- <text text-anchor="middle" x="193.5" y="-733.5" font-family="Times,serif" font-size="8.00" fill="#000000">68</text>
 -- </g>
 -- </g>
 -- </svg>
