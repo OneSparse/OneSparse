@@ -649,24 +649,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#scalar-assignment-operations" class="md-nav__link">
-    <span class="md-ellipsis">
-      Scalar Assignment Operations
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#practical-integration-patterns" class="md-nav__link">
-    <span class="md-ellipsis">
-      Practical Integration Patterns
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -2893,14 +2875,16 @@ Vector eunion with scalar defaults
 </span></code></pre></div>
 Matrix eunion with scalar defaults
 <div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-106-1"><a id="__codelineno-106-1" name="__codelineno-106-1" href="#__codelineno-106-1"></a><span class="k">select</span><span class="w"> </span><span class="n">eunion</span><span class="p">(</span><span class="s1">&#39;int32(3,3)[0:0:10 1:1:20]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">,</span>
-</span><span id="__span-106-2"><a id="__codelineno-106-2" name="__codelineno-106-2" href="#__codelineno-106-2"></a><span class="w">    </span><span class="s1">&#39;int32(3,3)[0:1:15 2:2:30]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">,</span>
-</span><span id="__span-106-3"><a id="__codelineno-106-3" name="__codelineno-106-3" href="#__codelineno-106-3"></a><span class="w">    </span><span class="s1">&#39;plus_int32&#39;</span><span class="o">::</span><span class="n">binaryop</span><span class="p">,</span>
+</span><span id="__span-106-2"><a id="__codelineno-106-2" name="__codelineno-106-2" href="#__codelineno-106-2"></a><span class="w">    </span><span class="mf">0</span><span class="o">::</span><span class="nb">int</span><span class="p">,</span>
+</span><span id="__span-106-3"><a id="__codelineno-106-3" name="__codelineno-106-3" href="#__codelineno-106-3"></a><span class="w">    </span><span class="s1">&#39;int32(3,3)[0:1:15 2:2:30]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">,</span>
 </span><span id="__span-106-4"><a id="__codelineno-106-4" name="__codelineno-106-4" href="#__codelineno-106-4"></a><span class="w">    </span><span class="mf">0</span><span class="o">::</span><span class="nb">int</span><span class="p">,</span>
-</span><span id="__span-106-5"><a id="__codelineno-106-5" name="__codelineno-106-5" href="#__codelineno-106-5"></a><span class="w">    </span><span class="mf">0</span><span class="o">::</span><span class="nb">int</span><span class="p">);</span>
-</span><span id="__span-106-6"><a id="__codelineno-106-6" name="__codelineno-106-6" href="#__codelineno-106-6"></a><span class="gs">ERROR:</span><span class="gr">  function eunion(matrix, matrix, binaryop, integer, integer) does not exist</span>
-</span><span id="__span-106-7"><a id="__codelineno-106-7" name="__codelineno-106-7" href="#__codelineno-106-7"></a><span class="gs">LINE 1:</span><span class="gr"> select eunion(&#39;int32(3,3)[0:0:10 1:1:20]&#39;::matrix,</span>
-</span><span id="__span-106-8"><a id="__codelineno-106-8" name="__codelineno-106-8" href="#__codelineno-106-8"></a><span class="gr">               ^</span>
-</span><span id="__span-106-9"><a id="__codelineno-106-9" name="__codelineno-106-9" href="#__codelineno-106-9"></a><span class="gs">HINT:</span><span class="gr">  No function matches the given name and argument types. You might need to add explicit type casts.</span>
+</span><span id="__span-106-5"><a id="__codelineno-106-5" name="__codelineno-106-5" href="#__codelineno-106-5"></a><span class="w">    </span><span class="s1">&#39;plus_int32&#39;</span><span class="o">::</span><span class="n">binaryop</span><span class="p">);</span>
+</span><span id="__span-106-6"><a id="__codelineno-106-6" name="__codelineno-106-6" href="#__codelineno-106-6"></a><span class="go">┌────────────────────────────────────────┐</span>
+</span><span id="__span-106-7"><a id="__codelineno-106-7" name="__codelineno-106-7" href="#__codelineno-106-7"></a><span class="go">│                 eunion                 │</span>
+</span><span id="__span-106-8"><a id="__codelineno-106-8" name="__codelineno-106-8" href="#__codelineno-106-8"></a><span class="go">├────────────────────────────────────────┤</span>
+</span><span id="__span-106-9"><a id="__codelineno-106-9" name="__codelineno-106-9" href="#__codelineno-106-9"></a><span class="go">│ int32(3:)[0:0:10 0:1:15 1:1:20 2:2:30] │</span>
+</span><span id="__span-106-10"><a id="__codelineno-106-10" name="__codelineno-106-10" href="#__codelineno-106-10"></a><span class="go">└────────────────────────────────────────┘</span>
+</span><span id="__span-106-11"><a id="__codelineno-106-11" name="__codelineno-106-11" href="#__codelineno-106-11"></a><span class="go">(1 row)</span>
 </span></code></pre></div>
 eunion with different default values
 <div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-107-1"><a id="__codelineno-107-1" name="__codelineno-107-1" href="#__codelineno-107-1"></a><span class="k">select</span><span class="w"> </span><span class="n">eunion</span><span class="p">(</span><span class="s1">&#39;int32(5)[0:10 2:30]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span>
@@ -2958,34 +2942,45 @@ functionality with scalar results.
 Reduction with different accumulators would accumulate intermediate scalars
 (though GraphBLAS handles this internally)
 Test that accumulation works correctly
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-111-1"><a id="__codelineno-111-1" name="__codelineno-111-1" href="#__codelineno-111-1"></a><span class="k">select</span><span class="w"> </span><span class="n">reduce_scalar</span><span class="p">(</span><span class="n">apply</span><span class="p">(</span><span class="s1">&#39;int32[0:1 1:2 2:3]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;minv_int32&#39;</span><span class="o">::</span><span class="n">unaryop</span><span class="p">),</span><span class="w"> </span><span class="s1">&#39;plus_int32&#39;</span><span class="o">::</span><span class="n">monoid</span><span class="p">);</span>
-</span><span id="__span-111-2"><a id="__codelineno-111-2" name="__codelineno-111-2" href="#__codelineno-111-2"></a><span class="gs">ERROR:</span><span class="gr">  Unknown monoid plus_int32</span>
-</span><span id="__span-111-3"><a id="__codelineno-111-3" name="__codelineno-111-3" href="#__codelineno-111-3"></a><span class="gs">LINE 1:</span><span class="gr"> ...32[0:1 1:2 2:3]&#39;::vector, &#39;minv_int32&#39;::unaryop), &#39;plus_int3...</span>
-</span><span id="__span-111-4"><a id="__codelineno-111-4" name="__codelineno-111-4" href="#__codelineno-111-4"></a><span class="gr">                                                             ^</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-111-1"><a id="__codelineno-111-1" name="__codelineno-111-1" href="#__codelineno-111-1"></a><span class="k">select</span><span class="w"> </span><span class="n">reduce_scalar</span><span class="p">(</span><span class="n">apply</span><span class="p">(</span><span class="s1">&#39;int32[0:1 1:2 2:3]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;minv_int32&#39;</span><span class="o">::</span><span class="n">unaryop</span><span class="p">),</span><span class="w"> </span><span class="s1">&#39;plus_monoid_int32&#39;</span><span class="o">::</span><span class="n">monoid</span><span class="p">);</span>
+</span><span id="__span-111-2"><a id="__codelineno-111-2" name="__codelineno-111-2" href="#__codelineno-111-2"></a><span class="go">┌───────────────┐</span>
+</span><span id="__span-111-3"><a id="__codelineno-111-3" name="__codelineno-111-3" href="#__codelineno-111-3"></a><span class="go">│ reduce_scalar │</span>
+</span><span id="__span-111-4"><a id="__codelineno-111-4" name="__codelineno-111-4" href="#__codelineno-111-4"></a><span class="go">├───────────────┤</span>
+</span><span id="__span-111-5"><a id="__codelineno-111-5" name="__codelineno-111-5" href="#__codelineno-111-5"></a><span class="go">│ int32:1       │</span>
+</span><span id="__span-111-6"><a id="__codelineno-111-6" name="__codelineno-111-6" href="#__codelineno-111-6"></a><span class="go">└───────────────┘</span>
+</span><span id="__span-111-7"><a id="__codelineno-111-7" name="__codelineno-111-7" href="#__codelineno-111-7"></a><span class="go">(1 row)</span>
 </span></code></pre></div></p>
 <h2 id="scalars-with-descriptors">Scalars with Descriptors</h2>
 <p>Test scalar operations with descriptors (limited applicability).
 Matrix/vector operations with scalars typically don't use descriptors,
 but verify they work when provided
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-112-1"><a id="__codelineno-112-1" name="__codelineno-112-1" href="#__codelineno-112-1"></a><span class="k">select</span><span class="w"> </span><span class="n">apply</span><span class="p">(</span><span class="mf">10</span><span class="o">::</span><span class="nb">int</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;int32(5)[0:1 1:2 2:3]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;plus_int32&#39;</span><span class="o">::</span><span class="n">binaryop</span><span class="p">,</span>
-</span><span id="__span-112-2"><a id="__codelineno-112-2" name="__codelineno-112-2" href="#__codelineno-112-2"></a><span class="w">    </span><span class="n">descr</span><span class="o">=&gt;</span><span class="s1">&#39;GrB_DEFAULT&#39;</span><span class="o">::</span><span class="n">descriptor</span><span class="p">);</span>
-</span><span id="__span-112-3"><a id="__codelineno-112-3" name="__codelineno-112-3" href="#__codelineno-112-3"></a><span class="gs">ERROR:</span><span class="gr">  Unknown descriptor GrB_DEFAULT</span>
-</span><span id="__span-112-4"><a id="__codelineno-112-4" name="__codelineno-112-4" href="#__codelineno-112-4"></a><span class="gp">LINE 2:     descr=&gt;</span><span class="s1">&#39;GrB_DEFAULT&#39;</span><span class="o">::</span><span class="n">descriptor</span><span class="p">);</span>
-</span><span id="__span-112-5"><a id="__codelineno-112-5" name="__codelineno-112-5" href="#__codelineno-112-5"></a><span class="go">                   ^</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-112-1"><a id="__codelineno-112-1" name="__codelineno-112-1" href="#__codelineno-112-1"></a><span class="k">select</span><span class="w"> </span><span class="n">apply</span><span class="p">(</span><span class="mf">10</span><span class="o">::</span><span class="nb">int</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;int32(5)[0:1 1:2 2:3]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;plus_int32&#39;</span><span class="o">::</span><span class="n">binaryop</span><span class="p">);</span>
+</span><span id="__span-112-2"><a id="__codelineno-112-2" name="__codelineno-112-2" href="#__codelineno-112-2"></a><span class="go">┌──────────────────────────┐</span>
+</span><span id="__span-112-3"><a id="__codelineno-112-3" name="__codelineno-112-3" href="#__codelineno-112-3"></a><span class="go">│          apply           │</span>
+</span><span id="__span-112-4"><a id="__codelineno-112-4" name="__codelineno-112-4" href="#__codelineno-112-4"></a><span class="go">├──────────────────────────┤</span>
+</span><span id="__span-112-5"><a id="__codelineno-112-5" name="__codelineno-112-5" href="#__codelineno-112-5"></a><span class="go">│ int32(5)[0:11 1:12 2:13] │</span>
+</span><span id="__span-112-6"><a id="__codelineno-112-6" name="__codelineno-112-6" href="#__codelineno-112-6"></a><span class="go">└──────────────────────────┘</span>
+</span><span id="__span-112-7"><a id="__codelineno-112-7" name="__codelineno-112-7" href="#__codelineno-112-7"></a><span class="go">(1 row)</span>
 </span></code></pre></div></p>
 <h2 id="scalar-utility-integration">Scalar Utility Integration</h2>
 <p>Test utility functions in integration contexts.
 Print scalars from reductions
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-113-1"><a id="__codelineno-113-1" name="__codelineno-113-1" href="#__codelineno-113-1"></a><span class="k">select</span><span class="w"> </span><span class="n">print</span><span class="p">(</span><span class="n">reduce_scalar</span><span class="p">(</span><span class="s1">&#39;int32[0:10 1:20 2:30]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;plus_int32&#39;</span><span class="o">::</span><span class="n">monoid</span><span class="p">)</span><span class="o">::</span><span class="n">scalar</span><span class="p">);</span>
-</span><span id="__span-113-2"><a id="__codelineno-113-2" name="__codelineno-113-2" href="#__codelineno-113-2"></a><span class="gs">ERROR:</span><span class="gr">  Unknown monoid plus_int32</span>
-</span><span id="__span-113-3"><a id="__codelineno-113-3" name="__codelineno-113-3" href="#__codelineno-113-3"></a><span class="gs">LINE 1:</span><span class="gr"> ...nt(reduce_scalar(&#39;int32[0:10 1:20 2:30]&#39;::vector, &#39;plus_int3...</span>
-</span><span id="__span-113-4"><a id="__codelineno-113-4" name="__codelineno-113-4" href="#__codelineno-113-4"></a><span class="gr">                                                             ^</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-113-1"><a id="__codelineno-113-1" name="__codelineno-113-1" href="#__codelineno-113-1"></a><span class="k">select</span><span class="w"> </span><span class="n">print</span><span class="p">(</span><span class="n">reduce_scalar</span><span class="p">(</span><span class="s1">&#39;int32[0:10 1:20 2:30]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;plus_monoid_int32&#39;</span><span class="o">::</span><span class="n">monoid</span><span class="p">)</span><span class="o">::</span><span class="n">scalar</span><span class="p">);</span>
+</span><span id="__span-113-2"><a id="__codelineno-113-2" name="__codelineno-113-2" href="#__codelineno-113-2"></a><span class="go">┌───────┐</span>
+</span><span id="__span-113-3"><a id="__codelineno-113-3" name="__codelineno-113-3" href="#__codelineno-113-3"></a><span class="go">│ print │</span>
+</span><span id="__span-113-4"><a id="__codelineno-113-4" name="__codelineno-113-4" href="#__codelineno-113-4"></a><span class="go">├───────┤</span>
+</span><span id="__span-113-5"><a id="__codelineno-113-5" name="__codelineno-113-5" href="#__codelineno-113-5"></a><span class="go">│ 60    │</span>
+</span><span id="__span-113-6"><a id="__codelineno-113-6" name="__codelineno-113-6" href="#__codelineno-113-6"></a><span class="go">└───────┘</span>
+</span><span id="__span-113-7"><a id="__codelineno-113-7" name="__codelineno-113-7" href="#__codelineno-113-7"></a><span class="go">(1 row)</span>
 </span></code></pre></div>
 Check type of reduced scalar
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-114-1"><a id="__codelineno-114-1" name="__codelineno-114-1" href="#__codelineno-114-1"></a><span class="k">select</span><span class="w"> </span><span class="k">type</span><span class="p">(</span><span class="n">reduce_scalar</span><span class="p">(</span><span class="s1">&#39;fp64[0:1.5 1:2.5 2:3.5]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;plus_fp64&#39;</span><span class="o">::</span><span class="n">monoid</span><span class="p">)</span><span class="o">::</span><span class="n">scalar</span><span class="p">);</span>
-</span><span id="__span-114-2"><a id="__codelineno-114-2" name="__codelineno-114-2" href="#__codelineno-114-2"></a><span class="gs">ERROR:</span><span class="gr">  Unknown monoid plus_fp64</span>
-</span><span id="__span-114-3"><a id="__codelineno-114-3" name="__codelineno-114-3" href="#__codelineno-114-3"></a><span class="gs">LINE 1:</span><span class="gr"> ...(reduce_scalar(&#39;fp64[0:1.5 1:2.5 2:3.5]&#39;::vector, &#39;plus_fp64...</span>
-</span><span id="__span-114-4"><a id="__codelineno-114-4" name="__codelineno-114-4" href="#__codelineno-114-4"></a><span class="gr">                                                             ^</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-114-1"><a id="__codelineno-114-1" name="__codelineno-114-1" href="#__codelineno-114-1"></a><span class="k">select</span><span class="w"> </span><span class="k">type</span><span class="p">(</span><span class="n">reduce_scalar</span><span class="p">(</span><span class="s1">&#39;fp64[0:1.5 1:2.5 2:3.5]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;plus_monoid_fp64&#39;</span><span class="o">::</span><span class="n">monoid</span><span class="p">)</span><span class="o">::</span><span class="n">scalar</span><span class="p">);</span>
+</span><span id="__span-114-2"><a id="__codelineno-114-2" name="__codelineno-114-2" href="#__codelineno-114-2"></a><span class="go">┌──────┐</span>
+</span><span id="__span-114-3"><a id="__codelineno-114-3" name="__codelineno-114-3" href="#__codelineno-114-3"></a><span class="go">│ type │</span>
+</span><span id="__span-114-4"><a id="__codelineno-114-4" name="__codelineno-114-4" href="#__codelineno-114-4"></a><span class="go">├──────┤</span>
+</span><span id="__span-114-5"><a id="__codelineno-114-5" name="__codelineno-114-5" href="#__codelineno-114-5"></a><span class="go">│ fp64 │</span>
+</span><span id="__span-114-6"><a id="__codelineno-114-6" name="__codelineno-114-6" href="#__codelineno-114-6"></a><span class="go">└──────┘</span>
+</span><span id="__span-114-7"><a id="__codelineno-114-7" name="__codelineno-114-7" href="#__codelineno-114-7"></a><span class="go">(1 row)</span>
 </span></code></pre></div></p>
 <h2 id="empty-vectormatrix-with-scalar-operations">Empty Vector/Matrix with Scalar Operations</h2>
 <p>Test scalar operations on empty structures.
@@ -3007,10 +3002,13 @@ Empty vector with scalar
 </span><span id="__span-115-15"><a id="__codelineno-115-15" name="__codelineno-115-15" href="#__codelineno-115-15"></a><span class="go">(1 row)</span>
 </span></code></pre></div>
 Reduce empty vector to scalar
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-116-1"><a id="__codelineno-116-1" name="__codelineno-116-1" href="#__codelineno-116-1"></a><span class="k">select</span><span class="w"> </span><span class="n">reduce_scalar</span><span class="p">(</span><span class="s1">&#39;int32(10)[]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;plus_int32&#39;</span><span class="o">::</span><span class="n">monoid</span><span class="p">);</span>
-</span><span id="__span-116-2"><a id="__codelineno-116-2" name="__codelineno-116-2" href="#__codelineno-116-2"></a><span class="gs">ERROR:</span><span class="gr">  Unknown monoid plus_int32</span>
-</span><span id="__span-116-3"><a id="__codelineno-116-3" name="__codelineno-116-3" href="#__codelineno-116-3"></a><span class="gs">LINE 1:</span><span class="gr"> select reduce_scalar(&#39;int32(10)[]&#39;::vector, &#39;plus_int32&#39;::mo...</span>
-</span><span id="__span-116-4"><a id="__codelineno-116-4" name="__codelineno-116-4" href="#__codelineno-116-4"></a><span class="gr">                                                    ^</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-116-1"><a id="__codelineno-116-1" name="__codelineno-116-1" href="#__codelineno-116-1"></a><span class="k">select</span><span class="w"> </span><span class="n">reduce_scalar</span><span class="p">(</span><span class="s1">&#39;int32(10)[]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;plus_monoid_int32&#39;</span><span class="o">::</span><span class="n">monoid</span><span class="p">);</span>
+</span><span id="__span-116-2"><a id="__codelineno-116-2" name="__codelineno-116-2" href="#__codelineno-116-2"></a><span class="go">┌───────────────┐</span>
+</span><span id="__span-116-3"><a id="__codelineno-116-3" name="__codelineno-116-3" href="#__codelineno-116-3"></a><span class="go">│ reduce_scalar │</span>
+</span><span id="__span-116-4"><a id="__codelineno-116-4" name="__codelineno-116-4" href="#__codelineno-116-4"></a><span class="go">├───────────────┤</span>
+</span><span id="__span-116-5"><a id="__codelineno-116-5" name="__codelineno-116-5" href="#__codelineno-116-5"></a><span class="go">│ int32         │</span>
+</span><span id="__span-116-6"><a id="__codelineno-116-6" name="__codelineno-116-6" href="#__codelineno-116-6"></a><span class="go">└───────────────┘</span>
+</span><span id="__span-116-7"><a id="__codelineno-116-7" name="__codelineno-116-7" href="#__codelineno-116-7"></a><span class="go">(1 row)</span>
 </span></code></pre></div>
 Empty matrix with scalar
 <div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-117-1"><a id="__codelineno-117-1" name="__codelineno-117-1" href="#__codelineno-117-1"></a><span class="k">select</span><span class="w"> </span><span class="n">apply</span><span class="p">(</span><span class="mf">5</span><span class="o">::</span><span class="nb">int</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;int32(3,3)[]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;plus_int32&#39;</span><span class="o">::</span><span class="n">binaryop</span><span class="p">);</span>
@@ -3022,10 +3020,13 @@ Empty matrix with scalar
 </span><span id="__span-117-7"><a id="__codelineno-117-7" name="__codelineno-117-7" href="#__codelineno-117-7"></a><span class="go">(1 row)</span>
 </span></code></pre></div>
 Reduce empty matrix to scalar
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-118-1"><a id="__codelineno-118-1" name="__codelineno-118-1" href="#__codelineno-118-1"></a><span class="k">select</span><span class="w"> </span><span class="n">reduce_scalar</span><span class="p">(</span><span class="s1">&#39;int32(5,5)[]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;times_int32&#39;</span><span class="o">::</span><span class="n">monoid</span><span class="p">);</span>
-</span><span id="__span-118-2"><a id="__codelineno-118-2" name="__codelineno-118-2" href="#__codelineno-118-2"></a><span class="gs">ERROR:</span><span class="gr">  Unknown monoid times_int32</span>
-</span><span id="__span-118-3"><a id="__codelineno-118-3" name="__codelineno-118-3" href="#__codelineno-118-3"></a><span class="gs">LINE 1:</span><span class="gr"> select reduce_scalar(&#39;int32(5,5)[]&#39;::matrix, &#39;times_int32&#39;::...</span>
-</span><span id="__span-118-4"><a id="__codelineno-118-4" name="__codelineno-118-4" href="#__codelineno-118-4"></a><span class="gr">                                                     ^</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-118-1"><a id="__codelineno-118-1" name="__codelineno-118-1" href="#__codelineno-118-1"></a><span class="k">select</span><span class="w"> </span><span class="n">reduce_scalar</span><span class="p">(</span><span class="s1">&#39;int32(5,5)[]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;times_monoid_int32&#39;</span><span class="o">::</span><span class="n">monoid</span><span class="p">);</span>
+</span><span id="__span-118-2"><a id="__codelineno-118-2" name="__codelineno-118-2" href="#__codelineno-118-2"></a><span class="go">┌───────────────┐</span>
+</span><span id="__span-118-3"><a id="__codelineno-118-3" name="__codelineno-118-3" href="#__codelineno-118-3"></a><span class="go">│ reduce_scalar │</span>
+</span><span id="__span-118-4"><a id="__codelineno-118-4" name="__codelineno-118-4" href="#__codelineno-118-4"></a><span class="go">├───────────────┤</span>
+</span><span id="__span-118-5"><a id="__codelineno-118-5" name="__codelineno-118-5" href="#__codelineno-118-5"></a><span class="go">│ int32         │</span>
+</span><span id="__span-118-6"><a id="__codelineno-118-6" name="__codelineno-118-6" href="#__codelineno-118-6"></a><span class="go">└───────────────┘</span>
+</span><span id="__span-118-7"><a id="__codelineno-118-7" name="__codelineno-118-7" href="#__codelineno-118-7"></a><span class="go">(1 row)</span>
 </span></code></pre></div></p>
 <h2 id="scalar-chains">Scalar Chains</h2>
 <p>Operations that chain multiple scalar transformations.
@@ -3042,11 +3043,14 @@ Extract element, modify via scalar ops, set back
 </span></code></pre></div>
 Reduce to scalar, use in apply
 <div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-120-1"><a id="__codelineno-120-1" name="__codelineno-120-1" href="#__codelineno-120-1"></a><span class="k">select</span><span class="w"> </span><span class="n">apply</span><span class="p">(</span><span class="s1">&#39;int32[0:1 1:2 2:3]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span>
-</span><span id="__span-120-2"><a id="__codelineno-120-2" name="__codelineno-120-2" href="#__codelineno-120-2"></a><span class="w">    </span><span class="n">reduce_scalar</span><span class="p">(</span><span class="s1">&#39;int32[0:10 1:20 2:30]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;plus_int32&#39;</span><span class="o">::</span><span class="n">monoid</span><span class="p">)</span><span class="o">::</span><span class="nb">int</span><span class="p">,</span>
+</span><span id="__span-120-2"><a id="__codelineno-120-2" name="__codelineno-120-2" href="#__codelineno-120-2"></a><span class="w">    </span><span class="n">reduce_scalar</span><span class="p">(</span><span class="s1">&#39;int32[0:10 1:20 2:30]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;plus_monoid_int32&#39;</span><span class="o">::</span><span class="n">monoid</span><span class="p">)</span><span class="o">::</span><span class="nb">int</span><span class="p">,</span>
 </span><span id="__span-120-3"><a id="__codelineno-120-3" name="__codelineno-120-3" href="#__codelineno-120-3"></a><span class="w">    </span><span class="s1">&#39;plus_int32&#39;</span><span class="o">::</span><span class="n">binaryop</span><span class="p">);</span>
-</span><span id="__span-120-4"><a id="__codelineno-120-4" name="__codelineno-120-4" href="#__codelineno-120-4"></a><span class="gs">ERROR:</span><span class="gr">  Unknown monoid plus_int32</span>
-</span><span id="__span-120-5"><a id="__codelineno-120-5" name="__codelineno-120-5" href="#__codelineno-120-5"></a><span class="gs">LINE 2:</span><span class="gr"> ...   reduce_scalar(&#39;int32[0:10 1:20 2:30]&#39;::vector, &#39;plus_int3...</span>
-</span><span id="__span-120-6"><a id="__codelineno-120-6" name="__codelineno-120-6" href="#__codelineno-120-6"></a><span class="gr">                                                             ^</span>
+</span><span id="__span-120-4"><a id="__codelineno-120-4" name="__codelineno-120-4" href="#__codelineno-120-4"></a><span class="go">┌───────────────────────┐</span>
+</span><span id="__span-120-5"><a id="__codelineno-120-5" name="__codelineno-120-5" href="#__codelineno-120-5"></a><span class="go">│         apply         │</span>
+</span><span id="__span-120-6"><a id="__codelineno-120-6" name="__codelineno-120-6" href="#__codelineno-120-6"></a><span class="go">├───────────────────────┤</span>
+</span><span id="__span-120-7"><a id="__codelineno-120-7" name="__codelineno-120-7" href="#__codelineno-120-7"></a><span class="go">│ int32[0:61 1:62 2:63] │</span>
+</span><span id="__span-120-8"><a id="__codelineno-120-8" name="__codelineno-120-8" href="#__codelineno-120-8"></a><span class="go">└───────────────────────┘</span>
+</span><span id="__span-120-9"><a id="__codelineno-120-9" name="__codelineno-120-9" href="#__codelineno-120-9"></a><span class="go">(1 row)</span>
 </span></code></pre></div></p>
 <h2 id="scalars-with-boolean-operations">Scalars with Boolean Operations</h2>
 <p>Test boolean scalars in integration contexts.
@@ -3068,35 +3072,51 @@ Boolean scalar with vector apply
 </span><span id="__span-121-15"><a id="__codelineno-121-15" name="__codelineno-121-15" href="#__codelineno-121-15"></a><span class="go">(1 row)</span>
 </span></code></pre></div>
 Boolean reduction
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-122-1"><a id="__codelineno-122-1" name="__codelineno-122-1" href="#__codelineno-122-1"></a><span class="k">select</span><span class="w"> </span><span class="n">reduce_scalar</span><span class="p">(</span><span class="s1">&#39;bool[0:true 1:false 2:true]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;lor_monoid&#39;</span><span class="o">::</span><span class="n">monoid</span><span class="p">);</span>
-</span><span id="__span-122-2"><a id="__codelineno-122-2" name="__codelineno-122-2" href="#__codelineno-122-2"></a><span class="gs">ERROR:</span><span class="gr">  Unknown monoid lor_monoid</span>
-</span><span id="__span-122-3"><a id="__codelineno-122-3" name="__codelineno-122-3" href="#__codelineno-122-3"></a><span class="gs">LINE 1:</span><span class="gr"> ...uce_scalar(&#39;bool[0:true 1:false 2:true]&#39;::vector, &#39;lor_monoi...</span>
-</span><span id="__span-122-4"><a id="__codelineno-122-4" name="__codelineno-122-4" href="#__codelineno-122-4"></a><span class="gr">                                                             ^</span>
-</span><span id="__span-122-5"><a id="__codelineno-122-5" name="__codelineno-122-5" href="#__codelineno-122-5"></a><span class="gr">select reduce_scalar(&#39;bool[0:true 1:true 2:true]&#39;::vector, &#39;land_monoid&#39;::monoid);</span>
-</span><span id="__span-122-6"><a id="__codelineno-122-6" name="__codelineno-122-6" href="#__codelineno-122-6"></a><span class="gs">ERROR:</span><span class="gr">  Unknown monoid land_monoid</span>
-</span><span id="__span-122-7"><a id="__codelineno-122-7" name="__codelineno-122-7" href="#__codelineno-122-7"></a><span class="gs">LINE 1:</span><span class="gr"> ...duce_scalar(&#39;bool[0:true 1:true 2:true]&#39;::vector, &#39;land_mono...</span>
-</span><span id="__span-122-8"><a id="__codelineno-122-8" name="__codelineno-122-8" href="#__codelineno-122-8"></a><span class="gr">                                                             ^</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-122-1"><a id="__codelineno-122-1" name="__codelineno-122-1" href="#__codelineno-122-1"></a><span class="k">select</span><span class="w"> </span><span class="n">reduce_scalar</span><span class="p">(</span><span class="s1">&#39;bool[0:true 1:false 2:true]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;lor_monoid_bool&#39;</span><span class="o">::</span><span class="n">monoid</span><span class="p">);</span>
+</span><span id="__span-122-2"><a id="__codelineno-122-2" name="__codelineno-122-2" href="#__codelineno-122-2"></a><span class="go">┌───────────────┐</span>
+</span><span id="__span-122-3"><a id="__codelineno-122-3" name="__codelineno-122-3" href="#__codelineno-122-3"></a><span class="go">│ reduce_scalar │</span>
+</span><span id="__span-122-4"><a id="__codelineno-122-4" name="__codelineno-122-4" href="#__codelineno-122-4"></a><span class="go">├───────────────┤</span>
+</span><span id="__span-122-5"><a id="__codelineno-122-5" name="__codelineno-122-5" href="#__codelineno-122-5"></a><span class="go">│ bool:t        │</span>
+</span><span id="__span-122-6"><a id="__codelineno-122-6" name="__codelineno-122-6" href="#__codelineno-122-6"></a><span class="go">└───────────────┘</span>
+</span><span id="__span-122-7"><a id="__codelineno-122-7" name="__codelineno-122-7" href="#__codelineno-122-7"></a><span class="go">(1 row)</span>
+</span><span id="__span-122-8"><a id="__codelineno-122-8" name="__codelineno-122-8" href="#__codelineno-122-8"></a>
+</span><span id="__span-122-9"><a id="__codelineno-122-9" name="__codelineno-122-9" href="#__codelineno-122-9"></a><span class="go">select reduce_scalar(&#39;bool[0:true 1:true 2:true]&#39;::vector, &#39;land_monoid_bool&#39;::monoid);</span>
+</span><span id="__span-122-10"><a id="__codelineno-122-10" name="__codelineno-122-10" href="#__codelineno-122-10"></a><span class="go">┌───────────────┐</span>
+</span><span id="__span-122-11"><a id="__codelineno-122-11" name="__codelineno-122-11" href="#__codelineno-122-11"></a><span class="go">│ reduce_scalar │</span>
+</span><span id="__span-122-12"><a id="__codelineno-122-12" name="__codelineno-122-12" href="#__codelineno-122-12"></a><span class="go">├───────────────┤</span>
+</span><span id="__span-122-13"><a id="__codelineno-122-13" name="__codelineno-122-13" href="#__codelineno-122-13"></a><span class="go">│ bool:t        │</span>
+</span><span id="__span-122-14"><a id="__codelineno-122-14" name="__codelineno-122-14" href="#__codelineno-122-14"></a><span class="go">└───────────────┘</span>
+</span><span id="__span-122-15"><a id="__codelineno-122-15" name="__codelineno-122-15" href="#__codelineno-122-15"></a><span class="go">(1 row)</span>
 </span></code></pre></div></p>
 <h2 id="scalar-precision-in-integration">Scalar Precision in Integration</h2>
 <p>Test that precision is maintained through operations.
 High-precision float through operations
 <div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-123-1"><a id="__codelineno-123-1" name="__codelineno-123-1" href="#__codelineno-123-1"></a><span class="k">select</span><span class="w"> </span><span class="n">reduce_scalar</span><span class="p">(</span><span class="s1">&#39;fp64[0:3.141592653589793 1:2.718281828459045 2:1.414213562373095]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span>
-</span><span id="__span-123-2"><a id="__codelineno-123-2" name="__codelineno-123-2" href="#__codelineno-123-2"></a><span class="w">    </span><span class="s1">&#39;plus_fp64&#39;</span><span class="o">::</span><span class="n">monoid</span><span class="p">);</span>
-</span><span id="__span-123-3"><a id="__codelineno-123-3" name="__codelineno-123-3" href="#__codelineno-123-3"></a><span class="gs">ERROR:</span><span class="gr">  Unknown monoid plus_fp64</span>
-</span><span id="__span-123-4"><a id="__codelineno-123-4" name="__codelineno-123-4" href="#__codelineno-123-4"></a><span class="gs">LINE 2:</span><span class="gr">     &#39;plus_fp64&#39;::monoid);</span>
-</span><span id="__span-123-5"><a id="__codelineno-123-5" name="__codelineno-123-5" href="#__codelineno-123-5"></a><span class="gr">            ^</span>
+</span><span id="__span-123-2"><a id="__codelineno-123-2" name="__codelineno-123-2" href="#__codelineno-123-2"></a><span class="w">    </span><span class="s1">&#39;plus_monoid_fp64&#39;</span><span class="o">::</span><span class="n">monoid</span><span class="p">);</span>
+</span><span id="__span-123-3"><a id="__codelineno-123-3" name="__codelineno-123-3" href="#__codelineno-123-3"></a><span class="go">┌───────────────┐</span>
+</span><span id="__span-123-4"><a id="__codelineno-123-4" name="__codelineno-123-4" href="#__codelineno-123-4"></a><span class="go">│ reduce_scalar │</span>
+</span><span id="__span-123-5"><a id="__codelineno-123-5" name="__codelineno-123-5" href="#__codelineno-123-5"></a><span class="go">├───────────────┤</span>
+</span><span id="__span-123-6"><a id="__codelineno-123-6" name="__codelineno-123-6" href="#__codelineno-123-6"></a><span class="go">│ fp64:7.274088 │</span>
+</span><span id="__span-123-7"><a id="__codelineno-123-7" name="__codelineno-123-7" href="#__codelineno-123-7"></a><span class="go">└───────────────┘</span>
+</span><span id="__span-123-8"><a id="__codelineno-123-8" name="__codelineno-123-8" href="#__codelineno-123-8"></a><span class="go">(1 row)</span>
 </span></code></pre></div>
 Very small values
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-124-1"><a id="__codelineno-124-1" name="__codelineno-124-1" href="#__codelineno-124-1"></a><span class="k">select</span><span class="w"> </span><span class="n">reduce_scalar</span><span class="p">(</span><span class="s1">&#39;fp64[0:1e-100 1:1e-100 2:1e-100]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;plus_fp64&#39;</span><span class="o">::</span><span class="n">monoid</span><span class="p">);</span>
-</span><span id="__span-124-2"><a id="__codelineno-124-2" name="__codelineno-124-2" href="#__codelineno-124-2"></a><span class="gs">ERROR:</span><span class="gr">  Unknown monoid plus_fp64</span>
-</span><span id="__span-124-3"><a id="__codelineno-124-3" name="__codelineno-124-3" href="#__codelineno-124-3"></a><span class="gs">LINE 1:</span><span class="gr"> ...calar(&#39;fp64[0:1e-100 1:1e-100 2:1e-100]&#39;::vector, &#39;plus_fp64...</span>
-</span><span id="__span-124-4"><a id="__codelineno-124-4" name="__codelineno-124-4" href="#__codelineno-124-4"></a><span class="gr">                                                             ^</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-124-1"><a id="__codelineno-124-1" name="__codelineno-124-1" href="#__codelineno-124-1"></a><span class="k">select</span><span class="w"> </span><span class="n">reduce_scalar</span><span class="p">(</span><span class="s1">&#39;fp64[0:1e-100 1:1e-100 2:1e-100]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;plus_monoid_fp64&#39;</span><span class="o">::</span><span class="n">monoid</span><span class="p">);</span>
+</span><span id="__span-124-2"><a id="__codelineno-124-2" name="__codelineno-124-2" href="#__codelineno-124-2"></a><span class="go">┌───────────────┐</span>
+</span><span id="__span-124-3"><a id="__codelineno-124-3" name="__codelineno-124-3" href="#__codelineno-124-3"></a><span class="go">│ reduce_scalar │</span>
+</span><span id="__span-124-4"><a id="__codelineno-124-4" name="__codelineno-124-4" href="#__codelineno-124-4"></a><span class="go">├───────────────┤</span>
+</span><span id="__span-124-5"><a id="__codelineno-124-5" name="__codelineno-124-5" href="#__codelineno-124-5"></a><span class="go">│ fp64:0.000000 │</span>
+</span><span id="__span-124-6"><a id="__codelineno-124-6" name="__codelineno-124-6" href="#__codelineno-124-6"></a><span class="go">└───────────────┘</span>
+</span><span id="__span-124-7"><a id="__codelineno-124-7" name="__codelineno-124-7" href="#__codelineno-124-7"></a><span class="go">(1 row)</span>
 </span></code></pre></div>
 Very large values
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-125-1"><a id="__codelineno-125-1" name="__codelineno-125-1" href="#__codelineno-125-1"></a><span class="k">select</span><span class="w"> </span><span class="n">reduce_scalar</span><span class="p">(</span><span class="s1">&#39;fp64[0:1e100 1:1e100 2:1e100]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;plus_fp64&#39;</span><span class="o">::</span><span class="n">monoid</span><span class="p">);</span>
-</span><span id="__span-125-2"><a id="__codelineno-125-2" name="__codelineno-125-2" href="#__codelineno-125-2"></a><span class="gs">ERROR:</span><span class="gr">  Unknown monoid plus_fp64</span>
-</span><span id="__span-125-3"><a id="__codelineno-125-3" name="__codelineno-125-3" href="#__codelineno-125-3"></a><span class="gs">LINE 1:</span><span class="gr"> ...e_scalar(&#39;fp64[0:1e100 1:1e100 2:1e100]&#39;::vector, &#39;plus_fp64...</span>
-</span><span id="__span-125-4"><a id="__codelineno-125-4" name="__codelineno-125-4" href="#__codelineno-125-4"></a><span class="gr">                                                             ^</span>
+<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-125-1"><a id="__codelineno-125-1" name="__codelineno-125-1" href="#__codelineno-125-1"></a><span class="k">select</span><span class="w"> </span><span class="n">reduce_scalar</span><span class="p">(</span><span class="s1">&#39;fp64[0:1e100 1:1e100 2:1e100]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;plus_monoid_fp64&#39;</span><span class="o">::</span><span class="n">monoid</span><span class="p">);</span>
+</span><span id="__span-125-2"><a id="__codelineno-125-2" name="__codelineno-125-2" href="#__codelineno-125-2"></a><span class="go">┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐</span>
+</span><span id="__span-125-3"><a id="__codelineno-125-3" name="__codelineno-125-3" href="#__codelineno-125-3"></a><span class="go">│                                                   reduce_scalar                                                   │</span>
+</span><span id="__span-125-4"><a id="__codelineno-125-4" name="__codelineno-125-4" href="#__codelineno-125-4"></a><span class="go">├───────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤</span>
+</span><span id="__span-125-5"><a id="__codelineno-125-5" name="__codelineno-125-5" href="#__codelineno-125-5"></a><span class="go">│ fp64:30000000000000002419755625518526612324544332515354750811750821725383037568323552921344695162778943488.000000 │</span>
+</span><span id="__span-125-6"><a id="__codelineno-125-6" name="__codelineno-125-6" href="#__codelineno-125-6"></a><span class="go">└───────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘</span>
+</span><span id="__span-125-7"><a id="__codelineno-125-7" name="__codelineno-125-7" href="#__codelineno-125-7"></a><span class="go">(1 row)</span>
 </span></code></pre></div></p>
 <h2 id="scalar-results-from-matrix-vector-operations">Scalar Results from Matrix-Vector Operations</h2>
 <p>Test operations that produce scalars from matrix-vector products.
@@ -3149,81 +3169,6 @@ float scalar with int vector (requires conversion)
 </span><span id="__span-129-7"><a id="__codelineno-129-7" name="__codelineno-129-7" href="#__codelineno-129-7"></a><span class="go">│ int32(5)[0:20 1:40 2:60] │</span>
 </span><span id="__span-129-8"><a id="__codelineno-129-8" name="__codelineno-129-8" href="#__codelineno-129-8"></a><span class="go">└──────────────────────────┘</span>
 </span><span id="__span-129-9"><a id="__codelineno-129-9" name="__codelineno-129-9" href="#__codelineno-129-9"></a><span class="go">(1 row)</span>
-</span></code></pre></div></p>
-<h2 id="scalar-assignment-operations">Scalar Assignment Operations</h2>
-<p>Test assign_scalar with various patterns.
-Assign scalar to all indices
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-130-1"><a id="__codelineno-130-1" name="__codelineno-130-1" href="#__codelineno-130-1"></a><span class="k">select</span><span class="w"> </span><span class="n">assign_scalar</span><span class="p">(</span><span class="s1">&#39;int32(10)[0:1 2:3 4:5]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span><span class="w"> </span><span class="mf">42</span><span class="o">::</span><span class="nb">int</span><span class="p">,</span><span class="w"> </span><span class="k">array</span><span class="p">[</span><span class="mf">0</span><span class="p">,</span><span class="mf">1</span><span class="p">,</span><span class="mf">2</span><span class="p">,</span><span class="mf">3</span><span class="p">,</span><span class="mf">4</span><span class="p">,</span><span class="mf">5</span><span class="p">,</span><span class="mf">6</span><span class="p">,</span><span class="mf">7</span><span class="p">,</span><span class="mf">8</span><span class="p">,</span><span class="mf">9</span><span class="p">]</span><span class="o">::</span><span class="nb">bigint</span><span class="p">[]);</span>
-</span><span id="__span-130-2"><a id="__codelineno-130-2" name="__codelineno-130-2" href="#__codelineno-130-2"></a><span class="gs">ERROR:</span><span class="gr">  function assign_scalar(vector, integer, bigint[]) does not exist</span>
-</span><span id="__span-130-3"><a id="__codelineno-130-3" name="__codelineno-130-3" href="#__codelineno-130-3"></a><span class="gs">LINE 1:</span><span class="gr"> select assign_scalar(&#39;int32(10)[0:1 2:3 4:5]&#39;::vector, 42::i...</span>
-</span><span id="__span-130-4"><a id="__codelineno-130-4" name="__codelineno-130-4" href="#__codelineno-130-4"></a><span class="gr">               ^</span>
-</span><span id="__span-130-5"><a id="__codelineno-130-5" name="__codelineno-130-5" href="#__codelineno-130-5"></a><span class="gs">HINT:</span><span class="gr">  No function matches the given name and argument types. You might need to add explicit type casts.</span>
-</span></code></pre></div>
-Assign scalar to sparse indices
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-131-1"><a id="__codelineno-131-1" name="__codelineno-131-1" href="#__codelineno-131-1"></a><span class="k">select</span><span class="w"> </span><span class="n">assign_scalar</span><span class="p">(</span><span class="s1">&#39;int32(10)[0:1 2:3 4:5]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span><span class="w"> </span><span class="mf">99</span><span class="o">::</span><span class="nb">int</span><span class="p">,</span><span class="w"> </span><span class="k">array</span><span class="p">[</span><span class="mf">1</span><span class="p">,</span><span class="mf">5</span><span class="p">,</span><span class="mf">9</span><span class="p">]</span><span class="o">::</span><span class="nb">bigint</span><span class="p">[]);</span>
-</span><span id="__span-131-2"><a id="__codelineno-131-2" name="__codelineno-131-2" href="#__codelineno-131-2"></a><span class="gs">ERROR:</span><span class="gr">  function assign_scalar(vector, integer, bigint[]) does not exist</span>
-</span><span id="__span-131-3"><a id="__codelineno-131-3" name="__codelineno-131-3" href="#__codelineno-131-3"></a><span class="gs">LINE 1:</span><span class="gr"> select assign_scalar(&#39;int32(10)[0:1 2:3 4:5]&#39;::vector, 99::i...</span>
-</span><span id="__span-131-4"><a id="__codelineno-131-4" name="__codelineno-131-4" href="#__codelineno-131-4"></a><span class="gr">               ^</span>
-</span><span id="__span-131-5"><a id="__codelineno-131-5" name="__codelineno-131-5" href="#__codelineno-131-5"></a><span class="gs">HINT:</span><span class="gr">  No function matches the given name and argument types. You might need to add explicit type casts.</span>
-</span></code></pre></div>
-Assign zero scalar
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-132-1"><a id="__codelineno-132-1" name="__codelineno-132-1" href="#__codelineno-132-1"></a><span class="k">select</span><span class="w"> </span><span class="n">assign_scalar</span><span class="p">(</span><span class="s1">&#39;int32(10)[0:10 1:20 2:30]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span><span class="w"> </span><span class="mf">0</span><span class="o">::</span><span class="nb">int</span><span class="p">,</span><span class="w"> </span><span class="k">array</span><span class="p">[</span><span class="mf">0</span><span class="p">,</span><span class="mf">1</span><span class="p">,</span><span class="mf">2</span><span class="p">]</span><span class="o">::</span><span class="nb">bigint</span><span class="p">[]);</span>
-</span><span id="__span-132-2"><a id="__codelineno-132-2" name="__codelineno-132-2" href="#__codelineno-132-2"></a><span class="gs">ERROR:</span><span class="gr">  function assign_scalar(vector, integer, bigint[]) does not exist</span>
-</span><span id="__span-132-3"><a id="__codelineno-132-3" name="__codelineno-132-3" href="#__codelineno-132-3"></a><span class="gs">LINE 1:</span><span class="gr"> select assign_scalar(&#39;int32(10)[0:10 1:20 2:30]&#39;::vector, 0:...</span>
-</span><span id="__span-132-4"><a id="__codelineno-132-4" name="__codelineno-132-4" href="#__codelineno-132-4"></a><span class="gr">               ^</span>
-</span><span id="__span-132-5"><a id="__codelineno-132-5" name="__codelineno-132-5" href="#__codelineno-132-5"></a><span class="gs">HINT:</span><span class="gr">  No function matches the given name and argument types. You might need to add explicit type casts.</span>
-</span></code></pre></div>
-Assign to matrix
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-133-1"><a id="__codelineno-133-1" name="__codelineno-133-1" href="#__codelineno-133-1"></a><span class="k">select</span><span class="w"> </span><span class="n">assign_scalar</span><span class="p">(</span><span class="s1">&#39;int32(5,5)[0:0:1 1:1:2]&#39;</span><span class="o">::</span><span class="n">matrix</span><span class="p">,</span><span class="w"> </span><span class="mf">100</span><span class="o">::</span><span class="nb">int</span><span class="p">,</span><span class="w"> </span><span class="k">array</span><span class="p">[</span><span class="mf">2</span><span class="p">,</span><span class="mf">3</span><span class="p">]</span><span class="o">::</span><span class="nb">bigint</span><span class="p">[],</span><span class="w"> </span><span class="k">array</span><span class="p">[</span><span class="mf">2</span><span class="p">,</span><span class="mf">3</span><span class="p">]</span><span class="o">::</span><span class="nb">bigint</span><span class="p">[]);</span>
-</span><span id="__span-133-2"><a id="__codelineno-133-2" name="__codelineno-133-2" href="#__codelineno-133-2"></a><span class="gs">ERROR:</span><span class="gr">  function assign_scalar(matrix, integer, bigint[], bigint[]) does not exist</span>
-</span><span id="__span-133-3"><a id="__codelineno-133-3" name="__codelineno-133-3" href="#__codelineno-133-3"></a><span class="gs">LINE 1:</span><span class="gr"> select assign_scalar(&#39;int32(5,5)[0:0:1 1:1:2]&#39;::matrix, 100:...</span>
-</span><span id="__span-133-4"><a id="__codelineno-133-4" name="__codelineno-133-4" href="#__codelineno-133-4"></a><span class="gr">               ^</span>
-</span><span id="__span-133-5"><a id="__codelineno-133-5" name="__codelineno-133-5" href="#__codelineno-133-5"></a><span class="gs">HINT:</span><span class="gr">  No function matches the given name and argument types. You might need to add explicit type casts.</span>
-</span></code></pre></div></p>
-<h2 id="practical-integration-patterns">Practical Integration Patterns</h2>
-<p>Real-world usage patterns combining scalars with other types.
-Threshold filtering and reduction
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-134-1"><a id="__codelineno-134-1" name="__codelineno-134-1" href="#__codelineno-134-1"></a><span class="k">select</span><span class="w"> </span><span class="n">reduce_scalar</span><span class="p">(</span>
-</span><span id="__span-134-2"><a id="__codelineno-134-2" name="__codelineno-134-2" href="#__codelineno-134-2"></a><span class="w">    </span><span class="n">choose</span><span class="p">(</span><span class="s1">&#39;int32(10)[0:5 1:15 2:10 3:20 4:8 5:25 6:3]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span>
-</span><span id="__span-134-3"><a id="__codelineno-134-3" name="__codelineno-134-3" href="#__codelineno-134-3"></a><span class="w">        </span><span class="s1">&#39;valuegt_int32&#39;</span><span class="o">::</span><span class="n">indexunaryop</span><span class="p">,</span>
-</span><span id="__span-134-4"><a id="__codelineno-134-4" name="__codelineno-134-4" href="#__codelineno-134-4"></a><span class="w">        </span><span class="mf">10</span><span class="o">::</span><span class="nb">int</span><span class="p">),</span>
-</span><span id="__span-134-5"><a id="__codelineno-134-5" name="__codelineno-134-5" href="#__codelineno-134-5"></a><span class="w">    </span><span class="s1">&#39;plus_monoid_int32&#39;</span><span class="o">::</span><span class="n">monoid</span>
-</span><span id="__span-134-6"><a id="__codelineno-134-6" name="__codelineno-134-6" href="#__codelineno-134-6"></a><span class="p">);</span>
-</span><span id="__span-134-7"><a id="__codelineno-134-7" name="__codelineno-134-7" href="#__codelineno-134-7"></a><span class="go">┌───────────────┐</span>
-</span><span id="__span-134-8"><a id="__codelineno-134-8" name="__codelineno-134-8" href="#__codelineno-134-8"></a><span class="go">│ reduce_scalar │</span>
-</span><span id="__span-134-9"><a id="__codelineno-134-9" name="__codelineno-134-9" href="#__codelineno-134-9"></a><span class="go">├───────────────┤</span>
-</span><span id="__span-134-10"><a id="__codelineno-134-10" name="__codelineno-134-10" href="#__codelineno-134-10"></a><span class="go">│ int32:60      │</span>
-</span><span id="__span-134-11"><a id="__codelineno-134-11" name="__codelineno-134-11" href="#__codelineno-134-11"></a><span class="go">└───────────────┘</span>
-</span><span id="__span-134-12"><a id="__codelineno-134-12" name="__codelineno-134-12" href="#__codelineno-134-12"></a><span class="go">(1 row)</span>
-</span></code></pre></div>
-Scale vector by reduced value
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-135-1"><a id="__codelineno-135-1" name="__codelineno-135-1" href="#__codelineno-135-1"></a><span class="k">select</span><span class="w"> </span><span class="n">apply</span><span class="p">(</span>
-</span><span id="__span-135-2"><a id="__codelineno-135-2" name="__codelineno-135-2" href="#__codelineno-135-2"></a><span class="w">    </span><span class="s1">&#39;int32[0:10 1:20 2:30]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span>
-</span><span id="__span-135-3"><a id="__codelineno-135-3" name="__codelineno-135-3" href="#__codelineno-135-3"></a><span class="w">    </span><span class="p">(</span><span class="n">reduce_scalar</span><span class="p">(</span><span class="s1">&#39;int32[0:1 1:2 2:3]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;plus_monoid_int32&#39;</span><span class="o">::</span><span class="n">monoid</span><span class="p">)</span><span class="o">::</span><span class="nb">int</span><span class="p">),</span>
-</span><span id="__span-135-4"><a id="__codelineno-135-4" name="__codelineno-135-4" href="#__codelineno-135-4"></a><span class="w">    </span><span class="s1">&#39;div_int32&#39;</span><span class="o">::</span><span class="n">binaryop</span>
-</span><span id="__span-135-5"><a id="__codelineno-135-5" name="__codelineno-135-5" href="#__codelineno-135-5"></a><span class="p">);</span>
-</span><span id="__span-135-6"><a id="__codelineno-135-6" name="__codelineno-135-6" href="#__codelineno-135-6"></a><span class="go">┌────────────────────┐</span>
-</span><span id="__span-135-7"><a id="__codelineno-135-7" name="__codelineno-135-7" href="#__codelineno-135-7"></a><span class="go">│       apply        │</span>
-</span><span id="__span-135-8"><a id="__codelineno-135-8" name="__codelineno-135-8" href="#__codelineno-135-8"></a><span class="go">├────────────────────┤</span>
-</span><span id="__span-135-9"><a id="__codelineno-135-9" name="__codelineno-135-9" href="#__codelineno-135-9"></a><span class="go">│ int32[0:1 1:3 2:5] │</span>
-</span><span id="__span-135-10"><a id="__codelineno-135-10" name="__codelineno-135-10" href="#__codelineno-135-10"></a><span class="go">└────────────────────┘</span>
-</span><span id="__span-135-11"><a id="__codelineno-135-11" name="__codelineno-135-11" href="#__codelineno-135-11"></a><span class="go">(1 row)</span>
-</span></code></pre></div>
-Conditional element update based on scalar threshold
-<div class="language-postgres-console highlight"><pre><span></span><code><span id="__span-136-1"><a id="__codelineno-136-1" name="__codelineno-136-1" href="#__codelineno-136-1"></a><span class="k">select</span><span class="w"> </span><span class="n">set_element</span><span class="p">(</span>
-</span><span id="__span-136-2"><a id="__codelineno-136-2" name="__codelineno-136-2" href="#__codelineno-136-2"></a><span class="w">    </span><span class="s1">&#39;int32[0:10 1:20 2:30]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span>
-</span><span id="__span-136-3"><a id="__codelineno-136-3" name="__codelineno-136-3" href="#__codelineno-136-3"></a><span class="w">    </span><span class="mf">1</span><span class="p">,</span>
-</span><span id="__span-136-4"><a id="__codelineno-136-4" name="__codelineno-136-4" href="#__codelineno-136-4"></a><span class="w">    </span><span class="k">CASE</span><span class="w"> </span><span class="k">WHEN</span><span class="w"> </span><span class="p">(</span><span class="n">get_element</span><span class="p">(</span><span class="s1">&#39;int32[0:10 1:20 2:30]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span><span class="w"> </span><span class="mf">1</span><span class="p">)</span><span class="o">::</span><span class="nb">int</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mf">15</span>
-</span><span id="__span-136-5"><a id="__codelineno-136-5" name="__codelineno-136-5" href="#__codelineno-136-5"></a><span class="w">         </span><span class="k">THEN</span><span class="w"> </span><span class="mf">100</span>
-</span><span id="__span-136-6"><a id="__codelineno-136-6" name="__codelineno-136-6" href="#__codelineno-136-6"></a><span class="w">         </span><span class="k">ELSE</span><span class="w"> </span><span class="p">(</span><span class="n">get_element</span><span class="p">(</span><span class="s1">&#39;int32[0:10 1:20 2:30]&#39;</span><span class="o">::</span><span class="n">vector</span><span class="p">,</span><span class="w"> </span><span class="mf">1</span><span class="p">)</span><span class="o">::</span><span class="nb">int</span><span class="p">)</span>
-</span><span id="__span-136-7"><a id="__codelineno-136-7" name="__codelineno-136-7" href="#__codelineno-136-7"></a><span class="w">    </span><span class="k">END</span>
-</span><span id="__span-136-8"><a id="__codelineno-136-8" name="__codelineno-136-8" href="#__codelineno-136-8"></a><span class="p">);</span>
-</span><span id="__span-136-9"><a id="__codelineno-136-9" name="__codelineno-136-9" href="#__codelineno-136-9"></a><span class="go">┌────────────────────────┐</span>
-</span><span id="__span-136-10"><a id="__codelineno-136-10" name="__codelineno-136-10" href="#__codelineno-136-10"></a><span class="go">│      set_element       │</span>
-</span><span id="__span-136-11"><a id="__codelineno-136-11" name="__codelineno-136-11" href="#__codelineno-136-11"></a><span class="go">├────────────────────────┤</span>
-</span><span id="__span-136-12"><a id="__codelineno-136-12" name="__codelineno-136-12" href="#__codelineno-136-12"></a><span class="go">│ int32[0:10 1:100 2:30] │</span>
-</span><span id="__span-136-13"><a id="__codelineno-136-13" name="__codelineno-136-13" href="#__codelineno-136-13"></a><span class="go">└────────────────────────┘</span>
-</span><span id="__span-136-14"><a id="__codelineno-136-14" name="__codelineno-136-14" href="#__codelineno-136-14"></a><span class="go">(1 row)</span>
 </span></code></pre></div></p>
 
 
