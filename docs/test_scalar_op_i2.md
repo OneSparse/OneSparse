@@ -2,143 +2,440 @@
 ## Scalar `smallint`
 
 Test various scalar math operations with native Postgres types
-```
-
-```
 Scalar-native arithmetic (scalar op native)
-```
+``` postgres-console
 select (1::smallint)::scalar + -1::smallint;
+ ?column? 
+----------
+ int16:0
+(1 row)
+
 select (1::smallint)::scalar - 1::smallint;
+ ?column? 
+----------
+ int16:0
+(1 row)
+
 select (1::smallint)::scalar * -1::smallint;
+ ?column? 
+----------
+ int16:-1
+(1 row)
+
 select (1::smallint)::scalar / 1::smallint;
+ ?column? 
+----------
+ int16:1
+(1 row)
 
 ```
 Native-scalar arithmetic (native op scalar)
-```
+``` postgres-console
 select 1::smallint + (-1::smallint)::scalar;
+ ?column? 
+----------
+        0
+(1 row)
+
 select 1::smallint - (1::smallint)::scalar;
+ ?column? 
+----------
+        0
+(1 row)
+
 select 1::smallint * (-1::smallint)::scalar;
+ ?column? 
+----------
+       -1
+(1 row)
+
 select 1::smallint / (1::smallint)::scalar;
+ ?column? 
+----------
+        1
+(1 row)
 
 ```
 Scalar-scalar arithmetic (via native extraction)
-```
+``` postgres-console
 select ((1::smallint)::scalar)::smallint + ((-1::smallint)::scalar)::smallint;
+ ?column? 
+----------
+        0
+(1 row)
+
 select ((1::smallint)::scalar)::smallint - ((0::smallint)::scalar)::smallint;
+ ?column? 
+----------
+        1
+(1 row)
+
 select ((1::smallint)::scalar)::smallint * ((-1::smallint)::scalar)::smallint;
+ ?column? 
+----------
+       -1
+(1 row)
+
 select ((1::smallint)::scalar)::smallint / ((1::smallint)::scalar)::smallint;
+ ?column? 
+----------
+        1
+(1 row)
 
 ```
 Test construction of min, zero and max values:
-```
+``` postgres-console
 select '-1'::smallint::scalar;
+  scalar  
+----------
+ int16:-1
+(1 row)
+
 select '0'::smallint::scalar;
+ scalar  
+---------
+ int16:0
+(1 row)
+
 select '1'::smallint::scalar;
+ scalar  
+---------
+ int16:1
+(1 row)
 
 ```
 Test setting a scalar value from max to 2
-```
+``` postgres-console
 select set('1'::smallint::scalar, 2);
+   set   
+---------
+ int16:2
+(1 row)
 
 ```
 Test setting to min, zero, max
-```
+``` postgres-console
 select set('0'::smallint::scalar, -1::smallint);
+   set    
+----------
+ int16:-1
+(1 row)
+
 select set('1'::smallint::scalar, 0::smallint);
+   set   
+---------
+ int16:0
+(1 row)
+
 select set('-1'::smallint::scalar, 1::smallint);
+   set   
+---------
+ int16:1
+(1 row)
 
 ```
 Comparison operations (via extraction)
-```
+``` postgres-console
 select ((1::smallint)::scalar)::smallint = 1::smallint;
+ ?column? 
+----------
+ t
+(1 row)
+
 select ((-1::smallint)::scalar)::smallint = -1::smallint;
+ ?column? 
+----------
+ t
+(1 row)
+
 select ((0::smallint)::scalar)::smallint = 0::smallint;
+ ?column? 
+----------
+ t
+(1 row)
+
 select ((1::smallint)::scalar)::smallint > -1::smallint;
+ ?column? 
+----------
+ t
+(1 row)
+
 select ((-1::smallint)::scalar)::smallint < 1::smallint;
+ ?column? 
+----------
+ t
+(1 row)
+
 select ((1::smallint)::scalar)::smallint >= 1::smallint;
+ ?column? 
+----------
+ t
+(1 row)
+
 select ((-1::smallint)::scalar)::smallint <= -1::smallint;
+ ?column? 
+----------
+ t
+(1 row)
+
 select ((1::smallint)::scalar)::smallint != -1::smallint;
+ ?column? 
+----------
+ t
+(1 row)
 
 ```
 Compare two scalar values (via extraction)
-```
+``` postgres-console
 select ((1::smallint)::scalar)::smallint = ((1::smallint)::scalar)::smallint;
+ ?column? 
+----------
+ t
+(1 row)
+
 select ((1::smallint)::scalar)::smallint > ((-1::smallint)::scalar)::smallint;
+ ?column? 
+----------
+ t
+(1 row)
+
 select ((-1::smallint)::scalar)::smallint < ((1::smallint)::scalar)::smallint;
+ ?column? 
+----------
+ t
+(1 row)
 
 ```
 Edge case: operations with zero
-```
+``` postgres-console
 select (0::smallint)::scalar + 1::smallint;
+ ?column? 
+----------
+ int16:1
+(1 row)
+
 select (1::smallint)::scalar - 0::smallint;
+ ?column? 
+----------
+ int16:1
+(1 row)
+
 select (0::smallint)::scalar * 1::smallint;
+ ?column? 
+----------
+ int16:0
+(1 row)
+
 select (1::smallint)::scalar * 0::smallint;
+ ?column? 
+----------
+ int16:0
+(1 row)
 
 ```
 Edge case: operations at boundaries
-```
+``` postgres-console
 select (1::smallint)::scalar + 0::smallint;
+ ?column? 
+----------
+ int16:1
+(1 row)
+
 select (-1::smallint)::scalar - 0::smallint;
+ ?column? 
+----------
+ int16:-1
+(1 row)
+
 select (1::smallint)::scalar / 1::smallint;
+ ?column? 
+----------
+ int16:1
+(1 row)
+
 select (-1::smallint)::scalar * 1::smallint;
+ ?column? 
+----------
+ int16:-1
+(1 row)
 
 ```
 Test various casting functions used by the CREATE CAST machinery:
-```
+``` postgres-console
 select scalar_smallint((-1)::smallint);
+ scalar_smallint 
+-----------------
+ int16:-1
+(1 row)
+
 select scalar_smallint((0)::smallint);
+ scalar_smallint 
+-----------------
+ int16:0
+(1 row)
+
 select scalar_smallint((1)::smallint);
+ scalar_smallint 
+-----------------
+ int16:1
+(1 row)
+
 select smallint_scalar((-1)::smallint::scalar);
+ smallint_scalar 
+-----------------
+              -1
+(1 row)
+
 select smallint_scalar((0)::smallint::scalar);
+ smallint_scalar 
+-----------------
+               0
+(1 row)
+
 select smallint_scalar((1)::smallint::scalar);
+ smallint_scalar 
+-----------------
+               1
+(1 row)
 
 ```
 These casting functions cast the Postgres type `smallint` to the
 GraphBLAS scalar type `GrB_INT16`.
-```
-
+``` postgres-console
 select cast(-1::smallint as scalar);
+  scalar  
+----------
+ int16:-1
+(1 row)
+
 select cast(0::smallint as scalar);
+ scalar  
+---------
+ int16:0
+(1 row)
+
 select cast(1::smallint as scalar);
+ scalar  
+---------
+ int16:1
+(1 row)
 
 ```
 These tests cast back from the scalar type `GrB_INT16` to the
 Postgres type `smallint`
-```
-
+``` postgres-console
 select cast((-1::smallint)::scalar as smallint);
+ int2 
+------
+   -1
+(1 row)
+
 select cast((0::smallint)::scalar as  smallint);
+ int2 
+------
+    0
+(1 row)
+
 select cast((1::smallint)::scalar as scalar);
+ scalar  
+---------
+ int16:1
+(1 row)
 
 ```
 Round-trip conversion tests (value should be preserved)
-```
+``` postgres-console
 select (-1::smallint)::scalar::smallint = -1::smallint;
+ ?column? 
+----------
+ t
+(1 row)
+
 select (0::smallint)::scalar::smallint = 0::smallint;
+ ?column? 
+----------
+ t
+(1 row)
+
 select (1::smallint)::scalar::smallint = 1::smallint;
+ ?column? 
+----------
+ t
+(1 row)
 
 ```
 Multiple round-trips should preserve value
-```
+``` postgres-console
 select ((-1::smallint)::scalar::smallint)::scalar::smallint = -1::smallint;
+ ?column? 
+----------
+ t
+(1 row)
+
 select ((1::smallint)::scalar::smallint)::scalar::smallint = 1::smallint;
+ ?column? 
+----------
+ t
+(1 row)
 
 ```
 NULL handling
-```
+``` postgres-console
 select NULL::smallint::scalar;
-select (1::smallint)::scalar + NULL::smallint;
-select NULL::smallint + (1::smallint)::scalar;
-select NULL::smallint * (0::smallint)::scalar;
+ scalar 
+--------
+ int16
+(1 row)
 
+select (1::smallint)::scalar + NULL::smallint;
+ERROR:  Cannot pass NULL to scalar_plus_int16
+select NULL::smallint + (1::smallint)::scalar;
+ERROR:  Cannot pass NULL to plus_scalar_int16
+select NULL::smallint * (0::smallint)::scalar;
+ERROR:  Cannot pass NULL to mult_scalar_int16
 ```
 Utility functions
-```
+``` postgres-console
 select nvals((1::smallint)::scalar) as has_value;
+ has_value 
+-----------
+         1
+(1 row)
+
 select nvals(('int16')::scalar) as empty_scalar;
+ empty_scalar 
+--------------
+            0
+(1 row)
+
 select type((1::smallint)::scalar);
+ type  
+-------
+ int16
+(1 row)
+
 select print((1::smallint)::scalar);
+ print 
+-------
+ 1
+(1 row)
+
 select dup((1::smallint)::scalar)::smallint;
+ dup 
+-----
+   1
+(1 row)
+
 select wait((1::smallint)::scalar)::smallint;
+ wait 
+------
+    1
+(1 row)
+
 select nvals(clear((1::smallint)::scalar)) as cleared;
+ cleared 
+---------
+       0
+(1 row)
+
 ```

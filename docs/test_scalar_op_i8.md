@@ -2,143 +2,440 @@
 ## Scalar `bigint`
 
 Test various scalar math operations with native Postgres types
-```
-
-```
 Scalar-native arithmetic (scalar op native)
-```
+``` postgres-console
 select (1::bigint)::scalar + -1::bigint;
+ ?column? 
+----------
+ int64:0
+(1 row)
+
 select (1::bigint)::scalar - 1::bigint;
+ ?column? 
+----------
+ int64:0
+(1 row)
+
 select (1::bigint)::scalar * -1::bigint;
+ ?column? 
+----------
+ int64:-1
+(1 row)
+
 select (1::bigint)::scalar / 1::bigint;
+ ?column? 
+----------
+ int64:1
+(1 row)
 
 ```
 Native-scalar arithmetic (native op scalar)
-```
+``` postgres-console
 select 1::bigint + (-1::bigint)::scalar;
+ ?column? 
+----------
+        0
+(1 row)
+
 select 1::bigint - (1::bigint)::scalar;
+ ?column? 
+----------
+        0
+(1 row)
+
 select 1::bigint * (-1::bigint)::scalar;
+ ?column? 
+----------
+       -1
+(1 row)
+
 select 1::bigint / (1::bigint)::scalar;
+ ?column? 
+----------
+        1
+(1 row)
 
 ```
 Scalar-scalar arithmetic (via native extraction)
-```
+``` postgres-console
 select ((1::bigint)::scalar)::bigint + ((-1::bigint)::scalar)::bigint;
+ ?column? 
+----------
+        0
+(1 row)
+
 select ((1::bigint)::scalar)::bigint - ((0::bigint)::scalar)::bigint;
+ ?column? 
+----------
+        1
+(1 row)
+
 select ((1::bigint)::scalar)::bigint * ((-1::bigint)::scalar)::bigint;
+ ?column? 
+----------
+       -1
+(1 row)
+
 select ((1::bigint)::scalar)::bigint / ((1::bigint)::scalar)::bigint;
+ ?column? 
+----------
+        1
+(1 row)
 
 ```
 Test construction of min, zero and max values:
-```
+``` postgres-console
 select '-1'::bigint::scalar;
+  scalar  
+----------
+ int64:-1
+(1 row)
+
 select '0'::bigint::scalar;
+ scalar  
+---------
+ int64:0
+(1 row)
+
 select '1'::bigint::scalar;
+ scalar  
+---------
+ int64:1
+(1 row)
 
 ```
 Test setting a scalar value from max to 2
-```
+``` postgres-console
 select set('1'::bigint::scalar, 2);
+   set   
+---------
+ int64:2
+(1 row)
 
 ```
 Test setting to min, zero, max
-```
+``` postgres-console
 select set('0'::bigint::scalar, -1::bigint);
+   set    
+----------
+ int64:-1
+(1 row)
+
 select set('1'::bigint::scalar, 0::bigint);
+   set   
+---------
+ int64:0
+(1 row)
+
 select set('-1'::bigint::scalar, 1::bigint);
+   set   
+---------
+ int64:1
+(1 row)
 
 ```
 Comparison operations (via extraction)
-```
+``` postgres-console
 select ((1::bigint)::scalar)::bigint = 1::bigint;
+ ?column? 
+----------
+ t
+(1 row)
+
 select ((-1::bigint)::scalar)::bigint = -1::bigint;
+ ?column? 
+----------
+ t
+(1 row)
+
 select ((0::bigint)::scalar)::bigint = 0::bigint;
+ ?column? 
+----------
+ t
+(1 row)
+
 select ((1::bigint)::scalar)::bigint > -1::bigint;
+ ?column? 
+----------
+ t
+(1 row)
+
 select ((-1::bigint)::scalar)::bigint < 1::bigint;
+ ?column? 
+----------
+ t
+(1 row)
+
 select ((1::bigint)::scalar)::bigint >= 1::bigint;
+ ?column? 
+----------
+ t
+(1 row)
+
 select ((-1::bigint)::scalar)::bigint <= -1::bigint;
+ ?column? 
+----------
+ t
+(1 row)
+
 select ((1::bigint)::scalar)::bigint != -1::bigint;
+ ?column? 
+----------
+ t
+(1 row)
 
 ```
 Compare two scalar values (via extraction)
-```
+``` postgres-console
 select ((1::bigint)::scalar)::bigint = ((1::bigint)::scalar)::bigint;
+ ?column? 
+----------
+ t
+(1 row)
+
 select ((1::bigint)::scalar)::bigint > ((-1::bigint)::scalar)::bigint;
+ ?column? 
+----------
+ t
+(1 row)
+
 select ((-1::bigint)::scalar)::bigint < ((1::bigint)::scalar)::bigint;
+ ?column? 
+----------
+ t
+(1 row)
 
 ```
 Edge case: operations with zero
-```
+``` postgres-console
 select (0::bigint)::scalar + 1::bigint;
+ ?column? 
+----------
+ int64:1
+(1 row)
+
 select (1::bigint)::scalar - 0::bigint;
+ ?column? 
+----------
+ int64:1
+(1 row)
+
 select (0::bigint)::scalar * 1::bigint;
+ ?column? 
+----------
+ int64:0
+(1 row)
+
 select (1::bigint)::scalar * 0::bigint;
+ ?column? 
+----------
+ int64:0
+(1 row)
 
 ```
 Edge case: operations at boundaries
-```
+``` postgres-console
 select (1::bigint)::scalar + 0::bigint;
+ ?column? 
+----------
+ int64:1
+(1 row)
+
 select (-1::bigint)::scalar - 0::bigint;
+ ?column? 
+----------
+ int64:-1
+(1 row)
+
 select (1::bigint)::scalar / 1::bigint;
+ ?column? 
+----------
+ int64:1
+(1 row)
+
 select (-1::bigint)::scalar * 1::bigint;
+ ?column? 
+----------
+ int64:-1
+(1 row)
 
 ```
 Test various casting functions used by the CREATE CAST machinery:
-```
+``` postgres-console
 select scalar_bigint((-1)::bigint);
+ scalar_bigint 
+---------------
+ int64:-1
+(1 row)
+
 select scalar_bigint((0)::bigint);
+ scalar_bigint 
+---------------
+ int64:0
+(1 row)
+
 select scalar_bigint((1)::bigint);
+ scalar_bigint 
+---------------
+ int64:1
+(1 row)
+
 select bigint_scalar((-1)::bigint::scalar);
+ bigint_scalar 
+---------------
+            -1
+(1 row)
+
 select bigint_scalar((0)::bigint::scalar);
+ bigint_scalar 
+---------------
+             0
+(1 row)
+
 select bigint_scalar((1)::bigint::scalar);
+ bigint_scalar 
+---------------
+             1
+(1 row)
 
 ```
 These casting functions cast the Postgres type `bigint` to the
 GraphBLAS scalar type `GrB_INT64`.
-```
-
+``` postgres-console
 select cast(-1::bigint as scalar);
+  scalar  
+----------
+ int64:-1
+(1 row)
+
 select cast(0::bigint as scalar);
+ scalar  
+---------
+ int64:0
+(1 row)
+
 select cast(1::bigint as scalar);
+ scalar  
+---------
+ int64:1
+(1 row)
 
 ```
 These tests cast back from the scalar type `GrB_INT64` to the
 Postgres type `bigint`
-```
-
+``` postgres-console
 select cast((-1::bigint)::scalar as bigint);
+ int8 
+------
+   -1
+(1 row)
+
 select cast((0::bigint)::scalar as  bigint);
+ int8 
+------
+    0
+(1 row)
+
 select cast((1::bigint)::scalar as scalar);
+ scalar  
+---------
+ int64:1
+(1 row)
 
 ```
 Round-trip conversion tests (value should be preserved)
-```
+``` postgres-console
 select (-1::bigint)::scalar::bigint = -1::bigint;
+ ?column? 
+----------
+ t
+(1 row)
+
 select (0::bigint)::scalar::bigint = 0::bigint;
+ ?column? 
+----------
+ t
+(1 row)
+
 select (1::bigint)::scalar::bigint = 1::bigint;
+ ?column? 
+----------
+ t
+(1 row)
 
 ```
 Multiple round-trips should preserve value
-```
+``` postgres-console
 select ((-1::bigint)::scalar::bigint)::scalar::bigint = -1::bigint;
+ ?column? 
+----------
+ t
+(1 row)
+
 select ((1::bigint)::scalar::bigint)::scalar::bigint = 1::bigint;
+ ?column? 
+----------
+ t
+(1 row)
 
 ```
 NULL handling
-```
+``` postgres-console
 select NULL::bigint::scalar;
-select (1::bigint)::scalar + NULL::bigint;
-select NULL::bigint + (1::bigint)::scalar;
-select NULL::bigint * (0::bigint)::scalar;
+ scalar 
+--------
+ int64
+(1 row)
 
+select (1::bigint)::scalar + NULL::bigint;
+ERROR:  Cannot pass NULL to scalar_plus_int64
+select NULL::bigint + (1::bigint)::scalar;
+ERROR:  Cannot pass NULL to plus_scalar_int64
+select NULL::bigint * (0::bigint)::scalar;
+ERROR:  Cannot pass NULL to mult_scalar_int64
 ```
 Utility functions
-```
+``` postgres-console
 select nvals((1::bigint)::scalar) as has_value;
+ has_value 
+-----------
+         1
+(1 row)
+
 select nvals(('int64')::scalar) as empty_scalar;
+ empty_scalar 
+--------------
+            0
+(1 row)
+
 select type((1::bigint)::scalar);
+ type  
+-------
+ int64
+(1 row)
+
 select print((1::bigint)::scalar);
+ print 
+-------
+ 1
+(1 row)
+
 select dup((1::bigint)::scalar)::bigint;
+ dup 
+-----
+   1
+(1 row)
+
 select wait((1::bigint)::scalar)::bigint;
+ wait 
+------
+    1
+(1 row)
+
 select nvals(clear((1::bigint)::scalar)) as cleared;
+ cleared 
+---------
+       0
+(1 row)
+
 ```

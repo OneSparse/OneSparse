@@ -2,143 +2,440 @@
 ## Scalar `integer`
 
 Test various scalar math operations with native Postgres types
-```
-
-```
 Scalar-native arithmetic (scalar op native)
-```
+``` postgres-console
 select (1::integer)::scalar + -1::integer;
+ ?column? 
+----------
+ int32:0
+(1 row)
+
 select (1::integer)::scalar - 1::integer;
+ ?column? 
+----------
+ int32:0
+(1 row)
+
 select (1::integer)::scalar * -1::integer;
+ ?column? 
+----------
+ int32:-1
+(1 row)
+
 select (1::integer)::scalar / 1::integer;
+ ?column? 
+----------
+ int32:1
+(1 row)
 
 ```
 Native-scalar arithmetic (native op scalar)
-```
+``` postgres-console
 select 1::integer + (-1::integer)::scalar;
+ ?column? 
+----------
+        0
+(1 row)
+
 select 1::integer - (1::integer)::scalar;
+ ?column? 
+----------
+        0
+(1 row)
+
 select 1::integer * (-1::integer)::scalar;
+ ?column? 
+----------
+       -1
+(1 row)
+
 select 1::integer / (1::integer)::scalar;
+ ?column? 
+----------
+        1
+(1 row)
 
 ```
 Scalar-scalar arithmetic (via native extraction)
-```
+``` postgres-console
 select ((1::integer)::scalar)::integer + ((-1::integer)::scalar)::integer;
+ ?column? 
+----------
+        0
+(1 row)
+
 select ((1::integer)::scalar)::integer - ((0::integer)::scalar)::integer;
+ ?column? 
+----------
+        1
+(1 row)
+
 select ((1::integer)::scalar)::integer * ((-1::integer)::scalar)::integer;
+ ?column? 
+----------
+       -1
+(1 row)
+
 select ((1::integer)::scalar)::integer / ((1::integer)::scalar)::integer;
+ ?column? 
+----------
+        1
+(1 row)
 
 ```
 Test construction of min, zero and max values:
-```
+``` postgres-console
 select '-1'::integer::scalar;
+  scalar  
+----------
+ int32:-1
+(1 row)
+
 select '0'::integer::scalar;
+ scalar  
+---------
+ int32:0
+(1 row)
+
 select '1'::integer::scalar;
+ scalar  
+---------
+ int32:1
+(1 row)
 
 ```
 Test setting a scalar value from max to 2
-```
+``` postgres-console
 select set('1'::integer::scalar, 2);
+   set   
+---------
+ int32:2
+(1 row)
 
 ```
 Test setting to min, zero, max
-```
+``` postgres-console
 select set('0'::integer::scalar, -1::integer);
+   set    
+----------
+ int32:-1
+(1 row)
+
 select set('1'::integer::scalar, 0::integer);
+   set   
+---------
+ int32:0
+(1 row)
+
 select set('-1'::integer::scalar, 1::integer);
+   set   
+---------
+ int32:1
+(1 row)
 
 ```
 Comparison operations (via extraction)
-```
+``` postgres-console
 select ((1::integer)::scalar)::integer = 1::integer;
+ ?column? 
+----------
+ t
+(1 row)
+
 select ((-1::integer)::scalar)::integer = -1::integer;
+ ?column? 
+----------
+ t
+(1 row)
+
 select ((0::integer)::scalar)::integer = 0::integer;
+ ?column? 
+----------
+ t
+(1 row)
+
 select ((1::integer)::scalar)::integer > -1::integer;
+ ?column? 
+----------
+ t
+(1 row)
+
 select ((-1::integer)::scalar)::integer < 1::integer;
+ ?column? 
+----------
+ t
+(1 row)
+
 select ((1::integer)::scalar)::integer >= 1::integer;
+ ?column? 
+----------
+ t
+(1 row)
+
 select ((-1::integer)::scalar)::integer <= -1::integer;
+ ?column? 
+----------
+ t
+(1 row)
+
 select ((1::integer)::scalar)::integer != -1::integer;
+ ?column? 
+----------
+ t
+(1 row)
 
 ```
 Compare two scalar values (via extraction)
-```
+``` postgres-console
 select ((1::integer)::scalar)::integer = ((1::integer)::scalar)::integer;
+ ?column? 
+----------
+ t
+(1 row)
+
 select ((1::integer)::scalar)::integer > ((-1::integer)::scalar)::integer;
+ ?column? 
+----------
+ t
+(1 row)
+
 select ((-1::integer)::scalar)::integer < ((1::integer)::scalar)::integer;
+ ?column? 
+----------
+ t
+(1 row)
 
 ```
 Edge case: operations with zero
-```
+``` postgres-console
 select (0::integer)::scalar + 1::integer;
+ ?column? 
+----------
+ int32:1
+(1 row)
+
 select (1::integer)::scalar - 0::integer;
+ ?column? 
+----------
+ int32:1
+(1 row)
+
 select (0::integer)::scalar * 1::integer;
+ ?column? 
+----------
+ int32:0
+(1 row)
+
 select (1::integer)::scalar * 0::integer;
+ ?column? 
+----------
+ int32:0
+(1 row)
 
 ```
 Edge case: operations at boundaries
-```
+``` postgres-console
 select (1::integer)::scalar + 0::integer;
+ ?column? 
+----------
+ int32:1
+(1 row)
+
 select (-1::integer)::scalar - 0::integer;
+ ?column? 
+----------
+ int32:-1
+(1 row)
+
 select (1::integer)::scalar / 1::integer;
+ ?column? 
+----------
+ int32:1
+(1 row)
+
 select (-1::integer)::scalar * 1::integer;
+ ?column? 
+----------
+ int32:-1
+(1 row)
 
 ```
 Test various casting functions used by the CREATE CAST machinery:
-```
+``` postgres-console
 select scalar_integer((-1)::integer);
+ scalar_integer 
+----------------
+ int32:-1
+(1 row)
+
 select scalar_integer((0)::integer);
+ scalar_integer 
+----------------
+ int32:0
+(1 row)
+
 select scalar_integer((1)::integer);
+ scalar_integer 
+----------------
+ int32:1
+(1 row)
+
 select integer_scalar((-1)::integer::scalar);
+ integer_scalar 
+----------------
+             -1
+(1 row)
+
 select integer_scalar((0)::integer::scalar);
+ integer_scalar 
+----------------
+              0
+(1 row)
+
 select integer_scalar((1)::integer::scalar);
+ integer_scalar 
+----------------
+              1
+(1 row)
 
 ```
 These casting functions cast the Postgres type `integer` to the
 GraphBLAS scalar type `GrB_INT32`.
-```
-
+``` postgres-console
 select cast(-1::integer as scalar);
+  scalar  
+----------
+ int32:-1
+(1 row)
+
 select cast(0::integer as scalar);
+ scalar  
+---------
+ int32:0
+(1 row)
+
 select cast(1::integer as scalar);
+ scalar  
+---------
+ int32:1
+(1 row)
 
 ```
 These tests cast back from the scalar type `GrB_INT32` to the
 Postgres type `integer`
-```
-
+``` postgres-console
 select cast((-1::integer)::scalar as integer);
+ int4 
+------
+   -1
+(1 row)
+
 select cast((0::integer)::scalar as  integer);
+ int4 
+------
+    0
+(1 row)
+
 select cast((1::integer)::scalar as scalar);
+ scalar  
+---------
+ int32:1
+(1 row)
 
 ```
 Round-trip conversion tests (value should be preserved)
-```
+``` postgres-console
 select (-1::integer)::scalar::integer = -1::integer;
+ ?column? 
+----------
+ t
+(1 row)
+
 select (0::integer)::scalar::integer = 0::integer;
+ ?column? 
+----------
+ t
+(1 row)
+
 select (1::integer)::scalar::integer = 1::integer;
+ ?column? 
+----------
+ t
+(1 row)
 
 ```
 Multiple round-trips should preserve value
-```
+``` postgres-console
 select ((-1::integer)::scalar::integer)::scalar::integer = -1::integer;
+ ?column? 
+----------
+ t
+(1 row)
+
 select ((1::integer)::scalar::integer)::scalar::integer = 1::integer;
+ ?column? 
+----------
+ t
+(1 row)
 
 ```
 NULL handling
-```
+``` postgres-console
 select NULL::integer::scalar;
-select (1::integer)::scalar + NULL::integer;
-select NULL::integer + (1::integer)::scalar;
-select NULL::integer * (0::integer)::scalar;
+ scalar 
+--------
+ int32
+(1 row)
 
+select (1::integer)::scalar + NULL::integer;
+ERROR:  Cannot pass NULL to scalar_plus_int32
+select NULL::integer + (1::integer)::scalar;
+ERROR:  Cannot pass NULL to plus_scalar_int32
+select NULL::integer * (0::integer)::scalar;
+ERROR:  Cannot pass NULL to mult_scalar_int32
 ```
 Utility functions
-```
+``` postgres-console
 select nvals((1::integer)::scalar) as has_value;
+ has_value 
+-----------
+         1
+(1 row)
+
 select nvals(('int32')::scalar) as empty_scalar;
+ empty_scalar 
+--------------
+            0
+(1 row)
+
 select type((1::integer)::scalar);
+ type  
+-------
+ int32
+(1 row)
+
 select print((1::integer)::scalar);
+ print 
+-------
+ 1
+(1 row)
+
 select dup((1::integer)::scalar)::integer;
+ dup 
+-----
+   1
+(1 row)
+
 select wait((1::integer)::scalar)::integer;
+ wait 
+------
+    1
+(1 row)
+
 select nvals(clear((1::integer)::scalar)) as cleared;
+ cleared 
+---------
+       0
+(1 row)
+
 ```

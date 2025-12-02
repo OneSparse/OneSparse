@@ -5,21 +5,13 @@ show the literal output of these statements from Postgres.
 
 Some setup to make sure warnings are shown, and that the extension
 is installed.
-```
-
+``` postgres-console
 set client_min_messages = 'WARNING';
 create extension if not exists onesparse;
-
-\pset linestyle unicode
-\pset border 2
-
 ```
 ## Construction
 
 Examples of creating vectors and inspecting their properties.
-```
-
-```
 An empty vector can be constructed many ways, but one of the
 simplest is casting a type code to the matrix type.  In this case
 `int32` means GrB_INT32.  The type codes are intentionally compressed
@@ -27,392 +19,805 @@ to be as short as possible for smaller pg_dumps.
 
 Much of these functions are basically vector versions of the same
 functions for matrix.  See those docs for details:
-```
-
-```
 Cast a type name to make an empty vector
-```
+``` postgres-console
 select 'int32'::vector;
+┌────────┐
+│ vector │
+├────────┤
+│ int32  │
+└────────┘
+(1 row)
 
 ```
 Use the constructor function
-```
+``` postgres-console
 select vector('int32');
+┌────────┐
+│ vector │
+├────────┤
+│ int32  │
+└────────┘
+(1 row)
 
 ```
 Count the stored elements
-```
+``` postgres-console
 select nvals('int32'::vector);
+┌───────┐
+│ nvals │
+├───────┤
+│     0 │
+└───────┘
+(1 row)
 
 ```
 Inspect the possible size of the vector
-```
+``` postgres-console
 select size('int32'::vector);
+┌─────────────────────┐
+│        size         │
+├─────────────────────┤
+│ 1152921504606846976 │
+└─────────────────────┘
+(1 row)
 
 ```
 Cast from an empty array
-```
+``` postgres-console
 select 'int32[]'::vector;
+┌────────┐
+│ vector │
+├────────┤
+│ int32  │
+└────────┘
+(1 row)
 
 ```
 Stored elements in the empty array
-```
+``` postgres-console
 select nvals('int32[]'::vector);
+┌───────┐
+│ nvals │
+├───────┤
+│     0 │
+└───────┘
+(1 row)
 
 ```
 Size of the unbounded empty array
-```
+``` postgres-console
 select size('int32[]'::vector);
+┌─────────────────────┐
+│        size         │
+├─────────────────────┤
+│ 1152921504606846976 │
+└─────────────────────┘
+(1 row)
 
 ```
 Create a bounded but empty vector
-```
+``` postgres-console
 select 'int32(10)'::vector;
+┌───────────┐
+│  vector   │
+├───────────┤
+│ int32(10) │
+└───────────┘
+(1 row)
 
 ```
 Bounded vectors start with zero elements
-```
+``` postgres-console
 select nvals('int32(10)'::vector);
+┌───────┐
+│ nvals │
+├───────┤
+│     0 │
+└───────┘
+(1 row)
 
 ```
 Its size reflects the bound
-```
+``` postgres-console
 select size('int32(10)'::vector);
+┌──────┐
+│ size │
+├──────┤
+│   10 │
+└──────┘
+(1 row)
 
 ```
 Alternate syntax for a bounded empty vector
-```
+``` postgres-console
 select 'int32(10)[]'::vector;
+┌───────────┐
+│  vector   │
+├───────────┤
+│ int32(10) │
+└───────────┘
+(1 row)
 
 ```
 It also has zero stored elements
-```
+``` postgres-console
 select nvals('int32(10)[]'::vector);
+┌───────┐
+│ nvals │
+├───────┤
+│     0 │
+└───────┘
+(1 row)
 
 ```
 And a fixed size
-```
+``` postgres-console
 select size('int32(10)[]'::vector);
+┌──────┐
+│ size │
+├──────┤
+│   10 │
+└──────┘
+(1 row)
 
 ```
 Create a vector with some values
-```
+``` postgres-console
 select 'int32[0:1 1:2 2:3]'::vector;
+┌────────────────────┐
+│       vector       │
+├────────────────────┤
+│ int32[0:1 1:2 2:3] │
+└────────────────────┘
+(1 row)
 
 ```
 Cast a vector from a Postgres array
-```
+``` postgres-console
 select '{1,2,3}'::integer[]::vector;
+┌───────────────────────┐
+│        vector         │
+├───────────────────────┤
+│ int32(3)[0:1 1:2 2:3] │
+└───────────────────────┘
+(1 row)
 
 ```
 Cast from a Postgres array with NULL indicating empty value:
-```
+``` postgres-console
 select '{1,NULL,3}'::integer[]::vector;
+┌───────────────────┐
+│      vector       │
+├───────────────────┤
+│ int32(3)[0:1 2:3] │
+└───────────────────┘
+(1 row)
 
 ```
 Cast a Postgres array from a vector
-```
+``` postgres-console
 select 'int32(3)[0:1 1:2 2:3]'::vector::integer[];
+┌─────────┐
+│  int4   │
+├─────────┤
+│ {1,2,3} │
+└─────────┘
+(1 row)
 
 ```
 Cast a Postgres array from a vector with  NULL indicating empty value:
-```
+``` postgres-console
 select 'int32(3)[0:1 2:3]'::vector::integer[];
+┌────────────┐
+│    int4    │
+├────────────┤
+│ {1,NULL,3} │
+└────────────┘
+(1 row)
 
 ```
 Count those values
-```
+``` postgres-console
 select nvals('int32[0:1 1:2 2:3]'::vector);
+┌───────┐
+│ nvals │
+├───────┤
+│     3 │
+└───────┘
+(1 row)
 
 ```
 Iterate over the index/value pairs
-```
+``` postgres-console
 select * from elements('int32[0:1 1:2 2:3]'::vector);
+┌───┬─────────┐
+│ i │    v    │
+├───┼─────────┤
+│ 0 │ int32:1 │
+│ 1 │ int32:2 │
+│ 2 │ int32:3 │
+└───┴─────────┘
+(3 rows)
 
 ```
 Combine bounds and elements
-```
+``` postgres-console
 select 'int32(10)[0:1 1:2 2:3]'::vector;
+┌────────────────────────┐
+│         vector         │
+├────────────────────────┤
+│ int32(10)[0:1 1:2 2:3] │
+└────────────────────────┘
+(1 row)
 
 ```
 Bounded size is retained
-```
+``` postgres-console
 select size('int32(10)[0:1 1:2 2:3]'::vector);
+┌──────┐
+│ size │
+├──────┤
+│   10 │
+└──────┘
+(1 row)
 
 ```
 Attempting to store outside the bounds raises an error
-```
+``` postgres-console
 select size('int32(2)[0:1 1:2 2:3]'::vector);
-
+ERROR:  INVALID_INDEX GraphBLAS error: GrB_INVALID_INDEX
+function: GrB_Vector_setElement_INT64 (w, x, row)
+Row index 2 out of range; must be < 2: Error setting Vector Element
+LINE 1: select size('int32(2)[0:1 1:2 2:3]'::vector);
+                    ^
 ```
 ## Equality
 
 Two matrices can be compared for equality with the '=' and '!=' operators:
-```
-
+``` postgres-console
 select u != v as "u != v", u = v as "u = v", v = u as "v = u", v = u as "v = u" from test_fixture;
+┌────────┬───────┬───────┬───────┐
+│ u != v │ u = v │ v = u │ v = u │
+├────────┼───────┼───────┼───────┤
+│ t      │ f     │ f     │ f     │
+└────────┴───────┴───────┴───────┘
+(1 row)
 
 ```
 ## Elementwise Addition
 
 Add two vectors element by element using a binary operator
-```
+``` postgres-console
 select eadd('int32[0:1 1:2 2:3]'::vector, 'int32[0:1 1:2 2:3]'::vector, 'plus_int32');
+┌────────────────────┐
+│        eadd        │
+├────────────────────┤
+│ int32[0:2 1:4 2:6] │
+└────────────────────┘
+(1 row)
 
 ```
 Eadd can also be accomplished with binary operators specific to
 OneSparse.  Different binaryops are passed to eadd to do different
 elementwise operations:
-```
-
+``` postgres-console
 select print(u |+ v) as "u |+ v", print(u |- v) as "u |- v", print(u |* v) as "u |* v", print(u |/ v) as "u |/ v" from test_fixture;
+┌───────────┬───────────┬───────────┬───────────┐
+│  u |+ v   │  u |- v   │  u |* v   │  u |/ v   │
+├───────────┼───────────┼───────────┼───────────┤
+│           │           │           │           │
+│    ───    │    ───    │    ───    │    ───    │
+│  0│       │  0│       │  0│       │  0│       │
+│  1│  5    │  1│ -1    │  1│  6    │  1│  0    │
+│  2│  3    │  2│  3    │  2│  3    │  2│  3    │
+│  3│       │  3│       │  3│       │  3│       │
+│           │           │           │           │
+└───────────┴───────────┴───────────┴───────────┘
+(1 row)
+
 ```
 ## Elementwise Multiplication
 
 Multiply corresponding elements of two vectors
-```
-
+``` postgres-console
 select emult('int32[0:1 1:2 2:3]'::vector, 'int32[0:1 1:2 2:3]'::vector, 'times_int32');
+┌────────────────────┐
+│       emult        │
+├────────────────────┤
+│ int32[0:1 1:4 2:9] │
+└────────────────────┘
+(1 row)
 
 ```
 Emult can also be accomplished with binary operators specific to
 OneSparse.  Different binaryops are passed to emult to do different
 elementwise operations:
-```
-
+``` postgres-console
 select print(u &+ v) as "u &+ v", print(u &- v) as "u &- v", print(u &* v) as "u &* v", print(u &/ v) as "u &/ v" from test_fixture;
+┌───────────┬───────────┬───────────┬───────────┐
+│  u &+ v   │  u &- v   │  u &* v   │  u &/ v   │
+├───────────┼───────────┼───────────┼───────────┤
+│           │           │           │           │
+│    ───    │    ───    │    ───    │    ───    │
+│  0│       │  0│       │  0│       │  0│       │
+│  1│  5    │  1│ -1    │  1│  6    │  1│  0    │
+│  2│       │  2│       │  2│       │  2│       │
+│  3│       │  3│       │  3│       │  3│       │
+│           │           │           │           │
+└───────────┴───────────┴───────────┴───────────┘
+(1 row)
 
 ```
 ## Elementwise Union
 
 Union of two vectors with scalars for missing values
-```
+``` postgres-console
 select eunion('int32[0:1 1:2 2:3]'::vector, 42, 'int32[0:1 1:2 2:3]'::vector, 84, 'plus_int32');
+┌────────────────────┐
+│       eunion       │
+├────────────────────┤
+│ int32[0:2 1:4 2:6] │
+└────────────────────┘
+(1 row)
 
 ```
 ## Reduction
 
 Reduce a vector to a scalar value using a monoid
-```
+``` postgres-console
 select reduce_scalar('int32[0:1 1:2 2:3]'::vector, 'plus_monoid_int32');
+┌───────────────┐
+│ reduce_scalar │
+├───────────────┤
+│ int32:6       │
+└───────────────┘
+(1 row)
 
 ```
 ## Selection and Apply
 
 Filter a vector and apply unary operators
-```
+``` postgres-console
 select choose('int32[0:1 1:2 2:3]'::vector, 'valuegt_int32', 1);
+┌────────────────┐
+│     choose     │
+├────────────────┤
+│ int32[1:2 2:3] │
+└────────────────┘
+(1 row)
 
 select apply('int32[1:1 2:2 3:3]'::vector, 'ainv_int32'::unaryop);
+┌───────────────────────┐
+│         apply         │
+├───────────────────────┤
+│ int32[1:-1 2:-2 3:-3] │
+└───────────────────────┘
+(1 row)
+
 ```
 ## Setting and Getting Elements
-```
-
-```
 Elements can be set individually with `set_element`, the modified
 input is returned:
-```
-
+``` postgres-console
 select set_element('int32[1:1 2:2 3:3]'::vector, 4, 4);
+┌────────────────────────┐
+│      set_element       │
+├────────────────────────┤
+│ int32[1:1 2:2 3:3 4:4] │
+└────────────────────────┘
+(1 row)
 
 ```
 Scalar elements can be extracted individually with `get_element`
-```
-
+``` postgres-console
 select get_element('int32[1:1 2:2 3:3]'::vector, 3);
+┌─────────────┐
+│ get_element │
+├─────────────┤
+│ int32:3     │
+└─────────────┘
+(1 row)
 
 ```
 ## Utility Operations
 
 Miscellaneous helpers for vectors
-```
+``` postgres-console
 select print('int32(4)[1:1 2:2 3:3]'::vector);
+┌───────────┐
+│   print   │
+├───────────┤
+│           │
+│    ───    │
+│  0│       │
+│  1│  1    │
+│  2│  2    │
+│  3│  3    │
+│           │
+└───────────┘
+(1 row)
 
 select wait('int32[0:1 1:2 2:3]'::vector);
+┌────────────────────┐
+│        wait        │
+├────────────────────┤
+│ int32[0:1 1:2 2:3] │
+└────────────────────┘
+(1 row)
 
 select dup('int32[0:1 1:2 2:3]'::vector);
+┌────────────────────┐
+│        dup         │
+├────────────────────┤
+│ int32[0:1 1:2 2:3] │
+└────────────────────┘
+(1 row)
 
 select clear('int32[0:1 1:2 2:3]'::vector);
+┌───────┐
+│ clear │
+├───────┤
+│ int32 │
+└───────┘
+(1 row)
 
 ```
 ## Vector-Vector Multiplication (vxv)
 
 The vxv operation performs inner product (dot product) between two vectors.
 It's analogous to matrix-matrix multiplication but for vectors.
-```
-
-```
 Basic vxv with default semiring (plus_times)
-```
+``` postgres-console
 select vxv('int32(4)[0:1 1:2 2:3]'::vector, 'int32(4)[0:2 1:3 2:4]'::vector);
+┌───────────────────────┐
+│          vxv          │
+├───────────────────────┤
+│ int32(4)[0:2 1:4 2:6] │
+└───────────────────────┘
+(1 row)
 
 ```
 vxv with different semirings
-```
+``` postgres-console
 select vxv('int32(4)[0:1 1:2 2:3]'::vector, 'int32(4)[0:2 1:3 2:4]'::vector, 'plus_times_int32'::semiring);
+┌───────────────────────┐
+│          vxv          │
+├───────────────────────┤
+│ int32(4)[0:2 1:4 2:6] │
+└───────────────────────┘
+(1 row)
 
 ```
 vxv with min_plus semiring
-```
+``` postgres-console
 select vxv('int32(4)[0:1 1:2 2:3]'::vector, 'int32(4)[0:2 1:3 2:4]'::vector, 'min_plus_int32'::semiring);
+┌───────────────────────┐
+│          vxv          │
+├───────────────────────┤
+│ int32(4)[0:3 1:4 2:5] │
+└───────────────────────┘
+(1 row)
 
 ```
 vxv with max_times semiring
-```
+``` postgres-console
 select vxv('int32(4)[0:1 1:2 2:3]'::vector, 'int32(4)[0:2 1:3 2:4]'::vector, 'max_times_int32'::semiring);
+┌───────────────────────┐
+│          vxv          │
+├───────────────────────┤
+│ int32(4)[0:2 1:4 2:6] │
+└───────────────────────┘
+(1 row)
 
 ```
 vxv with sparse vectors (no overlap)
-```
+``` postgres-console
 select vxv('int32(4)[0:1 1:2]'::vector, 'int32(4)[2:3 3:4]'::vector);
+┌──────────┐
+│   vxv    │
+├──────────┤
+│ int32(4) │
+└──────────┘
+(1 row)
 
 ```
 vxv with partial overlap
-```
+``` postgres-console
 select vxv('int32(4)[0:1 1:2 2:3]'::vector, 'int32(4)[1:5 2:6 3:7]'::vector);
+┌──────────┐
+│   vxv    │
+├──────────┤
+│ int32(4) │
+└──────────┘
+(1 row)
 
 ```
 vxv with empty vector
-```
+``` postgres-console
 select vxv('int32(4)[]'::vector, 'int32(4)[0:1 1:2]'::vector);
+┌──────────┐
+│   vxv    │
+├──────────┤
+│ int32(4) │
+└──────────┘
+(1 row)
 
 ```
 vxv from test fixture
-```
+``` postgres-console
 select vxv(u, v) from test_fixture;
+┌──────────┐
+│   vxv    │
+├──────────┤
+│ int32(4) │
+└──────────┘
+(1 row)
 
 ```
 vxv with boolean vectors (logical AND)
-```
+``` postgres-console
 select vxv('bool(4)[0:true 1:true 2:false]'::vector, 'bool(4)[0:true 1:false 2:true]'::vector);
+┌──────────────────────┐
+│         vxv          │
+├──────────────────────┤
+│ bool(4)[0:t 1:t 2:t] │
+└──────────────────────┘
+(1 row)
 
 ```
 vxv with float vectors
-```
+``` postgres-console
 select vxv('fp64(4)[0:1.5 1:2.5 2:3.5]'::vector, 'fp64(4)[0:2.0 1:3.0 2:4.0]'::vector);
+┌───────────────────────────────────────────┐
+│                    vxv                    │
+├───────────────────────────────────────────┤
+│ fp64(4)[0:3.000000 1:5.000000 2:7.000000] │
+└───────────────────────────────────────────┘
+(1 row)
 
 ```
 ## Vector Assignment
 
 The assign operation allows setting a subvector within a vector.
-```
-
-```
 Basic assign: replace elements
-```
+``` postgres-console
 select assign('int32(10)[0:1 2:3 4:5]'::vector, 'int32(3)[0:10 1:20 2:30]'::vector, array[5,6,7]::bigint[]);
+┌───────────────────────────────────────┐
+│                assign                 │
+├───────────────────────────────────────┤
+│ int32(10)[0:1 2:3 4:5 5:10 6:20 7:30] │
+└───────────────────────────────────────┘
+(1 row)
 
 ```
 Assign with mask
-```
+``` postgres-console
 select assign('int32(10)[0:1 2:3 4:5]'::vector, 'int32(3)[0:10 1:20 2:30]'::vector, array[1,3,5]::bigint[], 'int32(10)[1:1 3:1 5:1]'::vector, descr='r');
-
+ERROR:  column "descr" does not exist
+LINE 1: ...3,5]::bigint[], 'int32(10)[1:1 3:1 5:1]'::vector, descr='r')...
+                                                             ^
 ```
 Assign scalar to indices
-```
+``` postgres-console
 select assign('int32(10)[0:1 2:3 4:5]'::vector, 99::int, array[2,4,6]::bigint[]);
+┌───────────────────────────────┐
+│            assign             │
+├───────────────────────────────┤
+│ int32(10)[0:1 2:99 4:99 6:99] │
+└───────────────────────────────┘
+(1 row)
 
 ```
 Assign with accumulator
-```
+``` postgres-console
 select assign('int32(10)[0:1 2:3 4:5 6:7]'::vector, 'int32(3)[0:10 1:20 2:30]'::vector, array[0,2,4]::bigint[], accum=>'plus_int32'::binaryop);
+┌───────────────────────────────┐
+│            assign             │
+├───────────────────────────────┤
+│ int32(10)[0:11 2:23 4:35 6:7] │
+└───────────────────────────────┘
+(1 row)
 
 ```
 Assign empty subvector
-```
+``` postgres-console
 select assign('int32(10)[0:1 2:3 4:5]'::vector, 'int32(0)[]'::vector, array[]::bigint[]);
+┌────────────────────────┐
+│         assign         │
+├────────────────────────┤
+│ int32(10)[0:1 2:3 4:5] │
+└────────────────────────┘
+(1 row)
 
 ```
 Assign to empty vector
-```
+``` postgres-console
 select assign('int32(10)[]'::vector, 'int32(3)[0:10 1:20 2:30]'::vector, array[1,3,5]::bigint[]);
+┌───────────────────────────┐
+│          assign           │
+├───────────────────────────┤
+│ int32(10)[1:10 3:20 5:30] │
+└───────────────────────────┘
+(1 row)
 
 ```
 ## Vector Extraction
 
 The extract operation extracts a subvector from a vector.
-```
-
-```
 Basic extract: get specific indices
-```
+``` postgres-console
 select extract_vector('int32[0:10 1:20 2:30 3:40 4:50]'::vector, array[1,3]::bigint[]);
+┌─────────────────────┐
+│   extract_vector    │
+├─────────────────────┤
+│ int32(2)[0:20 1:40] │
+└─────────────────────┘
+(1 row)
 
 ```
 Extract with indices array
-```
+``` postgres-console
 select extract_vector('int32[0:1 1:2 2:3 3:4 4:5]'::vector, array[0,2,4]::bigint[]);
+┌───────────────────────┐
+│    extract_vector     │
+├───────────────────────┤
+│ int32(3)[0:1 1:3 2:5] │
+└───────────────────────┘
+(1 row)
 
 ```
 Extract single element as vector
-```
+``` postgres-console
 select extract_vector('int32[0:10 1:20 2:30]'::vector, array[1]::bigint[]);
+┌────────────────┐
+│ extract_vector │
+├────────────────┤
+│ int32(1)[0:20] │
+└────────────────┘
+(1 row)
 
 ```
 Extract all elements
-```
+``` postgres-console
 select extract_vector('int32[0:10 1:20 2:30]'::vector, array[0,1,2]::bigint[]);
+┌──────────────────────────┐
+│      extract_vector      │
+├──────────────────────────┤
+│ int32(3)[0:10 1:20 2:30] │
+└──────────────────────────┘
+(1 row)
 
 ```
 Extract with mask
-```
+``` postgres-console
 select extract_vector('int32(5)[0:10 1:20 2:30 3:40 4:50]'::vector, array[0,1,2,3,4]::bigint[], mask=>'int32(5)[0:1 2:1 4:1]'::vector);
+┌──────────────────────────┐
+│      extract_vector      │
+├──────────────────────────┤
+│ int32(5)[0:10 2:30 4:50] │
+└──────────────────────────┘
+(1 row)
 
 ```
 Extract from sparse vector
-```
+``` postgres-console
 select extract_vector('int32(20)[5:100 10:200 15:300]'::vector, array[5,10,15]::bigint[]);
+┌─────────────────────────────┐
+│       extract_vector        │
+├─────────────────────────────┤
+│ int32(3)[0:100 1:200 2:300] │
+└─────────────────────────────┘
+(1 row)
 
 ```
 Extract non-existent indices returns empty positions
-```
+``` postgres-console
 select extract_vector('int32(10)[2:20 5:50]'::vector, array[0,1,2,3,4,5]::bigint[]);
+┌─────────────────────┐
+│   extract_vector    │
+├─────────────────────┤
+│ int32(6)[2:20 5:50] │
+└─────────────────────┘
+(1 row)
 
 ```
 ## Element Manipulation
 
 Operations for adding and removing individual elements.
-```
-
-```
 Check if vector contains element at index
-```
+``` postgres-console
 select contains('int32[0:1 2:3 4:5]'::vector, 0);
+┌──────────┐
+│ contains │
+├──────────┤
+│ t        │
+└──────────┘
+(1 row)
+
 select contains('int32[0:1 2:3 4:5]'::vector, 1);
+┌──────────┐
+│ contains │
+├──────────┤
+│ f        │
+└──────────┘
+(1 row)
+
 select contains('int32[0:1 2:3 4:5]'::vector, 2);
+┌──────────┐
+│ contains │
+├──────────┤
+│ t        │
+└──────────┘
+(1 row)
 
 ```
 Check multiple indices
-```
+``` postgres-console
 select i, contains('int32[0:1 2:3 4:5]'::vector, i) as present
 from generate_series(0, 5) as i;
+┌───┬─────────┐
+│ i │ present │
+├───┼─────────┤
+│ 0 │ t       │
+│ 1 │ f       │
+│ 2 │ t       │
+│ 3 │ f       │
+│ 4 │ t       │
+│ 5 │ f       │
+└───┴─────────┘
+(6 rows)
 
 ```
 Remove element from vector
-```
+``` postgres-console
 select remove_element('int32[0:1 1:2 2:3 3:4]'::vector, 1);
+┌────────────────────┐
+│   remove_element   │
+├────────────────────┤
+│ int32[0:1 2:3 3:4] │
+└────────────────────┘
+(1 row)
 
 ```
 Remove multiple elements
-```
+``` postgres-console
 select remove_element(
     remove_element('int32[0:1 1:2 2:3 3:4]'::vector, 1),
     3
 );
+┌────────────────┐
+│ remove_element │
+├────────────────┤
+│ int32[0:1 2:3] │
+└────────────────┘
+(1 row)
 
 ```
 Remove non-existent element (no-op)
-```
+``` postgres-console
 select remove_element('int32[0:1 2:3 4:5]'::vector, 1);
+┌────────────────────┐
+│   remove_element   │
+├────────────────────┤
+│ int32[0:1 2:3 4:5] │
+└────────────────────┘
+(1 row)
 
 ```
 Remove from sparse vector
-```
+``` postgres-console
 select remove_element('int32(100)[10:5 50:10 90:15]'::vector, 50);
+┌────────────────────────┐
+│     remove_element     │
+├────────────────────────┤
+│ int32(100)[10:5 90:15] │
+└────────────────────────┘
+(1 row)
 
 ```
 Remove all elements one by one
-```
+``` postgres-console
 select remove_element(
     remove_element(
         remove_element('int32[0:1 1:2 2:3]'::vector, 0),
@@ -420,688 +825,1277 @@ select remove_element(
     ),
     2
 );
+┌────────────────┐
+│ remove_element │
+├────────────────┤
+│ int32          │
+└────────────────┘
+(1 row)
 
 ```
 ## Random Vector Generation
 
 Generate random vectors with specified density and type.
-```
-
-```
 Generate random int32 vector with 50% density
-```
+``` postgres-console
 select nvals(random_vector('int32', 10, 0.5, 42)) as stored_elements,
        size(random_vector('int32', 10, 0.5, 42)) as vector_size;
+┌─────────────────┬─────────────┐
+│ stored_elements │ vector_size │
+├─────────────────┼─────────────┤
+│               4 │          10 │
+└─────────────────┴─────────────┘
+(1 row)
 
 ```
 Random vector with specific seed gives consistent results
-```
+``` postgres-console
 select random_vector('int32', 5, 1.0, 42);
+┌────────────────────────────────────────────────────┐
+│                   random_vector                    │
+├────────────────────────────────────────────────────┤
+│ int32(5)[0:1073061043 1:-1004192945 3:-1198978626] │
+└────────────────────────────────────────────────────┘
+(1 row)
+
 select random_vector('int32', 5, 1.0, 42);
+┌────────────────────────────────────────────────────┐
+│                   random_vector                    │
+├────────────────────────────────────────────────────┤
+│ int32(5)[0:1073061043 1:-1004192945 3:-1198978626] │
+└────────────────────────────────────────────────────┘
+(1 row)
 
 ```
 Random vector with different seed gives different results
-```
+``` postgres-console
 select random_vector('int32', 5, 1.0, 42);
+┌────────────────────────────────────────────────────┐
+│                   random_vector                    │
+├────────────────────────────────────────────────────┤
+│ int32(5)[0:1073061043 1:-1004192945 3:-1198978626] │
+└────────────────────────────────────────────────────┘
+(1 row)
+
 select random_vector('int32', 5, 1.0, 43);
+┌───────────────────────────────────────────────────┐
+│                   random_vector                   │
+├───────────────────────────────────────────────────┤
+│ int32(5)[0:1101644775 1:-1004192945 3:1928226124] │
+└───────────────────────────────────────────────────┘
+(1 row)
 
 ```
 Random vector with low density
-```
+``` postgres-console
 select print(random_vector('int32', 20, 0.2, 42));
+┌───────────┐
+│   print   │
+├───────────┤
+│           │
+│    ───    │
+│  0│107    │
+│  1│       │
+│  2│       │
+│  3│       │
+│  4│       │
+│  5│       │
+│  6│126    │
+│  7│       │
+│  8│       │
+│  9│       │
+│ 10│       │
+│ 11│-11    │
+│ 12│       │
+│ 13│116    │
+│ 14│       │
+│ 15│       │
+│ 16│       │
+│ 17│       │
+│ 18│       │
+│ 19│       │
+│           │
+└───────────┘
+(1 row)
 
 ```
 Random vector with high density
-```
+``` postgres-console
 select print(random_vector('int32', 20, 0.9, 42));
+┌───────────┐
+│   print   │
+├───────────┤
+│           │
+│    ───    │
+│  0│107    │
+│  1│       │
+│  2│-39    │
+│  3│196    │
+│  4│       │
+│  5│114    │
+│  6│126    │
+│  7│181    │
+│  8│560    │
+│  9│       │
+│ 10│       │
+│ 11│-11    │
+│ 12│168    │
+│ 13│-18    │
+│ 14│       │
+│ 15│       │
+│ 16│-20    │
+│ 17│       │
+│ 18│       │
+│ 19│277    │
+│           │
+└───────────┘
+(1 row)
 
 ```
 Random vector with 100% density
-```
+``` postgres-console
 select nvals(random_vector('int32', 10, 'inf', 42));
+┌───────┐
+│ nvals │
+├───────┤
+│    10 │
+└───────┘
+(1 row)
 
 ```
 Random vector with 0% density (empty)
-```
+``` postgres-console
 select nvals(random_vector('int32', 10, 0.0, 42));
+┌───────┐
+│ nvals │
+├───────┤
+│     0 │
+└───────┘
+(1 row)
 
 ```
 Random vectors of different types
-```
+``` postgres-console
 select nvals(random_vector('int8', 10, 0.5, 42)) as int8_nvals,
        nvals(random_vector('int16', 10, 0.5, 42)) as int16_nvals,
        nvals(random_vector('int64', 10, 0.5, 42)) as int64_nvals;
+┌────────────┬─────────────┬─────────────┐
+│ int8_nvals │ int16_nvals │ int64_nvals │
+├────────────┼─────────────┼─────────────┤
+│          4 │           4 │           4 │
+└────────────┴─────────────┴─────────────┘
+(1 row)
 
 ```
 Random float vectors
-```
+``` postgres-console
 select nvals(random_vector('fp32', 10, 0.5, 42)) as fp32_nvals,
        nvals(random_vector('fp64', 10, 0.5, 42)) as fp64_nvals;
+┌────────────┬────────────┐
+│ fp32_nvals │ fp64_nvals │
+├────────────┼────────────┤
+│          4 │          4 │
+└────────────┴────────────┘
+(1 row)
 
 ```
 Random boolean vector
-```
+``` postgres-console
 select print(random_vector('bool', 10, 0.5, 42));
+┌───────────┐
+│   print   │
+├───────────┤
+│           │
+│    ───    │
+│  0│  f    │
+│  1│  f    │
+│  2│       │
+│  3│  t    │
+│  4│       │
+│  5│       │
+│  6│  f    │
+│  7│       │
+│  8│       │
+│  9│       │
+│           │
+└───────────┘
+(1 row)
 
 ```
 Large random vector
-```
+``` postgres-console
 select size(random_vector('int32', 1000, 0.1, 42)) as size,
        nvals(random_vector('int32', 1000, 0.1, 42)) as nvals;
+┌──────┬───────┐
+│ size │ nvals │
+├──────┼───────┤
+│ 1000 │    94 │
+└──────┴───────┘
+(1 row)
 
 ```
 ## Vector Norms
 
 Calculate various norms of vectors.
-```
-
+``` postgres-console
 select norm('fp64[0:3.0 1:-4.0 2:5.0]'::vector);
+┌─────────────────────────────────────────┐
+│                  norm                   │
+├─────────────────────────────────────────┤
+│ fp64[0:0.424264 1:-0.565685 2:0.707107] │
+└─────────────────────────────────────────┘
+(1 row)
 
 ```
 Norm of integer vector (casts to float)
 Norm of sparse vector
-```
+``` postgres-console
 select norm('fp64(100)[10:3.0 50:4.0 90:5.0]'::vector);
+┌────────────────────────────────────────────────┐
+│                      norm                      │
+├────────────────────────────────────────────────┤
+│ fp64(100)[10:0.424264 50:0.565685 90:0.707107] │
+└────────────────────────────────────────────────┘
+(1 row)
 
 ```
 Norm of empty vector
-```
+``` postgres-console
 select norm('fp64[]'::vector);
+┌──────┐
+│ norm │
+├──────┤
+│ fp64 │
+└──────┘
+(1 row)
 
 ```
 Norm of single element
-```
+``` postgres-console
 select norm('fp64[0:5.0]'::vector);
+┌──────────────────┐
+│       norm       │
+├──────────────────┤
+│ fp64[0:1.000000] │
+└──────────────────┘
+(1 row)
 
 ```
 ## Vector Comparison Select
 
 Use comparison operators with choose/select operations.
-```
-
-```
 Select elements greater than threshold
-```
+``` postgres-console
 select choose('int32[0:10 1:20 2:5 3:30 4:15]'::vector, 'valuegt_int32'::indexunaryop, 10::int);
+┌───────────────────────┐
+│        choose         │
+├───────────────────────┤
+│ int32[1:20 3:30 4:15] │
+└───────────────────────┘
+(1 row)
 
 ```
 Select elements less than threshold
-```
+``` postgres-console
 select choose('int32[0:10 1:20 2:5 3:30 4:15]'::vector, 'valuelt_int32'::indexunaryop, 10::int);
+┌────────────┐
+│   choose   │
+├────────────┤
+│ int32[2:5] │
+└────────────┘
+(1 row)
 
 ```
 Select elements greater than or equal to threshold
-```
+``` postgres-console
 select choose('int32[0:10 1:20 2:15 3:30 4:15]'::vector, 'valuege_int32'::indexunaryop, 20::int);
+┌──────────────────┐
+│      choose      │
+├──────────────────┤
+│ int32[1:20 3:30] │
+└──────────────────┘
+(1 row)
 
 ```
 Select elements less than or equal to threshold
-```
+``` postgres-console
 select choose('int32[0:10 1:20 2:15 3:30 4:15]'::vector, 'valuele_int32'::indexunaryop, 20::int);
+┌────────────────────────────┐
+│           choose           │
+├────────────────────────────┤
+│ int32[0:10 1:20 2:15 4:15] │
+└────────────────────────────┘
+(1 row)
 
 ```
 Select non-zero elements (valuene with threshold 0)
-```
+``` postgres-console
 select choose('int32[0:10 1:0 2:5 3:0 4:15]'::vector, 'valuene_int32'::indexunaryop, 0::int);
+┌──────────────────────┐
+│        choose        │
+├──────────────────────┤
+│ int32[0:10 2:5 4:15] │
+└──────────────────────┘
+(1 row)
 
 ```
 Select equal elements
-```
+``` postgres-console
 select choose('int32[0:10 1:20 2:15 3:30 4:15]'::vector, 'valueeq_int32'::indexunaryop, 15::int);
+┌──────────────────┐
+│      choose      │
+├──────────────────┤
+│ int32[2:15 4:15] │
+└──────────────────┘
+(1 row)
 
 ```
 Comparison with float vectors
-```
+``` postgres-console
 select choose('fp64[0:1.5 1:2.5 2:1.0 3:3.5]'::vector, 'valuegt_fp64'::indexunaryop, 2.0::double precision);
+┌─────────────────────────────┐
+│           choose            │
+├─────────────────────────────┤
+│ fp64[1:2.500000 3:3.500000] │
+└─────────────────────────────┘
+(1 row)
 
 ```
 ## Vector Cast
 
 Type conversion between vector types.
-```
-
-```
 Cast int32 to int64
-```
+``` postgres-console
 select cast_to('int32[0:1 1:2 2:3]'::vector, 'int64');
+┌────────────────────┐
+│      cast_to       │
+├────────────────────┤
+│ int64[0:1 1:2 2:3] │
+└────────────────────┘
+(1 row)
 
 ```
 Cast int32 to float
-```
+``` postgres-console
 select cast_to('int32[0:1 1:2 2:3]'::vector, 'fp64');
+┌────────────────────────────────────────┐
+│                cast_to                 │
+├────────────────────────────────────────┤
+│ fp64[0:1.000000 1:2.000000 2:3.000000] │
+└────────────────────────────────────────┘
+(1 row)
 
 ```
 Cast float to int (truncates)
-```
+``` postgres-console
 select cast_to('fp64[0:1.7 1:2.3 2:3.9]'::vector, 'int32');
+┌────────────────────┐
+│      cast_to       │
+├────────────────────┤
+│ int32[0:1 1:2 2:3] │
+└────────────────────┘
+(1 row)
 
 ```
 Cast between integer sizes
-```
+``` postgres-console
 select cast_to('int64[0:100 1:200 2:300]'::vector, 'int32');
+┌──────────────────────────┐
+│         cast_to          │
+├──────────────────────────┤
+│ int32[0:100 1:200 2:300] │
+└──────────────────────────┘
+(1 row)
+
 select cast_to('int32[0:1 1:2 2:3]'::vector, 'int16');
+┌────────────────────┐
+│      cast_to       │
+├────────────────────┤
+│ int16[0:1 1:2 2:3] │
+└────────────────────┘
+(1 row)
 
 ```
 Cast bool to int
-```
+``` postgres-console
 select cast_to('bool[0:true 1:false 2:true]'::vector, 'int32');
+┌────────────────────┐
+│      cast_to       │
+├────────────────────┤
+│ int32[0:1 1:0 2:1] │
+└────────────────────┘
+(1 row)
 
 ```
 Cast int to bool (0=false, non-zero=true)
-```
+``` postgres-console
 select cast_to('int32[0:0 1:1 2:5 3:0]'::vector, 'bool');
+┌───────────────────────┐
+│        cast_to        │
+├───────────────────────┤
+│ bool[0:f 1:t 2:t 3:f] │
+└───────────────────────┘
+(1 row)
 
 ```
 Cast preserves sparsity
-```
+``` postgres-console
 select size(cast_to('int32(100)[10:5 50:10 90:15]'::vector, 'fp64'));
+┌──────┐
+│ size │
+├──────┤
+│  100 │
+└──────┘
+(1 row)
 
 ```
 ## Vector Resize
 
 Change the size bound of a vector.
-```
-
-```
 Resize to larger size
-```
+``` postgres-console
 select size(resize('int32(10)[0:1 2:3 4:5]'::vector, 20));
+┌──────┐
+│ size │
+├──────┤
+│   20 │
+└──────┘
+(1 row)
 
 ```
 Resize to smaller size (keeps elements that fit)
-```
+``` postgres-console
 select print(resize('int32(10)[0:1 2:3 4:5 8:9]'::vector, 5));
+┌───────────┐
+│   print   │
+├───────────┤
+│           │
+│    ───    │
+│  0│  1    │
+│  1│       │
+│  2│  3    │
+│  3│       │
+│  4│  5    │
+│           │
+└───────────┘
+(1 row)
 
 ```
 Resize unbounded vector
-```
+``` postgres-console
 select size(resize('int32[0:1 2:3 4:5]'::vector, 10));
+┌──────┐
+│ size │
+├──────┤
+│   10 │
+└──────┘
+(1 row)
 
 ```
 Resize to same size (no-op)
-```
+``` postgres-console
 select print(resize('int32(10)[0:1 2:3 4:5]'::vector, 10));
+┌───────────┐
+│   print   │
+├───────────┤
+│           │
+│    ───    │
+│  0│  1    │
+│  1│       │
+│  2│  3    │
+│  3│       │
+│  4│  5    │
+│  5│       │
+│  6│       │
+│  7│       │
+│  8│       │
+│  9│       │
+│           │
+└───────────┘
+(1 row)
 
 ```
 Resize to zero
-```
+``` postgres-console
 select resize('int32(10)[0:1 2:3]'::vector, 0);
+┌──────────┐
+│  resize  │
+├──────────┤
+│ int32(0) │
+└──────────┘
+(1 row)
 
 ```
 Resize empty vector
-```
+``` postgres-console
 select size(resize('int32(10)[]'::vector, 20));
+┌──────┐
+│ size │
+├──────┤
+│   20 │
+└──────┘
+(1 row)
 
 ```
 ## Vector Info
 
 Get internal SuiteSparse information about vectors.
-```
-
-```
 Basic info
-```
+``` postgres-console
 select info('int32[0:1 1:2 2:3]'::vector);
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                                      info                                       │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                 │
+│   1152921504606846976x1 GraphBLAS int32_t vector, sparse by col, ints: 32/32/64 │
+│   A->vector, 3 entries, memory: 284 bytes                                       │
+│                                                                                 │
+│                                                                                 │
+└─────────────────────────────────────────────────────────────────────────────────┘
+(1 row)
 
 ```
 Info on sparse vector
-```
+``` postgres-console
 select info('int32(1000)[10:5 500:10 990:15]'::vector);
+┌──────────────────────────────────────────────────────────────────┐
+│                               info                               │
+├──────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│   1000x1 GraphBLAS int32_t vector, sparse by col, ints: 32/32/32 │
+│   A->vector, 3 entries, memory: 272 bytes                        │
+│                                                                  │
+│                                                                  │
+└──────────────────────────────────────────────────────────────────┘
+(1 row)
 
 ```
 Info on empty vector
-```
+``` postgres-console
 select info('int32(10)[]'::vector);
+┌────────────────────────────────────────────────────────────────┐
+│                              info                              │
+├────────────────────────────────────────────────────────────────┤
+│                                                                │
+│   10x1 GraphBLAS int32_t vector, sparse by col, ints: 32/32/32 │
+│   A->vector, no entries, memory: 264 bytes                     │
+│                                                                │
+└────────────────────────────────────────────────────────────────┘
+(1 row)
 
 ```
 Info on dense-ish vector
-```
+``` postgres-console
 select info(random_vector('int32', 100, 0.9, 42));
+┌─────────────────────────────────────────────────┐
+│                      info                       │
+├─────────────────────────────────────────────────┤
+│                                                 │
+│   100x1 GraphBLAS int32_t vector, bitmap by col │
+│   A->vector, 59 entries, memory: 740 bytes      │
+│                                                 │
+│                                                 │
+└─────────────────────────────────────────────────┘
+(1 row)
 
 ```
 ## Vector Aggregation
 
 Aggregate table data into vectors.
-```
-
-```
 Create test table for aggregation
-```
+``` postgres-console
 create temporary table vec_agg_test (idx bigint, val integer);
 insert into vec_agg_test values (0, 10), (2, 20), (4, 30), (1, 15);
-
 ```
 Aggregate into vector
-```
+``` postgres-console
 select vector_agg(idx, val) from vec_agg_test;
+┌────────────────────────────┐
+│         vector_agg         │
+├────────────────────────────┤
+│ int32[0:10 1:15 2:20 4:30] │
+└────────────────────────────┘
+(1 row)
 
 ```
 Aggregate empty table
-```
+``` postgres-console
 delete from vec_agg_test;
 select vector_agg(idx, val) from vec_agg_test;
+┌────────────┐
+│ vector_agg │
+├────────────┤
+│            │
+└────────────┘
+(1 row)
 
 ```
 Aggregate with different types
-```
+``` postgres-console
 create temporary table vec_agg_float (idx bigint, val double precision);
 insert into vec_agg_float values (0, 1.5), (1, 2.5), (3, 3.5);
 select vector_agg(idx, val) from vec_agg_float;
+┌────────────────────────────────────────┐
+│               vector_agg               │
+├────────────────────────────────────────┤
+│ fp64[0:1.500000 1:2.500000 3:3.500000] │
+└────────────────────────────────────────┘
+(1 row)
 
 ```
 Aggregate bool values
-```
+``` postgres-console
 create temporary table vec_agg_bool (idx bigint, val boolean);
 insert into vec_agg_bool values (0, true), (1, false), (2, true), (3, false);
 select vector_agg(idx, val) from vec_agg_bool;
-
+ERROR:  function vector_agg(bigint, boolean) does not exist
+LINE 1: select vector_agg(idx, val) from vec_agg_bool;
+               ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
 drop table vec_agg_test;
 drop table vec_agg_float;
 drop table vec_agg_bool;
-
 ```
 ## Descriptor Basics
 
 Test basic descriptor construction and properties.
-```
-
-```
 Get descriptor name
-```
+``` postgres-console
 select name('s'::descriptor);
+┌──────┐
+│ name │
+├──────┤
+│ s    │
+└──────┘
+(1 row)
+
 select name('c'::descriptor);
+┌──────┐
+│ name │
+├──────┤
+│ c    │
+└──────┘
+(1 row)
+
 select name('r'::descriptor);
+┌──────┐
+│ name │
+├──────┤
+│ r    │
+└──────┘
+(1 row)
 
 ```
 ## Structural Mask Descriptor (s)
 
 Structural masks use only the pattern (which indices exist),
 ignoring actual values.
-```
-
-```
 Value mask (default): false values block updates
-```
+``` postgres-console
 select apply('int32(5)[0:10 1:20 2:30 3:40 4:50]'::vector,
     'ainv_int32'::unaryop,
     mask=>'bool(5)[0:true 1:false 2:true 3:false 4:true]'::vector);
+┌─────────────────────────────┐
+│            apply            │
+├─────────────────────────────┤
+│ int32(5)[0:-10 2:-30 4:-50] │
+└─────────────────────────────┘
+(1 row)
 
 ```
 Structural mask (s): all existing positions allow updates, regardless of value
-```
+``` postgres-console
 select apply('int32(5)[0:10 1:20 2:30 3:40 4:50]'::vector,
     'ainv_int32'::unaryop,
     mask=>'bool(5)[0:true 1:false 2:true 3:false 4:true]'::vector,
     descr=>'s'::descriptor);
+┌─────────────────────────────────────────┐
+│                  apply                  │
+├─────────────────────────────────────────┤
+│ int32(5)[0:-10 1:-20 2:-30 3:-40 4:-50] │
+└─────────────────────────────────────────┘
+(1 row)
 
 ```
 Structural mask with integer values (all non-empty positions)
-```
+``` postgres-console
 select apply('int32(5)[0:10 1:20 2:30 3:40 4:50]'::vector,
     'abs_int32'::unaryop,
     mask=>'int32(5)[0:0 1:100 2:0 3:200 4:0]'::vector,
     descr=>'s'::descriptor);
+┌────────────────────────────────────┐
+│               apply                │
+├────────────────────────────────────┤
+│ int32(5)[0:10 1:20 2:30 3:40 4:50] │
+└────────────────────────────────────┘
+(1 row)
 
 ```
 Compare: without structural, zeros might block
-```
+``` postgres-console
 select apply('int32(5)[0:10 1:20 2:30 3:40 4:50]'::vector,
     'abs_int32'::unaryop,
     mask=>'int32(5)[0:0 1:100 2:0 3:200 4:0]'::vector);
+┌─────────────────────┐
+│        apply        │
+├─────────────────────┤
+│ int32(5)[1:20 3:40] │
+└─────────────────────┘
+(1 row)
 
 ```
 Structural mask with eadd
-```
+``` postgres-console
 select eadd('int32(5)[0:10 1:20 2:30]'::vector,
     'int32(5)[1:5 2:6 3:7]'::vector,
     'plus_int32'::binaryop,
     mask=>'int32(5)[0:0 1:1 2:0 3:1]'::vector,
     descr=>'s'::descriptor);
+┌──────────────────────────────┐
+│             eadd             │
+├──────────────────────────────┤
+│ int32(5)[0:10 1:25 2:36 3:7] │
+└──────────────────────────────┘
+(1 row)
 
 ```
 Structural mask with emult
-```
+``` postgres-console
 select emult('int32(5)[0:2 1:3 2:4 3:5 4:6]'::vector,
     'int32(5)[0:10 1:20 2:30 3:40 4:50]'::vector,
     'times_int32'::binaryop,
     mask=>'bool(5)[0:false 1:true 2:false 3:true 4:false]'::vector,
     descr=>'s'::descriptor);
+┌───────────────────────────────────────┐
+│                 emult                 │
+├───────────────────────────────────────┤
+│ int32(5)[0:20 1:60 2:120 3:200 4:300] │
+└───────────────────────────────────────┘
+(1 row)
 
 ```
 Structural mask with assign
-```
+``` postgres-console
 select assign('int32(10)[0:1 2:3 4:5]'::vector,
     'int32(3)[0:100 1:200 2:300]'::vector,
     array[1,3,5]::bigint[],
     mask=>'int32(10)[1:0 3:0 5:1]'::vector,
     descr=>'s'::descriptor);
+┌──────────────────────────────────────────┐
+│                  assign                  │
+├──────────────────────────────────────────┤
+│ int32(10)[0:1 1:100 2:3 3:200 4:5 5:300] │
+└──────────────────────────────────────────┘
+(1 row)
 
 ```
 ## Complement Mask Descriptor (c)
 
 Complement inverts the mask: masked positions become unmasked and vice versa.
-```
-
-```
 Normal mask: update positions 0, 2, 4
-```
+``` postgres-console
 select apply('int32(5)[0:10 1:20 2:30 3:40 4:50]'::vector,
     'ainv_int32'::unaryop,
     mask=>'int32(5)[0:1 2:1 4:1]'::vector);
+┌─────────────────────────────┐
+│            apply            │
+├─────────────────────────────┤
+│ int32(5)[0:-10 2:-30 4:-50] │
+└─────────────────────────────┘
+(1 row)
 
 ```
 Complement mask: update positions 1, 3 (opposite of normal)
-```
+``` postgres-console
 select apply('int32(5)[0:10 1:20 2:30 3:40 4:50]'::vector,
     'ainv_int32'::unaryop,
     mask=>'int32(5)[0:1 2:1 4:1]'::vector,
     descr=>'c'::descriptor);
+┌───────────────────────┐
+│         apply         │
+├───────────────────────┤
+│ int32(5)[1:-20 3:-40] │
+└───────────────────────┘
+(1 row)
 
 ```
 Complement with boolean mask
-```
+``` postgres-console
 select apply('int32(5)[0:10 1:20 2:30 3:40 4:50]'::vector,
     'abs_int32'::unaryop,
     mask=>'bool(5)[0:true 1:true 2:false 3:false 4:true]'::vector,
     descr=>'c'::descriptor);
+┌─────────────────────┐
+│        apply        │
+├─────────────────────┤
+│ int32(5)[2:30 3:40] │
+└─────────────────────┘
+(1 row)
 
 ```
 Complement with empty mask (all positions updated)
-```
+``` postgres-console
 select apply('int32(5)[0:10 1:20 2:30]'::vector,
     'abs_int32'::unaryop,
     mask=>'int32(5)[]'::vector,
     descr=>'c'::descriptor);
+┌──────────────────────────┐
+│          apply           │
+├──────────────────────────┤
+│ int32(5)[0:10 1:20 2:30] │
+└──────────────────────────┘
+(1 row)
 
 ```
 Complement with full mask (no positions updated)
-```
+``` postgres-console
 select apply('int32(5)[0:10 1:20 2:30 3:40 4:50]'::vector,
     'abs_int32'::unaryop,
     mask=>'int32(5)[0:1 1:1 2:1 3:1 4:1]'::vector,
     descr=>'c'::descriptor);
+┌──────────┐
+│  apply   │
+├──────────┤
+│ int32(5) │
+└──────────┘
+(1 row)
 
 ```
 Complement mask with eadd
-```
+``` postgres-console
 select eadd('int32(5)[0:10 1:20 2:30]'::vector,
     'int32(5)[1:5 2:6 3:7]'::vector,
     'plus_int32'::binaryop,
     mask=>'int32(5)[1:1 2:1]'::vector,
     descr=>'c'::descriptor);
+┌────────────────────┐
+│        eadd        │
+├────────────────────┤
+│ int32(5)[0:10 3:7] │
+└────────────────────┘
+(1 row)
 
 ```
 Complement mask with emult
-```
+``` postgres-console
 select emult('int32(5)[0:2 1:3 2:4 3:5 4:6]'::vector,
     'int32(5)[0:10 1:20 2:30 3:40 4:50]'::vector,
     'times_int32'::binaryop,
     mask=>'int32(5)[0:1 2:1 4:1]'::vector,
     descr=>'c'::descriptor);
+┌──────────────────────┐
+│        emult         │
+├──────────────────────┤
+│ int32(5)[1:60 3:200] │
+└──────────────────────┘
+(1 row)
 
 ```
 Complement mask with assign
-```
+``` postgres-console
 select assign('int32(10)[0:1 2:3 4:5]'::vector,
     'int32(3)[0:100 1:200 2:300]'::vector,
     array[1,3,5]::bigint[],
     mask=>'int32(10)[1:1 3:1]'::vector,
     descr=>'c'::descriptor);
+┌──────────────────────────────┐
+│            assign            │
+├──────────────────────────────┤
+│ int32(10)[0:1 2:3 4:5 5:300] │
+└──────────────────────────────┘
+(1 row)
 
 ```
 Complement mask with choose/select
-```
+``` postgres-console
 select choose('int32(10)[0:5 1:15 2:10 3:20 4:8 5:25]'::vector,
     15::int,
     '>_int32'::indexunaryop,
     mask=>'int32(10)[0:1 2:1 4:1]'::vector,
     descr=>'c'::descriptor);
-
+ERROR:  Unknown indexunaryop >_int32
+LINE 3:     '>_int32'::indexunaryop,
+            ^
 ```
 ## Structural Complement Descriptor (sc)
 
 Combine structural and complement: use pattern (not values) and invert.
-```
-
-```
 sc descriptor: structural interpretation then complement
-```
+``` postgres-console
 select apply('int32(5)[0:10 1:20 2:30 3:40 4:50]'::vector,
     'ainv_int32'::unaryop,
     mask=>'int32(5)[0:0 2:0 4:100]'::vector,
     descr=>'sc'::descriptor);
+┌───────────────────────┐
+│         apply         │
+├───────────────────────┤
+│ int32(5)[1:-20 3:-40] │
+└───────────────────────┘
+(1 row)
 
 ```
 Compare with just structural
-```
+``` postgres-console
 select apply('int32(5)[0:10 1:20 2:30 3:40 4:50]'::vector,
     'ainv_int32'::unaryop,
     mask=>'int32(5)[0:0 2:0 4:100]'::vector,
     descr=>'s'::descriptor);
+┌─────────────────────────────┐
+│            apply            │
+├─────────────────────────────┤
+│ int32(5)[0:-10 2:-30 4:-50] │
+└─────────────────────────────┘
+(1 row)
 
 ```
 Compare with just complement
-```
+``` postgres-console
 select apply('int32(5)[0:10 1:20 2:30 3:40 4:50]'::vector,
     'ainv_int32'::unaryop,
     mask=>'int32(5)[0:0 2:0 4:100]'::vector,
     descr=>'c'::descriptor);
+┌───────────────────────────────────┐
+│               apply               │
+├───────────────────────────────────┤
+│ int32(5)[0:-10 1:-20 2:-30 3:-40] │
+└───────────────────────────────────┘
+(1 row)
 
 ```
 sc with boolean mask (positions exist → true for structural, then complement)
-```
+``` postgres-console
 select apply('int32(5)[0:10 1:20 2:30 3:40 4:50]'::vector,
     'abs_int32'::unaryop,
     mask=>'bool(5)[0:false 2:false 4:false]'::vector,
     descr=>'sc'::descriptor);
+┌─────────────────────┐
+│        apply        │
+├─────────────────────┤
+│ int32(5)[1:20 3:40] │
+└─────────────────────┘
+(1 row)
 
 ```
 sc with eadd
-```
+``` postgres-console
 select eadd('int32(5)[0:10 1:20 2:30]'::vector,
     'int32(5)[1:5 2:6 3:7]'::vector,
     'plus_int32'::binaryop,
     mask=>'int32(5)[0:0 1:0 2:1]'::vector,
     descr=>'sc'::descriptor);
+┌───────────────┐
+│     eadd      │
+├───────────────┤
+│ int32(5)[3:7] │
+└───────────────┘
+(1 row)
 
 ```
 sc with emult
-```
+``` postgres-console
 select emult('int32(5)[0:2 1:3 2:4 3:5 4:6]'::vector,
     'int32(5)[0:10 1:20 2:30 3:40 4:50]'::vector,
     'times_int32'::binaryop,
     mask=>'int32(5)[1:0 3:0]'::vector,
     descr=>'sc'::descriptor);
+┌────────────────────────────┐
+│           emult            │
+├────────────────────────────┤
+│ int32(5)[0:20 2:120 4:300] │
+└────────────────────────────┘
+(1 row)
 
 ```
 ## Replace Descriptor (r)
 
 Replace clears the output vector before the operation, removing all
 existing values not produced by the operation.
-```
-
-```
 Without replace: existing values at unmasked positions remain
-```
+``` postgres-console
 select apply('int32(5)[0:10 1:20 2:30 3:40 4:50]'::vector,
     'ainv_int32'::unaryop,
     mask=>'int32(5)[0:1 2:1]'::vector);
+┌───────────────────────┐
+│         apply         │
+├───────────────────────┤
+│ int32(5)[0:-10 2:-30] │
+└───────────────────────┘
+(1 row)
 
 ```
 With replace: only masked result positions remain
-```
+``` postgres-console
 select apply('int32(5)[0:10 1:20 2:30 3:40 4:50]'::vector,
     'ainv_int32'::unaryop,
     mask=>'int32(5)[0:1 2:1]'::vector,
     descr=>'r'::descriptor);
+┌───────────────────────┐
+│         apply         │
+├───────────────────────┤
+│ int32(5)[0:-10 2:-30] │
+└───────────────────────┘
+(1 row)
 
 ```
 Replace with sparse mask
-```
+``` postgres-console
 select apply('int32(5)[0:10 1:20 2:30 3:40 4:50]'::vector,
     'abs_int32'::unaryop,
     mask=>'int32(5)[1:1]'::vector,
     descr=>'r'::descriptor);
+┌────────────────┐
+│     apply      │
+├────────────────┤
+│ int32(5)[1:20] │
+└────────────────┘
+(1 row)
 
 ```
 Replace with full mask (all results kept)
-```
+``` postgres-console
 select apply('int32(5)[0:10 1:20 2:30 3:40 4:50]'::vector,
     'ainv_int32'::unaryop,
     mask=>'int32(5)[0:1 1:1 2:1 3:1 4:1]'::vector,
     descr=>'r'::descriptor);
+┌─────────────────────────────────────────┐
+│                  apply                  │
+├─────────────────────────────────────────┤
+│ int32(5)[0:-10 1:-20 2:-30 3:-40 4:-50] │
+└─────────────────────────────────────────┘
+(1 row)
 
 ```
 Replace with eadd
-```
+``` postgres-console
 select eadd('int32(5)[0:10 1:20 2:30 3:40 4:50]'::vector,
     'int32(5)[1:5 2:6 3:7]'::vector,
     'plus_int32'::binaryop,
     mask=>'int32(5)[1:1 2:1]'::vector,
     descr=>'r'::descriptor);
+┌─────────────────────┐
+│        eadd         │
+├─────────────────────┤
+│ int32(5)[1:25 2:36] │
+└─────────────────────┘
+(1 row)
 
 ```
 Replace with emult
-```
+``` postgres-console
 select emult('int32(5)[0:2 1:3 2:4 3:5 4:6]'::vector,
     'int32(5)[0:10 1:20 2:30 3:40 4:50]'::vector,
     'times_int32'::binaryop,
     mask=>'int32(5)[0:1 2:1 4:1]'::vector,
     descr=>'r'::descriptor);
+┌────────────────────────────┐
+│           emult            │
+├────────────────────────────┤
+│ int32(5)[0:20 2:120 4:300] │
+└────────────────────────────┘
+(1 row)
 
 ```
 ## Combined Descriptors (rc, rs, rsc)
 
 Test combinations of replace with other descriptors.
-```
-
-```
 rc: replace + complement
-```
+``` postgres-console
 select apply('int32(5)[0:10 1:20 2:30 3:40 4:50]'::vector,
     'ainv_int32'::unaryop,
     mask=>'int32(5)[0:1 2:1]'::vector,
     descr=>'rc'::descriptor);
+┌─────────────────────────────┐
+│            apply            │
+├─────────────────────────────┤
+│ int32(5)[1:-20 3:-40 4:-50] │
+└─────────────────────────────┘
+(1 row)
 
 ```
 rs: replace + structural
-```
+``` postgres-console
 select apply('int32(5)[0:10 1:20 2:30 3:40 4:50]'::vector,
     'abs_int32'::unaryop,
     mask=>'int32(5)[0:0 2:100 4:0]'::vector,
     descr=>'rs'::descriptor);
+┌──────────────────────────┐
+│          apply           │
+├──────────────────────────┤
+│ int32(5)[0:10 2:30 4:50] │
+└──────────────────────────┘
+(1 row)
 
 ```
 rsc: replace + structural + complement
-```
+``` postgres-console
 select apply('int32(5)[0:10 1:20 2:30 3:40 4:50]'::vector,
     'ainv_int32'::unaryop,
     mask=>'int32(5)[1:0 3:0]'::vector,
     descr=>'rsc'::descriptor);
+┌─────────────────────────────┐
+│            apply            │
+├─────────────────────────────┤
+│ int32(5)[0:-10 2:-30 4:-50] │
+└─────────────────────────────┘
+(1 row)
 
 ```
 ## Descriptors with Accumulators
 
 Test how descriptors interact with accumulator operations.
-```
-
-```
 Normal accumulation with mask
-```
+``` postgres-console
 select apply('int32(5)[0:10 1:20 2:30 3:40 4:50]'::vector,
     'ainv_int32'::unaryop,
     mask=>'int32(5)[0:1 2:1 4:1]'::vector,
     accum=>'plus_int32'::binaryop);
+┌─────────────────────────────┐
+│            apply            │
+├─────────────────────────────┤
+│ int32(5)[0:-10 2:-30 4:-50] │
+└─────────────────────────────┘
+(1 row)
 
 ```
 Accumulation with complement mask
-```
+``` postgres-console
 select apply('int32(5)[0:10 1:20 2:30 3:40 4:50]'::vector,
     'ainv_int32'::unaryop,
     mask=>'int32(5)[0:1 2:1 4:1]'::vector,
     accum=>'plus_int32'::binaryop,
     descr=>'c'::descriptor);
+┌───────────────────────┐
+│         apply         │
+├───────────────────────┤
+│ int32(5)[1:-20 3:-40] │
+└───────────────────────┘
+(1 row)
 
 ```
 Accumulation with structural mask
-```
+``` postgres-console
 select apply('int32(5)[0:10 1:20 2:30 3:40 4:50]'::vector,
     'abs_int32'::unaryop,
     mask=>'int32(5)[0:0 2:1 4:0]'::vector,
     accum=>'times_int32'::binaryop,
     descr=>'s'::descriptor);
+┌──────────────────────────┐
+│          apply           │
+├──────────────────────────┤
+│ int32(5)[0:10 2:30 4:50] │
+└──────────────────────────┘
+(1 row)
 
 ```
 Accumulation with replace (replace then accumulate)
-```
+``` postgres-console
 select apply('int32(5)[0:10 1:20 2:30 3:40 4:50]'::vector,
     'ainv_int32'::unaryop,
     mask=>'int32(5)[0:1 2:1]'::vector,
     accum=>'plus_int32'::binaryop,
     descr=>'r'::descriptor);
+┌───────────────────────┐
+│         apply         │
+├───────────────────────┤
+│ int32(5)[0:-10 2:-30] │
+└───────────────────────┘
+(1 row)
 
 ```
 Accumulation with rsc
-```
+``` postgres-console
 select apply('int32(5)[0:10 1:20 2:30 3:40 4:50]'::vector,
     'abs_int32'::unaryop,
     mask=>'int32(5)[1:0 3:0]'::vector,
     accum=>'times_int32'::binaryop,
     descr=>'rsc'::descriptor);
+┌──────────────────────────┐
+│          apply           │
+├──────────────────────────┤
+│ int32(5)[0:10 2:30 4:50] │
+└──────────────────────────┘
+(1 row)
 
 ```
 ## Descriptors with Different Operation Types
 
 Test descriptors across various vector operations.
-```
-
-```
 Descriptor with apply
-```
+``` postgres-console
 select apply('int32(5)[0:10 1:20 2:30]'::vector,
     'abs_int32'::unaryop,
     mask=>'int32(5)[0:1 2:1]'::vector,
     descr=>'c'::descriptor);
+┌────────────────┐
+│     apply      │
+├────────────────┤
+│ int32(5)[1:20] │
+└────────────────┘
+(1 row)
 
 ```
 Descriptor with apply_first (scalar, vector)
-```
+``` postgres-console
 select apply(100::int,
     'int32(5)[0:10 1:20 2:30 3:40 4:50]'::vector,
     'minus_int32'::binaryop,
     mask=>'int32(5)[1:1 3:1]'::vector,
     descr=>'c'::descriptor);
+┌──────────────────────────┐
+│          apply           │
+├──────────────────────────┤
+│ int32(5)[0:90 2:70 4:50] │
+└──────────────────────────┘
+(1 row)
 
 ```
 Descriptor with apply_second (vector, scalar)
-```
+``` postgres-console
 select apply('int32(5)[0:10 1:20 2:30 3:40 4:50]'::vector,
     5::int,
     'plus_int32'::binaryop,
     mask=>'int32(5)[0:1 2:1 4:1]'::vector,
     descr=>'s'::descriptor);
+┌──────────────────────────┐
+│          apply           │
+├──────────────────────────┤
+│ int32(5)[0:15 2:35 4:55] │
+└──────────────────────────┘
+(1 row)
 
 ```
 Descriptor with eadd
-```
+``` postgres-console
 select eadd('int32(5)[0:10 1:20 2:30]'::vector,
     'int32(5)[1:5 2:6 3:7]'::vector,
     'plus_int32'::binaryop,
     mask=>'int32(5)[1:1 2:1]'::vector,
     descr=>'r'::descriptor);
+┌─────────────────────┐
+│        eadd         │
+├─────────────────────┤
+│ int32(5)[1:25 2:36] │
+└─────────────────────┘
+(1 row)
 
 ```
 Descriptor with emult
-```
+``` postgres-console
 select emult('int32(5)[0:2 1:3 2:4 3:5 4:6]'::vector,
     'int32(5)[0:10 1:20 2:30 3:40 4:50]'::vector,
     'times_int32'::binaryop,
     mask=>'int32(5)[0:1 2:1 4:1]'::vector,
     descr=>'rc'::descriptor);
+┌──────────────────────┐
+│        emult         │
+├──────────────────────┤
+│ int32(5)[1:60 3:200] │
+└──────────────────────┘
+(1 row)
 
 ```
 Descriptor with eunion
-```
+``` postgres-console
 select eunion('int32(5)[0:10 2:30]'::vector,
     'int32(5)[1:20 3:40]'::vector,
     'plus_int32'::binaryop,
@@ -1109,711 +2103,1229 @@ select eunion('int32(5)[0:10 2:30]'::vector,
     0::int,
     mask=>'int32(5)[0:1 2:1]'::vector,
     descr=>'c'::descriptor);
-
+ERROR:  function eunion(vector, vector, binaryop, integer, integer, mask => vector, descr => descriptor) does not exist
+LINE 1: select eunion('int32(5)[0:10 2:30]'::vector,
+               ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
 ```
 Descriptor with assign
-```
+``` postgres-console
 select assign('int32(10)[0:1 2:3 4:5]'::vector,
     'int32(3)[0:100 1:200 2:300]'::vector,
     array[1,3,5]::bigint[],
     mask=>'int32(10)[1:1 3:1 5:1]'::vector,
     descr=>'r'::descriptor);
+┌──────────────────────────────┐
+│            assign            │
+├──────────────────────────────┤
+│ int32(10)[1:100 3:200 5:300] │
+└──────────────────────────────┘
+(1 row)
 
 ```
 Descriptor with extract
-```
+``` postgres-console
 select extract_vector('int32[0:10 1:20 2:30 3:40 4:50]'::vector,
     array[0,1,2,3,4]::bigint[],
     mask=>'int32[0:1 2:1 4:1]'::vector,
     descr=>'c'::descriptor);
-
+ERROR:  DIMENSION_MISMATCH GraphBLAS error: GrB_DIMENSION_MISMATCH
+function: GrB_Vector_extract (w, M, accum, u, I, ni, desc)
+M is 1152921504606846976-by-1; does not match output dimensions (5-by-1): Error in extract vector.
 ```
 Descriptor with choose/select
-```
+``` postgres-console
 select choose('int32(10)[0:5 1:15 2:10 3:20 4:8]'::vector,
     10::int,
     '>_int32'::indexunaryop,
     mask=>'int32(10)[0:1 1:1 2:1 3:1]'::vector,
     descr=>'s'::descriptor);
-
+ERROR:  Unknown indexunaryop >_int32
+LINE 3:     '>_int32'::indexunaryop,
+            ^
 ```
 ## Descriptor Edge Cases
 
 Test descriptors with edge cases and boundary conditions.
-```
-
-```
 Descriptor with empty vector
-```
+``` postgres-console
 select apply('int32(5)[]'::vector,
     'abs_int32'::unaryop,
     mask=>'int32(5)[0:1 2:1]'::vector,
     descr=>'c'::descriptor);
+┌──────────┐
+│  apply   │
+├──────────┤
+│ int32(5) │
+└──────────┘
+(1 row)
 
 ```
 Descriptor with empty mask
-```
+``` postgres-console
 select apply('int32(5)[0:10 1:20 2:30]'::vector,
     'abs_int32'::unaryop,
     mask=>'int32(5)[]'::vector,
     descr=>'r'::descriptor);
+┌──────────┐
+│  apply   │
+├──────────┤
+│ int32(5) │
+└──────────┘
+(1 row)
 
 ```
 Descriptor with single-element mask
-```
+``` postgres-console
 select apply('int32(5)[0:10 1:20 2:30 3:40 4:50]'::vector,
     'ainv_int32'::unaryop,
     mask=>'int32(5)[2:1]'::vector,
     descr=>'c'::descriptor);
+┌───────────────────────────────────┐
+│               apply               │
+├───────────────────────────────────┤
+│ int32(5)[0:-10 1:-20 3:-40 4:-50] │
+└───────────────────────────────────┘
+(1 row)
 
 ```
 Complement of empty mask (all positions)
-```
+``` postgres-console
 select apply('int32(5)[0:10 1:20 2:30]'::vector,
     'abs_int32'::unaryop,
     mask=>'int32(5)[]'::vector,
     descr=>'c'::descriptor);
+┌──────────────────────────┐
+│          apply           │
+├──────────────────────────┤
+│ int32(5)[0:10 1:20 2:30] │
+└──────────────────────────┘
+(1 row)
 
 ```
 Replace with no mask (clears everything)
-```
+``` postgres-console
 select apply('int32(5)[0:10 1:20 2:30]'::vector,
     'abs_int32'::unaryop,
     descr=>'r'::descriptor);
+┌──────────────────────────┐
+│          apply           │
+├──────────────────────────┤
+│ int32(5)[0:10 1:20 2:30] │
+└──────────────────────────┘
+(1 row)
 
 ```
 ## Practical Descriptor Usage
 
 Real-world patterns combining descriptors effectively.
-```
-
-```
 Conditional update: update only positions NOT in a set
-```
+``` postgres-console
 select assign('int32(10)[0:1 1:2 2:3 3:4 4:5 5:6 6:7 7:8 8:9 9:10]'::vector,
     'int32(3)[0:0 1:0 2:0]'::vector,
     array[1,3,5]::bigint[],
     mask=>'int32(10)[1:1 3:1 5:1]'::vector,
     descr=>'c'::descriptor);
+┌─────────────────────────────────────────────────────┐
+│                       assign                        │
+├─────────────────────────────────────────────────────┤
+│ int32(10)[0:1 1:2 2:3 3:4 4:5 5:6 6:7 7:8 8:9 9:10] │
+└─────────────────────────────────────────────────────┘
+(1 row)
 
 ```
 Filter and replace: keep only filtered results
-```
+``` postgres-console
 select apply('int32(10)[0:5 1:-10 2:15 3:-20 4:8 5:30]'::vector,
     'abs_int32'::unaryop,
     mask=>choose('int32(10)[0:5 1:-10 2:15 3:-20 4:8 5:30]'::vector,
         'valuelt_int32'::indexunaryop, 0::int),
     descr=>'r'::descriptor);
+┌──────────────────────┐
+│        apply         │
+├──────────────────────┤
+│ int32(10)[1:10 3:20] │
+└──────────────────────┘
+(1 row)
 
 ```
 Structural masking with mixed-value mask
-```
+``` postgres-console
 select eadd('int32(10)[0:10 2:20 4:30 6:40]'::vector,
     'int32(10)[1:15 3:25 5:35 7:45]'::vector,
     'plus_int32'::binaryop,
     mask=>'int32(10)[0:1 1:0 2:999 3:-1 4:0 5:42]'::vector,
     descr=>'s'::descriptor);
+┌──────────────────────────────────────────┐
+│                   eadd                   │
+├──────────────────────────────────────────┤
+│ int32(10)[0:10 1:15 2:20 3:25 4:30 5:35] │
+└──────────────────────────────────────────┘
+(1 row)
 
 ```
 Complex filtering with sc descriptor
-```
+``` postgres-console
 select choose('int32(10)[0:100 1:50 2:150 3:75 4:200 5:25]'::vector,
     'valuelt_int32'::indexunaryop,
     100::int,
     mask=>'int32(10)[1:1 3:1 5:1]'::vector,
     descr=>'sc'::descriptor);
+┌───────────┐
+│  choose   │
+├───────────┤
+│ int32(10) │
+└───────────┘
+(1 row)
 
 ```
 ## Basic Masking with apply()
 
 The mask parameter controls which elements of the output are written.
-```
-
-```
 Apply with mask: only masked positions are updated
-```
+``` postgres-console
 select apply('int32(10)[0:1 1:2 2:3 3:4 4:5]'::vector, 'abs_int32'::unaryop,
     mask=>'int32(10)[0:1 2:1 4:1]'::vector);
+┌────────────────────────┐
+│         apply          │
+├────────────────────────┤
+│ int32(10)[0:1 2:3 4:5] │
+└────────────────────────┘
+(1 row)
 
 ```
 Apply with dense mask
-```
+``` postgres-console
 select apply('int32(5)[0:10 1:20 2:30 3:40 4:50]'::vector, 'ainv_int32'::unaryop,
     mask=>'int32(5)[0:1 1:1 2:1 3:1 4:1]'::vector);
+┌─────────────────────────────────────────┐
+│                  apply                  │
+├─────────────────────────────────────────┤
+│ int32(5)[0:-10 1:-20 2:-30 3:-40 4:-50] │
+└─────────────────────────────────────────┘
+(1 row)
 
 ```
 Apply with empty mask (nothing updated)
-```
+``` postgres-console
 select apply('int32(5)[0:10 1:20 2:30]'::vector, 'abs_int32'::unaryop,
     mask=>'int32(5)[]'::vector);
+┌──────────┐
+│  apply   │
+├──────────┤
+│ int32(5) │
+└──────────┘
+(1 row)
 
 ```
 Apply with sparse mask
-```
+``` postgres-console
 select apply('int32(10)[0:1 1:2 2:3 3:4 4:5]'::vector, 'minv_int32'::unaryop,
     mask=>'int32(10)[1:1 3:1 5:1]'::vector);
+┌────────────────────┐
+│       apply        │
+├────────────────────┤
+│ int32(10)[1:0 3:0] │
+└────────────────────┘
+(1 row)
 
 ```
 Apply with boolean mask
-```
+``` postgres-console
 select apply('int32(5)[0:10 1:20 2:30 3:40 4:50]'::vector, 'abs_int32'::unaryop,
     mask=>'bool(5)[0:true 2:true 4:true]'::vector);
+┌──────────────────────────┐
+│          apply           │
+├──────────────────────────┤
+│ int32(5)[0:10 2:30 4:50] │
+└──────────────────────────┘
+(1 row)
 
 ```
 ## Masking with assign()
 
 Mask controls which indices are assigned to.
-```
-
-```
 Basic assign with mask
-```
+``` postgres-console
 select assign('int32(10)[0:1 2:3 4:5]'::vector,
     'int32(3)[0:100 1:200 2:300]'::vector,
     array[1,3,5]::bigint[],
     mask=>'int32(10)[1:1 3:1]'::vector);
+┌────────────────────────────────────┐
+│               assign               │
+├────────────────────────────────────┤
+│ int32(10)[0:1 1:100 2:3 3:200 4:5] │
+└────────────────────────────────────┘
+(1 row)
 
 ```
 Assign with full mask
-```
+``` postgres-console
 select assign('int32(10)[0:1 1:2 2:3]'::vector,
     'int32(5)[0:10 1:20 2:30 3:40 4:50]'::vector,
     array[0,1,2,3,4]::bigint[],
     mask=>'int32(10)[0:1 1:1 2:1 3:1 4:1]'::vector);
+┌─────────────────────────────────────┐
+│               assign                │
+├─────────────────────────────────────┤
+│ int32(10)[0:10 1:20 2:30 3:40 4:50] │
+└─────────────────────────────────────┘
+(1 row)
 
 ```
 Assign scalar with mask
-```
+``` postgres-console
 select assign('int32(10)[0:1 2:3 4:5]'::vector,
     99::int,
     array[0,2,4,6,8]::bigint[],
     mask=>'int32(10)[0:1 4:1 6:1]'::vector);
+┌───────────────────────────────┐
+│            assign             │
+├───────────────────────────────┤
+│ int32(10)[0:99 2:3 4:99 6:99] │
+└───────────────────────────────┘
+(1 row)
 
 ```
 Assign with empty mask (nothing assigned)
-```
+``` postgres-console
 select assign('int32(10)[0:1 2:3 4:5]'::vector,
     'int32(3)[0:100 1:200 2:300]'::vector,
     array[5,6,7]::bigint[],
     mask=>'int32(10)[]'::vector);
+┌────────────────────────┐
+│         assign         │
+├────────────────────────┤
+│ int32(10)[0:1 2:3 4:5] │
+└────────────────────────┘
+(1 row)
 
 ```
 ## Masking with extract_vector()
 
 Mask selects which extracted elements to keep.
-```
-
-```
 Extract with mask
-```
+``` postgres-console
 select extract_vector('int32(5)[0:10 1:20 2:30 3:40 4:50]'::vector,
     array[0,1,2,3,4]::bigint[],
     mask=>'int32(5)[0:1 2:1 4:1]'::vector);
+┌──────────────────────────┐
+│      extract_vector      │
+├──────────────────────────┤
+│ int32(5)[0:10 2:30 4:50] │
+└──────────────────────────┘
+(1 row)
 
 ```
 Extract with boolean mask
-```
+``` postgres-console
 select extract_vector('int32(5)[0:10 1:20 2:30 3:40 4:50]'::vector,
     array[0,1,2,3,4]::bigint[],
     mask=>'bool(5)[0:true 1:false 2:true 3:false 4:true]'::vector);
+┌──────────────────────────┐
+│      extract_vector      │
+├──────────────────────────┤
+│ int32(5)[0:10 2:30 4:50] │
+└──────────────────────────┘
+(1 row)
 
 ```
 ## Masking with eadd() (Element-wise Add)
 
 Mask controls which elements participate in the element-wise operation.
-```
-
-```
 Element-wise add with mask
-```
+``` postgres-console
 select eadd('int32(5)[0:10 1:20 2:30]'::vector,
     'int32(5)[1:5 2:6 3:7]'::vector,
     'plus_int32'::binaryop,
     mask=>'int32(5)[1:1 2:1]'::vector);
+┌─────────────────────┐
+│        eadd         │
+├─────────────────────┤
+│ int32(5)[1:25 2:36] │
+└─────────────────────┘
+(1 row)
 
 ```
 Element-wise add with full mask
-```
+``` postgres-console
 select eadd('int32(5)[0:1 1:2 2:3 3:4 4:5]'::vector,
     'int32(5)[0:10 1:20 2:30 3:40 4:50]'::vector,
     'times_int32'::binaryop,
     mask=>'int32(5)[0:1 1:1 2:1 3:1 4:1]'::vector);
+┌──────────────────────────────────────┐
+│                 eadd                 │
+├──────────────────────────────────────┤
+│ int32(5)[0:10 1:40 2:90 3:160 4:250] │
+└──────────────────────────────────────┘
+(1 row)
 
 ```
 ## Masking with emult() (Element-wise Multiply)
 
 Mask filters the element-wise multiplication result.
-```
-
-```
 Element-wise multiply with mask
-```
+``` postgres-console
 select emult('int32(5)[0:2 1:3 2:4 3:5 4:6]'::vector,
     'int32(5)[0:10 1:20 2:30 3:40 4:50]'::vector,
     'times_int32'::binaryop,
     mask=>'int32(5)[0:1 2:1 4:1]'::vector);
+┌────────────────────────────┐
+│           emult            │
+├────────────────────────────┤
+│ int32(5)[0:20 2:120 4:300] │
+└────────────────────────────┘
+(1 row)
 
 ```
 Element-wise multiply with boolean mask
-```
+``` postgres-console
 select emult('fp64(5)[0:1.5 1:2.5 2:3.5 3:4.5 4:5.5]'::vector,
     'fp64(5)[0:2.0 1:3.0 2:4.0 3:5.0 4:6.0]'::vector,
     'times_fp64'::binaryop,
     mask=>'bool(5)[0:true 1:true 2:false 3:true 4:false]'::vector);
+┌────────────────────────────────────────────┐
+│                   emult                    │
+├────────────────────────────────────────────┤
+│ fp64(5)[0:3.000000 1:7.500000 3:22.500000] │
+└────────────────────────────────────────────┘
+(1 row)
 
 ```
 Element-wise multiply with min operator and mask
-```
+``` postgres-console
 select emult('int32(5)[0:100 1:200 2:50 3:300 4:25]'::vector,
     'int32(5)[0:150 1:100 2:75 3:250 4:50]'::vector,
     'min_int32'::binaryop,
     mask=>'int32(5)[1:1 3:1]'::vector);
+┌───────────────────────┐
+│         emult         │
+├───────────────────────┤
+│ int32(5)[1:100 3:250] │
+└───────────────────────┘
+(1 row)
 
 ```
 ## Masking with eunion() (Element-wise Union)
 
 eunion uses default values for missing elements.
-```
-
-```
 Element-wise union with mask
-```
+``` postgres-console
 select eunion('int32(5)[0:10 2:30]'::vector,
     0::int,
     'int32(5)[1:20 3:40]'::vector,
     0::int,
     'plus_int32'::binaryop,
     mask=>'int32(5)[0:1 1:1 2:1]'::vector);
+┌──────────────────────────┐
+│          eunion          │
+├──────────────────────────┤
+│ int32(5)[0:10 1:20 2:30] │
+└──────────────────────────┘
+(1 row)
 
 ```
 Element-wise union with sparse mask
-```
+``` postgres-console
 select eunion('int32(10)[2:5 4:10 6:15]'::vector,
     1::int,
     'int32(10)[3:7 5:12 7:18]'::vector,
     1::int,
     'times_int32'::binaryop,
     mask=>'int32(10)[2:1 5:1 7:1]'::vector);
+┌──────────────────────────┐
+│          eunion          │
+├──────────────────────────┤
+│ int32(10)[2:5 5:12 7:18] │
+└──────────────────────────┘
+(1 row)
 
 ```
 ## Masking with select/choose()
 
 Combine selection with masking for complex filtering.
-```
-
-```
 Select with mask
-```
+``` postgres-console
 select choose('int32(10)[0:10 1:20 2:5 3:30 4:15 5:25]'::vector,
     'valuegt_int32'::indexunaryop,
     15::int,
     mask=>'int32(10)[0:1 1:1 2:1 3:1 4:1]'::vector);
+┌──────────────────────┐
+│        choose        │
+├──────────────────────┤
+│ int32(10)[1:20 3:30] │
+└──────────────────────┘
+(1 row)
 
 ```
 Select with boolean mask
-```
+``` postgres-console
 select choose('fp64(5)[0:1.5 1:2.5 2:1.0 3:3.5 4:2.0]'::vector,
     'valuege_fp64'::indexunaryop,
     2.0::double precision,
     mask=>'bool(5)[0:true 2:true 4:true]'::vector);
+┌─────────────────────┐
+│       choose        │
+├─────────────────────┤
+│ fp64(5)[4:2.000000] │
+└─────────────────────┘
+(1 row)
 
 ```
 ## Structural vs Value Masks
 
 Structural masks consider only the pattern (which indices exist),
 not the actual values. This is controlled by the descriptor.
-```
-
-```
 Structural mask: only considers which positions exist
-```
+``` postgres-console
 select apply('int32(5)[0:10 1:20 2:30 3:40 4:50]'::vector,
     'ainv_int32'::unaryop,
     mask=>'bool(5)[0:true 2:true 4:true]'::vector,
     descr=>'s'::descriptor);
+┌─────────────────────────────┐
+│            apply            │
+├─────────────────────────────┤
+│ int32(5)[0:-10 2:-30 4:-50] │
+└─────────────────────────────┘
+(1 row)
 
 ```
 Structural mask with integer vector
-```
+``` postgres-console
 select apply('int32(5)[0:10 1:20 2:30 3:40 4:50]'::vector,
     'abs_int32'::unaryop,
     mask=>'int32(5)[1:100 3:200 4:0]'::vector,
     descr=>'s'::descriptor);
+┌──────────────────────────┐
+│          apply           │
+├──────────────────────────┤
+│ int32(5)[1:20 3:40 4:50] │
+└──────────────────────────┘
+(1 row)
 
 ```
 ## Mask Complement
 
 The descriptor can invert the mask (complement).
-```
-
-```
 Normal mask
-```
+``` postgres-console
 select apply('int32(5)[0:10 1:20 2:30 3:40 4:50]'::vector,
     'ainv_int32'::unaryop,
     mask=>'int32(5)[0:1 2:1 4:1]'::vector);
+┌─────────────────────────────┐
+│            apply            │
+├─────────────────────────────┤
+│ int32(5)[0:-10 2:-30 4:-50] │
+└─────────────────────────────┘
+(1 row)
 
 ```
 Complemented mask (opposite positions)
-```
+``` postgres-console
 select apply('int32(5)[0:10 1:20 2:30 3:40 4:50]'::vector,
     'ainv_int32'::unaryop,
     mask=>'int32(5)[0:1 2:1 4:1]'::vector,
     descr=>'c'::descriptor);
+┌───────────────────────┐
+│         apply         │
+├───────────────────────┤
+│ int32(5)[1:-20 3:-40] │
+└───────────────────────┘
+(1 row)
 
 ```
 Complement with boolean mask
-```
+``` postgres-console
 select apply('int32(5)[0:10 1:20 2:30 3:40 4:50]'::vector,
     'abs_int32'::unaryop,
     mask=>'bool(5)[0:true 1:true 2:false 3:false 4:true]'::vector,
     descr=>'c'::descriptor);
+┌─────────────────────┐
+│        apply        │
+├─────────────────────┤
+│ int32(5)[2:30 3:40] │
+└─────────────────────┘
+(1 row)
 
 ```
 ## Combined Descriptors
 
 Multiple descriptor flags can be combined.
-```
-
-```
 Structural complement mask
-```
+``` postgres-console
 select apply('int32(5)[0:10 1:20 2:30 3:40 4:50]'::vector,
     'ainv_int32'::unaryop,
     mask=>'int32(5)[0:5 2:0 4:100]'::vector,
     descr=>'sc'::descriptor);
+┌───────────────────────┐
+│         apply         │
+├───────────────────────┤
+│ int32(5)[1:-20 3:-40] │
+└───────────────────────┘
+(1 row)
 
 ```
 ## Masking with Accumulators
 
 Combine mask with accumulator for selective accumulation.
-```
-
-```
 Masked accumulation
-```
+``` postgres-console
 select apply('int32(5)[0:10 1:20 2:30 3:40 4:50]'::vector,
     'ainv_int32'::unaryop,
     'int32(5)[0:10 1:20 2:30 3:40 4:50]'::vector,
     mask=>'int32(5)[0:1 2:1 4:1]'::vector,
     accum=>'plus_int32'::binaryop);
+┌─────────────────────────────────┐
+│              apply              │
+├─────────────────────────────────┤
+│ int32(5)[0:0 1:20 2:0 3:40 4:0] │
+└─────────────────────────────────┘
+(1 row)
 
 ```
 Masked accumulation with complement
-```
+``` postgres-console
 select apply('int32(5)[0:10 1:20 2:30 3:40 4:50]'::vector,
     'minv_int32'::unaryop,
     'int32(5)[0:10 1:20 2:30 3:40 4:50]'::vector,
     mask=>'int32(5)[1:1 3:1]'::vector,
     accum=>'times_int32'::binaryop,
     descr=>'c'::descriptor);
+┌─────────────────────────────────┐
+│              apply              │
+├─────────────────────────────────┤
+│ int32(5)[0:0 1:20 2:0 3:40 4:0] │
+└─────────────────────────────────┘
+(1 row)
 
 ```
 ## Mask Type Compatibility
 
 Test masks of different types with vectors.
-```
-
-```
 int32 vector with int64 mask
-```
+``` postgres-console
 select apply('int32(5)[0:10 1:20 2:30 3:40 4:50]'::vector,
     'abs_int32'::unaryop,
     mask=>'int64(5)[0:1 2:1 4:1]'::vector);
+┌──────────────────────────┐
+│          apply           │
+├──────────────────────────┤
+│ int32(5)[0:10 2:30 4:50] │
+└──────────────────────────┘
+(1 row)
 
 ```
 fp64 vector with bool mask
-```
+``` postgres-console
 select apply('fp64(5)[0:1.5 1:2.5 2:3.5 3:4.5 4:5.5]'::vector,
     'abs_fp64'::unaryop,
     mask=>'bool(5)[0:true 2:true 4:true]'::vector);
+┌───────────────────────────────────────────┐
+│                   apply                   │
+├───────────────────────────────────────────┤
+│ fp64(5)[0:1.500000 2:3.500000 4:5.500000] │
+└───────────────────────────────────────────┘
+(1 row)
 
 ```
 fp64 vector with int32 mask
-```
+``` postgres-console
 select apply('fp64(5)[0:1.5 1:2.5 2:3.5 3:4.5 4:5.5]'::vector,
     'ainv_fp64'::unaryop,
     mask=>'int32(5)[1:1 3:1]'::vector);
+┌──────────────────────────────────┐
+│              apply               │
+├──────────────────────────────────┤
+│ fp64(5)[1:-2.500000 3:-4.500000] │
+└──────────────────────────────────┘
+(1 row)
 
 ```
 ## Edge Cases
 
 Test boundary conditions for masks.
-```
-
-```
 Empty vector with non-empty mask
-```
+``` postgres-console
 select apply('int32(5)[]'::vector,
     'abs_int32'::unaryop,
     mask=>'int32(5)[0:1 2:1 4:1]'::vector);
+┌──────────┐
+│  apply   │
+├──────────┤
+│ int32(5) │
+└──────────┘
+(1 row)
 
 ```
 Non-empty vector with empty mask
-```
+``` postgres-console
 select apply('int32(5)[0:10 1:20 2:30]'::vector,
     'abs_int32'::unaryop,
     mask=>'int32(5)[]'::vector);
+┌──────────┐
+│  apply   │
+├──────────┤
+│ int32(5) │
+└──────────┘
+(1 row)
 
 ```
 Unsized mask
-```
+``` postgres-console
 select apply('int32[0:10 1:20]'::vector,
     'abs_int32'::unaryop,
     mask=>'int32[]'::vector);
+┌───────┐
+│ apply │
+├───────┤
+│ int32 │
+└───────┘
+(1 row)
 
 ```
 ## Boolean Vector Operations
 
 Test boolean-specific operations and logic.
-```
-
-```
 Boolean construction
-```
+``` postgres-console
 select 'bool(5)[0:true 1:false 2:true 3:false 4:true]'::vector;
+┌──────────────────────────────┐
+│            vector            │
+├──────────────────────────────┤
+│ bool(5)[0:t 1:f 2:t 3:f 4:t] │
+└──────────────────────────────┘
+(1 row)
+
 select 'bool(5)[0:t 1:f 2:t 3:f 4:t]'::vector;
+┌──────────────────────────────┐
+│            vector            │
+├──────────────────────────────┤
+│ bool(5)[0:t 1:f 2:t 3:f 4:t] │
+└──────────────────────────────┘
+(1 row)
 
 ```
 Boolean element-wise OR
-```
+``` postgres-console
 select eadd('bool(5)[0:true 1:false 2:true]'::vector,
     'bool(5)[0:false 1:true 2:true]'::vector,
     'lor'::binaryop);
+┌──────────────────────┐
+│         eadd         │
+├──────────────────────┤
+│ bool(5)[0:t 1:t 2:t] │
+└──────────────────────┘
+(1 row)
 
 ```
 Boolean element-wise AND
-```
+``` postgres-console
 select emult('bool(5)[0:true 1:false 2:true 3:true 4:false]'::vector,
     'bool(5)[0:true 1:true 2:false 3:true 4:false]'::vector,
     'land'::binaryop);
+┌──────────────────────────────┐
+│            emult             │
+├──────────────────────────────┤
+│ bool(5)[0:t 1:f 2:f 3:t 4:f] │
+└──────────────────────────────┘
+(1 row)
 
 ```
 Boolean element-wise XOR
-```
+``` postgres-console
 select eadd('bool(5)[0:true 1:false 2:true]'::vector,
     'bool(5)[0:false 1:false 2:true]'::vector,
     'lxor'::binaryop);
+┌──────────────────────┐
+│         eadd         │
+├──────────────────────┤
+│ bool(5)[0:t 1:f 2:f] │
+└──────────────────────┘
+(1 row)
 
 ```
 Boolean element-wise XNOR
-```
+``` postgres-console
 select eadd('bool(5)[0:true 1:false 2:true]'::vector,
     'bool(5)[0:false 1:false 2:true]'::vector,
     'eq_bool'::binaryop);
+┌──────────────────────┐
+│         eadd         │
+├──────────────────────┤
+│ bool(5)[0:f 1:t 2:t] │
+└──────────────────────┘
+(1 row)
 
 ```
 Boolean NOT (unary complement)
-```
+``` postgres-console
 select apply('bool(5)[0:true 1:false 2:true 3:false 4:true]'::vector,
     'lnot'::unaryop);
+┌──────────────────────────────┐
+│            apply             │
+├──────────────────────────────┤
+│ bool(5)[0:f 1:t 2:f 3:t 4:f] │
+└──────────────────────────────┘
+(1 row)
 
 ```
 Boolean reduction with OR (any true?)
-```
+``` postgres-console
 select reduce_scalar('bool[0:false 1:false 2:true 3:false]'::vector,
     'lor_monoid_bool'::monoid);
+┌───────────────┐
+│ reduce_scalar │
+├───────────────┤
+│ bool:t        │
+└───────────────┘
+(1 row)
+
 select reduce_scalar('bool[0:false 1:false 2:false]'::vector,
     'lor_monoid_bool'::monoid);
+┌───────────────┐
+│ reduce_scalar │
+├───────────────┤
+│ bool:f        │
+└───────────────┘
+(1 row)
 
 ```
 Boolean reduction with AND (all true?)
-```
+``` postgres-console
 select reduce_scalar('bool[0:true 1:true 2:true]'::vector,
     'land_monoid_bool'::monoid);
+┌───────────────┐
+│ reduce_scalar │
+├───────────────┤
+│ bool:t        │
+└───────────────┘
+(1 row)
+
 select reduce_scalar('bool[0:true 1:false 2:true]'::vector,
     'land_monoid_bool'::monoid);
+┌───────────────┐
+│ reduce_scalar │
+├───────────────┤
+│ bool:f        │
+└───────────────┘
+(1 row)
 
 ```
 Boolean reduction with XOR (parity)
-```
+``` postgres-console
 select reduce_scalar('bool[0:true 1:true 2:true]'::vector,
     'lxor_monoid_bool'::monoid);
+┌───────────────┐
+│ reduce_scalar │
+├───────────────┤
+│ bool:t        │
+└───────────────┘
+(1 row)
+
 select reduce_scalar('bool[0:true 1:false 2:true]'::vector,
     'lxor_monoid_bool'::monoid);
+┌───────────────┐
+│ reduce_scalar │
+├───────────────┤
+│ bool:f        │
+└───────────────┘
+(1 row)
 
 ```
 Boolean to integer conversion
-```
+``` postgres-console
 select cast_to('bool[0:true 1:false 2:true 3:false]'::vector, 'int32');
+┌────────────────────────┐
+│        cast_to         │
+├────────────────────────┤
+│ int32[0:1 1:0 2:1 3:0] │
+└────────────────────────┘
+(1 row)
 
 ```
 Integer to boolean conversion
-```
+``` postgres-console
 select cast_to('int32[0:0 1:1 2:5 3:0 4:-1]'::vector, 'bool');
+┌───────────────────────────┐
+│          cast_to          │
+├───────────────────────────┤
+│ bool[0:f 1:t 2:t 3:f 4:t] │
+└───────────────────────────┘
+(1 row)
 
 ```
 Boolean comparisons (equal/not equal)
-```
+``` postgres-console
 select eadd('bool(5)[0:true 1:false 2:true]'::vector,
     'bool(5)[0:true 1:true 2:false]'::vector,
     'eq_bool'::binaryop);
+┌──────────────────────┐
+│         eadd         │
+├──────────────────────┤
+│ bool(5)[0:t 1:f 2:f] │
+└──────────────────────┘
+(1 row)
 
 ```
 ## Float32 (fp32) Special Values
 
 Test float-specific edge cases and special values.
-```
-
-```
 Infinity values
-```
+``` postgres-console
 select 'fp32(5)[0:Infinity 1:-Infinity 2:1.5]'::vector;
+┌────────────────────────────────────────────┐
+│                   vector                   │
+├────────────────────────────────────────────┤
+│ fp32(5)[0:Infinity 1:-Infinity 2:1.500000] │
+└────────────────────────────────────────────┘
+(1 row)
 
 ```
 NaN (Not a Number)
-```
+``` postgres-console
 select 'fp32(5)[0:NaN 1:1.5 2:2.5]'::vector;
+┌──────────────────────────────────────┐
+│                vector                │
+├──────────────────────────────────────┤
+│ fp32(5)[0:NaN 1:1.500000 2:2.500000] │
+└──────────────────────────────────────┘
+(1 row)
 
 ```
 Signed zeros
-```
+``` postgres-console
 select 'fp32(5)[0:0.0 1:-0.0 2:1.5]'::vector;
+┌────────────────────────────────────────────┐
+│                   vector                   │
+├────────────────────────────────────────────┤
+│ fp32(5)[0:0.000000 1:-0.000000 2:1.500000] │
+└────────────────────────────────────────────┘
+(1 row)
 
 ```
 Very large values (near max)
-```
+``` postgres-console
 select 'fp32(3)[0:3.40282e+38 1:-3.40282e+38 2:1.0]'::vector;
+┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                                         vector                                                         │
+├────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ fp32(3)[0:340282001837565597733306976381245063168.000000 1:-340282001837565597733306976381245063168.000000 2:1.000000] │
+└────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+(1 row)
 
 ```
 Operations with Infinity
-```
+``` postgres-console
 select apply('fp32(3)[0:1.0 1:2.0 2:3.0]'::vector,
     'Infinity'::float4::scalar::float4,
     'plus_fp32'::binaryop);
+┌───────────────────────────────────────────┐
+│                   apply                   │
+├───────────────────────────────────────────┤
+│ fp32(3)[0:Infinity 1:Infinity 2:Infinity] │
+└───────────────────────────────────────────┘
+(1 row)
+
 select apply('fp32(3)[0:1.0 1:2.0 2:3.0]'::vector,
     'Infinity'::float4::scalar::float4,
     'times_fp32'::binaryop);
+┌───────────────────────────────────────────┐
+│                   apply                   │
+├───────────────────────────────────────────┤
+│ fp32(3)[0:Infinity 1:Infinity 2:Infinity] │
+└───────────────────────────────────────────┘
+(1 row)
+
 select apply('fp32(3)[0:1.0 1:2.0 2:3.0]'::vector,
     'Infinity'::float4::scalar::float4,
     'div_fp32'::binaryop);
+┌───────────────────────────────────────────┐
+│                   apply                   │
+├───────────────────────────────────────────┤
+│ fp32(3)[0:0.000000 1:0.000000 2:0.000000] │
+└───────────────────────────────────────────┘
+(1 row)
 
 ```
 Operations producing NaN
-```
+``` postgres-console
 select apply('fp32(3)[0:0.0 1:1.0 2:2.0]'::vector,
     0.0::float4,
     'div_fp32'::binaryop);  -- 0/0 = NaN
+┌──────────────────────────────────────┐
+│                apply                 │
+├──────────────────────────────────────┤
+│ fp32(3)[0:NaN 1:Infinity 2:Infinity] │
+└──────────────────────────────────────┘
+(1 row)
 
 ```
 Operations with NaN (NaN propagates)
-```
+``` postgres-console
 select apply('fp32(3)[0:1.0 1:2.0 2:3.0]'::vector,
     'NaN'::float4::scalar::float4,
     'plus_fp32'::binaryop);
+┌────────────────────────────┐
+│           apply            │
+├────────────────────────────┤
+│ fp32(3)[0:NaN 1:NaN 2:NaN] │
+└────────────────────────────┘
+(1 row)
+
 select apply('fp32(3)[0:1.0 1:NaN 2:3.0]'::vector,
     'abs_fp32'::unaryop);
+┌──────────────────────────────────────┐
+│                apply                 │
+├──────────────────────────────────────┤
+│ fp32(3)[0:1.000000 1:NaN 2:3.000000] │
+└──────────────────────────────────────┘
+(1 row)
 
 ```
 Reduction with NaN
-```
+``` postgres-console
 select reduce_scalar('fp32[0:1.0 1:NaN 2:3.0]'::vector,
     'plus_monoid_fp32'::monoid);
+┌───────────────┐
+│ reduce_scalar │
+├───────────────┤
+│ fp32:NaN      │
+└───────────────┘
+(1 row)
 
 ```
 Min/max with special values
-```
+``` postgres-console
 select reduce_scalar('fp32[0:-Infinity 1:1.0 2:Infinity]'::vector,
     'max_monoid_fp32'::monoid);
+┌───────────────┐
+│ reduce_scalar │
+├───────────────┤
+│ fp32:Infinity │
+└───────────────┘
+(1 row)
+
 select reduce_scalar('fp32[0:-Infinity 1:1.0 2:Infinity]'::vector,
     'min_monoid_fp32'::monoid);
+┌────────────────┐
+│ reduce_scalar  │
+├────────────────┤
+│ fp32:-Infinity │
+└────────────────┘
+(1 row)
 
 ```
 ## Float64 (fp64) Special Values
 
 Test double-precision float edge cases.
-```
-
-```
 Infinity values
-```
+``` postgres-console
 select 'fp64(5)[0:Infinity 1:-Infinity 2:1.5 3:2.5 4:3.5]'::vector;
+┌──────────────────────────────────────────────────────────────────┐
+│                              vector                              │
+├──────────────────────────────────────────────────────────────────┤
+│ fp64(5)[0:Infinity 1:-Infinity 2:1.500000 3:2.500000 4:3.500000] │
+└──────────────────────────────────────────────────────────────────┘
+(1 row)
 
 ```
 NaN values
-```
+``` postgres-console
 select 'fp64(5)[0:NaN 1:1.5 2:2.5 3:3.5 4:4.5]'::vector;
+┌────────────────────────────────────────────────────────────┐
+│                           vector                           │
+├────────────────────────────────────────────────────────────┤
+│ fp64(5)[0:NaN 1:1.500000 2:2.500000 3:3.500000 4:4.500000] │
+└────────────────────────────────────────────────────────────┘
+(1 row)
 
 ```
 Signed zeros
-```
+``` postgres-console
 select 'fp64(5)[0:0.0 1:-0.0 2:1.5]'::vector;
+┌────────────────────────────────────────────┐
+│                   vector                   │
+├────────────────────────────────────────────┤
+│ fp64(5)[0:0.000000 1:-0.000000 2:1.500000] │
+└────────────────────────────────────────────┘
+(1 row)
 
 ```
 Very large values (near max)
-```
+``` postgres-console
 select 'fp64(3)[0:1.7976931348623157e+308 1:-1.7976931348623157e+308 2:1.0]'::vector;
+┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                                                                                                                                                                                                                                                                                                                       vector                                                                                                                                                                                                                                                                                                                                       │
+├────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ fp64(3)[0:179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368.000000 1:-179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368.000000 2:1.000000] │
+└────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+(1 row)
 
 ```
 Very small values (near min positive)
-```
+``` postgres-console
 select 'fp64(3)[0:2.2250738585072014e-308 1:1.0 2:2.0]'::vector;
+┌───────────────────────────────────────────┐
+│                  vector                   │
+├───────────────────────────────────────────┤
+│ fp64(3)[0:0.000000 1:1.000000 2:2.000000] │
+└───────────────────────────────────────────┘
+(1 row)
 
 ```
 High precision values
-```
+``` postgres-console
 select 'fp64(3)[0:3.141592653589793 1:2.718281828459045 2:1.414213562373095]'::vector;
+┌───────────────────────────────────────────┐
+│                  vector                   │
+├───────────────────────────────────────────┤
+│ fp64(3)[0:3.141593 1:2.718282 2:1.414214] │
+└───────────────────────────────────────────┘
+(1 row)
 
 ```
 Operations with Infinity
-```
+``` postgres-console
 select eadd('fp64(3)[0:1.0 1:Infinity 2:3.0]'::vector,
     'fp64(3)[0:2.0 1:4.0 2:-Infinity]'::vector,
     'plus_fp64'::binaryop);
+┌────────────────────────────────────────────┐
+│                    eadd                    │
+├────────────────────────────────────────────┤
+│ fp64(3)[0:3.000000 1:Infinity 2:-Infinity] │
+└────────────────────────────────────────────┘
+(1 row)
 
 ```
 Infinity - Infinity = NaN
-```
+``` postgres-console
 select emult('fp64(3)[0:Infinity 1:1.0 2:2.0]'::vector,
     'fp64(3)[0:-1.0 1:2.0 2:3.0]'::vector,
     'plus_fp64'::binaryop);
+┌───────────────────────────────────────────┐
+│                   emult                   │
+├───────────────────────────────────────────┤
+│ fp64(3)[0:Infinity 1:3.000000 2:5.000000] │
+└───────────────────────────────────────────┘
+(1 row)
 
 ```
 Float precision limits
-```
+``` postgres-console
 select apply('fp64(3)[0:1e-100 1:1e-200 2:1e-300]'::vector,
     1e-100::double precision,
     'plus_fp64'::binaryop);
+┌───────────────────────────────────────────┐
+│                   apply                   │
+├───────────────────────────────────────────┤
+│ fp64(3)[0:0.000000 1:0.000000 2:0.000000] │
+└───────────────────────────────────────────┘
+(1 row)
 
 ```
 Very large number operations
-```
+``` postgres-console
 select reduce_scalar('fp64[0:1e100 1:1e100 2:1e100]'::vector,
     'plus_fp64'::monoid);
-
+ERROR:  Unknown monoid plus_fp64
+LINE 2:     'plus_fp64'::monoid);
+            ^
 ```
 ## Type Casting and Promotion
 
 Test type conversions between vector types.
-```
-
-```
 Int to float (exact for small ints)
-```
+``` postgres-console
 select cast_to('int32[0:1 1:2 2:3 3:4 4:5]'::vector, 'fp64');
+┌──────────────────────────────────────────────────────────────┐
+│                           cast_to                            │
+├──────────────────────────────────────────────────────────────┤
+│ fp64[0:1.000000 1:2.000000 2:3.000000 3:4.000000 4:5.000000] │
+└──────────────────────────────────────────────────────────────┘
+(1 row)
+
 select cast_to('int32[0:100 1:200 2:300]'::vector, 'fp32');
+┌──────────────────────────────────────────────┐
+│                   cast_to                    │
+├──────────────────────────────────────────────┤
+│ fp32[0:100.000000 1:200.000000 2:300.000000] │
+└──────────────────────────────────────────────┘
+(1 row)
 
 ```
 Float to int (truncation)
-```
+``` postgres-console
 select cast_to('fp64[0:1.9 1:2.1 2:3.5 3:-1.9 4:-2.1]'::vector, 'int32');
+┌──────────────────────────────┐
+│           cast_to            │
+├──────────────────────────────┤
+│ int32[0:1 1:2 2:3 3:-1 4:-2] │
+└──────────────────────────────┘
+(1 row)
+
 select cast_to('fp32[0:3.7 1:-3.7 2:0.5]'::vector, 'int32');
+┌─────────────────────┐
+│       cast_to       │
+├─────────────────────┤
+│ int32[0:3 1:-3 2:0] │
+└─────────────────────┘
+(1 row)
 
 ```
 Large int to float (may lose precision)
-```
+``` postgres-console
 select cast_to('int64[0:9007199254740992 1:9007199254740993]'::vector, 'fp64');
+┌───────────────────────────────────────────────────────────┐
+│                          cast_to                          │
+├───────────────────────────────────────────────────────────┤
+│ fp64[0:9007199254740992.000000 1:9007199254740992.000000] │
+└───────────────────────────────────────────────────────────┘
+(1 row)
 
 ```
 Int size conversions
-```
+``` postgres-console
 select cast_to('int32[0:100 1:200 2:300]'::vector, 'int64');
+┌──────────────────────────┐
+│         cast_to          │
+├──────────────────────────┤
+│ int64[0:100 1:200 2:300] │
+└──────────────────────────┘
+(1 row)
+
 select cast_to('int32[0:100 1:200 2:300]'::vector, 'int16');
+┌──────────────────────────┐
+│         cast_to          │
+├──────────────────────────┤
+│ int16[0:100 1:200 2:300] │
+└──────────────────────────┘
+(1 row)
+
 select cast_to('int64[0:1000 1:2000 2:3000]'::vector, 'int32');
+┌─────────────────────────────┐
+│           cast_to           │
+├─────────────────────────────┤
+│ int32[0:1000 1:2000 2:3000] │
+└─────────────────────────────┘
+(1 row)
 
 ```
 Float precision conversions
-```
+``` postgres-console
 select cast_to('fp64[0:3.141592653589793 1:2.718281828459045]'::vector, 'fp32');
+┌─────────────────────────────┐
+│           cast_to           │
+├─────────────────────────────┤
+│ fp32[0:3.141593 1:2.718282] │
+└─────────────────────────────┘
+(1 row)
+
 select cast_to('fp32[0:3.14159 1:2.71828]'::vector, 'fp64');
+┌─────────────────────────────┐
+│           cast_to           │
+├─────────────────────────────┤
+│ fp64[0:3.141590 1:2.718280] │
+└─────────────────────────────┘
+(1 row)
+
 ```

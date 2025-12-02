@@ -5,1076 +5,2609 @@ show the literal output of these statements from Postgres.
 
 Some setup to make sure warnings are shown, and that the extension
 is installed.
-```
-
+``` postgres-console
 set client_min_messages = 'WARNING';
 create extension if not exists onesparse;
-
-\pset linestyle unicode
-\pset border 2
-
 ```
 Describe the scalar type
-```
-\dT+ scalar
+``` postgres-console
+                                                       List of data types
+┌───────────┬────────┬───────────────┬──────┬──────────┬──────────┬───────────────────┬─────────────────────────────────────────┐
+│  Schema   │  Name  │ Internal name │ Size │ Elements │  Owner   │ Access privileges │               Description               │
+├───────────┼────────┼───────────────┼──────┼──────────┼──────────┼───────────────────┼─────────────────────────────────────────┤
+│ onesparse │ scalar │ scalar        │ var  │          │ postgres │                   │ Scalars hold individual element values. │
+└───────────┴────────┴───────────────┴──────┴──────────┴──────────┴───────────────────┴─────────────────────────────────────────┘
+(1 row)
 
 ```
 print a scalar, this renders the value with no prefix
-```
+``` postgres-console
 select print('int32:42'::scalar);
+┌───────┐
+│ print │
+├───────┤
+│ 42    │
+└───────┘
+(1 row)
 
 ```
 Duplicate a scalar
-```
+``` postgres-console
 select dup('int32:42'::scalar);
+┌──────────┐
+│   dup    │
+├──────────┤
+│ int32:42 │
+└──────────┘
+(1 row)
 
 ```
 Wait for a scalar to complete in non-blocking mode
-```
+``` postgres-console
 select wait('int32:42'::scalar);
+┌──────────┐
+│   wait   │
+├──────────┤
+│ int32:42 │
+└──────────┘
+(1 row)
 
 ```
 Clear a scalar, deleting its stored element.
-```
+``` postgres-console
 select clear('int32:42'::scalar);
+┌───────┐
+│ clear │
+├───────┤
+│ int32 │
+└───────┘
+(1 row)
 
 ```
 ## Scalar Construction
 
 Various ways to construct scalars from native Postgres values.
-```
-
-```
 Construct from literals using cast
-```
+``` postgres-console
 select 42::int::scalar;
+┌──────────┐
+│  scalar  │
+├──────────┤
+│ int32:42 │
+└──────────┘
+(1 row)
+
 select 3.14::float8::scalar;
+┌───────────────┐
+│    scalar     │
+├───────────────┤
+│ fp64:3.140000 │
+└───────────────┘
+(1 row)
+
 select true::bool::scalar;
+┌────────┐
+│ scalar │
+├────────┤
+│ bool:t │
+└────────┘
+(1 row)
 
 ```
 Construct using explicit type
-```
+``` postgres-console
 select 'int32:42'::scalar;
+┌──────────┐
+│  scalar  │
+├──────────┤
+│ int32:42 │
+└──────────┘
+(1 row)
+
 select 'fp64:3.14'::scalar;
+┌───────────────┐
+│    scalar     │
+├───────────────┤
+│ fp64:3.140000 │
+└───────────────┘
+(1 row)
+
 select 'bool:true'::scalar;
+┌────────┐
+│ scalar │
+├────────┤
+│ bool:t │
+└────────┘
+(1 row)
 
 ```
 Construct from different integer sizes
-```
+``` postgres-console
 select 127::int2::scalar as int16_scalar;
+┌──────────────┐
+│ int16_scalar │
+├──────────────┤
+│ int16:127    │
+└──────────────┘
+(1 row)
+
 select 32767::int4::scalar as int32_scalar;
+┌──────────────┐
+│ int32_scalar │
+├──────────────┤
+│ int32:32767  │
+└──────────────┘
+(1 row)
+
 select 2147483647::int8::scalar as int64_scalar;
+┌──────────────────┐
+│   int64_scalar   │
+├──────────────────┤
+│ int64:2147483647 │
+└──────────────────┘
+(1 row)
 
 ```
 Construct from different float sizes
-```
+``` postgres-console
 select 3.14::float4::scalar as fp32_scalar;
+┌───────────────┐
+│  fp32_scalar  │
+├───────────────┤
+│ fp32:3.140000 │
+└───────────────┘
+(1 row)
+
 select 3.14159265::float8::scalar as fp64_scalar;
+┌───────────────┐
+│  fp64_scalar  │
+├───────────────┤
+│ fp64:3.141593 │
+└───────────────┘
+(1 row)
 
 ```
 Empty scalar (no value set)
-```
+``` postgres-console
 select 'int32'::scalar;
+┌────────┐
+│ scalar │
+├────────┤
+│ int32  │
+└────────┘
+(1 row)
+
 select nvals('int32'::scalar);
+┌───────┐
+│ nvals │
+├───────┤
+│     0 │
+└───────┘
+(1 row)
 
 ```
 Scalar with value
-```
+``` postgres-console
 select 'int32:42'::scalar;
+┌──────────┐
+│  scalar  │
+├──────────┤
+│ int32:42 │
+└──────────┘
+(1 row)
+
 select nvals('int32:42'::scalar);
+┌───────┐
+│ nvals │
+├───────┤
+│     1 │
+└───────┘
+(1 row)
 
 ```
 ## Scalar Arithmetic with Native Types
 
 Scalars can be combined with native Postgres types using standard operators.
-```
-
-```
 Addition: scalar + native
-```
+``` postgres-console
 select 'int32:10'::scalar + 5;
+┌──────────┐
+│ ?column? │
+├──────────┤
+│ int32:15 │
+└──────────┘
+(1 row)
+
 select 'fp64:3.14'::scalar + 2.0;
+┌───────────────┐
+│   ?column?    │
+├───────────────┤
+│ fp64:5.140000 │
+└───────────────┘
+(1 row)
 
 ```
 Addition: native + scalar
-```
+``` postgres-console
 select 5 + 'int32:10'::scalar;
+┌──────────┐
+│ ?column? │
+├──────────┤
+│       15 │
+└──────────┘
+(1 row)
+
 select 2.0 + 'fp64:3.14'::scalar;
+┌───────────────────┐
+│     ?column?      │
+├───────────────────┤
+│ 5.140000000000001 │
+└───────────────────┘
+(1 row)
 
 ```
 Subtraction: scalar - native
-```
+``` postgres-console
 select 'int32:20'::scalar - 5;
+┌──────────┐
+│ ?column? │
+├──────────┤
+│ int32:15 │
+└──────────┘
+(1 row)
+
 select 'fp64:10.5'::scalar - 2.5;
+┌───────────────┐
+│   ?column?    │
+├───────────────┤
+│ fp64:8.000000 │
+└───────────────┘
+(1 row)
 
 ```
 Subtraction: native - scalar
-```
+``` postgres-console
 select 30 - 'int32:10'::scalar;
+┌──────────┐
+│ ?column? │
+├──────────┤
+│       20 │
+└──────────┘
+(1 row)
+
 select 15.5 - 'fp64:5.5'::scalar;
+┌──────────┐
+│ ?column? │
+├──────────┤
+│       10 │
+└──────────┘
+(1 row)
 
 ```
 Multiplication: scalar * native
-```
+``` postgres-console
 select 'int32:7'::scalar * 6;
+┌──────────┐
+│ ?column? │
+├──────────┤
+│ int32:42 │
+└──────────┘
+(1 row)
+
 select 'fp64:2.5'::scalar * 3.0;
+┌───────────────┐
+│   ?column?    │
+├───────────────┤
+│ fp64:7.500000 │
+└───────────────┘
+(1 row)
 
 ```
 Multiplication: native * scalar
-```
+``` postgres-console
 select 6 * 'int32:7'::scalar;
+┌──────────┐
+│ ?column? │
+├──────────┤
+│       42 │
+└──────────┘
+(1 row)
+
 select 3.0 * 'fp64:2.5'::scalar;
+┌──────────┐
+│ ?column? │
+├──────────┤
+│      7.5 │
+└──────────┘
+(1 row)
 
 ```
 Division: scalar / native
-```
+``` postgres-console
 select 'int32:20'::scalar / 4;
+┌──────────┐
+│ ?column? │
+├──────────┤
+│ int32:5  │
+└──────────┘
+(1 row)
+
 select 'fp64:10.0'::scalar / 2.5;
+┌───────────────┐
+│   ?column?    │
+├───────────────┤
+│ fp64:4.000000 │
+└───────────────┘
+(1 row)
 
 ```
 Division: native / scalar
-```
+``` postgres-console
 select 100 / 'int32:5'::scalar;
+┌──────────┐
+│ ?column? │
+├──────────┤
+│       20 │
+└──────────┘
+(1 row)
+
 select 15.0 / 'fp64:3.0'::scalar;
+┌──────────┐
+│ ?column? │
+├──────────┤
+│        5 │
+└──────────┘
+(1 row)
 
 ```
 ## Scalar Type Conversions
 
 Convert between different scalar types and native Postgres types.
-```
-
-```
 Cast scalar to native type
-```
+``` postgres-console
 select 'int32:42'::scalar::int4;
+┌──────┐
+│ int4 │
+├──────┤
+│   42 │
+└──────┘
+(1 row)
+
 select 'fp64:3.14'::scalar::float8;
+┌────────┐
+│ float8 │
+├────────┤
+│   3.14 │
+└────────┘
+(1 row)
+
 select 'bool:true'::scalar::bool;
+┌──────┐
+│ bool │
+├──────┤
+│ t    │
+└──────┘
+(1 row)
 
 ```
 Cast between scalar types (int to float)
-```
+``` postgres-console
 select cast('int32:42'::scalar as scalar);  -- stays int32
+┌──────────┐
+│  scalar  │
+├──────────┤
+│ int32:42 │
+└──────────┘
+(1 row)
+
 select 'int32:42'::scalar::int4::float8::scalar;  -- through native
+┌────────────────┐
+│     scalar     │
+├────────────────┤
+│ fp64:42.000000 │
+└────────────────┘
+(1 row)
 
 ```
 Cast float to int (truncates)
-```
+``` postgres-console
 select 'fp64:3.9'::scalar::int4;
+┌──────┐
+│ int4 │
+├──────┤
+│    3 │
+└──────┘
+(1 row)
+
 select 'fp64:-3.9'::scalar::int4;
+┌──────┐
+│ int4 │
+├──────┤
+│   -3 │
+└──────┘
+(1 row)
 
 ```
 Cast bool to int
-```
+``` postgres-console
 select 'bool:true'::scalar::int4;
+┌──────┐
+│ int4 │
+├──────┤
+│    1 │
+└──────┘
+(1 row)
+
 select 'bool:false'::scalar::int4;
+┌──────┐
+│ int4 │
+├──────┤
+│    0 │
+└──────┘
+(1 row)
 
 ```
 Cast int to bool (0=false, non-zero=true)
-```
+``` postgres-console
 select 0::int::scalar::bool;
+┌──────┐
+│ bool │
+├──────┤
+│ f    │
+└──────┘
+(1 row)
+
 select 1::int::scalar::bool;
+┌──────┐
+│ bool │
+├──────┤
+│ t    │
+└──────┘
+(1 row)
+
 select 5::int::scalar::bool;
+┌──────┐
+│ bool │
+├──────┤
+│ t    │
+└──────┘
+(1 row)
+
 select (-1)::int::scalar::bool;
+┌──────┐
+│ bool │
+├──────┤
+│ t    │
+└──────┘
+(1 row)
 
 ```
 Cast between integer sizes
-```
+``` postgres-console
 select 127::int2::scalar::int4;  -- int16 to int32
+┌──────┐
+│ int4 │
+├──────┤
+│  127 │
+└──────┘
+(1 row)
+
 select 32767::int4::scalar::int8; -- int32 to int64
+┌───────┐
+│ int8  │
+├───────┤
+│ 32767 │
+└───────┘
+(1 row)
 
 ```
 ## Scalar Edge Cases - Integer Types
 
 Test boundary values for integer types.
-```
-
-```
 INT16 (int2) boundaries
-```
+``` postgres-console
 select (-32768)::int2::scalar as int16_min;
+┌──────────────┐
+│  int16_min   │
+├──────────────┤
+│ int16:-32768 │
+└──────────────┘
+(1 row)
+
 select 32767::int2::scalar as int16_max;
+┌─────────────┐
+│  int16_max  │
+├─────────────┤
+│ int16:32767 │
+└─────────────┘
+(1 row)
+
 select 0::int2::scalar as int16_zero;
+┌────────────┐
+│ int16_zero │
+├────────────┤
+│ int16:0    │
+└────────────┘
+(1 row)
 
 ```
 INT32 (int4) boundaries
-```
+``` postgres-console
 select (-2147483648)::int4::scalar as int32_min;
+┌───────────────────┐
+│     int32_min     │
+├───────────────────┤
+│ int32:-2147483648 │
+└───────────────────┘
+(1 row)
+
 select 2147483647::int4::scalar as int32_max;
+┌──────────────────┐
+│    int32_max     │
+├──────────────────┤
+│ int32:2147483647 │
+└──────────────────┘
+(1 row)
+
 select 0::int4::scalar as int32_zero;
+┌────────────┐
+│ int32_zero │
+├────────────┤
+│ int32:0    │
+└────────────┘
+(1 row)
 
 ```
 INT64 (int8) boundaries
-```
+``` postgres-console
 select (-9223372036854775808)::int8::scalar as int64_min;
+┌────────────────────────────┐
+│         int64_min          │
+├────────────────────────────┤
+│ int64:-9223372036854775808 │
+└────────────────────────────┘
+(1 row)
+
 select 9223372036854775807::int8::scalar as int64_max;
+┌───────────────────────────┐
+│         int64_max         │
+├───────────────────────────┤
+│ int64:9223372036854775807 │
+└───────────────────────────┘
+(1 row)
+
 select 0::int8::scalar as int64_zero;
+┌────────────┐
+│ int64_zero │
+├────────────┤
+│ int64:0    │
+└────────────┘
+(1 row)
 
 ```
 Arithmetic near boundaries
-```
+``` postgres-console
 select 'int32:2147483647'::scalar + 0 as at_max;
+┌──────────────────┐
+│      at_max      │
+├──────────────────┤
+│ int32:2147483647 │
+└──────────────────┘
+(1 row)
+
 select 'int32:-2147483648'::scalar + 0 as at_min;
+┌───────────────────┐
+│      at_min       │
+├───────────────────┤
+│ int32:-2147483648 │
+└───────────────────┘
+(1 row)
 
 ```
 Multiplication preserving range
-```
+``` postgres-console
 select 'int32:1000'::scalar * 1000;
+┌───────────────┐
+│   ?column?    │
+├───────────────┤
+│ int32:1000000 │
+└───────────────┘
+(1 row)
+
 select 'int32:-1000'::scalar * 1000;
+┌────────────────┐
+│    ?column?    │
+├────────────────┤
+│ int32:-1000000 │
+└────────────────┘
+(1 row)
 
 ```
 Division by small values
-```
+``` postgres-console
 select 'int32:1000'::scalar / 1;
+┌────────────┐
+│  ?column?  │
+├────────────┤
+│ int32:1000 │
+└────────────┘
+(1 row)
+
 select 'int32:1000'::scalar / 2;
+┌───────────┐
+│ ?column?  │
+├───────────┤
+│ int32:500 │
+└───────────┘
+(1 row)
+
 select 'int32:1000'::scalar / 3;
+┌───────────┐
+│ ?column?  │
+├───────────┤
+│ int32:333 │
+└───────────┘
+(1 row)
 
 ```
 ## Scalar Edge Cases - Float Types
 
 Test special floating-point values.
-```
-
-```
 FP32 (float4) boundaries
-```
+``` postgres-console
 select 'fp32:3.40282347e+38'::scalar as fp32_max;
+┌─────────────────────────────────────────────────────┐
+│                      fp32_max                       │
+├─────────────────────────────────────────────────────┤
+│ fp32:340282346638528859811704183484516925440.000000 │
+└─────────────────────────────────────────────────────┘
+(1 row)
+
 select 'fp32:-3.40282347e+38'::scalar as fp32_min;
+┌──────────────────────────────────────────────────────┐
+│                       fp32_min                       │
+├──────────────────────────────────────────────────────┤
+│ fp32:-340282346638528859811704183484516925440.000000 │
+└──────────────────────────────────────────────────────┘
+(1 row)
+
 select 'fp32:1.17549435e-38'::scalar as fp32_smallest_positive;
+┌────────────────────────┐
+│ fp32_smallest_positive │
+├────────────────────────┤
+│ fp32:0.000000          │
+└────────────────────────┘
+(1 row)
 
 ```
 FP64 (float8) boundaries
-```
+``` postgres-console
 select 'fp64:1.7976931348623157e+308'::scalar as fp64_max;
+┌─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                                            fp64_max                                                             │
+├─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ fp64:17976931348623157081452742373170435679807056752584499659891747680315726078002853876058955863276687817154045895351438246423 │
+└─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+(1 row)
+
 select 'fp64:-1.7976931348623157e+308'::scalar as fp64_min;
+┌─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                                            fp64_min                                                             │
+├─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ fp64:-1797693134862315708145274237317043567980705675258449965989174768031572607800285387605895586327668781715404589535143824642 │
+└─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+(1 row)
+
 select 'fp64:2.2250738585072014e-308'::scalar as fp64_smallest_positive;
+┌────────────────────────┐
+│ fp64_smallest_positive │
+├────────────────────────┤
+│ fp64:0.000000          │
+└────────────────────────┘
+(1 row)
 
 ```
 Zero values
-```
+``` postgres-console
 select 0.0::float4::scalar as fp32_zero;
+┌───────────────┐
+│   fp32_zero   │
+├───────────────┤
+│ fp32:0.000000 │
+└───────────────┘
+(1 row)
+
 select 0.0::float8::scalar as fp64_zero;
+┌───────────────┐
+│   fp64_zero   │
+├───────────────┤
+│ fp64:0.000000 │
+└───────────────┘
+(1 row)
+
 select (-0.0)::float8::scalar as fp64_negative_zero;
+┌────────────────────┐
+│ fp64_negative_zero │
+├────────────────────┤
+│ fp64:0.000000      │
+└────────────────────┘
+(1 row)
 
 ```
 Infinity
-```
+``` postgres-console
 select 'Infinity'::float8::scalar as positive_infinity;
+┌───────────────────┐
+│ positive_infinity │
+├───────────────────┤
+│ fp64:Infinity     │
+└───────────────────┘
+(1 row)
+
 select '-Infinity'::float8::scalar as negative_infinity;
+┌───────────────────┐
+│ negative_infinity │
+├───────────────────┤
+│ fp64:-Infinity    │
+└───────────────────┘
+(1 row)
 
 ```
 NaN (Not a Number)
-```
+``` postgres-console
 select 'NaN'::float8::scalar as not_a_number;
+┌──────────────┐
+│ not_a_number │
+├──────────────┤
+│ fp64:NaN     │
+└──────────────┘
+(1 row)
 
 ```
 Arithmetic with special values
-```
+``` postgres-console
 select 'fp64:1.0'::scalar + 'Infinity'::float8;
+┌───────────────┐
+│   ?column?    │
+├───────────────┤
+│ fp64:Infinity │
+└───────────────┘
+(1 row)
+
 select 'fp64:1.0'::scalar * 'Infinity'::float8;
+┌───────────────┐
+│   ?column?    │
+├───────────────┤
+│ fp64:Infinity │
+└───────────────┘
+(1 row)
+
 select 'fp64:1.0'::scalar / 'Infinity'::float8;
+┌───────────────┐
+│   ?column?    │
+├───────────────┤
+│ fp64:0.000000 │
+└───────────────┘
+(1 row)
+
 select 'Infinity'::float8 / 'fp64:2.0'::scalar;
+┌──────────┐
+│ ?column? │
+├──────────┤
+│ Infinity │
+└──────────┘
+(1 row)
 
 ```
 Operations producing NaN
-```
+``` postgres-console
 select 'fp64:0.0'::scalar / 0.0;  -- 0/0 = NaN
+┌──────────┐
+│ ?column? │
+├──────────┤
+│ fp64:NaN │
+└──────────┘
+(1 row)
+
 select 'Infinity'::float8 - 'Infinity'::float8::scalar; -- Inf - Inf = NaN
+┌──────────┐
+│ ?column? │
+├──────────┤
+│      NaN │
+└──────────┘
+(1 row)
 
 ```
 Very small numbers
-```
+``` postgres-console
 select 'fp64:1e-100'::scalar * 1e-100;
+┌───────────────┐
+│   ?column?    │
+├───────────────┤
+│ fp64:0.000000 │
+└───────────────┘
+(1 row)
+
 select 'fp64:1e-200'::scalar + 1e-200;
+┌───────────────┐
+│   ?column?    │
+├───────────────┤
+│ fp64:0.000000 │
+└───────────────┘
+(1 row)
 
 ```
 Very large numbers
-```
+``` postgres-console
 select 'fp64:1e100'::scalar * 1.0;
+┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                                     ?column?                                                      │
+├───────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ fp64:10000000000000000159028911097599180468360808563945281389781327557747838772170381060813469985856815104.000000 │
+└───────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+(1 row)
+
 select 'fp64:1e200'::scalar + 0.0;
+┌─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                                            ?column?                                                             │
+├─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ fp64:99999999999999996973312221251036165947450327545502362648241750950346848435554075534196338404706251868027512415973882408182 │
+└─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+(1 row)
 
 ```
 ## Scalar Boolean Operations
 
 Test boolean scalar operations.
-```
-
-```
 Boolean construction
-```
+``` postgres-console
 select true::bool::scalar;
+┌────────┐
+│ scalar │
+├────────┤
+│ bool:t │
+└────────┘
+(1 row)
+
 select false::bool::scalar;
+┌────────┐
+│ scalar │
+├────────┤
+│ bool:f │
+└────────┘
+(1 row)
 
 ```
 Boolean with different representations
-```
+``` postgres-console
 select 't'::bool::scalar;
+┌────────┐
+│ scalar │
+├────────┤
+│ bool:t │
+└────────┘
+(1 row)
+
 select 'f'::bool::scalar;
+┌────────┐
+│ scalar │
+├────────┤
+│ bool:f │
+└────────┘
+(1 row)
+
 select 'yes'::bool::scalar;
+┌────────┐
+│ scalar │
+├────────┤
+│ bool:t │
+└────────┘
+(1 row)
+
 select 'no'::bool::scalar;
+┌────────┐
+│ scalar │
+├────────┤
+│ bool:f │
+└────────┘
+(1 row)
 
 ```
 Boolean casting
-```
+``` postgres-console
 select true::bool::scalar::bool;
+┌──────┐
+│ bool │
+├──────┤
+│ t    │
+└──────┘
+(1 row)
+
 select false::bool::scalar::bool;
+┌──────┐
+│ bool │
+├──────┤
+│ f    │
+└──────┘
+(1 row)
 
 ```
 Boolean to int conversion
-```
+``` postgres-console
 select true::bool::scalar::int4 as true_as_int;
+┌─────────────┐
+│ true_as_int │
+├─────────────┤
+│           1 │
+└─────────────┘
+(1 row)
+
 select false::bool::scalar::int4 as false_as_int;
+┌──────────────┐
+│ false_as_int │
+├──────────────┤
+│            0 │
+└──────────────┘
+(1 row)
 
 ```
 Int to boolean conversion
-```
+``` postgres-console
 select 0::int4::scalar::bool as zero_as_bool;
+┌──────────────┐
+│ zero_as_bool │
+├──────────────┤
+│ f            │
+└──────────────┘
+(1 row)
+
 select 1::int4::scalar::bool as one_as_bool;
+┌─────────────┐
+│ one_as_bool │
+├─────────────┤
+│ t           │
+└─────────────┘
+(1 row)
+
 select 42::int4::scalar::bool as nonzero_as_bool;
+┌─────────────────┐
+│ nonzero_as_bool │
+├─────────────────┤
+│ t               │
+└─────────────────┘
+(1 row)
+
 select (-1)::int4::scalar::bool as negative_as_bool;
+┌──────────────────┐
+│ negative_as_bool │
+├──────────────────┤
+│ t                │
+└──────────────────┘
+(1 row)
 
 ```
 ## Scalar Update Operations
 
 Test the set() function to update scalar values.
-```
-
-```
 Basic set operation
-```
+``` postgres-console
 select set('int32:42'::scalar, 100);
+┌───────────┐
+│    set    │
+├───────────┤
+│ int32:100 │
+└───────────┘
+(1 row)
 
 ```
 Set with different types
-```
+``` postgres-console
 select set('fp64:3.14'::scalar, 2.71);
+┌───────────────┐
+│      set      │
+├───────────────┤
+│ fp64:2.710000 │
+└───────────────┘
+(1 row)
+
 select set('bool:true'::scalar, false);
+┌────────┐
+│  set   │
+├────────┤
+│ bool:f │
+└────────┘
+(1 row)
 
 ```
 Set on empty scalar
-```
+``` postgres-console
 select set('int32'::scalar, 42);
+┌──────────┐
+│   set    │
+├──────────┤
+│ int32:42 │
+└──────────┘
+(1 row)
 
 ```
 Set to zero
-```
+``` postgres-console
 select set('int32:42'::scalar, 0);
+┌─────────┐
+│   set   │
+├─────────┤
+│ int32:0 │
+└─────────┘
+(1 row)
 
 ```
 Set to negative
-```
+``` postgres-console
 select set('int32:42'::scalar, -100);
+┌────────────┐
+│    set     │
+├────────────┤
+│ int32:-100 │
+└────────────┘
+(1 row)
 
 ```
 Set boundary values
-```
+``` postgres-console
 select set('int32:0'::scalar, 2147483647);
+┌──────────────────┐
+│       set        │
+├──────────────────┤
+│ int32:2147483647 │
+└──────────────────┘
+(1 row)
+
 select set('int32:0'::scalar, -2147483648);
+┌───────────────────┐
+│        set        │
+├───────────────────┤
+│ int32:-2147483648 │
+└───────────────────┘
+(1 row)
 
 ```
 Set float values
-```
+``` postgres-console
 select set('fp64:0.0'::scalar, 'Infinity'::float8);
+┌───────────────┐
+│      set      │
+├───────────────┤
+│ fp64:Infinity │
+└───────────────┘
+(1 row)
+
 select set('fp64:0.0'::scalar, 'NaN'::float8);
+┌──────────┐
+│   set    │
+├──────────┤
+│ fp64:NaN │
+└──────────┘
+(1 row)
+
 select set('fp64:0.0'::scalar, -0.0);
+┌───────────────┐
+│      set      │
+├───────────────┤
+│ fp64:0.000000 │
+└───────────────┘
+(1 row)
 
 ```
 ## Scalar Utility Functions
 
 Test other scalar utility functions.
-```
-
-```
 Print scalar value
-```
+``` postgres-console
 select print('int32:42'::scalar);
+┌───────┐
+│ print │
+├───────┤
+│ 42    │
+└───────┘
+(1 row)
+
 select print('fp64:3.14'::scalar);
+┌──────────┐
+│  print   │
+├──────────┤
+│ 3.140000 │
+└──────────┘
+(1 row)
+
 select print('bool:true'::scalar);
+┌───────┐
+│ print │
+├───────┤
+│ t     │
+└───────┘
+(1 row)
 
 ```
 Print empty scalar
-```
+``` postgres-console
 select print('int32'::scalar);
+┌───────┐
+│ print │
+├───────┤
+│       │
+└───────┘
+(1 row)
 
 ```
 Get scalar type
-```
+``` postgres-console
 select type('int32:42'::scalar);
+┌───────┐
+│ type  │
+├───────┤
+│ int32 │
+└───────┘
+(1 row)
+
 select type('fp64:3.14'::scalar);
+┌──────┐
+│ type │
+├──────┤
+│ fp64 │
+└──────┘
+(1 row)
+
 select type('bool:true'::scalar);
+┌──────┐
+│ type │
+├──────┤
+│ bool │
+└──────┘
+(1 row)
+
 select type('int16:1'::scalar);
+┌───────┐
+│ type  │
+├───────┤
+│ int16 │
+└───────┘
+(1 row)
 
 ```
 Count values (always 0 or 1 for scalars)
-```
+``` postgres-console
 select nvals('int32:42'::scalar) as has_value;
+┌───────────┐
+│ has_value │
+├───────────┤
+│         1 │
+└───────────┘
+(1 row)
+
 select nvals('int32'::scalar) as empty;
+┌───────┐
+│ empty │
+├───────┤
+│     0 │
+└───────┘
+(1 row)
 
 ```
 Duplicate scalar
-```
+``` postgres-console
 select dup('int32:42'::scalar);
+┌──────────┐
+│   dup    │
+├──────────┤
+│ int32:42 │
+└──────────┘
+(1 row)
+
 select dup('fp64:3.14'::scalar);
+┌───────────────┐
+│      dup      │
+├───────────────┤
+│ fp64:3.140000 │
+└───────────────┘
+(1 row)
 
 ```
 Wait for scalar (synchronization in async mode)
-```
+``` postgres-console
 select wait('int32:42'::scalar);
+┌──────────┐
+│   wait   │
+├──────────┤
+│ int32:42 │
+└──────────┘
+(1 row)
 
 ```
 Clear scalar (removes value)
-```
+``` postgres-console
 select nvals(clear('int32:42'::scalar));
+┌───────┐
+│ nvals │
+├───────┤
+│     0 │
+└───────┘
+(1 row)
+
 select clear('int32:42'::scalar);
+┌───────┐
+│ clear │
+├───────┤
+│ int32 │
+└───────┘
+(1 row)
 
 ```
 Clear already empty scalar
-```
+``` postgres-console
 select clear('int32'::scalar);
+┌───────┐
+│ clear │
+├───────┤
+│ int32 │
+└───────┘
+(1 row)
 
 ```
 ## Scalar Type Promotion
 
 Test how scalars interact with different native types.
-```
-
-```
 Int32 scalar with different int sizes
-```
+``` postgres-console
 select 'int32:100'::scalar + 1::int2;  -- scalar + int16
+┌───────────┐
+│ ?column?  │
+├───────────┤
+│ int16:101 │
+└───────────┘
+(1 row)
+
 select 'int32:100'::scalar + 1::int4;  -- scalar + int32
+┌───────────┐
+│ ?column?  │
+├───────────┤
+│ int32:101 │
+└───────────┘
+(1 row)
+
 select 'int32:100'::scalar + 1::int8;  -- scalar + int64
+┌───────────┐
+│ ?column?  │
+├───────────┤
+│ int64:101 │
+└───────────┘
+(1 row)
 
 ```
 Float scalar with different float sizes
-```
+``` postgres-console
 select 'fp64:3.14'::scalar + 1.0::float4;  -- scalar + float32
+┌───────────────┐
+│   ?column?    │
+├───────────────┤
+│ fp32:4.140000 │
+└───────────────┘
+(1 row)
+
 select 'fp64:3.14'::scalar + 1.0::float8;  -- scalar + float64
+┌───────────────┐
+│   ?column?    │
+├───────────────┤
+│ fp64:4.140000 │
+└───────────────┘
+(1 row)
 
 ```
 Int scalar with float (promotes to float)
-```
+``` postgres-console
 select 'int32:10'::scalar + 3.14::float8;
+┌────────────────┐
+│    ?column?    │
+├────────────────┤
+│ fp64:13.140000 │
+└────────────────┘
+(1 row)
 
 ```
 Small int with large int
-```
+``` postgres-console
 select 1::int2 + 'int32:100'::scalar;  -- int16 + scalar
+┌──────────┐
+│ ?column? │
+├──────────┤
+│      101 │
+└──────────┘
+(1 row)
+
 select 1::int8 + 'int32:100'::scalar;  -- int64 + scalar
+┌──────────┐
+│ ?column? │
+├──────────┤
+│      101 │
+└──────────┘
+(1 row)
 
 ```
 ## Scalar Comparison Context
 
 While scalars don't have direct comparison operators, they can be
 extracted and compared as native types.
-```
-
-```
 Extract and compare
-```
+``` postgres-console
 select ('int32:10'::scalar::int4) = 10;
+┌──────────┐
+│ ?column? │
+├──────────┤
+│ t        │
+└──────────┘
+(1 row)
+
 select ('int32:10'::scalar::int4) > 5;
+┌──────────┐
+│ ?column? │
+├──────────┤
+│ t        │
+└──────────┘
+(1 row)
+
 select ('int32:10'::scalar::int4) < 20;
+┌──────────┐
+│ ?column? │
+├──────────┤
+│ t        │
+└──────────┘
+(1 row)
 
 ```
 Compare two scalar values via extraction
-```
+``` postgres-console
 select ('int32:10'::scalar::int4) = ('int32:10'::scalar::int4);
+┌──────────┐
+│ ?column? │
+├──────────┤
+│ t        │
+└──────────┘
+(1 row)
+
 select ('int32:10'::scalar::int4) < ('int32:20'::scalar::int4);
+┌──────────┐
+│ ?column? │
+├──────────┤
+│ t        │
+└──────────┘
+(1 row)
 
 ```
 Compare floats
-```
+``` postgres-console
 select ('fp64:3.14'::scalar::float8) = 3.14;
+┌──────────┐
+│ ?column? │
+├──────────┤
+│ t        │
+└──────────┘
+(1 row)
+
 select ('fp64:3.14'::scalar::float8) > 3.0;
+┌──────────┐
+│ ?column? │
+├──────────┤
+│ t        │
+└──────────┘
+(1 row)
 
 ```
 Compare booleans
-```
+``` postgres-console
 select ('bool:true'::scalar::bool) = true;
+┌──────────┐
+│ ?column? │
+├──────────┤
+│ t        │
+└──────────┘
+(1 row)
+
 select ('bool:false'::scalar::bool) = false;
+┌──────────┐
+│ ?column? │
+├──────────┤
+│ t        │
+└──────────┘
+(1 row)
 
 ```
 ## Scalar Edge Cases - Division
 
 Test division edge cases and error conditions.
-```
-
-```
 Integer division truncates
-```
+``` postgres-console
 select 'int32:7'::scalar / 2;
+┌──────────┐
+│ ?column? │
+├──────────┤
+│ int32:3  │
+└──────────┘
+(1 row)
+
 select 'int32:7'::scalar / 3;
+┌──────────┐
+│ ?column? │
+├──────────┤
+│ int32:2  │
+└──────────┘
+(1 row)
+
 select 'int32:-7'::scalar / 2;
+┌──────────┐
+│ ?column? │
+├──────────┤
+│ int32:-3 │
+└──────────┘
+(1 row)
 
 ```
 Division by 1 and -1
-```
+``` postgres-console
 select 'int32:42'::scalar / 1;
+┌──────────┐
+│ ?column? │
+├──────────┤
+│ int32:42 │
+└──────────┘
+(1 row)
+
 select 'int32:42'::scalar / -1;
+┌───────────┐
+│ ?column?  │
+├───────────┤
+│ int32:-42 │
+└───────────┘
+(1 row)
 
 ```
 Float division
-```
+``` postgres-console
 select 'fp64:7.0'::scalar / 2.0;
+┌───────────────┐
+│   ?column?    │
+├───────────────┤
+│ fp64:3.500000 │
+└───────────────┘
+(1 row)
+
 select 'fp64:1.0'::scalar / 3.0;
+┌───────────────┐
+│   ?column?    │
+├───────────────┤
+│ fp64:0.333333 │
+└───────────────┘
+(1 row)
 
 ```
 Division producing very small results
-```
+``` postgres-console
 select 'fp64:1.0'::scalar / 1e100;
+┌───────────────┐
+│   ?column?    │
+├───────────────┤
+│ fp64:0.000000 │
+└───────────────┘
+(1 row)
 
 ```
 Division producing very large results
-```
+``` postgres-console
 select 'fp64:1e100'::scalar / 0.001;
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                                       ?column?                                                       │
+├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ fp64:10000000000000000019156750857346687362159551272651920111528035145993793242039887559612361451081803235328.000000 │
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+(1 row)
 
 ```
 ## Scalar NULL Handling
 
 Test how scalars interact with SQL NULLs.
-```
-
-```
 NULL cast to scalar produces NULL
-```
+``` postgres-console
 select NULL::int::scalar;
+┌────────┐
+│ scalar │
+├────────┤
+│ int32  │
+└────────┘
+(1 row)
 
 ```
 Scalar operations with NULL
-```
+``` postgres-console
 select 'int32:42'::scalar + NULL::int;
+ERROR:  Cannot pass NULL to scalar_plus_int32
 select NULL::int + 'int32:42'::scalar;
-
+ERROR:  Cannot pass NULL to plus_scalar_int32
 ```
 Set with NULL (should fail or create empty scalar)
 Note: This may error depending on implementation
 select set('int32:42'::scalar, NULL::int);
-```
-
-```
 ## Scalar Round-Trip Conversions
 
 Test that values survive round-trip conversions.
-```
-
-```
 Int round-trips
-```
+``` postgres-console
 select 42::int4::scalar::int4;
+┌──────┐
+│ int4 │
+├──────┤
+│   42 │
+└──────┘
+(1 row)
+
 select (-42)::int4::scalar::int4;
+┌──────┐
+│ int4 │
+├──────┤
+│  -42 │
+└──────┘
+(1 row)
+
 select 0::int4::scalar::int4;
+┌──────┐
+│ int4 │
+├──────┤
+│    0 │
+└──────┘
+(1 row)
 
 ```
 Float round-trips (may have precision differences)
-```
+``` postgres-console
 select 3.14::float8::scalar::float8;
+┌────────┐
+│ float8 │
+├────────┤
+│   3.14 │
+└────────┘
+(1 row)
+
 select (-3.14)::float8::scalar::float8;
+┌────────┐
+│ float8 │
+├────────┤
+│  -3.14 │
+└────────┘
+(1 row)
+
 select 0.0::float8::scalar::float8;
+┌────────┐
+│ float8 │
+├────────┤
+│      0 │
+└────────┘
+(1 row)
 
 ```
 Bool round-trips
-```
+``` postgres-console
 select true::bool::scalar::bool;
+┌──────┐
+│ bool │
+├──────┤
+│ t    │
+└──────┘
+(1 row)
+
 select false::bool::scalar::bool;
+┌──────┐
+│ bool │
+├──────┤
+│ f    │
+└──────┘
+(1 row)
 
 ```
 Large int round-trips
-```
+``` postgres-console
 select 2147483647::int4::scalar::int4;
+┌────────────┐
+│    int4    │
+├────────────┤
+│ 2147483647 │
+└────────────┘
+(1 row)
+
 select (-2147483648)::int4::scalar::int4;
+┌─────────────┐
+│    int4     │
+├─────────────┤
+│ -2147483648 │
+└─────────────┘
+(1 row)
 
 ```
 Special float round-trips
-```
+``` postgres-console
 select 'Infinity'::float8::scalar::float8;
+┌──────────┐
+│  float8  │
+├──────────┤
+│ Infinity │
+└──────────┘
+(1 row)
+
 select '-Infinity'::float8::scalar::float8;
+┌───────────┐
+│  float8   │
+├───────────┤
+│ -Infinity │
+└───────────┘
+(1 row)
+
 select 'NaN'::float8::scalar::float8;
+┌────────┐
+│ float8 │
+├────────┤
+│    NaN │
+└────────┘
+(1 row)
 
 ```
 ## Scalar Precision and Accuracy
 
 Test precision maintenance across operations.
-```
-
-```
 Float precision
-```
+``` postgres-console
 select 'fp64:0.1'::scalar + 0.2;  -- famous 0.3 problem
+┌───────────────┐
+│   ?column?    │
+├───────────────┤
+│ fp64:0.300000 │
+└───────────────┘
+(1 row)
+
 select 'fp64:1.0'::scalar / 3.0 * 3.0;  -- should be close to 1.0
+┌───────────────┐
+│   ?column?    │
+├───────────────┤
+│ fp64:1.000000 │
+└───────────────┘
+(1 row)
 
 ```
 Very precise values
-```
+``` postgres-console
 select 'fp64:3.141592653589793'::scalar::float8;
+┌───────────────────┐
+│      float8       │
+├───────────────────┤
+│ 3.141592653589793 │
+└───────────────────┘
+(1 row)
 
 ```
 Addition of very different magnitudes
-```
+``` postgres-console
 select 'fp64:1e20'::scalar + 1.0;
+┌───────────────────────────────────┐
+│             ?column?              │
+├───────────────────────────────────┤
+│ fp64:100000000000000000000.000000 │
+└───────────────────────────────────┘
+(1 row)
+
 select 'fp64:1.0'::scalar + 1e-20;
+┌───────────────┐
+│   ?column?    │
+├───────────────┤
+│ fp64:1.000000 │
+└───────────────┘
+(1 row)
 
 ```
 Subtraction producing small differences
-```
+``` postgres-console
 select 'fp64:1.000000001'::scalar - 1.0;
+┌───────────────┐
+│   ?column?    │
+├───────────────┤
+│ fp64:0.000000 │
+└───────────────┘
+(1 row)
 
 ```
 ## Scalar Memory and Storage
 
 Test internal representation details.
-```
-
-```
 Empty scalars should be lightweight
-```
+``` postgres-console
 select nvals('int32'::scalar);
+┌───────┐
+│ nvals │
+├───────┤
+│     0 │
+└───────┘
+(1 row)
+
 select nvals('fp64'::scalar);
+┌───────┐
+│ nvals │
+├───────┤
+│     0 │
+└───────┘
+(1 row)
+
 select nvals('bool'::scalar);
+┌───────┐
+│ nvals │
+├───────┤
+│     0 │
+└───────┘
+(1 row)
 
 ```
 Scalars with values
-```
+``` postgres-console
 select nvals('int32:0'::scalar);  -- zero is still a value
+┌───────┐
+│ nvals │
+├───────┤
+│     1 │
+└───────┘
+(1 row)
+
 select nvals('fp64:0.0'::scalar);
+┌───────┐
+│ nvals │
+├───────┤
+│     1 │
+└───────┘
+(1 row)
+
 select nvals('bool:false'::scalar);
+┌───────┐
+│ nvals │
+├───────┤
+│     1 │
+└───────┘
+(1 row)
 
 ```
 Type information preserved
-```
+``` postgres-console
 select type('int32'::scalar);
+┌───────┐
+│ type  │
+├───────┤
+│ int32 │
+└───────┘
+(1 row)
+
 select type('int32:42'::scalar);
+┌───────┐
+│ type  │
+├───────┤
+│ int32 │
+└───────┘
+(1 row)
 
 ```
 Value preserved after dup
-```
+``` postgres-console
 select 'int32:42'::scalar::int4;
+┌──────┐
+│ int4 │
+├──────┤
+│   42 │
+└──────┘
+(1 row)
+
 select dup('int32:42'::scalar)::int4;
+┌─────┐
+│ dup │
+├─────┤
+│  42 │
+└─────┘
+(1 row)
 
 ```
 ## Scalars with Vector Operations
 
 Test scalar parameters and results in vector operations.
-```
-
-```
 Vector apply with scalar (apply_first: scalar op vector)
-```
+``` postgres-console
 select apply(5::int, 'int32(5)[0:10 1:20 2:30]'::vector, 'plus_int32'::binaryop);
+┌──────────────────────────┐
+│          apply           │
+├──────────────────────────┤
+│ int32(5)[0:15 1:25 2:35] │
+└──────────────────────────┘
+(1 row)
+
 select apply(10::int, 'int32(5)[0:1 1:2 2:3 3:4 4:5]'::vector, 'times_int32'::binaryop);
+┌────────────────────────────────────┐
+│               apply                │
+├────────────────────────────────────┤
+│ int32(5)[0:10 1:20 2:30 3:40 4:50] │
+└────────────────────────────────────┘
+(1 row)
+
 select apply(100::int, 'int32(5)[0:10 1:20 2:30]'::vector, 'minus_int32'::binaryop);
+┌──────────────────────────┐
+│          apply           │
+├──────────────────────────┤
+│ int32(5)[0:90 1:80 2:70] │
+└──────────────────────────┘
+(1 row)
 
 ```
 Vector apply with scalar (apply_second: vector op scalar)
-```
+``` postgres-console
 select apply('int32(5)[0:10 1:20 2:30]'::vector, 5::int, 'plus_int32'::binaryop);
+┌──────────────────────────┐
+│          apply           │
+├──────────────────────────┤
+│ int32(5)[0:15 1:25 2:35] │
+└──────────────────────────┘
+(1 row)
+
 select apply('int32(5)[0:1 1:2 2:3 3:4 4:5]'::vector, 10::int, 'times_int32'::binaryop);
+┌────────────────────────────────────┐
+│               apply                │
+├────────────────────────────────────┤
+│ int32(5)[0:10 1:20 2:30 3:40 4:50] │
+└────────────────────────────────────┘
+(1 row)
+
 select apply('int32(5)[0:100 1:200 2:300]'::vector, 50::int, 'minus_int32'::binaryop);
+┌────────────────────────────┐
+│           apply            │
+├────────────────────────────┤
+│ int32(5)[0:50 1:150 2:250] │
+└────────────────────────────┘
+(1 row)
 
 ```
 Vector apply with float scalar
-```
+``` postgres-console
 select apply(2.5::double precision, 'fp64(5)[0:1.0 1:2.0 2:3.0]'::vector, 'times_fp64'::binaryop);
+┌───────────────────────────────────────────┐
+│                   apply                   │
+├───────────────────────────────────────────┤
+│ fp64(5)[0:2.500000 1:5.000000 2:7.500000] │
+└───────────────────────────────────────────┘
+(1 row)
+
 select apply('fp64(5)[0:10.0 1:20.0 2:30.0]'::vector, 5.0::double precision, 'div_fp64'::binaryop);
+┌───────────────────────────────────────────┐
+│                   apply                   │
+├───────────────────────────────────────────┤
+│ fp64(5)[0:2.000000 1:4.000000 2:6.000000] │
+└───────────────────────────────────────────┘
+(1 row)
 
 ```
 Vector set_element with scalar value
-```
+``` postgres-console
 select set_element('int32(10)[0:1 2:3 4:5]'::vector, 1, 100::int);
+┌──────────────────────────────┐
+│         set_element          │
+├──────────────────────────────┤
+│ int32(10)[0:1 1:100 2:3 4:5] │
+└──────────────────────────────┘
+(1 row)
+
 select set_element('int32(10)[0:1 2:3 4:5]'::vector, 5, 42::int);
+┌─────────────────────────────┐
+│         set_element         │
+├─────────────────────────────┤
+│ int32(10)[0:1 2:3 4:5 5:42] │
+└─────────────────────────────┘
+(1 row)
+
 select set_element('fp64(5)[0:1.5 2:3.5]'::vector, 3, 2.71::double precision);
+┌───────────────────────────────────────────┐
+│                set_element                │
+├───────────────────────────────────────────┤
+│ fp64(5)[0:1.500000 2:3.500000 3:2.710000] │
+└───────────────────────────────────────────┘
+(1 row)
 
 ```
 Vector get_element returns scalar (conceptually)
-```
+``` postgres-console
 select get_element('int32[0:10 1:20 2:30]'::vector, 1);
+┌─────────────┐
+│ get_element │
+├─────────────┤
+│ int32:20    │
+└─────────────┘
+(1 row)
+
 select get_element('fp64[0:1.5 1:2.5 2:3.5]'::vector, 2);
+┌───────────────┐
+│  get_element  │
+├───────────────┤
+│ fp64:3.500000 │
+└───────────────┘
+(1 row)
+
 select get_element('bool[0:true 1:false 2:true]'::vector, 0);
+┌─────────────┐
+│ get_element │
+├─────────────┤
+│ bool:t      │
+└─────────────┘
+(1 row)
 
 ```
 ## Scalars with Matrix Operations
 
 Test scalar parameters in matrix operations.
-```
-
-```
 Matrix set_element with scalar value
-```
+``` postgres-console
 select set_element('int32(3,3)[0:0:10 1:1:20 2:2:30]'::matrix, 0, 1, 15::int);
+┌────────────────────────────────────────┐
+│              set_element               │
+├────────────────────────────────────────┤
+│ int32(3:)[0:0:10 0:1:15 1:1:20 2:2:30] │
+└────────────────────────────────────────┘
+(1 row)
+
 select set_element('fp64(3,3)[0:0:1.5 1:1:2.5]'::matrix, 2, 2, 3.14::double precision);
+┌──────────────────────────────────────────────────┐
+│                   set_element                    │
+├──────────────────────────────────────────────────┤
+│ fp64(3:)[0:0:1.500000 1:1:2.500000 2:2:3.140000] │
+└──────────────────────────────────────────────────┘
+(1 row)
 
 ```
 Matrix get_element returns scalar (conceptually)
-```
+``` postgres-console
 select get_element('int32[0:0:10 0:1:15 1:0:20 1:1:25]'::matrix, 0, 1);
+┌─────────────┐
+│ get_element │
+├─────────────┤
+│ int32:15    │
+└─────────────┘
+(1 row)
+
 select get_element('fp64[0:0:1.5 1:1:2.5 2:2:3.5]'::matrix, 1, 1);
+┌───────────────┐
+│  get_element  │
+├───────────────┤
+│ fp64:2.500000 │
+└───────────────┘
+(1 row)
 
 ```
 Matrix apply with scalar (apply_first: scalar op matrix)
-```
+``` postgres-console
 select apply(10::int, 'int32(3,3)[0:0:1 1:1:2 2:2:3]'::matrix, 'times_int32'::binaryop);
+┌─────────────────────────────────┐
+│              apply              │
+├─────────────────────────────────┤
+│ int32(3:)[0:0:10 1:1:20 2:2:30] │
+└─────────────────────────────────┘
+(1 row)
+
 select apply(100::int, 'int32(3,3)[0:0:10 0:1:20 1:0:30]'::matrix, 'minus_int32'::binaryop);
+┌─────────────────────────────────┐
+│              apply              │
+├─────────────────────────────────┤
+│ int32(3:)[0:0:90 0:1:80 1:0:70] │
+└─────────────────────────────────┘
+(1 row)
 
 ```
 Matrix apply with scalar (apply_second: matrix op scalar)
-```
+``` postgres-console
 select apply('int32(3,3)[0:0:10 1:1:20 2:2:30]'::matrix, 5::int, 'plus_int32'::binaryop);
+┌─────────────────────────────────┐
+│              apply              │
+├─────────────────────────────────┤
+│ int32(3:)[0:0:15 1:1:25 2:2:35] │
+└─────────────────────────────────┘
+(1 row)
+
 select apply('fp64(3,3)[0:0:2.0 1:1:4.0 2:2:6.0]'::matrix, 2.0::double precision, 'div_fp64'::binaryop);
+┌──────────────────────────────────────────────────┐
+│                      apply                       │
+├──────────────────────────────────────────────────┤
+│ fp64(3:)[0:0:1.000000 1:1:2.000000 2:2:3.000000] │
+└──────────────────────────────────────────────────┘
+(1 row)
 
 ```
 ## Scalar Reductions
 
 Operations that reduce vectors or matrices to scalars.
-```
-
-```
 Vector reduce to scalar
-```
+``` postgres-console
 select reduce_scalar('int32[0:10 1:20 2:30]'::vector, 'plus_monoid_int32'::monoid);
+┌───────────────┐
+│ reduce_scalar │
+├───────────────┤
+│ int32:60      │
+└───────────────┘
+(1 row)
+
 select reduce_scalar('int32[0:5 1:10 2:15 3:20]'::vector, 'times_monoid_int32'::monoid);
+┌───────────────┐
+│ reduce_scalar │
+├───────────────┤
+│ int32:15000   │
+└───────────────┘
+(1 row)
+
 select reduce_scalar('fp64[0:1.5 1:2.5 2:3.5]'::vector, 'plus_monoid_fp64'::monoid);
+┌───────────────┐
+│ reduce_scalar │
+├───────────────┤
+│ fp64:7.500000 │
+└───────────────┘
+(1 row)
 
 ```
 Vector reduce with different monoids
-```
+``` postgres-console
 select reduce_scalar('int32[0:10 1:5 2:20 3:15]'::vector, 'max_monoid_int32'::monoid);
+┌───────────────┐
+│ reduce_scalar │
+├───────────────┤
+│ int32:20      │
+└───────────────┘
+(1 row)
+
 select reduce_scalar('int32[0:10 1:5 2:20 3:15]'::vector, 'min_monoid_int32'::monoid);
+┌───────────────┐
+│ reduce_scalar │
+├───────────────┤
+│ int32:5       │
+└───────────────┘
+(1 row)
 
 ```
 Matrix reduce to scalar
-```
+``` postgres-console
 select reduce_scalar('int32[0:0:1 0:1:2 1:0:3 1:1:4]'::matrix, 'plus_monoid_int32'::monoid);
+┌───────────────┐
+│ reduce_scalar │
+├───────────────┤
+│ int32:10      │
+└───────────────┘
+(1 row)
+
 select reduce_scalar('fp64[0:0:1.5 0:1:2.5 1:0:3.5 1:1:4.5]'::matrix, 'times_monoid_fp64'::monoid);
+┌────────────────┐
+│ reduce_scalar  │
+├────────────────┤
+│ fp64:59.062500 │
+└────────────────┘
+(1 row)
 
 ```
 Reduce with identity returns identity for empty
-```
+``` postgres-console
 select reduce_scalar('int32(10)[]'::vector, 'plus_monoid_int32'::monoid);
+┌───────────────┐
+│ reduce_scalar │
+├───────────────┤
+│ int32         │
+└───────────────┘
+(1 row)
+
 select reduce_scalar('int32(5,5)[]'::matrix, 'times_monoid_int32'::monoid);
+┌───────────────┐
+│ reduce_scalar │
+├───────────────┤
+│ int32         │
+└───────────────┘
+(1 row)
 
 ```
 ## Scalars as Thresholds
 
 Use scalars as comparison thresholds in select operations.
-```
-
-```
 Vector select with scalar threshold
-```
+``` postgres-console
 select choose('int32(10)[0:5 1:15 2:10 3:20 4:8]'::vector, 'valuelt_int32'::indexunaryop, 10::int);
+┌────────────────────┐
+│       choose       │
+├────────────────────┤
+│ int32(10)[0:5 4:8] │
+└────────────────────┘
+(1 row)
+
 select choose('int32(10)[0:5 1:15 2:10 3:20 4:8]'::vector, 'valuegt_int32'::indexunaryop, 10::int);
+┌──────────────────────┐
+│        choose        │
+├──────────────────────┤
+│ int32(10)[1:15 3:20] │
+└──────────────────────┘
+(1 row)
+
 select choose('int32(10)[0:5 1:15 2:10 3:20 4:8]'::vector, 'valuege_int32'::indexunaryop, 10::int);
+┌───────────────────────────┐
+│          choose           │
+├───────────────────────────┤
+│ int32(10)[1:15 2:10 3:20] │
+└───────────────────────────┘
+(1 row)
+
 select choose('int32(10)[0:5 1:15 2:10 3:20 4:8]'::vector, 'valuele_int32'::indexunaryop, 10::int);
+┌─────────────────────────┐
+│         choose          │
+├─────────────────────────┤
+│ int32(10)[0:5 2:10 4:8] │
+└─────────────────────────┘
+(1 row)
+
 select choose('int32(10)[0:5 1:15 2:10 3:20 4:8]'::vector, 'valueeq_int32'::indexunaryop, 10::int);
+┌─────────────────┐
+│     choose      │
+├─────────────────┤
+│ int32(10)[2:10] │
+└─────────────────┘
+(1 row)
+
 select choose('int32(10)[0:5 1:15 2:10 3:20 4:8]'::vector, 'valuene_int32'::indexunaryop, 10::int);
+┌──────────────────────────────┐
+│            choose            │
+├──────────────────────────────┤
+│ int32(10)[0:5 1:15 3:20 4:8] │
+└──────────────────────────────┘
+(1 row)
 
 ```
 Float vector select with float threshold
-```
+``` postgres-console
 select choose('fp64(5)[0:1.5 1:2.5 2:1.0 3:3.5 4:2.0]'::vector, 'valuegt_fp64'::indexunaryop, 2.0::double precision);
+┌────────────────────────────────┐
+│             choose             │
+├────────────────────────────────┤
+│ fp64(5)[1:2.500000 3:3.500000] │
+└────────────────────────────────┘
+(1 row)
+
 select choose('fp64(5)[0:1.5 1:2.5 2:1.0 3:3.5 4:2.0]'::vector, 'valuele_fp64'::indexunaryop, 2.0::double precision);
+┌───────────────────────────────────────────┐
+│                  choose                   │
+├───────────────────────────────────────────┤
+│ fp64(5)[0:1.500000 2:1.000000 4:2.000000] │
+└───────────────────────────────────────────┘
+(1 row)
 
 ```
 Matrix select with scalar threshold
-```
+``` postgres-console
 select choose('int32(4,4)[0:0:5 0:1:15 1:0:10 1:1:20 2:2:8]'::matrix, 'valuegt_int32'::indexunaryop, 10::int);
+┌──────────────────────────┐
+│          choose          │
+├──────────────────────────┤
+│ int32(4:)[0:1:15 1:1:20] │
+└──────────────────────────┘
+(1 row)
+
 select choose('fp64(3,3)[0:0:1.5 1:1:2.5 2:2:3.5]'::matrix, 'valuele_fp64'::indexunaryop, 2.0::double precision);
+┌────────────────────────┐
+│         choose         │
+├────────────────────────┤
+│ fp64(3:)[0:0:1.500000] │
+└────────────────────────┘
+(1 row)
 
 ```
 ## Scalars with eunion Operations
 
 eunion uses scalar defaults for missing values.
-```
-
-```
 Vector eunion with scalar defaults
-```
+``` postgres-console
 select eunion('int32(5)[0:10 2:30]'::vector,
     5::int,
     'int32(5)[1:20 3:40]'::vector,
     7::int,
     'plus_int32'::binaryop);
+┌───────────────────────────────┐
+│            eunion             │
+├───────────────────────────────┤
+│ int32(5)[0:17 1:25 2:37 3:45] │
+└───────────────────────────────┘
+(1 row)
 
 select eunion('fp64(5)[0:1.5 2:3.5]'::vector,
     2.0::double precision,
     'fp64(5)[1:2.5 3:4.5]'::vector,
     3.0::double precision,
     'times_fp64'::binaryop);
+┌───────────────────────────────────────────────────────┐
+│                        eunion                         │
+├───────────────────────────────────────────────────────┤
+│ fp64(5)[0:4.500000 1:5.000000 2:10.500000 3:9.000000] │
+└───────────────────────────────────────────────────────┘
+(1 row)
 
 ```
 Matrix eunion with scalar defaults
-```
+``` postgres-console
 select eunion('int32(3,3)[0:0:10 1:1:20]'::matrix,
     'int32(3,3)[0:1:15 2:2:30]'::matrix,
     'plus_int32'::binaryop,
     0::int,
     0::int);
-
+ERROR:  function eunion(matrix, matrix, binaryop, integer, integer) does not exist
+LINE 1: select eunion('int32(3,3)[0:0:10 1:1:20]'::matrix,
+               ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
 ```
 eunion with different default values
-```
+``` postgres-console
 select eunion('int32(5)[0:10 2:30]'::vector,
     0::int,
     'int32(5)[1:20 3:40]'::vector,
     100::int,
     'plus_int32'::binaryop);
+┌─────────────────────────────────┐
+│             eunion              │
+├─────────────────────────────────┤
+│ int32(5)[0:110 1:20 2:130 3:40] │
+└─────────────────────────────────┘
+(1 row)
 
 ```
 ## Type Promotion with Scalars
 
 Test how scalars interact across different types.
-```
-
-```
 int32 scalar with int64 vector
-```
+``` postgres-console
 select apply(5::int4, 'int64(5)[0:100 1:200 2:300]'::vector, 'plus_int64'::binaryop);
+┌─────────────────────────────┐
+│            apply            │
+├─────────────────────────────┤
+│ int64(5)[0:105 1:205 2:305] │
+└─────────────────────────────┘
+(1 row)
 
 ```
 int64 scalar with int32 vector
-```
+``` postgres-console
 select apply(1000::int8, 'int32(5)[0:10 1:20 2:30]'::vector, 'times_int32'::binaryop);
+┌───────────────────────────────────┐
+│               apply               │
+├───────────────────────────────────┤
+│ int32(5)[0:10000 1:20000 2:30000] │
+└───────────────────────────────────┘
+(1 row)
 
 ```
 float scalar with int vector (via native operations)
-```
+``` postgres-console
 select 'int32(5)[0:10 1:20 2:30]'::vector + 5::int;
+┌──────────────────────────┐
+│         ?column?         │
+├──────────────────────────┤
+│ int32(5)[0:15 1:25 2:35] │
+└──────────────────────────┘
+(1 row)
+
 select 'fp64(5)[0:1.5 1:2.5 2:3.5]'::vector * 2.0::double precision;
+┌───────────────────────────────────────────┐
+│                 ?column?                  │
+├───────────────────────────────────────────┤
+│ fp64(5)[0:3.000000 1:5.000000 2:7.000000] │
+└───────────────────────────────────────────┘
+(1 row)
 
 ```
 ## Scalars as Accumulators
 
 While scalars aren't directly used as accumulators, test accumulator
 functionality with scalar results.
-```
-
-```
 Reduction with different accumulators would accumulate intermediate scalars
 (though GraphBLAS handles this internally)
-```
-
-```
 Test that accumulation works correctly
-```
+``` postgres-console
 select reduce_scalar(apply('int32[0:1 1:2 2:3]'::vector, 'minv_int32'::unaryop), 'plus_int32'::monoid);
-
+ERROR:  Unknown monoid plus_int32
+LINE 1: ...32[0:1 1:2 2:3]'::vector, 'minv_int32'::unaryop), 'plus_int3...
+                                                             ^
 ```
 ## Scalars with Descriptors
 
 Test scalar operations with descriptors (limited applicability).
-```
-
-```
 Matrix/vector operations with scalars typically don't use descriptors,
 but verify they work when provided
-```
-
+``` postgres-console
 select apply(10::int, 'int32(5)[0:1 1:2 2:3]'::vector, 'plus_int32'::binaryop,
     descr=>'GrB_DEFAULT'::descriptor);
-
+ERROR:  Unknown descriptor GrB_DEFAULT
+LINE 2:     descr=>'GrB_DEFAULT'::descriptor);
+                   ^
 ```
 ## Scalar Utility Integration
 
 Test utility functions in integration contexts.
-```
-
-```
 Print scalars from reductions
-```
+``` postgres-console
 select print(reduce_scalar('int32[0:10 1:20 2:30]'::vector, 'plus_int32'::monoid)::scalar);
-
+ERROR:  Unknown monoid plus_int32
+LINE 1: ...nt(reduce_scalar('int32[0:10 1:20 2:30]'::vector, 'plus_int3...
+                                                             ^
 ```
 Check type of reduced scalar
-```
+``` postgres-console
 select type(reduce_scalar('fp64[0:1.5 1:2.5 2:3.5]'::vector, 'plus_fp64'::monoid)::scalar);
-
+ERROR:  Unknown monoid plus_fp64
+LINE 1: ...(reduce_scalar('fp64[0:1.5 1:2.5 2:3.5]'::vector, 'plus_fp64...
+                                                             ^
 ```
 ## Empty Vector/Matrix with Scalar Operations
 
 Test scalar operations on empty structures.
-```
-
-```
 Empty vector with scalar
-```
+``` postgres-console
 select apply(10::int, 'int32(5)[]'::vector, 'plus_int32'::binaryop);
+┌──────────┐
+│  apply   │
+├──────────┤
+│ int32(5) │
+└──────────┘
+(1 row)
+
 select apply('int32(5)[]'::vector, 5::int, 'times_int32'::binaryop);
+┌──────────┐
+│  apply   │
+├──────────┤
+│ int32(5) │
+└──────────┘
+(1 row)
 
 ```
 Reduce empty vector to scalar
-```
+``` postgres-console
 select reduce_scalar('int32(10)[]'::vector, 'plus_int32'::monoid);
-
+ERROR:  Unknown monoid plus_int32
+LINE 1: select reduce_scalar('int32(10)[]'::vector, 'plus_int32'::mo...
+                                                    ^
 ```
 Empty matrix with scalar
-```
+``` postgres-console
 select apply(5::int, 'int32(3,3)[]'::matrix, 'plus_int32'::binaryop);
+┌───────────┐
+│   apply   │
+├───────────┤
+│ int32(3:) │
+└───────────┘
+(1 row)
 
 ```
 Reduce empty matrix to scalar
-```
+``` postgres-console
 select reduce_scalar('int32(5,5)[]'::matrix, 'times_int32'::monoid);
-
+ERROR:  Unknown monoid times_int32
+LINE 1: select reduce_scalar('int32(5,5)[]'::matrix, 'times_int32'::...
+                                                     ^
 ```
 ## Scalar Chains
 
 Operations that chain multiple scalar transformations.
-```
-
-```
 Extract element, modify via scalar ops, set back
-```
+``` postgres-console
 select set_element('int32[0:10 1:20 2:30]'::vector,
     1,
     (get_element('int32[0:10 1:20 2:30]'::vector, 1)::int + 5)::int);
+┌───────────────────────┐
+│      set_element      │
+├───────────────────────┤
+│ int32[0:10 1:25 2:30] │
+└───────────────────────┘
+(1 row)
 
 ```
 Reduce to scalar, use in apply
-```
+``` postgres-console
 select apply('int32[0:1 1:2 2:3]'::vector,
     reduce_scalar('int32[0:10 1:20 2:30]'::vector, 'plus_int32'::monoid)::int,
     'plus_int32'::binaryop);
-
+ERROR:  Unknown monoid plus_int32
+LINE 2: ...   reduce_scalar('int32[0:10 1:20 2:30]'::vector, 'plus_int3...
+                                                             ^
 ```
 ## Scalars with Boolean Operations
 
 Test boolean scalars in integration contexts.
-```
-
-```
 Boolean scalar with vector apply
-```
+``` postgres-console
 select apply(true::bool, 'bool(5)[0:false 1:true 2:false]'::vector, 'lor'::binaryop);
+┌──────────────────────┐
+│        apply         │
+├──────────────────────┤
+│ bool(5)[0:t 1:t 2:t] │
+└──────────────────────┘
+(1 row)
+
 select apply('bool(5)[0:false 1:true 2:false]'::vector, false::bool, 'land'::binaryop);
+┌──────────────────────┐
+│        apply         │
+├──────────────────────┤
+│ bool(5)[0:f 1:f 2:f] │
+└──────────────────────┘
+(1 row)
 
 ```
 Boolean reduction
-```
+``` postgres-console
 select reduce_scalar('bool[0:true 1:false 2:true]'::vector, 'lor_monoid'::monoid);
+ERROR:  Unknown monoid lor_monoid
+LINE 1: ...uce_scalar('bool[0:true 1:false 2:true]'::vector, 'lor_monoi...
+                                                             ^
 select reduce_scalar('bool[0:true 1:true 2:true]'::vector, 'land_monoid'::monoid);
-
+ERROR:  Unknown monoid land_monoid
+LINE 1: ...duce_scalar('bool[0:true 1:true 2:true]'::vector, 'land_mono...
+                                                             ^
 ```
 ## Scalar Precision in Integration
 
 Test that precision is maintained through operations.
-```
-
-```
 High-precision float through operations
-```
+``` postgres-console
 select reduce_scalar('fp64[0:3.141592653589793 1:2.718281828459045 2:1.414213562373095]'::vector,
     'plus_fp64'::monoid);
-
+ERROR:  Unknown monoid plus_fp64
+LINE 2:     'plus_fp64'::monoid);
+            ^
 ```
 Very small values
-```
+``` postgres-console
 select reduce_scalar('fp64[0:1e-100 1:1e-100 2:1e-100]'::vector, 'plus_fp64'::monoid);
-
+ERROR:  Unknown monoid plus_fp64
+LINE 1: ...calar('fp64[0:1e-100 1:1e-100 2:1e-100]'::vector, 'plus_fp64...
+                                                             ^
 ```
 Very large values
-```
+``` postgres-console
 select reduce_scalar('fp64[0:1e100 1:1e100 2:1e100]'::vector, 'plus_fp64'::monoid);
-
+ERROR:  Unknown monoid plus_fp64
+LINE 1: ...e_scalar('fp64[0:1e100 1:1e100 2:1e100]'::vector, 'plus_fp64...
+                                                             ^
 ```
 ## Scalar Results from Matrix-Vector Operations
 
 Test operations that produce scalars from matrix-vector products.
-```
-
-```
 This would test vxm and mxv but returning the result value
 (GraphBLAS typically returns vectors, but single-element results are scalar-like)
-```
-
-```
 Matrix-vector multiply resulting in single value
-```
+``` postgres-console
 select get_element(
     mxv('int32[0:0:2 0:1:3]'::matrix, 'int32[0:10 1:20]'::vector),
     0
 );
+┌─────────────┐
+│ get_element │
+├─────────────┤
+│ int32:80    │
+└─────────────┘
+(1 row)
 
 ```
 Vector-matrix multiply resulting in single value
-```
+``` postgres-console
 select get_element(
     vxm('int32[0:5 1:10]'::vector, 'int32[0:0:2 1:0:3]'::matrix),
     0
 );
+┌─────────────┐
+│ get_element │
+├─────────────┤
+│ int32:40    │
+└─────────────┘
+(1 row)
 
 ```
 ## Cross-Type Scalar Integration
 
 Test scalars of one type with structures of another.
-```
-
-```
 int scalar with float vector
-```
+``` postgres-console
 select apply('fp64(5)[0:1.5 1:2.5 2:3.5]'::vector,
     ((5::int)::scalar::int)::double precision,
     'plus_fp64'::binaryop);
+┌───────────────────────────────────────────┐
+│                   apply                   │
+├───────────────────────────────────────────┤
+│ fp64(5)[0:6.500000 1:7.500000 2:8.500000] │
+└───────────────────────────────────────────┘
+(1 row)
 
 ```
 float scalar with int vector (requires conversion)
-```
+``` postgres-console
 select apply('int32(5)[0:10 1:20 2:30]'::vector,
     ((2.5::double precision)::scalar::double precision)::int,
     'times_int32'::binaryop);
+┌──────────────────────────┐
+│          apply           │
+├──────────────────────────┤
+│ int32(5)[0:20 1:40 2:60] │
+└──────────────────────────┘
+(1 row)
 
 ```
 ## Scalar Assignment Operations
 
 Test assign_scalar with various patterns.
-```
-
-```
 Assign scalar to all indices
-```
+``` postgres-console
 select assign_scalar('int32(10)[0:1 2:3 4:5]'::vector, 42::int, array[0,1,2,3,4,5,6,7,8,9]::bigint[]);
-
+ERROR:  function assign_scalar(vector, integer, bigint[]) does not exist
+LINE 1: select assign_scalar('int32(10)[0:1 2:3 4:5]'::vector, 42::i...
+               ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
 ```
 Assign scalar to sparse indices
-```
+``` postgres-console
 select assign_scalar('int32(10)[0:1 2:3 4:5]'::vector, 99::int, array[1,5,9]::bigint[]);
-
+ERROR:  function assign_scalar(vector, integer, bigint[]) does not exist
+LINE 1: select assign_scalar('int32(10)[0:1 2:3 4:5]'::vector, 99::i...
+               ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
 ```
 Assign zero scalar
-```
+``` postgres-console
 select assign_scalar('int32(10)[0:10 1:20 2:30]'::vector, 0::int, array[0,1,2]::bigint[]);
-
+ERROR:  function assign_scalar(vector, integer, bigint[]) does not exist
+LINE 1: select assign_scalar('int32(10)[0:10 1:20 2:30]'::vector, 0:...
+               ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
 ```
 Assign to matrix
-```
+``` postgres-console
 select assign_scalar('int32(5,5)[0:0:1 1:1:2]'::matrix, 100::int, array[2,3]::bigint[], array[2,3]::bigint[]);
-
+ERROR:  function assign_scalar(matrix, integer, bigint[], bigint[]) does not exist
+LINE 1: select assign_scalar('int32(5,5)[0:0:1 1:1:2]'::matrix, 100:...
+               ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
 ```
 ## Practical Integration Patterns
 
 Real-world usage patterns combining scalars with other types.
-```
-
-```
 Threshold filtering and reduction
-```
+``` postgres-console
 select reduce_scalar(
     choose('int32(10)[0:5 1:15 2:10 3:20 4:8 5:25 6:3]'::vector,
         'valuegt_int32'::indexunaryop,
         10::int),
     'plus_monoid_int32'::monoid
 );
+┌───────────────┐
+│ reduce_scalar │
+├───────────────┤
+│ int32:60      │
+└───────────────┘
+(1 row)
 
 ```
 Scale vector by reduced value
-```
+``` postgres-console
 select apply(
     'int32[0:10 1:20 2:30]'::vector,
     (reduce_scalar('int32[0:1 1:2 2:3]'::vector, 'plus_monoid_int32'::monoid)::int),
     'div_int32'::binaryop
 );
+┌────────────────────┐
+│       apply        │
+├────────────────────┤
+│ int32[0:1 1:3 2:5] │
+└────────────────────┘
+(1 row)
 
 ```
 Conditional element update based on scalar threshold
-```
+``` postgres-console
 select set_element(
     'int32[0:10 1:20 2:30]'::vector,
     1,
@@ -1083,4 +2616,11 @@ select set_element(
          ELSE (get_element('int32[0:10 1:20 2:30]'::vector, 1)::int)
     END
 );
+┌────────────────────────┐
+│      set_element       │
+├────────────────────────┤
+│ int32[0:10 1:100 2:30] │
+└────────────────────────┘
+(1 row)
+
 ```
