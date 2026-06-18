@@ -13,7 +13,16 @@ docker rm -f onesparse-test
 set -e
 
 echo building test image
-docker build -f Dockerfile-debug --build-arg UID=$(id -u) --build-arg GID=$(id -g) . -t onesparse/test
+# LAGRAPH_REF / LAGRAPH_REPO / WITH_MATRIX_SUM can be overridden in the
+# environment to build against a LAGraph branch (e.g. the matrix-sum PR) and
+# enable the experimental matrix_sum aggregate:
+#   LAGRAPH_REF=matrix-sum WITH_MATRIX_SUM=1 ./test.sh
+docker build -f Dockerfile-debug \
+    --build-arg UID=$(id -u) --build-arg GID=$(id -g) \
+    --build-arg LAGRAPH_REPO="${LAGRAPH_REPO:-https://github.com/GraphBLAS/LAGraph.git}" \
+    --build-arg LAGRAPH_REF="${LAGRAPH_REF:-v1.2.1}" \
+    --build-arg WITH_MATRIX_SUM="${WITH_MATRIX_SUM:-0}" \
+    . -t onesparse/test
 
 docker run --user $(id -u):$(id -g) --mount type=bind,source=$(pwd),target=/home/postgres/onesparse,bind-propagation=rshared --cap-add=SYS_PTRACE --security-opt seccomp=unconfined -d --name "$DB_HOST" onesparse/test
 

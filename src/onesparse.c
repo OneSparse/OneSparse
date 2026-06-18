@@ -292,6 +292,38 @@ default_binaryop(GrB_Type type)
 	return NULL;
 }
 
+/*
+ * The PLUS binary op for a builtin type. Used as the default duplicate-combiner
+ * (dup) for matrix_sum, so matrix_sum(m) computes the element-wise sum.
+ */
+GrB_BinaryOp
+plus_binaryop(GrB_Type type)
+{
+	if (type == GrB_INT64)
+		return GrB_PLUS_INT64;
+	else if (type == GrB_INT32)
+		return GrB_PLUS_INT32;
+	else if (type == GrB_INT16)
+		return GrB_PLUS_INT16;
+	else if (type == GrB_INT8)
+		return GrB_PLUS_INT8;
+	if (type == GrB_UINT64)
+		return GrB_PLUS_UINT64;
+	else if (type == GrB_UINT32)
+		return GrB_PLUS_UINT32;
+	else if (type == GrB_UINT16)
+		return GrB_PLUS_UINT16;
+	else if (type == GrB_UINT8)
+		return GrB_PLUS_UINT8;
+	if (type == GrB_FP64)
+		return GrB_PLUS_FP64;
+	else if (type == GrB_FP32)
+		return GrB_PLUS_FP32;
+	else if (type == GrB_BOOL)
+		return GrB_LOR;
+	return NULL;
+}
+
 GrB_Monoid
 default_monoid(GrB_Type type)
 {
