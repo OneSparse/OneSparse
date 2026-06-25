@@ -26,7 +26,9 @@ CREATE TABLE bench_small AS
   SELECT g AS id, resize(random_matrix('int64', 200, 200, 0.05, g), -1, -1) AS a
   FROM generate_series(1, 50) g;
 
-SELECT (matrix_agg(a, 'plus_int64'::binaryop) = matrix_sum(a)) AS results_match
+-- All three summing engines must agree exactly.
+SELECT (matrix_agg(a, 'plus_int64'::binaryop) = matrix_sum(a)) AS agg_eq_sum,
+       (matrix_sum(a) = matrix_binary_sum(a))                  AS sum_eq_binary_sum
 FROM bench_small;
 
 -- Larger fixture for timing. Tune the count / dimensions / density (overlap)
@@ -38,8 +40,9 @@ CREATE TABLE bench_big AS
 
 -- Warm up, then compare wall-clock (\timing). nvals() forces full evaluation
 -- while keeping the printed output tiny.
-SELECT nvals(matrix_agg(a, 'plus_int64'::binaryop)) AS agg_nvals FROM bench_big;
-SELECT nvals(matrix_sum(a))                          AS sum_nvals FROM bench_big;
+SELECT nvals(matrix_agg(a, 'plus_int64'::binaryop)) AS agg_nvals        FROM bench_big;
+SELECT nvals(matrix_sum(a))                          AS sum_nvals        FROM bench_big;
+SELECT nvals(matrix_binary_sum(a))                   AS binary_sum_nvals FROM bench_big;
 
 -- GraphBLAS thread count affects the internally-parallel build. There is no
 -- SQL GUC for it; set OMP_NUM_THREADS in the server's environment before

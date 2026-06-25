@@ -34,6 +34,30 @@ CREATE AGGREGATE matrix_sum (a matrix)
 CREATE AGGREGATE matrix_sum (a matrix, op binaryop)
     (SFUNC=matrix_sum_matrix, STYPE=internal, FINALFUNC=matrix_sum_final);
 
+-- matrix_binary_sum: same interface and result as matrix_sum, but uses
+-- LAGraph_Matrix_Binary_Sum (a different summing technique inside LAGraph) for
+-- a different parallel/time/space tradeoff.
+CREATE FUNCTION matrix_binary_sum_matrix(state internal, a matrix)
+RETURNS internal
+AS '$libdir/onesparse', 'matrix_binary_sum_matrix'
+LANGUAGE C;
+
+CREATE FUNCTION matrix_binary_sum_matrix(state internal, a matrix, op binaryop)
+RETURNS internal
+AS '$libdir/onesparse', 'matrix_binary_sum_matrix'
+LANGUAGE C;
+
+CREATE FUNCTION matrix_binary_sum_final(state internal)
+RETURNS matrix
+AS '$libdir/onesparse', 'matrix_binary_sum_final'
+LANGUAGE C STRICT;
+
+CREATE AGGREGATE matrix_binary_sum (a matrix)
+    (SFUNC=matrix_binary_sum_matrix, STYPE=internal, FINALFUNC=matrix_binary_sum_final);
+
+CREATE AGGREGATE matrix_binary_sum (a matrix, op binaryop)
+    (SFUNC=matrix_binary_sum_matrix, STYPE=internal, FINALFUNC=matrix_binary_sum_final);
+
 -- A PLUS-capable matrix_agg for an apples-to-apples baseline. The shipped
 -- 1-arg matrix_agg defaults to TIMES; matrix_agg_matrix already accepts an
 -- optional binary operator, so we just expose a 2-arg aggregate form here.

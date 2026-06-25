@@ -22,6 +22,7 @@ docker build -f Dockerfile-debug \
     --build-arg LAGRAPH_REPO="${LAGRAPH_REPO:-https://github.com/GraphBLAS/LAGraph.git}" \
     --build-arg LAGRAPH_REF="${LAGRAPH_REF:-v1.2.1}" \
     --build-arg WITH_MATRIX_SUM="${WITH_MATRIX_SUM:-0}" \
+    --build-arg LAGRAPH_CACHE_BUST="${LAGRAPH_CACHE_BUST:-0}" \
     . -t onesparse/test
 
 docker run --user $(id -u):$(id -g) --mount type=bind,source=$(pwd),target=/home/postgres/onesparse,bind-propagation=rshared --cap-add=SYS_PTRACE --security-opt seccomp=unconfined -d --name "$DB_HOST" onesparse/test

@@ -52,6 +52,13 @@ SELECT sum(nvals(a)) AS total_input_nvals, nvals(matrix_sum(a)) AS union_nvals F
 \echo -- matrix_sum (LAGraph build) --
 SELECT nvals(matrix_sum(a)) AS sum_nvals FROM bench;
 
+-- matrix_binary_sum: same result, different LAGraph summing technique
+-- (binary reduction tree of eWiseAdds rather than a single concatenate+build).
+-- Different parallel/time/space tradeoff; compare its wall time against
+-- matrix_sum's above.
+\echo -- matrix_binary_sum (LAGraph binary reduction) --
+SELECT nvals(matrix_binary_sum(a)) AS binary_sum_nvals FROM bench;
+
 -- matrix_agg: pairwise eWiseAdd. WARNING: this is ~O(N^2) on low-overlap data
 -- (the accumulator grows with every row) -- minutes at a few hundred matrices,
 -- much worse beyond. Comment it out when measuring large :k.
