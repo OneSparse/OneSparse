@@ -769,6 +769,35 @@ drop table mat_agg_test;
 drop table mat_agg_float;
 drop table mat_agg_bool;
 
+-- ## Combining matrices with `matrix_agg(a matrix)`
+--
+-- The matrix-combining form of `matrix_agg` sums one matrix per row into a
+-- single result using a binary-counter merge. The default duplicate combiner is
+-- PLUS, so overlapping entries are added (matching `matrix_sum`).
+
+create temporary table mat_combine (a matrix);
+insert into mat_combine values
+    ('int64(3:3)[0:0:1 1:1:2]'::matrix),
+    ('int64(3:3)[0:0:10 2:2:3]'::matrix),
+    ('int64(3:3)[0:0:100 1:1:20]'::matrix);
+
+-- Default (PLUS): (0,0)=111, (1,1)=22, (2,2)=3
+select print(matrix_agg(a)) as combined from mat_combine;
+
+-- The default equals an explicit PLUS, and matches the expected literal
+select matrix_agg(a) = matrix_agg(a, 'plus_int64'::binaryop) as default_is_plus,
+       matrix_agg(a) = 'int64(3:3)[0:0:111 1:1:22 2:2:3]'::matrix as matches_expected
+from mat_combine;
+
+-- A non-default combiner (MAX): (0,0)=100, (1,1)=20, (2,2)=3
+select matrix_agg(a, 'max_int64'::binaryop) = 'int64(3:3)[0:0:100 1:1:20 2:2:3]'::matrix as max_ok
+from mat_combine;
+
+-- Empty input aggregates to NULL
+select matrix_agg(a) is null as empty_is_null from mat_combine where false;
+
+drop table mat_combine;
+
 -- ## Descriptor Basics
 --
 -- Test basic descriptor construction and properties.

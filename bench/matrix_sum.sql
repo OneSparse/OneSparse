@@ -58,13 +58,6 @@ CREATE AGGREGATE matrix_binary_sum (a matrix)
 CREATE AGGREGATE matrix_binary_sum (a matrix, op binaryop)
     (SFUNC=matrix_binary_sum_matrix, STYPE=internal, FINALFUNC=matrix_binary_sum_final);
 
--- A PLUS-capable matrix_agg for an apples-to-apples baseline. The shipped
--- 1-arg matrix_agg defaults to TIMES; matrix_agg_matrix already accepts an
--- optional binary operator, so we just expose a 2-arg aggregate form here.
-CREATE FUNCTION matrix_agg_matrix(state matrix, a matrix, op binaryop)
-RETURNS matrix
-AS '$libdir/onesparse', 'matrix_agg_matrix'
-LANGUAGE C STABLE;
-
-CREATE AGGREGATE matrix_agg (a matrix, op binaryop)
-    (SFUNC=matrix_agg_matrix, STYPE=matrix, FINALFUNC=matrix_agg_final);
+-- matrix_agg(a matrix) and matrix_agg(a matrix, op binaryop) now ship in the
+-- stock extension (binary-counter merge, default dup PLUS), so no bench-only
+-- definition is needed here.

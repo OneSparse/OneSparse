@@ -1,5 +1,5 @@
 -- Low-overlap benchmark: matrix_sum (LAGraph single build) vs matrix_agg
--- (pairwise eWiseAdd) over a corpus of serialized GraphBLAS matrices (.grb
+-- (binary-counter merge) over a corpus of serialized GraphBLAS matrices (.grb
 -- files produced by GxB_Matrix_serialize), such as ~/dev/NSC/data/grb.
 --
 -- Requires OneSparse built with WITH_MATRIX_SUM=1 against the LAGraph
@@ -11,11 +11,11 @@
 --     \i bench/matrix_sum.sql
 --     \i bench/matrix_sum_grb_bench.sql
 --
--- Why resize(..., -1, -1): these matrices are bounded (e.g. 2^32 square), but
--- matrix_agg accumulates into a GxB_INDEX_MAX (unbounded) matrix, so its inputs
--- must be unbounded too. resize to unbounded makes both engines comparable;
--- matrix_sum handles unbounded inputs fine. The corpus is uint32, so the PLUS
--- dup operator is plus_uint32; matrix_sum(a) defaults to PLUS.
+-- Why resize(..., -1, -1): all engines require the inputs to share dimensions
+-- (a GrB_eWiseAdd / build requirement). Resizing every matrix to unbounded
+-- (GxB_INDEX_MAX) makes the whole corpus uniform regardless of its stored dims.
+-- The corpus is uint32, so the PLUS dup operator is plus_uint32; every engine
+-- defaults to PLUS.
 
 \timing on
 
@@ -38,8 +38,8 @@ CREATE TABLE bench AS
   FROM manifest WHERE global_index < :k;
 
 -- Overlap check: with a low/no-overlap corpus, the union nvals approaches the
--- sum of the per-matrix nvals (so the result is large and matrix_agg re-merges
--- a growing accumulator N-1 times, while matrix_sum sorts/builds once).
+-- sum of the per-matrix nvals (so the result is large), while matrix_sum
+-- sorts/builds once.
 SELECT sum(nvals(a)) AS total_input_nvals, nvals(matrix_sum(a)) AS union_nvals FROM bench;
 
 -- matrix_sum: one internally-parallel LAGraph build.
@@ -59,8 +59,8 @@ SELECT nvals(matrix_sum(a)) AS sum_nvals FROM bench;
 \echo -- matrix_binary_sum (LAGraph binary reduction) --
 SELECT nvals(matrix_binary_sum(a)) AS binary_sum_nvals FROM bench;
 
--- matrix_agg: pairwise eWiseAdd. WARNING: this is ~O(N^2) on low-overlap data
--- (the accumulator grows with every row) -- minutes at a few hundred matrices,
--- much worse beyond. Comment it out when measuring large :k.
-\echo -- matrix_agg (pairwise eWiseAdd) --
+-- matrix_agg: serial binary-counter merge (O(N log N), no LAGraph dependency).
+-- Single-threaded so slower than the parallel LAGraph engines above, but frees
+-- each input as it is absorbed, so it is memory-frugal and reaches high :k.
+\echo -- matrix_agg (binary-counter merge) --
 SELECT nvals(matrix_agg(a, 'plus_uint32'::binaryop)) AS agg_nvals FROM bench;

@@ -394,21 +394,44 @@ RETURNS matrix
 AS '$libdir/onesparse', 'matrix_cast'
 LANGUAGE C STABLE;
 
-CREATE FUNCTION matrix_agg_matrix(state matrix, a matrix)
-RETURNS matrix
-AS '$libdir/onesparse', 'matrix_agg_matrix'
-LANGUAGE C STABLE;
-
+-- matrix_agg_final is the finalfunc for the per-type element builder
+-- matrix_agg(i, j, v) (see matrix_op.sql); leave it as-is.
 CREATE FUNCTION matrix_agg_final(matrix)
 RETURNS matrix
 AS '$libdir/onesparse', 'matrix_agg_final'
 LANGUAGE C STRICT;
 
+-- The matrix-combining matrix_agg(a matrix) uses a binary-counter merge with an
+-- internal carry-stack state (src/matrix/matrix_agg_matrix.c). The optional
+-- binaryop selects the duplicate combiner; the default is PLUS, matching
+-- matrix_sum and matrix_binary_sum.
+CREATE FUNCTION matrix_agg_matrix(state internal, a matrix)
+RETURNS internal
+AS '$libdir/onesparse', 'matrix_agg_matrix'
+LANGUAGE C;
+
+CREATE FUNCTION matrix_agg_matrix(state internal, a matrix, op binaryop)
+RETURNS internal
+AS '$libdir/onesparse', 'matrix_agg_matrix'
+LANGUAGE C;
+
+CREATE FUNCTION matrix_agg_combine_final(state internal)
+RETURNS matrix
+AS '$libdir/onesparse', 'matrix_agg_combine_final'
+LANGUAGE C STRICT;
+
 CREATE AGGREGATE matrix_agg (a matrix)
     (
     SFUNC=matrix_agg_matrix,
-    STYPE=matrix,
-    FINALFUNC=matrix_agg_final
+    STYPE=internal,
+    FINALFUNC=matrix_agg_combine_final
+    );
+
+CREATE AGGREGATE matrix_agg (a matrix, op binaryop)
+    (
+    SFUNC=matrix_agg_matrix,
+    STYPE=internal,
+    FINALFUNC=matrix_agg_combine_final
     );
 
 CREATE FUNCTION set_element(a matrix, i bigint, j bigint, s scalar)

@@ -11,8 +11,8 @@
  * inputs with a different strategy (a binary reduction tree of GrB_eWiseAdds);
  * both yield identical results for a commutative+associative dup operator but
  * trade off parallelism, time, and peak memory differently. matrix_agg
- * (pairwise eWiseAdd into a running accumulator) is the serial baseline; this
- * brings the family of summing aggregates to three.
+ * (a serial binary-counter merge of GrB_eWiseAdds, no LAGraph dependency) is the
+ * portable baseline; this brings the family of summing aggregates to three.
  *
  * The dup operator defaults to PLUS (so matrix_binary_sum(m) is the element-wise
  * sum); an optional binaryop argument overrides it. dup must be commutative and

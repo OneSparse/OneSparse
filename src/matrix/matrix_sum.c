@@ -4,9 +4,9 @@
  * matrix_sum: an aggregate that combines many matrices (one per row) into a
  * single result using LAGraph_Matrix_Sum.
  *
- * Unlike matrix_agg, which folds each row into a running accumulator with a
- * pairwise GrB_eWiseAdd (serial, K-1 merges for a value present in K inputs),
- * matrix_sum collects the input matrix handles during the scan and performs a
+ * Unlike matrix_agg, which combines the rows with a serial binary-counter merge
+ * of GrB_eWiseAdds (no LAGraph dependency), matrix_sum collects the input matrix
+ * handles during the scan and performs a
  * single LAGraph_Matrix_Sum at finalize. That primitive concatenates the tuples
  * of all inputs into one buffer and calls GrB_Matrix_build once with a "dup"
  * binary operator to combine duplicate (i,j) entries -- a single internally
