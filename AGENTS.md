@@ -22,16 +22,29 @@ pgindent <files>
 
 ### Running Tests
 ```bash
-# Full test suite in Docker (preferred method)
+# Full test suite in a container (preferred method)
 ./test.sh
 
+# Explicitly select a supported container runtime when needed
+CONTAINER_RUNTIME=podman ./test.sh
+```
+
+On macOS, configure the Podman machine with at least 4 GiB of memory before
+building the debug image:
+```bash
+podman machine stop
+podman machine set --memory 4096
+podman machine start
+```
+
+```bash
 # Direct PostgreSQL regression tests (requires PostgreSQL running)
 make installcheck
 ```
 
 The `test.sh` script:
 - Removes any previous test container
-- Builds the `onesparse/test` Docker image from `Dockerfile-debug`
+- Builds the `onesparse/test` image from `Dockerfile-debug`
 - Starts a PostgreSQL container with OneSparse installed
 - Runs `make installcheck` inside the container
 - Cleans up the container
@@ -126,11 +139,11 @@ python generate.py
 # Enable debug output (set before building)
 export OS_DEBUG=1
 
-# Run tests in debug Docker container with interactive access
-docker run -it --entrypoint /bin/bash onesparse/test
+# Run tests in the debug container with interactive access
+podman run -it --entrypoint /bin/bash onesparse/test
 
 # Attach to running test container for debugging
-docker exec -it onesparse-test-db bash
+podman exec -it onesparse-test-db bash
 ```
 
 ### Extension Loading

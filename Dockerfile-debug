@@ -1,6 +1,5 @@
 FROM ubuntu:latest
-ARG UID    
-ARG GID
+ARG BUILD_JOBS
    
 # install base dependences    
 RUN apt-get update && \
@@ -11,8 +10,9 @@ RUN apt-get update && \
     liblz4-dev libzstd-dev libxml2-dev libxslt1-dev
 
 RUN deluser --remove-home ubuntu
-# add postgres user and make data dir        
-RUN groupadd --gid ${GID} -r postgres && useradd --uid ${UID} --gid ${GID} --no-log-init -r -m -s /bin/bash -g postgres -G sudo postgres
+# Add a dedicated in-container postgres user. The mounted checkout is not built in place.
+RUN groupadd -r postgres; \
+    useradd -r --gid postgres --no-log-init -m -s /bin/bash -G sudo postgres
 
 # make postgres a sudoer
 RUN echo "postgres ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/user && \
@@ -32,7 +32,7 @@ RUN set -eux; \
      --enable-debug \
      --enable-depend --enable-cassert --enable-profiling \
      CFLAGS="-ggdb -Og -g3 -fno-omit-frame-pointer"; \
-    make -j"$(nproc)"; \
+    make -j"${BUILD_JOBS:-$(nproc)}"; \
     sudo make install; \
     cd ..; \
     sudo rm -rf postgresql-18.0 postgresql-18.0.tar.bz2 /var/lib/apt/lists/*
@@ -66,14 +66,14 @@ RUN set -eux; \
 # get GraphBLAS, compile with debug symbols    
 RUN curl -s -L -J https://github.com/DrTimothyAldenDavis/GraphBLAS/archive/refs/tags/v10.2.0.tar.gz | \
     tar zxvf - && cd GraphBLAS-10.2.0 && \
-    make debug \
+    make -j"${BUILD_JOBS:-$(nproc)}" debug \
 #    CMAKE_OPTIONS='-DGRAPHBLAS_COMPACT=1 ' \
     && sudo make install \
     && /bin/rm -Rf GraphBLAS-10.2.0
 
 RUN curl -s -L -J https://github.com/GraphBLAS/LAGraph/archive/refs/tags/v1.2.1.tar.gz | \
     tar zxvf - && cd LAGraph-1.2.1 && \
-    make library \
+    make -j"${BUILD_JOBS:-$(nproc)}" library \
     && sudo make install \
     && /bin/rm -Rf LAGraph-1.2.1
     
@@ -97,6 +97,5 @@ RUN initdb -D "$PGDATA" \
     -c onesparse.jit_control='on' \
     --encoding UTF8
 EXPOSE 5432
-# wait forever
-
-CMD tail -f /dev/null
+# Keep the test container running until the harness starts PostgreSQL.
+CMD sleep infinity
