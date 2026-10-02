@@ -31,7 +31,7 @@ RUN set -eux; \
     cd postgresql-18.0; \
     ./configure --prefix=/usr --with-openssl --with-icu --with-lz4 --with-zstd \
      --enable-debug \
-     --enable-depend --enable-cassert --enable-profiling \
+     --enable-depend --enable-cassert \
      CFLAGS="-ggdb -Og -g3 -fno-omit-frame-pointer"; \
     make -j"${BUILD_JOBS:-$(nproc)}"; \
     sudo make install; \

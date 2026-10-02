@@ -3,6 +3,7 @@
 DB_HOST="onesparse-test-db"
 DB_NAME="postgres"
 SU="postgres"
+TEST_WORKDIR="/home/postgres/test-work"
 export BUILDKIT_PROGRESS=plain
 
 set -e
@@ -29,7 +30,7 @@ elif ! command -v "$CONTAINER_RUNTIME" >/dev/null 2>&1; then
 fi
 
 container_exec() {
-    "$CONTAINER_RUNTIME" exec "$DB_HOST" "$@"
+    "$CONTAINER_RUNTIME" exec --workdir "$TEST_WORKDIR" "$DB_HOST" "$@"
 }
 
 cleanup() {
@@ -50,6 +51,10 @@ fi
 "$CONTAINER_RUNTIME" run --mount type=bind,source="$(pwd)",target=/home/postgres/onesparse --cap-add=SYS_PTRACE --security-opt seccomp=unconfined -d --name "$DB_HOST" onesparse/test
 trap cleanup EXIT
 
+# The checkout is bind-mounted from the host and may not be writable by the
+# container's postgres user. Run tests from a private writable copy instead.
+"$CONTAINER_RUNTIME" exec "$DB_HOST" mkdir -p "$TEST_WORKDIR"
+container_exec sh -c "cp -R /home/postgres/onesparse/. '$TEST_WORKDIR/'"
 container_exec pg_ctl start
 
 echo waiting for database to accept connections
