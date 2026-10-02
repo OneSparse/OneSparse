@@ -25,7 +25,7 @@ jobs:
           fi
           echo "Version $TAG_VERSION is consistent across files"
 
-      - name: Run test suite
+      - name: Run documentation regression and semantic unit tests
         run: ./test.sh
         timeout-minutes: 10
 

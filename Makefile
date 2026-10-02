@@ -11,5 +11,14 @@ PG_CPPFLAGS = -Wfatal-errors -std=c11 -I/usr/local/include/suitesparse/
 
 TESTS        = $(wildcard sql/*.sql)
 REGRESS      = $(patsubst sql/%.sql,%,$(TESTS))
+UNIT_TEST_RUNNER = ./test/unit/run.sh
+
 # REGRESS_OPTS = --load-language=plpgsql
 include $(PGXS)
+
+.PHONY: unitcheck check
+
+unitcheck:
+	$(UNIT_TEST_RUNNER)
+
+check: installcheck unitcheck

@@ -6,6 +6,7 @@ RUN apt-get update && \
     apt-get install -y make cmake git curl build-essential m4 sudo gdbserver python3-pip \
     gdb libreadline-dev bison flex zlib1g-dev libicu-dev icu-devtools tmux zile zip \
     gawk wget python3-full python3-virtualenv graphviz python3-dev libpq-dev \
+    libtap-parser-sourcehandler-pgtap-perl \
     python3-psycopg2 libssl-dev gnuplot python3-graph-tool pkg-config ca-certificates \
     liblz4-dev libzstd-dev libxml2-dev libxslt1-dev
 
@@ -36,7 +37,16 @@ RUN set -eux; \
     sudo make install; \
     cd ..; \
     sudo rm -rf postgresql-18.0 postgresql-18.0.tar.bz2 /var/lib/apt/lists/*
-        
+
+# pgTAP is installed only in the debug image used by the semantic test suite.
+RUN git clone --depth 1 --branch v1.3.4 https://github.com/theory/pgtap.git && \
+    cd pgtap && \
+    test "$(git rev-parse HEAD)" = "968eb53a33114e83042b3bdb0c664b5b80cf8bdf" && \
+    make && \
+    sudo make install && \
+    cd .. && \
+    rm -rf pgtap
+
 # # get postgres source and compile with debug and no optimization
 # RUN git clone https://github.com/postgres/postgres.git --depth=1 && \
 # #    git checkout REL_18_BETA1 && \

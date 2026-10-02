@@ -45,6 +45,13 @@ select 'bool:true'::scalar;
 select 127::int2::scalar as int16_scalar;
 select 32767::int4::scalar as int32_scalar;
 select 2147483647::int8::scalar as int64_scalar;
+select 42::int4::scalar::int4 as explicit_int32_round_trip;
+select scalar_integer(42) as explicit_int32_constructor;
+select integer_scalar('int32:42'::scalar) as explicit_int32_extractor;
+
+-- Construct unsigned values as well as signed values.
+select 'uint32:42'::scalar as uint32_scalar;
+select 'uint64:42'::scalar as uint64_scalar;
 
 -- Construct from different float sizes
 select 3.14::float4::scalar as fp32_scalar;
@@ -57,6 +64,9 @@ select nvals('int32'::scalar);
 -- Scalar with value
 select 'int32:42'::scalar;
 select nvals('int32:42'::scalar);
+
+-- Zero is a value, not an empty scalar.
+select nvals('int32:0'::scalar) as zero_has_value;
 
 -- ## Scalar Arithmetic with Native Types
 --

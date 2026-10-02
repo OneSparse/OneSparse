@@ -7,6 +7,13 @@ export BUILDKIT_PROGRESS=plain
 
 set -e
 
+if [ "$#" -gt 1 ] || { [ "$#" -eq 1 ] && [ "$1" != "doctest" ] && [ "$1" != "unit" ]; }; then
+    echo "usage: $0 [doctest|unit]" >&2
+    exit 2
+fi
+
+TEST_SUITE=${1:-all}
+
 if [ -z "${CONTAINER_RUNTIME:-}" ]; then
     if command -v docker >/dev/null 2>&1; then
         CONTAINER_RUNTIME=docker
@@ -54,4 +61,19 @@ until
 do sleep 1;
 done
 
-container_exec make installcheck
+case "$TEST_SUITE" in
+    doctest)
+        container_exec make installcheck
+        ;;
+    unit)
+        container_exec make unitcheck
+        ;;
+    all)
+        echo "::group::Documentation regression tests"
+        container_exec make installcheck
+        echo "::endgroup::"
+        echo "::group::Semantic unit tests"
+        container_exec make unitcheck
+        echo "::endgroup::"
+        ;;
+esac

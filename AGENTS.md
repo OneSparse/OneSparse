@@ -25,6 +25,10 @@ pgindent <files>
 # Full test suite in a container (preferred method)
 ./test.sh
 
+# Run only the documentation regression or semantic unit suite
+./test.sh doctest
+./test.sh unit
+
 # Explicitly select a supported container runtime when needed
 CONTAINER_RUNTIME=podman ./test.sh
 ```
@@ -40,16 +44,21 @@ podman machine start
 ```bash
 # Direct PostgreSQL regression tests (requires PostgreSQL running)
 make installcheck
+
+# Direct pgTAP unit tests (requires PostgreSQL with pgTAP installed)
+make unitcheck
 ```
 
 The `test.sh` script:
 - Removes any previous test container
 - Builds the `onesparse/test` image from `Dockerfile-debug`
 - Starts a PostgreSQL container with OneSparse installed
-- Runs `make installcheck` inside the container
+- Runs `make installcheck` and `make unitcheck` inside the container
 - Cleans up the container
 
 Individual test files are located in `sql/` with expected outputs in `expected/`.
+Semantic pgTAP tests are located in `test/unit/sql/` and are intentionally
+outside the documentation regression pipeline.
 
 ### Running Individual Tests
 ```bash
@@ -175,7 +184,7 @@ OneSparse uses PostgreSQL's expanded object framework:
 1. **Modify templates** in `templates/` for generated code changes
 2. **Run `generate.py`** to regenerate SQL and C files
 3. **Rebuild extension**: `make clean && make install`
-4. **Run tests**: `./test.sh` or `make installcheck`
+4. **Run tests**: `./test.sh`, `make installcheck`, or `make unitcheck`
 5. **Update documentation**: `python generate.py` regenerates markdown from SQL tests
 6. **Build docs site**: `mkdocs build` to verify documentation
 
