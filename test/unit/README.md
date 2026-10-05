@@ -24,6 +24,12 @@ Run both suites:
 ./test.sh
 ```
 
+Each `test.sh` invocation also writes source coverage reports for `src/` to
+`coverage/` in the repository root. Open `coverage/coverage.html` to inspect
+uncovered lines, or read `coverage/coverage.txt` for the terminal summary.
+The reports are generated only by the container-based test runner because it
+can stop PostgreSQL before collecting backend execution counters.
+
 With a compatible PostgreSQL server already running, run the unit suite
 directly:
 

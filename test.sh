@@ -4,6 +4,7 @@ DB_HOST="onesparse-test-db"
 DB_NAME="postgres"
 SU="postgres"
 TEST_WORKDIR="/home/postgres/test-work"
+COVERAGE_DIR="$(pwd)/coverage"
 export BUILDKIT_PROGRESS=plain
 
 set -e
@@ -33,12 +34,43 @@ container_exec() {
     "$CONTAINER_RUNTIME" exec --workdir "$TEST_WORKDIR" "$DB_HOST" "$@"
 }
 
+copy_coverage() {
+    mkdir -p "$COVERAGE_DIR"
+    "$CONTAINER_RUNTIME" cp "$DB_HOST:$TEST_WORKDIR/coverage/." "$COVERAGE_DIR" 2>/dev/null || true
+}
+
+collect_coverage() {
+    if [ "${POSTGRES_STARTED:-0}" -ne 1 ]; then
+        return
+    fi
+
+    echo stopping database for coverage collection
+    container_exec pg_ctl stop -m fast || true
+    POSTGRES_STARTED=0
+
+    echo generating coverage report
+    container_exec bash -o pipefail -c '
+        mkdir -p coverage &&
+        gcovr --root . --filter "^src/.*\\.c$" --txt-metric branch \
+            --txt - \
+            --html-details coverage/coverage.html \
+            --xml coverage/coverage.xml | tee coverage/coverage.txt
+    ' || echo "WARNING: coverage report generation failed" >&2
+    copy_coverage
+}
+
 cleanup() {
+    test_status=$?
+    trap - EXIT
+    set +e
+    collect_coverage
     "$CONTAINER_RUNTIME" rm --force "$DB_HOST" >/dev/null 2>&1 || true
+    exit "$test_status"
 }
 
 echo "removing previous test container"
-cleanup
+"$CONTAINER_RUNTIME" rm --force "$DB_HOST" >/dev/null 2>&1 || true
+rm -rf "$COVERAGE_DIR"
 
 echo building test image
 if [ "$CONTAINER_RUNTIME" = podman ]; then
@@ -55,7 +87,12 @@ trap cleanup EXIT
 # container's postgres user. Run tests from a private writable copy instead.
 "$CONTAINER_RUNTIME" exec "$DB_HOST" mkdir -p "$TEST_WORKDIR"
 container_exec sh -c "cp -R /home/postgres/onesparse/. '$TEST_WORKDIR/'"
+container_exec make clean
+container_exec sh -c "find src -name '*.gcda' -delete"
+container_exec make COVERAGE=1
+container_exec sudo make COVERAGE=1 install
 container_exec pg_ctl start
+POSTGRES_STARTED=1
 
 echo waiting for database to accept connections
 until
@@ -77,17 +114,17 @@ run_doctests() {
 
 case "$TEST_SUITE" in
     doctest)
-        run_doctests
+        run_doctests || exit $?
         ;;
     unit)
-        container_exec make unitcheck
+        container_exec make unitcheck || exit $?
         ;;
     all)
         echo "::group::Documentation regression tests"
-        run_doctests
+        run_doctests || exit $?
         echo "::endgroup::"
         echo "::group::Semantic unit tests"
-        container_exec make unitcheck
+        container_exec make unitcheck || exit $?
         echo "::endgroup::"
         ;;
 esac

@@ -8,7 +8,7 @@ RUN apt-get update && \
     gawk wget python3-full python3-virtualenv graphviz python3-dev libpq-dev \
     libtap-parser-sourcehandler-pgtap-perl \
     python3-psycopg2 libssl-dev gnuplot python3-graph-tool pkg-config ca-certificates \
-    liblz4-dev libzstd-dev libxml2-dev libxslt1-dev
+    liblz4-dev libzstd-dev libxml2-dev libxslt1-dev gcovr
 
 RUN deluser --remove-home ubuntu
 # Add a dedicated in-container postgres user. The mounted checkout is not built in place.
