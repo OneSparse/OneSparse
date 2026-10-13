@@ -4,7 +4,7 @@ CREATE EXTENSION IF NOT EXISTS onesparse;
 CREATE EXTENSION IF NOT EXISTS pgtap;
 SET LOCAL search_path = public, onesparse;
 
-SELECT plan(32);
+SELECT plan(42);
 
 -- Construction and sparse representation.
 SELECT is((type('int32'::vector))::text, 'int32',
@@ -152,6 +152,27 @@ SELECT results_eq(
     $$VALUES (0::bigint, 'fp64:1.000000'::text),
              (2::bigint, 'fp64:3.000000'::text)$$,
     'cast_to preserves sparse coordinates and converts values');
+-- Exercise every remaining built-in GraphBLAS target type.
+SELECT is((type(cast_to('int32(2)[0:1]'::vector, 'bool'::type)))::text, 'bool',
+          'cast_to supports boolean vectors');
+SELECT is((type(cast_to('int32(2)[0:1]'::vector, 'int8'::type)))::text, 'int8',
+          'cast_to supports int8 vectors');
+SELECT is((type(cast_to('int32(2)[0:1]'::vector, 'int16'::type)))::text, 'int16',
+          'cast_to supports int16 vectors');
+SELECT is((type(cast_to('int32(2)[0:1]'::vector, 'int32'::type)))::text, 'int32',
+          'cast_to supports int32 vectors');
+SELECT is((type(cast_to('int32(2)[0:1]'::vector, 'int64'::type)))::text, 'int64',
+          'cast_to supports int64 vectors');
+SELECT is((type(cast_to('int32(2)[0:1]'::vector, 'uint8'::type)))::text, 'uint8',
+          'cast_to supports uint8 vectors');
+SELECT is((type(cast_to('int32(2)[0:1]'::vector, 'uint16'::type)))::text, 'uint16',
+          'cast_to supports uint16 vectors');
+SELECT is((type(cast_to('int32(2)[0:1]'::vector, 'uint32'::type)))::text, 'uint32',
+          'cast_to supports uint32 vectors');
+SELECT is((type(cast_to('int32(2)[0:1]'::vector, 'uint64'::type)))::text, 'uint64',
+          'cast_to supports uint64 vectors');
+SELECT is((type(cast_to('int32(2)[0:1]'::vector, 'fp32'::type)))::text, 'fp32',
+          'cast_to supports fp32 vectors');
 
 SELECT * FROM finish();
 

@@ -4,7 +4,7 @@ CREATE EXTENSION IF NOT EXISTS onesparse;
 CREATE EXTENSION IF NOT EXISTS pgtap;
 SET LOCAL search_path = public, onesparse;
 
-SELECT plan(36);
+SELECT plan(46);
 
 -- Construction and sparse representation.
 SELECT is((type('int32'::matrix))::text, 'int32',
@@ -160,6 +160,27 @@ SELECT results_eq(
     $$VALUES (0::bigint, 0::bigint, 'fp64:1.000000'::text),
              (2::bigint, 2::bigint, 'fp64:3.000000'::text)$$,
     'cast_to preserves sparse coordinates and converts values');
+-- Exercise every remaining built-in GraphBLAS target type.
+SELECT is((type(cast_to('int32(2:2)[0:0:1]'::matrix, 'bool'::type)))::text, 'bool',
+          'cast_to supports boolean matrices');
+SELECT is((type(cast_to('int32(2:2)[0:0:1]'::matrix, 'int8'::type)))::text, 'int8',
+          'cast_to supports int8 matrices');
+SELECT is((type(cast_to('int32(2:2)[0:0:1]'::matrix, 'int16'::type)))::text, 'int16',
+          'cast_to supports int16 matrices');
+SELECT is((type(cast_to('int32(2:2)[0:0:1]'::matrix, 'int32'::type)))::text, 'int32',
+          'cast_to supports int32 matrices');
+SELECT is((type(cast_to('int32(2:2)[0:0:1]'::matrix, 'int64'::type)))::text, 'int64',
+          'cast_to supports int64 matrices');
+SELECT is((type(cast_to('int32(2:2)[0:0:1]'::matrix, 'uint8'::type)))::text, 'uint8',
+          'cast_to supports uint8 matrices');
+SELECT is((type(cast_to('int32(2:2)[0:0:1]'::matrix, 'uint16'::type)))::text, 'uint16',
+          'cast_to supports uint16 matrices');
+SELECT is((type(cast_to('int32(2:2)[0:0:1]'::matrix, 'uint32'::type)))::text, 'uint32',
+          'cast_to supports uint32 matrices');
+SELECT is((type(cast_to('int32(2:2)[0:0:1]'::matrix, 'uint64'::type)))::text, 'uint64',
+          'cast_to supports uint64 matrices');
+SELECT is((type(cast_to('int32(2:2)[0:0:1]'::matrix, 'fp32'::type)))::text, 'fp32',
+          'cast_to supports fp32 matrices');
 
 -- Diagonal construction preserves the vector's sparse representation.
 SELECT is(nrows(diag('int32(4)[0:10 2:30]'::vector)), 4::bigint,
