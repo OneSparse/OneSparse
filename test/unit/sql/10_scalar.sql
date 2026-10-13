@@ -4,7 +4,7 @@ CREATE EXTENSION IF NOT EXISTS onesparse;
 CREATE EXTENSION IF NOT EXISTS pgtap;
 SET LOCAL search_path = public, onesparse;
 
-SELECT plan(57);
+SELECT plan(67);
 
 -- Constructors, casts, lifecycle, floating-point behavior, and errors.
 
@@ -66,6 +66,20 @@ SELECT is(print('int32:42'::scalar), '42', 'print returns the scalar value');
 SELECT is(print('int32'::scalar), '', 'print returns an empty string for no value');
 SELECT is((type('int32:42'::scalar))::text, 'int32', 'type reports the scalar type');
 SELECT is((type('fp64:3.14'::scalar))::text, 'fp64', 'type reports floating-point type');
+
+-- Print dispatches through every built-in GraphBLAS scalar type.
+SELECT is(print('int64:-42'::scalar), '-42', 'print formats an int64 scalar');
+SELECT is(print('uint64:42'::scalar), '42', 'print formats a uint64 scalar');
+SELECT is(print('uint32:42'::scalar), '42', 'print formats a uint32 scalar');
+SELECT is(print('int16:-42'::scalar), '-42', 'print formats an int16 scalar');
+SELECT is(print('uint16:42'::scalar), '42', 'print formats a uint16 scalar');
+SELECT is(print(ident('plus_monoid_int8'::monoid)), '0',
+          'print formats an int8 scalar');
+SELECT is(print(ident('plus_monoid_uint8'::monoid)), '0',
+          'print formats a uint8 scalar');
+SELECT is(print('fp64:3.5'::scalar), '3.500000', 'print formats an fp64 scalar');
+SELECT is(print('fp32:3.5'::scalar), '3.500000', 'print formats an fp32 scalar');
+SELECT is(print('bool:true'::scalar), 't', 'print formats a boolean scalar');
 
 -- Boolean and special floating-point values.
 SELECT is((false::bool::scalar)::text, 'bool:f', 'construct false');

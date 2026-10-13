@@ -4,7 +4,7 @@ CREATE EXTENSION IF NOT EXISTS onesparse;
 CREATE EXTENSION IF NOT EXISTS pgtap;
 SET LOCAL search_path = public, onesparse;
 
-SELECT plan(17);
+SELECT plan(26);
 
 -- A four-vertex path makes BFS levels, parents, and weighted distances
 -- independently verifiable.
@@ -100,9 +100,62 @@ SELECT ok((SELECT (v::float8) > 0 FROM elements(betweenness(
                ARRAY[0, 3]::bigint[])) WHERE i = 1),
     'betweenness identifies an interior path vertex');
 SELECT ok((SELECT (v::float8) > 0 FROM elements(betweenness(
-               'int32(4:4)[0:1:1 1:0:1 1:2:1 2:1:1 2:3:1 3:2:1]'::matrix,
-               ARRAY[0, 3]::bigint[])) WHERE i = 2),
+                'int32(4:4)[0:1:1 1:0:1 1:2:1 2:1:1 2:3:1 3:2:1]'::matrix,
+                ARRAY[0, 3]::bigint[])) WHERE i = 2),
     'betweenness identifies both interior path vertices');
+
+-- Argmin/argmax return both the selected values and their positions for each
+-- row or column, depending on the requested dimension.
+SELECT results_eq(
+    $$SELECT i, v::text FROM elements((argmin(
+        'int32(3:3)[0:0:8 0:1:3 1:0:4 1:2:6 2:1:9 2:2:2]'::matrix,
+        1)).x_result) ORDER BY i$$,
+    $$VALUES (0::bigint, 'int32:4'::text),
+             (1::bigint, 'int32:3'::text),
+             (2::bigint, 'int32:2'::text)$$,
+    'argmin returns each column minimum');
+SELECT results_eq(
+    $$SELECT i, v::text FROM elements((argmin(
+        'int32(3:3)[0:0:8 0:1:3 1:0:4 1:2:6 2:1:9 2:2:2]'::matrix,
+        1)).p_result) ORDER BY i$$,
+    $$VALUES (0::bigint, 'int64:1'::text),
+             (1::bigint, 'int64:0'::text),
+             (2::bigint, 'int64:2'::text)$$,
+    'argmin returns each column minimum position');
+SELECT results_eq(
+    $$SELECT i, v::text FROM elements((argmax(
+        'int32(3:3)[0:0:8 0:1:3 1:0:4 1:2:6 2:1:9 2:2:2]'::matrix,
+        1)).x_result) ORDER BY i$$,
+    $$VALUES (0::bigint, 'int32:8'::text),
+             (1::bigint, 'int32:9'::text),
+             (2::bigint, 'int32:6'::text)$$,
+    'argmax returns each column maximum');
+SELECT results_eq(
+    $$SELECT i, v::text FROM elements((argmax(
+        'int32(3:3)[0:0:8 0:1:3 1:0:4 1:2:6 2:1:9 2:2:2]'::matrix,
+        1)).p_result) ORDER BY i$$,
+    $$VALUES (0::bigint, 'int64:0'::text),
+             (1::bigint, 'int64:2'::text),
+             (2::bigint, 'int64:1'::text)$$,
+    'argmax returns each column maximum position');
+
+-- The graphlet transform preserves the graph dimensions and materializes a
+-- non-empty matrix for a graph containing an edge.
+SELECT is(nrows(fglt('int32(3:3)[0:1:1 1:0:1 1:2:1 2:1:1]'::matrix)),
+          16::bigint, 'fglt returns sixteen graphlet features');
+SELECT is(ncols(fglt('int32(3:3)[0:1:1 1:0:1 1:2:1 2:1:1]'::matrix)),
+          3::bigint, 'fglt returns features for every vertex');
+SELECT ok(nvals(fglt('int32(3:3)[0:1:1 1:0:1 1:2:1 2:1:1]'::matrix)) > 0,
+          'fglt produces graphlet features for graph edges');
+
+-- Square clustering produces one FP64 coefficient for every vertex. Sparse
+-- vectors omit the zero coefficients a path produces when it has no squares.
+SELECT is(nvals(square_clustering(
+    'int32(3:3)[0:1:1 1:0:1 1:2:1 2:1:1]'::matrix)), 0::bigint,
+    'square_clustering omits zero coefficients for a path without squares');
+SELECT is(size(square_clustering(
+    'int32(4:4)[0:1:1 0:3:1 1:0:1 1:2:1 2:1:1 2:3:1 3:0:1 3:2:1]'::matrix)),
+    4::bigint, 'square_clustering returns one coefficient per vertex');
 
 -- Invalid graph inputs have deliberate, stable error contracts.
 SELECT throws_ok(

@@ -4,7 +4,7 @@ CREATE EXTENSION IF NOT EXISTS onesparse;
 CREATE EXTENSION IF NOT EXISTS pgtap;
 SET LOCAL search_path = public, onesparse;
 
-SELECT plan(31);
+SELECT plan(36);
 
 -- Construction and sparse representation.
 SELECT is((type('int32'::matrix))::text, 'int32',
@@ -160,6 +160,22 @@ SELECT results_eq(
     $$VALUES (0::bigint, 0::bigint, 'fp64:1.000000'::text),
              (2::bigint, 2::bigint, 'fp64:3.000000'::text)$$,
     'cast_to preserves sparse coordinates and converts values');
+
+-- Diagonal construction preserves the vector's sparse representation.
+SELECT is(nrows(diag('int32(4)[0:10 2:30]'::vector)), 4::bigint,
+          'diag creates a matrix with one row per vector position');
+SELECT is(ncols(diag('int32(4)[0:10 2:30]'::vector)), 4::bigint,
+          'diag creates a matrix with one column per vector position');
+SELECT is((type(diag('int32(4)[0:10 2:30]'::vector)))::text, 'int32',
+          'diag preserves the vector element type');
+SELECT results_eq(
+    $$SELECT i, j, v::text FROM elements(diag(
+        'int32(4)[0:10 2:30]'::vector)) ORDER BY i, j$$,
+    $$VALUES (0::bigint, 0::bigint, 'int32:10'::text),
+             (2::bigint, 2::bigint, 'int32:30'::text)$$,
+    'diag stores vector values only at matching row and column coordinates');
+SELECT is(nvals(diag('int32(3)'::vector)), 0::bigint,
+          'diag preserves an empty vector as an empty matrix');
 
 SELECT * FROM finish();
 
