@@ -1,5 +1,8 @@
 FROM ubuntu:latest
 ARG BUILD_JOBS
+ARG POSTGRES_VERSION
+ARG GRAPHBLAS_VERSION
+ARG LAGRAPH_VERSION
    
 # install base dependences    
 RUN apt-get update && \
@@ -26,9 +29,9 @@ RUN /bin/rm -Rf "$PGDATA" && mkdir "$PGDATA"
 WORKDIR "/home/postgres"
 
 RUN set -eux; \
-    curl -fsSLO https://ftp.postgresql.org/pub/source/v18.0/postgresql-18.0.tar.bz2; \
-    tar -xjf postgresql-18.0.tar.bz2; \
-    cd postgresql-18.0; \
+    curl -fsSLO https://ftp.postgresql.org/pub/source/v${POSTGRES_VERSION}/postgresql-${POSTGRES_VERSION}.tar.bz2; \
+    tar -xjf postgresql-${POSTGRES_VERSION}.tar.bz2; \
+    cd postgresql-${POSTGRES_VERSION}; \
     ./configure --prefix=/usr --with-openssl --with-icu --with-lz4 --with-zstd \
      --enable-debug \
      --enable-depend --enable-cassert \
@@ -36,7 +39,7 @@ RUN set -eux; \
     make -j"${BUILD_JOBS:-$(nproc)}"; \
     sudo make install; \
     cd ..; \
-    sudo rm -rf postgresql-18.0 postgresql-18.0.tar.bz2 /var/lib/apt/lists/*
+    sudo rm -rf postgresql-${POSTGRES_VERSION} postgresql-${POSTGRES_VERSION}.tar.bz2 /var/lib/apt/lists/*
 
 # pgTAP is installed only in the debug image used by the semantic test suite.
 RUN git clone --depth 1 --branch v1.3.4 https://github.com/theory/pgtap.git && \
@@ -47,45 +50,19 @@ RUN git clone --depth 1 --branch v1.3.4 https://github.com/theory/pgtap.git && \
     cd .. && \
     rm -rf pgtap
 
-# # get postgres source and compile with debug and no optimization
-# RUN git clone https://github.com/postgres/postgres.git --depth=1 && \
-# #    git checkout REL_18_BETA1 && \
-#     cd postgres && ./configure \
-#     --prefix=/usr/ \
-#     --without-icu \
-#     --enable-debug \
-#     --enable-depend --enable-cassert --enable-profiling \
-#     CFLAGS="-ggdb -Og -g3 -fno-omit-frame-pointer" \
-# #    CFLAGS="-O3" \
-#     && make -j 4 && sudo make install
-
-# COPY --chown=postgres:postgres postgres-upstream postgres-upstream
-# RUN cd postgres-upstream && ./configure \
-#     --prefix=/usr/ \
-#     --with-python \
-#     --with-openssl \
-#     --without-icu \
-#     --enable-debug \
-# #    --enable-depend --enable-cassert --enable-profiling \
-# #    CFLAGS="-ggdb -Og -g3 -fno-omit-frame-pointer" \
-#     CFLAGS="-O3" \
-#     && make -j 4 && sudo make install \
-#     && cd contrib/postgres_fdw && make && sudo make install \
-#     && cd .. && /bin/rm -Rf postgres-upstream
-
 # get GraphBLAS, compile with debug symbols    
-RUN curl -s -L -J https://github.com/DrTimothyAldenDavis/GraphBLAS/archive/refs/tags/v10.2.0.tar.gz | \
-    tar zxvf - && cd GraphBLAS-10.2.0 && \
+RUN curl -s -L -J https://github.com/DrTimothyAldenDavis/GraphBLAS/archive/refs/tags/v${GRAPHBLAS_VERSION}.tar.gz | \
+    tar zxvf - && cd GraphBLAS-${GRAPHBLAS_VERSION} && \
     make -j"${BUILD_JOBS:-$(nproc)}" debug \
 #    CMAKE_OPTIONS='-DGRAPHBLAS_COMPACT=1 ' \
     && sudo make install \
-    && /bin/rm -Rf GraphBLAS-10.2.0
+    && /bin/rm -Rf GraphBLAS-${GRAPHBLAS_VERSION}
 
-RUN curl -s -L -J https://github.com/GraphBLAS/LAGraph/archive/refs/tags/v1.2.1.tar.gz | \
-    tar zxvf - && cd LAGraph-1.2.1 && \
+RUN curl -s -L -J https://github.com/GraphBLAS/LAGraph/archive/refs/tags/v${LAGRAPH_VERSION}.tar.gz | \
+    tar zxvf - && cd LAGraph-${LAGRAPH_VERSION} && \
     make -j"${BUILD_JOBS:-$(nproc)}" library \
     && sudo make install \
-    && /bin/rm -Rf LAGraph-1.2.1
+    && /bin/rm -Rf LAGraph-${LAGRAPH_VERSION}
     
 RUN sudo ldconfig
 

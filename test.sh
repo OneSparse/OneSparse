@@ -15,6 +15,7 @@ if [ "$#" -gt 1 ] || { [ "$#" -eq 1 ] && [ "$1" != "doctest" ] && [ "$1" != "uni
 fi
 
 TEST_SUITE=${1:-all}
+. "$(dirname "$0")/versions.env"
 
 if [ -z "${CONTAINER_RUNTIME:-}" ]; then
     if command -v docker >/dev/null 2>&1; then
@@ -78,7 +79,13 @@ if [ "$CONTAINER_RUNTIME" = podman ]; then
 else
     BUILD_JOBS=
 fi
-"$CONTAINER_RUNTIME" build -f Dockerfile-debug --build-arg BUILD_JOBS="$BUILD_JOBS" . -t onesparse/test
+"$CONTAINER_RUNTIME" build \
+    --build-arg BUILD_JOBS="$BUILD_JOBS" \
+    --build-arg POSTGRES_VERSION="$POSTGRES_VERSION" \
+    --build-arg POSTGRES_MAJOR="$POSTGRES_MAJOR" \
+    --build-arg GRAPHBLAS_VERSION="$GRAPHBLAS_VERSION" \
+    --build-arg LAGRAPH_VERSION="$LAGRAPH_VERSION" \
+    -f Dockerfile-debug . -t onesparse/test
 
 "$CONTAINER_RUNTIME" run --mount type=bind,source="$(pwd)",target=/home/postgres/onesparse --cap-add=SYS_PTRACE --security-opt seccomp=unconfined -d --name "$DB_HOST" onesparse/test
 trap cleanup EXIT

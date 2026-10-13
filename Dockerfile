@@ -1,4 +1,7 @@
 FROM ubuntu:latest
+ARG POSTGRES_VERSION
+ARG GRAPHBLAS_VERSION
+ARG LAGRAPH_VERSION
    
 # install base dependences    
 RUN apt-get update && \
@@ -20,9 +23,10 @@ ENV PGDATA /home/postgres/data
 RUN /bin/rm -Rf "$PGDATA" && mkdir "$PGDATA"
 WORKDIR "/home/postgres"
 
-# get postgres source and compile with debug and no optimization
-RUN git clone --branch REL_17_STABLE https://github.com/postgres/postgres.git --depth=1 && \
-    cd postgres && ./configure \
+# get PostgreSQL source and compile with debug and no optimization
+RUN curl -fsSLO https://ftp.postgresql.org/pub/source/v${POSTGRES_VERSION}/postgresql-${POSTGRES_VERSION}.tar.bz2 && \
+    tar -xjf postgresql-${POSTGRES_VERSION}.tar.bz2 && \
+    cd postgresql-${POSTGRES_VERSION} && ./configure \
     --prefix=/usr/ \
     --without-icu \
     --enable-debug \
@@ -31,12 +35,19 @@ RUN git clone --branch REL_17_STABLE https://github.com/postgres/postgres.git --
 #    CFLAGS="-O3" \
     && make -j 4 && sudo make install
 
-# get GraphBLAS, compile with debug symbols    
-RUN curl -s -L -J https://github.com/DrTimothyAldenDavis/GraphBLAS/archive/refs/tags/v9.4.2.tar.gz | \
-    tar zxvf - && cd GraphBLAS-9.4.2 && \
+# get GraphBLAS, compile with debug symbols
+RUN curl -s -L -J https://github.com/DrTimothyAldenDavis/GraphBLAS/archive/refs/tags/v${GRAPHBLAS_VERSION}.tar.gz | \
+    tar zxvf - && cd GraphBLAS-${GRAPHBLAS_VERSION} && \
     make library \
     CMAKE_OPTIONS='-DGRAPHBLAS_COMPACT=1' \
-    && sudo make install
+    && sudo make install \
+    && /bin/rm -Rf GraphBLAS-${GRAPHBLAS_VERSION}
+
+RUN curl -s -L -J https://github.com/GraphBLAS/LAGraph/archive/refs/tags/v${LAGRAPH_VERSION}.tar.gz | \
+    tar zxvf - && cd LAGraph-${LAGRAPH_VERSION} && \
+    make library \
+    && sudo make install \
+    && /bin/rm -Rf LAGraph-${LAGRAPH_VERSION}
 
 RUN sudo ldconfig
 
