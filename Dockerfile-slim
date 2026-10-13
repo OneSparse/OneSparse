@@ -1,30 +1,34 @@
+ARG POSTGRES_VERSION
+ARG POSTGRES_MAJOR
+
 # ---- builder: compile deps + extension ----
-FROM postgres:18 AS builder
+FROM postgres:${POSTGRES_VERSION} AS builder
+ARG POSTGRES_MAJOR
 ARG DEBIAN_FRONTEND=noninteractive
-ARG GBLAS_VER=10.2.0
-ARG LAGRAPH_VER=1.2.1
+ARG GRAPHBLAS_VERSION
+ARG LAGRAPH_VERSION
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates curl xz-utils build-essential cmake m4 \
     git pkg-config file \
     libreadline-dev zlib1g-dev flex bison libxml2-dev libxslt1-dev \
     libssl-dev libyaml-dev \
-    postgresql-server-dev-18 \
+    postgresql-server-dev-${POSTGRES_MAJOR} \
  && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /opt/build
 
 # GraphBLAS
-RUN curl -sSL -o gblas.tgz https://github.com/DrTimothyAldenDavis/GraphBLAS/archive/refs/tags/v${GBLAS_VER}.tar.gz \
+RUN curl -sSL -o gblas.tgz https://github.com/DrTimothyAldenDavis/GraphBLAS/archive/refs/tags/v${GRAPHBLAS_VERSION}.tar.gz \
  && tar -xzf gblas.tgz \
- && make -C GraphBLAS-${GBLAS_VER} library CMAKE_OPTIONS='-DGRAPHBLAS_COMPACT=1' \
- && make -C GraphBLAS-${GBLAS_VER} install
+ && make -C GraphBLAS-${GRAPHBLAS_VERSION} library CMAKE_OPTIONS='-DGRAPHBLAS_COMPACT=1' \
+ && make -C GraphBLAS-${GRAPHBLAS_VERSION} install
 
 # LAGraph
-RUN curl -sSL -o lagraph.tgz https://github.com/GraphBLAS/LAGraph/archive/refs/tags/v${LAGRAPH_VER}.tar.gz \
+RUN curl -sSL -o lagraph.tgz https://github.com/GraphBLAS/LAGraph/archive/refs/tags/v${LAGRAPH_VERSION}.tar.gz \
  && tar -xzf lagraph.tgz \
- && make -C LAGraph-${LAGRAPH_VER} library \
- && make -C LAGraph-${LAGRAPH_VER} install
+ && make -C LAGraph-${LAGRAPH_VERSION} library \
+ && make -C LAGraph-${LAGRAPH_VERSION} install
 
 # OneSparse: copy only what’s needed to build the PG extension
 WORKDIR /src
@@ -43,13 +47,13 @@ RUN mkdir -p /opt/runtime/usr/local/lib \
  && cp -a /usr/local/lib/libgraphblas.so* /opt/runtime/usr/local/lib/ \
  && cp -a /usr/local/lib/liblagraph.so* /opt/runtime/usr/local/lib/ \
  && cp -a /usr/local/lib/liblagraphx.so* /opt/runtime/usr/local/lib/ \
- && mkdir -p /opt/runtime/usr/lib/postgresql/18/lib \
- && mkdir -p /opt/runtime/usr/share/postgresql/18/extension \
- && cp -a /opt/stage/usr/lib/postgresql/18/lib/*.so /opt/runtime/usr/lib/postgresql/18/lib/ \
- && cp -a /opt/stage/usr/share/postgresql/18/extension/* /opt/runtime/usr/share/postgresql/18/extension/
+ && mkdir -p /opt/runtime/usr/lib/postgresql/${POSTGRES_MAJOR}/lib \
+ && mkdir -p /opt/runtime/usr/share/postgresql/${POSTGRES_MAJOR}/extension \
+ && cp -a /opt/stage/usr/lib/postgresql/${POSTGRES_MAJOR}/lib/*.so /opt/runtime/usr/lib/postgresql/${POSTGRES_MAJOR}/lib/ \
+ && cp -a /opt/stage/usr/share/postgresql/${POSTGRES_MAJOR}/extension/* /opt/runtime/usr/share/postgresql/${POSTGRES_MAJOR}/extension/
 
 # ---- final: clean postgres image with only runtime bits ----
-FROM postgres:18
+FROM postgres:${POSTGRES_VERSION}
 
 ENV DEBIAN_FRONTEND=noninteractive
 # If you want this set at init time:

@@ -1,6 +1,9 @@
 FROM ubuntu:latest
 ARG UID    
 ARG GID
+ARG POSTGRES_VERSION
+ARG GRAPHBLAS_VERSION
+ARG LAGRAPH_VERSION
 ENV POSTGIS_VERSION=3.4.1
    
 # install base dependences    
@@ -24,9 +27,10 @@ ENV PGDATA /home/postgres/data
 RUN /bin/rm -Rf "$PGDATA" && mkdir "$PGDATA"
 WORKDIR "/home/postgres"
 
-# get postgres source and compile with debug and no optimization
-RUN git clone --single-branch --branch REL_18_BETA1 https://github.com/postgres/postgres.git && \
-    cd postgres && \
+# get PostgreSQL source and compile with debug and no optimization
+RUN curl -fsSLO https://ftp.postgresql.org/pub/source/v${POSTGRES_VERSION}/postgresql-${POSTGRES_VERSION}.tar.bz2 && \
+    tar -xjf postgresql-${POSTGRES_VERSION}.tar.bz2 && \
+    cd postgresql-${POSTGRES_VERSION} && \
     ./configure \
     --prefix=/usr/ \
     --without-icu \
@@ -77,20 +81,20 @@ RUN cmake -S . -B build \
 WORKDIR /build/graphblas
 
 # get GraphBLAS
-RUN curl -s -L -J https://github.com/DrTimothyAldenDavis/GraphBLAS/archive/refs/tags/v10.0.2.tar.gz | \
-    tar zxvf - && cd GraphBLAS-10.0.2 && \
+RUN curl -s -L -J https://github.com/DrTimothyAldenDavis/GraphBLAS/archive/refs/tags/v${GRAPHBLAS_VERSION}.tar.gz | \
+    tar zxvf - && cd GraphBLAS-${GRAPHBLAS_VERSION} && \
     make -j$(nproc) library \
 #    CMAKE_OPTIONS='-DCMAKE_BUILD_TYPE=Debug -DGRAPHBLAS_COMPACT=1' \
     && sudo make install \
-    && /bin/rm -Rf GraphBLAS-10.0.2
+    && /bin/rm -Rf GraphBLAS-${GRAPHBLAS_VERSION}
 
 # get LAGraph
-RUN curl -s -L -J https://github.com/GraphBLAS/LAGraph/archive/refs/tags/v1.1.5.tar.gz | \
-    tar zxvf - && cd LAGraph-1.1.5 && \
+RUN curl -s -L -J https://github.com/GraphBLAS/LAGraph/archive/refs/tags/v${LAGRAPH_VERSION}.tar.gz | \
+    tar zxvf - && cd LAGraph-${LAGRAPH_VERSION} && \
     make -j$(nproc) library \
 #    CMAKE_OPTIONS='-DCMAKE_BUILD_TYPE=Debug -DGRAPHBLAS_COMPACT=1' \
     && sudo make install \
-    && /bin/rm -Rf LAGraph-1-1.1.5
+    && /bin/rm -Rf LAGraph-${LAGRAPH_VERSION}
 
 RUN sudo ldconfig
 

@@ -47,7 +47,7 @@ matrix_kron(PG_FUNCTION_ARGS)
 		OS_MNCOLS(ancols, a);
 		OS_MNCOLS(bncols, b);
 		ctype = type_promote(atype, btype);
-		c = new_matrix(ctype, anrows * bncols, ancols * bnrows, CurrentMemoryContext, NULL);
+		c = new_matrix(ctype, anrows * bnrows, ancols * bncols, CurrentMemoryContext, NULL);
 	}
 	else
 		c = OS_GETARG_MATRIX_AB(3, a, b);

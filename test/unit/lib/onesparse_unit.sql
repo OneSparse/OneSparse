@@ -1,0 +1,7 @@
+-- Shared pgTAP helpers belong here as semantic coverage grows.
+--
+-- Planned helpers:
+--   * vector equality based on size, type, and ordered elements()
+--   * matrix equality based on dimensions, type, and ordered elements()
+--   * approximate floating-point comparison with NaN/infinity handling
+--   * connected-component partition comparison independent of label values
