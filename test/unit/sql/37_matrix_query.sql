@@ -1,0 +1,36 @@
+BEGIN;
+
+CREATE EXTENSION IF NOT EXISTS onesparse;
+CREATE EXTENSION IF NOT EXISTS pgtap;
+SET LOCAL search_path = public, onesparse;
+
+SELECT plan(4);
+
+-- Query rows are loaded as sparse matrix elements in cursor-sized batches.
+SELECT results_eq(
+    $$SELECT i, j, v::text FROM elements(matrix_query(
+        'SELECT i::bigint, j::bigint, v::integer
+         FROM (VALUES (0, 1, 10), (2, 3, 40), (1, 0, 20)) AS entries(i, j, v)',
+        3, 4, 1)) ORDER BY i, j$$,
+    $$VALUES (0::bigint, 1::bigint, 'int32:10'::text),
+             (1::bigint, 0::bigint, 'int32:20'::text),
+             (2::bigint, 3::bigint, 'int32:40'::text)$$,
+    'matrix_query loads integer entries across multiple batches');
+SELECT is((type(matrix_query(
+    'SELECT 0::bigint, 0::bigint, 1.5::double precision', 1, 1)))::text,
+    'fp64', 'matrix_query derives the matrix type from the value column');
+SELECT results_eq(
+    $$SELECT i, j, v::text FROM elements(matrix_query(
+        'SELECT i::bigint, j::bigint, v::integer
+         FROM (VALUES (0, 0, 10), (0, 0, 20)) AS entries(i, j, v)',
+        1, 1, 1))$$,
+    $$VALUES (0::bigint, 0::bigint, 'int32:20'::text)$$,
+    'matrix_query keeps the last value for duplicate coordinates');
+SELECT throws_ok(
+    $$SELECT matrix_query('SELECT 0::bigint, 0::bigint')$$,
+    'XX000', 'query must return exactly three columns, got 2',
+    'matrix_query requires exactly three query columns');
+
+SELECT * FROM finish();
+
+ROLLBACK;

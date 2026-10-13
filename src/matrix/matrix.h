@@ -24,6 +24,7 @@ typedef struct os_Matrix_ExtractState
 	GrB_Type	type;
 	GrB_Info	info;
 	os_Matrix  *matrix;
+	GrB_Matrix	temporary_matrix;
 	GxB_Iterator iterator;
 }			os_Matrix_ExtractState;
 
@@ -72,4 +73,3 @@ os_Matrix  *DatumGetMatrixMaybeABC(Datum d, os_Matrix * A, os_Matrix * B, os_Mat
 
 os_Matrix  *_parse_matrix(char *input);
 char	   *_print_matrix(GrB_Matrix matrix);
-

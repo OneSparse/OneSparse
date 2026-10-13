@@ -26,7 +26,7 @@ matrix_elements(PG_FUNCTION_ARGS)
 		oldcontext = MemoryContextSwitchTo(funcctx->multi_call_memory_ctx);
 		matrix = OS_GETARG_MATRIX(0);
 
-		state = (os_Matrix_ExtractState *) palloc(sizeof(os_Matrix_ExtractState));
+		state = (os_Matrix_ExtractState *) palloc0(sizeof(os_Matrix_ExtractState));
 		OS_MNVALS(nvals, matrix);
 
 		state->matrix = matrix;
@@ -53,6 +53,8 @@ matrix_elements(PG_FUNCTION_ARGS)
 	state = (os_Matrix_ExtractState *) funcctx->user_fctx;
 	if (state->info == GxB_EXHAUSTED || funcctx->call_cntr > funcctx->max_calls)
 	{
+		if (state->temporary_matrix != NULL)
+			GrB_Matrix_free(&state->temporary_matrix);
 		SRF_RETURN_DONE(funcctx);
 	}
 	else

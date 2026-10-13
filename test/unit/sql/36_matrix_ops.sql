@@ -4,7 +4,7 @@ CREATE EXTENSION IF NOT EXISTS onesparse;
 CREATE EXTENSION IF NOT EXISTS pgtap;
 SET LOCAL search_path = public, onesparse;
 
-SELECT plan(18);
+SELECT plan(25);
 
 -- GraphBLAS info text is diagnostic output, so only assert stable structure.
 SELECT ok(length(info('int32(2:3)[0:1:4 1:2:5]'::matrix)) > 0,
@@ -149,6 +149,44 @@ SELECT results_eq(
     $$VALUES (0::bigint, 0::bigint, 'int32:6'::text),
              (1::bigint, 1::bigint, 'int32:4'::text)$$,
     'matrix_agg merges matrices with the default binary operator');
+
+-- Iterators return each occupied coordinate exactly once.
+SELECT results_eq(
+    $$SELECT irows FROM irows('int32(4:5)[0:3:1 2:1:2 2:4:3]'::matrix) AS irows ORDER BY irows$$,
+    $$VALUES (0::bigint), (2::bigint)$$,
+    'irows returns distinct stored row coordinates');
+SELECT results_eq(
+    $$SELECT icols FROM icols('int32(4:5)[0:3:1 2:1:2 2:4:3]'::matrix) AS icols ORDER BY icols$$,
+    $$VALUES (1::bigint), (3::bigint), (4::bigint)$$,
+    'icols returns distinct stored column coordinates');
+SELECT is((SELECT count(*) FROM irows('int32(4:5)'::matrix)), 0::bigint,
+          'irows returns no coordinates for an empty matrix');
+SELECT is((SELECT count(*) FROM icols('int32(4:5)'::matrix)), 0::bigint,
+          'icols returns no coordinates for an empty matrix');
+
+-- Selection keeps sparse entries that satisfy value or index predicates.
+SELECT results_eq(
+    $$SELECT i, j, v::text FROM elements(choose(
+        'int32(3:4)[0:0:5 0:3:20 1:2:10 2:1:30]'::matrix,
+        'valuegt_int32'::indexunaryop, 10::scalar)) ORDER BY i, j$$,
+    $$VALUES (0::bigint, 3::bigint, 'int32:20'::text),
+             (2::bigint, 1::bigint, 'int32:30'::text)$$,
+    'choose filters matrix entries greater than its scalar thunk');
+SELECT results_eq(
+    $$SELECT i, j, v::text FROM elements(choose(
+        'int32(3:4)[0:0:5 0:3:20 1:2:10 2:1:30]'::matrix,
+        'triu'::indexunaryop, 0::scalar)) ORDER BY i, j$$,
+    $$VALUES (0::bigint, 0::bigint, 'int32:5'::text),
+             (0::bigint, 3::bigint, 'int32:20'::text),
+             (1::bigint, 2::bigint, 'int32:10'::text)$$,
+    'choose applies index-based upper-triangular selection');
+SELECT results_eq(
+    $$SELECT i, j, v::text FROM elements(choose(
+        'int32(3:4)[0:0:5 0:3:20 1:2:10 2:1:30]'::matrix,
+        'valuele_int32'::indexunaryop, 10::scalar, 'int32(3:4)'::matrix)) ORDER BY i, j$$,
+    $$VALUES (0::bigint, 0::bigint, 'int32:5'::text),
+             (1::bigint, 2::bigint, 'int32:10'::text)$$,
+    'choose writes value selection into a caller-provided matrix');
 
 SELECT * FROM finish();
 
