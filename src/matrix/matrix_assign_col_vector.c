@@ -26,7 +26,7 @@ matrix_assign_col_vector(PG_FUNCTION_ARGS)
 	OS_MNROWS(nrows, C);
 	OS_MNCOLS(ncols, C);
 
-	ni = ncols;
+	ni = nrows;
 	if (!PG_ARGISNULL(3))
 	{
 		rows = get_c_array_from_pg_array(fcinfo, 3, &ni);

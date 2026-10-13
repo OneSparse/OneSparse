@@ -14,7 +14,7 @@ matrix_vxm(PG_FUNCTION_ARGS)
 	GrB_Descriptor descriptor;
 	GrB_BinaryOp accum;
 	GrB_Semiring semiring;
-	GrB_Index	asize;
+	GrB_Index	ncols;
 	int			nargs;
 	struct timeval start,
 				end;
@@ -38,8 +38,8 @@ matrix_vxm(PG_FUNCTION_ARGS)
 
 	if (PG_ARGISNULL(3))
 	{
-		OS_VSIZE(asize, a);
-		c = new_vector(ctype, asize, CurrentMemoryContext, NULL);
+		OS_MNCOLS(ncols, b);
+		c = new_vector(ctype, ncols, CurrentMemoryContext, NULL);
 	}
 	else
 		c = OS_GETARG_VECTOR(3);

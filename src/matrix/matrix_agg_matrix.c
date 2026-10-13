@@ -8,6 +8,8 @@ matrix_agg_matrix(PG_FUNCTION_ARGS)
 	os_Matrix  *state,
 			   *A;
 	GrB_BinaryOp op;
+	GrB_Index	nrows,
+				ncols;
 	MemoryContext aggcontext;
 	int			nargs;
 
@@ -25,7 +27,9 @@ matrix_agg_matrix(PG_FUNCTION_ARGS)
 		{
 			elog(ERROR, "aggregate function called in non-aggregate context");
 		}
-		state = new_matrix(type, GxB_INDEX_MAX, GxB_INDEX_MAX, aggcontext, NULL);
+		OS_MNROWS(nrows, A);
+		OS_MNCOLS(ncols, A);
+		state = new_matrix(type, nrows, ncols, aggcontext, NULL);
 	}
 	else
 	{
