@@ -4,11 +4,20 @@ CREATE EXTENSION IF NOT EXISTS onesparse;
 CREATE EXTENSION IF NOT EXISTS pgtap;
 SET LOCAL search_path = public, onesparse;
 
-SELECT plan(42);
+SELECT plan(69);
 
 -- Construction and sparse representation.
 SELECT is((type('int32'::vector))::text, 'int32',
-          'an empty vector retains its element type');
+           'an empty vector retains its element type');
+SELECT is(size(vector('int16'::type, 3)), 3::bigint,
+          'vector constructor creates a bounded vector');
+SELECT is((type(vector('int16'::type, 3)))::text, 'int16',
+          'vector constructor retains its requested type');
+SELECT is(nvals(vector('int16'::type, 3)), 0::bigint,
+          'vector constructor creates an empty vector');
+SELECT is(vector_out('int32(4)[0:10 2:30]'::vector)::text,
+          'int32(4)[0:10 2:30]',
+          'vector output round-trips a sparse literal');
 SELECT is(size('int32(4)'::vector), 4::bigint,
           'a bounded vector reports its size');
 SELECT is(nvals('int32(4)'::vector), 0::bigint,
@@ -25,7 +34,33 @@ SELECT is(('int32(3)[0:10 2:30]'::vector::integer[])::text,
 SELECT is(size('{10,NULL,30}'::integer[]::vector), 3::bigint,
           'an array cast creates a bounded vector');
 SELECT is((type('int32[0:10 2:30]'::vector))::text, 'int32',
-          'a sparse literal reports its element type');
+           'a sparse literal reports its element type');
+
+-- Every built-in vector type has a canonical text I/O round trip.
+SELECT is(vector_out(vector_in(vector_out('bool(2)[1:t]'::vector)))::text, 'bool(2)[1:t]',
+          'vector text I/O round-trips true');
+SELECT is(vector_out(vector_in(vector_out('bool(2)[1:f]'::vector)))::text, 'bool(2)[1:f]',
+          'vector text I/O round-trips false');
+SELECT is(vector_out(vector_in(vector_out('int8(2)[1:-42]'::vector)))::text, 'int8(2)[1:-42]',
+          'vector text I/O round-trips int8');
+SELECT is(vector_out(vector_in(vector_out('uint8(2)[1:200]'::vector)))::text, 'uint8(2)[1:200]',
+          'vector text I/O round-trips uint8');
+SELECT is(vector_out(vector_in(vector_out('int16(2)[1:-42]'::vector)))::text, 'int16(2)[1:-42]',
+          'vector text I/O round-trips int16');
+SELECT is(vector_out(vector_in(vector_out('uint16(2)[1:60000]'::vector)))::text, 'uint16(2)[1:60000]',
+          'vector text I/O round-trips uint16');
+SELECT is(vector_out(vector_in(vector_out('int32(2)[1:-42]'::vector)))::text, 'int32(2)[1:-42]',
+          'vector text I/O round-trips int32');
+SELECT is(vector_out(vector_in(vector_out('int64(2)[1:-42]'::vector)))::text, 'int64(2)[1:-42]',
+          'vector text I/O round-trips int64');
+SELECT is(vector_out(vector_in(vector_out('uint64(2)[1:9223372036854775808]'::vector)))::text,
+          'uint64(2)[1:9223372036854775808]', 'vector text I/O round-trips uint64');
+SELECT is(vector_out(vector_in(vector_out('uint32(2)[1:4000000000]'::vector)))::text,
+          'uint32(2)[1:4000000000]', 'vector text I/O round-trips uint32');
+SELECT is(vector_out(vector_in(vector_out('fp32(2)[1:1.25]'::vector)))::text, 'fp32(2)[1:1.250000]',
+          'vector text I/O round-trips fp32');
+SELECT is(vector_out(vector_in(vector_out('fp64(2)[1:-1.25]'::vector)))::text, 'fp64(2)[1:-1.250000]',
+          'vector text I/O round-trips fp64');
 
 -- Element access and lifecycle.
 SELECT is((get_element('int32(4)[0:10 2:30]'::vector, 2))::text,
@@ -54,7 +89,14 @@ SELECT ok(eq(wait('int32(4)[0:10 2:30]'::vector),
              'int32(4)[0:10 2:30]'::vector),
           'wait preserves vector contents');
 SELECT is(nvals(clear('int32(4)[0:10 2:30]'::vector)), 0::bigint,
-          'clear removes all stored values');
+           'clear removes all stored values');
+SELECT ok(info('int32(4)[0:10 2:30]'::vector, 0) IS NOT NULL,
+          'info accepts the lowest GraphBLAS print level');
+SELECT throws_ok(
+    $$SELECT info('int32(4)[0:10]'::vector, 6)$$,
+    'XX000',
+    'Print level is from 0 to 5',
+    'info rejects an unsupported print level');
 
 -- Element-wise operations, reduction, selection, and apply.
 SELECT results_eq(
@@ -82,8 +124,10 @@ SELECT results_eq(
              (1::bigint, 'int32:21'::text)$$,
     'eunion applies defaults to absent coordinates');
 SELECT is((reduce_scalar('int32(4)[0:10 2:30]'::vector,
-                         'plus_monoid_int32'::monoid))::text,
-          'int32:40', 'reduce_scalar sums stored values');
+                          'plus_monoid_int32'::monoid))::text,
+           'int32:40', 'reduce_scalar sums stored values');
+SELECT is((reduce_scalar('int32(4)[0:10 2:30]'::vector))::text,
+          'int32:40', 'reduce_scalar resolves the default monoid');
 SELECT results_eq(
     $$SELECT i, v::text FROM elements(apply(
         'int32(4)[0:-10 2:30]'::vector,
@@ -134,6 +178,12 @@ SELECT results_eq(
     $$VALUES (0::bigint, 'int32:50'::text),
              (2::bigint, 'int32:10'::text)$$,
     'extract_vector maps requested source coordinates');
+SELECT results_eq(
+    $$SELECT i, v::text FROM elements(extract_vector(
+        'int32(3)[0:10 2:30]'::vector)) ORDER BY i$$,
+    $$VALUES (0::bigint, 'int32:10'::text),
+             (2::bigint, 'int32:30'::text)$$,
+    'extract_vector accepts default all-index selection');
 
 -- Size and type transformations.
 SELECT is(size(resize('int32(5)[0:1 2:3 4:5]'::vector, 3)), 3::bigint,
@@ -172,7 +222,39 @@ SELECT is((type(cast_to('int32(2)[0:1]'::vector, 'uint32'::type)))::text, 'uint3
 SELECT is((type(cast_to('int32(2)[0:1]'::vector, 'uint64'::type)))::text, 'uint64',
           'cast_to supports uint64 vectors');
 SELECT is((type(cast_to('int32(2)[0:1]'::vector, 'fp32'::type)))::text, 'fp32',
-          'cast_to supports fp32 vectors');
+           'cast_to supports fp32 vectors');
+SELECT ok(eq(cast_to('int32(2)[0:1]'::vector, 'int32'::type),
+             'int32(2)[0:1]'::vector),
+          'cast_to preserves an identity conversion');
+SELECT is(nvals(cast_to('int32(3)'::vector, 'bool'::type)), 0::bigint,
+          'cast_to preserves an empty vector');
+
+-- Vector products, normalization, and dense hashing use small exact inputs.
+SELECT results_eq(
+    $$SELECT i, v::text FROM elements(norm('fp32(2)[0:3 1:4]'::vector)) ORDER BY i$$,
+    $$VALUES (0::bigint, 'fp32:0.600000'::text),
+             (1::bigint, 'fp32:0.800000'::text)$$,
+    'norm scales a vector to unit length');
+SELECT is(lsh('fp64(3)[0:-1 1:0 2:2]'::vector), 6::bigint,
+          'lsh sets bits for non-negative dense vector values');
+SELECT throws_ok(
+    $$SELECT lsh('fp64(3)[0:1 2:2]'::vector)$$,
+    'XX000',
+    'Vector must be dense.',
+    'lsh rejects sparse vectors');
+SELECT throws_ok(
+    $$SELECT lsh(vector('fp64'::type, 61))$$,
+    'XX000',
+    'Vector cannot be larger than 60.',
+    'lsh rejects vectors larger than its hash width');
+SELECT results_eq(
+    $$SELECT i, v::text FROM elements(vxv(
+        'int32(2)[0:2 1:3]'::vector,
+        'int32(2)[0:4 1:5]'::vector,
+        'plus_times_int32'::semiring)) ORDER BY i$$,
+    $$VALUES (0::bigint, 'int32:8'::text),
+             (1::bigint, 'int32:12'::text)$$,
+    'vxv multiplies vectors using the requested semiring');
 
 SELECT * FROM finish();
 

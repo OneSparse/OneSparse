@@ -4,7 +4,7 @@ CREATE EXTENSION IF NOT EXISTS onesparse;
 CREATE EXTENSION IF NOT EXISTS pgtap;
 SET LOCAL search_path = public, onesparse;
 
-SELECT plan(67);
+SELECT plan(79);
 
 -- Constructors, casts, lifecycle, floating-point behavior, and errors.
 
@@ -20,6 +20,32 @@ SELECT is((3.14::float4::scalar)::text, 'fp32:3.140000', 'construct an fp32 scal
 SELECT is(('uint32:42'::scalar)::text, 'uint32:42', 'construct an unsigned scalar');
 SELECT is((scalar_integer(42))::text, 'int32:42', 'construct with the explicit constructor');
 SELECT is((integer_scalar('int32:42'::scalar)), 42, 'extract with the explicit cast function');
+
+-- Every built-in scalar type has a canonical text I/O round trip.
+SELECT is(scalar_out(scalar_in(scalar_out('bool:t'::scalar)))::text, 'bool:t',
+          'scalar text I/O round-trips true');
+SELECT is(scalar_out(scalar_in(scalar_out('bool:f'::scalar)))::text, 'bool:f',
+          'scalar text I/O round-trips false');
+SELECT is(scalar_out(scalar_in(scalar_out('int8:-42'::scalar)))::text, 'int8:-42',
+          'scalar text I/O round-trips int8');
+SELECT is(scalar_out(scalar_in(scalar_out('uint8:200'::scalar)))::text, 'uint8:200',
+          'scalar text I/O round-trips uint8');
+SELECT is(scalar_out(scalar_in(scalar_out('int16:-42'::scalar)))::text, 'int16:-42',
+          'scalar text I/O round-trips int16');
+SELECT is(scalar_out(scalar_in(scalar_out('uint16:60000'::scalar)))::text, 'uint16:60000',
+          'scalar text I/O round-trips uint16');
+SELECT is(scalar_out(scalar_in(scalar_out('int32:-42'::scalar)))::text, 'int32:-42',
+          'scalar text I/O round-trips int32');
+SELECT is(scalar_out(scalar_in(scalar_out('uint32:4000000000'::scalar)))::text, 'uint32:4000000000',
+          'scalar text I/O round-trips uint32');
+SELECT is(scalar_out(scalar_in(scalar_out('int64:-42'::scalar)))::text, 'int64:-42',
+          'scalar text I/O round-trips int64');
+SELECT is(scalar_out(scalar_in(scalar_out('uint64:9223372036854775808'::scalar)))::text,
+          'uint64:9223372036854775808', 'scalar text I/O round-trips uint64');
+SELECT is(scalar_out(scalar_in(scalar_out('fp32:1.25'::scalar)))::text, 'fp32:1.250000',
+          'scalar text I/O round-trips fp32');
+SELECT is(scalar_out(scalar_in(scalar_out('fp64:-1.25'::scalar)))::text, 'fp64:-1.250000',
+          'scalar text I/O round-trips fp64');
 
 -- Empty scalars retain their type and do not count as having an element.
 SELECT is(('int32'::scalar)::text, 'int32', 'construct an empty scalar');

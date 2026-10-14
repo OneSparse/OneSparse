@@ -4,7 +4,7 @@ CREATE EXTENSION IF NOT EXISTS onesparse;
 CREATE EXTENSION IF NOT EXISTS pgtap;
 SET LOCAL search_path = public, onesparse;
 
-SELECT plan(13);
+SELECT plan(16);
 
 -- In-memory SuiteSparse serialization.
 SELECT ok(octet_length(serialize(
@@ -20,7 +20,10 @@ SELECT is(nrows(deserialize(serialize(
           'in-memory serialization preserves row count');
 SELECT is(ncols(deserialize(serialize(
     'int32(3:4)[0:1:10 1:2:20 2:3:30]'::matrix))), 4::bigint,
-          'in-memory serialization preserves column count');
+           'in-memory serialization preserves column count');
+SELECT ok(eq(deserialize(serialize('int32(2:3)'::matrix)),
+             'int32(2:3)'::matrix),
+          'in-memory serialization preserves an empty matrix');
 
 -- Filesystem round trip. The test container permits writes to /tmp.
 SELECT is(serialize_file(
@@ -68,6 +71,10 @@ SELECT throws_ok(
     $$SELECT load(999999999::oid)$$,
     '42704', 'large object 999999999 does not exist',
     'load rejects a missing large object');
+SELECT is(nrows(mmread('/home/postgres/test-work/demo/Matrix/cover.mtx')), 7::bigint,
+          'mmread loads a valid Matrix Market fixture');
+SELECT is(nvals(mmread('/home/postgres/test-work/demo/Matrix/cover.mtx')), 12::bigint,
+          'mmread preserves Matrix Market coordinate count');
 
 SELECT * FROM finish();
 

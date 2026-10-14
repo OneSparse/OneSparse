@@ -141,6 +141,26 @@ _parse_matrix(char *input_copy)
 					 matrix->matrix,
 					 "Error setting Matrix Element");
 		}
+		else if (typ == GrB_INT8)
+		{
+			int			num = (int) strtol(number_token, &endptr, 10);
+
+			if (errno != 0 || *endptr != '\0' || num < INT8_MIN || num > INT8_MAX)
+				elog(ERROR, "Invalid INT8 %s", number_token);
+			OS_CHECK(GrB_Matrix_setElement(matrix->matrix, num, row, col),
+					 matrix->matrix,
+					 "Error setting Matrix Element");
+		}
+		else if (typ == GrB_UINT8)
+		{
+			unsigned int num = (unsigned int) strtoul(number_token, &endptr, 10);
+
+			if (errno != 0 || *endptr != '\0' || num > UINT8_MAX)
+				elog(ERROR, "Invalid UINT8 %s", number_token);
+			OS_CHECK(GrB_Matrix_setElement(matrix->matrix, num, row, col),
+					 matrix->matrix,
+					 "Error setting Matrix Element");
+		}
 		else if (typ == GrB_FP64)
 		{
 			double		num = strtod(number_token, &endptr);

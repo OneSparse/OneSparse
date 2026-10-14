@@ -4,7 +4,46 @@ CREATE EXTENSION IF NOT EXISTS onesparse;
 CREATE EXTENSION IF NOT EXISTS pgtap;
 SET LOCAL search_path = public, onesparse;
 
-SELECT plan(26);
+SELECT plan(38);
+
+SELECT is(graph_out(graph('int32(2:2)[0:1:1 1:0:1]'::matrix, 'u'))::text,
+          'u:int32(2:2)[0:1:1 1:0:1]',
+          'graph output round-trips an undirected adjacency matrix');
+SELECT ok(graph_out('d:int32(2:2)[0:1:1]'::graph) IS NOT NULL,
+          'graph input accepts a directed adjacency literal');
+
+-- Invoke every algorithm through its public graph overload as well as the
+-- matrix convenience wrappers exercised below.
+SELECT is(size((bfs(graph(
+    'int32(3:3)[0:1:1 1:0:1 1:2:1 2:1:1]'::matrix), 2)).level), 3::bigint,
+    'bfs accepts a graph and a nonzero source vertex');
+SELECT is((get_element(sssp(graph(
+    'int32(3:3)[0:1:2 1:0:2 1:2:3 2:1:3]'::matrix), 0, 1::scalar), 2))::text,
+    'int32:5', 'sssp accepts a graph directly');
+SELECT is(size(pagerank(graph(
+    'int32(3:3)[0:1:1 1:2:1]'::matrix, 'd'), 0.85::float, 1e-6::float, 100)),
+    3::bigint, 'pagerank accepts a directed graph and explicit parameters');
+SELECT is(triangle_count(graph(
+    'int32(3:3)[0:1:1 0:2:1 1:0:1 1:2:1 2:0:1 2:1:1]'::matrix)),
+    1::bigint, 'triangle_count accepts a graph directly');
+SELECT is(size(triangle_centrality(graph(
+    'int32(3:3)[0:1:1 0:2:1 1:0:1 1:2:1 2:0:1 2:1:1]'::matrix))),
+    3::bigint, 'triangle_centrality accepts a graph directly');
+SELECT is(size(betweenness(graph(
+    'int32(3:3)[0:1:1 1:0:1 1:2:1 2:1:1]'::matrix), ARRAY[0]::bigint[])),
+    3::bigint, 'betweenness accepts a graph directly');
+SELECT is(size(connected_components(graph(
+    'int32(3:3)[0:1:1 1:0:1]'::matrix))), 3::bigint,
+    'connected_components accepts a graph directly');
+SELECT is(size(square_clustering(graph(
+    'int32(4:4)[0:1:1 0:3:1 1:0:1 1:2:1 2:1:1 2:3:1 3:0:1 3:2:1]'::matrix))),
+    4::bigint, 'square_clustering accepts a graph directly');
+SELECT is(ncols(fglt(graph(
+    'int32(3:3)[0:1:1 1:0:1 1:2:1 2:1:1]'::matrix))), 3::bigint,
+    'fglt accepts a graph directly');
+SELECT is(size((argminmax(graph(
+    'int32(2:2)[0:0:2 0:1:1 1:0:4 1:1:3]'::matrix), 1, false)).x_result),
+    2::bigint, 'argminmax accepts a graph directly');
 
 -- A four-vertex path makes BFS levels, parents, and weighted distances
 -- independently verifiable.

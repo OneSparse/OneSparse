@@ -138,6 +138,40 @@ _scalar_in(char *input)
 				elog(ERROR, "Invalid format for %s %s", fmt, str_val);
 		}
 	}
+	else if (typ == GrB_INT8)
+	{
+		int8_t		value;
+
+		fmt = "%hhi";
+		if (colon_pos != NULL)
+		{
+			if (sscanf(str_val, fmt, &value) == 1)
+			{
+				OS_CHECK(GrB_Scalar_setElement(scalar->scalar, value),
+						 scalar->scalar,
+						 "Cannot set scalar element in expand.");
+			}
+			else
+				elog(ERROR, "Invalid format for %s %s", fmt, str_val);
+		}
+	}
+	else if (typ == GrB_UINT8)
+	{
+		uint8_t		value;
+
+		fmt = "%hhu";
+		if (colon_pos != NULL)
+		{
+			if (sscanf(str_val, fmt, &value) == 1)
+			{
+				OS_CHECK(GrB_Scalar_setElement(scalar->scalar, value),
+						 scalar->scalar,
+						 "Cannot set scalar element in expand.");
+			}
+			else
+				elog(ERROR, "Invalid format for %s %s", fmt, str_val);
+		}
+	}
 	else if (typ == GrB_FP64)
 	{
 		double		value;
