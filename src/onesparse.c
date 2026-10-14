@@ -174,6 +174,10 @@ short_type(char *name)
 		return GrB_INT16;
 	if (strcmp(name, "uint16") == 0)
 		return GrB_UINT16;
+	if (strcmp(name, "int8") == 0)
+		return GrB_INT8;
+	if (strcmp(name, "uint8") == 0)
+		return GrB_UINT8;
 	if (strcmp(name, "fp64") == 0)
 		return GrB_FP64;
 	if (strcmp(name, "fp32") == 0)

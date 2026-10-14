@@ -4,7 +4,46 @@ CREATE EXTENSION IF NOT EXISTS onesparse;
 CREATE EXTENSION IF NOT EXISTS pgtap;
 SET LOCAL search_path = public, onesparse;
 
-SELECT plan(17);
+SELECT plan(38);
+
+SELECT is(graph_out(graph('int32(2:2)[0:1:1 1:0:1]'::matrix, 'u'))::text,
+          'u:int32(2:2)[0:1:1 1:0:1]',
+          'graph output round-trips an undirected adjacency matrix');
+SELECT ok(graph_out('d:int32(2:2)[0:1:1]'::graph) IS NOT NULL,
+          'graph input accepts a directed adjacency literal');
+
+-- Invoke every algorithm through its public graph overload as well as the
+-- matrix convenience wrappers exercised below.
+SELECT is(size((bfs(graph(
+    'int32(3:3)[0:1:1 1:0:1 1:2:1 2:1:1]'::matrix), 2)).level), 3::bigint,
+    'bfs accepts a graph and a nonzero source vertex');
+SELECT is((get_element(sssp(graph(
+    'int32(3:3)[0:1:2 1:0:2 1:2:3 2:1:3]'::matrix), 0, 1::scalar), 2))::text,
+    'int32:5', 'sssp accepts a graph directly');
+SELECT is(size(pagerank(graph(
+    'int32(3:3)[0:1:1 1:2:1]'::matrix, 'd'), 0.85::float, 1e-6::float, 100)),
+    3::bigint, 'pagerank accepts a directed graph and explicit parameters');
+SELECT is(triangle_count(graph(
+    'int32(3:3)[0:1:1 0:2:1 1:0:1 1:2:1 2:0:1 2:1:1]'::matrix)),
+    1::bigint, 'triangle_count accepts a graph directly');
+SELECT is(size(triangle_centrality(graph(
+    'int32(3:3)[0:1:1 0:2:1 1:0:1 1:2:1 2:0:1 2:1:1]'::matrix))),
+    3::bigint, 'triangle_centrality accepts a graph directly');
+SELECT is(size(betweenness(graph(
+    'int32(3:3)[0:1:1 1:0:1 1:2:1 2:1:1]'::matrix), ARRAY[0]::bigint[])),
+    3::bigint, 'betweenness accepts a graph directly');
+SELECT is(size(connected_components(graph(
+    'int32(3:3)[0:1:1 1:0:1]'::matrix))), 3::bigint,
+    'connected_components accepts a graph directly');
+SELECT is(size(square_clustering(graph(
+    'int32(4:4)[0:1:1 0:3:1 1:0:1 1:2:1 2:1:1 2:3:1 3:0:1 3:2:1]'::matrix))),
+    4::bigint, 'square_clustering accepts a graph directly');
+SELECT is(ncols(fglt(graph(
+    'int32(3:3)[0:1:1 1:0:1 1:2:1 2:1:1]'::matrix))), 3::bigint,
+    'fglt accepts a graph directly');
+SELECT is(size((argminmax(graph(
+    'int32(2:2)[0:0:2 0:1:1 1:0:4 1:1:3]'::matrix), 1, false)).x_result),
+    2::bigint, 'argminmax accepts a graph directly');
 
 -- A four-vertex path makes BFS levels, parents, and weighted distances
 -- independently verifiable.
@@ -100,9 +139,62 @@ SELECT ok((SELECT (v::float8) > 0 FROM elements(betweenness(
                ARRAY[0, 3]::bigint[])) WHERE i = 1),
     'betweenness identifies an interior path vertex');
 SELECT ok((SELECT (v::float8) > 0 FROM elements(betweenness(
-               'int32(4:4)[0:1:1 1:0:1 1:2:1 2:1:1 2:3:1 3:2:1]'::matrix,
-               ARRAY[0, 3]::bigint[])) WHERE i = 2),
+                'int32(4:4)[0:1:1 1:0:1 1:2:1 2:1:1 2:3:1 3:2:1]'::matrix,
+                ARRAY[0, 3]::bigint[])) WHERE i = 2),
     'betweenness identifies both interior path vertices');
+
+-- Argmin/argmax return both the selected values and their positions for each
+-- row or column, depending on the requested dimension.
+SELECT results_eq(
+    $$SELECT i, v::text FROM elements((argmin(
+        'int32(3:3)[0:0:8 0:1:3 1:0:4 1:2:6 2:1:9 2:2:2]'::matrix,
+        1)).x_result) ORDER BY i$$,
+    $$VALUES (0::bigint, 'int32:4'::text),
+             (1::bigint, 'int32:3'::text),
+             (2::bigint, 'int32:2'::text)$$,
+    'argmin returns each column minimum');
+SELECT results_eq(
+    $$SELECT i, v::text FROM elements((argmin(
+        'int32(3:3)[0:0:8 0:1:3 1:0:4 1:2:6 2:1:9 2:2:2]'::matrix,
+        1)).p_result) ORDER BY i$$,
+    $$VALUES (0::bigint, 'int64:1'::text),
+             (1::bigint, 'int64:0'::text),
+             (2::bigint, 'int64:2'::text)$$,
+    'argmin returns each column minimum position');
+SELECT results_eq(
+    $$SELECT i, v::text FROM elements((argmax(
+        'int32(3:3)[0:0:8 0:1:3 1:0:4 1:2:6 2:1:9 2:2:2]'::matrix,
+        1)).x_result) ORDER BY i$$,
+    $$VALUES (0::bigint, 'int32:8'::text),
+             (1::bigint, 'int32:9'::text),
+             (2::bigint, 'int32:6'::text)$$,
+    'argmax returns each column maximum');
+SELECT results_eq(
+    $$SELECT i, v::text FROM elements((argmax(
+        'int32(3:3)[0:0:8 0:1:3 1:0:4 1:2:6 2:1:9 2:2:2]'::matrix,
+        1)).p_result) ORDER BY i$$,
+    $$VALUES (0::bigint, 'int64:0'::text),
+             (1::bigint, 'int64:2'::text),
+             (2::bigint, 'int64:1'::text)$$,
+    'argmax returns each column maximum position');
+
+-- The graphlet transform preserves the graph dimensions and materializes a
+-- non-empty matrix for a graph containing an edge.
+SELECT is(nrows(fglt('int32(3:3)[0:1:1 1:0:1 1:2:1 2:1:1]'::matrix)),
+          16::bigint, 'fglt returns sixteen graphlet features');
+SELECT is(ncols(fglt('int32(3:3)[0:1:1 1:0:1 1:2:1 2:1:1]'::matrix)),
+          3::bigint, 'fglt returns features for every vertex');
+SELECT ok(nvals(fglt('int32(3:3)[0:1:1 1:0:1 1:2:1 2:1:1]'::matrix)) > 0,
+          'fglt produces graphlet features for graph edges');
+
+-- Square clustering produces one FP64 coefficient for every vertex. Sparse
+-- vectors omit the zero coefficients a path produces when it has no squares.
+SELECT is(nvals(square_clustering(
+    'int32(3:3)[0:1:1 1:0:1 1:2:1 2:1:1]'::matrix)), 0::bigint,
+    'square_clustering omits zero coefficients for a path without squares');
+SELECT is(size(square_clustering(
+    'int32(4:4)[0:1:1 0:3:1 1:0:1 1:2:1 2:1:1 2:3:1 3:0:1 3:2:1]'::matrix)),
+    4::bigint, 'square_clustering returns one coefficient per vertex');
 
 -- Invalid graph inputs have deliberate, stable error contracts.
 SELECT throws_ok(

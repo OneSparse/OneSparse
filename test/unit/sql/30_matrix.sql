@@ -4,11 +4,22 @@ CREATE EXTENSION IF NOT EXISTS onesparse;
 CREATE EXTENSION IF NOT EXISTS pgtap;
 SET LOCAL search_path = public, onesparse;
 
-SELECT plan(31);
+SELECT plan(64);
 
 -- Construction and sparse representation.
 SELECT is((type('int32'::matrix))::text, 'int32',
-          'an empty matrix retains its element type');
+           'an empty matrix retains its element type');
+SELECT is(nrows(matrix('int16'::type, 2, 3)), 2::bigint,
+          'matrix constructor creates the requested row count');
+SELECT is(ncols(matrix('int16'::type, 2, 3)), 3::bigint,
+          'matrix constructor creates the requested column count');
+SELECT is((type(matrix('int16'::type, 2, 3)))::text, 'int16',
+          'matrix constructor retains its requested type');
+SELECT is(nvals(matrix('int16'::type, 2, 3)), 0::bigint,
+          'matrix constructor creates an empty matrix');
+SELECT is(matrix_out('int32(3:4)[0:1:10 2:3:30]'::matrix)::text,
+          'int32(3:4)[0:1:10 2:3:30]',
+          'matrix output round-trips a sparse literal');
 SELECT is(nrows('int32(3:4)'::matrix), 3::bigint,
           'a bounded matrix reports its row count');
 SELECT is(ncols('int32(3:4)'::matrix), 4::bigint,
@@ -22,7 +33,33 @@ SELECT results_eq(
              (2::bigint, 3::bigint, 'int32:30'::text)$$,
     'elements returns sorted sparse coordinates');
 SELECT is((type('int32(3:4)[0:1:10 2:3:30]'::matrix))::text, 'int32',
-          'a sparse literal reports its element type');
+           'a sparse literal reports its element type');
+
+-- Every built-in matrix type has a canonical text I/O round trip.
+SELECT is(matrix_out(matrix_in(matrix_out('bool(2:3)[1:2:t]'::matrix)))::text,
+          'bool(2:3)[1:2:t]', 'matrix text I/O round-trips true');
+SELECT is(matrix_out(matrix_in(matrix_out('bool(2:3)[1:2:f]'::matrix)))::text,
+          'bool(2:3)[1:2:f]', 'matrix text I/O round-trips false');
+SELECT is(matrix_out(matrix_in(matrix_out('int8(2:3)[1:2:-42]'::matrix)))::text,
+          'int8(2:3)[1:2:-42]', 'matrix text I/O round-trips int8');
+SELECT is(matrix_out(matrix_in(matrix_out('uint8(2:3)[1:2:200]'::matrix)))::text,
+          'uint8(2:3)[1:2:200]', 'matrix text I/O round-trips uint8');
+SELECT is(matrix_out(matrix_in(matrix_out('int16(2:3)[1:2:-42]'::matrix)))::text,
+          'int16(2:3)[1:2:-42]', 'matrix text I/O round-trips int16');
+SELECT is(matrix_out(matrix_in(matrix_out('uint16(2:3)[1:2:60000]'::matrix)))::text,
+          'uint16(2:3)[1:2:60000]', 'matrix text I/O round-trips uint16');
+SELECT is(matrix_out(matrix_in(matrix_out('int32(2:3)[1:2:-42]'::matrix)))::text,
+          'int32(2:3)[1:2:-42]', 'matrix text I/O round-trips int32');
+SELECT is(matrix_out(matrix_in(matrix_out('int64(2:3)[1:2:-42]'::matrix)))::text,
+          'int64(2:3)[1:2:-42]', 'matrix text I/O round-trips int64');
+SELECT is(matrix_out(matrix_in(matrix_out('uint64(2:3)[1:2:9223372036854775808]'::matrix)))::text,
+          'uint64(2:3)[1:2:9223372036854775808]', 'matrix text I/O round-trips uint64');
+SELECT is(matrix_out(matrix_in(matrix_out('uint32(2:3)[1:2:4000000000]'::matrix)))::text,
+          'uint32(2:3)[1:2:4000000000]', 'matrix text I/O round-trips uint32');
+SELECT is(matrix_out(matrix_in(matrix_out('fp32(2:3)[1:2:1.25]'::matrix)))::text,
+          'fp32(2:3)[1:2:1.250000]', 'matrix text I/O round-trips fp32');
+SELECT is(matrix_out(matrix_in(matrix_out('fp64(2:3)[1:2:-1.25]'::matrix)))::text,
+          'fp64(2:3)[1:2:-1.250000]', 'matrix text I/O round-trips fp64');
 
 -- Element access and lifecycle.
 SELECT is((get_element('int32(3:4)[0:1:10 2:3:30]'::matrix, 2, 3))::text,
@@ -160,6 +197,50 @@ SELECT results_eq(
     $$VALUES (0::bigint, 0::bigint, 'fp64:1.000000'::text),
              (2::bigint, 2::bigint, 'fp64:3.000000'::text)$$,
     'cast_to preserves sparse coordinates and converts values');
+-- Exercise every remaining built-in GraphBLAS target type.
+SELECT is((type(cast_to('int32(2:2)[0:0:1]'::matrix, 'bool'::type)))::text, 'bool',
+          'cast_to supports boolean matrices');
+SELECT is((type(cast_to('int32(2:2)[0:0:1]'::matrix, 'int8'::type)))::text, 'int8',
+          'cast_to supports int8 matrices');
+SELECT is((type(cast_to('int32(2:2)[0:0:1]'::matrix, 'int16'::type)))::text, 'int16',
+          'cast_to supports int16 matrices');
+SELECT is((type(cast_to('int32(2:2)[0:0:1]'::matrix, 'int32'::type)))::text, 'int32',
+          'cast_to supports int32 matrices');
+SELECT is((type(cast_to('int32(2:2)[0:0:1]'::matrix, 'int64'::type)))::text, 'int64',
+          'cast_to supports int64 matrices');
+SELECT is((type(cast_to('int32(2:2)[0:0:1]'::matrix, 'uint8'::type)))::text, 'uint8',
+          'cast_to supports uint8 matrices');
+SELECT is((type(cast_to('int32(2:2)[0:0:1]'::matrix, 'uint16'::type)))::text, 'uint16',
+          'cast_to supports uint16 matrices');
+SELECT is((type(cast_to('int32(2:2)[0:0:1]'::matrix, 'uint32'::type)))::text, 'uint32',
+          'cast_to supports uint32 matrices');
+SELECT is((type(cast_to('int32(2:2)[0:0:1]'::matrix, 'uint64'::type)))::text, 'uint64',
+          'cast_to supports uint64 matrices');
+SELECT is((type(cast_to('int32(2:2)[0:0:1]'::matrix, 'fp32'::type)))::text, 'fp32',
+          'cast_to supports fp32 matrices');
+
+-- Diagonal construction preserves the vector's sparse representation.
+SELECT is(nrows(diag('int32(4)[0:10 2:30]'::vector)), 4::bigint,
+          'diag creates a matrix with one row per vector position');
+SELECT is(ncols(diag('int32(4)[0:10 2:30]'::vector)), 4::bigint,
+          'diag creates a matrix with one column per vector position');
+SELECT is((type(diag('int32(4)[0:10 2:30]'::vector)))::text, 'int32',
+          'diag preserves the vector element type');
+SELECT results_eq(
+    $$SELECT i, j, v::text FROM elements(diag(
+        'int32(4)[0:10 2:30]'::vector)) ORDER BY i, j$$,
+    $$VALUES (0::bigint, 0::bigint, 'int32:10'::text),
+             (2::bigint, 2::bigint, 'int32:30'::text)$$,
+    'diag stores vector values only at matching row and column coordinates');
+SELECT is(nvals(diag('int32(3)'::vector)), 0::bigint,
+           'diag preserves an empty vector as an empty matrix');
+SELECT results_eq(
+    $$SELECT i, j, v::text FROM elements(norm(
+        'fp32(2:2)[0:0:3 0:1:4 1:0:5]'::matrix)) ORDER BY i, j$$,
+    $$VALUES (0::bigint, 0::bigint, 'fp32:0.600000'::text),
+             (0::bigint, 1::bigint, 'fp32:0.800000'::text),
+             (1::bigint, 0::bigint, 'fp32:1.000000'::text)$$,
+    'norm scales each matrix row to unit length');
 
 SELECT * FROM finish();
 

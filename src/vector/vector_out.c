@@ -59,7 +59,7 @@ vector_out(PG_FUNCTION_ARGS)
 				{
 					uint64_t	vu64 = GxB_Iterator_get_UINT64(iterator);
 
-					appendStringInfo(&buf, "%lu:%ld", i, vu64);
+					appendStringInfo(&buf, "%lu:%lu", i, vu64);
 					break;
 				}
 			case GrB_INT32_CODE:
@@ -73,7 +73,7 @@ vector_out(PG_FUNCTION_ARGS)
 				{
 					uint32_t	vu32 = GxB_Iterator_get_UINT32(iterator);
 
-					appendStringInfo(&buf, "%lu:%d", i, vu32);
+					appendStringInfo(&buf, "%lu:%u", i, vu32);
 					break;
 				}
 			case GrB_INT16_CODE:
@@ -87,7 +87,21 @@ vector_out(PG_FUNCTION_ARGS)
 				{
 					uint16_t	vu16 = GxB_Iterator_get_UINT16(iterator);
 
-					appendStringInfo(&buf, "%lu:%d", i, vu16);
+					appendStringInfo(&buf, "%lu:%u", i, vu16);
+					break;
+				}
+			case GrB_INT8_CODE:
+				{
+					int8_t		vi8 = GxB_Iterator_get_INT8(iterator);
+
+					appendStringInfo(&buf, "%lu:%hhd", i, vi8);
+					break;
+				}
+			case GrB_UINT8_CODE:
+				{
+					uint8_t		vu8 = GxB_Iterator_get_UINT8(iterator);
+
+					appendStringInfo(&buf, "%lu:%hhu", i, vu8);
 					break;
 				}
 			case GrB_FP64_CODE:

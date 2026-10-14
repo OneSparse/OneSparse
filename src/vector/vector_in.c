@@ -136,7 +136,7 @@ vector_in(PG_FUNCTION_ARGS)
 		{
 			unsigned long num = strtoul(number_token, &endptr, 10);
 
-			if (num < INT8_MIN || num > INT8_MAX)
+			if (num > UINT8_MAX)
 				elog(ERROR, "Invalid UINT8 range %s", number_token);
 			if (errno != 0 || *endptr != '\0')
 				elog(ERROR, "Invalid UINT8 %s", number_token);

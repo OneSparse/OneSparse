@@ -82,6 +82,8 @@ new_binaryop(
 	}
 	else
 	{
+		char	   *builtin_name;
+
 		OS_CHECK(GrB_get(binop,
 						 &len,
 						 GrB_NAME),
@@ -94,6 +96,17 @@ new_binaryop(
 						 GrB_NAME),
 				 binop,
 				 "Error extracting binop name.");
+
+		/* Built-in GraphBLAS names use a GrB_/GxB_ prefix; SQL names do not. */
+		if (strncmp(name, "GrB_", 4) == 0 || strncmp(name, "GxB_", 4) == 0)
+		{
+			builtin_name = palloc(len - 3);
+
+			for (size_t i = 4; i < len; i++)
+				builtin_name[i - 4] = tolower(name[i]);
+			builtin_name[len - 4] = '\0';
+			name = builtin_name;
+		}
 	}
 
 	objcxt = AllocSetContextCreate(parentcontext,
