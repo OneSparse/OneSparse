@@ -4,7 +4,7 @@ CREATE EXTENSION IF NOT EXISTS onesparse;
 CREATE EXTENSION IF NOT EXISTS pgtap;
 SET LOCAL search_path = public, onesparse;
 
-SELECT plan(16);
+SELECT plan(19);
 
 -- Explicit seeds make generated sparse objects reproducible.
 SELECT ok(eq(random_matrix('int32', 3, 5, 0.5, 42),
@@ -23,14 +23,20 @@ SELECT ok(nvals(random_matrix('int32', 3, 5, 1, 42)) > 0
            'random_matrix bounds generated entries by its shape');
 SELECT throws_ok(
     $$SELECT random_matrix('int32', 3, 5, -0.1, 42)$$,
-    'XX000',
-    '-3: LAGraph failure (file /home/postgres/LAGraph-1.2.2/experimental/utility/LAGraph_Random_Matrix.c, line 106): invalid density',
+    'XX000', NULL,
     'random_matrix rejects a negative density');
+SELECT throws_like(
+    $$SELECT random_matrix('int32', 3, 5, -0.1, 42)$$,
+    '-3: LAGraph failure (file %, line %): invalid density',
+    'random_matrix reports a negative density with the library diagnostic');
 SELECT throws_ok(
     $$SELECT random_matrix('int32', -2, 5, 0.5, 42)$$,
-    'XX000',
-    '-3: GraphBLAS failure (file /home/postgres/LAGraph-1.2.2/experimental/utility/LAGraph_Random_Matrix.c, line 115): info: -3',
+    'XX000', NULL,
     'random_matrix rejects an invalid row count');
+SELECT throws_like(
+    $$SELECT random_matrix('int32', -2, 5, 0.5, 42)$$,
+    '-3: GraphBLAS failure (file %, line %): info: -3',
+    'random_matrix reports an invalid row count with the library diagnostic');
 
 SELECT ok(eq(random_vector('int32', 7, 0.5, 42),
              random_vector('int32', 7, 0.5, 42)),
@@ -49,9 +55,12 @@ SELECT ok(nvals(random_vector('int32', 7, 1, 42)) > 0
           'random_vector accepts full density');
 SELECT throws_ok(
     $$SELECT random_vector('int32', 7, -0.1, 42)$$,
-    'XX000',
-    '-3: LAGraph failure (file /home/postgres/LAGraph-1.2.2/experimental/utility/LAGraph_Random_Matrix.c, line 106): invalid density',
+    'XX000', NULL,
     'random_vector rejects a negative density');
+SELECT throws_like(
+    $$SELECT random_vector('int32', 7, -0.1, 42)$$,
+    '-3: LAGraph failure (file %, line %): invalid density',
+    'random_vector reports a negative density with the library diagnostic');
 SELECT throws_ok(
     $$SELECT random_vector('int32', -2, 0.5, 42)$$,
     'XX000',
