@@ -6,8 +6,15 @@ DATA = $(wildcard onesparse/*--*.sql)
 PGXS := $(shell $(PG_CONFIG) --pgxs)
 MODULE_big = onesparse
 OBJS = $(patsubst %.c,%.o,$(shell find src -name '*.c'))
+PKG_CONFIG ?= pkg-config
+PG_CPPFLAGS = -Wfatal-errors -std=c11
+ifeq ($(shell $(PKG_CONFIG) --exists GraphBLAS LAGraph 2>/dev/null && echo yes),yes)
+PG_CPPFLAGS += $(shell $(PKG_CONFIG) --cflags GraphBLAS LAGraph)
+SHLIB_LINK = -llagraphx $(shell $(PKG_CONFIG) --libs LAGraph GraphBLAS) -lpq
+else
+PG_CPPFLAGS += -I/usr/local/include/suitesparse/
 SHLIB_LINK = -lc -lgraphblas -llagraph -llagraphx -lpq
-PG_CPPFLAGS = -Wfatal-errors -std=c11 -I/usr/local/include/suitesparse/
+endif
 
 ifeq ($(COVERAGE),1)
 PG_CPPFLAGS += --coverage
